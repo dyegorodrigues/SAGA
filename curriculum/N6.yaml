@@ -1,0 +1,51 @@
+strand: "N6"
+name: "Decimais, Porcentagem e Proporção"
+color: "azul-petróleo"
+nodes:
+  N6.01:
+    title: "Décimos e centésimos (fração ↔ decimal)"
+    objective: ""
+    prereqs:
+      - "N5.02"
+      - "N2.04"
+    kinds:
+      - "frac-shade (quadrado 10×10)"
+      - "numberline"
+      - "build-number"
+      - "money."
+    micros:
+  N6.02:
+    title: "Operações com decimais"
+    objective: ""
+    prereqs:
+      - "N6.01"
+      - "N3.11"
+      - "N3.12"
+    kinds:
+      - "vertical (com vírgula alinhada)"
+      - "money"
+      - "math."
+    micros:
+  N6.03:
+    title: "Porcentagem"
+    objective: ""
+    prereqs:
+      - "N6.01"
+      - "N5.03"
+    kinds:
+      - "frac-shade (quadrado 100)"
+      - "plain"
+      - "money"
+      - "story."
+    micros:
+  N6.04:
+    title: "Razão e proporcionalidade"
+    objective: ""
+    prereqs:
+      - "N6.03"
+      - "N4.06"
+    kinds:
+      - "ratio-table (tabela de proporção — PRIORIDADE 3)"
+      - "plain"
+      - "story."
+    micros:

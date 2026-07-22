@@ -1,0 +1,159 @@
+strand: "N1"
+name: "Senso Numérico e Contagem"
+color: "roxo"
+nodes:
+  N1.01:
+    title: "Correspondência um a um"
+    objective: "parear cada objeto com exatamente um toque/um par, sem pular nem repetir."
+    prereqs:
+    kinds:
+      - "count (com trava de objeto já tocado)"
+      - "plain"
+      - "drag-match."
+    micros:
+      - "a) parear objetos iguais 1↔1 (n ∈ [2,4]; ex.: dar um osso a cada cachorro)"
+      - "b) tocar uma vez em cada objeto com contador visual (n ∈ [2,5], alinhados)"
+      - "c) parear conjuntos diferentes e dizer se sobrou (n ∈ [3,6]) — ponte para N1.05"
+  N1.02:
+    title: "Sequência oral de contagem (Canto Numérico)"
+    objective: "recitar a ordem dos números de memória, sem objetos."
+    prereqs:
+    kinds:
+      - "order (com áudio)"
+      - "plain"
+      - "canto com música."
+    micros:
+      - "a) recitar até 5 (completar \"um, dois, __\")"
+      - "b) recitar até 10"
+      - "c) recitar até 20 (atenção aos irregulares do PT: onze–quinze)"
+      - "d) continuar de um ponto qualquer (\"...sete, oito, __?\") — pré-req direto de N3.03"
+      - "e) recitar de trás para frente de 10 até 0 — pré-req de N3.04"
+  N1.03:
+    title: "Subitização perceptual (Olhômetro)"
+    objective: "reconhecer 1–5 num relance, sem contar."
+    prereqs:
+    kinds:
+      - "flash (existente)"
+      - "tenframe."
+    micros:
+      - "a) flash de 1–3 (arranjos de dado)"
+      - "b) flash de 1–4 (arranjos variados)"
+      - "c) flash de 1–5 (inclui padrão de dedos da mão)"
+  N1.04:
+    title: "Contagem de objetos com cardinalidade"
+    objective: "contar objetos um a um e responder \"quantos são?\" entendendo que o último número dito é o total."
+    prereqs:
+      - "N1.01"
+      - "N1.02"
+    kinds:
+      - "count (dedo-guia 👉 — padrão-ouro)"
+      - "plain."
+    micros:
+      - "a) contar até 3 tocando (alinhados)"
+      - "b) contar até 5 (alinhados)"
+      - "c) cardinalidade: após contar, \"quantos são?\" sem recontar (n ∈ [2,6]) — se recontar do zero, ainda não há cardinalidade"
+      - "d) produzir conjunto: \"me dá N\" (arrastar N itens para a cesta; n ∈ [2,5])"
+      - "e) contar até 10 em arranjos variados (círculo, espalhado — exige marcar por onde começou)"
+  N1.05:
+    title: "Comparação de quantidades"
+    objective: "dizer qual grupo tem mais/menos ou se têm a mesma quantidade — mesmo quando a aparência engana."
+    prereqs:
+      - "N1.04"
+    kinds:
+      - "plain (2 grupos)"
+      - "conserv (existente)"
+      - "groups."
+    micros:
+      - "a) mais/menos com diferença gritante (3 vs 8), grupos organizados"
+      - "b) mais/menos com diferença de 1–2 (obriga a contar ou parear)"
+      - "c) **conservação**: fila espalhada vs compacta com a MESMA quantidade (\"espalhou, mas continua 5\") — o clássico de Piaget; o kind conserv anima o espalhamento"
+      - "d) \"mesma quantidade\" como resposta válida (igualdade)"
+  N1.06:
+    title: "Numerais 0–10 (símbolo ↔ quantidade ↔ nome)"
+    objective: "reconhecer o desenho \"7\", saber que se chama \"sete\" e ligar às 7 coisas."
+    prereqs:
+      - "N1.02"
+      - "N1.04"
+    kinds:
+      - "plain"
+      - "drag-match"
+      - "trace (traçado — o antigo C000C)."
+    micros:
+      - "a) ouvir \"três\" → tocar no numeral 3 (entre 3 opções; numerais 1–5)"
+      - "b) numerais 1–9 (4 opções)"
+      - "c) traçado do numeral com o dedo (guia animado; começa em 1–5) — motricidade + memória do símbolo"
+      - "d) ligar numeral ↔ quantidade (ver 6 maçãs → tocar \"6\"; e o inverso)"
+      - "e) o zero como \"nenhum\" (caixa vazia → 0)"
+  N1.07:
+    title: "Ordem, sucessor e antecessor até 10"
+    objective: "saber o que vem depois/antes e ordenar numerais."
+    prereqs:
+      - "N1.02"
+      - "N1.06"
+    kinds:
+      - "plain"
+      - "order (existente)"
+      - "numberline."
+    micros:
+      - "a) sucessor até 5 · b) sucessor até 10 · c) antecessor até 5 · d) antecessor até 10 (mais difícil — exige a recitação reversa N1.02e)"
+      - "e) ordenar 3–4 cartas numéricas (crescente)"
+  N1.08:
+    title: "Subitização conceitual (Caixa Mágica / moldura de 10)"
+    objective: "enxergar quantidades como estrutura (5+n na moldura), sem contar de um em um."
+    prereqs:
+      - "N1.03"
+      - "N1.04"
+    kinds:
+      - "tenframe (existente)."
+    micros:
+      - "a) \"quantos você vê?\" na moldura, 1–5 (fileira de cima)"
+      - "b) 5–10 (\"fileira cheia é 5, mais os de baixo\")"
+      - "c) \"quantos faltam para 10?\" (contar os vazios — a semente dos amigos do 10, N1.11)"
+  N1.09:
+    title: "Contagem até 20 e a partir de qualquer número"
+    objective: "estender a contagem além do 10 e continuar de onde parou."
+    prereqs:
+      - "N1.04"
+      - "N1.02"
+    kinds:
+      - "count"
+      - "plain"
+      - "order."
+    micros:
+      - "a) contar objetos 10–15 · b) 10–20 · c) \"continue: 8, 9, __, __\" · d) contagem regressiva 10→0 (foguete 🚀)"
+  N1.10:
+    title: "Parte-todo (Amigos dos Números / number bonds)"
+    objective: "ver um número como composto de partes: 5 é 2 e 3, é 4 e 1."
+    prereqs:
+      - "N1.04"
+      - "N1.08"
+    kinds:
+      - "bond (existente)"
+      - "tenframe"
+      - "part-whole."
+    micros:
+      - "a) decompor 5 com objetos (todas as duplas)"
+      - "b) decompor até 7 · c) decompor até 10"
+      - "d) parte oculta: \"7 no total, 4 na mão aberta — quantos escondi?\" (subtração disfarçada)"
+  N1.11:
+    title: "Amigos do 10"
+    objective: "automatizar os pares que somam 10 (1+9, 2+8, …) — a base do cálculo mental para a vida toda."
+    prereqs:
+      - "N1.08"
+      - "N1.10"
+    kinds:
+      - "bond"
+      - "tenframe"
+      - "rapid-fire (nível 5)."
+    micros:
+  N1.12:
+    title: "Reta numérica até 20"
+    objective: "usar a reta como modelo mental: números têm posição, distância e vizinhança."
+    prereqs:
+      - "N1.07"
+      - "N1.09"
+    kinds:
+      - "numberline (PRIORIDADE 1 de kind novo — hoje a \"reta\" é texto)"
+      - "order"
+      - "plain."
+    micros:

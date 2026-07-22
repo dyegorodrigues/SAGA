@@ -1,0 +1,49 @@
+strand: "PE"
+name: "Probabilidade e Estatística"
+color: "índigo"
+nodes:
+  PE.01:
+    title: "Pictogramas e tabelas simples"
+    objective: "ler e comparar dados em pictogramas, tabelas de marquinhas e blocos."
+    prereqs:
+      - "N1.04"
+      - "N1.05"
+    kinds:
+      - "picto (existente)."
+    micros:
+  PE.02:
+    title: "Gráficos de barras; possível e provável"
+    objective: "ler/construir barras e conversar sobre acaso (impossível, possível, certo)."
+    prereqs:
+      - "PE.01"
+      - "N2.02"
+    kinds:
+      - "picto"
+      - "bar-build (arrastar a barra até o valor)"
+      - "plain"
+      - "story."
+    micros:
+  PE.03:
+    title: "Média e probabilidade como fração"
+    objective: ""
+    prereqs:
+      - "PE.02"
+      - "N4.10"
+      - "N5.02"
+    kinds:
+      - "bar-build (nivelar as barras = média visual)"
+      - "plain"
+      - "story."
+    micros:
+  PE.04:
+    title: "Estatística e probabilidade com contagem"
+    objective: ""
+    prereqs:
+      - "PE.03"
+      - "N6.03"
+    kinds:
+      - "bar-build"
+      - "plain"
+      - "story"
+      - "picto."
+    micros:

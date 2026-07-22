@@ -1,0 +1,98 @@
+strand: "GM"
+name: "Grandezas e Medidas"
+color: "esmeralda"
+nodes:
+  GM.01:
+    title: "Comparação direta de grandezas"
+    objective: "comprido/curto, alto/baixo, pesado/leve, cheio/vazio, grande/pequeno — comparando dois objetos lado a lado."
+    prereqs:
+    kinds:
+      - "plain"
+      - "scene"
+      - "balance (balança visual para peso)."
+    micros:
+  GM.02:
+    title: "Tempo cotidiano"
+    objective: "partes do dia, ontem/hoje/amanhã, dias da semana, ordem de eventos."
+    prereqs:
+    kinds:
+      - "daypart (existente)"
+      - "order"
+      - "story"
+      - "plain (calendário — existente)."
+    micros:
+  GM.03:
+    title: "Sistema monetário (Real)"
+    objective: "reconhecer moedas/cédulas, juntar valores, dar troco simples."
+    prereqs:
+      - "N2.01"
+      - "N3.09"
+    kinds:
+      - "money (existente)."
+    micros:
+  GM.04:
+    title: "Horas (relógio de ponteiros e digital)"
+    objective: "horas exatas e meia hora nos dois relógios."
+    prereqs:
+      - "N1.06"
+      - "GM.06"
+    kinds:
+      - "clock (existente)"
+      - "clock-set (arrastar ponteiro). Nota: ler minutos exige contagem de 5 em 5 — por isso fica para GM.06."
+    micros:
+  GM.05:
+    title: "Medidas padronizadas (cm/m, g/kg, mL/L)"
+    objective: "medir com régua virtual e escolher a unidade sensata."
+    prereqs:
+      - "GM.01"
+      - "N2.02"
+    kinds:
+      - "measure (régua arrastável — PRIORIDADE 3)"
+      - "plain"
+      - "story."
+    micros:
+  GM.06:
+    title: "Horas e minutos; duração"
+    objective: "ler qualquer horário (de 5 em 5 min) e calcular quanto tempo passou."
+    prereqs:
+      - "GM.04"
+      - "AL.03"
+    kinds:
+      - "clock"
+      - "clock-set"
+      - "numberline (linha do tempo)."
+    micros:
+  GM.07:
+    title: "Perímetro"
+    objective: "o contorno: somar os lados."
+    prereqs:
+      - "GM.05"
+      - "N3.11"
+    kinds:
+      - "grid"
+      - "measure"
+      - "plain."
+    micros:
+  GM.08:
+    title: "Área"
+    objective: ""
+    prereqs:
+      - "GM.07"
+      - "N4.02"
+    kinds:
+      - "grid"
+      - "array"
+      - "plain."
+    micros:
+  GM.09:
+    title: "Conversões e problemas de medida"
+    objective: ""
+    prereqs:
+      - "GM.05"
+      - "N4.08"
+      - "N6.01"
+    kinds:
+      - "measure"
+      - "plain"
+      - "story."
+    micros:

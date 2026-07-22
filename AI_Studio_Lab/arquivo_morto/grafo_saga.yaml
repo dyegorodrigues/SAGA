@@ -1,0 +1,255 @@
+# Grafo de Conhecimento Executável (SAGA)
+
+nodes:
+  - id: "N1.01"
+    name: "Correspondência um a um"
+    prereqs: []
+  - id: "N1.02"
+    name: "Sequência oral de contagem (Canto Numérico)"
+    prereqs: []
+  - id: "N1.03"
+    name: "Subitização perceptual (Olhômetro)"
+    prereqs: []
+  - id: "N1.04"
+    name: "Contagem de objetos com cardinalidade"
+    prereqs: ["N1.01", "N1.02"]
+  - id: "N1.05"
+    name: "Comparação de quantidades"
+    prereqs: ["N1.04"]
+  - id: "N1.06"
+    name: "Numerais 0–10 (símbolo ↔ quantidade ↔ nome)"
+    prereqs: ["N1.02", "N1.04"]
+  - id: "N1.07"
+    name: "Ordem, sucessor e antecessor até 10"
+    prereqs: ["N1.02", "N1.06"]
+  - id: "N1.08"
+    name: "Subitização conceitual (Caixa Mágica / moldura de 10)"
+    prereqs: ["N1.03", "N1.04"]
+  - id: "N1.09"
+    name: "Contagem até 20 e a partir de qualquer número"
+    prereqs: ["N1.04", "N1.02"]
+  - id: "AL.01"
+    name: "Classificação e o intruso"
+    prereqs: []
+  - id: "AL.02"
+    name: "Padrões de repetição"
+    prereqs: ["AL.01"]
+  - id: "GE.01"
+    name: "Posição e localização espacial"
+    prereqs: []
+  - id: "GE.02"
+    name: "Formas planas básicas"
+    prereqs: ["AL.01"]
+  - id: "GM.01"
+    name: "Comparação direta de grandezas"
+    prereqs: []
+  - id: "GM.02"
+    name: "Tempo cotidiano"
+    prereqs: []
+  - id: "N1.10"
+    name: "Parte-todo (Amigos dos Números / number bonds)"
+    prereqs: ["N1.04", "N1.08"]
+  - id: "N1.11"
+    name: "Amigos do 10"
+    prereqs: ["N1.08", "N1.10"]
+  - id: "N1.12"
+    name: "Reta numérica até 20"
+    prereqs: ["N1.07", "N1.09"]
+  - id: "N2.01"
+    name: "Dezena e unidades"
+    prereqs: ["N1.09", "N1.11"]
+  - id: "N2.02"
+    name: "Números até 100"
+    prereqs: ["N2.01"]
+  - id: "N2.03"
+    name: "Comparação simbólica (>, <, =)"
+    prereqs: ["N2.02", "N1.05"]
+  - id: "N3.01"
+    name: "Adição concreta: juntar e acrescentar (até 10)"
+    prereqs: ["N1.04", "N1.10"]
+  - id: "N3.02"
+    name: "Subtração concreta: tirar (até 10)"
+    prereqs: ["N3.01"]
+  - id: "N3.03"
+    name: "Contar a partir do maior (counting on)"
+    prereqs: ["N3.01", "N1.09", "N2.03"]
+  - id: "N3.04"
+    name: "Subtração: contar para trás e completar"
+    prereqs: ["N3.02", "N1.02", "N1.12"]
+  - id: "N3.05"
+    name: "Família de fatos (relação + ↔ −)"
+    prereqs: ["N1.10", "N3.03", "N3.04"]
+  - id: "N3.06"
+    name: "Dobros e quase-dobros"
+    prereqs: ["N3.03"]
+  - id: "N3.07"
+    name: "Fazer 10 (adição atravessando a dezena)"
+    prereqs: ["N1.11", "N1.10", "N2.01"]
+  - id: "N3.08"
+    name: "Voltar pelo 10 (subtração atravessando a dezena)"
+    prereqs: ["N3.07", "N3.04"]
+  - id: "N3.09"
+    name: "Somar e subtrair até 100 (sem reagrupamento)"
+    prereqs: ["N2.01", "N3.07"]
+  - id: "N3.10"
+    name: "Problemas aditivos (as 4 situações)"
+    prereqs: ["N3.03", "N3.04"]
+  - id: "AL.03"
+    name: "Contagem por saltos (2, 5, 10)"
+    prereqs: ["N1.09", "N2.01"]
+  - id: "GM.03"
+    name: "Sistema monetário (Real)"
+    prereqs: ["N2.01", "N3.09"]
+  - id: "GM.04"
+    name: "Horas (relógio de ponteiros e digital)"
+    prereqs: ["N1.06"]
+  - id: "PE.01"
+    name: "Pictogramas e tabelas simples"
+    prereqs: ["N1.04", "N1.05"]
+  - id: "N2.04"
+    name: "Centena e números até 1000"
+    prereqs: ["N2.02", "N2.01"]
+  - id: "N3.11"
+    name: "Adição com reagrupamento"
+    prereqs: ["N2.01", "N3.07", "N3.09"]
+  - id: "N3.12"
+    name: "Subtração com reagrupamento"
+    prereqs: ["N3.11", "N3.08"]
+  - id: "N3.13"
+    name: "Cálculo mental e estimativa aditiva"
+    prereqs: ["N3.11", "N3.12"]
+  - id: "N4.01"
+    name: "Multiplicação: grupos iguais"
+    prereqs: ["N3.03", "AL.03"]
+  - id: "N4.02"
+    name: "Arranjos retangulares e comutatividade"
+    prereqs: ["N4.01"]
+  - id: "N4.03"
+    name: "Tabuadas do 2, 5 e 10"
+    prereqs: ["N4.01", "AL.03"]
+  - id: "N4.04"
+    name: "Tabuadas do 3 e do 4"
+    prereqs: ["N4.03"]
+  - id: "N4.05"
+    name: "Divisão: repartir e medir"
+    prereqs: ["N4.01", "N3.02"]
+  - id: "N4.06"
+    name: "Relação × ↔ ÷ e famílias multiplicativas"
+    prereqs: ["N4.03", "N4.05"]
+  - id: "N4.07"
+    name: "Tabuadas do 6 ao 9"
+    prereqs: ["N4.04", "N4.06"]
+  - id: "N5.01"
+    name: "Metade, terço e quarto"
+    prereqs: ["N4.05"]
+  - id: "AL.04"
+    name: "Sequências e regra de formação"
+    prereqs: ["AL.03", "N3.09"]
+  - id: "AL.05"
+    name: "Igualdade como equilíbrio"
+    prereqs: ["N2.03", "N3.05"]
+  - id: "GE.03"
+    name: "Atributos de figuras e simetria"
+    prereqs: ["GE.02"]
+  - id: "GE.04"
+    name: "Sólidos geométricos"
+    prereqs: ["GE.02"]
+  - id: "GE.05"
+    name: "Localização em malhas e mapas"
+    prereqs: ["GE.01"]
+  - id: "GM.05"
+    name: "Medidas padronizadas (cm/m, g/kg, mL/L)"
+    prereqs: ["GM.01", "N2.02"]
+  - id: "GM.06"
+    name: "Horas e minutos; duração"
+    prereqs: ["GM.04", "AL.03"]
+  - id: "GM.07"
+    name: "Perímetro"
+    prereqs: ["GM.05", "N3.11"]
+  - id: "PE.02"
+    name: "Gráficos de barras; possível e provável"
+    prereqs: ["PE.01", "N2.02"]
+  - id: "N2.05"
+    name: "Números grandes e arredondamento"
+    prereqs: ["N2.04"]
+  - id: "N4.08"
+    name: "Multiplicação por 1 dígito e por 10/100"
+    prereqs: ["N4.07", "N2.04", "N3.11"]
+  - id: "N4.09"
+    name: "Multiplicação com 2 dígitos"
+    prereqs: ["N4.08"]
+  - id: "N4.10"
+    name: "Divisão com resto e algoritmo"
+    prereqs: ["N4.06", "N4.05", "N3.12"]
+  - id: "N4.11"
+    name: "Múltiplos, divisores e primos"
+    prereqs: ["N4.07", "N4.10"]
+  - id: "N4.12"
+    name: "Divisão com divisor de 2 dígitos"
+    prereqs: ["N4.10", "N2.04"]
+  - id: "N5.02"
+    name: "Fração: parte-todo, da coleção e na reta"
+    prereqs: ["N5.01", "N4.05"]
+  - id: "N5.03"
+    name: "Equivalência e comparação de frações"
+    prereqs: ["N5.02"]
+  - id: "N5.04"
+    name: "Adição e subtração de frações"
+    prereqs: ["N5.03"]
+  - id: "N6.01"
+    name: "Décimos e centésimos (fração ↔ decimal)"
+    prereqs: ["N5.02", "N2.04"]
+  - id: "N6.02"
+    name: "Operações com decimais"
+    prereqs: ["N6.01", "N3.11", "N3.12"]
+  - id: "AL.06"
+    name: "Expressões, propriedades e a incógnita"
+    prereqs: ["AL.05", "N4.06"]
+  - id: "GE.06"
+    name: "Ângulos e retas"
+    prereqs: ["GE.03"]
+  - id: "GE.07"
+    name: "Polígonos: triângulos e quadriláteros"
+    prereqs: ["GE.03", "GE.06"]
+  - id: "GE.08"
+    name: "Plano cartesiano (1º quadrante)"
+    prereqs: ["GE.05", "N1.12"]
+  - id: "GM.08"
+    name: "Área"
+    prereqs: ["GM.07", "N4.02"]
+  - id: "GM.09"
+    name: "Conversões e problemas de medida"
+    prereqs: ["GM.05", "N4.08", "N6.01"]
+  - id: "PE.03"
+    name: "Média e probabilidade como fração"
+    prereqs: ["PE.02", "N4.10", "N5.02"]
+  - id: "N6.03"
+    name: "Porcentagem"
+    prereqs: ["N6.01", "N5.03"]
+  - id: "N6.04"
+    name: "Razão e proporcionalidade"
+    prereqs: ["N6.03", "N4.06"]
+  - id: "N5.05"
+    name: "Multiplicação e divisão de frações"
+    prereqs: ["N5.04", "N6.04"]
+  - id: "N7.01"
+    name: "Números negativos e a reta completa"
+    prereqs: ["N1.12", "N3.04"]
+  - id: "N7.02"
+    name: "Operações com inteiros"
+    prereqs: ["N7.01", "N3.13"]
+  - id: "AL.07"
+    name: "Linguagem algébrica e generalização"
+    prereqs: ["AL.06", "AL.04"]
+  - id: "AL.08"
+    name: "Equações do 1º grau"
+    prereqs: ["AL.07", "N7.02"]
+  - id: "GE.09"
+    name: "Círculo e áreas de triângulos/paralelogramos"
+    prereqs: ["GM.08", "GE.06"]
+  - id: "GE.10"
+    name: "Volume e vistas"
+    prereqs: ["GE.04", "GM.08"]
+  - id: "PE.04"
+    name: "Estatística e probabilidade com contagem"
+    prereqs: ["PE.03", "N6.03"]

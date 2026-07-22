@@ -1,0 +1,59 @@
+strand: "N2"
+name: "Sistema Decimal e Valor Posicional"
+color: "rosa"
+nodes:
+  N2.01:
+    title: "Dezena e unidades"
+    objective: "entender o 10 como grupo-unidade: 14 é 1 dezena e 4 soltos."
+    prereqs:
+      - "N1.09"
+      - "N1.11"
+    kinds:
+      - "tens (existente — material dourado)"
+      - "build-number"
+      - "plain."
+    micros:
+  N2.02:
+    title: "Números até 100"
+    objective: "ler, escrever, ordenar e localizar números até 100."
+    prereqs:
+      - "N2.01"
+    kinds:
+      - "plain"
+      - "order"
+      - "numberline"
+      - "hundred-chart (tabela 10×10)."
+    micros:
+  N2.03:
+    title: "Comparação simbólica (>, <, =)"
+    objective: "comparar números pelo valor posicional e usar os símbolos."
+    prereqs:
+      - "N2.02"
+      - "N1.05"
+    kinds:
+      - "plain (boca do jacaré 🐊 — já usada)"
+      - "math."
+    micros:
+  N2.04:
+    title: "Centena e números até 1000"
+    objective: "estender o valor posicional: 10 dezenas viram 1 centena."
+    prereqs:
+      - "N2.02"
+      - "N2.01"
+    kinds:
+      - "tens (estender p/ placas de 100)"
+      - "build-number"
+      - "plain"
+      - "order."
+    micros:
+  N2.05:
+    title: "Números grandes e arredondamento"
+    objective: ""
+    prereqs:
+      - "N2.04"
+    kinds:
+      - "plain"
+      - "order"
+      - "build-number"
+      - "numberline."
+    micros:

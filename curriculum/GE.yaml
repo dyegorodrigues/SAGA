@@ -1,0 +1,102 @@
+strand: "GE"
+name: "Geometria e Espaço"
+color: "ciano"
+nodes:
+  GE.01:
+    title: "Posição e localização espacial"
+    objective: "em cima/embaixo, dentro/fora, na frente/atrás, perto/longe; esquerda/direita por último."
+    prereqs:
+    kinds:
+      - "scene"
+      - "plain (onde — existente)."
+    micros:
+  GE.02:
+    title: "Formas planas básicas"
+    objective: "reconhecer círculo, quadrado, triângulo e retângulo em qualquer tamanho, cor e rotação."
+    prereqs:
+      - "AL.01"
+    kinds:
+      - "shapes (existente)"
+      - "plain."
+    micros:
+  GE.03:
+    title: "Atributos de figuras e simetria"
+    objective: "lados, vértices, ângulos \"de canto certo\"; eixo de simetria."
+    prereqs:
+      - "GE.02"
+    kinds:
+      - "shapes"
+      - "plain"
+      - "symmetry (completar o espelho)."
+    micros:
+  GE.04:
+    title: "Sólidos geométricos"
+    objective: "cubo, bloco, esfera, cilindro, cone, pirâmide — e sua relação com as formas planas (a face do cubo é um quadrado)."
+    prereqs:
+      - "GE.02"
+    kinds:
+      - "plain"
+      - "scene"
+      - "drag-match."
+    micros:
+  GE.05:
+    title: "Localização em malhas e mapas"
+    objective: "seguir e dar caminhos (frente, vire) e localizar em grade (casa B3)."
+    prereqs:
+      - "GE.01"
+    kinds:
+      - "grid (grade interativa — PRIORIDADE 3)"
+      - "scene."
+    micros:
+  GE.06:
+    title: "Ângulos e retas"
+    objective: ""
+    prereqs:
+      - "GE.03"
+    kinds:
+      - "angle (transferidor virtual — PRIORIDADE 3)"
+      - "plain"
+      - "scene."
+    micros:
+  GE.07:
+    title: "Polígonos: triângulos e quadriláteros"
+    objective: ""
+    prereqs:
+      - "GE.03"
+      - "GE.06"
+    kinds:
+      - "shapes"
+      - "plain"
+      - "drag-match."
+    micros:
+  GE.08:
+    title: "Plano cartesiano (1º quadrante)"
+    objective: ""
+    prereqs:
+      - "GE.05"
+      - "N1.12"
+    kinds:
+      - "grid (com eixos)"
+      - "plain."
+    micros:
+  GE.09:
+    title: "Círculo e áreas de triângulos/paralelogramos"
+    objective: ""
+    prereqs:
+      - "GM.08"
+      - "GE.06"
+    kinds:
+      - "geo-transform (recortar e rearranjar animado)"
+      - "grid"
+      - "plain."
+    micros:
+  GE.10:
+    title: "Volume e vistas"
+    objective: ""
+    prereqs:
+      - "GE.04"
+      - "GM.08"
+    kinds:
+      - "blocks-3d (empilhar cubinhos — PRIORIDADE 3)"
+      - "plain."
+    micros:

@@ -1,0 +1,136 @@
+strand: "N4"
+name: "Multiplicação e Divisão"
+color: "vermelho"
+nodes:
+  N4.01:
+    title: "Multiplicação: grupos iguais"
+    objective: "entender 3×4 como \"3 grupos de 4\" e como adição repetida."
+    prereqs:
+      - "N3.03"
+      - "AL.03"
+    kinds:
+      - "groups (existente)"
+      - "plain"
+      - "math."
+    micros:
+  N4.02:
+    title: "Arranjos retangulares e comutatividade"
+    objective: "ver a multiplicação como retângulo — e descobrir que 3×5 = 5×3 girando-o."
+    prereqs:
+      - "N4.01"
+    kinds:
+      - "array (PRIORIDADE 2: grade interativa)"
+      - "groups."
+    micros:
+  N4.03:
+    title: "Tabuadas do 2, 5 e 10"
+    objective: "primeiros fatos automatizados, ancorados nos saltos (AL.03)."
+    prereqs:
+      - "N4.01"
+      - "AL.03"
+    kinds:
+      - "math"
+      - "rapid-fire"
+      - "array."
+    micros:
+  N4.04:
+    title: "Tabuadas do 3 e do 4"
+    objective: "estender com estratégias, não decoreba: ×4 = dobro do dobro; ×3 = dobro + mais um grupo."
+    prereqs:
+      - "N4.03"
+    kinds:
+      - "math"
+      - "array"
+      - "rapid-fire."
+    micros:
+  N4.05:
+    title: "Divisão: repartir e medir"
+    objective: "os dois sentidos: repartir igualmente (12 balas ÷ 3 amigos) e medir quantos grupos cabem (12 balas, saquinhos de 3)."
+    prereqs:
+      - "N4.01"
+      - "N3.02"
+    kinds:
+      - "drag-group (repartir arrastando — PRIORIDADE 2)"
+      - "groups"
+      - "story."
+    micros:
+  N4.06:
+    title: "Relação × ↔ ÷ e famílias multiplicativas"
+    objective: "3×4=12 ⇒ 12÷3=4 e 12÷4=3 — a família de fatos, agora multiplicativa."
+    prereqs:
+      - "N4.03"
+      - "N4.05"
+    kinds:
+      - "fact-family"
+      - "array (o MESMO retângulo conta as 4 histórias)"
+      - "math."
+    micros:
+  N4.07:
+    title: "Tabuadas do 6 ao 9"
+    objective: "fechar os fatos com estratégias derivadas: ×9 = ×10−1 grupo; ×6 = ×5+1 grupo; quadrados como âncoras."
+    prereqs:
+      - "N4.04"
+      - "N4.06"
+    kinds:
+      - "math"
+      - "array (decomposição visível)"
+      - "rapid-fire."
+    micros:
+  N4.08:
+    title: "Multiplicação por 1 dígito e por 10/100"
+    objective: ""
+    prereqs:
+      - "N4.07"
+      - "N2.04"
+      - "N3.11"
+    kinds:
+      - "vertical"
+      - "array (modelo de área)"
+      - "math."
+    micros:
+  N4.09:
+    title: "Multiplicação com 2 dígitos"
+    objective: ""
+    prereqs:
+      - "N4.08"
+    kinds:
+      - "area-model (grade 2×2 de parcelas)"
+      - "vertical"
+      - "math."
+    micros:
+  N4.10:
+    title: "Divisão com resto e algoritmo"
+    objective: ""
+    prereqs:
+      - "N4.06"
+      - "N4.05"
+      - "N3.12"
+    kinds:
+      - "drag-group"
+      - "vertical (modo divisão)"
+      - "math"
+      - "story."
+    micros:
+  N4.11:
+    title: "Múltiplos, divisores e primos"
+    objective: ""
+    prereqs:
+      - "N4.07"
+      - "N4.10"
+    kinds:
+      - "array"
+      - "hundred-chart (crivo pintado)"
+      - "plain."
+    micros:
+  N4.12:
+    title: "Divisão com divisor de 2 dígitos"
+    objective: ""
+    prereqs:
+      - "N4.10"
+      - "N2.04"
+    kinds:
+      - "vertical (modo divisão"
+      - "divisor grande)"
+      - "math"
+      - "story."
+    micros:

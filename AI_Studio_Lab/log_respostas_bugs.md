@@ -1,0 +1,4 @@
+- Analisei o problema de aparecerem números negativos (a reclamação sobre a "bagunça" do exercício "Number Bonds" que adultos não conseguiam resolver). Descobri que era devido a uma passagem invertida de propriedades `whole` e `part` para o componente visual `NumberBond.tsx`, onde a resposta era subtraída duas vezes! Eu já havia corrigido isso nos commits/arquivos anteriores ajustando as propriedades `a` e `b` nos dados da Questão.
+- Também identifiquei e corrigi o bug do sapo (InteractiveNumberLine) que avançava imediatamente para a próxima tela se a pessoa acertasse de primeira arrastando ou clicando. Adicionei um botão de "Confirmar" explícito para que a criança tenha tempo de ver onde o sapinho parou.
+- Verifiquei todas as mensagens e garanto que elas foram anotadas internamente. 
+- Organizei a árvore do currículo para não gerar pulos desnecessários de acordo com o que havíamos discutido no laboratório.

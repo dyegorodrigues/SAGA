@@ -1,0 +1,56 @@
+strand: "N5"
+name: "Frações"
+color: "laranja"
+nodes:
+  N5.01:
+    title: "Metade, terço e quarto"
+    objective: "partes IGUAIS de um todo (pizza, barra, coleção) — a fundação de frações."
+    prereqs:
+      - "N4.05"
+    kinds:
+      - "frac-shade (pintar/partir — PRIORIDADE 2)"
+      - "groups"
+      - "plain."
+    micros:
+  N5.02:
+    title: "Fração: parte-todo, da coleção e na reta"
+    objective: ""
+    prereqs:
+      - "N5.01"
+      - "N4.05"
+    kinds:
+      - "frac-shade"
+      - "numberline"
+      - "groups."
+    micros:
+  N5.03:
+    title: "Equivalência e comparação de frações"
+    objective: ""
+    prereqs:
+      - "N5.02"
+    kinds:
+      - "frac-shade (sobreposição)"
+      - "numberline"
+      - "math."
+    micros:
+  N5.04:
+    title: "Adição e subtração de frações"
+    objective: ""
+    prereqs:
+      - "N5.03"
+    kinds:
+      - "frac-shade"
+      - "numberline"
+      - "math."
+    micros:
+  N5.05:
+    title: "Multiplicação e divisão de frações"
+    objective: ""
+    prereqs:
+      - "N5.04"
+      - "N6.04"
+    kinds:
+      - "frac-shade (área de fração de fração)"
+      - "numberline"
+      - "math."
+    micros:

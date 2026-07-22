@@ -1,0 +1,124 @@
+# GRAFO DE CONHECIMENTO — SAGA · Matemática 4-12 anos · v1.0 (jul/2026)
+# Versão executável do GRAFO_DE_CONHECIMENTO_SAGA.md (fonte humana). 84 nós.
+# Regra de desbloqueio: nó aberto <=> todos os prereqs com maxLvl >= 3 ou dom=true.
+# Nós com prereqs [] são raízes (sempre abertos).
+# faixa: F0 4-5 · F1 5-7 · F2 7-9 · F3 9-11 · F4 11-12 (referência, não trava)
+
+strands:
+  N1: Senso Numérico e Contagem
+  N2: Sistema Decimal e Valor Posicional
+  N3: Adição e Subtração
+  N4: Multiplicação e Divisão
+  N5: Frações
+  N6: Decimais, Porcentagem e Proporção
+  N7: Números Inteiros (negativos)
+  AL: Álgebra e Padrões
+  GE: Geometria e Espaço
+  GM: Grandezas e Medidas
+  PE: Probabilidade e Estatística
+
+nodes:
+  # ---------- F0 — Alfabetização Matemática ----------
+  - { id: N1.01, nome: "Correspondência um a um",                strand: N1, faixa: F0, prereqs: [] }
+  - { id: N1.02, nome: "Sequência oral de contagem",             strand: N1, faixa: F0, prereqs: [] }
+  - { id: N1.03, nome: "Subitização perceptual (Olhômetro)",     strand: N1, faixa: F0, prereqs: [] }
+  - { id: N1.04, nome: "Contagem com cardinalidade",             strand: N1, faixa: F0, prereqs: [N1.01, N1.02] }
+  - { id: N1.05, nome: "Comparação de quantidades",              strand: N1, faixa: F0, prereqs: [N1.04] }
+  - { id: N1.06, nome: "Numerais 0-10",                          strand: N1, faixa: F0, prereqs: [N1.02, N1.04] }
+  - { id: N1.07, nome: "Ordem, sucessor e antecessor até 10",    strand: N1, faixa: F0, prereqs: [N1.02, N1.06] }
+  - { id: N1.08, nome: "Subitização conceitual (moldura de 10)", strand: N1, faixa: F0, prereqs: [N1.03, N1.04] }
+  - { id: N1.09, nome: "Contagem até 20 e a partir de N",        strand: N1, faixa: F0, prereqs: [N1.02, N1.04] }
+  - { id: AL.01, nome: "Classificação e o intruso",              strand: AL, faixa: F0, prereqs: [] }
+  - { id: AL.02, nome: "Padrões de repetição",                   strand: AL, faixa: F0, prereqs: [AL.01] }
+  - { id: GE.01, nome: "Posição e localização espacial",         strand: GE, faixa: F0, prereqs: [] }
+  - { id: GE.02, nome: "Formas planas básicas",                  strand: GE, faixa: F0, prereqs: [AL.01] }
+  - { id: GM.01, nome: "Comparação direta de grandezas",         strand: GM, faixa: F0, prereqs: [] }
+  - { id: GM.02, nome: "Tempo cotidiano",                        strand: GM, faixa: F0, prereqs: [] }
+
+  # ---------- F1 — Números até 100 e estrutura aditiva ----------
+  - { id: N1.10, nome: "Parte-todo (number bonds)",              strand: N1, faixa: F1, prereqs: [N1.04, N1.08] }
+  - { id: N1.11, nome: "Amigos do 10",                           strand: N1, faixa: F1, prereqs: [N1.08, N1.10] }
+  - { id: N1.12, nome: "Reta numérica até 20",                   strand: N1, faixa: F1, prereqs: [N1.07, N1.09] }
+  - { id: N2.01, nome: "Dezena e unidades",                      strand: N2, faixa: F1, prereqs: [N1.09, N1.11] }
+  - { id: N2.02, nome: "Números até 100",                        strand: N2, faixa: F1, prereqs: [N2.01] }
+  - { id: N2.03, nome: "Comparação simbólica (>, <, =)",         strand: N2, faixa: F1, prereqs: [N2.02, N1.05] }
+  - { id: N3.01, nome: "Adição concreta até 10",                 strand: N3, faixa: F1, prereqs: [N1.04, N1.10] }
+  - { id: N3.02, nome: "Subtração concreta até 10",              strand: N3, faixa: F1, prereqs: [N3.01] }
+  - { id: N3.03, nome: "Contar a partir do maior (counting on)", strand: N3, faixa: F1, prereqs: [N3.01, N1.09, N2.03] }
+  - { id: N3.04, nome: "Subtração: contar p/ trás e completar",  strand: N3, faixa: F1, prereqs: [N3.02, N1.02, N1.12] }
+  - { id: N3.05, nome: "Família de fatos (+ e −)",               strand: N3, faixa: F1, prereqs: [N1.10, N3.03, N3.04] }
+  - { id: N3.06, nome: "Dobros e quase-dobros",                  strand: N3, faixa: F1, prereqs: [N3.03] }
+  - { id: N3.07, nome: "Fazer 10 (soma cruzando a dezena)",      strand: N3, faixa: F1, prereqs: [N1.11, N1.10, N2.01] }
+  - { id: N3.08, nome: "Voltar pelo 10 (subtração cruzando)",    strand: N3, faixa: F1, prereqs: [N3.07, N3.04] }
+  - { id: N3.09, nome: "Somar/subtrair até 100 sem reagrupar",   strand: N3, faixa: F1, prereqs: [N2.01, N3.07] }
+  - { id: N3.10, nome: "Problemas aditivos (4 situações)",       strand: N3, faixa: F1, prereqs: [N3.03, N3.04] }
+  - { id: AL.03, nome: "Contagem por saltos (2, 5, 10)",         strand: AL, faixa: F1, prereqs: [N1.09, N2.01] }
+  - { id: GM.03, nome: "Sistema monetário (Real)",               strand: GM, faixa: F1, prereqs: [N2.01, N3.09] }
+  - { id: GM.04, nome: "Horas (ponteiros e digital)",            strand: GM, faixa: F1, prereqs: [N1.06] } # AL.03 exigido só do micro d em diante
+  - { id: PE.01, nome: "Pictogramas e tabelas simples",          strand: PE, faixa: F1, prereqs: [N1.04, N1.05] }
+
+  # ---------- F2 — Reagrupamento e mundo multiplicativo ----------
+  - { id: N2.04, nome: "Centena e números até 1000",             strand: N2, faixa: F2, prereqs: [N2.02, N2.01] }
+  - { id: N3.11, nome: "Adição com reagrupamento",               strand: N3, faixa: F2, prereqs: [N2.01, N3.07, N3.09] }
+  - { id: N3.12, nome: "Subtração com reagrupamento",            strand: N3, faixa: F2, prereqs: [N3.11, N3.08] }
+  - { id: N3.13, nome: "Cálculo mental e estimativa aditiva",    strand: N3, faixa: F2, prereqs: [N3.11, N3.12] }
+  - { id: N4.01, nome: "Multiplicação: grupos iguais",           strand: N4, faixa: F2, prereqs: [N3.03, AL.03] }
+  - { id: N4.02, nome: "Arranjos retangulares e comutatividade", strand: N4, faixa: F2, prereqs: [N4.01] }
+  - { id: N4.03, nome: "Tabuadas do 2, 5 e 10",                  strand: N4, faixa: F2, prereqs: [N4.01, AL.03] }
+  - { id: N4.04, nome: "Tabuadas do 3 e do 4",                   strand: N4, faixa: F2, prereqs: [N4.03] }
+  - { id: N4.05, nome: "Divisão: repartir e medir",              strand: N4, faixa: F2, prereqs: [N4.01, N3.02] }
+  - { id: N4.06, nome: "Relação × e ÷ (famílias)",               strand: N4, faixa: F2, prereqs: [N4.03, N4.05] }
+  - { id: N4.07, nome: "Tabuadas do 6 ao 9",                     strand: N4, faixa: F2, prereqs: [N4.04, N4.06] }
+  - { id: N5.01, nome: "Metade, terço e quarto",                 strand: N5, faixa: F2, prereqs: [N4.05] }
+  - { id: AL.04, nome: "Sequências e regra de formação",         strand: AL, faixa: F2, prereqs: [AL.03, N3.09] }
+  - { id: AL.05, nome: "Igualdade como equilíbrio",              strand: AL, faixa: F2, prereqs: [N2.03, N3.05] }
+  - { id: GE.03, nome: "Atributos de figuras e simetria",        strand: GE, faixa: F2, prereqs: [GE.02] }
+  - { id: GE.04, nome: "Sólidos geométricos",                    strand: GE, faixa: F2, prereqs: [GE.02] }
+  - { id: GE.05, nome: "Localização em malhas e mapas",          strand: GE, faixa: F2, prereqs: [GE.01] }
+  - { id: GM.05, nome: "Medidas padronizadas (cm/m, g/kg, L)",   strand: GM, faixa: F2, prereqs: [GM.01, N2.02] }
+  - { id: GM.06, nome: "Horas e minutos; duração",               strand: GM, faixa: F2, prereqs: [GM.04, AL.03] }
+  - { id: GM.07, nome: "Perímetro",                              strand: GM, faixa: F2, prereqs: [GM.05, N3.11] }
+  - { id: PE.02, nome: "Gráficos de barras; possível/provável",  strand: PE, faixa: F2, prereqs: [PE.01, N2.02] }
+
+  # ---------- F3 — Multiplicativo completo, frações e decimais ----------
+  - { id: N2.05, nome: "Números grandes e arredondamento",       strand: N2, faixa: F3, prereqs: [N2.04] }
+  - { id: N4.08, nome: "Multiplicação por 1 dígito e ×10/×100",  strand: N4, faixa: F3, prereqs: [N4.07, N2.04, N3.11] }
+  - { id: N4.09, nome: "Multiplicação com 2 dígitos",            strand: N4, faixa: F3, prereqs: [N4.08] }
+  - { id: N4.10, nome: "Divisão com resto e algoritmo",          strand: N4, faixa: F3, prereqs: [N4.06, N4.05, N3.12] }
+  - { id: N4.11, nome: "Múltiplos, divisores e primos",          strand: N4, faixa: F3, prereqs: [N4.07, N4.10] }
+  - { id: N4.12, nome: "Divisão com divisor de 2 dígitos",       strand: N4, faixa: F3, prereqs: [N4.10, N2.04] }
+  - { id: N5.02, nome: "Fração: parte-todo, coleção e reta",     strand: N5, faixa: F3, prereqs: [N5.01, N4.05] }
+  - { id: N5.03, nome: "Equivalência e comparação de frações",   strand: N5, faixa: F3, prereqs: [N5.02] }
+  - { id: N5.04, nome: "Adição e subtração de frações",          strand: N5, faixa: F3, prereqs: [N5.03] }
+  - { id: N6.01, nome: "Décimos e centésimos (fração↔decimal)",  strand: N6, faixa: F3, prereqs: [N5.02, N2.04] }
+  - { id: N6.02, nome: "Operações com decimais",                 strand: N6, faixa: F3, prereqs: [N6.01, N3.11, N3.12] }
+  - { id: AL.06, nome: "Expressões, propriedades e incógnita",   strand: AL, faixa: F3, prereqs: [AL.05, N4.06] }
+  - { id: GE.06, nome: "Ângulos e retas",                        strand: GE, faixa: F3, prereqs: [GE.03] }
+  - { id: GE.07, nome: "Polígonos: triângulos e quadriláteros",  strand: GE, faixa: F3, prereqs: [GE.03, GE.06] }
+  - { id: GE.08, nome: "Plano cartesiano (1º quadrante)",        strand: GE, faixa: F3, prereqs: [GE.05, N1.12] }
+  - { id: GM.08, nome: "Área",                                   strand: GM, faixa: F3, prereqs: [GM.07, N4.02] }
+  - { id: GM.09, nome: "Conversões e problemas de medida",       strand: GM, faixa: F3, prereqs: [GM.05, N4.08, N6.01] }
+  - { id: PE.03, nome: "Média e probabilidade como fração",      strand: PE, faixa: F3, prereqs: [PE.02, N4.10, N5.02] }
+
+  # ---------- F4 — Proporcionalidade, inteiros e pré-álgebra ----------
+  - { id: N6.03, nome: "Porcentagem",                            strand: N6, faixa: F4, prereqs: [N6.01, N5.03] }
+  - { id: N6.04, nome: "Razão e proporcionalidade",              strand: N6, faixa: F4, prereqs: [N6.03, N4.06] }
+  - { id: N5.05, nome: "Multiplicação e divisão de frações",     strand: N5, faixa: F4, prereqs: [N5.04, N6.04] }
+  - { id: N7.01, nome: "Negativos e a reta completa",            strand: N7, faixa: F4, prereqs: [N1.12, N3.04] }
+  - { id: N7.02, nome: "Operações com inteiros",                 strand: N7, faixa: F4, prereqs: [N7.01, N3.13] }
+  - { id: AL.07, nome: "Linguagem algébrica e generalização",    strand: AL, faixa: F4, prereqs: [AL.06, AL.04] }
+  - { id: AL.08, nome: "Equações do 1º grau",                    strand: AL, faixa: F4, prereqs: [AL.07, N7.02] }
+  - { id: GE.09, nome: "Círculo; áreas de triângulo/paralelog.", strand: GE, faixa: F4, prereqs: [GM.08, GE.06] }
+  - { id: GE.10, nome: "Volume e vistas",                        strand: GE, faixa: F4, prereqs: [GE.04, GM.08] }
+  - { id: PE.04, nome: "Estatística e probabilidade (contagem)", strand: PE, faixa: F4, prereqs: [PE.03, N6.03] }
+
+# ---------- Trilhas de fluência (Dojo) ----------
+fluency:
+  - { id: FD1, nome: "Amigos do 10",                 destrava: { N1.11: 4 }, rt_max_s: 3 }
+  - { id: FD2, nome: "Dobros e quase-dobros",        destrava: { N3.06: 4 }, rt_max_s: 3 }
+  - { id: FD3, nome: "+/− até 20",                   destrava: { N3.07: 4, N3.08: 4 }, rt_max_s: 4 }
+  - { id: FD4, nome: "Tabuadas 2, 5, 10",            destrava: { N4.03: 4 }, rt_max_s: 4 }
+  - { id: FD5, nome: "Tabuadas 3, 4, 6-9",           destrava: { N4.07: 4 }, rt_max_s: 5 }
+  - { id: FD6, nome: "Fatos de divisão",             destrava: { N4.06: 4 }, rt_max_s: 5 }
+  - { id: FD7, nome: "Complementos de 100 e mental", destrava: { N3.13: 4 }, rt_max_s: 6 }
+  - { id: FD8, nome: "Fração↔decimal↔% comuns",      destrava: { N6.03: 4 }, rt_max_s: 6 }

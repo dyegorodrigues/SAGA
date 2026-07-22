@@ -1,0 +1,321 @@
+<title>Atlas do Matemágica</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --ground:#f6f5fa; --surface:#ffffff; --surface-2:#faf9fd; --ink:#1f1a2e;
+    --muted:#6b6480; --line:#e7e3f0; --violet:#7c3aed; --violet-soft:#ede7fb;
+    --amber:#b45309; --amber-soft:#fef3c7;
+    --live:#15803d; --live-bg:#dcfce7; --partial:#b45309; --partial-bg:#fdf1d6;
+    --reorg:#1d4ed8; --reorg-bg:#dbeafe; --plan:#5b647a; --plan-bg:#eef1f6;
+    --shadow:0 1px 2px rgba(31,26,46,.04),0 6px 20px rgba(31,26,46,.06);
+    --r:14px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#131019; --surface:#1d1a28; --surface-2:#231f31; --ink:#f2eefa;
+      --muted:#a79fb8; --line:#2f2a3e; --violet:#a78bfa; --violet-soft:#2a2340;
+      --amber:#fbbf24; --amber-soft:#39301a;
+      --live:#4ade80; --live-bg:#16351f; --partial:#fbbf24; --partial-bg:#3a2f14;
+      --reorg:#93b4fd; --reorg-bg:#1a2540; --plan:#a2acc0; --plan-bg:#232838;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#f6f5fa; --surface:#ffffff; --surface-2:#faf9fd; --ink:#1f1a2e;
+    --muted:#6b6480; --line:#e7e3f0; --violet:#7c3aed; --violet-soft:#ede7fb;
+    --amber:#b45309; --amber-soft:#fef3c7;
+    --live:#15803d; --live-bg:#dcfce7; --partial:#b45309; --partial-bg:#fdf1d6;
+    --reorg:#1d4ed8; --reorg-bg:#dbeafe; --plan:#5b647a; --plan-bg:#eef1f6;
+    --shadow:0 1px 2px rgba(31,26,46,.04),0 6px 20px rgba(31,26,46,.06);
+  }
+  :root[data-theme="dark"]{
+    --ground:#131019; --surface:#1d1a28; --surface-2:#231f31; --ink:#f2eefa;
+    --muted:#a79fb8; --line:#2f2a3e; --violet:#a78bfa; --violet-soft:#2a2340;
+    --amber:#fbbf24; --amber-soft:#39301a;
+    --live:#4ade80; --live-bg:#16351f; --partial:#fbbf24; --partial-bg:#3a2f14;
+    --reorg:#93b4fd; --reorg-bg:#1a2540; --plan:#a2acc0; --plan-bg:#232838;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--ground);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.55;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:clamp(20px,4vw,52px) clamp(16px,4vw,32px) 80px}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+  .eyebrow{font-family:ui-monospace,monospace;font-size:12px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--violet);font-weight:600}
+  h1{font-size:clamp(30px,5.5vw,50px);line-height:1.02;letter-spacing:-.03em;
+    font-weight:800;margin:.35em 0 .1em;text-wrap:balance}
+  .lede{font-size:clamp(16px,2.2vw,19px);color:var(--muted);max-width:60ch;margin:.4em 0 0}
+  h2{font-size:clamp(20px,3vw,26px);letter-spacing:-.02em;font-weight:750;margin:0;text-wrap:balance}
+  .sec{margin-top:clamp(40px,6vw,68px)}
+  .sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);
+    padding-bottom:12px;margin-bottom:22px;flex-wrap:wrap}
+  .sec-head .n{font-family:ui-monospace,monospace;font-size:13px;color:var(--violet);font-weight:600}
+  .sec-head p{margin:0;color:var(--muted);font-size:14px;flex:1;min-width:200px}
+  .grid{display:grid;gap:14px}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  .cols-2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:760px){.cols-3,.cols-2{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    padding:18px;box-shadow:var(--shadow)}
+  .tier-h{display:flex;align-items:center;gap:9px;font-weight:750;font-size:15px;margin-bottom:4px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .doc{padding:11px 0;border-top:1px solid var(--line)}
+  .doc:first-of-type{border-top:0}
+  .doc b{font-size:13.5px;font-weight:700;display:block}
+  .doc .fn{font-family:ui-monospace,monospace;font-size:11px;color:var(--violet);font-weight:600}
+  .doc small{color:var(--muted);font-size:12.5px;display:block;margin-top:2px}
+  .start{background:var(--violet-soft);border-color:color-mix(in srgb,var(--violet) 35%,transparent)}
+  .paths{display:grid;gap:9px}
+  .path{display:flex;gap:12px;align-items:flex-start;background:var(--surface);
+    border:1px solid var(--line);border-radius:11px;padding:12px 14px}
+  .path .q{font-weight:700;font-size:13.5px;min-width:190px;flex:none}
+  @media(max-width:600px){.path{flex-direction:column;gap:4px}.path .q{min-width:0}}
+  .path .a{color:var(--muted);font-size:13px}
+  .path .a code{font-family:ui-monospace,monospace;font-size:12px;color:var(--violet);
+    background:var(--violet-soft);padding:1px 6px;border-radius:5px;white-space:nowrap}
+  .arrow{color:var(--violet);font-weight:700}
+  /* curriculum */
+  .subj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+    padding:16px 18px;box-shadow:var(--shadow)}
+  .subj>h3{margin:0 0 3px;font-size:17px;font-weight:750;letter-spacing:-.01em}
+  .subj>.sub{color:var(--muted);font-size:12.5px;margin-bottom:12px}
+  .mod{margin-top:12px}
+  .mod .ml{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--muted);
+    font-weight:600;letter-spacing:.02em;margin-bottom:6px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:12.5px;font-weight:600;padding:4px 9px;border-radius:999px;
+    border:1px solid var(--line);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.9}
+  .s-live{color:var(--live);background:var(--live-bg);border-color:transparent}
+  .s-partial{color:var(--partial);background:var(--partial-bg);border-color:transparent}
+  .s-reorg{color:var(--reorg);background:var(--reorg-bg);border-color:transparent}
+  .s-plan{color:var(--plan);background:var(--plan-bg);border-color:transparent}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:4px}
+  .legend span{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+  .new-badge{font-family:ui-monospace,monospace;font-size:10px;font-weight:700;
+    letter-spacing:.08em;color:#fff;background:var(--violet);padding:2px 7px;border-radius:5px;
+    text-transform:uppercase;vertical-align:middle;margin-left:8px}
+  .ladder{display:flex;flex-wrap:wrap;align-items:stretch;gap:0}
+  .rung{flex:1;min-width:150px;background:var(--surface);border:1px solid var(--line);
+    padding:14px;position:relative}
+  .rung:first-child{border-radius:var(--r) 0 0 var(--r)}
+  .rung:last-child{border-radius:0 var(--r) var(--r) 0}
+  @media(max-width:720px){.rung{min-width:100%;border-radius:12px!important;margin-bottom:8px}}
+  .rung .k{font-family:ui-monospace,monospace;font-size:11px;color:var(--violet);font-weight:700}
+  .rung b{display:block;font-size:14px;margin:5px 0 3px}
+  .rung small{color:var(--muted);font-size:12.5px}
+  .fix{display:flex;gap:13px;padding:14px;background:var(--surface);border:1px solid var(--line);
+    border-radius:12px;align-items:flex-start}
+  .fix .ic{font-size:22px;line-height:1;flex:none;filter:saturate(1.1)}
+  .fix b{font-size:14px}
+  .fix p{margin:3px 0 0;color:var(--muted);font-size:13px}
+  .fix .was{color:var(--partial);font-weight:600}
+  .fix .now{color:var(--live);font-weight:600}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:12.5px;text-align:center}
+  .toggle{position:fixed;top:14px;right:14px;background:var(--surface);border:1px solid var(--line);
+    color:var(--ink);border-radius:9px;padding:7px 11px;font-size:12px;cursor:pointer;
+    font-family:ui-monospace,monospace;box-shadow:var(--shadow);z-index:9}
+  .toggle:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+</style>
+
+<button class="toggle" id="tg" aria-label="Alternar tema">◐ tema</button>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Atlas do Matemágica · mapa da arquitetura</div>
+    <h1>O projeto inteiro, num mapa só</h1>
+    <p class="lede">Onde vive cada documento, como o currículo se organiza de matéria a
+    habilidade, e como a criança progride. Feito para você <b>enxergar</b> a lógica sem
+    abrir o código.</p>
+  </header>
+
+  <!-- DOCUMENTOS -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="n">01</span>
+      <h2>Os documentos — o que é cada um</h2>
+      <p>19 arquivos em 3 camadas. Você só precisa dos 🟢 vivos no dia a dia.</p>
+    </div>
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="tier-h"><span class="dot" style="background:var(--live)"></span>Vivos — a verdade de agora</div>
+        <div class="doc start"><span class="fn">sala-de-situacao.md</span><b>O painel ▸ comece aqui</b><small>Estado das 6 frentes + governança dos docs.</small></div>
+        <div class="doc"><span class="fn">curriculo-mestre.md</span><b>A ementa</b><small>Matéria→módulo→trilha→habilidade, com status e o que falta.</small></div>
+        <div class="doc"><span class="fn">arquitetura-pedagogica.md</span><b>As leis</b><small>Anatomia de exercício, kinds, régua anti-exaustão.</small></div>
+        <div class="doc"><span class="fn">roteiro-cinematografico.md</span><b>O filme</b><small>O app cena a cena + raio-X trilha × momentos.</small></div>
+        <div class="doc"><span class="fn">graphogame-blueprint.md</span><b>A leitura</b><small>A sequência fônica pt-BR completa (as "manhas").</small></div>
+        <div class="doc"><span class="fn">luna-roteiro-audios.md</span><b>A voz</b><small>Plano de lotes + 210 roteiros prontos (.json).</small></div>
+        <div class="doc"><span class="fn">CLAUDE.md</span><b>A memória</b><small>Decisões rodada a rodada + a Constituição.</small></div>
+      </div>
+      <div class="card">
+        <div class="tier-h"><span class="dot" style="background:var(--violet)"></span>Fontes — referência estável</div>
+        <div class="doc"><span class="fn">biblia-do-matemagica.md</span><b>O porquê</b><small>Visão, filosofia, história do projeto.</small></div>
+        <div class="doc"><span class="fn">metodo-matemagica.md</span><b>A receita</b><small>Como criar QUALQUER trilha (6 passos).</small></div>
+        <div class="doc"><span class="fn">catalogo-atividades.md</span><b>O detalhe</b><small>O que aparece na tela de cada trilha planejada.</small></div>
+        <div class="doc"><span class="fn">solucao-fonetica-…md</span><b>A voz por dentro</b><small>A verdade técnica do áudio (o que buga e por quê).</small></div>
+        <div class="doc"><span class="fn">mapa-mestre.md</span><b>O índice</b><small>Suas perguntas ↔ minhas respostas.</small></div>
+      </div>
+      <div class="card">
+        <div class="tier-h"><span class="dot" style="background:var(--plan)"></span>Históricos — guardados, carimbados</div>
+        <div class="doc"><span class="fn">plano-diretor-v2.md</span><b>Cumprido</b><small>As sessões 0-12 que já executei.</small></div>
+        <div class="doc"><span class="fn">roteiro-de-execucao.md</span><b>Cumprido</b><small>O passo a passo já rodado.</small></div>
+        <div class="doc"><span class="fn">backup-gemini-…md</span><b>Backup</b><small>Trabalho do Gemini, preservado por segurança.</small></div>
+        <div class="doc"><span class="fn">voz-fonetica-analise.md</span><b>Superado</b><small>Absorvido pela solução de voz atual.</small></div>
+        <div class="doc"><span class="fn">relatorio + adendo</span><b>Absorvidos</b><small>Viraram o catálogo e o currículo-mestre.</small></div>
+        <p style="color:var(--muted);font-size:12px;margin:12px 0 0">Nada aqui se perde — cada um tem carimbo no topo dizendo o que é.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;margin:26px 0 12px;font-weight:700">Se você quer… vá direto a:</h3>
+    <div class="paths">
+      <div class="path"><span class="q">…ver como está tudo</span><span class="a"><span class="arrow">→</span> <code>sala-de-situacao</code></span></div>
+      <div class="path"><span class="q">…entender o currículo</span><span class="a"><span class="arrow">→</span> <code>curriculo-mestre</code> e, pro detalhe da tela, <code>catalogo-atividades</code></span></div>
+      <div class="path"><span class="q">…saber como um exercício é (ou devia ser)</span><span class="a"><span class="arrow">→</span> <code>arquitetura-pedagogica</code> + <code>roteiro-cinematografico</code></span></div>
+      <div class="path"><span class="q">…gerar/plugar as vozes</span><span class="a"><span class="arrow">→</span> <code>luna-roteiro-audios</code></span></div>
+      <div class="path"><span class="q">…criar uma trilha nova</span><span class="a"><span class="arrow">→</span> <code>metodo-matemagica</code> (a receita)</span></div>
+    </div>
+  </section>
+
+  <!-- CURRICULO -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="n">02</span>
+      <h2>O currículo — matéria ▸ módulo ▸ trilha</h2>
+      <p>Cada pastilha é uma trilha (o card que a criança toca). A cor diz o estado.</p>
+    </div>
+    <div class="legend card" style="padding:14px 18px;margin-bottom:16px">
+      <span><span class="chip s-live" style="padding:2px 7px"></span> no ar, completo</span>
+      <span><span class="chip s-partial" style="padding:2px 7px"></span> no ar, falta afinar</span>
+      <span><span class="chip s-reorg" style="padding:2px 7px"></span> reorganizar</span>
+      <span><span class="chip s-plan" style="padding:2px 7px"></span> planejado</span>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="subj" style="grid-column:1/-1;border-color:color-mix(in srgb,var(--violet) 40%,transparent)">
+        <h3>🌍 Meu Mundo — os Conceitos Vitais <span class="new-badge">novo · nível zero</span></h3>
+        <div class="sub">O verdadeiro começo, antes de número e letra: as noções de vida que estavam espalhadas e mal-arquivadas. Leve, conceitual, transversal.</div>
+        <div class="chips">
+          <span class="chip s-plan">🧭 Onde Está? (perto/longe, dentro/fora)</span>
+          <span class="chip s-plan">📏 Grande ou Pequeno? (cheio/vazio, pesado/leve)</span>
+          <span class="chip s-plan">⚖️ Muito ou Pouco?</span>
+          <span class="chip s-plan">🔍 Igual ou Diferente?</span>
+          <span class="chip s-plan">☀️🌙 Meu Dia (rotina, antes/depois)</span>
+        </div>
+      </div>
+
+      <div class="subj">
+        <h3>📐 Matemática</h3>
+        <div class="mod"><div class="ml">M1 · Números & Contagem</div><div class="chips">
+          <span class="chip s-partial">Contar</span><span class="chip s-plan">Olhômetro</span>
+          <span class="chip s-live">Moldura de 10</span><span class="chip s-live">Amigos dos Números</span></div></div>
+        <div class="mod"><div class="ml">M2 · Operações</div><div class="chips">
+          <span class="chip s-live">Somar</span><span class="chip s-partial">Tirar</span>
+          <span class="chip s-partial">Probleminhas</span></div></div>
+        <div class="mod"><div class="ml">M3 · Estrutura do número</div><div class="chips">
+          <span class="chip s-live">Antes/Depois</span><span class="chip s-live">Maior/Menor</span>
+          <span class="chip s-live">Contar Pulando</span><span class="chip s-live">Dezenas</span></div></div>
+        <div class="mod"><div class="ml">M4 · Mundo matemático</div><div class="chips">
+          <span class="chip s-partial">Formas</span><span class="chip s-partial">Padrões</span>
+          <span class="chip s-reorg">Dinheirinho</span><span class="chip s-partial">Gráficos</span></div></div>
+        <div class="mod"><div class="ml">M5 · Tempo (relógio = último degrau)</div><div class="chips">
+          <span class="chip s-plan">Senhor do Tempo ⏰</span></div></div>
+      </div>
+
+      <div class="subj">
+        <h3>📖 Português — alfabetização fônica</h3>
+        <div class="mod"><div class="ml">P0 · Consciência fonológica</div><div class="chips">
+          <span class="chip s-partial">Caça-Rimas</span><span class="chip s-partial">Palminhas</span></div></div>
+        <div class="mod"><div class="ml">P1 · Letras & sons (o alfabeto)</div><div class="chips">
+          <span class="chip s-partial">Sons Mágicos</span></div></div>
+        <div class="mod"><div class="ml">P2 · Sílabas & palavras</div><div class="chips">
+          <span class="chip s-partial">Fábrica de Sílabas</span><span class="chip s-plan">Fábrica de Palavras</span>
+          <span class="chip s-partial">Ditado Mágico</span></div></div>
+        <div class="mod"><div class="ml">P3 · Leitor Veloz (o foco do Heitor)</div><div class="chips">
+          <span class="chip s-plan">Cola-Sílabas</span><span class="chip s-plan">Palavras-Relâmpago</span>
+          <span class="chip s-plan">Leitura em Eco</span><span class="chip s-plan">Livrinhos</span></div></div>
+        <div class="mod"><div class="ml">P4 · As Manhas do Português</div><div class="chips">
+          <span class="chip s-plan">Dança do C · Os 3 R · Nasais · b/d…</span></div></div>
+      </div>
+
+      <div class="subj">
+        <h3>🔬 Ciências <span class="new-badge" style="background:var(--reorg)">reorganizada</span></h3>
+        <div class="sub">4 trilhas finas viraram trilhas ricas com progressão real (a crítica do "vivo, morto, vivo, morto").</div>
+        <div class="mod"><div class="ml">Mundo natural</div><div class="chips">
+          <span class="chip s-reorg">Mundo Vivo 🌱</span><span class="chip s-reorg">Meu Corpo 👂</span>
+          <span class="chip s-plan">Ciclo da Vida 🐣</span><span class="chip s-plan">Estações & Natureza 🍂</span>
+          <span class="chip s-plan">Água Mágica</span><span class="chip s-plan">Sistema Solar</span></div></div>
+      </div>
+
+      <div class="subj">
+        <h3>🇺🇸 Inglês <span style="font-size:12px;color:var(--muted);font-weight:600">· ouvir antes de falar</span></h3>
+        <div class="chips">
+          <span class="chip s-live">Hello!</span><span class="chip s-live">Colors</span>
+          <span class="chip s-live">Animals</span><span class="chip s-live">Numbers</span>
+          <span class="chip s-plan">Family & Food</span><span class="chip s-plan">Listen & Touch</span>
+          <span class="chip s-plan">Word of the Day</span></div>
+      </div>
+
+      <div class="subj">
+        <h3>🧩 Lógica &nbsp;·&nbsp; 🌐 Missões do Mundo</h3>
+        <div class="mod"><div class="ml">Raciocínio puro</div><div class="chips"><span class="chip s-partial">Detetive Lógico 🕵️</span></div></div>
+        <div class="mod"><div class="ml">Multidisciplinar (onde as matérias se cruzam)</div><div class="chips">
+          <span class="chip s-plan">Mercadinho 🛒</span><span class="chip s-plan">Cozinha 👩‍🍳</span>
+          <span class="chip s-plan">A Turma Vota 🗳️</span><span class="chip s-plan">Minha Linha do Tempo 📅</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESSAO -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="n">03</span>
+      <h2>Como a criança progride</h2>
+      <p>Sua intuição do GraphoGame/Duolingo, virada regra: idade não é muro.</p>
+    </div>
+    <div class="ladder">
+      <div class="rung"><span class="k">entrada</span><b>Idade = dica</b><small>Escolhe o ponto de partida sugerido, não um teto. Tudo é um continuum só.</small></div>
+      <div class="rung"><span class="k">motor</span><b>Adapta sozinho</b><small>3 acertos sobe, 2 erros desce. O nível conquistado nunca regride.</small></div>
+      <div class="rung"><span class="k">destrava</span><b>Por limiar, não perfeição</b><small>A próxima trilha abre quando a base chega no nível ~2 — não exige 100%.</small></div>
+      <div class="rung"><span class="k">rumo</span><b>Sugere + deixa escolher</b><small>O motor recomenda o próximo passo; o seletor 🎯 deixa você escolher à mão.</small></div>
+      <div class="rung"><span class="k">troféu</span><b>👑 é prestígio</b><small>Dominar tudo dá a coroa — uma conquista, jamais um portão que trava.</small></div>
+    </div>
+  </section>
+
+  <!-- CORRECOES -->
+  <section class="sec">
+    <div class="sec-head">
+      <span class="n">04</span>
+      <h2>O que corrigi hoje (você estava certo)</h2>
+      <p>Coisas que estavam no lugar errado e embolavam a cabeça da criança.</p>
+    </div>
+    <div class="grid cols-2">
+      <div class="fix"><span class="ic">💰</span><div><b>Dinheiro resequenciado</b><p><span class="was">antes:</span> moedas de 25/50¢ pra quem mal soma. <span class="now">agora:</span> "100 centavos = 1 real" primeiro, depois cédulas inteiras; centavos só quando já contar até 100.</p></div></div>
+      <div class="fix"><span class="ic">🍂</span><div><b>Estações do ano → Ciências</b><p><span class="was">antes:</span> misturadas no Tempo. <span class="now">agora:</span> são fenômeno da natureza (por que esfria, por que cai a folha), não calendário.</p></div></div>
+      <div class="fix"><span class="ic">🐣</span><div><b>Ciclo da vida ganhou trilha</b><p>Nascer→crescer→gerar→morrer, com naturalidade. Em Ciências, de mãos dadas com a "Linha do Tempo da Minha Vida" (história).</p></div></div>
+      <div class="fix"><span class="ic">🧭</span><div><b>Perto/longe, cheio/vazio não são geografia</b><p>São <b>conceitos vitais</b> → foram pro novo módulo "Meu Mundo 🌍", o nível zero de todos.</p></div></div>
+      <div class="fix"><span class="ic">⏰</span><div><b>Ler o relógio virou o ÚLTIMO degrau</b><p>A criança "não sabe as horas" porque o relógio vinha cedo demais. Agora: dia/noite → semana → mês → e só então o relógio.</p></div></div>
+      <div class="fix"><span class="ic">🌍</span><div><b>Nasceu o módulo "Meu Mundo"</b><p>Espaço, tamanho, muito/pouco, igual/diferente, rotina — o solo comum que sustenta todas as matérias.</p></div></div>
+    </div>
+  </section>
+
+  <footer>
+    Atlas gerado do repositório · branch <span class="mono">claude/ai-studio-github-sync-889al1</span><br>
+    Fonte viva: <span class="mono">docs/curriculo-mestre.md</span> · <span class="mono">docs/sala-de-situacao.md</span>
+  </footer>
+</div>
+
+<script>
+  (function(){
+    var tg=document.getElementById('tg');
+    tg.addEventListener('click',function(){
+      var cur=document.documentElement.getAttribute('data-theme');
+      if(!cur){cur=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';}
+      document.documentElement.setAttribute('data-theme',cur==='dark'?'light':'dark');
+    });
+  })();
+</script>

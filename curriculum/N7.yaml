@@ -1,0 +1,26 @@
+strand: "N7"
+name: "Números Inteiros (negativos)"
+color: "grafite"
+nodes:
+  N7.01:
+    title: "Números negativos e a reta completa"
+    objective: ""
+    prereqs:
+      - "N1.12"
+      - "N3.04"
+    kinds:
+      - "numberline (agora com lado esquerdo)"
+      - "plain"
+      - "story."
+    micros:
+  N7.02:
+    title: "Operações com inteiros"
+    objective: ""
+    prereqs:
+      - "N7.01"
+      - "N3.13"
+    kinds:
+      - "numberline (saltos bidirecionais)"
+      - "chip-model (fichas + e − que se anulam)"
+      - "math."
+    micros:

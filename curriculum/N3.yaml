@@ -1,0 +1,151 @@
+strand: "N3"
+name: "Adição e Subtração"
+color: "verde"
+nodes:
+  N3.01:
+    title: "Adição concreta: juntar e acrescentar (até 10)"
+    objective: "somar juntando dois grupos visíveis, contando tudo."
+    prereqs:
+      - "N1.04"
+      - "N1.10"
+    kinds:
+      - "sum (existente"
+      - "com dedo-guia)"
+      - "groups"
+      - "tenframe."
+    micros:
+  N3.02:
+    title: "Subtração concreta: tirar (até 10)"
+    objective: "subtrair vendo objetos saírem/se esconderem."
+    prereqs:
+      - "N3.01"
+    kinds:
+      - "subvis (existente — esconder)"
+      - "groups."
+    micros:
+  N3.03:
+    title: "Contar a partir do maior (counting on)"
+    objective: "abandonar o \"contar tudo\": 2+7 → \"sete… oito, nove!\"."
+    prereqs:
+      - "N3.01"
+      - "N1.09"
+      - "N2.03"
+    kinds:
+      - "sum"
+      - "numberline"
+      - "plain."
+    micros:
+  N3.04:
+    title: "Subtração: contar para trás e completar"
+    objective: "duas estratégias — voltar passinhos (9−2) e contar PARA FRENTE quando os números são próximos (9−7 → \"de 7 até 9 são 2\")."
+    prereqs:
+      - "N3.02"
+      - "N1.02"
+      - "N1.12"
+    kinds:
+      - "numberline"
+      - "subvis"
+      - "plain."
+    micros:
+  N3.05:
+    title: "Família de fatos (relação + ↔ −)"
+    objective: "ver que 3+4=7, 4+3=7, 7−3=4 e 7−4=3 são a MESMA história parte-todo."
+    prereqs:
+      - "N1.10"
+      - "N3.03"
+      - "N3.04"
+    kinds:
+      - "bond"
+      - "math"
+      - "fact-family."
+    micros:
+  N3.06:
+    title: "Dobros e quase-dobros"
+    objective: "automatizar 3+3, 4+4… e derivar 4+5 = \"dobro de 4 mais 1\"."
+    prereqs:
+      - "N3.03"
+    kinds:
+      - "groups (espelhado)"
+      - "plain"
+      - "rapid-fire."
+    micros:
+  N3.07:
+    title: "Fazer 10 (adição atravessando a dezena)"
+    objective: "a estratégia-rainha: 8+5 → 8+2=10, sobram 3 → 13. Já existe no código (gMatBond N5) — aqui vira competência própria."
+    prereqs:
+      - "N1.11"
+      - "N1.10"
+      - "N2.01"
+    kinds:
+      - "tenframe (com animação das bolinhas migrando)"
+      - "bond"
+      - "math."
+    micros:
+  N3.08:
+    title: "Voltar pelo 10 (subtração atravessando a dezena)"
+    objective: "13−5 → 13−3=10, 10−2=8."
+    prereqs:
+      - "N3.07"
+      - "N3.04"
+    kinds:
+      - "tenframe"
+      - "numberline"
+      - "math."
+    micros:
+  N3.09:
+    title: "Somar e subtrair até 100 (sem reagrupamento)"
+    objective: "operar com dezenas inteiras e D+U sem \"vai um\"."
+    prereqs:
+      - "N2.01"
+      - "N3.07"
+    kinds:
+      - "tens"
+      - "math"
+      - "plain."
+    micros:
+  N3.10:
+    title: "Problemas aditivos (as 4 situações)"
+    objective: "resolver histórias de juntar, transformar (ganhar/perder), comparar e completar — com dados na fala e na cena."
+    prereqs:
+      - "N3.03"
+      - "N3.04"
+    kinds:
+      - "story (existente"
+      - "100% narrado)"
+      - "scene."
+    micros:
+  N3.11:
+    title: "Adição com reagrupamento"
+    objective: "somar quando as unidades passam de 10 — do material ao algoritmo."
+    prereqs:
+      - "N2.01"
+      - "N3.07"
+      - "N3.09"
+    kinds:
+      - "tens (troca animada)"
+      - "vertical (PRIORIDADE 1: conta armada interativa"
+      - "dígito a dígito)"
+      - "math."
+    micros:
+  N3.12:
+    title: "Subtração com reagrupamento"
+    objective: "subtrair \"desmanchando\" uma dezena — o algoritmo mais mal-ensinado do mundo, feito direito."
+    prereqs:
+      - "N3.11"
+      - "N3.08"
+    kinds:
+      - "tens (desmanchar animado)"
+      - "vertical"
+      - "math."
+    micros:
+  N3.13:
+    title: "Cálculo mental e estimativa aditiva"
+    objective: "escolher estratégia (compensar, arredondar, decompor) em vez de armar sempre."
+    prereqs:
+      - "N3.11"
+      - "N3.12"
+    kinds:
+      - "math"
+      - "plain"
+      - "rapid-fire."
+    micros:
