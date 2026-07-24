@@ -813,13 +813,51 @@ export function gN1_04(lvl: number): Question {
 }
 
 export function gN1_05(lvl: number): Question {
-  const q = gPreMais(lvl);
-  q.tutorial = lvl === 1 ? [{say: "Vamos ver qual lado tem mais coisas."}] : undefined;
-  q.kind = lvl <= 2 ? "groups" : "plain";
-  q.howto = "Veja qual conjunto é maior.";
-  q.audioPrompt = "Qual tem mais?";
-  q.explain = "Compare a quantidade de cada grupo e escolha o conjunto com a quantidade pedida.";
-  return q;
+  const isMais = Math.random() < 0.5;
+  const n1 = ri(2, 5);
+  let n2 = ri(2, 5);
+  while (n1 === n2) n2 = ri(2, 5);
+
+  const groups = [
+    { n: n1, e: pickEmo() },
+    { n: n2, e: pickEmo() }
+  ];
+  const wantsMais = isMais;
+  const idxBig = n1 > n2 ? 0 : 1;
+  const ansIdx = wantsMais ? idxBig : (1 - idxBig);
+
+  if (lvl <= 2) {
+    return {
+      tutorial: lvl === 1 ? [{say: "Vamos ver qual lado tem mais coisas."}] : undefined,
+      kind: "groups",
+      groups: groups,
+      prompt: wantsMais ? "Qual tem MAIS itens?" : "Qual tem MENOS itens?",
+      options: [
+        { label: "Grupo 1", value: 0 },
+        { label: "Grupo 2", value: 1 }
+      ],
+      answer: ansIdx,
+      howto: "Compare as quantidades.",
+      audioPrompt: wantsMais ? "Qual tem mais?" : "Qual tem menos?",
+      explain: "Veja qual grupo tem uma quantidade maior ou menor."
+    };
+  } else {
+    // plain text comparison
+    return {
+      tutorial: undefined,
+      kind: "plain",
+      big: groups[0].e,
+      prompt: wantsMais ? `O que é MAIS: ${n1} ou ${n2}?` : `O que é MENOS: ${n1} ou ${n2}?`,
+      options: [
+        { label: `${n1}`, value: n1 },
+        { label: `${n2}`, value: n2 }
+      ],
+      answer: wantsMais ? (n1 > n2 ? n1 : n2) : (n1 < n2 ? n1 : n2),
+      howto: "Compare os números.",
+      audioPrompt: wantsMais ? "Qual é mais?" : "Qual é menos?",
+      explain: "Compare os números para encontrar o pedido."
+    };
+  }
 }
 
 export function gN1_06(lvl: number): Question {
@@ -897,7 +935,7 @@ export function gN1_08(lvl: number): Question {
   return {
     tutorial: lvl === 1 ? [{ say: "Esta é a caixa mágica! Se a primeira linha estiver cheia, tem 5!" }] : undefined,
     excecaoCPA: "perceptual",
-    kind: "tens",
+    kind: "tenframe",
     prompt: "A Caixa Mágica abriu e fechou! Quantos você viu?",
     emoji: pickEmo(),
     n,

@@ -43,7 +43,7 @@ Antes de cada assunto, três coisas são sempre definidas. É o gabarito que tod
 - **1ª tentativa errada → deixa a criança se auto-corrigir.** Nada de aula. Feedback gentil que convida a tentar de novo ("hmm, olha de novo!") + esconder 1 opção absurda. A maioria dos erros é deslize (pressa, dedo torto) e a própria criança conserta sozinha — interromper isso com explicação é chato e ensina dependência.
 - **2ª tentativa errada → UMA dica estratégica (a "E1").** Agora vale um empurrão: uma pergunta curta que aponta a estratégia do nível (*"quantos espaços vazios sobraram na moldura?"*). A criança continua no comando, ainda resolvendo.
 - **Ainda errou → mostra a resposta com uma frase de porquê e SEGUE.** Sem cerimônia, sem demonstração longa no meio do fluxo. A questão é "estacionada" (marcada como frágil no fato/competência) e a criança AVANÇA na hora. **Nunca trava.**
-- *Deslize vs. dificuldade:* o motor separa os dois pelo tempo de resposta e pelo tipo de distrator — erro rápido num distrator qualquer = provável deslize (toque mais leve ainda); erro lento ou num distrator de misconception = dificuldade real (a dica da 2ª tentativa já é a certeira daquela confusão).
+- *Deslize vs. dificuldade:* o motor separa os dois pelo tempo de resposta e pelo tipo de distrator — erro rápido num distrator qualquer = provável deslize → toque mínimo. Erro lento OU num distrator com tag de misconception = dificuldade real → a dica do passo 2 já é a específica daquela confusão.
 
 **CAMADA 2 — Remediação profunda (por padrão, no momento certo).** É AQUI que mora o ensino pesado — a demonstração narrada, a Mão Fantasma (fazer junto) e o microtutorial. Mas ele **NÃO dispara na questão isolada**; dispara quando o Radar de Lacunas (Bíblia §11.4) detecta um PADRÃO — a mesma tag de misconception 2× em poucas questões, ou um fato cronicamente fraco. E entrega a remediação no momento que respeita o fluxo: numa pausa natural, no fim da sessão, ou como Missão de Resgate na sessão seguinte — nunca engasgando a criança no meio de uma questão. É exatamente o "depois de alguns exercícios, verificar os erros e aí trabalhar pontualmente".
 - **Os três conteúdos de remediação** (o que cada nível CONTÉM, disparados pela Camada 2, não a cada erro): **Dica** aponta a estratégia · **Demonstração** = worked example, o tutor resolve um gêmeo narrando, a criança assiste · **Fazer Junto** = Mão Fantasma, a criança executa com o tutor sustentando. Quando um assunto abaixo diz "E1/E2/E3", está descrevendo o CONTEÚDO de cada nível — o QUANDO é governado por este modelo de duas camadas, sempre.
@@ -57,7 +57,7 @@ Antes de cada assunto, três coisas são sempre definidas. É o gabarito que tod
 
 # 🧒 A CRIANÇA REAL — as limitações que TODO gerador e TODA tela respeitam
 
-Antes de qualquer assunto: o SAGA não ensina para uma "criança ideal". Ele ensina para uma criança real, com um cérebro em construção. Estas são as restrições de hardware que todos os geradores, tutores e telas obedecem — ignorar qualquer uma delas produz frustração que parece "falta de capacidade" mas é só design errado.
+Antes de qualquer assunto: o SAGA não ensina para uma "criança ideal". Ele ensina para uma criança real, com um cérebro em construção. Estas são as restrictions de hardware que todos os geradores, tutores e telas obedecem — ignorar qualquer uma delas produz frustração que parece "falta de capacidade" mas é só design errado.
 
 **Memória de trabalho.** Aos 4-5 anos a criança segura ~2-3 informações ao mesmo tempo; aos 6-7, ~3-4; aos 8+, ~4-5. Consequência dura: **nenhuma instrução com mais de 2 passos para F0-F1**. "Pegue as maçãs vermelhas E conte E arraste pro cesto" = 3 comandos = travamento garantido. Uma ação por vez, o tutor guia a próxima.
 
@@ -168,7 +168,7 @@ Dois grupos de patinhos entram nadando (2 e 1). Tutor: *"Os patinhos querem nada
 ### Nível 2 — o poder do 10 (N1.11, N3.06)
 - **A moldura de 10** é a lente principal: o 8 na grade 2×5 mostra fisicamente **2 buracos vazios**. A criança não calcula "quanto falta pra 10" — ela VÊ.
 - **Dobros como estacas (N3.06):** 4+4, 5+5... memorizados por simetria visual (espelho). Quase-dobros derivam: 5+6 = (5+5)+1. 🧒 *Erro:* derivar pro lado errado (5+6 = 10−1=9). E1: *"6 é MAIS que 5 ou MENOS?"*
-- Params: molduras sempre preenchidas da esquerda pra direita, linha de cima primeiro (a estrutura canônica é o que vira imagem mental).
+- Params: molduras sempre preenchidas da esquerda pra direita, linha de cima primeiro (a structure canônica é o que vira imagem mental).
 
 ### Nível 3 — a Ponte do 10 (N3.07) — o segredo asiático
 Como somar 8+5 de cabeça: **(1)** olha pro 8: *"de quanto você precisa pra virar 10?"* → 2. **(2)** espatifa o 5 em 2+3 (efeito de divisão de célula na tela). **(3)** o 2 voa pro 8 → fecha a barra dourada de 10. **(4)** sobra 10+3 = 13.
@@ -575,6 +575,45 @@ Até aqui, "menor que zero" não existia — e a subtração "sempre diminui". O
 
 ---
 
+# 🌡️ INTEIROS — O MUNDO ABAIXO DO ZERO → N7.01, N7.02
+*Didática construída nesta versão. Fecha a última strand numérica (F4): a reta que a criança conhece desde N1.12 finalmente abre o lado esquerdo.*
+
+## Por que trava
+Os negativos chegam na escola como regras de sinal decoradas — e a regra da multiplicação VAZA para a adição (−2 + −3 = +5?). Sintoma-diagnóstico: *"−5 > −2, porque 5 é maior que 2"*. Causa: a reta numérica mental da criança termina no zero; ninguém abriu o lado de baixo com contextos que ela já vive.
+
+## A escada
+```
+ Nível 2: Operar — movimento na reta, fichas, subtrair dívida → N7.02
+ Nível 1: A reta completa — comparar, oposto, zero no centro  → N7.01b-d
+ Nível 0: Contextos vividos — elevador, termômetro, saldo     → N7.01a
+```
+
+## ▶️ Primeira vez
+O elevador do prédio: térreo (0), andares 1, 2, 3... e a garagem embaixo. Tutor: *"O elevador DESCEU pra garagem. Que andar é esse? É o andar MENOS UM — um abaixo do térreo."* Depois o termômetro num dia de inverno: *"três graus ABAIXO de zero"*. O sinal − nasce como **endereço** (o lado de baixo/esquerda do zero), não como operação. Só então a velha reta de N1.12 volta — espelhada, com o zero virando o CENTRO do mundo.
+
+## Nível a nível
+
+### Nível 0-1 — morar na reta completa (N7.01)
+- Comparar: 🧒 **o erro-chefão dos inteiros:** −5 > −2 "porque 5 > 2" (a lógica dos naturais vazando — igualzinho ao 1/8 > 1/4 das frações). A cura nunca é a regra falada: é o termômetro (−5 é MAIS FRIO) e o elevador (−5 é MAIS FUNDO). Regra deduzida: **mais à esquerda = menor.** Distrator canônico: a comparação pelos módulos.
+- Oposto e distância ao zero (módulo informal): −3 e 3 são vizinhos do zero à MESMA distância, em lados opostos — o espelho da reta.
+
+### Nível 2 — operar com corpo (N7.02)
+- **Somar/subtrair como movimento:** ganhar/perder, subir/descer — saltos bidirecionais na reta. −3 + 5: começa no −3, anda 5 pra direita, chega no 2.
+- **O modelo de fichas:** ficha +1 e ficha −1 se ANULAM em par (poof!). −3 + 5 = três pares somem, sobram 2 positivas. 🧒 *Erros mapeados:* −3+5 tratado como −(3+5); "menos com menos dá menos" na SOMA (−2 + −3 = +5?) — as fichas desmontam: juntar dívida com dívida dá dívida maior.
+- **Subtrair negativo:** *"tirar uma dívida é GANHAR"* — o mascote deve 3 moedas; a dívida é perdoada (sai da tela) → ele ficou 3 moedas mais rico. A cena antes do símbolo, como sempre.
+- **Regras de sinal da × e ÷ por padrão observado, nunca por decreto:** a tabela viva 3×(−2)=−6, 2×(−2)=−4, 1×(−2)=−2, 0×(−2)=0, (−1)×(−2)=... — a sequência REVELA o +2. 🧒 *O vazamento clássico:* decorar a regra da × e aplicá-la na adição — atacado mostrando lado a lado a conta de + (fichas) e a de × (padrão): mundos diferentes, ferramentas diferentes.
+
+## Microtutoriais
+**"O Elevador"** (N7.01) · **"As Fichas que Somem"** (N7.02 — I do: tutor resolve −4+6 anulando pares; We do: −3+5; You do: −2+6) · **"A Dívida Perdoada"** (N7.02c).
+
+## Regras de implementação
+1. O − de endereço (negativo) e o − de operação (subtração) nascem separados — a fala do tutor SEMPRE distingue ("menos três" vs "tirar três").
+2. Termômetro/elevador disponíveis como apoio em toda comparação até nível 4 da competência.
+3. Regras de sinal só por padrão observado na tabela viva.
+4. Fichas com anulação animada em pares — o par que some é a alma do modelo.
+
+---
+
 # 🧠 LÓGICA, PADRÕES E ÁLGEBRA — O BERÇO DO X → AL.01-AL.08
 *Fonte: `logica-e-padroes.md`, expandido e costurado ao Grafo.*
 
@@ -846,5 +885,5 @@ Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada C
 **Divisão de papéis definitiva:** o **Grafo** é a estrutura (o quê, em que ordem, com quais pré-requisitos e distratores) · o **Manual** é a alma (como se ensina, o que se fala, o que a criança sente e erra) · a **Bíblia** é o comportamento do sistema (motores, sessão, adaptatividade, regras duras) · o **Dojo** (doc próprio) é a academia de fluência · o **YAML** é o grafo executável. Cinco peças, uma linguagem: os IDs.
 
 *Changelog: v2.0 (jul/2026) — detalhamento completo de todos os assuntos no padrão da divisão; novas didáticas: Fundação N1/N2, Decimais/Porcentagem/Proporção, Inteiros (N7), Dados/Probabilidade, Método de Barras; seção A Criança Real (limites de desenvolvimento); mapa de confluências.*
-*v2.1 (jul/2026) — Contrato de Ensino: modelo de erro reformulado para duas camadas (resposta imediata leve na questão (preserva o fluxo, nunca trava) + remediação profunda por padrão, no momento certo). Regra-mãe "o fluxo é sagrado". Os E1/E2/E3 por assunto passam a descrever o CONTEÚDO de cada nível; o QUANDO é governado centralmente. Andaime de ensino distinguido de resposta a erro.*
+*v2.1 (jul/2026) — Contrato de Ensino: modelo de erro reformulado para duas camadas (resposta imediata leve que preserva o fluxo + remediação profunda por padrão, no momento certo). Regra-mãe "o fluxo é sagrado". Os E1/E2/E3 por assunto passam a descrever o CONTEÚDO de cada nível; o QUANDO é governado centralmente. Andaime de ensino distinguido de resposta a erro.*
 *v2.2 (jul/2026) — Fundação N1.02: exercício-âncora Canhão de Balões (contar = tiro + numeral + som, semente da correspondência 1-a-1 e da cardinalidade) e a ordem correta da contagem (o 1 antes do 0; zero nasce concreto como "vazio", depois da cardinalidade).*
