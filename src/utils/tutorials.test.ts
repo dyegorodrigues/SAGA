@@ -1,25 +1,28 @@
 import { describe, it, expect } from "vitest";
-import { TUTORIALS, hasTutorial, tutorialSteps } from "./tutorials";
+import { hasTutorial, tutorialSteps } from "./tutorials";
+import { LEGACY_CHOREOGRAPHIES } from "./choreographyRegistry";
 import { Question } from "../types";
 
 const fakeQ = (kind: string): Question => ({ kind, prompt: "?", options: [], answer: 0 });
 
 describe("Tutoriais guiados 👉 (generalizados)", () => {
-  it("todo tutorial registrado tem passos, todos com fala não-vazia", () => {
-    for (const kind of Object.keys(TUTORIALS)) {
+  it("todo tutorial registrado tem passos, todos com fala não-vazia, e pelo menos um passo com show não-vazio", () => {
+    for (const kind of Object.keys(LEGACY_CHOREOGRAPHIES)) {
       const steps = tutorialSteps(fakeQ(kind));
       expect(steps.length, `${kind} sem passos`).toBeGreaterThan(0);
       for (const s of steps) {
         expect(typeof s.say, kind).toBe("string");
         expect(s.say.trim().length, `${kind} fala vazia`).toBeGreaterThan(0);
       }
+      const hasShow = steps.some(s => s.show !== undefined && s.show !== null && s.show !== "");
+      expect(hasShow, `Coreografia de ${kind} é só narração: não tem nenhum show`).toBe(true);
     }
   });
 
   it("hasTutorial só é true para kinds registrados", () => {
     expect(hasTutorial("grow")).toBe(true);
     expect(hasTutorial("tenframe")).toBe(true);
-    expect(hasTutorial("count")).toBe(false); // count tem a mãozinha antiga hardcoded
+    expect(hasTutorial("count")).toBe(true);
     expect(hasTutorial("inexistente")).toBe(false);
   });
 

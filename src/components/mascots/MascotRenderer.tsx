@@ -18,13 +18,14 @@ import { getMascotPng } from "./mascotAssets";
 
 interface MascotRendererProps {
   theme?: string;
-  size?: number;
+  size?: number | string;
   className?: string;
   outfit?: string;
   bgAccessory?: string;
   kid?: any;
   stage?: number;
   animation?: "idle" | "walk" | "happy";
+  transparentBg?: boolean;
 }
 
 export function MascotRenderer({
@@ -36,11 +37,12 @@ export function MascotRenderer({
   kid = null,
   stage = 3,
   animation = "idle",
+  transparentBg = false,
 }: MascotRendererProps) {
   const activeTheme = theme !== "classico" ? theme : (kid?.theme || "classico");
   const bodyColor = BODY_COLORS[activeTheme] || BODY_COLORS.classico;
   
-  let activeOutfit = "kimono";
+  let activeOutfit = "none"; // Disable all outfits/accessories to prevent rendering bugs
   let activeBg = bgAccessory !== "default" ? bgAccessory : (kid?.bgAccessory || "default");
 
   if (activeBg === "default" || activeBg === "none") {
@@ -63,8 +65,8 @@ export function MascotRenderer({
   let bodyAnimClass = animation === "walk" ? "anim-walk" : animation === "happy" ? "anim-happy" : "anim-float";
   let eggAnimClass = "anim-egg-wiggle";
 
-  bodyAnimClass = "anim-float";
-  eggAnimClass = "anim-egg-wiggle";
+
+
 
   const pngUrl = getMascotPng(activeTheme, stage);
 
@@ -83,7 +85,7 @@ export function MascotRenderer({
     scaleFactor = 0.80; // Growing smart child!
   } else if (stage === 4) {
     scaleFactor = 1.0;  // Full signature adult hero!
-  } else if (stage >= 5) {
+  } else if (stage === 5) {
     scaleFactor = 1.15; // Supreme legend, slightly larger and epic!
   }
 
@@ -100,7 +102,7 @@ export function MascotRenderer({
     bx = 29; by = 34; bw = 42; bh = 42; br = 18;
   } else if (stage === 4) {
     bx = 26; by = 28; bw = 48; bh = 48; br = 20;
-  } else if (stage >= 5) {
+  } else if (stage === 5) {
     bx = 24; by = 24; bw = 52; bh = 52; br = 22;
   }
 
@@ -124,7 +126,7 @@ export function MascotRenderer({
     faceTransform = "translate(0, 0) translate(50, 50) scale(0.96) translate(-50, -50)";
     glassesTransform = "translate(0, -1) translate(50, 50) scale(0.96) translate(-50, -50)";
     foneTransform = "translate(0, -1) translate(50, 50) scale(0.96) translate(-50, -50)";
-  } else if (stage >= 5) {
+  } else if (stage === 5) {
     hatTransform = "translate(0, -3) translate(50, 50) scale(1.06) translate(-50, -50)";
     faceTransform = "translate(0, -2) translate(50, 50) scale(1.05) translate(-50, -50)";
     glassesTransform = "translate(0, -3) translate(50, 50) scale(1.05) translate(-50, -50)";
@@ -146,9 +148,6 @@ export function MascotRenderer({
       style={{ display: "block", margin: "0 auto", overflow: "visible" }}
     >
       <defs>
-        <clipPath id="scenery-clip">
-          <circle cx="50" cy="50" r="45" />
-        </clipPath>
 
         <radialGradient id={`bg-${activeBg}`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.6" />
@@ -167,12 +166,12 @@ export function MascotRenderer({
       </defs>
 
       <style>{`
-        @keyframes pkFloat { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-4px); } }
+        @keyframes pkBreathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.97) scaleX(1.02); } }
         @keyframes pkEgg { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
         @keyframes pkWalk { 0%, 100% { transform: rotate(0deg) translateY(0px); } 25% { transform: rotate(-8deg) translateY(-2px); } 75% { transform: rotate(8deg) translateY(-2px); } }
         @keyframes pkHappy { 0%, 100% { transform: translateY(0px) scale(1); } 50% { transform: translateY(-10px) scale(1.05); } }
         
-        .anim-float { animation: pkFloat 3s ease-in-out infinite; transform-origin: 50px 50px; }
+        .anim-float { animation: pkBreathe 4s ease-in-out infinite; transform-origin: 50px 85px; }
         .anim-egg-wiggle { animation: pkEgg 2s ease-in-out infinite; transform-origin: 50px 80px; }
         .anim-walk { animation: pkWalk 0.6s ease-in-out infinite; transform-origin: 50px 80px; }
         .anim-happy { animation: pkHappy 0.6s ease-in-out infinite; transform-origin: 50px 80px; }
@@ -180,35 +179,9 @@ export function MascotRenderer({
         .eye-blink { animation: blink 4s infinite; }
         @keyframes blink { 0%, 96%, 100% { transform: scaleY(1); } 98% { transform: scaleY(0.1); } }
       `}</style>
-
-      {/* Scenic Backdrops clipped to circular stage boundaries */}
-      <g clipPath="url(#scenery-clip)">
-        {/* Sky/Default backing */}
-        <rect x="5" y="5" width="90" height="90" fill="#E2E8F0" />
-
-        {activeBg === "espaco" && (
-          <g>
-            <rect x="5" y="5" width="90" height="90" fill="#0B0F19" />
-            <circle cx="50" cy="50" r="35" fill="none" stroke="#1E293B" strokeWidth="0.5" />
-            {/* Stars */}
-            <circle cx="25" cy="25" r="1.2" fill="#FFFFFF" opacity="0.9" />
-            <circle cx="75" cy="30" r="1.5" fill="#FFFFFF" opacity="0.8" className="animate-pulse" />
-            <circle cx="35" cy="65" r="1.2" fill="#38BDF8" opacity="0.7" />
-            <circle cx="68" cy="72" r="1" fill="#FBBF24" opacity="0.9" />
-            {/* Crescent Moon */}
-            <path d="M 22 18 A 6 6 0 0 0 34 26 A 8 8 0 1 1 22 18 Z" fill="#FDE047" opacity="0.85" />
-            {/* Saturn */}
-            <g transform="translate(74, 20) rotate(-15) scale(0.6)">
-              <ellipse cx="0" cy="0" rx="14" ry="4" fill="none" stroke="#F59E0B" strokeWidth="3" opacity="0.6" />
-              <circle cx="0" cy="0" r="8" fill="#F3F4F6" />
-              <ellipse cx="0" cy="0" rx="14" ry="4" fill="none" stroke="#FBBF24" strokeWidth="1.5" />
-            </g>
-          </g>
-        )}
-
         {activeBg === "castelo" && (
           <g>
-            <rect x="5" y="5" width="90" height="90" fill="#2E1065" />
+            <rect x="0" y="0" width="100" height="100" fill="#2E1065" />
             <circle cx="50" cy="35" r="28" fill="#4C1D95" opacity="0.5" />
             <circle cx="30" cy="20" r="1" fill="#FFF" />
             <circle cx="70" cy="22" r="1" fill="#FFF" />
@@ -232,7 +205,7 @@ export function MascotRenderer({
 
         {activeBg === "campo" && (
           <g>
-            <rect x="5" y="5" width="90" height="90" fill="#38BDF8" />
+            <rect x="0" y="0" width="100" height="100" fill="#38BDF8" />
             <circle cx="25" cy="24" r="10" fill="#FFFFFF" opacity="0.8" />
             <circle cx="35" cy="26" r="8" fill="#FFFFFF" opacity="0.8" />
             <circle cx="75" cy="20" r="12" fill="#FFFFFF" opacity="0.8" />
@@ -247,7 +220,7 @@ export function MascotRenderer({
 
         {activeBg === "parque" && (
           <g>
-            <rect x="5" y="5" width="90" height="90" fill="#BAE6FD" />
+            <rect x="0" y="0" width="100" height="100" fill="#BAE6FD" />
             <circle cx="20" cy="20" r="10" fill="#F59E0B" />
             <circle cx="20" cy="20" r="7" fill="#FDE047" />
             {/* Meadows and Trees */}
@@ -263,16 +236,15 @@ export function MascotRenderer({
           </g>
         )}
 
-        {/* Scenic radial spotlight highlight overlay */}
-        <circle cx="50" cy="50" r="45" fill={`url(#bg-${activeBg})`} />
-      </g>
 
       {/* PNG definitivo (pipeline de arte): quando existir, vence qualquer desenho SVG */}
       {pngUrl && (
         <g className={stage === 1 ? eggAnimClass : bodyAnimClass}>
+
           <ellipse cx="50" cy="85" rx="20" ry="5" fill="rgba(0,0,0,0.2)" />
-          <image href={pngUrl} x="12" y="8" width="76" height="76" />
+          <image href={pngUrl} x="15" y="10" width="70" height="70" />
         </g>
+
       )}
 
       {/* Egg stage (Stage 1) */}
@@ -339,7 +311,7 @@ export function MascotRenderer({
         <g className={bodyAnimClass}>
           
           {/* Level 5 Aura Effect */}
-          {stage >= 5 && (
+          {stage === 5 && (
             <MascotAura theme={activeTheme} />
           )}
 
@@ -413,7 +385,6 @@ export function MascotRenderer({
               {activeOutfit === "witch" && <Accs.WitchCostume stage={stage} activeColor={bodyColor} />}
               {activeOutfit === "ironman" && <Accs.IronManArmor stage={stage} activeColor={bodyColor} />}
               {activeOutfit === "rei" && <Accs.KingOutfit stage={stage} activeColor={bodyColor} />}
-              {activeOutfit === "kimono" && <Accs.KimonoOutfit stage={stage} />}
 
               {/* Standard Outfits */}
               {activeOutfit === "chapeu" && <Accs.ChaplinHat stage={stage} activeColor={bodyColor} />}

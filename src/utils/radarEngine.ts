@@ -1,19 +1,25 @@
-import { MisconceptionTagType } from "../constants/misconceptions";
-
 /**
- * RadarEngine (Fase 5 - Stub)
- * Ouve os erros do GameLoop e, se bater com uma Misconception conhecida,
- * aciona a interveção da Camada 2 (ex: Mão Fantasma) ou Camada 3 (IA).
+ * RadarEngine - Motor da Revisão Espaçada (Leitner Simplificado)
+ * 
+ * Controla os baldes baseados na Força (0-5) dos conceitos.
+ * Força 1: ~1 dia, Força 2: ~2 dias, Força 3: ~4 dias, Força 4: ~9 dias, Força 5: ~21 dias
  */
-export function analyzeMisconception(
-  tag: MisconceptionTagType | string,
-  question: any
-) {
-  // TODO: Fase 5 plena será implementada aqui para mapear a tag de erro
-  // e disparar a resposta correspondente.
-  console.log(`[RadarEngine] Misconception detectada: ${tag}`, question);
-  return {
-    needsIntervention: true,
-    tag,
-  };
-}
+
+import { Progress } from "../types";
+
+export const RadarEngine = {
+  // Retorna IDs de trilhas/nós que precisam de revisão hoje
+  getRescueItems: (kidId: string, pMap: Record<string, Progress>): string[] => {
+    // Stub
+    return [];
+  },
+  
+  // Atualiza o balde baseado no tempo e acerto
+  evaluateSpacedRepetition: (kidId: string, trackId: string, right: boolean, durationMs: number) => {
+    // Stub
+  }
+};
+
+export const trackMisconception = (kidId: string, node: string, tag: string) => {
+  // Stub
+};

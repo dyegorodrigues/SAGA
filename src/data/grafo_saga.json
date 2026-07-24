@@ -828,6 +828,7 @@
   "fluency": [
     {
       "id": "FD1",
+      "familia": "FD",
       "nome": "Amigos do 10",
       "destrava": {
         "N1.11": 4
@@ -836,6 +837,7 @@
     },
     {
       "id": "FD2",
+      "familia": "FD",
       "nome": "Dobros e quase-dobros",
       "destrava": {
         "N3.06": 4
@@ -844,6 +846,7 @@
     },
     {
       "id": "FD3",
+      "familia": "FD",
       "nome": "+/− até 20",
       "destrava": {
         "N3.07": 4,
@@ -853,6 +856,7 @@
     },
     {
       "id": "FD4",
+      "familia": "FD",
       "nome": "Tabuadas 2, 5, 10",
       "destrava": {
         "N4.03": 4
@@ -861,6 +865,7 @@
     },
     {
       "id": "FD5",
+      "familia": "FD",
       "nome": "Tabuadas 3, 4, 6-9",
       "destrava": {
         "N4.07": 4
@@ -869,6 +874,7 @@
     },
     {
       "id": "FD6",
+      "familia": "FD",
       "nome": "Fatos de divisão",
       "destrava": {
         "N4.06": 4
@@ -877,6 +883,7 @@
     },
     {
       "id": "FD7",
+      "familia": "FD",
       "nome": "Complementos de 100 e mental",
       "destrava": {
         "N3.13": 4
@@ -885,11 +892,88 @@
     },
     {
       "id": "FD8",
+      "familia": "FD",
       "nome": "Fração↔decimal↔% comuns",
       "destrava": {
         "N6.03": 4
       },
       "rt_max_s": 6
+    },
+    {
+      "id": "PD-A",
+      "familia": "PD",
+      "nome": "Adição armada",
+      "destrava": {
+        "N3.11": 4
+      },
+      "degraus": [
+        "2dig_s_reserva",
+        "2dig_c_reserva",
+        "3dig",
+        "4dig",
+        "varias_parcelas"
+      ]
+    },
+    {
+      "id": "PD-S",
+      "familia": "PD",
+      "nome": "Subtração armada",
+      "destrava": {
+        "N3.12": 4
+      },
+      "degraus": [
+        "2dig_s_troca",
+        "2dig_c_troca",
+        "3dig",
+        "com_zeros",
+        "4dig"
+      ]
+    },
+    {
+      "id": "PD-M",
+      "familia": "PD",
+      "nome": "Multiplicação armada",
+      "destrava": {
+        "N4.08": 4,
+        "N4.09": 4
+      },
+      "degraus": [
+        "x1dig",
+        "x1dig_reserva",
+        "x10_100",
+        "x2dig",
+        "x3dig"
+      ]
+    },
+    {
+      "id": "PD-D",
+      "familia": "PD",
+      "nome": "Divisão armada",
+      "destrava": {
+        "N4.10": 4
+      },
+      "degraus": [
+        "1dig_exata",
+        "1dig_resto",
+        "3dig",
+        "zero_quociente",
+        "2dig",
+        "decimais"
+      ]
+    },
+    {
+      "id": "PD-Dec",
+      "familia": "PD",
+      "nome": "Operações com decimais armadas",
+      "destrava": {
+        "N6.02": 4
+      },
+      "degraus": [
+        "soma_sub_virgula",
+        "x_dig",
+        "div",
+        "x_div_10_100"
+      ]
     }
   ]
 }

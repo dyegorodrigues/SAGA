@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion } from "motion/react";
 import { State, Kid, Track, Progress } from "./types";
-import { migrateStateM3 } from "./utils/migrator";
 import {
   C,
   FONT,
@@ -21,7 +20,7 @@ import { GameLoop } from "./components/GameLoop";
 import { ParentDashboard } from "./components/ParentDashboard";
 import { getKidLifetimeStars, getMascotStage } from "./components/MascotEvolution";
 import { computeUnlockStatus } from "./utils/unlockEngine";
-import { TRACKS_PRE, TRACKS_ANO1, TRACKS_ANO2 } from "./utils/curriculum";
+
 import { tracksForGrade } from "./subjects";
 import { buildMixedTrack } from "./utils/mixedChallenge";
 import { buildDojoTrack } from "./utils/dojoMode";
@@ -32,6 +31,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
 import { AdminGodPanel } from "./components/AdminGodPanel";
 import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
+import { GalleryScreen } from "./components/GalleryScreen";
 
 /* ============================================================
    MATEMÁGICA IA — Matemática Adaptativa & Tutoria Inteligente (PT-BR)
@@ -151,112 +151,6 @@ const calcStreak = (log: any[]) => {
   return streak;
 };
 
-/* ---------------- Theme-Specific Background Decorations ---------------- */
-function ThemeDecor({ theme }: { theme: string }) {
-  if (theme === "dino") {
-    return (
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-        {/* Floating organic items */}
-        <span className="absolute text-4xl" style={{ top: "15%", left: "4%", animation: "mkDrift 9s ease-in-out infinite" }}>🌿</span>
-        <span className="absolute text-3xl" style={{ top: "45%", right: "6%", animation: "mkDrift 11s ease-in-out infinite", animationDelay: "-2s" }}>🦴</span>
-        <span className="absolute text-2xl" style={{ top: "72%", left: "6%", animation: "mkDrift 8s ease-in-out infinite", animationDelay: "-4s" }}>🍃</span>
-        <span className="absolute text-4xl" style={{ top: "25%", right: "10%", animation: "mkDrift 10s ease-in-out infinite", animationDelay: "-6s" }}>🦕</span>
-        <span className="absolute text-3xl" style={{ top: "58%", left: "8%", animation: "mkDrift 12s ease-in-out infinite", animationDelay: "-1s" }}>🦖</span>
-
-        {/* Cute active volcano at the bottom left */}
-        <div className="absolute bottom-[-15px] left-[-25px] opacity-90 scale-75 md:scale-95" style={{ transformOrigin: "bottom left" }}>
-          <svg width="150" height="150" viewBox="0 0 100 100">
-            <polygon points="10,100 50,30 90,100" fill="#7D5C45" />
-            <polygon points="35,53 50,30 65,53" fill="#D35400" />
-            <ellipse cx="50" cy="31" rx="10" ry="4" fill="#E74C3C" />
-            <path d="M47 32 Q50 50 48 65 Q50 75 52 80" stroke="#FF5733" strokeWidth="3" strokeLinecap="round" fill="none" />
-            <path d="M53 32 Q55 45 57 58 Q54 68 53 72" stroke="#FFC300" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-            <rect x="5" y="90" width="90" height="10" rx="4" fill="#2ECC71" />
-            <circle cx="20" cy="88" r="8" fill="#27AE60" />
-            <circle cx="82" cy="89" r="7" fill="#27AE60" />
-          </svg>
-          <span className="absolute" style={{ top: "15px", left: "42px", fontSize: "20px", animation: "mkPuff 4s ease-in-out infinite" }}>💭</span>
-          <span className="absolute" style={{ top: "8px", left: "48px", fontSize: "15px", animation: "mkPuff 4.5s ease-in-out infinite", animationDelay: "1.8s" }}>💭</span>
-        </div>
-
-        {/* Shaking dinosaur egg in a nest at bottom right */}
-        <div className="absolute bottom-2 right-4 opacity-95 scale-90">
-          <svg width="80" height="80" viewBox="0 0 80 80">
-            <path d="M10 65 Q40 85 70 65 Q70 75 60 78 Q40 82 20 78 Q10 75 10 65 Z" fill="#D35400" />
-            <path d="M15 62 C30 58, 50 58, 65 62 C60 70, 40 72, 20 70 Z" fill="#A04000" />
-            <g style={{ animation: "mkSway 2.4s ease-in-out infinite", transformOrigin: "40px 60px" }}>
-              <ellipse cx="40" cy="46" rx="18" ry="24" fill="#FCF3CF" stroke="#D4AC0D" strokeWidth="1.5" />
-              <circle cx="32" cy="40" r="3" fill="#F4D03F" />
-              <circle cx="48" cy="36" r="4.5" fill="#F4D03F" />
-              <circle cx="44" cy="54" r="3.5" fill="#F4D03F" />
-              <circle cx="34" cy="50" r="2.5" fill="#F4D03F" />
-            </g>
-          </svg>
-        </div>
-      </div>
-    );
-  }
-
-  if (theme === "heroi") {
-    return (
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-        <span className="absolute text-5xl" style={{ top: "12%", left: "5%", animation: "mkDrift 7s ease-in-out infinite" }}>⚡</span>
-        <span className="absolute text-4xl" style={{ top: "52%", right: "5%", animation: "mkDrift 9s ease-in-out infinite", animationDelay: "-1.5s" }}>🛡️</span>
-        <span className="absolute text-3xl" style={{ top: "78%", left: "10%", animation: "mkDrift 8s ease-in-out infinite", animationDelay: "-3s" }}>💥</span>
-        <span className="absolute text-4xl" style={{ top: "28%", right: "10%", animation: "mkDrift 10s ease-in-out infinite", animationDelay: "-4.5s" }}>🚀</span>
-
-        <span className="absolute font-black text-rose-500 text-xs px-2 py-1 bg-amber-300 rounded border-2 border-slate-900 rotate-[-12deg]" style={{ top: "42%", left: "4%", animation: "mkPulse 2.8s ease-in-out infinite" }}>
-          POW!
-        </span>
-        <span className="absolute font-black text-blue-600 text-xs px-2 py-1 bg-yellow-300 rounded border-2 border-slate-900 rotate-[15deg]" style={{ top: "22%", right: "4%", animation: "mkPulse 3.2s ease-in-out infinite", animationDelay: "1s" }}>
-          BOOM!
-        </span>
-      </div>
-    );
-  }
-
-  if (theme === "futebol") {
-    return (
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-        <span className="absolute text-3xl" style={{ top: "14%", left: "8%", animation: "mkDrift 10s ease-in-out infinite" }}>⚽</span>
-        <span className="absolute text-4xl" style={{ top: "48%", right: "8%", animation: "mkDrift 8s ease-in-out infinite", animationDelay: "-2.5s" }}>🏆</span>
-        <span className="absolute text-3xl" style={{ top: "74%", left: "10%", animation: "mkDrift 9s ease-in-out infinite", animationDelay: "-4s" }}>🥇</span>
-        <span className="absolute text-2xl opacity-60" style={{ top: "28%", right: "14%", animation: "mkDrift 11s ease-in-out infinite", animationDelay: "-1s" }}>📣</span>
-
-        <div className="absolute top-0 left-[-10%] w-[120%] h-full flex justify-between opacity-15">
-          <div className="w-[120px] h-[500px] bg-gradient-to-b from-white to-transparent" style={{ transformOrigin: "top left", animation: "mkSpotlight 8s ease-in-out infinite" }} />
-          <div className="w-[120px] h-[500px] bg-gradient-to-b from-white to-transparent" style={{ transformOrigin: "top right", animation: "mkSpotlight 9s ease-in-out infinite", animationDelay: "1.5s" }} />
-        </div>
-      </div>
-    );
-  }
-
-  if (theme === "musica") {
-    return (
-      <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-        <span className="absolute text-3xl" style={{ top: "10%", left: "8%", animation: "mkDrift 8s ease-in-out infinite" }}>🎵</span>
-        <span className="absolute text-4xl" style={{ top: "42%", right: "6%", animation: "mkDrift 11s ease-in-out infinite", animationDelay: "-2s" }}>🎶</span>
-        <span className="absolute text-3xl" style={{ top: "78%", left: "6%", animation: "mkDrift 9s ease-in-out infinite", animationDelay: "-4s" }}>🎸</span>
-        <span className="absolute text-4xl" style={{ top: "26%", right: "10%", animation: "mkDrift 10s ease-in-out infinite", animationDelay: "-6s" }}>🎧</span>
-        <span className="absolute text-2xl opacity-50" style={{ top: "60%", left: "12%", animation: "mkDrift 7s ease-in-out infinite", animationDelay: "-1s" }}>🎹</span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-      <span className="absolute select-none text-4xl opacity-50" style={{ top: 12, left: 0, animation: "mkCloud 48s linear infinite" }}>☁️</span>
-      <span className="absolute select-none text-2xl opacity-40" style={{ top: 68, left: 0, animation: "mkCloud 66s linear infinite", animationDelay: "-24s" }}>☁️</span>
-      <span className="absolute select-none text-xl opacity-35" style={{ top: 38, left: 0, animation: "mkCloud 84s linear infinite", animationDelay: "-50s" }}>☁️</span>
-      
-      <span className="absolute select-none text-sm" style={{ top: 96, left: 16, animation: "mkTwinkle 3.4s ease-in-out infinite" }}>✨</span>
-      <span className="absolute select-none text-xs" style={{ top: 28, right: 24, animation: "mkTwinkle 4.2s ease-in-out infinite", animationDelay: "1.1s" }}>✨</span>
-      <span className="absolute select-none text-base" style={{ top: "54%", left: "4%", animation: "mkTwinkle 3s ease-in-out infinite", animationDelay: "2s" }}>⭐</span>
-      <span className="absolute select-none text-sm" style={{ top: "42%", right: "5%", animation: "mkTwinkle 3.8s ease-in-out infinite", animationDelay: "0.5s" }}>✨</span>
-    </div>
-  );
-}
-
 /* ---------------- Immersive Layout Shell ---------------- */
 interface ShellProps {
   children: React.ReactNode;
@@ -326,9 +220,6 @@ export function Shell({ children, theme = "classico" }: ShellProps) {
         button{-webkit-tap-highlight-color:transparent; outline: none !important;}
         @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
       `}</style>
-
-      {/* Theme-Specific Background Decorations component */}
-      <ThemeDecor theme={theme} />
 
       <div className="relative mx-auto w-full max-w-md px-4 pt-5 pb-8">
         <div className="relative z-10">{children}</div>
@@ -531,7 +422,7 @@ export default function App() {
     
     // We only show tracks that are OPENED according to the graph
     // (i.e. all prerequisites are met).
-    const unlockedTracks = allTracks.filter(t => status.opened.includes(t.id));
+    const unlockedTracks = allTracks; // Return all tracks to show them in the map
 
     const custom = (state.customTracks || [])
       // removed filter by grade here too
@@ -897,14 +788,15 @@ export default function App() {
             onAddKid={handleAddKid}
             onFactoryReset={handleFactoryReset}
             onBack={() => setScreen({ name: "pick" })}
-            tracksPre={TRACKS_PRE}
-            tracksAno1={TRACKS_ANO1}
-            tracksAno2={TRACKS_ANO2}
             onUpdateState={(newState) => persist(newState)}
             userEmail={userEmail}
             onLogout={handleLogout}
             onTriggerAdmin={() => setScreen({ name: "admin" })}
           />
+        )}
+
+        {screen.name === "galeria" && (
+          <GalleryScreen onExit={() => setScreen({ name: "home", kid: screen.kid })} />
         )}
 
         {screen.name === "admin" && state && (

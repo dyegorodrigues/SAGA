@@ -45,7 +45,7 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     }
     // warmup is t1 or t2 because they are the first without prereqs (since they are in TRACKS_BASE)
     // Actually warmup logic defaults to one of the basics. If not found, tracks[0] which is t1.
-    expect(plan.warmup!.id).toBe("contar");
+    expect(plan.aquecimento!.id).toBe("t1");
     
     // fronteira should NOT be N1.05 (soma) because N1.04 (contar) is NOT practiced, so contar should be fronteira (fresh)
     expect(plan.fronteira!.id).toBe("contar");
@@ -62,7 +62,7 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     const { plan } = composeAula(tracks, progOfMap(m));
     expect(plan.fronteira!.id).toBe("soma");
     // warmup should be contar because best acc and tot >= 4
-    expect(plan.warmup!.id).toBe("contar");
+    expect(plan.aquecimento!.id).toBe("contar");
   });
 
   it("tudo dominado → fronteira vira conteúdo NOVO (nunca praticado com prereqs ok)", () => {
@@ -110,7 +110,7 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     expect(track.totalQ).toBe(AULA_TOTAL);
     const seen: string[] = [];
     for (let i = 0; i < AULA_TOTAL; i++) seen.push(track.gen(1).prompt);
-    expect(seen[0]).toBe("contar");
+    expect(seen[0]).toBe("t1");
     expect(seen.length).toBe(AULA_TOTAL);
   });
 

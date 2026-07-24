@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Track, Progress } from '../types';
+import { computeUnlockStatus } from '../utils/unlockEngine';
 import { ISLAND_DEFS } from '../utils/curriculum';
 import { C, FONT, sfx } from './Mascot';
 
@@ -11,6 +12,12 @@ interface Props {
 
 
 export function LearningPath({ tracks, progOf, onSelectTrack }: Props) {
+  // Build a pMap for computeUnlockStatus
+  const pMap = tracks.reduce((acc, t) => {
+    acc[t.id] = progOf(t.id);
+    return acc;
+  }, {} as Record<string, Progress>);
+  const status = computeUnlockStatus(pMap);
   const [expandedIsland, setExpandedIsland] = useState<string | null>(null); // changed to island string ID
   
   // Group tracks by island
@@ -69,7 +76,8 @@ export function LearningPath({ tracks, progOf, onSelectTrack }: Props) {
 
               {islandTracks.map((track, i) => {
                 const p = progOf(track.id);
-                const isLocked = false;
+                const isLocked = !status.opened.includes(track.id);
+   const isFrontier = status.frontier.includes(track.id);
                 const lvl = p.lvl || 1;
                 const isDominated = p.dom;
                 const offset = offsets[i % offsets.length];
@@ -105,8 +113,8 @@ export function LearningPath({ tracks, progOf, onSelectTrack }: Props) {
                     </button>
                     
                     {/* Progresso (Nível) */}
-                    <div className="mt-2.5 bg-white border-2 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-black shadow-sm" style={{ borderColor: track.color, color: track.dark }}>
-                      {isDominated ? 'Dominado' : `Nível ${lvl}`}
+                    <div className="mt-2.5 bg-white border-2 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-black shadow-sm" style={{ borderColor: isLocked ? '#cbd5e1' : track.color, color: isLocked ? '#94a3b8' : track.dark }}>
+                      {isLocked ? '🔒 Travada' : isDominated ? '👑 Dominado' : isFrontier ? '🔥 Fronteira' : `🌱 Nível ${lvl}`}
                     </div>
                   </div>
                 );

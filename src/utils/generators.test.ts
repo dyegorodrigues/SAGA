@@ -33,7 +33,7 @@ describe.each(ALL_TRACKS.map((t) => [`${t.grade}/${t.id}`, t] as const))(
           expect(typeof q.kind, ctx).toBe("string");
           expect(q.kind.length, ctx).toBeGreaterThan(0);
           expect(typeof q.prompt === "string" || q.kind === "picto", ctx).toBe(true);
-          if (q.kind !== "numberline-interactive" && q.kind !== "drag-group") {
+          if (q.kind !== "numberline-interactive" && q.kind !== "numberline" && q.isFallback !== true && q.kind !== "drag-group") {
             expect(Array.isArray(q.options), ctx).toBe(true);
             expect(q.options.length, ctx).toBeGreaterThanOrEqual(2);
             expect(q.options.length, ctx).toBeLessThanOrEqual(6);

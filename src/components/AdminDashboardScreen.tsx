@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { State, Track } from '../types';
 import { CURRICULUM, ISLAND_DEFS, getTrackById } from '../utils/curriculum';
 import { AdminGodPanel } from './AdminGodPanel';
 import { DOCS_TEXT } from '../docsText';
-import { GrafoSaga } from '../utils/grafoSaga';
+import { GrafoSaga, SagaNode } from '../utils/grafoSaga';
 import { FONT, sfx } from './Mascot';
 import Markdown from 'react-markdown';
 
@@ -17,12 +17,42 @@ interface AdminDashboardScreenProps {
 
 export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack, onTestTrackLvl }: AdminDashboardScreenProps) {
   const [activeTab, setActiveTab] = useState<"curriculum" | "profiles" | "notes" | "docs">("curriculum");
-  const [notes, setNotes] = useState(() => localStorage.getItem("matemagica_dev_notes") || "");
-  
-  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const [generalNotes, setGeneralNotes] = useState(() => localStorage.getItem("matemagica_dev_notes") || "");
+  const [nodeNotes, setNodeNotes] = useState<Record<string, string>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("saga_node_notes") || "{}");
+    } catch {
+      return {};
+    }
+  });
+  const [selectedNode, setSelectedNode] = useState<SagaNode | null>(null);
+
+  const handleGeneralNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
-    setNotes(val);
+    setGeneralNotes(val);
     localStorage.setItem("matemagica_dev_notes", val);
+  };
+
+  const handleNodeNoteChange = (nodeId: string, text: string) => {
+    const newNotes = { ...nodeNotes, [nodeId]: text };
+    setNodeNotes(newNotes);
+    localStorage.setItem("saga_node_notes", JSON.stringify(newNotes));
+  };
+
+  const exportNotes = () => {
+    const data = {
+      general: generalNotes,
+      byNode: nodeNotes
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `saga-audit-notes-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -103,7 +133,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
                           const isImplemented = !!track;
                           
                           return (
-                            <div key={node.id} className={`rounded-xl p-4 border flex flex-col justify-between transition-colors ${isImplemented ? 'bg-slate-800 border-indigo-500 hover:border-indigo-400' : 'bg-slate-800/50 border-slate-700 opacity-60'}`}>
+                            <div key={node.id} className={`rounded-xl p-4 border flex flex-col justify-between transition-colors ${isImplemented ? 'bg-slate-800 border-indigo-500 hover:border-indigo-400' : 'bg-slate-800/50 border-slate-700 opacity-60'} cursor-pointer`} onClick={() => setSelectedNode(node)}>
                               <div>
                                 <div className="flex justify-between items-start mb-2">
                                   <div className="flex items-center gap-2">
@@ -128,7 +158,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
                                   {[1, 2, 3, 4, 5].map((lvl) => (
                                     <button
                                       key={lvl}
-                                      onClick={() => onTestTrackLvl(node.id, lvl)}
+                                      onClick={(e) => { e.stopPropagation(); onTestTrackLvl(node.id, lvl); }}
                                       className="py-1 text-center bg-slate-700 hover:bg-indigo-500 text-slate-300 hover:text-white rounded text-xs font-bold transition-colors"
                                     >
                                       L{lvl}
@@ -180,14 +210,83 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
         {activeTab === "notes" && (
           <div className="max-w-4xl mx-auto pb-20">
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-xl flex flex-col h-[500px]">
-              <h2 className="text-white text-lg font-black mb-2">Anotações e Bugs</h2>
-              <p className="text-slate-400 text-sm mb-4">Salvo automaticamente no LocalStorage. Use para não perder ideias de mecânicas ou erros.</p>
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-white text-lg font-black">Anotações Gerais</h2>
+                <button onClick={exportNotes} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded flex items-center gap-1 transition-colors">
+                  <span>📥</span> Exportar JSON
+                </button>
+              </div>
+              <p className="text-slate-400 text-sm mb-4">Salvo automaticamente no LocalStorage. Use para não perder ideias gerais do projeto.</p>
               <textarea
-                value={notes}
-                onChange={handleNotesChange}
+                value={generalNotes}
+                onChange={handleGeneralNotesChange}
                 className="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-4 text-slate-300 font-mono text-sm resize-none focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                placeholder="Ex: Bug no Lvl 4 do Counting On..."
+                placeholder="Ex: Ideias gerais, bugs arquiteturais..."
               />
+            </div>
+            
+            {Object.keys(nodeNotes).length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-white font-black mb-4">Anotações por Nó</h3>
+                <div className="space-y-4">
+                  {Object.entries(nodeNotes).map(([id, note]) => {
+                    if (!note.trim()) return null;
+                    const node = GrafoSaga.nodes.find(n => n.id === id);
+                    return (
+                      <div key={id} className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+                        <div className="text-indigo-400 font-bold text-xs mb-1">{id} {node ? `- ${node.nome}` : ''}</div>
+                        <p className="text-slate-300 text-sm whitespace-pre-wrap">{note}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* NODE DETAIL MODAL */}
+        {selectedNode && (
+          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
+            <div className="bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-slate-700 shadow-2xl">
+              <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80 rounded-t-2xl">
+                <div>
+                  <div className="text-xs font-bold text-indigo-400 tracking-widest">{selectedNode.id} - Faixa {selectedNode.faixa}</div>
+                  <h2 className="text-xl font-black text-white">{selectedNode.nome}</h2>
+                </div>
+                <button 
+                  onClick={() => setSelectedNode(null)}
+                  className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-600 transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Detalhes</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                      <div className="text-xs text-slate-500 mb-1">Strand</div>
+                      <div className="text-slate-300 font-bold">{selectedNode.strand}</div>
+                    </div>
+                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
+                      <div className="text-xs text-slate-500 mb-1">Pré-requisitos</div>
+                      <div className="text-amber-400 font-medium">{selectedNode.prereqs?.join(', ') || 'Nenhum'}</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Anotações da Auditoria</h3>
+                  <textarea
+                    value={nodeNotes[selectedNode.id] || ''}
+                    onChange={(e) => handleNodeNoteChange(selectedNode.id, e.target.value)}
+                    placeholder="Anote bugs, lacunas didáticas ou ideias para este nó específico..."
+                    className="w-full h-32 bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-300 text-sm resize-none focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         )}

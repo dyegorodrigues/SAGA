@@ -1,0 +1,5619 @@
+{
+  "gPreContar": [
+    {
+      "kind": "count",
+      "prompt": "Quantos tem aqui?",
+      "emoji": "🐞",
+      "n": 2,
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 2,
+      "explain": "Conte com o dedinho, um por um... são 2!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Quantos tem aqui?",
+      "emoji": "🍪",
+      "n": 3,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 3,
+      "explain": "Conte com o dedinho, um por um... são 3!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Quantos tem aqui?",
+      "emoji": "🦆",
+      "n": 6,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ],
+      "answer": 6,
+      "explain": "Conte com o dedinho, um por um... são 6!"
+    },
+    {
+      "kind": "conserv",
+      "prompt": "Qual linha tem MAIS?",
+      "emoji": "🐟",
+      "n": 5,
+      "howto": "Conte as duas linhas: espalhar bem longe não muda a quantidade!",
+      "explain": "As duas têm 5! Espalhar não faz ter mais — é só olhar mais longe. 🟰",
+      "options": [
+        {
+          "label": "A de Cima ⬆️",
+          "value": "cima"
+        },
+        {
+          "label": "A de Baixo ⬇️",
+          "value": "baixo"
+        },
+        {
+          "label": "Iguais 🟰",
+          "value": "igual"
+        }
+      ],
+      "answer": "igual"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Continue contando!",
+      "big": "7, 8, 9, ...",
+      "howto": "Não volte pro um! Continue de onde a contagem parou.",
+      "explain": "Depois do 9 vem o 10. É só seguir contando! 🔢",
+      "options": [
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "10",
+          "value": 10
+        }
+      ],
+      "answer": 10
+    }
+  ],
+  "gPreMais": [
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "🐶",
+          "n": 3
+        },
+        {
+          "emoji": "🚗",
+          "n": 5
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 5 é mais que 3!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "⭐",
+          "n": 3
+        },
+        {
+          "emoji": "🌼",
+          "n": 5
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 5 é mais que 3!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "🐞",
+          "n": 4
+        },
+        {
+          "emoji": "🐶",
+          "n": 6
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 6 é mais que 4!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "🍎",
+          "n": 3
+        },
+        {
+          "emoji": "🚗",
+          "n": 5
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 5 é mais que 3!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MENOS figuras",
+      "groups": [
+        {
+          "emoji": "🍓",
+          "n": 2
+        },
+        {
+          "emoji": "⭐",
+          "n": 3
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 0,
+      "explain": "Conte os dois grupos: 2 é menos que 3!"
+    }
+  ],
+  "gPreFormas": [
+    {
+      "kind": "shapes",
+      "prompt": "Toque no quadrado",
+      "options": [
+        {
+          "shape": "quad",
+          "color": "#2ED573",
+          "value": "quad"
+        },
+        {
+          "shape": "circ",
+          "color": "#1E90FF",
+          "value": "circ"
+        },
+        {
+          "shape": "tri",
+          "color": "#7C5CFF",
+          "value": "tri"
+        }
+      ],
+      "answer": "quad",
+      "explain": "Essa é a quadrado! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque no quadrado",
+      "options": [
+        {
+          "shape": "tri",
+          "color": "#1E90FF",
+          "value": "tri"
+        },
+        {
+          "shape": "quad",
+          "color": "#FF8FD8",
+          "value": "quad"
+        },
+        {
+          "shape": "circ",
+          "color": "#FF6B6B",
+          "value": "circ"
+        }
+      ],
+      "answer": "quad",
+      "explain": "Essa é a quadrado! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque no triângulo",
+      "options": [
+        {
+          "shape": "quad",
+          "color": "#FF6B6B",
+          "value": "quad"
+        },
+        {
+          "shape": "tri",
+          "color": "#FF8FD8",
+          "value": "tri"
+        },
+        {
+          "shape": "est",
+          "color": "#7C5CFF",
+          "value": "est"
+        },
+        {
+          "shape": "circ",
+          "color": "#1E90FF",
+          "value": "circ"
+        }
+      ],
+      "answer": "tri",
+      "explain": "Essa é a triângulo! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque no retângulo",
+      "options": [
+        {
+          "shape": "est",
+          "color": "#7C5CFF",
+          "value": "est"
+        },
+        {
+          "shape": "cor",
+          "color": "#FF8FD8",
+          "value": "cor"
+        },
+        {
+          "shape": "circ",
+          "color": "#FFC531",
+          "value": "circ"
+        },
+        {
+          "shape": "ret",
+          "color": "#2ED573",
+          "value": "ret"
+        }
+      ],
+      "answer": "ret",
+      "explain": "Essa é a retângulo! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque na estrela",
+      "options": [
+        {
+          "shape": "tri",
+          "color": "#FF8FD8",
+          "value": "tri"
+        },
+        {
+          "shape": "ret",
+          "color": "#1E90FF",
+          "value": "ret"
+        },
+        {
+          "shape": "est",
+          "color": "#7C5CFF",
+          "value": "est"
+        },
+        {
+          "shape": "circ",
+          "color": "#FFC531",
+          "value": "circ"
+        }
+      ],
+      "answer": "est",
+      "explain": "Essa é a estrela! Olhe bem o formato dela e toque. na"
+    }
+  ],
+  "gPrePadrao": [
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🌞",
+        "🌙",
+        "🌞",
+        "🌙",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌙",
+          "value": "🌙"
+        },
+        {
+          "label": "🐟",
+          "value": "🐟"
+        },
+        {
+          "label": "🌞",
+          "value": "🌞"
+        }
+      ],
+      "answer": "🌙",
+      "explain": "Procure o segredo que se repete: 🌞, 🌙... de novo! Então vem 🌙."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🌞",
+        "🌙",
+        "🌞",
+        "🌙",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🌙",
+          "value": "🌙"
+        },
+        {
+          "label": "⭐",
+          "value": "⭐"
+        }
+      ],
+      "answer": "🌙",
+      "explain": "Procure o segredo que se repete: 🌞, 🌙... de novo! Então vem 🌙."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🌞",
+        "🌞",
+        "🌙",
+        "🌞",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🌙",
+          "value": "🌙"
+        },
+        {
+          "label": "🍓",
+          "value": "🍓"
+        }
+      ],
+      "answer": "🌙",
+      "explain": "Procure o segredo que se repete: 🌞, 🌞, 🌙... de novo! Então vem 🌙."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🍌",
+        "🌞",
+        "🌼",
+        "🍌",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌼",
+          "value": "🌼"
+        },
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🍌",
+          "value": "🍌"
+        }
+      ],
+      "answer": "🌼",
+      "explain": "Procure o segredo que se repete: 🍌, 🌞, 🌼... de novo! Então vem 🌼."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🚗",
+        "🌞",
+        "🌞",
+        "🚗",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🍎",
+          "value": "🍎"
+        },
+        {
+          "label": "🚗",
+          "value": "🚗"
+        }
+      ],
+      "answer": "🌞",
+      "explain": "Procure o segredo que se repete: 🚗, 🌞, 🌞... de novo! Então vem 🌞."
+    }
+  ],
+  "gPreVizinho": [
+    {
+      "kind": "plain",
+      "prompt": "O que vem DEPOIS do 2?",
+      "big": "2 ➜ ?",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "Conte comigo: 2... e depois vem o 3!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "O que vem DEPOIS do 4?",
+      "big": "4 ➜ ?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "Conte comigo: 4... e depois vem o 5!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "O que vem ANTES do 6?",
+      "big": "? ➜ 6",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 5,
+      "explain": "Antes do 6 vem o 5. Conte: 5, 6!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "O que vem ANTES do 5?",
+      "big": "? ➜ 5",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 4,
+      "explain": "Antes do 5 vem o 4. Conte: 4, 5!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Que número fica ENTRE 8 e 10?",
+      "big": "8 ➜ ? ➜ 10",
+      "options": [
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 9,
+      "explain": "Conte: 8, 9, 10 — o 9 fica no meio!"
+    }
+  ],
+  "gPreSoma": [
+    {
+      "kind": "sum",
+      "prompt": "Quantos ficam juntos?",
+      "emoji": "🐶",
+      "a": 2,
+      "b": 2,
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 4,
+      "explain": "Junte tudo e conte: 2 e mais 2 fazem 4!"
+    },
+    {
+      "kind": "sum",
+      "prompt": "Quantos ficam juntos?",
+      "emoji": "⭐",
+      "a": 2,
+      "b": 3,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 5,
+      "explain": "Junte tudo e conte: 2 e mais 3 fazem 5!"
+    },
+    {
+      "kind": "sum",
+      "prompt": "Quantos ficam juntos?",
+      "emoji": "🍪",
+      "a": 4,
+      "b": 2,
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 6,
+      "explain": "Junte tudo e conte: 4 e mais 2 fazem 6!"
+    },
+    {
+      "kind": "sum",
+      "prompt": "Quantos ficam juntos?",
+      "emoji": "🦆",
+      "a": 6,
+      "b": 2,
+      "options": [
+        {
+          "label": "11",
+          "value": 11
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 8,
+      "explain": "Junte tudo e conte: 6 e mais 2 fazem 8!"
+    },
+    {
+      "kind": "sum",
+      "prompt": "Quantos ficam juntos?",
+      "emoji": "🍓",
+      "a": 6,
+      "b": 1,
+      "options": [
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 7,
+      "explain": "Junte tudo e conte: 6 e mais 1 fazem 7!"
+    }
+  ],
+  "gA1Seq": [
+    {
+      "kind": "numberline-interactive",
+      "prompt": "O que vem DEPOIS de 9?",
+      "nlStart": 7,
+      "nlEnd": 12,
+      "nlStartPos": 9,
+      "answer": 10,
+      "explain": "Conte comigo: 9... e depois vem o 10!"
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "O que vem ANTES de 11?",
+      "nlStart": 7,
+      "nlEnd": 12,
+      "nlStartPos": 11,
+      "answer": 10,
+      "explain": "Antes do 11 vem o 10. Conte: 10, 11!"
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Que número fica ENTRE 26 e 28?",
+      "nlStart": 24,
+      "nlEnd": 29,
+      "nlStartPos": 26,
+      "answer": 27,
+      "explain": "Conte: 26, 27, 28 — o 27 fica no meio!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "O que vem ANTES de 41?",
+      "big": "? ➜ 41",
+      "options": [
+        {
+          "label": "39",
+          "value": 39
+        },
+        {
+          "label": "37",
+          "value": 37
+        },
+        {
+          "label": "38",
+          "value": 38
+        },
+        {
+          "label": "40",
+          "value": 40
+        }
+      ],
+      "answer": 40,
+      "explain": "Antes do 41 vem o 40. Conte: 40, 41!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quanto é 10 A MENOS que 26?",
+      "big": "26",
+      "options": [
+        {
+          "label": "16",
+          "value": 16
+        },
+        {
+          "label": "14",
+          "value": 14
+        },
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "27",
+          "value": 27
+        }
+      ],
+      "answer": 16,
+      "explain": "10 a menos é uma dezena a menos: 26 vira 16!"
+    }
+  ],
+  "gA1Soma": [
+    {
+      "kind": "sum",
+      "prompt": "Quanto é a soma?",
+      "emoji": "🐶",
+      "a": 3,
+      "b": 5,
+      "options": [
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 8,
+      "explain": "Junte tudo e conte: 3 e mais 5 fazem 8!"
+    },
+    {
+      "kind": "singapore-bars",
+      "prompt": "Junte os blocos!",
+      "a": 5,
+      "b": 4,
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 9,
+      "explain": "Guarde o 5 na cabeça e conte mais 4 nos dedos: dá 9!"
+    },
+    {
+      "kind": "math",
+      "prompt": "Quanto é?",
+      "expr": "9 + 7 = ?",
+      "options": [
+        {
+          "label": "17",
+          "value": 17
+        },
+        {
+          "label": "15",
+          "value": 15
+        },
+        {
+          "label": "16",
+          "value": 16
+        },
+        {
+          "label": "20",
+          "value": 20
+        }
+      ],
+      "answer": 16,
+      "explain": "Guarde o 9 na cabeça e conte mais 7 nos dedos: dá 16!"
+    },
+    {
+      "kind": "math",
+      "prompt": "Qual número falta?",
+      "expr": "6 + ▢ = 9",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "Do 6 até o 9, conte nos dedos: faltam 3!"
+    },
+    {
+      "kind": "rapid-fire",
+      "prompt": "Dojo de Velocidade!",
+      "expr": "13 + 2",
+      "options": [
+        {
+          "label": "21",
+          "value": 21
+        },
+        {
+          "label": "15",
+          "value": 15
+        },
+        {
+          "label": "13",
+          "value": 13
+        }
+      ],
+      "answer": 15,
+      "explain": "Guarde o 13 na cabeça e conte mais 2 nos dedos: dá 15!"
+    }
+  ],
+  "gA1Sub": [
+    {
+      "kind": "subvis",
+      "prompt": "Quantos sobram?",
+      "emoji": "🐶",
+      "a": 5,
+      "b": 4,
+      "expr": "5 − 4 = ?",
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Tire 4 e conte o que sobrou: 1!"
+    },
+    {
+      "kind": "math",
+      "prompt": "Quanto é?",
+      "expr": "6 − 5 = ?",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "9",
+          "value": 9
+        }
+      ],
+      "answer": 1,
+      "explain": "Comece no 6 e volte 5 passinhos: dá 1!"
+    },
+    {
+      "kind": "math",
+      "prompt": "Quanto é?",
+      "expr": "13 − 7 = ?",
+      "options": [
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "18",
+          "value": 18
+        }
+      ],
+      "answer": 6,
+      "explain": "Comece no 13 e volte 7 passinhos: dá 6!"
+    },
+    {
+      "kind": "math",
+      "prompt": "Qual número falta?",
+      "expr": "9 − ▢ = 6",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "Do 6 até o 9 são 3 passinhos: tiramos 3!"
+    },
+    {
+      "kind": "math",
+      "prompt": "Quanto é?",
+      "expr": "38 − 2 = ?",
+      "options": [
+        {
+          "label": "36",
+          "value": 36
+        },
+        {
+          "label": "34",
+          "value": 34
+        },
+        {
+          "label": "24",
+          "value": 24
+        },
+        {
+          "label": "33",
+          "value": 33
+        }
+      ],
+      "answer": 36,
+      "explain": "Comece no 38 e volte 2 passinhos: dá 36!"
+    }
+  ],
+  "gA1Comp": [
+    {
+      "kind": "plain",
+      "prompt": "Toque no número MAIOR",
+      "big": null,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "17",
+          "value": 17
+        }
+      ],
+      "answer": 17,
+      "explain": "Na contagem, o 3 vem antes — então 17 é o maior!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no número MAIOR",
+      "big": null,
+      "options": [
+        {
+          "label": "68",
+          "value": 68
+        },
+        {
+          "label": "94",
+          "value": 94
+        }
+      ],
+      "answer": 94,
+      "explain": "Na contagem, o 68 vem antes — então 94 é o maior!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Qual símbolo completa?",
+      "big": "16 ▢ 23",
+      "options": [
+        {
+          "label": "<",
+          "value": "<"
+        },
+        {
+          "label": ">",
+          "value": ">"
+        },
+        {
+          "label": "=",
+          "value": "="
+        }
+      ],
+      "answer": "<",
+      "explain": "A boca do jacaré abre para o maior: 23 é maior, então é <!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Qual símbolo completa?",
+      "big": "57 ▢ 53",
+      "options": [
+        {
+          "label": "<",
+          "value": "<"
+        },
+        {
+          "label": "=",
+          "value": "="
+        },
+        {
+          "label": ">",
+          "value": ">"
+        }
+      ],
+      "answer": ">",
+      "explain": "A boca do jacaré abre para o maior: 57 é maior, então é >!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Qual símbolo completa?",
+      "big": "4 + 2 ▢ 5",
+      "options": [
+        {
+          "label": "=",
+          "value": "="
+        },
+        {
+          "label": "<",
+          "value": "<"
+        },
+        {
+          "label": ">",
+          "value": ">"
+        }
+      ],
+      "answer": ">",
+      "explain": "4 mais 2 fazem 6. A boca do jacaré abre para o maior: 6 é maior, então é >!"
+    }
+  ],
+  "gA1Pular": [
+    {
+      "kind": "plain",
+      "prompt": "Continue a contagem",
+      "big": "6, 8, 10, ?",
+      "options": [
+        {
+          "label": "15",
+          "value": 15
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "12",
+          "value": 12
+        },
+        {
+          "label": "9",
+          "value": 9
+        }
+      ],
+      "answer": 12,
+      "explain": "Estamos pulando de 2 em 2: 10 mais 2 dá 12!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Continue a contagem",
+      "big": "30, 40, 50, ?",
+      "options": [
+        {
+          "label": "62",
+          "value": 62
+        },
+        {
+          "label": "60",
+          "value": 60
+        },
+        {
+          "label": "63",
+          "value": 63
+        },
+        {
+          "label": "57",
+          "value": 57
+        }
+      ],
+      "answer": 60,
+      "explain": "Estamos pulando de 10 em 10: 50 mais 10 dá 60!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Continue a contagem",
+      "big": "25, 30, 35, ?",
+      "options": [
+        {
+          "label": "38",
+          "value": 38
+        },
+        {
+          "label": "40",
+          "value": 40
+        },
+        {
+          "label": "42",
+          "value": 42
+        },
+        {
+          "label": "32",
+          "value": 32
+        }
+      ],
+      "answer": 40,
+      "explain": "Estamos pulando de 5 em 5: 35 mais 5 dá 40!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Continue a contagem",
+      "big": "15, 20, 25, ?",
+      "options": [
+        {
+          "label": "29",
+          "value": 29
+        },
+        {
+          "label": "27",
+          "value": 27
+        },
+        {
+          "label": "28",
+          "value": 28
+        },
+        {
+          "label": "30",
+          "value": 30
+        }
+      ],
+      "answer": 30,
+      "explain": "Estamos pulando de 5 em 5: 25 mais 5 dá 30!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Continue contando para trás",
+      "big": "25, 20, 15, ?",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "12",
+          "value": 12
+        }
+      ],
+      "answer": 10,
+      "explain": "Estamos voltando de 5 em 5: 15 menos 5 dá 10!"
+    }
+  ],
+  "gA1Dez": [
+    {
+      "kind": "plain",
+      "prompt": "Quanto vale?",
+      "big": "5 dezenas",
+      "options": [
+        {
+          "label": "84",
+          "value": 84
+        },
+        {
+          "label": "48",
+          "value": 48
+        },
+        {
+          "label": "50",
+          "value": 50
+        },
+        {
+          "label": "23",
+          "value": 23
+        }
+      ],
+      "answer": 50,
+      "explain": "Cada dezena vale 10! Conte de 10 em 10: 5 dezenas são 50."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quanto vale?",
+      "big": "3 dezenas e 7 unidades",
+      "options": [
+        {
+          "label": "54",
+          "value": 54
+        },
+        {
+          "label": "49",
+          "value": 49
+        },
+        {
+          "label": "37",
+          "value": 37
+        },
+        {
+          "label": "35",
+          "value": 35
+        }
+      ],
+      "answer": 37,
+      "explain": "3 dezenas são 30. Com mais 7 unidades... 37!"
+    },
+    {
+      "kind": "tens",
+      "prompt": "Quantos cubinhos temos ao todo no Material Dourado?",
+      "t": 3,
+      "u": 5,
+      "options": [
+        {
+          "label": "36",
+          "value": 36
+        },
+        {
+          "label": "34",
+          "value": 34
+        },
+        {
+          "label": "35",
+          "value": 35
+        },
+        {
+          "label": "53",
+          "value": 53
+        }
+      ],
+      "answer": 35,
+      "explain": "Cada barra tem 10 cubinhos: 30. Com os 5 soltos... 35!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "O número 66 tem quantas DEZENAS?",
+      "big": "66",
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 6,
+      "explain": "O primeiro algarismo do 66 conta as dezenas: são 6!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quanto vale?",
+      "big": "6 dezenas e 2 unidades",
+      "options": [
+        {
+          "label": "62",
+          "value": 62
+        },
+        {
+          "label": "60",
+          "value": 60
+        },
+        {
+          "label": "24",
+          "value": 24
+        },
+        {
+          "label": "61",
+          "value": 61
+        }
+      ],
+      "answer": 62,
+      "explain": "6 dezenas são 60. Com mais 2 unidades... 62!"
+    }
+  ],
+  "gPreIntruso": [
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦜",
+          "value": "🦜"
+        },
+        {
+          "label": "🐦",
+          "value": "🐦"
+        },
+        {
+          "label": "🦆",
+          "value": "🦆"
+        },
+        {
+          "label": "🪗",
+          "value": "🪗"
+        }
+      ],
+      "answer": "🪗"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🚜",
+          "value": "🚜"
+        },
+        {
+          "label": "🦆",
+          "value": "🦆"
+        },
+        {
+          "label": "🦉",
+          "value": "🦉"
+        },
+        {
+          "label": "🦜",
+          "value": "🦜"
+        }
+      ],
+      "answer": "🚜"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦜",
+          "value": "🦜"
+        },
+        {
+          "label": "🦉",
+          "value": "🦉"
+        },
+        {
+          "label": "🎹",
+          "value": "🎹"
+        },
+        {
+          "label": "🐦",
+          "value": "🐦"
+        }
+      ],
+      "answer": "🎹"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦉",
+          "value": "🦉"
+        },
+        {
+          "label": "🦆",
+          "value": "🦆"
+        },
+        {
+          "label": "🐭",
+          "value": "🐭"
+        },
+        {
+          "label": "🐧",
+          "value": "🐧"
+        }
+      ],
+      "answer": "🐭"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦜",
+          "value": "🦜"
+        },
+        {
+          "label": "🦅",
+          "value": "🦅"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        },
+        {
+          "label": "🦉",
+          "value": "🦉"
+        }
+      ],
+      "answer": "🐱"
+    }
+  ],
+  "gPreOnde": [
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está EM CIMA da mesa",
+      "items": [
+        {
+          "e": "🦊",
+          "pos": "cima"
+        },
+        {
+          "e": "🐢",
+          "pos": "baixo"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐢",
+          "value": "🐢"
+        },
+        {
+          "label": "🦊",
+          "value": "🦊"
+        }
+      ],
+      "answer": "🦊"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está AO LADO da mesa",
+      "items": [
+        {
+          "e": "🐶",
+          "pos": "cima"
+        },
+        {
+          "e": "🐢",
+          "pos": "baixo"
+        },
+        {
+          "e": "🐱",
+          "pos": "esq"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐶",
+          "value": "🐶"
+        },
+        {
+          "label": "🐢",
+          "value": "🐢"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        }
+      ],
+      "answer": "🐱"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está do lado DIREITO da mesa",
+      "items": [
+        {
+          "e": "🐶",
+          "pos": "esq"
+        },
+        {
+          "e": "🐱",
+          "pos": "dir"
+        },
+        {
+          "e": "🦊",
+          "pos": "cima"
+        }
+      ],
+      "options": [
+        {
+          "label": "🦊",
+          "value": "🦊"
+        },
+        {
+          "label": "🐶",
+          "value": "🐶"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        }
+      ],
+      "answer": "🐱"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está EMBAIXO da mesa",
+      "items": [
+        {
+          "e": "🐥",
+          "pos": "cima"
+        },
+        {
+          "e": "🦊",
+          "pos": "baixo"
+        },
+        {
+          "e": "🐱",
+          "pos": "esq"
+        },
+        {
+          "e": "🐰",
+          "pos": "dir"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐰",
+          "value": "🐰"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        },
+        {
+          "label": "🐥",
+          "value": "🐥"
+        },
+        {
+          "label": "🦊",
+          "value": "🦊"
+        }
+      ],
+      "answer": "🦊"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está do lado ESQUERDO da mesa",
+      "items": [
+        {
+          "e": "🐰",
+          "pos": "cima"
+        },
+        {
+          "e": "🦊",
+          "pos": "baixo"
+        },
+        {
+          "e": "🐥",
+          "pos": "esq"
+        },
+        {
+          "e": "🐶",
+          "pos": "dir"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐥",
+          "value": "🐥"
+        },
+        {
+          "label": "🦊",
+          "value": "🦊"
+        },
+        {
+          "label": "🐶",
+          "value": "🐶"
+        },
+        {
+          "label": "🐰",
+          "value": "🐰"
+        }
+      ],
+      "answer": "🐥"
+    }
+  ],
+  "gPreTirar": [
+    {
+      "kind": "subvis",
+      "prompt": "Quantos sobram?",
+      "emoji": "🐶",
+      "a": 2,
+      "b": 1,
+      "expr": "2 − 1 = ?",
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Tire 1 e conte os que sobraram: 1!"
+    },
+    {
+      "kind": "subvis",
+      "prompt": "Quantos sobram?",
+      "emoji": "⭐",
+      "a": 3,
+      "b": 2,
+      "expr": "3 − 2 = ?",
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Tire 2 e conte os que sobraram: 1!"
+    },
+    {
+      "kind": "subvis",
+      "prompt": "Quantos sobram?",
+      "emoji": "🍪",
+      "a": 4,
+      "b": 2,
+      "expr": "4 − 2 = ?",
+      "options": [
+        {
+          "label": "0",
+          "value": 0
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 2,
+      "explain": "Tire 2 e conte os que sobraram: 2!"
+    },
+    {
+      "kind": "subvis",
+      "prompt": "Quantos sobram?",
+      "emoji": "🦆",
+      "a": 4,
+      "b": 2,
+      "expr": "4 − 2 = ?",
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "0",
+          "value": 0
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 2,
+      "explain": "Tire 2 e conte os que sobraram: 2!"
+    },
+    {
+      "kind": "subvis",
+      "prompt": "Quantos sobram?",
+      "emoji": "🍓",
+      "a": 5,
+      "b": 1,
+      "expr": "5 − 1 = ?",
+      "options": [
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 4,
+      "explain": "Tire 1 e conte os que sobraram: 4!"
+    }
+  ],
+  "gA1Dinheiro": [
+    {
+      "kind": "money",
+      "prompt": "Quantos reais tem aqui?",
+      "coins": [
+        100,
+        100,
+        100
+      ],
+      "notes": [],
+      "howto": "Cada moeda dessas vale 1 real inteirinho. Conte uma por uma!",
+      "explain": "São 3 moedas de 1 real: 3 reais! (Cada uma vale 100 centavinhos juntos.)",
+      "options": [
+        {
+          "label": "R$ 2",
+          "value": 200
+        },
+        {
+          "label": "R$ 1",
+          "value": 100
+        },
+        {
+          "label": "R$ 3",
+          "value": 300
+        },
+        {
+          "label": "R$ 6",
+          "value": 600
+        }
+      ],
+      "answer": 300
+    },
+    {
+      "kind": "money",
+      "prompt": "Quanto vale esta cédula?",
+      "coins": [],
+      "notes": [
+        5
+      ],
+      "explain": "É uma cédula de 5 reais — está escrito nela!",
+      "options": [
+        {
+          "label": "R$ 8",
+          "value": 800
+        },
+        {
+          "label": "R$ 7",
+          "value": 700
+        },
+        {
+          "label": "R$ 6",
+          "value": 600
+        },
+        {
+          "label": "R$ 5",
+          "value": 500
+        }
+      ],
+      "answer": 500
+    },
+    {
+      "kind": "money",
+      "prompt": "Quantos reais ao todo?",
+      "coins": [],
+      "notes": [
+        5,
+        2
+      ],
+      "explain": "Some as cédulas: 5 + 2 = 7 reais! Comece pela maior.",
+      "options": [
+        {
+          "label": "R$ 5",
+          "value": 500
+        },
+        {
+          "label": "R$ 6",
+          "value": 600
+        },
+        {
+          "label": "R$ 7",
+          "value": 700
+        },
+        {
+          "label": "R$ 8",
+          "value": 800
+        }
+      ],
+      "answer": 700
+    },
+    {
+      "kind": "money",
+      "prompt": "Quantos reais ao todo?",
+      "coins": [
+        100
+      ],
+      "notes": [
+        5
+      ],
+      "explain": "Primeiro as cédulas, depois as moedas de 1 real. Tudo junto: 6 reais!",
+      "options": [
+        {
+          "label": "R$ 9",
+          "value": 900
+        },
+        {
+          "label": "R$ 5",
+          "value": 500
+        },
+        {
+          "label": "R$ 6",
+          "value": 600
+        },
+        {
+          "label": "R$ 3",
+          "value": 300
+        }
+      ],
+      "answer": 600
+    },
+    {
+      "kind": "money",
+      "prompt": "Duas moedas de 50 centavos formam quanto?",
+      "coins": [
+        50,
+        50
+      ],
+      "notes": [],
+      "explain": "50 é a METADE de 100. Duas metades formam 1 real inteiro!",
+      "options": [
+        {
+          "label": "50 centavos",
+          "value": 50
+        },
+        {
+          "label": "R$ 1,50",
+          "value": 150
+        },
+        {
+          "label": "R$ 1",
+          "value": 100
+        },
+        {
+          "label": "R$ 2,50",
+          "value": 250
+        }
+      ],
+      "answer": 100
+    }
+  ],
+  "gA1Problemas": [
+    {
+      "kind": "story",
+      "prompt": "Escute e responda 👂",
+      "story": "João tinha 4 balas 🍬. Ganhou mais 2. Quantas balas João tem agora?",
+      "emoji": "🍬",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "17",
+          "value": 17
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 6,
+      "explain": "\"Ganhou mais\" é JUNTAR! Some 4 + 2 e dá 6."
+    },
+    {
+      "kind": "story",
+      "prompt": "Escute e responda 👂",
+      "story": "João tinha 8 biscoitos 🍪. Deu 2 para Cauã. Quantos biscoitos sobraram?",
+      "emoji": "🍪",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "13",
+          "value": 13
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 6,
+      "explain": "\"Deu para alguém\" é TIRAR! Comece no 8 e volte 2: sobra 6."
+    },
+    {
+      "kind": "story",
+      "prompt": "Escute e responda 👂",
+      "story": "Duda tem 3 biscoitos 🍪 e Cauã tem 6. Quantos biscoitos os dois têm juntos?",
+      "emoji": "🍪",
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "10",
+          "value": 10
+        }
+      ],
+      "answer": 9,
+      "explain": "\"Juntos\" é somar os dois! 3 + 6 dá 9."
+    },
+    {
+      "kind": "story",
+      "prompt": "Escute e responda 👂",
+      "story": "Duda tem 3 carrinhos 🚗 e Leo tem 2. Quantos carrinhos Duda tem a mais que Leo?",
+      "emoji": "🚗",
+      "options": [
+        {
+          "label": "14",
+          "value": 14
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 1,
+      "explain": "\"Quantos a mais\" é a diferença: tire 2 de 3 e sobra 1."
+    },
+    {
+      "kind": "story",
+      "prompt": "Escute e responda 👂",
+      "story": "Duda tinha 5 bolinhas ⚪. Ganhou algumas e ficou com 14. Quantas bolinhas Duda ganhou?",
+      "emoji": "⚪",
+      "options": [
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 9,
+      "explain": "Do 5 até o 14, conte quanto falta: Duda ganhou 9."
+    }
+  ],
+  "gA1Graficos": [
+    {
+      "kind": "picto",
+      "title": "Bichinho preferido",
+      "rows": [
+        {
+          "e": "🐶",
+          "n": 5
+        },
+        {
+          "e": "🐱",
+          "n": 1
+        },
+        {
+          "e": "🐰",
+          "n": 3
+        }
+      ],
+      "prompt": "Quantos votos teve o cachorro 🐶?",
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 5,
+      "explain": "Conte os 🐶 da linha, um por um: são 5."
+    },
+    {
+      "kind": "picto",
+      "title": "Bichinho preferido",
+      "rows": [
+        {
+          "e": "🐶",
+          "n": 1
+        },
+        {
+          "e": "🐱",
+          "n": 2
+        },
+        {
+          "e": "🐰",
+          "n": 4
+        }
+      ],
+      "prompt": "Quantos votos teve o coelho 🐰?",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 4,
+      "explain": "Conte os 🐰 da linha, um por um: são 4."
+    },
+    {
+      "kind": "picto",
+      "title": "Esporte favorito",
+      "rows": [
+        {
+          "e": "⚽",
+          "n": 4
+        },
+        {
+          "e": "🏀",
+          "n": 5
+        },
+        {
+          "e": "🎾",
+          "n": 6
+        }
+      ],
+      "prompt": "Quem teve MAIS votos?",
+      "options": [
+        {
+          "label": "🏀",
+          "value": "🏀"
+        },
+        {
+          "label": "🎾",
+          "value": "🎾"
+        },
+        {
+          "label": "⚽",
+          "value": "⚽"
+        }
+      ],
+      "answer": "🎾",
+      "explain": "A linha MAIS comprida ganhou! É o 🎾, com 6."
+    },
+    {
+      "kind": "picto",
+      "title": "Esporte favorito",
+      "rows": [
+        {
+          "e": "⚽",
+          "n": 3
+        },
+        {
+          "e": "🏀",
+          "n": 4
+        },
+        {
+          "e": "🎾",
+          "n": 1
+        }
+      ],
+      "prompt": "o basquete 🏀 teve quantos votos a MAIS que o tênis 🎾?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "0",
+          "value": 0
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "4 menos 1: a diferença é 3."
+    },
+    {
+      "kind": "picto",
+      "title": "Esporte favorito",
+      "rows": [
+        {
+          "e": "⚽",
+          "n": 6
+        },
+        {
+          "e": "🏀",
+          "n": 4
+        },
+        {
+          "e": "🎾",
+          "n": 3
+        }
+      ],
+      "prompt": "Quantos votos ao todo?",
+      "options": [
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "11",
+          "value": 11
+        },
+        {
+          "label": "14",
+          "value": 14
+        },
+        {
+          "label": "13",
+          "value": 13
+        }
+      ],
+      "answer": 13,
+      "explain": "Some todas as linhas: 6 + 4 + 3 dá 13."
+    }
+  ],
+  "gPreCalendario": [
+    {
+      "kind": "plain",
+      "prompt": "O que vem depois da Tarde? 🌤️ ➔ ❓",
+      "big": "🌤️ Tarde ➔ ❓",
+      "options": [
+        {
+          "label": "Manhã ☀️",
+          "value": "Manhã"
+        },
+        {
+          "label": "Noite 🌙",
+          "value": "Noite"
+        },
+        {
+          "label": "Semana 📅",
+          "value": "Semana"
+        }
+      ],
+      "answer": "Noite"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Se hoje é Quarta-feira, amanhã será...?",
+      "big": "📅 Hoje: Quarta-feira",
+      "options": [
+        {
+          "label": "Quinta-feira",
+          "value": "Quinta-feira"
+        },
+        {
+          "label": "Sexta-feira",
+          "value": "Sexta-feira"
+        },
+        {
+          "label": "Terça-feira",
+          "value": "Terça-feira"
+        }
+      ],
+      "answer": "Quinta-feira"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Se hoje é Quarta-feira, ontem foi...?",
+      "big": "📅 Hoje: Quarta-feira",
+      "options": [
+        {
+          "label": "Terça-feira",
+          "value": "Terça-feira"
+        },
+        {
+          "label": "Sábado",
+          "value": "Sábado"
+        },
+        {
+          "label": "Quinta-feira",
+          "value": "Quinta-feira"
+        }
+      ],
+      "answer": "Terça-feira"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Qual dia é um dia de Aula/Trabalho? 🏫",
+      "big": "🎒 Estudo!",
+      "options": [
+        {
+          "label": "Domingo",
+          "value": "Domingo"
+        },
+        {
+          "label": "Terça-feira",
+          "value": "Terça-feira"
+        },
+        {
+          "label": "Sábado",
+          "value": "Sábado"
+        }
+      ],
+      "answer": "Terça-feira"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Se ontem foi Quarta-feira, amanhã será...?",
+      "big": "👈 Ontem: Quarta-feira",
+      "options": [
+        {
+          "label": "Sexta-feira",
+          "value": "Sexta-feira"
+        },
+        {
+          "label": "Quinta-feira",
+          "value": "Quinta-feira"
+        },
+        {
+          "label": "Quarta-feira",
+          "value": "Quarta-feira"
+        }
+      ],
+      "answer": "Sexta-feira"
+    }
+  ],
+  "gA1Horas": [
+    {
+      "kind": "clock",
+      "prompt": "Que horas o reloginho está marcando?",
+      "hour": 6,
+      "minute": 0,
+      "options": [
+        {
+          "label": "07:00",
+          "value": "07:00"
+        },
+        {
+          "label": "05:00",
+          "value": "05:00"
+        },
+        {
+          "label": "06:00",
+          "value": "06:00"
+        },
+        {
+          "label": "06:30",
+          "value": "06:30"
+        }
+      ],
+      "answer": "06:00"
+    },
+    {
+      "kind": "clock",
+      "prompt": "O ponteiro maior está no 6 (meia hora). Que horas são?",
+      "hour": 6,
+      "minute": 30,
+      "options": [
+        {
+          "label": "06:30",
+          "value": "06:30"
+        },
+        {
+          "label": "06:00",
+          "value": "06:00"
+        },
+        {
+          "label": "05:00",
+          "value": "05:00"
+        },
+        {
+          "label": "07:30",
+          "value": "07:30"
+        }
+      ],
+      "answer": "06:30"
+    },
+    {
+      "kind": "clock",
+      "prompt": "Que horas são?",
+      "hour": 7,
+      "minute": 0,
+      "options": [
+        {
+          "label": "07:30",
+          "value": "07:30"
+        },
+        {
+          "label": "07:00",
+          "value": "07:00"
+        },
+        {
+          "label": "06:00",
+          "value": "06:00"
+        },
+        {
+          "label": "08:00",
+          "value": "08:00"
+        }
+      ],
+      "answer": "07:00",
+      "explain": "O ponteiro grande no 12 é hora cheia!"
+    },
+    {
+      "kind": "clock",
+      "prompt": "Agora são 5 horas. Daqui a 2 horas, que horas serão?",
+      "hour": 5,
+      "minute": 0,
+      "options": [
+        {
+          "label": "06:00",
+          "value": "06:00"
+        },
+        {
+          "label": "05:00",
+          "value": "05:00"
+        },
+        {
+          "label": "07:00",
+          "value": "07:00"
+        },
+        {
+          "label": "08:00",
+          "value": "08:00"
+        }
+      ],
+      "answer": "07:00",
+      "explain": "5 mais 2 é 7: serão 7 horas!"
+    },
+    {
+      "kind": "clock",
+      "prompt": "Que horas são?",
+      "hour": 8,
+      "minute": 30,
+      "options": [
+        {
+          "label": "9 e meia",
+          "value": "9 e meia"
+        },
+        {
+          "label": "7 e meia",
+          "value": "7 e meia"
+        },
+        {
+          "label": "8 e meia",
+          "value": "8 e meia"
+        },
+        {
+          "label": "8 horas",
+          "value": "8 horas"
+        }
+      ],
+      "answer": "8 e meia",
+      "explain": "O ponteiro pequeno passou do 8 e o grande no 6: 8 e meia!"
+    }
+  ],
+  "gPreSimbolos": [
+    {
+      "kind": "plain",
+      "prompt": "Toque no número 3!",
+      "big": "?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "Esse é o número 3!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no número 3!",
+      "big": "?",
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 3,
+      "explain": "Esse é o número 3!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no número 6!",
+      "big": "?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 6,
+      "explain": "Esse é o número 6!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no número 6!",
+      "big": "?",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 6,
+      "explain": "Esse é o número 6!"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no número 7!",
+      "big": "?",
+      "options": [
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 7,
+      "explain": "Esse é o número 7!"
+    }
+  ],
+  "gPreCanto": [
+    {
+      "kind": "order",
+      "prompt": "Toque nos números na ordem certa!",
+      "big": "contar",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "explain": "A ordem certa é 1, 2, 3!"
+    },
+    {
+      "kind": "order",
+      "prompt": "Toque nos números na ordem certa!",
+      "big": "contar",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": [
+        1,
+        2,
+        3
+      ],
+      "explain": "A ordem certa é 1, 2, 3!"
+    },
+    {
+      "kind": "order",
+      "prompt": "Toque nos números na ordem certa!",
+      "big": "contar",
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": [
+        4,
+        5,
+        6
+      ],
+      "explain": "A ordem certa é 4, 5, 6!"
+    },
+    {
+      "kind": "order",
+      "prompt": "Toque nos números na ordem certa!",
+      "big": "contar",
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ],
+      "answer": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "explain": "A ordem certa é 4, 5, 6, 7!"
+    },
+    {
+      "kind": "order",
+      "prompt": "Toque nos números na ordem certa!",
+      "big": "contar",
+      "options": [
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "9",
+          "value": 9
+        }
+      ],
+      "answer": [
+        7,
+        8,
+        9,
+        10
+      ],
+      "explain": "A ordem certa é 7, 8, 9, 10!"
+    }
+  ],
+  "gAL_02": [
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🌞",
+        "🌙",
+        "🌞",
+        "🌙",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌙",
+          "value": "🌙"
+        },
+        {
+          "label": "🐟",
+          "value": "🐟"
+        },
+        {
+          "label": "🌞",
+          "value": "🌞"
+        }
+      ],
+      "answer": "🌙",
+      "explain": "Procure o segredo que se repete: 🌞, 🌙... de novo! Então vem 🌙."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🌞",
+        "🌙",
+        "🌞",
+        "🌙",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🌙",
+          "value": "🌙"
+        },
+        {
+          "label": "⭐",
+          "value": "⭐"
+        }
+      ],
+      "answer": "🌙",
+      "explain": "Procure o segredo que se repete: 🌞, 🌙... de novo! Então vem 🌙."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🌞",
+        "🌞",
+        "🌙",
+        "🌞",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🌙",
+          "value": "🌙"
+        },
+        {
+          "label": "🍓",
+          "value": "🍓"
+        }
+      ],
+      "answer": "🌙",
+      "explain": "Procure o segredo que se repete: 🌞, 🌞, 🌙... de novo! Então vem 🌙."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🍌",
+        "🌞",
+        "🌼",
+        "🍌",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌼",
+          "value": "🌼"
+        },
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🍌",
+          "value": "🍌"
+        }
+      ],
+      "answer": "🌼",
+      "explain": "Procure o segredo que se repete: 🍌, 🌞, 🌼... de novo! Então vem 🌼."
+    },
+    {
+      "kind": "pattern",
+      "prompt": "O que vem agora?",
+      "shown": [
+        "🚗",
+        "🌞",
+        "🌞",
+        "🚗",
+        "🌞"
+      ],
+      "options": [
+        {
+          "label": "🌞",
+          "value": "🌞"
+        },
+        {
+          "label": "🍎",
+          "value": "🍎"
+        },
+        {
+          "label": "🚗",
+          "value": "🚗"
+        }
+      ],
+      "answer": "🌞",
+      "explain": "Procure o segredo que se repete: 🚗, 🌞, 🌞... de novo! Então vem 🌞."
+    }
+  ],
+  "gGE_01": [
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está EM CIMA da mesa",
+      "items": [
+        {
+          "e": "🦊",
+          "pos": "cima"
+        },
+        {
+          "e": "🐢",
+          "pos": "baixo"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐢",
+          "value": "🐢"
+        },
+        {
+          "label": "🦊",
+          "value": "🦊"
+        }
+      ],
+      "answer": "🦊"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está AO LADO da mesa",
+      "items": [
+        {
+          "e": "🐶",
+          "pos": "cima"
+        },
+        {
+          "e": "🐢",
+          "pos": "baixo"
+        },
+        {
+          "e": "🐱",
+          "pos": "esq"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐶",
+          "value": "🐶"
+        },
+        {
+          "label": "🐢",
+          "value": "🐢"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        }
+      ],
+      "answer": "🐱"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está do lado DIREITO da mesa",
+      "items": [
+        {
+          "e": "🐶",
+          "pos": "esq"
+        },
+        {
+          "e": "🐱",
+          "pos": "dir"
+        },
+        {
+          "e": "🦊",
+          "pos": "cima"
+        }
+      ],
+      "options": [
+        {
+          "label": "🦊",
+          "value": "🦊"
+        },
+        {
+          "label": "🐶",
+          "value": "🐶"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        }
+      ],
+      "answer": "🐱"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está EMBAIXO da mesa",
+      "items": [
+        {
+          "e": "🐥",
+          "pos": "cima"
+        },
+        {
+          "e": "🦊",
+          "pos": "baixo"
+        },
+        {
+          "e": "🐱",
+          "pos": "esq"
+        },
+        {
+          "e": "🐰",
+          "pos": "dir"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐰",
+          "value": "🐰"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        },
+        {
+          "label": "🐥",
+          "value": "🐥"
+        },
+        {
+          "label": "🦊",
+          "value": "🦊"
+        }
+      ],
+      "answer": "🦊"
+    },
+    {
+      "kind": "scene",
+      "prompt": "Toque no bichinho que está do lado ESQUERDO da mesa",
+      "items": [
+        {
+          "e": "🐰",
+          "pos": "cima"
+        },
+        {
+          "e": "🦊",
+          "pos": "baixo"
+        },
+        {
+          "e": "🐥",
+          "pos": "esq"
+        },
+        {
+          "e": "🐶",
+          "pos": "dir"
+        }
+      ],
+      "options": [
+        {
+          "label": "🐥",
+          "value": "🐥"
+        },
+        {
+          "label": "🦊",
+          "value": "🦊"
+        },
+        {
+          "label": "🐶",
+          "value": "🐶"
+        },
+        {
+          "label": "🐰",
+          "value": "🐰"
+        }
+      ],
+      "answer": "🐥"
+    }
+  ],
+  "gGE_02": [
+    {
+      "kind": "shapes",
+      "prompt": "Toque no quadrado",
+      "options": [
+        {
+          "shape": "quad",
+          "color": "#2ED573",
+          "value": "quad"
+        },
+        {
+          "shape": "circ",
+          "color": "#1E90FF",
+          "value": "circ"
+        },
+        {
+          "shape": "tri",
+          "color": "#7C5CFF",
+          "value": "tri"
+        }
+      ],
+      "answer": "quad",
+      "explain": "Essa é a quadrado! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque no quadrado",
+      "options": [
+        {
+          "shape": "tri",
+          "color": "#1E90FF",
+          "value": "tri"
+        },
+        {
+          "shape": "quad",
+          "color": "#FF8FD8",
+          "value": "quad"
+        },
+        {
+          "shape": "circ",
+          "color": "#FF6B6B",
+          "value": "circ"
+        }
+      ],
+      "answer": "quad",
+      "explain": "Essa é a quadrado! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque no triângulo",
+      "options": [
+        {
+          "shape": "quad",
+          "color": "#FF6B6B",
+          "value": "quad"
+        },
+        {
+          "shape": "tri",
+          "color": "#FF8FD8",
+          "value": "tri"
+        },
+        {
+          "shape": "est",
+          "color": "#7C5CFF",
+          "value": "est"
+        },
+        {
+          "shape": "circ",
+          "color": "#1E90FF",
+          "value": "circ"
+        }
+      ],
+      "answer": "tri",
+      "explain": "Essa é a triângulo! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque no retângulo",
+      "options": [
+        {
+          "shape": "est",
+          "color": "#7C5CFF",
+          "value": "est"
+        },
+        {
+          "shape": "cor",
+          "color": "#FF8FD8",
+          "value": "cor"
+        },
+        {
+          "shape": "circ",
+          "color": "#FFC531",
+          "value": "circ"
+        },
+        {
+          "shape": "ret",
+          "color": "#2ED573",
+          "value": "ret"
+        }
+      ],
+      "answer": "ret",
+      "explain": "Essa é a retângulo! Olhe bem o formato dela e toque. no"
+    },
+    {
+      "kind": "shapes",
+      "prompt": "Toque na estrela",
+      "options": [
+        {
+          "shape": "tri",
+          "color": "#FF8FD8",
+          "value": "tri"
+        },
+        {
+          "shape": "ret",
+          "color": "#1E90FF",
+          "value": "ret"
+        },
+        {
+          "shape": "est",
+          "color": "#7C5CFF",
+          "value": "est"
+        },
+        {
+          "shape": "circ",
+          "color": "#FFC531",
+          "value": "circ"
+        }
+      ],
+      "answer": "est",
+      "explain": "Essa é a estrela! Olhe bem o formato dela e toque. na"
+    }
+  ],
+  "gGM_02": [
+    {
+      "kind": "plain",
+      "prompt": "O que vem depois da Tarde? 🌤️ ➔ ❓",
+      "big": "🌤️ Tarde ➔ ❓",
+      "options": [
+        {
+          "label": "Manhã ☀️",
+          "value": "Manhã"
+        },
+        {
+          "label": "Noite 🌙",
+          "value": "Noite"
+        },
+        {
+          "label": "Semana 📅",
+          "value": "Semana"
+        }
+      ],
+      "answer": "Noite"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Se hoje é Quarta-feira, amanhã será...?",
+      "big": "📅 Hoje: Quarta-feira",
+      "options": [
+        {
+          "label": "Quinta-feira",
+          "value": "Quinta-feira"
+        },
+        {
+          "label": "Sexta-feira",
+          "value": "Sexta-feira"
+        },
+        {
+          "label": "Terça-feira",
+          "value": "Terça-feira"
+        }
+      ],
+      "answer": "Quinta-feira"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Se hoje é Quarta-feira, ontem foi...?",
+      "big": "📅 Hoje: Quarta-feira",
+      "options": [
+        {
+          "label": "Terça-feira",
+          "value": "Terça-feira"
+        },
+        {
+          "label": "Sábado",
+          "value": "Sábado"
+        },
+        {
+          "label": "Quinta-feira",
+          "value": "Quinta-feira"
+        }
+      ],
+      "answer": "Terça-feira"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Qual dia é um dia de Aula/Trabalho? 🏫",
+      "big": "🎒 Estudo!",
+      "options": [
+        {
+          "label": "Domingo",
+          "value": "Domingo"
+        },
+        {
+          "label": "Terça-feira",
+          "value": "Terça-feira"
+        },
+        {
+          "label": "Sábado",
+          "value": "Sábado"
+        }
+      ],
+      "answer": "Terça-feira"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Se ontem foi Quarta-feira, amanhã será...?",
+      "big": "👈 Ontem: Quarta-feira",
+      "options": [
+        {
+          "label": "Sexta-feira",
+          "value": "Sexta-feira"
+        },
+        {
+          "label": "Quinta-feira",
+          "value": "Quinta-feira"
+        },
+        {
+          "label": "Quarta-feira",
+          "value": "Quarta-feira"
+        }
+      ],
+      "answer": "Sexta-feira"
+    }
+  ],
+  "gN1_01": [
+    {
+      "kind": "count",
+      "prompt": "Quantos temos aqui? Toque em um de cada vez!",
+      "emoji": "🚗",
+      "n": 3,
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "Muito bem! Você tocou um por um e contou 3!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Quantos temos aqui? Toque em um de cada vez!",
+      "emoji": "🚗",
+      "n": 4,
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ],
+      "answer": 4,
+      "explain": "Muito bem! Você tocou um por um e contou 4!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Quantos temos aqui? Toque em um de cada vez!",
+      "emoji": "🦆",
+      "n": 5,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 5,
+      "explain": "Muito bem! Você tocou um por um e contou 5!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Quantos temos aqui? Toque em um de cada vez!",
+      "emoji": "🦆",
+      "n": 5,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ],
+      "answer": 5,
+      "explain": "Muito bem! Você tocou um por um e contou 5!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Quantos temos aqui? Toque em um de cada vez!",
+      "emoji": "🌼",
+      "n": 5,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "Muito bem! Você tocou um por um e contou 5!"
+    }
+  ],
+  "gN1_02": [
+    {
+      "kind": "count",
+      "prompt": "Conte comigo sem pressa!",
+      "emoji": "🐞",
+      "n": 3,
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 3,
+      "explain": "Contamos no ritmo certo até 3!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte comigo sem pressa!",
+      "emoji": "🍪",
+      "n": 3,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "1",
+          "value": 1
+        }
+      ],
+      "answer": 3,
+      "explain": "Contamos no ritmo certo até 3!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte comigo sem pressa!",
+      "emoji": "🦆",
+      "n": 4,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 4,
+      "explain": "Contamos no ritmo certo até 4!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte comigo sem pressa!",
+      "emoji": "🐟",
+      "n": 4,
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 4,
+      "explain": "Contamos no ritmo certo até 4!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte comigo sem pressa!",
+      "emoji": "⚽",
+      "n": 4,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 4,
+      "explain": "Contamos no ritmo certo até 4!"
+    }
+  ],
+  "gN1_03": [
+    {
+      "kind": "count",
+      "prompt": "Conte com calma, sem pular nenhum!",
+      "emoji": "🐞",
+      "n": 8,
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 8,
+      "explain": "Que ritmo ótimo, contamos até 8!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte com calma, sem pular nenhum!",
+      "emoji": "🍪",
+      "n": 8,
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ],
+      "answer": 8,
+      "explain": "Que ritmo ótimo, contamos até 8!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte com calma, sem pular nenhum!",
+      "emoji": "🦆",
+      "n": 8,
+      "options": [
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 8,
+      "explain": "Que ritmo ótimo, contamos até 8!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte com calma, sem pular nenhum!",
+      "emoji": "🐟",
+      "n": 8,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 8,
+      "explain": "Que ritmo ótimo, contamos até 8!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte com calma, sem pular nenhum!",
+      "emoji": "⚽",
+      "n": 9,
+      "options": [
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 9,
+      "explain": "Que ritmo ótimo, contamos até 9!"
+    }
+  ],
+  "gN1_04": [
+    {
+      "kind": "count",
+      "prompt": "Conte tudo e me diga: Quantos SÃO no total?",
+      "emoji": "🐞",
+      "n": 4,
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 4,
+      "explain": "Isso! Se o último que você contou foi o 4, então SÃO 4 no total!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte tudo e me diga: Quantos SÃO no total?",
+      "emoji": "🍪",
+      "n": 4,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 4,
+      "explain": "Isso! Se o último que você contou foi o 4, então SÃO 4 no total!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte tudo e me diga: Quantos SÃO no total?",
+      "emoji": "🦆",
+      "n": 4,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 4,
+      "explain": "Isso! Se o último que você contou foi o 4, então SÃO 4 no total!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte tudo e me diga: Quantos SÃO no total?",
+      "emoji": "🐟",
+      "n": 4,
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 4,
+      "explain": "Isso! Se o último que você contou foi o 4, então SÃO 4 no total!"
+    },
+    {
+      "kind": "count",
+      "prompt": "Conte tudo e me diga: Quantos SÃO no total?",
+      "emoji": "⚽",
+      "n": 4,
+      "options": [
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "2",
+          "value": 2
+        }
+      ],
+      "answer": 4,
+      "explain": "Isso! Se o último que você contou foi o 4, então SÃO 4 no total!"
+    }
+  ],
+  "gN1_05": [
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "🐶",
+          "n": 3
+        },
+        {
+          "emoji": "🚗",
+          "n": 5
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 5 é mais que 3!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "⭐",
+          "n": 3
+        },
+        {
+          "emoji": "🌼",
+          "n": 5
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 5 é mais que 3!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "🐞",
+          "n": 4
+        },
+        {
+          "emoji": "🐶",
+          "n": 6
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 6 é mais que 4!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MAIS figuras",
+      "groups": [
+        {
+          "emoji": "🍎",
+          "n": 3
+        },
+        {
+          "emoji": "🚗",
+          "n": 5
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 1,
+      "explain": "Conte os dois grupos: 5 é mais que 3!"
+    },
+    {
+      "kind": "groups",
+      "prompt": "Toque no grupo com MENOS figuras",
+      "groups": [
+        {
+          "emoji": "🍓",
+          "n": 2
+        },
+        {
+          "emoji": "⭐",
+          "n": 3
+        }
+      ],
+      "options": [
+        {
+          "value": 0
+        },
+        {
+          "value": 1
+        }
+      ],
+      "answer": 0,
+      "explain": "Conte os dois grupos: 2 é menos que 3!"
+    }
+  ],
+  "gN1_06": [
+    {
+      "kind": "plain",
+      "prompt": "Encontre o número 5!",
+      "big": "Qual é o 5?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "O 5 é esse mesmo! Você ligou o nome ao número."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Encontre o número 5!",
+      "big": "Qual é o 5?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "O 5 é esse mesmo! Você ligou o nome ao número."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Encontre o número 5!",
+      "big": "Qual é o 5?",
+      "options": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 5,
+      "explain": "O 5 é esse mesmo! Você ligou o nome ao número."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Encontre o número 6!",
+      "big": "Qual é o 6?",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 6,
+      "explain": "O 6 é esse mesmo! Você ligou o nome ao número."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Encontre o número 6!",
+      "big": "Qual é o 6?",
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 6,
+      "explain": "O 6 é esse mesmo! Você ligou o nome ao número."
+    }
+  ],
+  "gN1_07": [
+    {
+      "kind": "plain",
+      "prompt": "Quem vem logo DEPOIS do 4?",
+      "big": "4 ➔ ?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "Isso! Depois do 4 vem sempre o 5."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quem vem logo DEPOIS do 4?",
+      "big": "4 ➔ ?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "Isso! Depois do 4 vem sempre o 5."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quem vem logo DEPOIS do 5?",
+      "big": "5 ➔ ?",
+      "options": [
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 6,
+      "explain": "Isso! Depois do 5 vem sempre o 6."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quem vem logo DEPOIS do 5?",
+      "big": "5 ➔ ?",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "7",
+          "value": 7
+        }
+      ],
+      "answer": 6,
+      "explain": "Isso! Depois do 5 vem sempre o 6."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Quem vem logo DEPOIS do 5?",
+      "big": "5 ➔ ?",
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 6,
+      "explain": "Isso! Depois do 5 vem sempre o 6."
+    }
+  ],
+  "gN1_09": [
+    {
+      "kind": "plain",
+      "prompt": "Não volte pro um! Continue contando:",
+      "big": "5, 6, 7, ... ?",
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "8",
+          "value": 8
+        }
+      ],
+      "answer": 8,
+      "explain": "Perfeito! Você continuou contando direto para o 8."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Não volte pro um! Continue contando:",
+      "big": "5, 6, 7, ... ?",
+      "options": [
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "10",
+          "value": 10
+        }
+      ],
+      "answer": 8,
+      "explain": "Perfeito! Você continuou contando direto para o 8."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Não volte pro um! Continue contando:",
+      "big": "6, 7, 8, ... ?",
+      "options": [
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "11",
+          "value": 11
+        }
+      ],
+      "answer": 9,
+      "explain": "Perfeito! Você continuou contando direto para o 9."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Não volte pro um! Continue contando:",
+      "big": "6, 7, 8, ... ?",
+      "options": [
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "10",
+          "value": 10
+        }
+      ],
+      "answer": 9,
+      "explain": "Perfeito! Você continuou contando direto para o 9."
+    },
+    {
+      "kind": "plain",
+      "prompt": "Não volte pro um! Continue contando:",
+      "big": "6, 7, 8, ... ?",
+      "options": [
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "9",
+          "value": 9
+        }
+      ],
+      "answer": 9,
+      "explain": "Perfeito! Você continuou contando direto para o 9."
+    }
+  ],
+  "gN1_08": [
+    {
+      "kind": "flash",
+      "prompt": "A Caixa Mágica abriu e fechou! Quantos você viu?",
+      "emoji": "🐞",
+      "n": 5,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 5,
+      "explain": "Você viu rapidinho e acertou! Eram 5."
+    },
+    {
+      "kind": "flash",
+      "prompt": "A Caixa Mágica abriu e fechou! Quantos você viu?",
+      "emoji": "🍪",
+      "n": 5,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "3",
+          "value": 3
+        }
+      ],
+      "answer": 5,
+      "explain": "Você viu rapidinho e acertou! Eram 5."
+    },
+    {
+      "kind": "flash",
+      "prompt": "A Caixa Mágica abriu e fechou! Quantos você viu?",
+      "emoji": "🦆",
+      "n": 6,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "6",
+          "value": 6
+        }
+      ],
+      "answer": 6,
+      "explain": "Você viu rapidinho e acertou! Eram 6."
+    },
+    {
+      "kind": "flash",
+      "prompt": "A Caixa Mágica abriu e fechou! Quantos você viu?",
+      "emoji": "🐟",
+      "n": 6,
+      "options": [
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "5",
+          "value": 5
+        }
+      ],
+      "answer": 6,
+      "explain": "Você viu rapidinho e acertou! Eram 6."
+    },
+    {
+      "kind": "flash",
+      "prompt": "A Caixa Mágica abriu e fechou! Quantos você viu?",
+      "emoji": "⚽",
+      "n": 6,
+      "options": [
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "4",
+          "value": 4
+        }
+      ],
+      "answer": 6,
+      "explain": "Você viu rapidinho e acertou! Eram 6."
+    }
+  ],
+  "gAL_01": [
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦜",
+          "value": "🦜"
+        },
+        {
+          "label": "🐦",
+          "value": "🐦"
+        },
+        {
+          "label": "🦆",
+          "value": "🦆"
+        },
+        {
+          "label": "🪗",
+          "value": "🪗"
+        }
+      ],
+      "answer": "🪗"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🚜",
+          "value": "🚜"
+        },
+        {
+          "label": "🦆",
+          "value": "🦆"
+        },
+        {
+          "label": "🦉",
+          "value": "🦉"
+        },
+        {
+          "label": "🦜",
+          "value": "🦜"
+        }
+      ],
+      "answer": "🚜"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦜",
+          "value": "🦜"
+        },
+        {
+          "label": "🦉",
+          "value": "🦉"
+        },
+        {
+          "label": "🎹",
+          "value": "🎹"
+        },
+        {
+          "label": "🐦",
+          "value": "🐦"
+        }
+      ],
+      "answer": "🎹"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦉",
+          "value": "🦉"
+        },
+        {
+          "label": "🦆",
+          "value": "🦆"
+        },
+        {
+          "label": "🐭",
+          "value": "🐭"
+        },
+        {
+          "label": "🐧",
+          "value": "🐧"
+        }
+      ],
+      "answer": "🐭"
+    },
+    {
+      "kind": "plain",
+      "prompt": "Toque no que NÃO combina com os outros",
+      "big": null,
+      "options": [
+        {
+          "label": "🦜",
+          "value": "🦜"
+        },
+        {
+          "label": "🦅",
+          "value": "🦅"
+        },
+        {
+          "label": "🐱",
+          "value": "🐱"
+        },
+        {
+          "label": "🦉",
+          "value": "🦉"
+        }
+      ],
+      "answer": "🐱"
+    }
+  ],
+  "gN1_10": [
+    {
+      "kind": "bond",
+      "prompt": "Qual é o número total lá em cima?",
+      "a": 6,
+      "b": 5,
+      "big": "topo",
+      "howto": "Os dois pedaços de baixo se juntam para formar o total lá em cima. É só somar!",
+      "explain": "Isso! Os pedaços de baixo, 5 e 1, juntos formam o número grandão 6 no topo!",
+      "options": [
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 1,
+          "value": 1
+        }
+      ],
+      "answer": 6
+    },
+    {
+      "kind": "bond",
+      "prompt": "Qual é o número total lá em cima?",
+      "a": 6,
+      "b": 4,
+      "big": "topo",
+      "howto": "Os dois pedaços de baixo se juntam para formar o total lá em cima. É só somar!",
+      "explain": "Isso! Os pedaços de baixo, 4 e 2, juntos formam o número grandão 6 no topo!",
+      "options": [
+        {
+          "label": 2,
+          "value": 2
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 4,
+          "value": 4
+        }
+      ],
+      "answer": 6
+    },
+    {
+      "kind": "bond",
+      "prompt": "Qual pedaço está faltando para completar?",
+      "a": 7,
+      "b": 4,
+      "big": "topo_ok",
+      "howto": "O número de cima é feito juntando os de baixo. Pense: 4 mais quanto dá 7?",
+      "explain": "Isso! Os dois pedaços de baixo se juntam para formar o grandão lá em cima: 4 e 3 fazem 7!",
+      "options": [
+        {
+          "label": 11,
+          "value": 11
+        },
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 3,
+          "value": 3
+        },
+        {
+          "label": 5,
+          "value": 5
+        }
+      ],
+      "answer": 3
+    },
+    {
+      "kind": "bond",
+      "prompt": "Qual pedaço está faltando para completar?",
+      "a": 7,
+      "b": 3,
+      "big": "topo_ok",
+      "howto": "O número de cima é feito juntando os de baixo. Pense: 3 mais quanto dá 7?",
+      "explain": "Isso! Os dois pedaços de baixo se juntam para formar o grandão lá em cima: 3 e 4 fazem 7!",
+      "options": [
+        {
+          "label": 1,
+          "value": 1
+        },
+        {
+          "label": 3,
+          "value": 3
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 4,
+          "value": 4
+        }
+      ],
+      "answer": 4
+    },
+    {
+      "kind": "bond",
+      "prompt": "Qual pedaço está faltando para completar?",
+      "a": 7,
+      "b": 2,
+      "big": "topo_ok",
+      "howto": "O número de cima é feito juntando os de baixo. Pense: 2 mais quanto dá 7?",
+      "explain": "Isso! Os dois pedaços de baixo se juntam para formar o grandão lá em cima: 2 e 5 fazem 7!",
+      "options": [
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 2,
+          "value": 2
+        },
+        {
+          "label": 9,
+          "value": 9
+        }
+      ],
+      "answer": 5
+    }
+  ],
+  "gN1_11": [
+    {
+      "kind": "tenframe",
+      "prompt": "Quantos faltam para completar a caixa de 10?",
+      "n": 5,
+      "big": "fill",
+      "options": [
+        {
+          "label": 3,
+          "value": 3
+        },
+        {
+          "label": 7,
+          "value": 7
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 10,
+          "value": 10
+        }
+      ],
+      "answer": 5
+    },
+    {
+      "kind": "tenframe",
+      "prompt": "Quantos faltam para completar a caixa de 10?",
+      "n": 5,
+      "big": "fill",
+      "options": [
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 6,
+          "value": 6
+        }
+      ],
+      "answer": 5
+    },
+    {
+      "kind": "tenframe",
+      "prompt": "Quantos faltam para completar a caixa de 10?",
+      "n": 5,
+      "big": "fill",
+      "options": [
+        {
+          "label": 7,
+          "value": 7
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 5,
+          "value": 5
+        }
+      ],
+      "answer": 5
+    },
+    {
+      "kind": "tenframe",
+      "prompt": "Quantos faltam para completar a caixa de 10?",
+      "n": 4,
+      "big": "fill",
+      "options": [
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 10,
+          "value": 10
+        }
+      ],
+      "answer": 6
+    },
+    {
+      "kind": "tenframe",
+      "prompt": "Quantos faltam para completar a caixa de 10?",
+      "n": 4,
+      "big": "fill",
+      "options": [
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 4,
+          "value": 4
+        }
+      ],
+      "answer": 6
+    }
+  ],
+  "gN2_02": [
+    {
+      "kind": "tens",
+      "prompt": "Que número é esse?",
+      "t": 5,
+      "u": 6,
+      "options": [
+        {
+          "label": 46,
+          "value": 46
+        },
+        {
+          "label": 58,
+          "value": 58
+        },
+        {
+          "label": 65,
+          "value": 65
+        },
+        {
+          "label": 56,
+          "value": 56
+        }
+      ],
+      "answer": 56
+    },
+    {
+      "kind": "tens",
+      "prompt": "Que número é esse?",
+      "t": 5,
+      "u": 9,
+      "options": [
+        {
+          "label": 49,
+          "value": 49
+        },
+        {
+          "label": 59,
+          "value": 59
+        },
+        {
+          "label": 95,
+          "value": 95
+        },
+        {
+          "label": 60,
+          "value": 60
+        }
+      ],
+      "answer": 59
+    },
+    {
+      "kind": "tens",
+      "prompt": "Que número é esse?",
+      "t": 6,
+      "u": 2,
+      "options": [
+        {
+          "label": 26,
+          "value": 26
+        },
+        {
+          "label": 52,
+          "value": 52
+        },
+        {
+          "label": 62,
+          "value": 62
+        },
+        {
+          "label": 64,
+          "value": 64
+        }
+      ],
+      "answer": 62
+    },
+    {
+      "kind": "tens",
+      "prompt": "Que número é esse?",
+      "t": 6,
+      "u": 5,
+      "options": [
+        {
+          "label": 56,
+          "value": 56
+        },
+        {
+          "label": 64,
+          "value": 64
+        },
+        {
+          "label": 65,
+          "value": 65
+        },
+        {
+          "label": 55,
+          "value": 55
+        }
+      ],
+      "answer": 65
+    },
+    {
+      "kind": "tens",
+      "prompt": "Que número é esse?",
+      "t": 6,
+      "u": 9,
+      "options": [
+        {
+          "label": 59,
+          "value": 59
+        },
+        {
+          "label": 67,
+          "value": 67
+        },
+        {
+          "label": 69,
+          "value": 69
+        },
+        {
+          "label": 96,
+          "value": 96
+        }
+      ],
+      "answer": 69
+    }
+  ],
+  "gN3_05": [
+    {
+      "kind": "bond",
+      "prompt": "Se sabemos que 4 + 6 = 10... então 10 - 4 é igual a?",
+      "a": 10,
+      "b": 4,
+      "big": "topo_ok",
+      "howto": "Na família desses números, se você tirar o pedaço 4 do grandão 10, o que sobra?",
+      "explain": "Exato! Os três formam uma família. 4 e 6 fazem 10. Tirando 4, sobra o 6!",
+      "options": [
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 10,
+          "value": 10
+        }
+      ],
+      "answer": 6
+    },
+    {
+      "kind": "bond",
+      "prompt": "Se sabemos que 4 + 5 = 9... então 9 - 4 é igual a?",
+      "a": 9,
+      "b": 4,
+      "big": "topo_ok",
+      "howto": "Na família desses números, se você tirar o pedaço 4 do grandão 9, o que sobra?",
+      "explain": "Exato! Os três formam uma família. 4 e 5 fazem 9. Tirando 4, sobra o 5!",
+      "options": [
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 5,
+          "value": 5
+        }
+      ],
+      "answer": 5
+    },
+    {
+      "kind": "bond",
+      "prompt": "Se sabemos que 5 + 4 = 9... então 9 - 5 é igual a?",
+      "a": 9,
+      "b": 5,
+      "big": "topo_ok",
+      "howto": "Na família desses números, se você tirar o pedaço 5 do grandão 9, o que sobra?",
+      "explain": "Exato! Os três formam uma família. 5 e 4 fazem 9. Tirando 5, sobra o 4!",
+      "options": [
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 7,
+          "value": 7
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 4,
+          "value": 4
+        }
+      ],
+      "answer": 4
+    },
+    {
+      "kind": "bond",
+      "prompt": "Se sabemos que 5 + 3 = 8... então 8 - 5 é igual a?",
+      "a": 8,
+      "b": 5,
+      "big": "topo_ok",
+      "howto": "Na família desses números, se você tirar o pedaço 5 do grandão 8, o que sobra?",
+      "explain": "Exato! Os três formam uma família. 5 e 3 fazem 8. Tirando 5, sobra o 3!",
+      "options": [
+        {
+          "label": 0,
+          "value": 0
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 3,
+          "value": 3
+        }
+      ],
+      "answer": 3
+    },
+    {
+      "kind": "bond",
+      "prompt": "Se sabemos que 5 + 2 = 7... então 7 - 5 é igual a?",
+      "a": 7,
+      "b": 5,
+      "big": "topo_ok",
+      "howto": "Na família desses números, se você tirar o pedaço 5 do grandão 7, o que sobra?",
+      "explain": "Exato! Os três formam uma família. 5 e 2 fazem 7. Tirando 5, sobra o 2!",
+      "options": [
+        {
+          "label": 2,
+          "value": 2
+        },
+        {
+          "label": 1,
+          "value": 1
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 7,
+          "value": 7
+        }
+      ],
+      "answer": 2
+    }
+  ],
+  "gN3_06": [
+    {
+      "kind": "groups",
+      "prompt": "O dobro de 3 é...",
+      "groups": [
+        {
+          "emoji": "🍎",
+          "n": 3
+        },
+        {
+          "emoji": "🍎",
+          "n": 3
+        }
+      ],
+      "options": [
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 6,
+          "value": 6
+        }
+      ],
+      "answer": 6
+    },
+    {
+      "kind": "groups",
+      "prompt": "O dobro de 3 é...",
+      "groups": [
+        {
+          "emoji": "🍎",
+          "n": 3
+        },
+        {
+          "emoji": "🍎",
+          "n": 3
+        }
+      ],
+      "options": [
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 7,
+          "value": 7
+        }
+      ],
+      "answer": 6
+    },
+    {
+      "kind": "math",
+      "prompt": "Pense: o dobro de 4 é 8. Então 4 + 5 é?",
+      "expr": "4 + 5 = ?",
+      "options": [
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 11,
+          "value": 11
+        }
+      ],
+      "answer": 9
+    },
+    {
+      "kind": "math",
+      "prompt": "Pense: o dobro de 3 é 6. Então 3 + 4 é?",
+      "expr": "3 + 4 = ?",
+      "options": [
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 7,
+          "value": 7
+        }
+      ],
+      "answer": 7
+    },
+    {
+      "kind": "math",
+      "prompt": "Pense: o dobro de 2 é 4. Então 2 + 3 é?",
+      "expr": "2 + 3 = ?",
+      "options": [
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 5,
+          "value": 5
+        },
+        {
+          "label": 4,
+          "value": 4
+        },
+        {
+          "label": 6,
+          "value": 6
+        }
+      ],
+      "answer": 5
+    }
+  ],
+  "gN3_07": [
+    {
+      "kind": "tenframe",
+      "prompt": "Complete o 10 primeiro!",
+      "n": 7,
+      "big": "add",
+      "u": 7,
+      "options": [
+        {
+          "label": 12,
+          "value": 12
+        },
+        {
+          "label": 13,
+          "value": 13
+        },
+        {
+          "label": 14,
+          "value": 14
+        },
+        {
+          "label": 10,
+          "value": 10
+        }
+      ],
+      "answer": 14
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos pular até o 10 e depois o resto!",
+      "nlStartPos": 7,
+      "nlStart": 7,
+      "nlEnd": 15,
+      "nlJumps": [
+        {
+          "val": 3,
+          "delay": 0
+        },
+        {
+          "val": 3,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 16,
+          "value": 16
+        },
+        {
+          "label": 13,
+          "value": 13
+        },
+        {
+          "label": 12,
+          "value": 12
+        }
+      ],
+      "answer": 13
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos pular até o 10 e depois o resto!",
+      "nlStartPos": 8,
+      "nlStart": 8,
+      "nlEnd": 15,
+      "nlJumps": [
+        {
+          "val": 2,
+          "delay": 0
+        },
+        {
+          "val": 3,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 12,
+          "value": 12
+        },
+        {
+          "label": 13,
+          "value": 13
+        },
+        {
+          "label": 15,
+          "value": 15
+        }
+      ],
+      "answer": 13
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos pular até o 10 e depois o resto!",
+      "nlStartPos": 8,
+      "nlStart": 8,
+      "nlEnd": 14,
+      "nlJumps": [
+        {
+          "val": 2,
+          "delay": 0
+        },
+        {
+          "val": 2,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 11,
+          "value": 11
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 12,
+          "value": 12
+        }
+      ],
+      "answer": 12
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos pular até o 10 e depois o resto!",
+      "nlStartPos": 8,
+      "nlStart": 8,
+      "nlEnd": 13,
+      "nlJumps": [
+        {
+          "val": 2,
+          "delay": 0
+        },
+        {
+          "val": 1,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 14,
+          "value": 14
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 11,
+          "value": 11
+        }
+      ],
+      "answer": 11
+    }
+  ],
+  "gN3_08": [
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos voltar até o 10 e depois tirar o resto!",
+      "nlStartPos": 13,
+      "nlStart": 6,
+      "nlEnd": 14,
+      "nlJumps": [
+        {
+          "val": -3,
+          "delay": 0
+        },
+        {
+          "val": -3,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 7,
+          "value": 7
+        }
+      ],
+      "answer": 7
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos voltar até o 10 e depois tirar o resto!",
+      "nlStartPos": 13,
+      "nlStart": 6,
+      "nlEnd": 14,
+      "nlJumps": [
+        {
+          "val": -3,
+          "delay": 0
+        },
+        {
+          "val": -3,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 6,
+          "value": 6
+        },
+        {
+          "label": 7,
+          "value": 7
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 8,
+          "value": 8
+        }
+      ],
+      "answer": 7
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos voltar até o 10 e depois tirar o resto!",
+      "nlStartPos": 13,
+      "nlStart": 7,
+      "nlEnd": 14,
+      "nlJumps": [
+        {
+          "val": -3,
+          "delay": 0
+        },
+        {
+          "val": -2,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 7,
+          "value": 7
+        }
+      ],
+      "answer": 8
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos voltar até o 10 e depois tirar o resto!",
+      "nlStartPos": 13,
+      "nlStart": 7,
+      "nlEnd": 14,
+      "nlJumps": [
+        {
+          "val": -3,
+          "delay": 0
+        },
+        {
+          "val": -2,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 8,
+          "value": 8
+        },
+        {
+          "label": 7,
+          "value": 7
+        }
+      ],
+      "answer": 8
+    },
+    {
+      "kind": "numberline-interactive",
+      "prompt": "Vamos voltar até o 10 e depois tirar o resto!",
+      "nlStartPos": 14,
+      "nlStart": 8,
+      "nlEnd": 15,
+      "nlJumps": [
+        {
+          "val": -4,
+          "delay": 0
+        },
+        {
+          "val": -1,
+          "delay": 1
+        }
+      ],
+      "options": [
+        {
+          "label": 12,
+          "value": 12
+        },
+        {
+          "label": 9,
+          "value": 9
+        },
+        {
+          "label": 10,
+          "value": 10
+        },
+        {
+          "label": 8,
+          "value": 8
+        }
+      ],
+      "answer": 9
+    }
+  ],
+  "gN3_09": [
+    {
+      "kind": "vertical",
+      "prompt": "Resolva a conta:",
+      "vTop": 51,
+      "vBot": 8,
+      "vOp": "+",
+      "options": [
+        {
+          "label": 60,
+          "value": 60
+        },
+        {
+          "label": 58,
+          "value": 58
+        },
+        {
+          "label": 59,
+          "value": 59
+        },
+        {
+          "label": 43,
+          "value": 43
+        }
+      ],
+      "answer": 59
+    },
+    {
+      "kind": "vertical",
+      "prompt": "Resolva a conta:",
+      "vTop": 61,
+      "vBot": 7,
+      "vOp": "-",
+      "options": [
+        {
+          "label": 68,
+          "value": 68
+        },
+        {
+          "label": 55,
+          "value": 55
+        },
+        {
+          "label": 54,
+          "value": 54
+        },
+        {
+          "label": 53,
+          "value": 53
+        }
+      ],
+      "answer": 54
+    },
+    {
+      "kind": "vertical",
+      "prompt": "Resolva a conta:",
+      "vTop": 62,
+      "vBot": 5,
+      "vOp": "-",
+      "options": [
+        {
+          "label": 67,
+          "value": 67
+        },
+        {
+          "label": 56,
+          "value": 56
+        },
+        {
+          "label": 57,
+          "value": 57
+        },
+        {
+          "label": 58,
+          "value": 58
+        }
+      ],
+      "answer": 57
+    },
+    {
+      "kind": "vertical",
+      "prompt": "Resolva a conta:",
+      "vTop": 64,
+      "vBot": 4,
+      "vOp": "-",
+      "options": [
+        {
+          "label": 68,
+          "value": 68
+        },
+        {
+          "label": 59,
+          "value": 59
+        },
+        {
+          "label": 61,
+          "value": 61
+        },
+        {
+          "label": 60,
+          "value": 60
+        }
+      ],
+      "answer": 60
+    },
+    {
+      "kind": "vertical",
+      "prompt": "Resolva a conta:",
+      "vTop": 62,
+      "vBot": 2,
+      "vOp": "+",
+      "options": [
+        {
+          "label": 64,
+          "value": 64
+        },
+        {
+          "label": 65,
+          "value": 65
+        },
+        {
+          "label": 63,
+          "value": 63
+        },
+        {
+          "label": 60,
+          "value": 60
+        }
+      ],
+      "answer": 64
+    }
+  ]
+}

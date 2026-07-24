@@ -54,7 +54,7 @@ nodes:
   - { id: N3.10, nome: "Problemas aditivos (4 situações)",       strand: N3, faixa: F1, prereqs: [N3.03, N3.04] }
   - { id: AL.03, nome: "Contagem por saltos (2, 5, 10)",         strand: AL, faixa: F1, prereqs: [N1.09, N2.01] }
   - { id: GM.03, nome: "Sistema monetário (Real)",               strand: GM, faixa: F1, prereqs: [N2.01, N3.09] }
-  - { id: GM.04, nome: "Horas (ponteiros e digital)",            strand: GM, faixa: F1, prereqs: [N1.06] } # AL.03 exigido só do micro d em diante
+  - { id: GM.04, nome: "Horas (ponteiros e digital)",            strand: GM, faixa: F1, prereqs: [N1.06] }
   - { id: PE.01, nome: "Pictogramas e tabelas simples",          strand: PE, faixa: F1, prereqs: [N1.04, N1.05] }
 
   # ---------- F2 — Reagrupamento e mundo multiplicativo ----------
@@ -113,12 +113,22 @@ nodes:
   - { id: PE.04, nome: "Estatística e probabilidade (contagem)", strand: PE, faixa: F4, prereqs: [PE.03, N6.03] }
 
 # ---------- Trilhas de fluência (Dojo) ----------
+# Duas famílias: FD = fluência de FATO (recordação atômica, medida por rt).
+#                PD = fluência de PROCEDIMENTO (algoritmo armado, medida por precisão + tempo + passo_fraco).
+# Spec completa em DOJO_SAGA.md. Regra: trilha abre <=> competência-mãe em nível >= 4.
 fluency:
-  - { id: FD1, nome: "Amigos do 10",                 destrava: { N1.11: 4 }, rt_max_s: 3 }
-  - { id: FD2, nome: "Dobros e quase-dobros",        destrava: { N3.06: 4 }, rt_max_s: 3 }
-  - { id: FD3, nome: "+/− até 20",                   destrava: { N3.07: 4, N3.08: 4 }, rt_max_s: 4 }
-  - { id: FD4, nome: "Tabuadas 2, 5, 10",            destrava: { N4.03: 4 }, rt_max_s: 4 }
-  - { id: FD5, nome: "Tabuadas 3, 4, 6-9",           destrava: { N4.07: 4 }, rt_max_s: 5 }
-  - { id: FD6, nome: "Fatos de divisão",             destrava: { N4.06: 4 }, rt_max_s: 5 }
-  - { id: FD7, nome: "Complementos de 100 e mental", destrava: { N3.13: 4 }, rt_max_s: 6 }
-  - { id: FD8, nome: "Fração↔decimal↔% comuns",      destrava: { N6.03: 4 }, rt_max_s: 6 }
+  # -- Família FD: fatos --
+  - { id: FD1, familia: FD, nome: "Amigos do 10",                 destrava: { N1.11: 4 }, rt_max_s: 3 }
+  - { id: FD2, familia: FD, nome: "Dobros e quase-dobros",        destrava: { N3.06: 4 }, rt_max_s: 3 }
+  - { id: FD3, familia: FD, nome: "+/− até 20",                   destrava: { N3.07: 4, N3.08: 4 }, rt_max_s: 4 }
+  - { id: FD4, familia: FD, nome: "Tabuadas 2, 5, 10",            destrava: { N4.03: 4 }, rt_max_s: 4 }
+  - { id: FD5, familia: FD, nome: "Tabuadas 3, 4, 6-9",           destrava: { N4.07: 4 }, rt_max_s: 5 }
+  - { id: FD6, familia: FD, nome: "Fatos de divisão",             destrava: { N4.06: 4 }, rt_max_s: 5 }
+  - { id: FD7, familia: FD, nome: "Complementos de 100 e mental", destrava: { N3.13: 4 }, rt_max_s: 6 }
+  - { id: FD8, familia: FD, nome: "Fração↔decimal↔% comuns",      destrava: { N6.03: 4 }, rt_max_s: 6 }
+  # -- Família PD: procedimentos armados (só a partir de F2 — simbólico) --
+  - { id: PD-A, familia: PD, nome: "Adição armada",              destrava: { N3.11: 4 }, degraus: ["2dig_s_reserva","2dig_c_reserva","3dig","4dig","varias_parcelas"] }
+  - { id: PD-S, familia: PD, nome: "Subtração armada",           destrava: { N3.12: 4 }, degraus: ["2dig_s_troca","2dig_c_troca","3dig","com_zeros","4dig"] }
+  - { id: PD-M, familia: PD, nome: "Multiplicação armada",       destrava: { N4.08: 4, N4.09: 4 }, degraus: ["x1dig","x1dig_reserva","x10_100","x2dig","x3dig"] }
+  - { id: PD-D, familia: PD, nome: "Divisão armada",             destrava: { N4.10: 4 }, degraus: ["1dig_exata","1dig_resto","3dig","zero_quociente","2dig","decimais"] }
+  - { id: PD-Dec, familia: PD, nome: "Operações com decimais armadas", destrava: { N6.02: 4 }, degraus: ["soma_sub_virgula","x_dig","div","x_div_10_100"] }

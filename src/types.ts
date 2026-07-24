@@ -33,6 +33,7 @@ export interface ThemeConfig {
 }
 
 export interface Option {
+  tag?: string;
   label?: string;
   value: any;
   shape?: string;
@@ -44,6 +45,13 @@ export interface Option {
 }
 
 export interface Question {
+  /** A fala que introduz o exercício (narração principal) */
+  audioPrompt?: string;
+  /** Array de falas em estágios, quando o jogo narra passo-a-passo (ex: I-do/We-do) */
+  audioSteps?: string[];
+  tutorial?: { say: string; show?: Record<string, any> | string | number; ms?: number }[];
+  excecaoCPA?: boolean | "perceptual";
+  isFallback?: boolean;
   kind: string;
   prompt: string;
   big?: string | null;
@@ -124,6 +132,8 @@ export interface BankItem {
 }
 
 export interface Progress {
+  /** Janela rolante de erros recentes. O Radar avalia isso. */
+  misconceptions?: { tag: string; ts: number }[];
   lvl: number;
   streak: number;
   bad: number;
@@ -171,9 +181,9 @@ export interface DojoTrackState {
 
 export interface LogEntry {
   d: string;
-  ok: number;
-  tot: number;
-  stars: number;
+  ok?: number;
+  tot?: number;
+  stars?: number;
   t: number;
   /** missões completadas no dia (para o bônus da primeira missão) */
   m?: number;

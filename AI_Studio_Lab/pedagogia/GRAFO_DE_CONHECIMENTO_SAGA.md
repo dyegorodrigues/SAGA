@@ -191,7 +191,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 - c) "quantos faltam para 10?" (contar os vazios — a semente dos amigos do 10, N1.11)
 **Erros típicos:** contar bolinha por bolinha ignorando a fileira cheia (a dica ataca isso: "a fileira cheia já é 5!"). *Distratores: n±1, 10−n (confusão cheios/vazios).*
 
-### N1.09 — Contagem até 20 e a partir de qualquer número
+### N1.09 — Contagem até 20 e a partir de N
 **Objetivo:** estender a contagem além do 10 e continuar de onde parou.
 **Pré-req:** N1.04(e), N1.02(c–d). **Kinds:** count, plain, order.
 **Micros:**
@@ -279,7 +279,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 
 ### N2.03 — Comparação simbólica (>, <, =)
 **Objetivo:** comparar números pelo valor posicional e usar os símbolos.
-**Pré-req:** N2.02(a), N1.05. **Kinds:** plain (boca do jacaré 🐊 — já usada), math.
+**Pré-req:** N2.02, N1.05. **Kinds:** plain (boca do jacaré 🐊 — já usada), math.
 **Micros:** a) comparar até 10 com símbolo · b) até 100 (regra: olhe a dezena primeiro) · c) comparar somas (5+2 __ 6) · d) o = como "mesmo valor" (não "a resposta é") — ponte direta para AL.05
 **Erros típicos:** jacaré para o lado errado (a dica âncora: "a boca come o MAIOR"); comparar unidades antes das dezenas (28 > 31 "porque 8 > 1").
 
@@ -523,7 +523,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Erros:** esquecer o deslocamento da segunda linha (o zero-fantasma); somar as parciais errado.
 
 ### N4.10 — Divisão com resto e algoritmo
-**Pré-req:** N4.06, N4.05(d), N3.12. **Kinds:** drag-group*, vertical* (modo divisão), math, story.
+**Pré-req:** N4.06, N4.05, N3.12. **Kinds:** drag-group*, vertical* (modo divisão), math, story.
 **Micros:** a) algoritmo com resultado EXATO, sem sobra, divisor de 1 dígito (DU÷U) — a mecânica pura primeiro: divide, multiplica, subtrai, desce o próximo · b) agora com sobra: resto com material e o registro (13÷4 = 3 resto 1) · c) CDU÷U com resto (inclui zero no quociente) · d) interpretar o resto no problema (sobe ou desce? "4 por barco, 13 pessoas → 4 barcos") · e) checagem: q×d+r.
 **Erros:** zero no meio do quociente engolido (816÷4 = 24); resto maior que o divisor; interpretação cega do resto em (d).
 **Didática:** o resto como coisa física + a "Chave Viva" (algoritmo sincronizado com blocos dourados, passo a passo) — Manual §Divisão, Nível 4-5. Sincronia papel↔bloco no mesmo frame é inegociável.

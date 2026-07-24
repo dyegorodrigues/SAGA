@@ -33,13 +33,8 @@ export const PATSETS = [["🍎", "🍌"], ["⚽", "🏀"], ["🐶", "🐱"], ["�
 export const PRAISE = ["Você acertou! Que orgulho! 🎉", "Uau, você mandou muito bem! ⭐", "Isso mesmo! Você é brilhante! 🥳", "Parabéns, meu amiguinho! Que inteligência! 💪", "Uhul! Que lindo acerto! ✨", "Perfeito! Você brilha como uma estrela! 🌟"];
 export const OOPS = ["Hum, quase! Mas você está indo muito bem! A resposta certa está com a cor verde bem ali embaixo! 👇", "Tudo bem, errar faz parte do jogo! Dá uma olhadinha no botão verde que é a resposta certa. ✨", "Excelente tentativa! O certo está destacado em verde para você ver como é fácil. 💚", "Sem problemas, meu campeão! O balão verde mostra o caminho certo. Vamos para a próxima? 😊"];
 
-export const THEMES: Record<string, ThemeConfig> = {
-  classico: { nome: "Dojo", icon: "🥋", emojis: EMO, praise: PRAISE, bg: ["#E4F0FF", "#F1F7FF"], burst: ["⭐", "✨", "🎉", "💛", "🌟"] },
-};
-
-export const THEME_EMOJIS: Record<string, string> = {
-  classico: "🥋",
-};
+import { THEMES, THEME_EMOJIS } from "./mascots/MascotThemes";
+export { THEMES, THEME_EMOJIS };
 
 import { MascotRenderer } from "./mascots/MascotRenderer";
 
@@ -52,15 +47,17 @@ export function Mascote({
   kid = null,
   stage = 3,
   animation = "idle",
+  transparentBg = false,
 }: {
   theme?: string;
-  size?: number;
+  size?: number | string;
   className?: string;
   outfit?: string;
   bgAccessory?: string;
   kid?: any;
   stage?: number;
   animation?: "idle" | "walk" | "happy";
+  transparentBg?: boolean;
 }) {
   return (
     <MascotRenderer
@@ -72,6 +69,7 @@ export function Mascote({
       kid={kid}
       stage={stage}
       animation={animation}
+      
     />
   );
 }
@@ -394,7 +392,7 @@ export const Card = ({ children, className = "" }: { children: React.ReactNode; 
   </div>
 );
 
-export const EmojiRow = ({ 
+export const EmojiRowOld = ({ 
   emoji, 
   n, 
   small,
@@ -664,7 +662,7 @@ export function NumberBond({ whole, part, missingWhole = false }: { whole: numbe
  * CENA VIVA: Moldura de 10 🔟 (ten-frame). Caixa 2×5; `filled` bolinhas cheias.
  * `filled2` (opcional) desenha uma segunda moldura para somar.
  */
-export function TenFrame({ filled, filled2 = null, highlightRow = null }: { filled: number; filled2?: number | null; highlightRow?: 1 | 2 | null }) {
+export function TenFrameOld({ filled, filled2 = null, highlightRow = null }: { filled: number; filled2?: number | null; highlightRow?: 1 | 2 | null }) {
   const Frame = ({ n }: { n: number }) => (
     <div className="relative grid grid-cols-5 gap-1 p-1.5 bg-white rounded-xl border-4 border-slate-300 shadow-md select-none">
       {highlightRow === 1 && <div className="absolute top-0 left-0 right-0 h-[48%] border-4 border-amber-400 bg-amber-100/50 rounded-lg animate-pulse pointer-events-none" />}
@@ -732,3 +730,4 @@ export function TensDots({ t, u, highlightIndex = null }: { t: number; u: number
     </div>
   );
 }
+export { EmojiRow } from "./primitives/EmojiRow"; export { TenFrame } from "./primitives/TenFrame";

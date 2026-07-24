@@ -33,13 +33,19 @@ O método Kumon acertou coisas que quase ninguém acerta. E errou coisas que só
 
 ---
 
-## §2. OS DOIS MODOS
+## §2. OS MODOS DO DOJO
 
-**🥋 Treino do Mestre (padrão).** O algoritmo monta o treino do dia (§5). É o modo da sessão normal: 1 bloco de Dojo dentro da aula (Bíblia §6) ou treino avulso quando a criança abre o Dojo direto. A criança não escolhe nada — senta e treina, como no tatame.
+O Dojo tem **quatro modos**. Nos dois primeiros o algoritmo decide tudo; nos dois últimos a criança tem controle. Todos valem para as duas famílias (FD fatos e PD procedimentos).
 
-**🎯 Treino Livre.** A criança escolhe QUAL trilha destravada quer treinar — de qualquer família ("hoje quero tabuada do 7" ou "quero treinar divisão armada"). Autonomia real: dá senso de controle, deixa treinar para o "teste de amanhã", e o algoritmo aproveita — dentro da trilha escolhida, ele ainda decide os itens (os fracos dela naquela trilha). Escolha do quê; ciência do como.
+**🥋 Jornada (o treino diário padrão).** O Treino do Mestre monta o bloco do dia (§5) — equilibrado: um pouco de fronteira, revisão intercalada, fila quente. É o que entra na sessão da Academia (Bíblia §6) e o que a criança faz ao abrir o Dojo sem pedir nada. Senta e treina, como no tatame.
 
-Em ambos: sem nota, sem ranking entre crianças, sem punição. O adversário é o próprio tempo de ontem.
+**🎯 Reforço (só os pontos fracos).** O algoritmo puxa APENAS as trilhas/itens de menor força — se a subtração está em 42%, vem subtração. É o modo para afiar o que está frágil, sem diluir com o que já é forte. Pode ser sugerido pelo Motor ou escolhido pela criança.
+
+**⚡ Livre (a criança escolhe).** Ela pega qualquer trilha destravada, de qualquer família ("hoje quero tabuada do 7" ou "quero treinar divisão armada"). Autonomia real: dá senso de controle e serve para treinar para o "teste de amanhã". Dentro da trilha escolhida, o algoritmo ainda escolhe os itens (os fracos dela). Escolha do quê; ciência do como.
+
+**🔥 Mestre (o desafio).** O algoritmo pega tudo o que ela já domina, mistura, aperta a dificuldade e cronometra — como uma prova de faixa ou um treino de atleta. Para a criança mais velha ou motivada que quer se testar. Fecha com recorde pessoal, nunca com comparação entre crianças.
+
+Em todos: sem nota, sem ranking entre crianças, sem punição. O adversário é o próprio tempo de ontem.
 
 ---
 
@@ -107,8 +113,8 @@ Cada trilha FD do Grafo se abre em micro-degraus. A progressão canônica (exemp
 FD3.1  +1/+2 e −1/−2 (vizinhos da reta)        FD3.6  −e depois do 10 (voltar pelo 10)
 FD3.2  +0/−0 e o próprio número (n−n=0)        FD3.7  mistos ± até 20, lote equilibrado
 FD3.3  dobros até 20                           FD3.8  o buraco: 8+__=15, 14−__=6
-FD3.4  quase-dobros                            FD3.5  +atravessando o 10 (ponte)
-FD3.9  três parcelas rápidas (2+5+3)           FD3.10 faixa-preta: tudo misturado, rt no alvo
+FD3.4  quase-dobros                            FD3.9  três parcelas rápidas (2+5+3)
+FD3.5  +atravessando o 10 (ponte)              FD3.10 faixa-preta: tudo misturado, rt no alvo
 ```
 
 **Receita de cada round FD (10-20 itens):** ~60% do degrau atual · ~20% revisão dos degraus anteriores (intercalada — interleaving, que consolida mais que bloco puro) · ~10% fatos da fila quente (errados recentes) · ~10% UM degrau acima, como amostra grátis (se acerta, acelera a promoção). Sempre: **os 3 últimos itens são fáceis** — toda sessão termina em vitória.
@@ -188,3 +194,4 @@ O composer da aula (Bíblia §6) pede ao Dojo 1 bloco pronto (secundário); o pr
 
 *Changelog: v1.0 (jul/2026) — especificação inaugural: análise Kumon, força por fato, degraus FD, Treino do Mestre, faixas, Jardim do Dojo (JD1-JD5), contratos de dados.*
 *v1.1 (jul/2026) — segunda família de fluência: trilhas de PROCEDIMENTO (PD-A/S/M/D/Dec) para os algoritmos armados multi-dígito (a espinha do Kumon), com modelo ProcStrength (precisão + passo fraco + tempo) e intervenção pelo passo exato que falha; Dojo reafirmado como pilar autônomo (entra-se direto, treina-se à vontade), não apêndice da aula; três camadas explícitas (Jardim → Fato → Procedimento).*
+*v1.2 (jul/2026) — QUATRO modos (§2): Jornada (diário), Reforço (só fracos), Livre (criança escolhe), Mestre (desafio cronometrado). Alinhado à Bíblia §3.1 (Dojo como uma das três funções).*

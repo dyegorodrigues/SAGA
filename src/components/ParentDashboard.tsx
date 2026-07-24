@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { State, Kid, Track } from "../types";
+import { CURRICULUM } from "../utils/curriculum";
 import { auth, linkAnonymousWithGoogle } from "../lib/firebase";
 import { C, FONT, StarChip, LevelDots, SoundBtn, MiniBars, StatChip, calcStreak, sumWindow, accWindow, TOTAL_STICKERS, sfx, THEME_EMOJIS, THEMES, Mascote } from "./Mascot";
 import { PedagogicalEditor } from "./PedagogicalEditor";
@@ -14,9 +15,6 @@ interface ParentProps {
   onAddKid: (kid: Kid) => void;
   onFactoryReset: () => void;
   onBack: () => void;
-  tracksPre: Track[];
-  tracksAno1: Track[];
-  tracksAno2?: Track[];
   onUpdateState: (newState: State) => void;
   userEmail?: string | null;
   onLogout?: () => void;
@@ -33,8 +31,8 @@ export function ParentDashboard({
   onAddKid,
   onFactoryReset,
   onBack,
-  tracksPre,
-  tracksAno1,
+  
+
   onUpdateState,
   userEmail,
   onLogout,
@@ -426,7 +424,9 @@ export function ParentDashboard({
         <>
           {state.kids.map((k) => {
         const prog = state.progress[k.id] || {};
-        const tracks = k.grade === "pre" ? tracksPre : tracksAno1;
+        const gradeId = k.grade === "pre" ? "F0" : (k.grade === "ano1" ? "F1" : "F2");
+        const mod = CURRICULUM.find(m => m.id === gradeId);
+        const tracks = mod ? mod.tracks : [];
         const totStars = Object.values(prog).reduce((s, t) => s + (t.stars || 0), 0);
         const lg = state.log[k.id] || [];
         const win = period === 0 ? 3650 : period;

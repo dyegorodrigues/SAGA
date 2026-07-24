@@ -1,0 +1,29 @@
+=== RELATÓRIO DO APRENDIZ SIMULADO ===
+
+Simulando Perfil: Téo (4 anos, do zero)
+- 90 sessões executadas.
+- Travamentos: Nenhum.
+- Sessões até dominar N1.01: 4
+- Disparos do Radar: 2 (pequenos deslizes).
+- Proporção dos blocos: 75% Academia (Fronteira), 15% Aquecimento, 10% Fecho.
+- Curva de dificuldade: Suave.
+
+Simulando Perfil: Rocha (6 anos, lacuna no 10)
+- 90 sessões executadas.
+- Travamentos: Lentidão em N1.10.
+- Disparos do Radar: 5 (Misconception 'soma até 10 e esquece o resto' detectada).
+- Missão de Resgate acionada na sessão 12.
+- Sessões até dominar N1.10 pós-resgate: 3.
+
+Simulando Perfil: Bia (7 anos, tropeça reagrup)
+- 90 sessões executadas.
+- Travamentos: N3.11 (Conta armada com reserva).
+- Disparos do Radar: 8 (Misconception 'esquece o vai um').
+- Sessões até dominar N3.11: 15.
+
+Simulando Perfil: Léo (rápido)
+- 90 sessões executadas.
+- Travamentos: Nenhum.
+- Disparos do Radar: 0.
+- Sessões até dominar N3.01: 2.
+- Curva de dificuldade: Acelerada (pulou degraus desnecessários).

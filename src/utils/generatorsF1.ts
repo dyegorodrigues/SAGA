@@ -17,19 +17,25 @@ export const gN1_10 = (lvl: number): Question => {
   const missingPart = lvl > 2; // se missing part or not
   if (missingPart) {
     return {
-      kind: "bond", prompt: "Qual pedaço está faltando para completar?",
+      tutorial: lvl === 1 ? [{say: "Vamos completar o inteiro."}] : undefined,
+      kind: lvl <= 2 ? "bond" : "plain",
+      prompt: "Qual pedaço está faltando para completar?",
       a: whole, b: part, big: "topo_ok",
       howto: `O número de cima é feito juntando os de baixo. Pense: ${part} mais quanto dá ${whole}?`,
-      explain: `Isso! Os dois pedaços de baixo se juntam para formar o grandão lá em cima: ${part} e ${whole - part} fazem ${whole}!`,
+      audioPrompt: "Qual falta?",
+      explain: "Olha para o total lá no topo e pense quanto falta juntar ao pedaço de baixo.",
       options: numOpts(whole - part, whole + part, part),
       answer: whole - part
     };
   } else {
     return {
-      kind: "bond", prompt: "Qual é o número total lá em cima?",
+      tutorial: lvl === 1 ? [{say: "Os pedaços formam o todo."}] : undefined,
+      kind: lvl <= 2 ? "bond" : "plain",
+      prompt: "Qual é o número total lá em cima?",
       a: whole, b: part, big: "topo",
       howto: "Os dois pedaços de baixo se juntam para formar o total lá em cima. É só somar!",
-      explain: `Isso! Os pedaços de baixo, ${part} e ${whole - part}, juntos formam o número grandão ${whole} no topo!`,
+      audioPrompt: "Qual o total?",
+      explain: "Junte os dois pedaços de baixo para ver o total que vai no topo.",
       options: numOpts(whole, whole - part, part),
       answer: whole
     };
@@ -39,12 +45,49 @@ export const gN1_10 = (lvl: number): Question => {
 export const gN1_11 = (lvl: number): Question => {
   const ans = ri(1, 9);
   const comp = 10 - ans;
-  return {
-    kind: "tenframe", prompt: `Quantos faltam para completar a caixa de 10?`,
-    n: comp, big: "fill",
-    options: numOpts(ans, comp, 10),
-    answer: ans
-  };
+  if (lvl <= 2) {
+    return {
+      tutorial: lvl === 1 ? [
+        { say: "Esta é a caixa mágica: duas fileiras de cinco quadradinhos." },
+        { say: "Temos algumas peças. Quantas faltam para completar 10?" }
+      ] : undefined,
+      kind: "tenframe",
+      prompt: "Quantos faltam para completar a caixa de 10?",
+      n: comp,
+      big: "fill",
+      options: numOpts(ans, comp, 10),
+      answer: ans,
+      howto: "Conte os espaços vazios na caixa mágica.",
+      audioPrompt: "Quantos faltam para 10?",
+      explain: "Olha os quadradinhos vazios e conte quantos faltam."
+    };
+  } else if (lvl === 3) {
+    return {
+      tutorial: undefined,
+      kind: "bond",
+      prompt: "O topo é 10! Qual pedaço está faltando embaixo?",
+      a: 10,
+      b: comp,
+      big: "topo_ok",
+      options: numOpts(ans, comp, 10),
+      answer: ans,
+      howto: `O número de cima é feito juntando os de baixo. Pense: ${comp} mais quanto dá 10?`,
+      audioPrompt: "Qual pedaço está faltando?",
+      explain: "Lembre que os dois círculos de baixo se juntam para formar o 10 no topo."
+    };
+  } else {
+    return {
+      tutorial: undefined,
+      kind: "plain",
+      prompt: `Quanto falta para completar 10?`,
+      big: `${comp} + ? = 10`,
+      options: numOpts(ans, comp, 10),
+      answer: ans,
+      howto: "Pense nos amigos do 10.",
+      audioPrompt: "Quanto falta para 10?",
+      explain: "Pense em qual amigo do 10 se junta com este número para fechar 10."
+    };
+  }
 };
 
 export const gN2_02 = (lvl: number): Question => {

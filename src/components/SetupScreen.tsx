@@ -99,9 +99,9 @@ export function SetupScreen({ initial, onDone, onLogout }: SetupProps) {
   };
 
   return (
-    <div className="mk-pop text-center max-w-lg mx-auto">
+    <div className="mk-pop text-center max-w-lg mx-auto bg-white/80 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
       {/* Premium Header */}
-      <div className="mb-6">
+      <div className="mb-8 relative z-10">
         <span className="text-5xl inline-block mb-3 animate-[mkSway_3s_ease-in-out_infinite] transform-origin-bottom">
           🥋
         </span>
@@ -118,7 +118,7 @@ export function SetupScreen({ initial, onDone, onLogout }: SetupProps) {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white p-8 rounded-3xl border-4 border-indigo-100 shadow-lg flex flex-col items-center justify-center gap-5 my-6 relative overflow-hidden"
+          className="bg-white p-8 rounded-3xl border border-indigo-100 shadow-[0_10px_40px_-10px_rgba(79,70,229,0.15)] flex flex-col items-center justify-center gap-5 my-6 relative overflow-hidden"
         >
           {/* Subtle decorative glows */}
           <div className="absolute -top-10 -left-10 w-24 h-24 bg-indigo-50 rounded-full blur-xl pointer-events-none" />

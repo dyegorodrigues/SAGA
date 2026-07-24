@@ -265,7 +265,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
         <div className="sm:col-span-2 relative h-[180px] rounded-3xl overflow-hidden border-4 border-slate-900 shadow-lg flex items-center justify-center">
           
           {/* BACKGROUND RENDERING PER CHARACTER */}
-          <ScenicBackdrop theme={kid.theme} />
+          
 
           {/* Floaters based on action */}
           {petAction === "sleeping" && (
@@ -302,9 +302,11 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             <Mascote 
               theme={kid.theme} 
               stage={curStage.stage} 
-              size={110} 
-              kid={kid} 
+              size={140}
+              kid={kid}
+              bgAccessory={kid.bgAccessory} 
               animation={petAction === "playing" ? "happy" : "idle"}
+              
             />
           </div>
 

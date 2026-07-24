@@ -128,169 +128,17 @@ export function moneyOpts(ans: number, count: number, step: number) {
 }
 
 /* ---------------- geradores: PRÉ-ESCOLA (4 anos) ---------------- */
-export function gPreContar(lvl: number): Question {
-  // N4 — CONSERVAÇÃO (Piaget/Gelman): mesma quantidade, uma fileira JUNTA e outra
-  // ESPALHADA. Quebra o erro clássico de achar que espalhado = mais.
-  if (lvl === 4) {
-    const n = ri(4, 6);
-    return {
-      kind: "conserv",
-      prompt: "Qual linha tem MAIS?",
-      emoji: pickEmo(),
-      n,
-      howto: "Conte as duas linhas: espalhar bem longe não muda a quantidade!",
-      explain: `As duas têm ${n}! Espalhar não faz ter mais — é só olhar mais longe. 🟰`,
-      options: [
-        { label: "A de Cima ⬆️", value: "cima" },
-        { label: "A de Baixo ⬇️", value: "baixo" },
-        { label: "Iguais 🟰", value: "igual" },
-      ],
-      answer: "igual",
-    };
-  }
-  // N5 — CONTAR A PARTIR DE (Gelman): continuar a contagem sem voltar ao 1.
-  if (lvl === 5) {
-    const s = ri(3, 9);
-    return {
-      kind: "plain",
-      prompt: "Continue contando!",
-      big: `${s}, ${s + 1}, ${s + 2}, ...`,
-      howto: "Não volte pro um! Continue de onde a contagem parou.",
-      explain: `Depois do ${s + 2} vem o ${s + 3}. É só seguir contando! 🔢`,
-      options: numOpts(s + 3, 3, Math.max(1, s), s + 5),
-      answer: s + 3,
-    };
-  }
-  // N1-N3 — contar (correspondência 1-a-1); a faixa cresce, N3 já espalhado.
-  const ranges = [[1, 3], [2, 5], [4, 8]];
-  const R = ranges[(lvl - 1) % ranges.length];
-  const n = ri(R[0], R[1]);
-  return {
-    kind: "count",
-    prompt: "Quantos tem aqui?",
-    emoji: pickEmo(),
-    n,
-    options: numOpts(n, 3, Math.max(1, n - 4), n + 4),
-    answer: n,
-    explain: `Conte com o dedinho, um por um... são ${n}!`,
-  };
-}
 
-export function gPreMais(lvl: number): Question {
-  const more = lvl < 3 ? true : Math.random() < 0.6;
-  const maxes = [5, 6, 7, 8, 9];
-  const max = maxes[(lvl - 1) % maxes.length];
-  const minDiff = lvl < 4 ? 2 : 1;
-  let a = ri(1, max), b = ri(1, max), g = 0;
-  while ((a === b || Math.abs(a - b) < minDiff) && g++ < 60) {
-    a = ri(1, max);
-    b = ri(1, max);
-  }
-  if (a === b) b = a > 1 ? a - 1 : a + 1;
-  const ea = pickEmo();
-  let eb = pickEmo();
-  while (eb === ea) eb = pickEmo();
-  const answer = more ? (a > b ? 0 : 1) : (a < b ? 0 : 1);
-  const hi = Math.max(a, b), lo = Math.min(a, b);
-  return {
-    kind: "groups",
-    prompt: more ? "Toque no grupo com MAIS figuras" : "Toque no grupo com MENOS figuras",
-    groups: [{ emoji: ea, n: a }, { emoji: eb, n: b }],
-    options: [{ value: 0 }, { value: 1 }],
-    answer,
-    explain: more
-      ? `Conte os dois grupos: ${hi} é mais que ${lo}!`
-      : `Conte os dois grupos: ${lo} é menos que ${hi}!`,
-  };
-}
 
-export function gPreFormas(lvl: number): Question {
-  const poolSize = [3, 4, 5, 6, 7][(lvl - 1) % 5];
-  const pool = SHAPES.slice(0, poolSize);
-  const target = pick(pool);
-  const count = lvl < 3 ? 3 : 4;
-  const others = shuffle(pool.filter((s) => s.id !== target.id)).slice(0, count - 1);
-  const colors = shuffle(SHAPE_COLORS);
-  const options = shuffle([target, ...others]).map((s, i) => ({
-    shape: s.id,
-    color: colors[i % colors.length],
-    value: s.id,
-  }));
-  return {
-    kind: "shapes",
-    prompt: `Toque ${target.art} ${target.name}`,
-    options,
-    answer: target.id,
-    explain: `Essa é a ${target.name}! Olhe bem o formato dela e toque. ${target.art}`,
-  };
-}
 
-export function gPrePadrao(lvl: number): Question {
-  let unit: string[], distract: string;
-  if (lvl <= 2) {
-    const s = pick(PATSETS);
-    unit = [s[0], s[1]];
-    distract = pick(PATPOOL.filter((e) => !unit.includes(e)));
-  } else if (lvl === 3) {
-    const s = pick(PATSETS);
-    unit = [s[0], s[0], s[1]];
-    distract = pick(PATPOOL.filter((e) => !unit.includes(e)));
-  } else {
-    const all = shuffle(PATPOOL);
-    unit = lvl === 4 ? [all[0], all[1], all[2]] : pick([[all[0], all[1], all[1]], [all[0], all[1], all[2]]]);
-    distract = all[3];
-  }
-  const reps = unit.length === 2 ? 3 : 2;
-  let seq: string[] = [];
-  for (let i = 0; i < reps; i++) seq = seq.concat(unit);
-  const answer = seq[seq.length - 1];
-  const shown = seq.slice(0, seq.length - 1);
-  const uniq = [...new Set(unit)];
-  const optVals = uniq.length >= 3 ? uniq : [...uniq, distract];
-  return {
-    kind: "pattern",
-    prompt: "O que vem agora?",
-    shown,
-    options: shuffle(optVals).map((e) => ({ label: e, value: e })),
-    answer,
-    // ensina a achar a UNIDADE que se repete (o "segredo" do padrão)
-    explain: `Procure o segredo que se repete: ${unit.join(", ")}... de novo! Então vem ${answer}.`,
-  };
-}
 
-export function gPreVizinho(lvl: number): Question {
-  // explicações (só ao errar): sempre a ESTRATÉGIA de contar, não só a resposta
-  const eDepois = (n: number) => `Conte comigo: ${n}... e depois vem o ${n + 1}!`;
-  const eAntes = (n: number) => `Antes do ${n} vem o ${n - 1}. Conte: ${n - 1}, ${n}!`;
-  if (lvl === 1) {
-    const n = ri(1, 4);
-    return plainQ(`O que vem DEPOIS do ${n}?`, `${n} ➜ ?`, n + 1, 3, 1, n + 4, eDepois(n));
-  }
-  if (lvl === 2) {
-    const n = ri(1, 8);
-    return plainQ(`O que vem DEPOIS do ${n}?`, `${n} ➜ ?`, n + 1, 3, 1, n + 4, eDepois(n));
-  }
-  if (lvl === 3) {
-    const n = ri(2, 9);
-    return plainQ(`O que vem ANTES do ${n}?`, `? ➜ ${n}`, n - 1, 3, Math.max(0, n - 4), n + 3, eAntes(n));
-  }
-  if (lvl === 4) {
-    const dep = Math.random() < 0.5;
-    const n = dep ? ri(1, 11) : ri(2, 12);
-    return dep
-      ? plainQ(`O que vem DEPOIS do ${n}?`, `${n} ➜ ?`, n + 1, 3, 1, n + 4, eDepois(n))
-      : plainQ(`O que vem ANTES do ${n}?`, `? ➜ ${n}`, n - 1, 3, Math.max(0, n - 4), n + 3, eAntes(n));
-  }
-  const n = ri(1, 13);
-  return plainQ(
-    `Que número fica ENTRE ${n} e ${n + 2}?`,
-    `${n} ➜ ? ➜ ${n + 2}`,
-    n + 1, 3, Math.max(1, n - 2), n + 4,
-    `Conte: ${n}, ${n + 1}, ${n + 2} — o ${n + 1} fica no meio!`
-  );
-}
 
-export function gPreSoma(lvl: number): Question {
+
+
+
+
+
+export function gN3_01(lvl: number): Question {
   const totals = [4, 5, 7, 10, 10];
   const tot = totals[(lvl - 1) % totals.length];
   const a = ri(1, tot - 1);
@@ -308,30 +156,28 @@ export function gPreSoma(lvl: number): Question {
 }
 
 /* ---------------- geradores: 1º ANO (6 anos) ---------------- */
-export function gA1Seq(lvl: number): Question {
-  const eDepois = (n: number) => `Conte comigo: ${n}... e depois vem o ${n + 1}!`;
-  const eAntes = (n: number) => `Antes do ${n} vem o ${n - 1}. Conte: ${n - 1}, ${n}!`;
+export function gN1_12(lvl: number): Question {
   if (lvl === 1) {
     const n = ri(1, 19);
     const start = Math.max(1, n - 2);
-    return { kind: "numberline-interactive", prompt: `O que vem DEPOIS de ${n}?`, nlStart: start, nlEnd: start + 5, nlStartPos: n, answer: n + 1, explain: eDepois(n) };
+    return { tutorial: [{say: "A reta numérica nos ajuda a ver a ordem. O que vem depois?"}], kind: "numberline", prompt: `O que vem DEPOIS de ${n}?`, nlStart: start, nlEnd: start + 5, nlStartPos: n, answer: n + 1, explain: "Dê um salto para a frente na reta para encontrar o próximo número.", howto: 'Conte para frente!', audioPrompt: 'O que vem depois?' };
   }
   if (lvl === 2) {
     const n = ri(2, 20);
     const start = Math.max(1, n - 4);
-    return { kind: "numberline-interactive", prompt: `O que vem ANTES de ${n}?`, nlStart: start, nlEnd: start + 5, nlStartPos: n, answer: n - 1, explain: eAntes(n) };
+    return { kind: "numberline", prompt: `O que vem ANTES de ${n}?`, nlStart: start, nlEnd: start + 5, nlStartPos: n, answer: n - 1, explain: "Dê um salto para trás na reta para ver qual número vem primeiro.", howto: 'Conte para trás!', audioPrompt: 'O que vem antes?' };
   }
   if (lvl === 3) {
     const n = ri(1, 48);
     const start = Math.max(1, n - 2);
-    return { kind: "numberline-interactive", prompt: `Que número fica ENTRE ${n} e ${n + 2}?`, nlStart: start, nlEnd: start + 5, nlStartPos: n, answer: n + 1, explain: `Conte: ${n}, ${n + 1}, ${n + 2} — o ${n + 1} fica no meio!` };
+    return { kind: "numberline", prompt: `Que número fica ENTRE ${n} e ${n + 2}?`, nlStart: start, nlEnd: start + 5, nlStartPos: n, answer: n + 1, explain: "Olhe na reta o número que fica exatamente no meio entre os dois.", howto: "Encontre o número do meio.", audioPrompt: "Quem fica no meio?" };
   }
   if (lvl === 4) {
     const dep = Math.random() < 0.5;
     const n = ri(10, 98);
     return dep
-      ? plainQ(`O que vem DEPOIS de ${n}?`, `${n} ➜ ?`, n + 1, 4, n - 4, n + 5, eDepois(n))
-      : plainQ(`O que vem ANTES de ${n}?`, `? ➜ ${n}`, n - 1, 4, n - 5, n + 4, eAntes(n));
+      ? plainQ(`O que vem DEPOIS de ${n}?`, `${n} ➜ ?`, n + 1, 4, n - 4, n + 5, "Pense no número que vem logo a seguir na contagem.")
+      : plainQ(`O que vem ANTES de ${n}?`, `? ➜ ${n}`, n - 1, 4, n - 5, n + 4, "Pense no número que vem um passo antes na contagem.");
   }
   const plus = Math.random() < 0.5;
   const n = ri(11, 88);
@@ -348,7 +194,7 @@ export function gA1Seq(lvl: number): Question {
   );
 }
 
-export function gA1Soma(lvl: number): Question {
+export function gN3_03(lvl: number): Question {
   if (lvl === 1) {
     const a = ri(1, 5), b = ri(1, 5);
     return {
@@ -404,7 +250,7 @@ export function gA1Soma(lvl: number): Question {
   };
 }
 
-export function gA1Sub(lvl: number): Question {
+export function gN3_04(lvl: number): Question {
   if (lvl === 1) {
     const a = ri(3, 8), b = ri(1, a - 1);
     return {
@@ -445,7 +291,7 @@ export function gA1Sub(lvl: number): Question {
   return mathQ(`${a} − ${b} = ?`, a - b, a - 15, a + 5, eSub(a, b));
 }
 
-export function gA1Comp(lvl: number): Question {
+export function gN2_03(lvl: number): Question {
   if (lvl <= 2) {
     const max = lvl === 1 ? 20 : 99;
     const maior = Math.random() < 0.6;
@@ -493,7 +339,7 @@ export function gA1Comp(lvl: number): Question {
   };
 }
 
-export function gA1Pular(lvl: number): Question {
+export function gAL_03(lvl: number): Question {
   const step = lvl === 1 ? 2 : lvl === 2 ? 10 : lvl === 3 ? 5 : pick([2, 5, 10]);
   const desc = lvl === 5;
   let s0;
@@ -514,7 +360,7 @@ export function gA1Pular(lvl: number): Question {
   };
 }
 
-export function gA1Dez(lvl: number): Question {
+export function gN2_01(lvl: number): Question {
   const eDez = (t: number, u: number) =>
     `${t} dezenas são ${t * 10}. Com mais ${u} unidades... ${t * 10 + u}!`;
   if (lvl === 1) {
@@ -551,54 +397,11 @@ export function gA1Dez(lvl: number): Question {
 }
 
 /* ---------------- geradores: FASE 1 (novas trilhas) ---------------- */
-export function gPreIntruso(lvl: number): Question {
-  const keys = Object.keys(CATS);
-  let a: string, b: string;
-  if (lvl >= 4) {
-    const par = pick(CATS_RELACIONADAS);
-    a = par[0]; b = par[1];
-    if (Math.random() < 0.5) { const t = a; a = b; b = t; }
-  } else {
-    a = pick(keys);
-    b = pick(keys);
-    while (b === a || (lvl < 4 && CATS_RELACIONADAS.some((p) => p.includes(a) && p.includes(b)))) b = pick(keys);
-  }
-  const tres = shuffle(CATS[a]).slice(0, 3);
-  const intruso = pick(CATS[b]);
-  return {
-    kind: "plain",
-    prompt: "Toque no que NÃO combina com os outros",
-    big: null,
-    options: shuffle([...tres.map((e) => ({ label: e, value: e })), { label: intruso, value: intruso }]),
-    answer: intruso,
-  };
-}
 
-export function gPreOnde(lvl: number): Question {
-  let slots: string[];
-  if (lvl === 1) slots = ["cima", "baixo"];
-  else if (lvl === 2) slots = ["cima", "baixo", pick(["esq", "dir"])];
-  else if (lvl === 3) slots = ["esq", "dir", "cima"];
-  else slots = ["cima", "baixo", "esq", "dir"];
-  const anims = shuffle(ONDE_ANIM).slice(0, slots.length);
-  const items = slots.map((pos, i) => ({ e: anims[i], pos }));
-  let ti = ri(0, items.length - 1);
-  if (lvl >= 3) {
-    const lat = items.filter((it) => it.pos === "esq" || it.pos === "dir");
-    if (lat.length && Math.random() < (lvl === 5 ? 0.9 : 0.6)) ti = items.indexOf(pick(lat));
-  }
-  const target = items[ti];
-  const fr = lvl === 2 && (target.pos === "esq" || target.pos === "dir") ? ONDE_FRASE.lado : ONDE_FRASE[target.pos];
-  return {
-    kind: "scene",
-    prompt: `Toque no bichinho que está ${fr}`,
-    items,
-    options: shuffle(items.map((it) => ({ label: it.e, value: it.e }))),
-    answer: target.e,
-  };
-}
 
-export function gPreTirar(lvl: number): Question {
+
+
+export function gN3_02(lvl: number): Question {
   const maxa = [3, 4, 5, 6, 6][(lvl - 1) % 5];
   const a = ri(2, maxa);
   const b = ri(1, a - 1);
@@ -623,7 +426,7 @@ export function gPreTirar(lvl: number): Question {
    N3 = JUNTAR cédulas (somas ≤ 20, números redondos) →
    N4 = equivalências simples ("2 notas de 5 valem quanto?") + misto nota+moeda de 1 →
    N5 = centavos SÓ COMO INTRODUÇÃO (50¢ = metade; 50+50 = 1 real). */
-export function gA1Dinheiro(lvl: number): Question {
+export function gGM_03(lvl: number): Question {
   if (lvl === 1) {
     // contar moedas de 1 real — número pequeno, resposta em reais inteiros
     const n = ri(1, 5);
@@ -745,7 +548,7 @@ export function gA1Dinheiro(lvl: number): Question {
   };
 }
 
-export function gA1Problemas(lvl: number): Question {
+export function gN3_10(lvl: number): Question {
   const X = pick(NOMES);
   let Y = pick(NOMES);
   while (Y === X) Y = pick(NOMES);
@@ -781,7 +584,7 @@ export function gA1Problemas(lvl: number): Question {
   return { kind: "story", prompt: "Escute e responda 👂", story, emoji: o.e, options: numOpts(ans, 4, 0, 20), answer: ans, explain };
 }
 
-export function gA1Graficos(lvl: number): Question {
+export function gPE_01(lvl: number): Question {
   const s = pick(PICTO_SETS);
   const maxN = lvl <= 2 ? 5 : 6;
   let counts: number[] = [], guard = 0;
@@ -809,129 +612,9 @@ export function gA1Graficos(lvl: number): Question {
 }
 
 /* ---------------- novas trilhas: calendário e horas ---------------- */
-export function gPreCalendario(lvl: number): Question {
-  const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-  
-  if (lvl === 1) {
-    const cycleType = Math.floor(Math.random() * 3); // 0: manhã, 1: tarde, 2: noite
-    if (cycleType === 0) {
-      return {
-        kind: "plain",
-        prompt: "O que vem depois da Manhã? ☀️ ➔ ❓",
-        big: "☀️ Manhã ➔ ❓",
-        options: shuffle([
-          { label: "Tarde 🌤️", value: "Tarde" },
-          { label: "Noite 🌙", value: "Noite" },
-          { label: "Ontem 📅", value: "Ontem" }
-        ]),
-        answer: "Tarde",
-      };
-    } else if (cycleType === 1) {
-      return {
-        kind: "plain",
-        prompt: "O que vem depois da Tarde? 🌤️ ➔ ❓",
-        big: "🌤️ Tarde ➔ ❓",
-        options: shuffle([
-          { label: "Noite 🌙", value: "Noite" },
-          { label: "Manhã ☀️", value: "Manhã" },
-          { label: "Semana 📅", value: "Semana" }
-        ]),
-        answer: "Noite",
-      };
-    } else {
-      return {
-        kind: "plain",
-        prompt: "O que vem depois da Noite? 🌙 ➔ ❓",
-        big: "🌙 Noite ➔ ❓",
-        options: shuffle([
-          { label: "Manhã ☀️", value: "Manhã" },
-          { label: "Tarde 🌤️", value: "Tarde" },
-          { label: "Mês 📅", value: "Mês" }
-        ]),
-        answer: "Manhã",
-      };
-    }
-  }
-  
-  if (lvl === 2) {
-    const idx = ri(1, 5); // Segunda a Sexta
-    const diaHoje = dias[idx];
-    const diaAmanha = dias[idx + 1];
-    const opts = shuffle([
-      { label: diaAmanha, value: diaAmanha },
-      { label: dias[(idx + 2) % 7], value: dias[(idx + 2) % 7] },
-      { label: dias[idx - 1], value: dias[idx - 1] }
-    ]);
-    return {
-      kind: "plain",
-      prompt: `Se hoje é ${diaHoje}, amanhã será...?`,
-      big: `📅 Hoje: ${diaHoje}`,
-      options: opts,
-      answer: diaAmanha,
-    };
-  }
-  
-  if (lvl === 3) {
-    const idx = ri(1, 5);
-    const diaHoje = dias[idx];
-    const diaOntem = dias[idx - 1];
-    const opts = shuffle([
-      { label: diaOntem, value: diaOntem },
-      { label: dias[idx + 1], value: dias[idx + 1] },
-      { label: dias[(idx + 3) % 7], value: dias[(idx + 3) % 7] }
-    ]);
-    return {
-      kind: "plain",
-      prompt: `Se hoje é ${diaHoje}, ontem foi...?`,
-      big: `📅 Hoje: ${diaHoje}`,
-      options: opts,
-      answer: diaOntem,
-    };
-  }
 
-  if (lvl === 4) {
-    const isFim = Math.random() < 0.5;
-    const prompt = isFim ? "Qual dia é parte do Fim de Semana? 🎉" : "Qual dia é um dia de Aula/Trabalho? 🏫";
-    const ans = isFim ? pick(["Sábado", "Domingo"]) : pick(["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira"]);
-    const others = isFim 
-      ? ["Segunda-feira", "Terça-feira", "Quarta-feira"] 
-      : ["Sábado", "Domingo", "Feriado"];
-    const opts = shuffle([
-      { label: ans, value: ans },
-      { label: others[0], value: others[0] },
-      { label: others[1], value: others[1] }
-    ]);
-    return {
-      kind: "plain",
-      prompt,
-      big: isFim ? "🍿 Descanso!" : "🎒 Estudo!",
-      options: opts,
-      answer: ans,
-    };
-  }
 
-  const idx = ri(1, 5);
-  const ontem = dias[idx - 1];
-  const amanha = dias[idx + 1];
-  const hoje = dias[idx];
-  const qType = Math.random() < 0.5;
-  const prompt = qType ? `Se ontem foi ${ontem}, amanhã será...?` : `Se amanhã for ${amanha}, ontem foi...?`;
-  const ans = qType ? amanha : ontem;
-  const opts = shuffle([
-    { label: ontem, value: ontem },
-    { label: amanha, value: amanha },
-    { label: hoje, value: hoje }
-  ]);
-  return {
-    kind: "plain",
-    prompt,
-    big: qType ? `👈 Ontem: ${ontem}` : `👉 Amanhã: ${amanha}`,
-    options: opts,
-    answer: ans,
-  };
-}
-
-export function gA1Horas(lvl: number): Question {
+export function gGM_04(lvl: number): Question {
   if (lvl === 1) {
     const hour = ri(1, 12);
     const ans = `${String(hour).padStart(2, "0")}:00`;
@@ -1041,64 +724,12 @@ export function gA1Horas(lvl: number): Question {
 
 /* ---------------- Registro de Trilhas Integradas ---------------- */
 
-export function gPreSimbolos(lvl: number): Question {
-  // Nível 0: Reconhecimento de Símbolos
-  const ans = ri(1, lvl <= 2 ? 5 : 10);
-  return {
-    kind: "plain",
-    prompt: `Toque no número ${ans}!`,
-    big: "?",
-    options: numOpts(ans, 3, 1, 10),
-    answer: ans,
-    explain: `Esse é o número ${ans}!`
-  };
-}
 
 
-export function gPreCanto(lvl: number): Question {
-  // Nível 0: Canto Numérico (Rote Counting) - Tocar na ordem correta
-  const start = lvl <= 2 ? 1 : lvl <= 4 ? 4 : 7;
-  const count = lvl <= 3 ? 3 : 4;
-  const nums = Array.from({ length: count }, (_, i) => start + i);
-  return {
-    kind: "order",
-    prompt: "Toque nos números na ordem certa!",
-    big: "contar",
-    options: shuffle(nums).map((n) => ({ label: String(n), value: n })),
-    answer: nums, // O componente order valida se a criança toca na sequência dessa array
-    explain: `A ordem certa é ${nums.join(', ')}!`
-  };
-}
 
 
-// --- DECOUPLED F0 GENERATORS (M3 PHASE) ---
-export function gN1_01(lvl: number): Question {
-  return gPreContar(lvl === 1 ? 1 : 2);
-}
-export function gN1_02(lvl: number): Question {
-  return gPreCanto(lvl);
-}
-export function gN1_03(lvl: number): Question {
-  return gPreContar(3);
-}
-export function gN1_04(lvl: number): Question {
-  return gPreContar(lvl > 2 ? 4 : 2);
-}
-export function gN1_05(lvl: number): Question {
-  return gPreMais(lvl);
-}
-export function gN1_06(lvl: number): Question {
-  return gPreSimbolos(lvl);
-}
-export function gN1_07(lvl: number): Question {
-  return gPreVizinho(lvl);
-}
-export function gN1_09(lvl: number): Question {
-  return gPreContar(5);
-}
-export function gAL_01(lvl: number): Question {
-  return gPreIntruso(lvl);
-}
+
+
 export function gAL_02(lvl: number): Question {
   return gPrePadrao(lvl);
 }
@@ -1110,4 +741,197 @@ export function gGE_02(lvl: number): Question {
 }
 export function gGM_02(lvl: number): Question {
   return gPreCalendario(lvl);
+}
+
+// --- FUNDAÇÃO SAGA: N1.01 a N1.09 ---
+export function gN1_01(lvl: number): Question {
+  const n = lvl === 1 ? 3 : (lvl === 2 ? 4 : (lvl === 3 ? 5 : (lvl === 4 ? 6 : 7)));
+  return {
+    tutorial: lvl === 1 ? [{ say: "Olha só, para saber quantos tem, a gente toca em um de cada vez!" }] : undefined,
+    excecaoCPA: "perceptual",
+    kind: "count",
+    prompt: "Quantos temos aqui? Toque em um de cada vez!",
+    emoji: pickEmo(),
+    n,
+    options: numOpts(n, 3, 1, 8),
+    answer: n,
+    howto: "Toque em cada objeto uma única vez para contar.",
+    audioPrompt: "Quantos temos aqui?",
+    explain: "Olha os objetos que ainda não foram tocados e conte um por um com o dedinho.",
+  };
+}
+
+export function gN1_02(lvl: number): Question {
+  const n = ri(2, 5);
+  return {
+    tutorial: lvl === 1 ? [{ say: "Vamos contar com ritmo!" }] : undefined,
+    excecaoCPA: "perceptual",
+    kind: "count",
+    prompt: "Conte comigo sem pressa!",
+    emoji: pickEmo(),
+    n,
+    options: numOpts(n, 3, 1, 5),
+    answer: n,
+    howto: "Vá no seu ritmo e conte tudo.",
+    audioPrompt: "Quantos tem?",
+    explain: "Acompanhe o ritmo: fale um número para cada batida sem acelerar.",
+  };
+}
+
+export function gN1_03(lvl: number): Question {
+  const n = ri(6, 10);
+  return {
+    tutorial: lvl === 1 ? [{ say: "Vamos contar até 10!" }] : undefined,
+    excecaoCPA: "perceptual",
+    kind: "count",
+    prompt: "Conte com calma, sem pular nenhum!",
+    emoji: pickEmo(),
+    n,
+    options: numOpts(n, 3, 5, 10),
+    answer: n,
+    howto: "Preste atenção para não pular.",
+    audioPrompt: "Quantos são?",
+    explain: "Olhe o desenho todo de uma vez — que formato as bolinhas fizeram?",
+  };
+}
+
+export function gN1_04(lvl: number): Question {
+  const n = ri(3, 5);
+  return {
+    tutorial: lvl === 1 ? [{ say: "O último número que você fala é o total!" }] : undefined,
+    excecaoCPA: "perceptual",
+    kind: "count",
+    prompt: "Conte tudo e me diga: Quantos SÃO no total?",
+    emoji: pickEmo(),
+    n,
+    options: numOpts(n, 3, 1, 6),
+    answer: n,
+    howto: "O último número falado é o total da brincadeira.",
+    audioPrompt: "Qual o total?",
+    explain: "Conte todos os objetos: o último número que você falar é a resposta total.",
+  };
+}
+
+export function gN1_05(lvl: number): Question {
+  const q = gPreMais(lvl);
+  q.tutorial = lvl === 1 ? [{say: "Vamos ver qual lado tem mais coisas."}] : undefined;
+  q.kind = lvl <= 2 ? "groups" : "plain";
+  q.howto = "Veja qual conjunto é maior.";
+  q.audioPrompt = "Qual tem mais?";
+  q.explain = "Compare a quantidade de cada grupo e escolha o conjunto com a quantidade pedida.";
+  return q;
+}
+
+export function gN1_06(lvl: number): Question {
+  const ans = ri(1, 9);
+  return {
+    tutorial: lvl === 1 ? [{say: "Esse é o número e esse é o nome."}] : undefined,
+    kind: lvl <= 2 ? "plain" : "math",
+    prompt: `Encontre o número ${ans}!`,
+    big: `Qual é o ${ans}?`,
+    options: numOpts(ans, 3, 1, 9),
+    answer: ans,
+    howto: "Ligue o nome ao símbolo.",
+    audioPrompt: `Encontre o ${ans}!`,
+    explain: "Pense em como a gente desenha esse número quando escreve.",
+  };
+}
+
+export function gN1_07(lvl: number): Question {
+  const base = ri(1, 8);
+  const ans = base + 1;
+  
+  if (lvl <= 2) {
+    return {
+      tutorial: lvl === 1 ? [
+        { say: "A reta numérica nos ajuda a ver a ordem." },
+        { say: `O que vem logo depois do ${base}?`, show: { saltarDe: base } }
+      ] : undefined,
+      kind: "numberline",
+      nlStart: Math.max(1, base - 2),
+      nlEnd: base + 4,
+      nlStartPos: base,
+      prompt: `Quem vem logo DEPOIS do ${base}?`,
+      options: numOpts(ans, 3, 1, 10),
+      answer: ans,
+      howto: "Dê um salto para a frente na reta numérica.",
+      audioPrompt: "Quem vem depois?",
+      explain: "Olha para a reta e dê um salto para a frente a partir do número.",
+    };
+  } else {
+    return {
+      tutorial: undefined,
+      kind: "plain",
+      prompt: `Quem vem logo DEPOIS do ${base}?`,
+      big: `${base} ➔ ?`,
+      options: numOpts(ans, 3, 1, 10),
+      answer: ans,
+      howto: "O sucessor é sempre um a mais.",
+      audioPrompt: "Quem vem logo depois?",
+      explain: "Pense no número que você fala em seguida ao contar para a frente.",
+    };
+  }
+}
+
+export function gN1_09(lvl: number): Question {
+  const s = ri(3, 8);
+  const ans = s + 3;
+  return {
+    tutorial: lvl === 1 ? [{say: "Continue contando de onde parou."}] : undefined,
+    kind: lvl <= 2 ? "plain" : "numberline",
+    nlStart: Math.max(1, s - 1),
+    nlEnd: s + 5,
+    nlStartPos: s,
+    prompt: `Não volte pro um! Continue contando:`,
+    big: `${s}, ${s + 1}, ${s + 2}, ... ?`,
+    options: numOpts(ans, 3, Math.max(1, s), s + 5),
+    answer: ans,
+    howto: "Conte para a frente sem voltar ao um.",
+    audioPrompt: "Continue contando!",
+    explain: "Comece a contar direto do número onde paramos, dando os passos seguintes.",
+  };
+}
+
+export function gN1_08(lvl: number): Question {
+  const n = ri(4, 7);
+  return {
+    tutorial: lvl === 1 ? [{ say: "Olhe rápido, a caixa vai fechar!" }] : undefined,
+    excecaoCPA: "perceptual",
+    kind: "flash",
+    prompt: "A Caixa Mágica abriu e fechou! Quantos você viu?",
+    emoji: pickEmo(),
+    n,
+    options: numOpts(n, 3, 1, 8),
+    answer: n,
+    howto: "Preste muita atenção e tente não contar um por um.",
+    audioPrompt: "Quantos viu?",
+    explain: "Tente lembrar da imagem que piscou na caixa sem contar de um em um.",
+  };
+}
+
+export function gAL_01(lvl: number): Question {
+  return gPreIntruso(lvl);
+}
+
+
+export function gPrePadrao(lvl: number): any {
+  const isCores = Math.random() > 0.5;
+  const A = isCores ? "🔴" : "🍎";
+  const B = isCores ? "🔵" : "🍌";
+  return { kind: "pattern", prompt: "O que vem a seguir?", shown: [A, B, A, B, A], options: [{label:A, value:A}, {label:B, value:B}], answer: B };
+}
+export function gPreOnde(lvl: number): any {
+  return { kind: "plain", big: "📦", prompt: "O gato está EM CIMA ou EMBAIXO da caixa?", options: [{label:"Em cima", value:"Em cima"}, {label:"Embaixo", value:"Embaixo"}], answer: "Em cima" };
+}
+export function gPreFormas(lvl: number): any {
+  return { kind: "shapes", prompt: "Qual é o círculo?", options: [{label:"🔴", shape:"circle", color:"red", value:"circle"}, {label:"🟥", shape:"square", color:"red", value:"square"}], answer: "circle" };
+}
+export function gPreCalendario(lvl: number): any {
+  return { kind: "daypart", big: "morning", prompt: "Qual parte do dia é agora?", options: [{label:"Manhã", value:"morning"}, {label:"Noite", value:"night"}], answer: "morning" };
+}
+export function gPreMais(lvl: number): any {
+  return { kind: "plain", big: "🍎", prompt: "Qual é mais: 5 maçãs ou 3 maçãs?", options: [{label:"5 maçãs", value:5}, {label:"3 maçãs", value:3}], answer: 5 };
+}
+export function gPreIntruso(lvl: number): any {
+  return { kind: "plain", big: "🐶", prompt: "Quem não é animal?", options: [{label:"Gato", value:"gato"}, {label:"Carro", value:"carro"}], answer: "carro" };
 }

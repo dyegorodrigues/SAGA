@@ -134,7 +134,7 @@ const shuffle = (arr: any[]) => {
   return a;
 };
 
-import { analyzeMisconception } from "../utils/radarEngine";
+import { trackMisconception } from "../utils/radarEngine";
 
 export function GameLoop({
   kid,
@@ -182,19 +182,23 @@ export function GameLoop({
   const [aiTutorMessage, setAiTutorMessage] = useState("");
   const [aiTutorLoading, setAiTutorLoading] = useState(false);
   const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
+  const [mockTutorialN, setMockTutorialN] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (guidedIdx === null) setMockTutorialN(null);
+  }, [guidedIdx]);
   const [qErrors, setQErrors] = useState(0);
   const [hiddenOpts, setHiddenOpts] = useState<any[]>([]);
   const [showClockTutorial, setShowClockTutorial] = useState(false);
   // kind `order` (ordenar/sequenciar): a criança toca as cenas na ordem certa
   const [orderTaps, setOrderTaps] = useState<any[]>([]);
-  const [orderErr, setOrderErr] = useState(false);
-  const [orderShake, setOrderShake] = useState<any>(null);
+    const [orderShake, setOrderShake] = useState<any>(null);
   // kind `flash` (subitização): o grupo aparece por ~2s e some — "quantos eram?"
   const [flashHidden, setFlashHidden] = useState(false);
   // tutorial guiado 👉 generalizado: legenda do passo atual (null = parado)
   const [guidedNarr, setGuidedNarr] = useState<string | null>(null);
   // aula com IMAGENS: cena que o passo atual do tutorial manda mostrar (null = a da questão)
-  const [tutShow, setTutShow] = useState<string | number | null>(null);
+  const [tutShow, setTutShow] = useState<Record<string, any> | string | number | null>(null);
   // kind `journey` (viagem narrada): true quando a viagem terminou e a pergunta aparece
   const [journeyDone, setJourneyDone] = useState(false);
   // TOQUE DUPLO inteligente (auditoria HCI-Kids): em questões audíveis, o 1º toque
@@ -234,7 +238,6 @@ export function GameLoop({
   // reset do sequenciamento a cada questão nova (+ mata timers de aulinha em curso)
   useEffect(() => {
     setOrderTaps([]);
-    setOrderErr(false);
     setOrderShake(null);
     setGuidedNarr(null);
     setTutShow(null);
@@ -352,11 +355,10 @@ export function GameLoop({
       const nt = [...orderTaps, value];
       setOrderTaps(nt);
       if (sound) sfx.tick();
-      if (nt.length === seq.length) handlePick(value, !orderErr); // completou → resolve
+      if (nt.length === seq.length) handlePick(value, true); // completou → resolve
     } else {
       // toque fora de ordem: sacode, marca erro (conta como bad) e recomeça — nunca trava
-      setOrderErr(true);
-      setOrderShake(value);
+            setOrderShake(value);
       if (sound) sfx.wrong();
       setTimeout(() => {
         setOrderTaps([]);
@@ -423,6 +425,12 @@ export function GameLoop({
         return; // não avança, não marca answeredRef
       }
       // Se errou a 3ª vez, segue pro erro terminal e avança
+      
+      // Registra a misconception no Radar se houver e estiver mapeada nas opções
+      const pickedOpt = q.options.find((o: any) => o.value === val);
+      if (pickedOpt && pickedOpt.misconception) {
+        trackMisconception(kid.id, track.graphId || track.id, pickedOpt.tag || pickedOpt.misconception);
+      }
     }
 
     answeredRef.current = true;
@@ -531,7 +539,9 @@ export function GameLoop({
       if (p.streak < 3) p.streak = 3; 
     }
 
-    onCommit(p, right, starGain + nextBonus, durationMs, isLast);
+    if (!q.isFallback) {
+      onCommit(p, right, starGain + nextBonus, durationMs, isLast);
+    }
 
     if (sound) {
       if (right) sfx.right();
@@ -611,7 +621,7 @@ export function GameLoop({
      explica o conceito com o dedo já no 1º item; a contagem só começa quando a
      intro TERMINA de verdade (onEnd — nunca timer fixo cortando fala); a frase
      final fecha com a cardinalidade (o último número é o total). */
-  const runCountAula = (total: number, intro: string, finale: string, isAuto: boolean) => {
+  const runCountAula = (total: number, intro: string, finale: string, isAuto: boolean, isMock: boolean = false) => {
     if (guidedIdx !== null || total <= 0) return;
     sfx.level();
     const q0 = qRef.current;
@@ -621,7 +631,7 @@ export function GameLoop({
     // Se for um pedido de ajuda (não automático) E tiver mais de 2 itens,
     // o mascote só conta os dois primeiros (Scaffold) e encoraja a criança a continuar.
     const shouldScaffold = !isAuto && total > 2;
-    const limit = shouldScaffold ? 2 : total;
+    const limit = (shouldScaffold && !isMock) ? 2 : total;
     
     speak(`${intro} ... Um!`, {
       onEnd: () => {
@@ -647,15 +657,17 @@ export function GameLoop({
   };
 
   const startGuidedCount = (isAuto: boolean = true) => {
-    const n = q.n || 0;
+    const realN = q.n || 3;
+    const mockN = realN === 3 ? 4 : 3;
+    setMockTutorialN(mockN);
     runCountAula(
-      n,
-      "Vamos contar juntos! Aponte com o dedinho, um por um:",
-      `Contamos até ${numPt(n).toLowerCase()}... então são ${numPt(n).toLowerCase()}! O último número é o total! 🎉`,
-      isAuto
+      mockN,
+      "Veja como a gente conta! Aponte um por um:",
+      `... então são ${numPt(mockN).toLowerCase()}! O último número é o total! Agora é sua vez!`,
+      isAuto,
+      true
     );
   };
-
   const startGuidedSum = (isAuto: boolean = true) => {
     const total = (q.a || 0) + (q.b || 0);
     runCountAula(
@@ -1002,54 +1014,9 @@ export function GameLoop({
         <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
           {q.kind === "count" && q.emoji && q.n != null && (
             <div className="flex flex-col items-center gap-3">
-              <EmojiRow emoji={q.emoji} n={q.n} highlightIndex={guidedIdx} />
+              <EmojiRow emoji={q.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />
               
-              {guidedIdx === null && !status && (
-                <button
-                  onClick={() => playAulinha(false)}
-                  className="mt-1 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-xs px-4 py-2 rounded-md flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
-                  style={{ fontFamily: FONT }}
-                >
-                  <span>👉 Mostrar Como Contar 🫵</span>
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* conservação: MESMA quantidade, fileira JUNTA (cima) vs ESPALHADA (baixo) */}
-          {q.kind === "conserv" && q.emoji && q.n != null && (
-            <div className="flex flex-col gap-5 py-2">
-              <div className="flex justify-center gap-0.5">
-                {Array.from({ length: q.n }).map((_, i) => (
-                  <span key={i} className="mk-drop" style={{ fontSize: 30, animationDelay: `${i * 70}ms` }}>{q.emoji}</span>
-                ))}
-              </div>
-              <div className="flex justify-between px-0.5">
-                {Array.from({ length: q.n }).map((_, i) => (
-                  <span key={i} className="mk-drop" style={{ fontSize: 30, animationDelay: `${(q.n! + i) * 70}ms` }}>{q.emoji}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {q.kind === "sum" && q.emoji && q.a != null && q.b != null && (
-            <div className="flex flex-col items-center gap-3">
-              <div className="flex flex-wrap items-center justify-center gap-3">
-                {/* a mãozinha atravessa os DOIS grupos (somar = juntar e contar tudo) */}
-                <EmojiRow emoji={q.emoji} n={q.a} small highlightIndex={guidedIdx} />
-                <BigText size={36}>+</BigText>
-                <EmojiRow emoji={q.emoji} n={q.b} small startIndex={(q.a || 0) + 1} highlightIndex={guidedIdx == null ? null : guidedIdx - (q.a || 0)} />
-                <BigText size={36}>= ?</BigText>
-              </div>
-              {guidedIdx === null && !status && (
-                <button
-                  onClick={() => playAulinha(false)}
-                  className="mt-1 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-xs px-4 py-2 rounded-md flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
-                  style={{ fontFamily: FONT }}
-                >
-                  <span>👉 Mostrar Como Somar 🫵</span>
-                </button>
-              )}
+              
             </div>
           )}
 
@@ -1093,15 +1060,7 @@ export function GameLoop({
               <div className="mt-2">
                 <BigText size={34}>{q.expr}</BigText>
               </div>
-              {guidedIdx === null && !status && (
-                <button
-                  onClick={() => playAulinha(false)}
-                  className="mt-1 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-xs px-4 py-2 rounded-md flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
-                  style={{ fontFamily: FONT }}
-                >
-                  <span>👉 Mostrar Como Tirar 🫵</span>
-                </button>
-              )}
+              
             </div>
           )}
 
@@ -1224,15 +1183,7 @@ export function GameLoop({
           {q.kind === "tens" && q.t != null && q.u != null && (
             <div className="flex flex-col items-center gap-3">
               <TensDots t={q.t} u={q.u} highlightIndex={guidedIdx} />
-              {guidedIdx === null && !status && (
-                <button
-                  onClick={() => playAulinha(false)}
-                  className="mt-1 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-xs px-4 py-2 rounded-md flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
-                  style={{ fontFamily: FONT }}
-                >
-                  <span>👉 Como Ler Esse Número 🫵</span>
-                </button>
-              )}
+              
             </div>
           )}
 
@@ -1276,12 +1227,12 @@ export function GameLoop({
             <NumberBond whole={q.a} part={q.b} missingWhole={q.big === "topo"} />
           )}
 
-          {q.kind === "numberline" && <NumberLine q={q} tutShow={tutShow} />}
+          {q.kind === "numberline" && <NumberLine min={q.nlStart} max={q.nlEnd} targetValue={q.nlTarget} currentValue={typeof tutShow === "number" ? tutShow : null} />}
           {q.kind === "numberline-interactive" && <InteractiveNumberLine q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "drag-group" && <DragGroup q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "tenframe" && q.n != null && (
-            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} highlightRow={tutShow as (1 | 2)} />
+            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} highlightRow={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} />
           )}
 
           {q.kind === "flash" && q.emoji && q.n != null && (

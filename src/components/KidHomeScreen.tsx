@@ -77,6 +77,7 @@ export function KidHomeScreen({
   }, [tracks, prog]);
 
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
+  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "dojo" | "oficina" | "perfil">("jornada");
   const [pickerTrack, setPickerTrack] = useState<Track | null>(null);
 
   // Wardrobe states
@@ -237,24 +238,9 @@ export function KidHomeScreen({
   };
 
   return (
-    <div className="mk-pop">
-      <div className="mb-4 flex items-center justify-between gap-2.5">
-        <button
-          onClick={() => {
-            sfx.tick();
-            onBack();
-          }}
-          className="w-11 h-11 flex items-center justify-center font-bold text-lg select-none cursor-pointer border-2 active:translate-y-0.5 rounded-md"
-          style={{
-            background: C.card,
-            color: C.ink,
-            borderColor: C.line,
-            boxShadow: `0 4px 0 ${C.line}`,
-          }}
-        >
-          ✕
-        </button>
-
+    <div className="mk-pop h-screen max-h-screen flex flex-col bg-slate-50 overflow-hidden">
+      {/* HEADER GLOBALS (Coin & Name) */}
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2.5 bg-white border-b-2 border-slate-100 shrink-0">
         <div className="flex-1 text-left px-1">
           <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 700, color: C.ink }}>
             Oi, {kid.name}! {kid.avatar}
@@ -263,7 +249,6 @@ export function KidHomeScreen({
             Portal de Aventuras
           </div>
         </div>
-
         <div className="flex items-center gap-1.5">
           {streak >= 2 && (
             <span
@@ -286,381 +271,394 @@ export function KidHomeScreen({
         </div>
       </div>
 
-      {/* Interactive Tamagotchi Mascot Evolution Card */}
-      <div className="mb-4">
-        <MascotEvolutionCard 
-          kid={kid} 
-          state={state} 
-          onUpdateKid={onUpdateKid} 
-          coins={coins} 
-        />
-      </div>
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 scrollbar-hide">
+        {activeShellTab === "jornada" && (
+          <div className="animate-[mkPop_0.25s_ease-out_1]">
+            {/* 🎒 MATRÍCULA (E3) */}
+            {Object.keys(prog).length === 0 && (
+              <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#0EA5E9", boxShadow: "0 6px 0 #0369A1" }}>
+                <button
+                  onClick={() => {
+                    sfx.level();
+                    onMatricula();
+                  }}
+                  className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
+                  style={{ background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)" }}
+                >
+                  <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.4s_ease-in-out_infinite]" />
+                  <div className="flex items-center justify-between gap-3 mb-1.5">
+                    <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-sky-900 bg-sky-200 border-2 border-sky-300 rounded-md inline-block">
+                      ✨ Sua primeira aventura
+                    </span>
+                    <span className="text-2xl animate-bounce">🎒</span>
+                  </div>
+                  <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#0C4A6E" }}>
+                    Missão de Boas-Vindas
+                  </div>
+                  <div className="text-xs font-bold mt-1 leading-snug text-sky-900/80">
+                    {kid.petName || "Seu mascote"} quer te conhecer! Mostre o que você já sabe — sem pressa, é só diversão. 🌟
+                  </div>
+                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-sky-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                    <span>Vamos lá!</span>
+                    <span>🚀</span>
+                  </div>
+                </button>
+              </div>
+            )}
 
-      {/* Mascot Scenery Customizer Button */}
-      <div className="mb-4">
-        <button
-          onClick={() => {
-            sfx.level();
-            setTempBg(kid.bgAccessory || "none");
-            setTempInventory(kid.inventory || []);
-            setTempCoins(coins);
-            setCoinsSpent(0);
-            setShowWardrobe(true);
-          }}
-          className="w-full select-none transition-all active:translate-y-1 active:scale-[0.98] py-3.5 text-sm font-black text-amber-950 cursor-pointer flex items-center justify-center gap-2 border-b-4 border-amber-600 rounded-2xl animate-pulse"
-          style={{
-            fontFamily: FONT,
-            background: "linear-gradient(135deg, #FEF08A 0%, #FDE047 100%)",
-            boxShadow: `0 2px 0 #CA8A04`,
-          }}
-        >
-          <span>🎨 Mudar Cenário do Mascote 🌟</span>
-        </button>
-      </div>
-
-
-
-      {/* 🎒 MATRÍCULA (E3) — só na PRIMEIRA visita (nenhum progresso ainda): o
-          placement disfarçado de brincadeira que semeia o nível real por trilha. */}
-      {Object.keys(prog).length === 0 && (
-        <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#0EA5E9", boxShadow: "0 6px 0 #0369A1" }}>
-          <button
-            onClick={() => {
-              sfx.level();
-              onMatricula();
-            }}
-            className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-            style={{ background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)" }}
-          >
-            <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.4s_ease-in-out_infinite]" />
-            <div className="flex items-center justify-between gap-3 mb-1.5">
-              <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-sky-900 bg-sky-200 border-2 border-sky-300 rounded-md inline-block">
-                ✨ Sua primeira aventura
-              </span>
-              <span className="text-2xl animate-bounce">🎒</span>
-            </div>
-            <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#0C4A6E" }}>
-              Missão de Boas-Vindas
-            </div>
-            <div className="text-xs font-bold mt-1 leading-snug text-sky-900/80">
-              {kid.petName || "Seu mascote"} quer te conhecer! Mostre o que você já sabe — sem pressa, é só diversão. 🌟
-            </div>
-            <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-sky-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-              <span>Vamos lá!</span>
-              <span>🚀</span>
-            </div>
-          </button>
-        </div>
-      )}
-
-      {/* ▶️ MINHA AULA 📚 — o card-herói do Professor Mágico (E2): a criança toca UM
-          botão e o Compositor entrega a aula do dia (aquecimento → resgate →
-          fronteira → fluência → fecho lúdico). O professor sabe; ela só joga. */}
-      <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3" }}>
-        <button
-          onClick={() => {
-            sfx.level();
-            onAula();
-          }}
-          className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-          style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
-        >
-          <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.6s_ease-in-out_infinite]" />
-          <div className="flex items-center justify-between gap-3 mb-1.5">
-            <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-md inline-block">
-              🎓 O professor preparou pra você
-            </span>
-            <span className="text-2xl animate-bounce">📚</span>
-          </div>
-          <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#312E81" }}>
-            ▶️ MINHA AULA
-          </div>
-          <div className="text-xs font-bold mt-1 leading-snug text-indigo-900/80">
-            {aulaPlan.resumo} · começa fácil e termina na brincadeira! ✨
-          </div>
-          <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-indigo-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-            <span>Começar a Aula</span>
-            <span>▶</span>
-          </div>
-        </button>
-      </div>
-
-      {/* Smart Recommended Quest: Jornada Mágica Adaptive Button */}
-      <div className="mb-5 relative overflow-hidden card-block border-2 border-amber-300" style={{ boxShadow: "0 6px 0 #D4AC0D" }}>
-        <button
-          onClick={() => {
-            sfx.level();
-            onTrack(rec.track);
-          }}
-          className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-          style={{
-            background: "linear-gradient(135deg, #FFFDEB 0%, #FFF5C2 100%)",
-          }}
-        >
-          <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/50 to-transparent animate-[mkShine_2.8s_ease-in-out_infinite]" />
-          
-          <div className="flex items-center justify-between gap-3 mb-1.5">
-            <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-amber-900 bg-amber-200 border-2 border-amber-300 rounded-md inline-block">
-              ✨ Recomendado para você
-            </span>
-            <span className="text-2xl animate-bounce">🎁</span>
-          </div>
-
-          <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#784B00" }}>
-            Jornada Mágica: {rec.track.icon} {rec.track.name}
-          </div>
-
-          <div className="text-xs text-amber-900/80 font-bold mt-1 leading-snug">
-            {rec.reason}
-          </div>
-
-          <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-amber-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-            <span>Começar Aventura</span>
-            <span>▶</span>
-          </div>
-        </button>
-      </div>
-
-      {/* Desafio Misto 👑 — o "chefão" diário: 1×/dia, 10 questões de todas as trilhas, moedinhas em dobro */}
-      <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: mixedDoneToday ? "#CBD5E1" : "#7C3AED", boxShadow: mixedDoneToday ? "0 6px 0 #CBD5E1" : "0 6px 0 #5B21B6" }}>
-        <button
-          onClick={() => {
-            if (mixedDoneToday) {
-              sfx.tick();
-              return;
-            }
-            sfx.level();
-            onMixed();
-          }}
-          className={`w-full text-left p-4 select-none relative transition-all ${mixedDoneToday ? "cursor-default" : "cursor-pointer active:translate-y-0.5"}`}
-          style={{
-            background: mixedDoneToday
-              ? "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)"
-              : "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
-          }}
-        >
-          {!mixedDoneToday && (
-            <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3.2s_ease-in-out_infinite]" />
-          )}
-          <div className="flex items-center justify-between gap-3 mb-1.5">
-            <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block border-2 ${mixedDoneToday ? "text-slate-500 bg-slate-100 border-slate-200" : "text-purple-900 bg-purple-200 border-purple-300"}`}>
-              {mixedDoneToday ? "✅ Desafio de hoje completo!" : "👑 Desafio especial do dia"}
-            </span>
-            <span className={`text-2xl ${mixedDoneToday ? "" : "animate-bounce"}`}>🏆</span>
-          </div>
-          <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: mixedDoneToday ? "#64748B" : "#4C1D95" }}>
-            Desafio Misto 👑
-          </div>
-          <div className={`text-xs font-bold mt-1 leading-snug ${mixedDoneToday ? "text-slate-400" : "text-purple-900/80"}`}>
-            {mixedDoneToday
-              ? "Você venceu o chefão de hoje! Volte amanhã para um novo desafio. ✨"
-              : "10 perguntas de TODAS as suas trilhas — e as moedinhas valem EM DOBRO! 🪙🪙"}
-          </div>
-          {!mixedDoneToday && (
-            <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-purple-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-              <span>Enfrentar o Desafio</span>
-              <span>👑</span>
-            </div>
-          )}
-        </button>
-      </div>
-
-      
-      {/* Dojo Matemático 🥋 */}
-      <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#E11D48", boxShadow: "0 6px 0 #9F1239" }}>
-        <button
-          onClick={() => {
-            sfx.level();
-            onDojo();
-          }}
-          className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5"
-          style={{ background: "linear-gradient(135deg, #FFE4E6 0%, #FECDD3 100%)" }}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-[10px] font-black tracking-widest uppercase text-rose-900/60 bg-rose-900/10 px-2 py-0.5 rounded-full">
-              ⚡ Foco & Velocidade
-            </span>
-            <span className="text-2xl animate-pulse">🥋</span>
-          </div>
-          <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#9F1239" }}>
-            Modo Dojo
-          </div>
-          <div className="text-xs font-bold mt-1 leading-snug text-rose-900/80">
-            Treine sua velocidade (subitização)! Responda o mais rápido que puder para ganhar o título de Gênio. ⚡
-          </div>
-        </button>
-      </div>
-
-
-
-      {/* Toggle View Mode */}
-      <div className="flex bg-slate-200/50 rounded-2xl p-1.5 mb-8 mt-10 shadow-inner">
-        <button
-          onClick={() => { sfx.tick(); setViewMode("path"); }}
-          className={`flex-1 py-3 font-bold rounded-xl text-sm transition-all ${viewMode === 'path' ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-700'}`}
-          style={{ fontFamily: FONT }}
-        >
-          🗺️ O Mapa de Ilhas
-        </button>
-        <button
-          onClick={() => { sfx.tick(); setViewMode("list"); }}
-          className={`flex-1 py-3 font-bold rounded-xl text-sm transition-all ${viewMode === 'list' ? 'bg-white text-indigo-600 shadow-sm border border-slate-100' : 'text-slate-500 hover:text-slate-700'}`}
-          style={{ fontFamily: FONT }}
-        >
-          🗂️ Todas as Matérias
-        </button>
-      </div>
-
-      {/* RENDER PATH MODE (Mundo SAGA) */}
-      {viewMode === 'path' && (
-        <div className="mb-10">
-           <div className="text-center mb-6">
-             <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Mundo SAGA</h2>
-             <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha para dominar os números!</p>
-           </div>
-           <LearningPath 
-              tracks={SUBJECTS.find(s => s.id === 'mat')?.tracks[kid.grade] || []}
-              progOf={(id) => prog[id] || FRESH()}
-              onSelectTrack={onTrack}
-           />
-        </div>
-      )}
-
-      {/* RENDER LIST MODE */}
-      {viewMode === 'list' && SUBJECTS.map((subject) => {
-        const subjectTracks = subject.tracks[kid.grade] || [];
-        if (!subjectTracks.length) return null;
-        return (
-          <div key={subject.id} className="mb-6">
-            <div className="flex items-center gap-2 mb-3 pl-1">
-              <span className="text-xl">{subject.icon}</span>
-              <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                {subject.nome}
-              </span>
-              {subject.novo && (
-                <span className="text-[10px] font-black text-white bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
-                  Novo! ✨
-                </span>
-              )}
-            </div>
-            <div className="grid grid-cols-2 gap-3.5">
-              {subjectTracks.map((t) => renderTrackCard(t))}
-            </div>
-          </div>
-        );
-      })}
-
-      {/* Trilhas personalizadas criadas no editor pedagógico */}
-      {customTracks.length > 0 && (
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3 pl-1">
-            <span className="text-xl">🧪</span>
-            <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-              Trilhas Especiais
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-3.5">
-            {customTracks.map((t) => renderTrackCard(t))}
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={() => {
-          sfx.tick();
-          onAlbum();
-        }}
-        className="mt-5 w-full relative overflow-hidden select-none transition-all active:translate-y-1 active:scale-[0.98] py-4 text-lg font-bold text-white cursor-pointer"
-        style={{
-          fontFamily: FONT,
-          background: C.pink,
-          borderRadius: 8,
-          boxShadow: `0 6px 0 ${C.pinkDark}`,
-          border: "none",
-        }}
-      >
-        <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/40 to-transparent animate-[mkShine_3.4s_ease-in-out_infinite]" />
-        🎁 Meu Álbum de Figurinhos ({albumCount}/{TOTAL_STICKERS})
-      </button>
-
-      {/* Seletor de nível 🎯 — ver o que cada nível pergunta e começar por ele */}
-      {pickerTrack && (() => {
-        const p = prog[pickerTrack.id] || FRESH();
-        const conquered = p.maxLvl || 1;
-        return (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setPickerTrack(null)}>
-            <div
-              className="bg-white card-block border-4 p-5 max-w-md w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]"
-              style={{ borderColor: pickerTrack.color }}
-              onClick={(e) => e.stopPropagation()}
-            >
+            {/* ▶️ MINHA AULA 📚 */}
+            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3" }}>
               <button
                 onClick={() => {
-                  sfx.tick();
-                  setPickerTrack(null);
+                  sfx.level();
+                  onAula();
                 }}
-                className="absolute top-3 right-3 w-9 h-9 rounded-md border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
+                className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
+                style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
               >
-                ✕
+                <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.6s_ease-in-out_infinite]" />
+                <div className="flex items-center justify-between gap-3 mb-1.5">
+                  <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-md inline-block">
+                    🎓 O professor preparou pra você
+                  </span>
+                  <span className="text-2xl animate-bounce">📚</span>
+                </div>
+                <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#312E81" }}>
+                  ▶️ MINHA AULA
+                </div>
+                <div className="text-xs font-bold mt-1 leading-snug text-indigo-900/80">
+                  {aulaPlan.resumo} · começa fácil e termina na brincadeira! ✨
+                </div>
+                <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-indigo-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                  <span>Começar a Aula</span>
+                  <span>▶</span>
+                </div>
               </button>
-              <div className="text-center mb-3">
-                <div className="text-3xl mb-1">{pickerTrack.icon}</div>
-                <h3 className="text-lg font-black" style={{ fontFamily: FONT, color: C.ink }}>
-                  {pickerTrack.name}
-                </h3>
-                <p className="text-xs text-slate-500 font-bold">Escolha o nível para treinar 🎯</p>
-              </div>
-              <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-                {[1, 2, 3, 4, 5].map((lvl) => {
-                  const won = lvl <= conquered;
-                  const atual = lvl === p.lvl;
-                  return (
-                    <button
-                      key={lvl}
-                      onClick={() => {
-                        sfx.level();
-                        setPickerTrack(null);
-                        onTrackLvl(pickerTrack, lvl);
-                      }}
-                      className="w-full flex items-center gap-3 p-2.5 rounded-2xl border-2 text-left transition-all cursor-pointer active:translate-y-0.5 hover:bg-slate-50"
-                      style={{ borderColor: atual ? pickerTrack.color : "#E2E8F0", background: atual ? `${pickerTrack.color}14` : "#fff" }}
-                    >
-                      <span
-                        className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black text-base border-2"
-                        style={{
-                          fontFamily: FONT,
-                          background: won ? pickerTrack.color : "#F1F5F9",
-                          borderColor: won ? pickerTrack.dark : "#E2E8F0",
-                          color: won ? "#fff" : "#94A3B8",
-                        }}
-                      >
-                        {p.dom && lvl === 5 ? "👑" : lvl}
-                      </span>
-                      <span className="flex-1 min-w-0">
-                        <span className="block text-xs font-black" style={{ fontFamily: FONT, color: C.ink }}>
-                          Nível {lvl}
-                          {pickerTrack.lvlSkills?.[lvl - 1] && (
-                            <span className="font-bold text-slate-600"> · {pickerTrack.lvlSkills[lvl - 1]}</span>
-                          )}
-                          {atual && <span className="ml-1.5 text-[10px] font-black uppercase px-1.5 py-0.5 rounded-md text-white" style={{ background: pickerTrack.color }}>atual</span>}
-                          {p.dom && lvl === 5 && <span className="ml-1.5 text-[10px]">👑</span>}
-                        </span>
-                        <span className="block text-[11px] text-slate-500 font-bold truncate">{pickerSamples[lvl - 1]}</span>
-                      </span>
-                      <span className="text-slate-300 font-black">▶</span>
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-[10px] text-slate-400 font-bold text-center mt-3">
-                As bolinhas coloridas são níveis já conquistados — elas nunca se apagam. 💜
-              </p>
+            </div>
+
+            {/* Mundo SAGA */}
+            <div className="mb-10">
+               <div className="text-center mb-6 mt-8">
+                 <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Mundo SAGA</h2>
+                 <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha para dominar os números!</p>
+               </div>
+               <LearningPath 
+                  tracks={SUBJECTS.find(s => s.id === 'mat')?.tracks[kid.grade] || []}
+                  progOf={(id) => prog[id] || FRESH()}
+                  onSelectTrack={onTrack}
+               />
+            </div>
+
+            {/* Outros Mundos / Matérias */}
+            <div className="mt-12 mb-10">
+               <div className="text-center mb-6 mt-8">
+                 <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Outros Mundos</h2>
+                 <p className="text-sm font-bold text-slate-500 mt-1">Explore novos conhecimentos!</p>
+               </div>
+               {SUBJECTS.filter(s => s.id !== 'mat').map(subj => {
+                 const tks = subj.tracks[kid.grade];
+                 if (!tks || tks.length === 0) return null;
+                 return (
+                   <div key={subj.id} className="mb-8">
+                     <h3 className="text-lg font-bold text-slate-700 mb-3 px-2 flex items-center gap-2">
+                       <span>{subj.icon}</span> {subj.nome}
+                     </h3>
+                     <LearningPath
+                         tracks={tks}
+                        progOf={(id) => prog[id] || FRESH()}
+                        onSelectTrack={onTrack}
+                     />
+                   </div>
+                 );
+               })}
+            </div>
+
+          </div>
+        )}
+
+        {activeShellTab === "dojo" && (
+          <div className="animate-[mkPop_0.25s_ease-out_1]">
+            <div className="text-center mb-6 mt-2">
+               <h2 className="text-2xl font-black text-purple-900" style={{ fontFamily: FONT }}>Dojo Matemático</h2>
+               <p className="text-sm font-bold text-slate-500 mt-1">Treine sua fluência e velocidade! ⚡</p>
+            </div>
+            {/* Desafio Misto 👑 */}
+            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: mixedDoneToday ? "#CBD5E1" : "#7C3AED", boxShadow: mixedDoneToday ? "0 6px 0 #CBD5E1" : "0 6px 0 #5B21B6" }}>
+              <button
+                onClick={() => {
+                  if (mixedDoneToday) {
+                    sfx.tick();
+                    return;
+                  }
+                  sfx.level();
+                  onMixed();
+                }}
+                className={`w-full text-left p-4 select-none relative transition-all ${mixedDoneToday ? "cursor-default" : "cursor-pointer active:translate-y-0.5"}`}
+                style={{
+                  background: mixedDoneToday
+                    ? "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)"
+                    : "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
+                }}
+              >
+                {!mixedDoneToday && (
+                  <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3.2s_ease-in-out_infinite]" />
+                )}
+                <div className="flex items-center justify-between gap-3 mb-1.5">
+                  <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block border-2 ${mixedDoneToday ? "text-slate-500 bg-slate-100 border-slate-200" : "text-purple-900 bg-purple-200 border-purple-300"}`}>
+                    {mixedDoneToday ? "✅ Desafio de hoje completo!" : "👑 Desafio especial do dia"}
+                  </span>
+                  <span className={`text-2xl ${mixedDoneToday ? "" : "animate-bounce"}`}>🏆</span>
+                </div>
+                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: mixedDoneToday ? "#64748B" : "#4C1D95" }}>
+                  Desafio Misto 👑
+                </div>
+                <div className={`text-xs font-bold mt-1 leading-snug ${mixedDoneToday ? "text-slate-400" : "text-purple-900/80"}`}>
+                  {mixedDoneToday
+                    ? "Você venceu o chefão de hoje! Volte amanhã para um novo desafio. ✨"
+                    : "10 perguntas de TODAS as suas trilhas — e as moedinhas valem EM DOBRO! 🪙🪙"}
+                </div>
+                {!mixedDoneToday && (
+                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-purple-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
+                    <span>Enfrentar o Desafio</span>
+                    <span>👑</span>
+                  </div>
+                )}
+              </button>
+            </div>
+            
+            {/* Dojo Matemático 🥋 */}
+            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#E11D48", boxShadow: "0 6px 0 #9F1239" }}>
+              <button
+                onClick={() => {
+                  sfx.level();
+                  onDojo();
+                }}
+                className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5"
+                style={{ background: "linear-gradient(135deg, #FFE4E6 0%, #FECDD3 100%)" }}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-black tracking-widest uppercase text-rose-900/60 bg-rose-900/10 px-2 py-0.5 rounded-full">
+                    ⚡ Foco & Velocidade
+                  </span>
+                  <span className="text-2xl animate-pulse">🥋</span>
+                </div>
+                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#9F1239" }}>
+                  Modo Dojo Livre
+                </div>
+                <div className="text-xs font-bold mt-1 leading-snug text-rose-900/80">
+                  Treine sua velocidade e reflexos! Responda o mais rápido que puder para ganhar o título de Gênio. ⚡
+                </div>
+              </button>
             </div>
           </div>
-        );
-      })()}
+        )}
 
-      {/* Wardrobe Modal Dialog Container */}
+        {activeShellTab === "oficina" && (
+          <div className="animate-[mkPop_0.25s_ease-out_1]">
+            <div className="text-center mb-6 mt-2">
+               <h2 className="text-2xl font-black text-emerald-900" style={{ fontFamily: FONT }}>Oficina</h2>
+               <p className="text-sm font-bold text-slate-500 mt-1">Aventura e Recuperação 🔧</p>
+            </div>
+
+            {aulaPlan.resgates.length === 0 ? (
+               <div className="text-center p-8 border-4 border-dashed border-slate-200 rounded-3xl bg-slate-50">
+                 <span className="text-4xl mb-4 block opacity-50">✨</span>
+                 <p className="text-sm font-bold text-slate-400">Nenhuma missão de resgate necessária no momento. Você está indo super bem!</p>
+               </div>
+            ) : (
+               <div className="space-y-4">
+                 <p className="text-xs font-bold text-center text-slate-500">O Guardião da Ponte precisa de você nestas missões antigas:</p>
+                 {aulaPlan.resgates.map((r, i) => (
+                   <button 
+                     key={i}
+                     onClick={() => { sfx.level(); onTrack(r.track); }}
+                     className="w-full bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between shadow-sm active:scale-95 transition-all text-left"
+                   >
+                      <div>
+                        <div className="text-[10px] font-black text-emerald-700 uppercase bg-emerald-200 px-2 py-0.5 rounded-md inline-block mb-1">
+                          Missão Especial
+                        </div>
+                        <div className="font-bold text-emerald-900 text-lg" style={{ fontFamily: FONT }}>{r.track.name}</div>
+                      </div>
+                      <span className="text-3xl animate-bounce">🛡️</span>
+                   </button>
+                 ))}
+               </div>
+            )}
+          </div>
+        )}
+
+        {activeShellTab === "perfil" && (
+          <div className="animate-[mkPop_0.25s_ease-out_1]">
+            <div className="text-center mb-6 mt-2">
+               <h2 className="text-2xl font-black text-amber-900" style={{ fontFamily: FONT }}>Meu Perfil</h2>
+               <p className="text-sm font-bold text-slate-500 mt-1">Sua coleção e mascote 🌟</p>
+            </div>
+
+            {/* Mascot in 3 Layers (Replaced old bolinha evolution card) */}
+            <div className="mb-4">
+              <MascotEvolutionCard 
+                 kid={kid} 
+                 state={state} 
+                 onUpdateKid={onUpdateKid} 
+                 coins={coins} 
+               />
+            </div>
+            
+            <div className="mb-4">
+              <button
+                onClick={() => {
+                  sfx.level();
+                  setTempBg(kid.bgAccessory || "none");
+                  setTempInventory(kid.inventory || []);
+                  setTempCoins(coins);
+                  setCoinsSpent(0);
+                  setShowWardrobe(true);
+                }}
+                className="w-full select-none transition-all active:translate-y-1 active:scale-[0.98] py-3.5 text-sm font-black text-amber-950 cursor-pointer flex items-center justify-center gap-2 border-b-4 border-amber-600 rounded-2xl animate-pulse"
+                style={{
+                  fontFamily: FONT,
+                  background: "linear-gradient(135deg, #FEF08A 0%, #FDE047 100%)",
+                  boxShadow: `0 2px 0 #CA8A04`,
+                }}
+              >
+                <span>🎨 Mudar Cenário do Mascote 🌟</span>
+              </button>
+            </div>
+
+            {/* Álbum */}
+            <button
+              onClick={() => {
+                sfx.tick();
+                onAlbum();
+              }}
+              className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all mb-4 card-block border-2"
+              style={{ background: "linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)", borderColor: "#F472B6", boxShadow: "0 6px 0 #DB2777" }}
+            >
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-pink-900 bg-pink-200 border-2 border-pink-300 rounded-md inline-block">
+                  Sua Coleção
+                </span>
+                <span className="text-2xl">📖</span>
+              </div>
+              <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#831843" }}>
+                Álbum de Figurinhas
+              </div>
+              <div className="text-xs font-bold mt-1 text-pink-900/80">
+                Você tem {albumCount} de {TOTAL_STICKERS} figurinhas! Complete as páginas.
+              </div>
+            </button>
+
+            {/* Logout/Back Button */}
+            <button
+              onClick={() => {
+                sfx.tick();
+                onBack();
+              }}
+              className="w-full bg-slate-200 border-2 border-slate-300 text-slate-700 font-black py-4 px-6 rounded-2xl shadow-sm hover:bg-slate-300 transition-all cursor-pointer mt-4"
+              style={{ fontFamily: FONT }}
+            >
+              ⬅️ Trocar de Jogador
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* BOTTOM TAB BAR */}
+      <div className="absolute bottom-0 left-0 w-full bg-white border-t-2 border-slate-200 px-2 py-2 flex items-center justify-around z-20 pb-safe">
+        {[
+          { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },
+          { id: "dojo", label: "Dojo", icon: "🥋", color: "text-purple-600", activeBg: "bg-purple-50" },
+          { id: "oficina", label: "Oficina", icon: "🔧", color: "text-emerald-600", activeBg: "bg-emerald-50" },
+          { id: "perfil", label: "Perfil", icon: "👤", color: "text-amber-600", activeBg: "bg-amber-50" },
+        ].map(tab => {
+          const isActive = activeShellTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => { sfx.tick(); setActiveShellTab(tab.id as any); }}
+              className={`flex-1 flex flex-col items-center justify-center py-2 transition-all rounded-xl ${isActive ? tab.activeBg : "opacity-60 grayscale"}`}
+            >
+              <span className={`text-2xl mb-1 ${isActive ? "animate-bounce" : ""}`}>{tab.icon}</span>
+              <span className={`text-[10px] font-black uppercase ${isActive ? tab.color : "text-slate-500"}`}>{tab.label}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Trazemos o Picker modal e Wardrobe modal (igual estava) */}
+      {pickerTrack && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white card-block border-4 p-6 max-w-sm w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]" style={{ borderColor: pickerTrack.color }}>
+            <button
+              onClick={() => {
+                sfx.tick();
+                setPickerTrack(null);
+              }}
+              className="absolute top-3.5 right-3.5 w-9 h-9 rounded-md border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
+            >
+              ✕
+            </button>
+            <div className="text-center mb-5 mt-2">
+              <div
+                className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-4xl mb-3 shadow-sm border-b-4"
+                style={{ background: pickerTrack.color, color: "#fff", borderColor: pickerTrack.dark }}
+              >
+                {pickerTrack.icon}
+              </div>
+              <h3 className="text-xl font-black text-slate-800" style={{ fontFamily: FONT }}>
+                {pickerTrack.name}
+              </h3>
+              <p className="text-xs text-slate-500 font-bold mt-1">
+                Escolha o nível de dificuldade para jogar agora! 🎯
+              </p>
+            </div>
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {[1, 2, 3, 4, 5].map((lvl) => {
+                const p = prog[pickerTrack.id] || FRESH();
+                const won = lvl <= p.maxLvl;
+                const atual = lvl === p.lvl;
+                return (
+                  <button
+                    key={lvl}
+                    onClick={() => {
+                      sfx.level();
+                      setPickerTrack(null);
+                      onTrackLvl(pickerTrack, lvl);
+                    }}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-2xl border-2 text-left transition-all cursor-pointer active:translate-y-0.5 hover:bg-slate-50"
+                    style={{ borderColor: atual ? pickerTrack.color : "#E2E8F0", background: atual ? `${pickerTrack.color}14` : "#fff" }}
+                  >
+                    <span
+                      className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black text-base border-2"
+                      style={{
+                        fontFamily: FONT,
+                        background: won ? pickerTrack.color : "#F1F5F9",
+                        borderColor: won ? pickerTrack.dark : "#E2E8F0",
+                        color: won ? "#fff" : "#94A3B8",
+                      }}
+                    >
+                      {p.dom && lvl === 5 ? "👑" : lvl}
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block text-xs font-black" style={{ fontFamily: FONT, color: C.ink }}>
+                        Nível {lvl}
+                        {pickerTrack.lvlSkills?.[lvl - 1] && (
+                          <span className="font-bold text-slate-600"> · {pickerTrack.lvlSkills[lvl - 1]}</span>
+                        )}
+                        {atual && <span className="ml-1.5 text-[10px] font-black uppercase px-1.5 py-0.5 rounded-md text-white" style={{ background: pickerTrack.color }}>atual</span>}
+                        {p.dom && lvl === 5 && <span className="ml-1.5 text-[10px]">👑</span>}
+                      </span>
+                    </span>
+                    <span className="text-slate-300 font-black">▶</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {showWardrobe && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white card-block border-4 border-amber-300 p-6 max-w-md w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]">
@@ -673,8 +671,6 @@ export function KidHomeScreen({
             >
               ✕
             </button>
-
-            {/* Wardrobe Title */}
             <div className="text-center mb-4">
               <h3 className="text-xl font-black text-amber-950" style={{ fontFamily: FONT }}>
                 Cenário Mágico 🌌
@@ -683,25 +679,17 @@ export function KidHomeScreen({
                 Mude o cenário de fundo do seu mascote com suas estrelas!
               </p>
             </div>
-
-            {/* Live Interactive Preview Center Frame */}
-            {/* Preview do cenário: sem scale — o mascote aparece INTEIRO, nunca "espiando pela janela" */}
-            <div className="relative w-40 h-40 rounded-md mx-auto bg-slate-50 border-4 border-slate-100 flex items-center justify-center shadow-inner mb-4">
+            <div className="relative w-40 h-40 rounded-md mx-auto bg-slate-50 border-4 border-slate-100 flex items-center justify-center shadow-inner mb-4 overflow-hidden">
               <Mascote theme={kid.theme} size={140} outfit="none" bgAccessory={tempBg} stage={stageNum} kid={kid} />
             </div>
-
-            {/* Star count */}
             <div className="flex items-center justify-between gap-2 mb-4 bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
               <span className="text-xs font-black text-slate-600 uppercase" style={{ fontFamily: FONT }}>Suas Moedinhas:</span>
               <CoinChip n={tempCoins} />
             </div>
-
-            {/* Tab items list (Sceneries only) */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
               {WARDROBE_ITEMS.map((item) => {
                 const isUnlocked = item.cost === 0 || tempInventory.includes(item.id);
                 const isSelected = tempBg === item.id;
-
                 return (
                   <div
                     key={item.id}
@@ -724,7 +712,6 @@ export function KidHomeScreen({
                         </div>
                       </div>
                     </div>
-
                     <div>
                       {isSelected ? (
                         <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 border-2 border-emerald-300/60 px-3 py-1.5 rounded-xl uppercase tracking-wider">
@@ -755,8 +742,6 @@ export function KidHomeScreen({
                 );
               })}
             </div>
-
-            {/* Save selections */}
             <div className="mt-5 pt-3 border-t border-slate-100">
               <button
                 onClick={handleSaveWardrobe}
