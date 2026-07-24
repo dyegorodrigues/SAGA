@@ -779,12 +779,12 @@ export function gN1_02(lvl: number): Question {
 }
 
 export function gN1_03(lvl: number): Question {
-  const n = ri(6, 10);
+  const n = ri(2, 5); // Subitizing perceptual usually up to 5
   return {
-    tutorial: lvl === 1 ? [{ say: "Vamos contar até 10!" }] : undefined,
+    tutorial: lvl === 1 ? [{ say: "Olhe rápido, a caixa vai fechar!" }] : undefined,
     excecaoCPA: "perceptual",
-    kind: "count",
-    prompt: "Conte com calma, sem pular nenhum!",
+    kind: "flash",
+    prompt: "Quantos tinham ali?",
     emoji: pickEmo(),
     n,
     options: numOpts(n, 3, 5, 10),
@@ -893,11 +893,11 @@ export function gN1_09(lvl: number): Question {
 }
 
 export function gN1_08(lvl: number): Question {
-  const n = ri(4, 7);
+  const n = ri(5, 10);
   return {
-    tutorial: lvl === 1 ? [{ say: "Olhe rápido, a caixa vai fechar!" }] : undefined,
+    tutorial: lvl === 1 ? [{ say: "Esta é a caixa mágica! Se a primeira linha estiver cheia, tem 5!" }] : undefined,
     excecaoCPA: "perceptual",
-    kind: "flash",
+    kind: "tens",
     prompt: "A Caixa Mágica abriu e fechou! Quantos você viu?",
     emoji: pickEmo(),
     n,

@@ -77,9 +77,11 @@ export function KidHomeScreen({
   }, [tracks, prog]);
 
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
-  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "dojo" | "oficina" | "perfil">("jornada");
+  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "escola" | "dojo" | "oficina" | "perfil">("jornada");
   const [pickerTrack, setPickerTrack] = useState<Track | null>(null);
 
+  
+  
   // Wardrobe states
   const [showWardrobe, setShowWardrobe] = useState(false);
   const [viewMode, setViewMode] = useState<"path" | "list">("path");
@@ -453,6 +455,40 @@ export function KidHomeScreen({
           </div>
         )}
 
+        
+        {activeShellTab === "escola" && (
+          <div className="animate-[mkPop_0.25s_ease-out_1]">
+            <div className="text-center mb-6 mt-2"> 
+               <h2 className="text-2xl font-black text-sky-900" style={{ fontFamily: FONT }}>Modo Escola</h2>
+               <p className="text-sm font-bold text-slate-500 mt-1">Todas as matérias e exercícios 📚</p>
+            </div>
+            
+            {/* As aventuras, organizadas por matéria (SUBJECTS = cartuchos do console) */}
+            {SUBJECTS.map((subject) => {
+              const subjectTracks = ["pre", "ano1", "ano2"].flatMap(g => subject.tracks[g as "pre" | "ano1" | "ano2"] || []);
+              if (!subjectTracks.length) return null;
+              return (
+                <div key={subject.id} className="mb-6">
+                  <div className="flex items-center gap-2 mb-3 pl-1">
+                    <span className="text-xl">{subject.icon}</span>
+                    <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                      {subject.nome}
+                    </span>
+                    {subject.novo && (
+                      <span className="text-[10px] font-black text-white bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
+                        Novo! ✨
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3.5">
+                    {subjectTracks.map((t) => renderTrackCard(t))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         {activeShellTab === "oficina" && (
           <div className="animate-[mkPop_0.25s_ease-out_1]">
             <div className="text-center mb-6 mt-2">
@@ -566,12 +602,15 @@ export function KidHomeScreen({
 
       {/* BOTTOM TAB BAR */}
       <div className="absolute bottom-0 left-0 w-full bg-white border-t-2 border-slate-200 px-2 py-2 flex items-center justify-around z-20 pb-safe">
+        
         {[
           { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },
+          { id: "escola", label: "Escola", icon: "📚", color: "text-sky-600", activeBg: "bg-sky-50" },
           { id: "dojo", label: "Dojo", icon: "🥋", color: "text-purple-600", activeBg: "bg-purple-50" },
           { id: "oficina", label: "Oficina", icon: "🔧", color: "text-emerald-600", activeBg: "bg-emerald-50" },
           { id: "perfil", label: "Perfil", icon: "👤", color: "text-amber-600", activeBg: "bg-amber-50" },
         ].map(tab => {
+
           const isActive = activeShellTab === tab.id;
           return (
             <button

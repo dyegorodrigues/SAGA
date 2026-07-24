@@ -302,7 +302,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             <Mascote 
               theme={kid.theme} 
               stage={curStage.stage} 
-              size={140}
+              size={"100%"}
               kid={kid}
               bgAccessory={kid.bgAccessory} 
               animation={petAction === "playing" ? "happy" : "idle"}

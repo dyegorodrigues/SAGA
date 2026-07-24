@@ -148,6 +148,7 @@ export function MascotRenderer({
       style={{ display: "block", margin: "0 auto", overflow: "visible" }}
     >
       <defs>
+        
 
         <radialGradient id={`bg-${activeBg}`} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#ffffff" stopOpacity="0.6" />
@@ -179,6 +180,7 @@ export function MascotRenderer({
         .eye-blink { animation: blink 4s infinite; }
         @keyframes blink { 0%, 96%, 100% { transform: scaleY(1); } 98% { transform: scaleY(0.1); } }
       `}</style>
+        <g>
         {activeBg === "castelo" && (
           <g>
             <rect x="0" y="0" width="100" height="100" fill="#2E1065" />
@@ -235,6 +237,7 @@ export function MascotRenderer({
             </g>
           </g>
         )}
+        </g>
 
 
       {/* PNG definitivo (pipeline de arte): quando existir, vence qualquer desenho SVG */}

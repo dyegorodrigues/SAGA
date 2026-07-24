@@ -178,10 +178,7 @@ export function GameLoop({
   useEffect(() => () => stopSpeak(), []);
 
   // AI Tutor states
-  const [aiTutorOpen, setAiTutorOpen] = useState(false);
-  const [aiTutorMessage, setAiTutorMessage] = useState("");
-  const [aiTutorLoading, setAiTutorLoading] = useState(false);
-  const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
+    const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
   const [mockTutorialN, setMockTutorialN] = useState<number | null>(null);
 
   useEffect(() => {
@@ -568,7 +565,7 @@ export function GameLoop({
     setSel(val);
     setToast(currentToast);
     setMsg(fb);
-    setAiTutorOpen(false); // Close AI bubble on reply
+    
 
     setOk(nextOk);
     setStars(nextStars);
@@ -630,7 +627,7 @@ export function GameLoop({
     
     // Se for um pedido de ajuda (não automático) E tiver mais de 2 itens,
     // o mascote só conta os dois primeiros (Scaffold) e encoraja a criança a continuar.
-    const shouldScaffold = !isAuto && total > 2;
+    const shouldScaffold = !isAuto && total > 2 && !isMock;
     const limit = (shouldScaffold && !isMock) ? 2 : total;
     
     speak(`${intro} ... Um!`, {
@@ -714,82 +711,7 @@ export function GameLoop({
     });
   };
 
-  const askAiTutor = async () => {
-    if (aiTutorLoading) return;
-    setAiTutorOpen(true);
-    setAiTutorLoading(true);
-    setAiTutorMessage("");
-    sfx.tick();
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => {
-      controller.abort();
-    }, 15000);
-
-    try {
-      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
-      const response = await fetch("/api/tutor", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          ...(token ? { "Authorization": `Bearer ${token}` } : {})
-        },
-        signal: controller.signal,
-        body: JSON.stringify({
-          kidName: kid.name,
-          grade: kid.grade === "pre" ? "Pré-escola" : "1º Ano",
-          theme: kid.theme,
-          question: {
-            kind: q.kind,
-            prompt: q.prompt,
-            expr: q.expr,
-            story: q.story,
-          },
-        }),
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.status === 429) {
-        const limited = await response.json();
-        const msg = limited.hint || "Por hoje as dicas acabaram! Amanhã tem mais. 🌙";
-        setAiTutorMessage(msg);
-        if (sound) {
-          speak(msg);
-        }
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error("Erro de conexão");
-      }
-
-      const data = await response.json();
-      setAiTutorMessage(data.hint);
-      if (sound) {
-        speak(data.hint);
-      }
-    } catch (e) {
-      clearTimeout(timeoutId);
-      // Premium contextual mathematical fallbacks so there is never an infinite loading state
-      let fallback = "Estou torcendo por você! Vamos contar as figuras bem devagarzinho de um em um? Você consegue! 🌟";
-      if (q.kind === "count") {
-        fallback = `Oi ${kid.name}! Vamos contar cada uma dessas figuras fofas apontando com o dedinho? Vá contando de um em um! ✨`;
-      } else if (q.kind === "sum" || q.kind === "math") {
-        fallback = `Tente juntar os dois grupos de brinquedos! Junte as pecinhas e conte tudo junto! Você é brilhante! 🧠✨`;
-      } else if (q.kind === "subvis" || q.kind === "sub") {
-        fallback = `Nós tínhamos um grupo, mas algumas foram retiradas ou riscadas. Quantas restaram sem riscar? Conte só essas! 💚`;
-      } else if (q.kind === "pattern") {
-        fallback = `Dá uma olhadinha no ritmo das figuras! O que vem logo depois para completar o segredo do desenho? 😊⭐`;
-      }
-      setAiTutorMessage(fallback);
-      if (sound) {
-        speak(fallback);
-      }
-    } finally {
-      setAiTutorLoading(false);
-    }
-  };
+  
 
   const restart = () => {
     setReplays((r) => r + 1);
@@ -804,7 +726,7 @@ export function GameLoop({
     setMsg(null);
     setDone(false);
     setBonus(0);
-    setAiTutorOpen(false);
+    
   };
 
   if (done) {
@@ -926,7 +848,7 @@ export function GameLoop({
 
       {/* Narrative Mascot Header Row */}
       <div className="mb-4 flex items-start gap-3">
-        <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`} onClick={askAiTutor}>
+        <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`}>
           <Mascote 
             theme={kid.theme} 
             stage={stage} 
@@ -958,44 +880,8 @@ export function GameLoop({
           {status ? msg : q.prompt}
         </div>
 
-        {/* AI Tutor Floating Bulb Button */}
-        <button
-          onClick={askAiTutor}
-          disabled={!!status}
-          className="flex-shrink-0 w-11 h-11 bg-amber-100 hover:bg-amber-200 border-2 border-amber-300 rounded-md flex items-center justify-center text-xl select-none cursor-pointer transition-all active:scale-90"
-        >
-          💡
-        </button>
+        
       </div>
-
-      {/* AI Tutor Dialogue Bubble */}
-      {aiTutorOpen && (
-        <div className="mb-4 p-3.5 bg-amber-50 border-2 border-amber-200 rounded-2xl text-left relative mk-optin">
-          <div className="absolute -top-2 left-6 w-3 h-3 bg-amber-50 border-t-2 border-l-2 border-amber-200 rotate-45" />
-          <div className="flex items-center gap-2 mb-1.5 border-b border-amber-100 pb-1">
-            <span className="text-sm">💡</span>
-            <span className="font-bold text-xs text-amber-900" style={{ fontFamily: FONT }}>
-              Dica do Mascote Tutor Inteligente
-            </span>
-            <button
-              onClick={() => setAiTutorOpen(false)}
-              className="ml-auto text-amber-700 font-bold text-xs hover:text-amber-900"
-            >
-              ✕
-            </button>
-          </div>
-          {aiTutorLoading ? (
-            <div className="flex items-center gap-2 text-xs text-amber-800 font-semibold italic animate-pulse">
-              <span className="animate-spin inline-block w-3.5 h-3.5 border-2 border-amber-800 border-t-transparent rounded-md" />
-              Sussurrando uma mágica matemática... 💭
-            </div>
-          ) : (
-            <p className="text-xs text-amber-950 font-semibold leading-relaxed" style={{ fontFamily: BODY }}>
-              {aiTutorMessage}
-            </p>
-          )}
-        </div>
-      )}
 
       {q.review && !status && (
         <div className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-md text-xs font-bold mb-3">
@@ -1005,7 +891,6 @@ export function GameLoop({
 
       <div className="relative">
         {status === "right" && <Burst />}
-
         {q.kind === "rapid-fire" && <RapidFire q={q} onAnswer={handlePick} disabled={status !== null} />}
         {q.kind === "singapore-bars" && <SingaporeBars q={q} onAnswer={handlePick} disabled={status !== null} />}
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
@@ -1014,55 +899,21 @@ export function GameLoop({
         <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
           {q.kind === "count" && q.emoji && q.n != null && (
             <div className="flex flex-col items-center gap-3">
-              <EmojiRow emoji={q.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />
-              
-              
+              <EmojiRow emoji={q.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />                                        
             </div>
           )}
-
-          {q.kind === "subvis" && q.emoji && q.a != null && q.b != null && (
+          {q.kind === "sum" && q.expr && (
             <div className="flex flex-col items-center gap-2">
               <div className="flex flex-wrap justify-center gap-2">
-                {Array.from({ length: q.a }).map((_, i) => {
-                  const gone = i >= (q.a || 0) - (q.b || 0);
-                  const hi = !gone && guidedIdx === i;
-                  return (
-                    <span
-                      key={i}
-                      className="transition-all duration-300"
-                      style={{
-                        position: "relative",
-                        fontSize: 34,
-                        opacity: gone ? (guidedIdx !== null ? 0.12 : 0.25) : guidedIdx !== null && !hi ? 0.4 : 1,
-                        transform: hi ? "scale(1.35)" : "scale(1)",
-                        zIndex: hi ? 20 : 1,
-                        display: "inline-block",
-                      }}
-                    >
-                      {q.emoji}
-                      {hi && (
-                        <span
-                          className="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full flex items-center justify-center font-black text-white text-xs"
-                          style={{ background: C.grape, fontFamily: FONT }}
-                        >
-                          {i + 1}
-                        </span>
-                      )}
-                      {gone && (
-                        <span className="absolute -top-1 -right-1 text-2xl font-bold text-red-500 animate-ping">
-                          ❌
-                        </span>
-                      )}
-                    </span>
-                  );
-                })}
+                {q.emoji && <EmojiRow emoji={q.emoji} n={q.a || 0} startIndex={1} highlightIndex={guidedIdx !== null && guidedIdx < (q.a || 0) ? guidedIdx : null} />}
+                {q.emoji && <EmojiRow emoji={q.emoji} n={q.b || 0} startIndex={(q.a || 0) + 1} highlightIndex={guidedIdx !== null && guidedIdx >= (q.a || 0) ? guidedIdx - (q.a || 0) : null} state="acerto" />}
               </div>
               <div className="mt-2">
                 <BigText size={34}>{q.expr}</BigText>
               </div>
-              
             </div>
           )}
+
 
           {q.kind === "pattern" && q.shown && (
             <div className="flex flex-wrap items-center justify-center gap-2.5">
