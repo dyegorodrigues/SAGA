@@ -10,7 +10,7 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "auditar": "node catalog_auditor.cjs",
+    "auditar": "node AI_Studio_Lab/tools/catalog_auditor.cjs",
     "simular": "tsx simulated-learner-real.ts",
     "contrato": "vitest run"
   },

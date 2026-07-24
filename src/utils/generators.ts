@@ -819,8 +819,8 @@ export function gN1_05(lvl: number): Question {
   while (n1 === n2) n2 = ri(2, 5);
 
   const groups = [
-    { n: n1, e: pickEmo() },
-    { n: n2, e: pickEmo() }
+    { n: n1, emoji: pickEmo() },
+    { n: n2, emoji: pickEmo() }
   ];
   const wantsMais = isMais;
   const idxBig = n1 > n2 ? 0 : 1;
@@ -846,7 +846,7 @@ export function gN1_05(lvl: number): Question {
     return {
       tutorial: undefined,
       kind: "plain",
-      big: groups[0].e,
+      big: groups[0].emoji,
       prompt: wantsMais ? `O que é MAIS: ${n1} ou ${n2}?` : `O que é MENOS: ${n1} ou ${n2}?`,
       options: [
         { label: `${n1}`, value: n1 },

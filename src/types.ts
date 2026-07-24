@@ -158,18 +158,26 @@ export interface Progress {
   rt?: number;
   /** Telemetria: Registro de tags de misconception cometidas para o Radar de Lacunas */
   errKind?: string[];
+  /** Leitner: Força de revisão espaçada (1..5) mantida separadamente do nível CPA (lvl/mast) */
+  reviewForce?: number;
 }
 
 export interface FactStrength {
-  rt: number;
-  history: boolean[];
+  fact_id: string;
+  forca: number; // 0-5
+  rt_medio: number;
+  ultima_vez: string;
+  erros_seguidos: number;
 }
 
 export interface ProcStrength {
-  step: string;
-  accuracy: number;
-  rt: number;
-  weakestSubStep?: string;
+  proc_id: string;
+  precisao: number;
+  passo_fraco?: string;
+  tempo_medio: number;
+  forca: number; // 0-5
+  ultima_vez: string;
+  erros_seguidos: number;
 }
 
 export interface DojoTrackState {
