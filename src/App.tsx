@@ -422,7 +422,7 @@ export default function App() {
     
     // We only show tracks that are OPENED according to the graph
     // (i.e. all prerequisites are met).
-    const unlockedTracks = allTracks; // Return all tracks to show them in the map
+    const unlockedTracks = Array.from(new Map(allTracks.map(t => [t.id, t])).values()); // Deduplicate
 
     const custom = (state.customTracks || [])
       // removed filter by grade here too

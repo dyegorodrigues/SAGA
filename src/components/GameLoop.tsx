@@ -1083,7 +1083,7 @@ export function GameLoop({
           {q.kind === "drag-group" && <DragGroup q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "tenframe" && q.n != null && (
-            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} highlightRow={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} />
+            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} />
           )}
 
           {q.kind === "flash" && q.emoji && q.n != null && (

@@ -345,7 +345,12 @@ export function KidHomeScreen({
                  <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha para dominar os números!</p>
                </div>
                <LearningPath 
-                  tracks={SUBJECTS.find(s => s.id === 'mat')?.tracks[kid.grade] || []}
+                  tracks={(() => {
+                    const mat = SUBJECTS.find(s => s.id === 'mat');
+                    if (!mat) return [];
+                    const allMat = ["pre", "ano1", "ano2"].flatMap(g => mat.tracks[g as "pre" | "ano1" | "ano2"] || []);
+                    return Array.from(new Map(allMat.map(t => [t.id, t])).values());
+                  })()}
                   progOf={(id) => prog[id] || FRESH()}
                   onSelectTrack={onTrack}
                />
@@ -358,7 +363,8 @@ export function KidHomeScreen({
                  <p className="text-sm font-bold text-slate-500 mt-1">Explore novos conhecimentos!</p>
                </div>
                {SUBJECTS.filter(s => s.id !== 'mat').map(subj => {
-                 const tks = subj.tracks[kid.grade];
+                 const allTks = ["pre", "ano1", "ano2"].flatMap(g => subj.tracks[g as "pre" | "ano1" | "ano2"] || []);
+                 const tks = Array.from(new Map(allTks.map(t => [t.id, t])).values());
                  if (!tks || tks.length === 0) return null;
                  return (
                    <div key={subj.id} className="mb-8">
@@ -465,7 +471,8 @@ export function KidHomeScreen({
             
             {/* As aventuras, organizadas por matéria (SUBJECTS = cartuchos do console) */}
             {SUBJECTS.map((subject) => {
-              const subjectTracks = ["pre", "ano1", "ano2"].flatMap(g => subject.tracks[g as "pre" | "ano1" | "ano2"] || []);
+              const allSubjectTracks = ["pre", "ano1", "ano2"].flatMap(g => subject.tracks[g as "pre" | "ano1" | "ano2"] || []);
+              const subjectTracks = Array.from(new Map(allSubjectTracks.map(t => [t.id, t])).values());
               if (!subjectTracks.length) return null;
               return (
                 <div key={subject.id} className="mb-6">
