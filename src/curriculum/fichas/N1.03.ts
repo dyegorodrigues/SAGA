@@ -16,7 +16,7 @@ export const N1_03: FichaCompetencia = {
         n_min: 1, 
         n_max: 3,
         flash_ms: 1500, // Pisca e esconde após 1.5s
-        audio_prompt: "Rápido! Quantos têm aqui?" 
+        audio_prompt: "Rápido! Quantos têm aqui?", tutorial: [{ say: "Preste atenção, eles vão sumir rapidinho!" }] 
       },
       dominio: { acertos: 4, de: 5, sessoes: 2 }
     }

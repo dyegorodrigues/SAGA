@@ -1,7 +1,7 @@
 // schema.ts
 // Definindo o contrato estrito para o Motor de Fichas (Substituindo os generators.ts hardcoded)
 
-export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens";
+export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis";
 
 export interface FichaParams {
   [key: string]: any;

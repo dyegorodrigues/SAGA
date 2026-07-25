@@ -16,7 +16,7 @@ export const N1_07: FichaCompetencia = {
         start: 1, 
         end: 10,
         jump_size: 1,
-        audio_prompt: "Dê um pulo para frente. Onde fomos parar?" 
+        audio_prompt: "O sapinho está no número! Qual número vem DEPOIS?", tutorial: [{say: "Arraste o sapinho UM número para frente!"}] 
       },
       dominio: { acertos: 4, de: 5, sessoes: 2 }
     }

@@ -15,7 +15,7 @@ export const N2_01: FichaCompetencia = {
       params: { 
         dezenas_max: 5,
         unidades_max: 9,
-        audio_prompt: "Quantos blocos temos aqui no total?" 
+        audio_prompt: "Quantos blocos temos aqui no total?", tutorial: [{say: "Lembre-se que cada barra grande vale 10!"}] 
       },
       dominio: { acertos: 4, de: 5, sessoes: 2 }
     }

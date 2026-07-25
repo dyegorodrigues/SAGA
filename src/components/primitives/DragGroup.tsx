@@ -29,6 +29,17 @@ export function DragGroup({
   const [itemsLeft, setItemsLeft] = useState(actualSourceCount);
   const [boxes, setBoxes] = useState<number[]>(Array(actualDestCount).fill(0));
   const [isAnswered, setIsAnswered] = useState(false);
+
+  const [showTutorial, setShowTutorial] = useState(false);
+  useEffect(() => {
+    // Only show once per page load for this component
+    if (!window.localStorage.getItem('seen-draggroup-tut')) {
+      setShowTutorial(true);
+      window.localStorage.setItem('seen-draggroup-tut', '1');
+      setTimeout(() => setShowTutorial(false), 4500);
+    }
+  }, []);
+
   
   const reset = () => {
     setItemsLeft(actualSourceCount);
@@ -82,7 +93,15 @@ export function DragGroup({
   }, [itemsLeft, boxes, disabled, onAnswer, actualDestCount, q, isAnswered]);
   
   return (
-    <div className={`w-full flex flex-col items-center gap-6 mt-4 select-none ${tokens.estado[state]}`}>
+            <div className={`w-full flex flex-col items-center gap-6 mt-4 select-none ${tokens.estado[state]} relative`}>
+      {showTutorial && (
+        <div className="absolute top-[-70px] left-0 right-0 z-50 pointer-events-none flex justify-center">
+          <div className="bg-indigo-50 p-4 rounded-2xl shadow-xl border-4 border-indigo-400 flex flex-col items-center max-w-[320px]">
+             <span className="text-xl mb-2 text-center font-black text-indigo-700 leading-tight">Dê uma comidinha para cada bichinho!</span>
+             <div className="flex gap-2 text-3xl animate-bounce">👇👇👇</div>
+          </div>
+        </div>
+      )}
       <div 
         className="flex flex-wrap gap-2 justify-center min-h-[60px] p-4 w-full border-dashed"
         style={{

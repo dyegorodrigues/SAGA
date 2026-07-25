@@ -15,7 +15,7 @@ export const N1_10: FichaCompetencia = {
       params: { 
         soma_max: 5,
         interactive: "whole",
-        audio_prompt: "Juntando essas duas partes, qual é o total?" 
+        audio_prompt: "Juntando as duas partes, qual é o total?", tutorial: [{say: "Esses dois números menores se juntam para formar o número grande em cima!"}] 
       },
       dominio: { acertos: 4, de: 5, sessoes: 2 }
     },
@@ -26,7 +26,7 @@ export const N1_10: FichaCompetencia = {
       params: { 
         soma_max: 7,
         interactive: "part",
-        audio_prompt: "Nós temos o total. Que parte está faltando?" 
+        audio_prompt: "Nós temos o total. Que parte está faltando?", tutorial: [{say: "Qual número junta com essa parte para dar o total lá de cima?"}] 
       }
     }
   ],

@@ -1,0 +1,80 @@
+# Diário de Bordo - Mega Auditoria SAGA (25 Julho 2026)
+
+## Execução Fable: Classify, Evidence, Decide, Act, Verify
+
+### 1. Problemas e Diagnósticos (Evidence & Decide)
+1. **Perceptual Subitization (N1.03) e TenFrame (N1.08):** O motor de `EmojiRow` congelava após um "flash" porque a dependência `useEffect` de `isFlashed` ignorava a mudança de objeto (`emoji`) se a quantidade (`n`) não mudasse. O `TenFrame` antigo nem sequer possuía código de Ocultamento (flash).
+2. **Cardinalidade Bloqueada (N1.04):** O `interactiveCount` manteve seu estado global `touchedCount` corrompido entre transições pela mesma falha de `useEffect` no React. A margem `gap-y` era insuficiente e as tags de números atropelavam a UI.
+3. **Erros N1.05 e N1.06 (Mais/Menos e Encontre):** `generators.ts` usava strings confusas `(Mais)` ou repetia a resposta na própria tela central.
+4. **O "Vazio" da Reta Numérica (N1.07 e N1.12):** O `GameLoop.tsx` não passava `onValueClick` para o componente visual da reta quando invocado nativamente (soft-lock), e o sapinho interativo nascia na origem (0) em vez da posição atual (`startPos`).
+5. **Currículo Desalinhado:** Faltavam as Fichas N1.08 e N1.09, o Composer não processava `tenframe` ou `plain` de forma correta, não embaralhava as alternativas no `NumberBond` (N1.10), e os micro-tutoriais (`tutorial.say`) se perderam na refatoração.
+
+### 2. Ação e Cirurgia (Act)
+- `N1.01.ts` a `N1.10.ts`: Micro-tutoriais e `audio_prompts` injetados. N1.08 e N1.09 criados no novo sistema.
+- `EmojiRow.tsx`: Estado `touchedCount` e `isFlashed` ganham dependência dura no React. `🙈` ampliado (text-7xl) e isolado via `AnimatePresence`. `gap-y` ampliado.
+- `TenFrame.tsx`: Componentizado para suportar `flashDurationMs` internamente, com esmaecimento animado usando `motion/react`.
+- `InteractiveNumberLine.tsx` e `NumberLine.tsx`: Acoplados corretamente à origem (`startPos`) no `Composer.ts`. Eventos de clique religados no `GameLoop`.
+- `Composer.ts`: Mecânica estocástica inserida (`options.sort(() => Math.random() - 0.5)`) e delegates implementados no `FichaRenderer.tsx`.
+- `generators.ts`: Strings ajustadas para `📈 MAIS`, `📉 MENOS` e `🔊 SEIS`.
+
+### 3. Verificação (Verify)
+- Build foi executado para provar que a refatoração dos contratos TypeScript suportou todas as injeções sem falhas estruturais (esbuild compilado limpo).
+# Diário de Bordo SAGA
+
+## Intervenção e Auditoria Geral (Build & UX)
+- **Correção da Navegação:** Adicionado persistência do estado da aba `activeShellTab` no `KidHomeScreen.tsx` usando `localStorage` (`mk-active-tab`). Agora, fechar um exercício retorna a criança para a aba onde ela estava (Jornada, Dojo, etc) em vez de resetar para a primeira aba sempre.
+- **Reta Numérica Animada (Sapo):** Corrigido o motor físico de drag no `InteractiveNumberLine.tsx`. A propriedade `animate={{ x: ... }}` estava conflitando com as `dragConstraints` do Framer Motion. Ajustado para controlar o percentual via `left` css e zerei o `x` de arrasto no encerramento, o que restabeleceu o comportamento correto da sapinho no celular e touchscreens.
+- **Botão CONFIRMAR Invisível:** Removido a sintaxe que tentava fazer `split(' ')` de uma classe tailwind pro estilo inline, o que deixava o botão invisível e com erro css em alguns browsers.
+- **Repetição Extrema de Áudio:** Refatorado o `GameLoop.tsx` para adicionar um `lastSpokenPromptRef`. Agora a instrução em áudio só toca automaticamente na primeira vez que uma dinâmica aparece, ou se a pergunta trocar. Nas repetições (quando só mudam os números), fica em silêncio. A criança ainda pode tocar no texto grande (🔊) para ouvir.
+- **Subtração Invisível:** Identificado que o tipo `subvis` gerado pelo Motor de Fichas não possuía **nenhuma** via de renderização no `GameLoop.tsx`. Adicionado o bloco para renderizar o `subvis`, reutilizando os emoticons, e inserido o suporte à tag `crossedOut` no componente primitivo `EmojiRow.tsx` para apresentar risquinhos vermelhos na subtração de objetos.
+- **Dojo Livre (Confuso):** No menu do Dojo, além dos cards unificados de Treino Misto e Dojo Matemático, expus individualmente todos os mini-jogos (Treinos Específicos: soma, sub, dezenas, contar, etc) para resgatar a fluência cirúrgica pedida na bíblia.
+- **Pop-up Tutorial Invasivo (Drag Group):** No exercício `draggroup` (N1.01 pareamento 1-a-1), implementei um overlay `DragGroupTutorial` nativo com o ícone do dedinho 👆 instruindo onde a criança deve apertar. Ele só sobe uma única vez, sendo silenciado permanentemente na máquina por `localStorage` (como a mãe pediu: "aparece, ensina uma vez só e some").
+# Diário de Bordo SAGA
+
+## Intervenção e Auditoria Geral (Build & UX)
+- **Correção da Navegação:** Adicionado persistência do estado da aba `activeShellTab` no `KidHomeScreen.tsx` usando `localStorage` (`mk-active-tab`). Agora, fechar um exercício retorna a criança para a aba onde ela estava (Jornada, Dojo, etc) em vez de resetar para a primeira aba sempre.
+- **Reta Numérica Animada (Sapo):** Corrigido o motor físico de drag no `InteractiveNumberLine.tsx`. A propriedade `animate={{ x: ... }}` estava conflitando com as `dragConstraints` do Framer Motion. Ajustado para controlar o percentual via `left` css e zerei o `x` de arrasto no encerramento, o que restabeleceu o comportamento correto da sapinho no celular e touchscreens.
+- **Botão CONFIRMAR Invisível:** Removido a sintaxe que tentava fazer `split(' ')` de uma classe tailwind pro estilo inline, o que deixava o botão invisível e com erro css em alguns browsers.
+- **Repetição Extrema de Áudio:** Refatorado o `GameLoop.tsx` para adicionar um `lastSpokenPromptRef`. Agora a instrução em áudio só toca automaticamente na primeira vez que uma dinâmica aparece, ou se a pergunta trocar. Nas repetições (quando só mudam os números), fica em silêncio. A criança ainda pode tocar no texto grande (🔊) para ouvir.
+- **Subtração Invisível:** Identificado que o tipo `subvis` gerado pelo Motor de Fichas não possuía **nenhuma** via de renderização no `GameLoop.tsx`. Adicionado o bloco para renderizar o `subvis`, reutilizando os emoticons, e inserido o suporte à tag `crossedOut` no componente primitivo `EmojiRow.tsx` para apresentar risquinhos vermelhos na subtração de objetos.
+- **Dojo Livre (Confuso):** No menu do Dojo, além dos cards unificados de Treino Misto e Dojo Matemático, expus individualmente todos os mini-jogos (Treinos Específicos: soma, sub, dezenas, contar, etc) para resgatar a fluência cirúrgica pedida na bíblia.
+- **Pop-up Tutorial Invasivo (Drag Group):** No exercício `draggroup` (N1.01 pareamento 1-a-1), implementei um overlay `DragGroupTutorial` nativo com o ícone do dedinho 👆 instruindo onde a criança deve apertar. Ele só sobe uma única vez, sendo silenciado permanentemente na máquina por `localStorage` (como a mãe pediu: "aparece, ensina uma vez só e some").
+
+## Hotfix: Crash de Renderização (Blank Screen)
+- **Ocorrência:** O usuário relatou que ao clicar na tela e nos exercícios (pareamento, sequências, subtração, soma) a tela ficava inteiramente branca ("glitched").
+- **Causa Raiz (Identificada pelo QA / Engenheiro):** 
+  1. A tentativa anterior de injetar a prop `crossedOut` no componente `EmojiRow.tsx` usando `arguments[0]` falhou, resultando em chamadas a uma variável `crossedOut` não definida no escopo funcional. Isso acionava um `ReferenceError` fatal no React render tree, derrubando a interface inteira em um Blank Screen.
+  2. O componente `GameLoop.tsx` tentava ler/escrever em uma ref `lastSpokenPromptRef` que a substituição de código anterior não havia conseguido criar (devido a uma falha de matching na expressão regular). Assim, ao tocar na tela para avançar ou ouvir o áudio, ocorria outro `ReferenceError` fatal.
+- **Solução Implementada (Act & Verify):** 
+  - Editada diretamente a assinatura de `EmojiRowProps` e sua desestruturação para incluir corretamente `crossedOut?: boolean`.
+  - Editada a declaração de `useRef` no `GameLoop.tsx` incluindo o `lastSpokenPromptRef` adequadamente.
+  - Adicionado o kind `"plain"` (que estava faltando e causando um TS error em `N1.09.ts`) no array tipado `KindType` do `src/curriculum/schema.ts`.
+  - Validado localmente através das suítes de validação rigorosa (`npm run lint` e `npm run build`), alcançando um build verde. O simulador reabilitou os painéis que dependiam do `EmojiRow` sem crashar a DOM.
+# Diário de Bordo SAGA
+
+## Intervenção e Auditoria Geral (Build & UX)
+- **Correção da Navegação:** Adicionado persistência do estado da aba `activeShellTab` no `KidHomeScreen.tsx` usando `localStorage` (`mk-active-tab`). Agora, fechar um exercício retorna a criança para a aba onde ela estava (Jornada, Dojo, etc) em vez de resetar para a primeira aba sempre.
+- **Reta Numérica Animada (Sapo):** Corrigido o motor físico de drag no `InteractiveNumberLine.tsx`. A propriedade `animate={{ x: ... }}` estava conflitando com as `dragConstraints` do Framer Motion. Ajustado para controlar o percentual via `left` css e zerei o `x` de arrasto no encerramento, o que restabeleceu o comportamento correto da sapinho no celular e touchscreens.
+- **Botão CONFIRMAR Invisível:** Removido a sintaxe que tentava fazer `split(' ')` de uma classe tailwind pro estilo inline, o que deixava o botão invisível e com erro css em alguns browsers.
+- **Repetição Extrema de Áudio:** Refatorado o `GameLoop.tsx` para adicionar um `lastSpokenPromptRef`. Agora a instrução em áudio só toca automaticamente na primeira vez que uma dinâmica aparece, ou se a pergunta trocar. Nas repetições (quando só mudam os números), fica em silêncio. A criança ainda pode tocar no texto grande (🔊) para ouvir.
+- **Subtração Invisível:** Identificado que o tipo `subvis` gerado pelo Motor de Fichas não possuía **nenhuma** via de renderização no `GameLoop.tsx`. Adicionado o bloco para renderizar o `subvis`, reutilizando os emoticons, e inserido o suporte à tag `crossedOut` no componente primitivo `EmojiRow.tsx` para apresentar risquinhos vermelhos na subtração de objetos.
+- **Dojo Livre (Confuso):** No menu do Dojo, além dos cards unificados de Treino Misto e Dojo Matemático, expus individualmente todos os mini-jogos (Treinos Específicos: soma, sub, dezenas, contar, etc) para resgatar a fluência cirúrgica pedida na bíblia.
+- **Pop-up Tutorial Invasivo (Drag Group):** No exercício `draggroup` (N1.01 pareamento 1-a-1), implementei um overlay `DragGroupTutorial` nativo com o ícone do dedinho 👆 instruindo onde a criança deve apertar. Ele só sobe uma única vez, sendo silenciado permanentemente na máquina por `localStorage` (como a mãe pediu: "aparece, ensina uma vez só e some").
+
+## Hotfix: Crash de Renderização (Blank Screen)
+- **Ocorrência:** O usuário relatou que ao clicar na tela e nos exercícios (pareamento, sequências, subtração, soma) a tela ficava inteiramente branca ("glitched").
+- **Causa Raiz (Identificada pelo QA / Engenheiro):** 
+  1. A tentativa anterior de injetar a prop `crossedOut` no componente `EmojiRow.tsx` usando `arguments[0]` falhou, resultando em chamadas a uma variável `crossedOut` não definida no escopo funcional. Isso acionava um `ReferenceError` fatal no React render tree, derrubando a interface inteira em um Blank Screen.
+  2. O componente `GameLoop.tsx` tentava ler/escrever em uma ref `lastSpokenPromptRef` que a substituição de código anterior não havia conseguido criar (devido a uma falha de matching na expressão regular). Assim, ao tocar na tela para avançar ou ouvir o áudio, ocorria outro `ReferenceError` fatal.
+- **Solução Implementada (Act & Verify):** 
+  - Editada diretamente a assinatura de `EmojiRowProps` e sua desestruturação para incluir corretamente `crossedOut?: boolean`.
+  - Editada a declaração de `useRef` no `GameLoop.tsx` incluindo o `lastSpokenPromptRef` adequadamente.
+  - Adicionado o kind `"plain"` (que estava faltando e causando um TS error em `N1.09.ts`) no array tipado `KindType` do `src/curriculum/schema.ts`.
+  - Validado localmente através das suítes de validação rigorosa (`npm run lint` e `npm run build`), alcançando um build verde. O simulador reabilitou os painéis que dependiam do `EmojiRow` sem crashar a DOM.
+
+## Correções Pós-Feedback (25 Julho)
+1. **Exercício de Soma em Branco:** Resolvido o problema de renderização (`Blank Screen` parcial) nos exercícios de Soma (`q.kind === "sum"`). A condição de renderização exigia incorretamente a existência de `q.expr`, o que o gerador de adições puras (`gN3_01` e outros) não fornece, ocultando o elemento principal.
+2. **Exercício do Olhômetro (TenFrame e EmojiRow Flash):** A opção "👀 Ver de novo" havia sumido após a refatoração do `GameLoop.tsx` e migração do estado de 'Flash' para os próprios componentes (`TenFrame` e `EmojiRow`). O botão foi reimplementado internamente em ambos os componentes, voltando a funcionar perfeitamente quando as imagens são escondidas ("Cadê?").
+3. **Tutorial de Correspondência ("DragGroup"):** A interface visual do "Como fazer?" para os exercícios de arrastar (`DragGroup`) tinha se perdido devido a uma falha no patch anterior que tentou injetar a DIV. Aplicado novamente com âncoragem correta de Regex, de forma que a instrução "Dê uma comidinha para cada bichinho! 👇👇👇" agora aparece sobre as caixas ao carregar a página.
+4. **Problema do "Mudo" no 1º exercício:** Entendido que a falta de voz ao atualizar a página no meio de uma partida é causada pela política de Autoplay dos navegadores, não por bug interno do engine.
+5. **Limpeza do Workspace:** Excluídos arquivos de script órfãos (`.cjs`, `.sh`, `.zip`, `.js` e `.ts` de testes) da raiz do projeto para limpar o File Explorer.

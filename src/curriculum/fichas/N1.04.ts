@@ -16,7 +16,7 @@ export const N1_04: FichaCompetencia = {
         n_min: 3, 
         n_max: 5,
         interactive_count: true,
-        audio_prompt: "Toque em um de cada vez e conte comigo!" 
+        audio_prompt: "Conte os bichinhos comigo!", tutorial: [{ say: "Toque em cada bichinho, um por um, para contar!" }] 
       },
       dominio: { acertos: 3, de: 3, sessoes: 2 }
     },

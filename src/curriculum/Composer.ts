@@ -49,6 +49,7 @@ export class Composer {
           options.push({ label: String(target), value: target });
           if(wrong1 >= min && wrong1 <= max && wrong1 !== target) options.push({ label: String(wrong1), value: wrong1 });
           if(wrong2 >= min && wrong2 <= max && wrong2 !== target && wrong2 !== wrong1) options.push({ label: String(wrong2), value: wrong2 });
+          options.sort(() => Math.random() - 0.5);
         } else {
           evaluate = (ans) => true; answer = target; options = [{ label: "Continuar 👍", value: target }];
         }
@@ -66,7 +67,7 @@ export class Composer {
           start,
           end,
           interactive: true,
-          showJumps: [{from: current, to: next}]
+          startPos: current, showJumps: [{from: current, to: next}]
         };
         evaluate = (ans) => ans === next;
         answer = next;

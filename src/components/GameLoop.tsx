@@ -165,6 +165,7 @@ export function GameLoop({
   const [replays, setReplays] = useState(0);
   // Fluidez: guarda a transição pendente para a criança PULAR com um toque
   const advanceRef = useRef<null | (() => void)>(null);
+  const lastSpokenPromptRef = useRef<string | null>(null);
 
   // Pula na hora: corta a voz e vai para a próxima (criança no comando do ritmo)
   const advanceNow = () => {
@@ -310,7 +311,7 @@ export function GameLoop({
       aulaEndRef.current = () => {
         // só fala o enunciado se ainda estamos na MESMA questão, sem resposta dada
         if (sound && qRef.current === q0 && !advanceRef.current) {
-          setTimeout(() => speak(qSpeech(q0, true), q0.lang ? { lang: q0.lang } : {}), 350);
+          setTimeout(() => { speak(qSpeech(q0, true), q0.lang ? { lang: q0.lang } : {}); lastSpokenPromptRef.current = q0.kind + "|" + q0.prompt; }, 350);
         }
       };
       playAulinha(true);
@@ -370,7 +371,11 @@ export function GameLoop({
     // e o enunciado é falado ao fim dela (ver efeito da aulinha)
     if (sound && !done && !status && q.kind !== "journey" && !autoAula) {
       // "como fazer" só na 1ª questão da missão; depois vai direto ao enunciado
-      speak(qSpeech(q, idx === 0), q.lang ? { lang: q.lang } : {});
+      const speechId = q.kind + "|" + q.prompt;
+      if (lastSpokenPromptRef.current !== speechId) {
+        lastSpokenPromptRef.current = speechId;
+        speak(qSpeech(q, idx === 0), q.lang ? { lang: q.lang } : {});
+      }
     }
   }, [q, done, autoAula]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -907,14 +912,25 @@ export function GameLoop({
               <EmojiRow emoji={q.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />                                        
             </div>
           )}
-          {q.kind === "sum" && q.expr && (
+          {q.kind === "subvis" && (
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex flex-wrap justify-center gap-2">
+                {q.emoji && <EmojiRow emoji={q.emoji} n={(q.a || 0) - (q.b || 0)} startIndex={1} highlightIndex={guidedIdx !== null && guidedIdx < ((q.a || 0) - (q.b || 0)) ? guidedIdx : null} />}
+                {q.emoji && <EmojiRow emoji={q.emoji} n={q.b || 0} startIndex={(q.a || 0) - (q.b || 0) + 1} crossedOut={true} highlightIndex={guidedIdx !== null && guidedIdx >= ((q.a || 0) - (q.b || 0)) ? guidedIdx - ((q.a || 0) - (q.b || 0)) : null} />}
+              </div>
+              <div className="mt-2">
+                {q.expr && <BigText size={34}>{q.expr}</BigText>}
+              </div>
+            </div>
+          )}
+          {q.kind === "sum" && (
             <div className="flex flex-col items-center gap-2">
               <div className="flex flex-wrap justify-center gap-2">
                 {q.emoji && <EmojiRow emoji={q.emoji} n={q.a || 0} startIndex={1} highlightIndex={guidedIdx !== null && guidedIdx < (q.a || 0) ? guidedIdx : null} />}
                 {q.emoji && <EmojiRow emoji={q.emoji} n={q.b || 0} startIndex={(q.a || 0) + 1} highlightIndex={guidedIdx !== null && guidedIdx >= (q.a || 0) ? guidedIdx - (q.a || 0) : null} state="acerto" />}
               </div>
               <div className="mt-2">
-                <BigText size={34}>{q.expr}</BigText>
+                {q.expr && <BigText size={34}>{q.expr}</BigText>}
               </div>
             </div>
           )}
@@ -1083,12 +1099,12 @@ export function GameLoop({
             <NumberBond whole={q.a} part={q.b} missingWhole={q.big === "topo"} />
           )}
 
-          {q.kind === "numberline" && <NumberLine min={q.nlStart} max={q.nlEnd} targetValue={q.nlTarget} currentValue={typeof tutShow === "number" ? tutShow : null} />}
+          {q.kind === "numberline" && <NumberLine min={q.nlStart} max={q.nlEnd} targetValue={q.nlTarget} currentValue={typeof tutShow === "number" ? tutShow : (q.nlStartPos ?? null)} onValueClick={status === null ? handlePick : undefined} />}
           {q.kind === "numberline-interactive" && <InteractiveNumberLine q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "drag-group" && <DragGroup q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "tenframe" && q.n != null && (
-            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} />
+            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} flashDurationMs={q.uiProps?.flashDurationMs} state={status === "right" ? "acerto" : status === "wrong" ? "erro-suave" : "ocioso"} />
           )}
 
           {q.kind === "flash" && q.emoji && q.n != null && (

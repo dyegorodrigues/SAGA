@@ -77,7 +77,8 @@ export function KidHomeScreen({
   }, [tracks, prog]);
 
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
-  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "escola" | "dojo" | "oficina" | "perfil">("jornada");
+  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "escola" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "jornada") as any);
+  React.useEffect(() => { window.localStorage.setItem("mk-active-tab", activeShellTab); }, [activeShellTab]);
   const [pickerTrack, setPickerTrack] = useState<Track | null>(null);
 
   
@@ -458,6 +459,20 @@ export function KidHomeScreen({
                 </div>
               </button>
             </div>
+
+            {/* Treinos Específicos */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <span className="text-xl">🎯</span>
+                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                  Treinos Específicos
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3.5">
+                {tracks.filter(t => ["soma", "sub", "dezenas", "canto", "contar", "vizinhos", "moldura"].includes(t.id)).map(renderTrackCard)}
+              </div>
+            </div>
+
           </div>
         )}
 

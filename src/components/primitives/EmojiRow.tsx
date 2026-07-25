@@ -17,6 +17,7 @@ export interface EmojiRowProps {
   // Touch Count Mode (N1.04)
   interactiveCount?: boolean;
   disabled?: boolean;
+  crossedOut?: boolean;
   onItemTouch?: (count: number) => void;
 }
 
@@ -30,7 +31,8 @@ export function EmojiRow({
   flashDurationMs,
   interactiveCount,
   onItemTouch,
-  disabled
+  disabled,
+  crossedOut
 }: EmojiRowProps) {
   
   const [isFlashed, setIsFlashed] = useState(false);
@@ -45,14 +47,12 @@ export function EmojiRow({
       }, flashDurationMs);
       return () => clearTimeout(timer);
     }
-  }, [flashDurationMs, n]);
+  }, [flashDurationMs, n, emoji]);
 
-  // Reset touch count when n changes
+  // Reset touch count
   useEffect(() => {
-    if (interactiveCount) {
-      setTouchedCount(0);
-    }
-  }, [n, interactiveCount]);
+    setTouchedCount(0);
+  }, [n, interactiveCount, emoji]);
 
   const handleTouch = (idx: number) => {
     if (!interactiveCount || disabled) return;
@@ -67,7 +67,7 @@ export function EmojiRow({
 
   return (
     <div 
-      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-12 relative py-6 ${tokens.estado[state]}`} 
+      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-16 relative py-6 ${tokens.estado[state]}`} 
       style={{ maxWidth: small ? 150 : "100%", minHeight: '80px' }}
     >
       <AnimatePresence mode="popLayout">
@@ -129,6 +129,7 @@ export function EmojiRow({
                   </span>
                 )}
                 {emoji}
+              {crossedOut && <div className="absolute inset-0 flex items-center justify-center"><div className="w-full h-1 bg-red-500 -rotate-45 shadow-sm" /></div>}
               </motion.span>
             );
           })
@@ -137,13 +138,25 @@ export function EmojiRow({
             key="hidden-box"
             initial={{ scale: 0.5, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center justify-center p-4 rounded-xl shadow-md"
+            className="flex flex-col items-center justify-center p-4 rounded-xl shadow-md gap-2"
             style={{ backgroundColor: tokens.cor.elementos.preenchimento, border: `3px solid ${tokens.cor.elementos.borda}` }}
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="text-5xl">🙈</span>
-              <span className="text-sm font-bold" style={{ color: tokens.cor.texto.secundario }}>Onde foram?</span>
+              <span className="text-7xl">🙈</span>
+              <span className="text-xl font-bold" style={{ color: tokens.cor.texto.secundario }}>Cadê?</span>
             </div>
+            {!disabled && (
+              <button
+                onClick={() => {
+                  setIsFlashed(false);
+                  setTimeout(() => setIsFlashed(true), 1200);
+                }}
+                className="mt-2 select-none cursor-pointer active:translate-y-0.5 transition-all"
+                style={{ fontFamily: 'inherit', fontWeight: 800, fontSize: 13, color: tokens.cor.elementos.marcador, background: "#F1EDFF", border: `2px solid ${tokens.cor.elementos.marcador}`, borderRadius: 12, padding: "6px 14px" }}
+              >
+                👀 Ver de novo
+              </button>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

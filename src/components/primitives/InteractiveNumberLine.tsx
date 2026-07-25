@@ -3,17 +3,18 @@ import { motion } from 'motion/react';
 import { Question } from '../../types';
 import { tokens, UIState } from '../../styles/tokens';
 
-export function InteractiveNumberLine({ q, onAnswer, disabled, state = 'ocioso' }: { q: Question; onAnswer: (val: any) => void; disabled: boolean; state?: UIState }) {
-  const start = q.nlStart ?? 0;
-  const end = q.nlEnd ?? 10;
+export function InteractiveNumberLine({ q, start: _start, end: _end, startPos: _startPos, emoji: _emoji, onAnswer, disabled, state = 'ocioso' }: { q?: any; start?: number; end?: number; startPos?: number; emoji?: string; onAnswer: (val: any) => void; disabled: boolean; state?: UIState }) {
+  const start = _start ?? q?.nlStart ?? 0;
+  const end = _end ?? q?.nlEnd ?? 10;
   const length = end - start;
   const stepWidth = 100 / (length || 1);
 
-  const [pos, setPos] = useState((q.nlStartPos !== undefined ? q.nlStartPos - start : 0));
+  const sp = _startPos ?? q?.nlStartPos;
+  const [pos, setPos] = useState((sp !== undefined ? sp - start : 0));
   
   useEffect(() => {
-    setPos(q.nlStartPos !== undefined ? q.nlStartPos - start : 0);
-  }, [q, start]);
+    setPos(sp !== undefined ? sp - start : 0);
+  }, [q, start, sp]);
   
   const lineRef = useRef<HTMLDivElement>(null);
   
@@ -70,15 +71,15 @@ export function InteractiveNumberLine({ q, onAnswer, disabled, state = 'ocioso' 
           dragElastic={0}
           dragMomentum={false}
           onDragEnd={handleDragEnd}
-          animate={{ x: `${pos * stepWidth}%` }}
+          animate={{ left: `${pos * stepWidth}%`, x: 0 }}
           className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full shadow-lg cursor-grab active:cursor-grabbing flex items-center justify-center text-white font-bold"
           style={{
-            left: 0,
+            
             backgroundColor: tokens.cor.elementos.base_A,
             zIndex: 10
           }}
         >
-          {q.emoji || "🐸"}
+          {_emoji ?? q?.emoji ?? "🐸"}
         </motion.div>
       </div>
 
@@ -88,7 +89,7 @@ export function InteractiveNumberLine({ q, onAnswer, disabled, state = 'ocioso' 
             onClick={() => onAnswer(start + pos)}
             className={`px-8 py-3 rounded-full text-xl font-black shadow-md hover:scale-105 active:scale-95 transition-all ${tokens.cor.acao.primaria}`}
             style={{ 
-              backgroundColor: tokens.cor.acao.primaria.split(' ')[0], // fallback handling
+              
               color: 'white'
             }}
             // Note: We use the inline utility classes directly for action buttons, but since we are extracting primitives,

@@ -50,6 +50,10 @@ export function FichaRenderer({ question, onAnswer, disabled }: FichaRendererPro
       
     case 'draggroup':
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
+    case 'tenframe':
+      return <div className="flex justify-center"><TenFrame {...uiProps} /></div>;
+    case 'plain':
+      return <div className="flex justify-center text-4xl font-black text-slate-800 py-8">{uiProps.text}</div>;
       
     default:
       return <div className="p-4 border border-rose-300 text-rose-500 rounded text-center font-bold">Ficha não implementada: {kind}</div>;

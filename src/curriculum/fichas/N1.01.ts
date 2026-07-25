@@ -16,7 +16,7 @@ export const N1_01: FichaCompetencia = {
       params: { 
         n_min: 3, 
         n_max: 5,
-        audio_prompt: "Dê um para cada!", tutorial: [{ say: "Toque para entregar uma comidinha para cada um!" }] 
+        audio_prompt: "Dê uma comidinha para cada bichinho!", tutorial: [{ say: "Toque nas caixinhas para colocar uma comidinha em cada!" }] 
       },
       dominio: { acertos: 3, de: 3, sessoes: 1 }
     },
@@ -27,7 +27,7 @@ export const N1_01: FichaCompetencia = {
       params: { 
         n_min: 5, 
         n_max: 7,
-        audio_prompt: "Será que tem o suficiente para todos?", tutorial: [{ say: "Lembre-se: é apenas UM para cada um!" }],
+        audio_prompt: "Entregue uma comidinha para cada. Será que vai sobrar?", tutorial: [{ say: "Lembre-se de colocar só UMA comidinha em cada bichinho!" }],
         tem_sobra: true 
       }
     }

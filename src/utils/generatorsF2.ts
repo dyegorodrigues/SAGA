@@ -50,27 +50,27 @@ export const gN3_11 = (lvl: number): Question => {
   const options: Option[] = [];
   
   // Resposta certa
-  options.push({ value: sum.toString() });
+  options.push({ label: sum.toString(), value: sum.toString() });
   opts.add(sum.toString());
   
   // Misconception 1: Esqueceu o vai um (ex: 27+15 = 32 em vez de 42)
   const esqueceuVaiUm = (d1 + d2) * 10 + (u1 + u2 - 10);
   if (!opts.has(esqueceuVaiUm.toString())) {
-    options.push({ value: esqueceuVaiUm.toString(), misconception: MisconceptionTag.ESQUECEU_VAI_UM });
+    options.push({ label: esqueceuVaiUm.toString(), value: esqueceuVaiUm.toString(), misconception: MisconceptionTag.ESQUECEU_VAI_UM });
     opts.add(esqueceuVaiUm.toString());
   }
   
   // Misconception 2: Concatenou tudo em vez de reagrupar (ex: 27+15 = 312)
   const concatenou = parseInt(`${d1+d2}${u1+u2}`);
   if (!opts.has(concatenou.toString())) {
-    options.push({ value: concatenou.toString(), misconception: MisconceptionTag.CONCATENOU_DIGITOS });
+    options.push({ label: concatenou.toString(), value: concatenou.toString(), misconception: MisconceptionTag.CONCATENOU_DIGITOS });
     opts.add(concatenou.toString());
   }
   
   // Misconception 3: Off-by-one (um a mais ou a menos no cálculo mental das unidades)
   const offByOne = sum + pick([-1, 1]);
   if (!opts.has(offByOne.toString())) {
-    options.push({ value: offByOne.toString(), misconception: MisconceptionTag.OFF_BY_ONE });
+    options.push({ label: offByOne.toString(), value: offByOne.toString(), misconception: MisconceptionTag.OFF_BY_ONE });
     opts.add(offByOne.toString());
   }
   
@@ -78,7 +78,7 @@ export const gN3_11 = (lvl: number): Question => {
   while (options.length < 4) {
     const v = sum + pick([-10, 10, -2, 2, -3, 3]);
     if (v > 0 && !opts.has(v.toString())) {
-      options.push({ value: v.toString() });
+      options.push({ label: v.toString(), value: v.toString() });
       opts.add(v.toString());
     }
   }
@@ -110,14 +110,14 @@ export const gN3_12 = (lvl: number): Question => {
   const options: Option[] = [];
   
   // Right answer
-  options.push({ value: ans.toString() });
+  options.push({ label: ans.toString(), value: ans.toString() });
   opts.add(ans.toString());
   
   // Misconception 1: Inverteu a coluna (Sempre subtrai o menor do maior: 2-5 -> 5-2 = 3)
   const invU = u2 - u1;
   const invAns = (d1 - d2) * 10 + invU;
   if (!opts.has(invAns.toString())) {
-    options.push({ value: invAns.toString(), misconception: "inverte-coluna" });
+    options.push({ label: invAns.toString(), value: invAns.toString(), misconception: "inverte-coluna" });
     opts.add(invAns.toString());
   }
   
@@ -125,14 +125,14 @@ export const gN3_12 = (lvl: number): Question => {
   const esqueceuD = d1 * 10 + u1 - b + 10 - 10; // wait, if d1 is 4, 12-5=7, but 4-1=3 (forgets to decrement 4 to 3, so 37)
   const ansEsq = (d1 - d2) * 10 + (u1 + 10 - u2);
   if (!opts.has(ansEsq.toString())) {
-    options.push({ value: ansEsq.toString(), misconception: "esqueceu-desconto-dezena" });
+    options.push({ label: ansEsq.toString(), value: ansEsq.toString(), misconception: "esqueceu-desconto-dezena" });
     opts.add(ansEsq.toString());
   }
   
   // Misconception 3: Off-by-one (um a mais ou a menos)
   const offByOne = ans + pick([-1, 1]);
   if (!opts.has(offByOne.toString())) {
-    options.push({ value: offByOne.toString(), misconception: "off-by-one" });
+    options.push({ label: offByOne.toString(), value: offByOne.toString(), misconception: "off-by-one" });
     opts.add(offByOne.toString());
   }
   
@@ -140,7 +140,7 @@ export const gN3_12 = (lvl: number): Question => {
   while (options.length < 4) {
     const v = ans + pick([-10, 10, -2, 2, -3, 3]);
     if (v > 0 && !opts.has(v.toString())) {
-      options.push({ value: v.toString() });
+      options.push({ label: v.toString(), value: v.toString() });
       opts.add(v.toString());
     }
   }

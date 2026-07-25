@@ -309,7 +309,7 @@ export function gN2_03(lvl: number): Question {
     return {
       kind: "plain",
       prompt: `Toque no número ${maior ? "MAIOR" : "MENOR"}`,
-      big: null,
+      big: `${a} ou ${b}?`,
       options: shuffle([{ label: String(a), value: a }, { label: String(b), value: b }]),
       answer,
       explain: `Na contagem, o ${Math.min(a, b)} vem antes — então ${Math.max(a, b)} é o maior!`,
@@ -383,8 +383,10 @@ export function gN2_01(lvl: number): Question {
   if (lvl === 3) {
     const t = ri(1, 4), u = ri(0, 9);
     return {
+      tutorial: [{ say: "Lembre-se que cada barra grande vale 10!" }],
       kind: "tens",
-      prompt: "Quantos cubinhos temos ao todo no Material Dourado?",
+      prompt: "Quantos blocos temos aqui no total?",
+      audioPrompt: "Quantos blocos temos aqui no total?",
       t,
       u,
       options: numOpts(t * 10 + u, 4, 10, 59),
@@ -803,7 +805,7 @@ export function gN1_05(lvl: number): Question {
     return {
       tutorial: undefined,
       kind: "plain",
-      big: wantsMais ? "MAIS" : "MENOS",
+      big: wantsMais ? "📈 MAIS" : "📉 MENOS",
       prompt: wantsMais ? `Escolha o número MAIOR` : `Escolha o número MENOR`,
       options: [
         { label: `${n1}`, value: n1 },
@@ -837,31 +839,18 @@ export function gN1_07(lvl: number): Question {
   return Composer.generate(N1_07, "a");
 }
 
+import { N1_08 } from "../curriculum/fichas/N1.08";
+import { N1_09 } from "../curriculum/fichas/N1.09";
 export function gN1_09(lvl: number): Question {
-  const s = ri(3, 8);
-  const ans = s + 3;
-  return {
-    tutorial: lvl === 1 ? [{say: "Continue contando de onde parou."}] : undefined,
-    kind: lvl <= 2 ? "plain" : "numberline",
-    nlStart: Math.max(1, s - 1),
-    nlEnd: s + 5,
-    nlStartPos: s,
-    prompt: `Não volte pro um! Continue contando:`,
-    big: `${s}, ${s + 1}, ${s + 2}, ... ?`,
-    options: numOpts(ans, 3, Math.max(1, s), s + 5),
-    answer: ans,
-    howto: "Conte para a frente sem voltar ao um.",
-    audioPrompt: "Continue contando!",
-    explain: "Comece a contar direto do número onde paramos, dando os passos seguintes.",
-  };
+  return Composer.generate(N1_09, "a");
 }
-
 export function gN1_08(lvl: number): Question {
   const n = ri(5, 10);
   return {
     tutorial: lvl === 1 ? [{ say: "Esta é a caixa mágica! Se a primeira linha estiver cheia, tem 5!" }] : undefined,
     excecaoCPA: "perceptual",
     kind: "tenframe",
+    uiProps: { flashDurationMs: 1500 },
     prompt: "A Caixa Mágica abriu e fechou! Quantos você viu?",
     emoji: pickEmo(),
     n,
@@ -888,7 +877,7 @@ export function gPreOnde(lvl: number): any {
   return { kind: "plain", big: "📦", prompt: "O gato está EM CIMA ou EMBAIXO da caixa?", options: [{label:"Em cima", value:"Em cima"}, {label:"Embaixo", value:"Embaixo"}], answer: "Em cima" };
 }
 export function gPreFormas(lvl: number): any {
-  return { kind: "shapes", prompt: "Qual é o círculo?", options: [{label:"🔴", shape:"circle", color:"red", value:"circle"}, {label:"🟥", shape:"square", color:"red", value:"square"}], answer: "circle" };
+  return { kind: "shapes", prompt: "Qual é o círculo?", options: [{label:"🔴", shape:"circ", color:"red", value:"circ"}, {label:"🟥", shape:"quad", color:"red", value:"quad"}], answer: "circ" };
 }
 export function gPreCalendario(lvl: number): any {
   return { kind: "daypart", big: "morning", prompt: "Qual parte do dia é agora?", options: [{label:"Manhã", value:"morning"}, {label:"Noite", value:"night"}], answer: "morning" };
