@@ -1,5 +1,5 @@
 import { Track } from "../types";
-import { TRACKS_PRE, TRACKS_ANO1, TRACKS_ANO2 } from "../utils/curriculum";
+import { TRACKS_PRE, TRACKS_ANO1, TRACKS_ANO2, TRACKS_IXL } from "../utils/curriculum";
 import { TRACKS_MAT_ELITE_PRE, TRACKS_MAT_ELITE_ANO1 } from "./matElite";
 import { TRACKS_LOGICA_ANO1 } from "./logica";
 import { TRACKS_PORT_PRE, TRACKS_PORT_ANO1 } from "./port";
@@ -32,7 +32,7 @@ export const SUBJECTS: Subject[] = [
     nome: "Matemática",
     icon: "🔢",
     tracks: {
-      pre: [...TRACKS_PRE, ...TRACKS_MAT_ELITE_PRE],
+      pre: [...TRACKS_PRE, ...TRACKS_MAT_ELITE_PRE, ...TRACKS_IXL],
       ano1: [...TRACKS_ANO1, ...TRACKS_MAT_ELITE_ANO1, ...TRACKS_LOGICA_ANO1],
       ano2: [...TRACKS_ANO2],
     },

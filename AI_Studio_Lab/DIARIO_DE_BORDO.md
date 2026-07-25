@@ -26,3 +26,25 @@
 3. **Tutorial de Correspondência ("DragGroup"):** A interface visual do "Como fazer?" para os exercícios de arrastar (`DragGroup`) tinha se perdido devido a uma falha no patch anterior que tentou injetar a DIV. Aplicado novamente com âncoragem correta de Regex, de forma que a instrução "Dê uma comidinha para cada bichinho! 👇👇👇" agora aparece sobre as caixas ao carregar a página.
 4. **Problema do "Mudo" no 1º exercício:** Entendido que a falta de voz ao atualizar a página no meio de uma partida é causada pela política de Autoplay dos navegadores, não por bug interno do engine.
 5. **Limpeza do Workspace:** Excluídos arquivos de script órfãos (`.cjs`, `.sh`, `.zip`, `.js` e `.ts` de testes) da raiz do projeto para limpar o File Explorer.
+
+## Análise Comparativa e Evolução Pedagógica: SAGA vs. IXL Learning (Soma e Contagem)
+- **Descoberta:** O usuário apontou que os exercícios do projeto atual baseados em Emojis (EmojiRow, TenFrame) são inferiores aos do IXL Learning (Pajarito rojo, Koala), que usam assets customizados, layouts limpos (white canvas) e agrupamento visual inteligente.
+- **Análise da Ausência:** Esses motores não existiam na Bíblia original pois o foco inicial foi em "ferramentas estruturais" (ábaco, reta numérica) visando velocidade de desenvolvimento com `emojis`. No entanto, pedagogicamente (Método CPA - Fase Concreta), crianças de 4-6 anos precisam de cenários narrativos imersivos e assets vetoriais coesos, não emojis genéricos do OS.
+- **Engenharia Reversa do IXL (Layout):**
+  1. Fundo branco puro (sem distração).
+  2. Ícone de Áudio (Speaker) isolado e previsível.
+  3. Disposição espacial intencional (ex: 2 pássaros num galho, 3 em outro).
+- **Proposta de Arquitetura (Próximos Passos):**
+  - Criar "Narrative Scene Engines" (ex: `SceneAddition.tsx`, `SceneCounter.tsx`) dentro de `primitives/`.
+  - Abandonar a dependência exclusiva de Emojis para as idades mais tenras e embutir SVGs flat-design de alta qualidade.
+  - Refatorar os geradores (ex: `gN3_01`, `gN3_03`) para suportar `q.sceneAsset` em vez de apenas `q.emoji`.
+
+## Intervenção e Arquitetura: Implementação dos Modelos IXL
+- **Ação:** O usuário solicitou que todos os componentes analisados a partir das capturas de tela do concorrente (IXL) fossem documentados detalhadamente e, principalmente, **adicionados ao aplicativo de forma integrada**.
+- **Diagnóstico Arquitetural:** Documentado por extenso em `/AI_Studio_Lab/arquitetura/ANALISE_IXL_PEDAGOGICA.md`. O aplicativo carecia das primitivas visuais em `src/components/primitives/` (Cubes, Scattered, Visual Addition, Take Apart) e dos tipos genéricos na `schema.ts`.
+- **Implementação Realizada (Act & Prove):**
+  1. Foram criados componentes agnósticos (primitivas) no React.
+  2. A interface de contrato `Option` foi expandida em `types.ts` para renderizar SVGs ou Blocos dentro dos próprios botões.
+  3. Adicionou-se uma nova suíte `generatorsIXL.ts` gerando 6 mecânicas totalmente novas (IXL.01 a IXL.06).
+  4. Estas mecânicas foram engatadas no `curriculum.ts` e exportadas para a aba "Escola" -> Matemática (Preschool) sob os títulos "IXL: Soma Visual", "IXL: Contagem Espalhada", etc., integrando 100% com o GameLoop base e Radar de Lacunas.
+- **Resultado (Verify):** Compilação bem-sucedida (npm run build). Todos os componentes injetados respeitam o design responsivo do SAGA, evoluindo a Fase Concreta (CPA).

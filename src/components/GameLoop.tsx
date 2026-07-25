@@ -46,6 +46,10 @@ import { InteractiveNumberLine } from "./InteractiveNumberLine";
 import { DragGroup } from "./DragGroup";
 import { ArrayGrid } from "./ArrayGrid";
 import { InteractiveVertical } from "./InteractiveVertical";
+import { VisualAddition } from "./primitives/VisualAddition";
+import { ScatteredItems } from "./primitives/ScatteredItems";
+import { LinkingCubes } from "./primitives/LinkingCubes";
+import { TakeApart } from "./primitives/TakeApart";
 import { GhostHand } from "./GhostHand";
 import JourneyScene from "./scenes/JourneyScene";
 import PlaceScene, { Place } from "./scenes/PlaceScene";
@@ -905,6 +909,7 @@ export function GameLoop({
         <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
           {q.uiProps ? (
             <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} />
+
           ) : (
             <>
               {q.kind === "count" && q.emoji && q.n != null && (
@@ -1102,6 +1107,11 @@ export function GameLoop({
           {q.kind === "numberline" && <NumberLine min={q.nlStart} max={q.nlEnd} targetValue={q.nlTarget} currentValue={typeof tutShow === "number" ? tutShow : (q.nlStartPos ?? null)} onValueClick={status === null ? handlePick : undefined} />}
           {q.kind === "numberline-interactive" && <InteractiveNumberLine q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "drag-group" && <DragGroup q={q} onAnswer={handlePick} disabled={status !== null} />}
+          {q.kind === "visual-addition" && q.a != null && q.b != null && <VisualAddition a={q.a} b={q.b} emojiA={q.uiProps?.emojiA || q.emoji} emojiB={q.uiProps?.emojiB || q.emoji} showNumbers={q.uiProps?.showNumbers !== false} />}
+          {q.kind === "scattered" && q.n != null && <ScatteredItems n={q.n} emoji={q.emoji || "⭐"} ordered={q.uiProps?.ordered} />}
+          {q.kind === "linking-cubes" && q.groups && <LinkingCubes groups={q.groups.map(g => ({ n: g.n, color: (g as any).color || "bg-blue-400" }))} showNumbers={q.uiProps?.showNumbers} />}
+          {q.kind === "take-apart" && q.a != null && q.b != null && q.n != null && <TakeApart total={q.n} knownSplit={{a: q.a, b: q.b}} />}
+
           {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "tenframe" && q.n != null && (
             <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} flashDurationMs={q.uiProps?.flashDurationMs} state={status === "right" ? "acerto" : status === "wrong" ? "erro-suave" : "ocioso"} />
@@ -1420,6 +1430,8 @@ export function GameLoop({
                     <span className="mk-pulse inline-block" style={{ animationDelay: `${i * 260}ms` }}>
                       <ShapeSVG id={o.shape} color={o.color} />
                     </span>
+                  ) : o.groups ? (
+                    <div className="scale-75 origin-center"><LinkingCubes groups={o.groups.map(g => ({n: g.n, color: g.color || "bg-blue-400"}))} /></div>
                   ) : (
                     <span style={{ fontSize: q.kind === "pattern" ? 36 : String(o.label).length > 2 ? 24 : 34 }}>
                       {o.label}

@@ -37,6 +37,7 @@ export interface Option {
   label?: string;
   value: any;
   shape?: string;
+  groups?: { n: number; color?: string; }[];
   color?: string;
   /** o que o 🔊 da opção FALA (quando difere do label — ex.: label é emoji 🐴, say é "horse") */
   say?: string;
