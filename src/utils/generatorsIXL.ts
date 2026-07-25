@@ -12,8 +12,8 @@ export function gIXL_VisualAddition(lvl: number): Question {
     b,
     emoji: isBirds ? "🐦" : "🐨",
     n: total, // we use this for internal consistency or answer
-    prompt: `Some. Quanto é ${a} + ${b}?`,
-    audioPrompt: "Junte os grupos. Quantos tem no total?",
+    prompt: `Quanto é ${a} + ${b}?`,
+    audioPrompt: `Quanto é ${a} mais ${b}?`,
     options: numOpts(total, 4, 2, 8),
     answer: total,
     uiProps: {
@@ -24,17 +24,21 @@ export function gIXL_VisualAddition(lvl: number): Question {
 
 export function gIXL_Scattered(lvl: number): Question {
   const n = Math.floor(Math.random() * 6) + 3;
-  const isStars = Math.random() > 0.5;
+  const isAnimal = Math.random() > 0.5;
+  const animals = ["🐵", "🦁", "🐯", "🐼", "🐶", "🐱"];
+  const fruits = ["🍌", "🍎", "🍓", "🍇", "🍉", "🍍"];
+  const emoji = isAnimal ? animals[Math.floor(Math.random() * animals.length)] : fruits[Math.floor(Math.random() * fruits.length)];
+  const name = isAnimal ? "animais" : "frutas";
   return {
     kind: "scattered",
     n,
-    emoji: isStars ? "⭐" : "✏️",
-    prompt: isStars ? "Quantas estrelas tem?" : "Quantos lápis tem?",
+    emoji,
+    prompt: `Quantos(as) ${name} tem?`,
     audioPrompt: "Conte. Quantos tem no total?",
     options: numOpts(n, 6, 2, 10),
     answer: n,
     uiProps: {
-      ordered: !isStars // pencils are ordered, stars are scattered
+      ordered: false // scattered
     }
   };
 }
@@ -115,14 +119,15 @@ export function gIXL_Sequence(lvl: number): Question {
   const start = Math.floor(Math.random() * 80) + 10;
   return {
     kind: "plain",
-    prompt: `Conte a partir do ${start}. Quais números vêm depois?\n${start}, __, __, __`,
+    prompt: `Conte a partir do ${start}. Quais números vêm depois?`,
     audioPrompt: "Quais números vêm depois?",
     options: [
       { label: `${start+1}, ${start+2}, ${start+3}`, value: "right" },
       { label: `${start+10}, ${start+20}, ${start+30}`, value: "wrong1" },
       { label: `${start+1}, ${start+3}, ${start+5}`, value: "wrong2" },
     ].sort(() => Math.random() - 0.5),
-    answer: "right"
+    answer: "right",
+    uiProps: { text: `${start}, ___, ___, ___` }
   };
 }
 

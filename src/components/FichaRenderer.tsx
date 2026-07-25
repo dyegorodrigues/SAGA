@@ -4,6 +4,10 @@ import { Question } from '../types';
 // Import primitives
 import { EmojiRow } from './primitives/EmojiRow';
 import { TenFrame } from './primitives/TenFrame';
+import { VisualAddition } from './primitives/VisualAddition';
+import { ScatteredItems } from './primitives/ScatteredItems';
+import { LinkingCubes } from './primitives/LinkingCubes';
+import { TakeApart } from './primitives/TakeApart';
 import { NumberBond } from './NumberBond';
 import { NumberLine } from './NumberLine';
 import { InteractiveNumberLine } from './InteractiveNumberLine';
@@ -52,6 +56,14 @@ export function FichaRenderer({ question, onAnswer, disabled }: FichaRendererPro
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
     case 'tenframe':
       return <div className="flex justify-center"><TenFrame {...uiProps} /></div>;
+    case 'visual-addition':
+      return <VisualAddition a={question.a!} b={question.b!} emojiA={question.emoji} emojiB={question.emoji} {...uiProps} />;
+    case 'scattered':
+      return <ScatteredItems n={question.n!} emoji={question.emoji!} {...uiProps} />;
+    case 'linking-cubes':
+      return <LinkingCubes groups={question.groups!} {...uiProps} />;
+    case 'take-apart':
+      return <TakeApart total={question.n!} knownSplit={{ a: question.a!, b: question.b! }} {...uiProps} />;
     case 'plain':
       return <div className="flex justify-center text-4xl font-black text-slate-800 py-8">{uiProps.text}</div>;
       

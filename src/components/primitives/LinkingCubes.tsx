@@ -6,40 +6,54 @@ export interface LinkingCubesProps {
   showNumbers?: boolean;
 }
 
+const COLOR_MAP: Record<string, string> = {
+  "bg-emerald-400": "#34d399",
+  "bg-indigo-400": "#818cf8",
+  "bg-blue-400": "#60a5fa",
+  "bg-rose-400": "#fb7185",
+  "bg-amber-400": "#fbbf24",
+  "bg-purple-400": "#c084fc",
+};
+
 export function LinkingCubes({ groups, showNumbers = false }: LinkingCubesProps) {
   const renderCubes = (n: number, colorClass: string) => {
+    const hexColor = COLOR_MAP[colorClass] || colorClass || "#34d399";
+    
     return Array.from({ length: n }).map((_, i) => (
       <div
         key={i}
-        className={`w-12 h-12 ${colorClass} border-2 border-black/10 rounded-sm relative shadow-sm flex items-center justify-center`}
+        className="relative"
         style={{
-          marginLeft: i === 0 ? 0 : -4, // overlap slightly to look linked
-          zIndex: 10 - i,
+          marginLeft: i === 0 ? 0 : -8, // overlap the peg of the previous cube
+          zIndex: 10 - i, // left cubes on top so they cover the right peg
         }}
       >
-        {/* The connector knob */}
-        <div className="absolute -right-3 w-4 h-6 rounded-r-md border-y-2 border-r-2 border-black/10 z-0 bg-inherit" />
-        <div className="absolute inset-1 bg-white/20 rounded-sm" /> {/* highlight */}
+        <svg width="46" height="40" viewBox="0 0 54 40" className="drop-shadow-sm overflow-visible">
+          {/* Main body of the cube */}
+          <rect x="2" y="2" width="38" height="36" rx="4" fill={hexColor} stroke="rgba(0,0,0,0.2)" strokeWidth="2.5" />
+          {/* Peg on the right side */}
+          <path d="M 40 14 L 48 14 L 48 26 L 40 26" fill={hexColor} stroke="rgba(0,0,0,0.2)" strokeWidth="2.5" strokeLinejoin="round" />
+          {/* Bright highlight to give a plastic 3D feel */}
+          <rect x="6" y="6" width="30" height="12" rx="2" fill="white" opacity="0.35" />
+        </svg>
       </div>
     ));
   };
 
   return (
-    <div className="flex flex-col items-center gap-6 p-8 bg-white border-2 border-slate-100 rounded-3xl shadow-sm">
-      <div className="flex items-center" style={{ paddingRight: 12 }}>
+    <div className="flex flex-col items-center gap-4">
+      <div className="flex items-center" style={{ paddingRight: 8 }}>
         {groups.map((g, idx) => (
           <div key={idx} className="flex items-center">
             {renderCubes(g.n, g.color)}
-            {/* Space between groups if they aren't meant to be connected, 
-                but for linking cubes we usually want them in a train if part of the same equation.
-                We'll add a small margin if it's a new group just to show it's a distinct part of the train */}
-            {idx < groups.length - 1 && <div className="w-1" />}
+            {/* If there are multiple groups and we want to show a split, add a clear margin */}
+            {idx < groups.length - 1 && <div className="w-4" />}
           </div>
         ))}
       </div>
       
       {showNumbers && (
-        <div className="flex gap-4 items-center mt-4 text-3xl font-black text-slate-700" style={{ fontFamily: FONT }}>
+        <div className="flex gap-4 items-center mt-2 text-4xl font-black text-slate-700" style={{ fontFamily: FONT }}>
           {groups.map((g, idx) => (
             <React.Fragment key={idx}>
               <span className="px-4 py-2 bg-slate-100 rounded-xl">{g.n}</span>

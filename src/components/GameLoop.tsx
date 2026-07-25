@@ -1431,7 +1431,12 @@ export function GameLoop({
                       <ShapeSVG id={o.shape} color={o.color} />
                     </span>
                   ) : o.groups ? (
-                    <div className="scale-75 origin-center"><LinkingCubes groups={o.groups.map(g => ({n: g.n, color: g.color || "bg-blue-400"}))} /></div>
+                    <div className="flex flex-col items-center gap-2 px-2 py-1">
+                      {o.label && <span className="text-xl font-black">{o.label}</span>}
+                      <div className="scale-75 origin-center">
+                        <LinkingCubes groups={o.groups.map(g => ({n: g.n, color: g.color || "bg-blue-400"}))} />
+                      </div>
+                    </div>
                   ) : (
                     <span style={{ fontSize: q.kind === "pattern" ? 36 : String(o.label).length > 2 ? 24 : 34 }}>
                       {o.label}

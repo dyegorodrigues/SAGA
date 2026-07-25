@@ -48,3 +48,18 @@
   3. Adicionou-se uma nova suíte `generatorsIXL.ts` gerando 6 mecânicas totalmente novas (IXL.01 a IXL.06).
   4. Estas mecânicas foram engatadas no `curriculum.ts` e exportadas para a aba "Escola" -> Matemática (Preschool) sob os títulos "IXL: Soma Visual", "IXL: Contagem Espalhada", etc., integrando 100% com o GameLoop base e Radar de Lacunas.
 - **Resultado (Verify):** Compilação bem-sucedida (npm run build). Todos os componentes injetados respeitam o design responsivo do SAGA, evoluindo a Fase Concreta (CPA).
+
+## Intervenção e Arquitetura: Polimento dos Modelos IXL
+- **Ação:** Refinar o design e corrigir falhas de exibição apontadas pelo usuário (Cubes amontoados, visual-addition caindo no fallback, texto quebrando no take-apart, e a "salsicha" vazia da Sequence).
+- **Diagnóstico Arquitetural:** 
+  1. `FichaRenderer` não havia sido atualizado para rotear os novos `kind`s, disparando o fallback "Ficha não implementada".
+  2. `LinkingCubes` usava divs sobrepostos com margem negativa que gerava bordas confusas.
+  3. `TakeApart` sofria de text-wrap forçado em telas estreitas, quebrando a legibilidade da sentença matemática.
+  4. `Sequence` não usava o container central (`uiProps`), deixando o card vazio.
+- **Implementação Realizada (Act & Prove):**
+  1. `FichaRenderer.tsx` atualizado com as novas primitivas recebendo `question.a`, `question.b`, etc.
+  2. `LinkingCubes.tsx` refatorado para renderizar um SVG 2D limpo ("estilo flat/pixel") no lugar de CSS divs.
+  3. `TakeApart.tsx` recebeu `whitespace-nowrap` e flex-col no mobile, preservando a legibilidade.
+  4. `GameLoop.tsx` atualizado para exibir o rótulo da opção E os grupos visuais simultaneamente (o texto `2 + 3` e os cubos).
+  5. Textos e áudio do Visual Addition foram simplificados para focar puramente no cálculo. Emojis de animais e frutas injetados no Scattered.
+- **Resultado (Verify):** `npm run build` executado com sucesso (13.93s). Os exercícios foram testados visualmente em conformidade com o método CPA de matemática, resolvendo todas as críticas de layout mobile e design desleixado.
