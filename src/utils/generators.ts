@@ -1,3 +1,11 @@
+import { N1_01 } from "../curriculum/fichas/N1.01";
+import { Composer } from "../curriculum/Composer";
+
+import { N1_02 } from "../curriculum/fichas/N1.02";
+import { N1_03 } from "../curriculum/fichas/N1.03";
+import { N1_04 } from "../curriculum/fichas/N1.04";
+import { N1_07 } from "../curriculum/fichas/N1.07";
+import { N1_10 } from "../curriculum/fichas/N1.10";
 import { Question, Track } from "../types";
 import {
   C,
@@ -745,71 +753,20 @@ export function gGM_02(lvl: number): Question {
 
 // --- FUNDAÇÃO SAGA: N1.01 a N1.09 ---
 export function gN1_01(lvl: number): Question {
-  const n = lvl === 1 ? 3 : (lvl === 2 ? 4 : (lvl === 3 ? 5 : (lvl === 4 ? 6 : 7)));
-  return {
-    tutorial: lvl === 1 ? [{ say: "Olha só, para saber quantos tem, a gente toca em um de cada vez!" }] : undefined,
-    excecaoCPA: "perceptual",
-    kind: "count",
-    prompt: "Quantos temos aqui? Toque em um de cada vez!",
-    emoji: pickEmo(),
-    n,
-    options: numOpts(n, 3, 1, 8),
-    answer: n,
-    howto: "Toque em cada objeto uma única vez para contar.",
-    audioPrompt: "Quantos temos aqui?",
-    explain: "Olha os objetos que ainda não foram tocados e conte um por um com o dedinho.",
-  };
+  const microId = lvl <= 2 ? "a" : "b";
+  return Composer.generate(N1_01, microId);
 }
 
 export function gN1_02(lvl: number): Question {
-  const n = ri(2, 5);
-  return {
-    tutorial: lvl === 1 ? [{ say: "Vamos contar com ritmo!" }] : undefined,
-    excecaoCPA: "perceptual",
-    kind: "count",
-    prompt: "Conte comigo sem pressa!",
-    emoji: pickEmo(),
-    n,
-    options: numOpts(n, 3, 1, 5),
-    answer: n,
-    howto: "Vá no seu ritmo e conte tudo.",
-    audioPrompt: "Quantos tem?",
-    explain: "Acompanhe o ritmo: fale um número para cada batida sem acelerar.",
-  };
+  return Composer.generate(N1_02, lvl <= 2 ? "a" : "b");
 }
 
 export function gN1_03(lvl: number): Question {
-  const n = ri(2, 5); // Subitizing perceptual usually up to 5
-  return {
-    tutorial: lvl === 1 ? [{ say: "Olhe rápido, a caixa vai fechar!" }] : undefined,
-    excecaoCPA: "perceptual",
-    kind: "flash",
-    prompt: "Quantos tinham ali?",
-    emoji: pickEmo(),
-    n,
-    options: numOpts(n, 3, 5, 10),
-    answer: n,
-    howto: "Preste atenção para não pular.",
-    audioPrompt: "Quantos são?",
-    explain: "Olhe o desenho todo de uma vez — que formato as bolinhas fizeram?",
-  };
+  return Composer.generate(N1_03, lvl <= 2 ? "a" : "b");
 }
 
 export function gN1_04(lvl: number): Question {
-  const n = ri(3, 5);
-  return {
-    tutorial: lvl === 1 ? [{ say: "O último número que você fala é o total!" }] : undefined,
-    excecaoCPA: "perceptual",
-    kind: "count",
-    prompt: "Conte tudo e me diga: Quantos SÃO no total?",
-    emoji: pickEmo(),
-    n,
-    options: numOpts(n, 3, 1, 6),
-    answer: n,
-    howto: "O último número falado é o total da brincadeira.",
-    audioPrompt: "Qual o total?",
-    explain: "Conte todos os objetos: o último número que você falar é a resposta total.",
-  };
+  return Composer.generate(N1_04, lvl <= 2 ? "a" : "b");
 }
 
 export function gN1_05(lvl: number): Question {
@@ -828,87 +785,56 @@ export function gN1_05(lvl: number): Question {
 
   if (lvl <= 2) {
     return {
-      tutorial: lvl === 1 ? [{say: "Vamos ver qual lado tem mais coisas."}] : undefined,
+      tutorial: lvl === 1 ? [{say: "Toque no grupo que tem a quantidade pedida."}] : undefined,
       kind: "groups",
       groups: groups,
-      prompt: wantsMais ? "Qual tem MAIS itens?" : "Qual tem MENOS itens?",
+      prompt: wantsMais ? "Toque no que tem MAIS." : "Toque no que tem MENOS.",
       options: [
-        { label: "Grupo 1", value: 0 },
-        { label: "Grupo 2", value: 1 }
+        { label: "1", value: 0 },
+        { label: "2", value: 1 }
       ],
       answer: ansIdx,
       howto: "Compare as quantidades.",
       audioPrompt: wantsMais ? "Qual tem mais?" : "Qual tem menos?",
-      explain: "Veja qual grupo tem uma quantidade maior ou menor."
+      explain: wantsMais ? "Encontre o grupo com o maior número de coisas." : "Encontre o grupo com o menor número de coisas."
     };
   } else {
     // plain text comparison
     return {
       tutorial: undefined,
       kind: "plain",
-      big: groups[0].emoji,
-      prompt: wantsMais ? `O que é MAIS: ${n1} ou ${n2}?` : `O que é MENOS: ${n1} ou ${n2}?`,
+      big: wantsMais ? "MAIS" : "MENOS",
+      prompt: wantsMais ? `Escolha o número MAIOR` : `Escolha o número MENOR`,
       options: [
         { label: `${n1}`, value: n1 },
         { label: `${n2}`, value: n2 }
       ],
       answer: wantsMais ? (n1 > n2 ? n1 : n2) : (n1 < n2 ? n1 : n2),
       howto: "Compare os números.",
-      audioPrompt: wantsMais ? "Qual é mais?" : "Qual é menos?",
-      explain: "Compare os números para encontrar o pedido."
+      audioPrompt: wantsMais ? "Qual é maior?" : "Qual é menor?",
+      explain: "Lembre da ordem de contagem para saber qual é maior ou menor."
     };
   }
 }
 
 export function gN1_06(lvl: number): Question {
   const ans = ri(1, 9);
+  const words = ["zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez"];
   return {
-    tutorial: lvl === 1 ? [{say: "Esse é o número e esse é o nome."}] : undefined,
-    kind: lvl <= 2 ? "plain" : "math",
-    prompt: `Encontre o número ${ans}!`,
-    big: `Qual é o ${ans}?`,
+    tutorial: lvl === 1 ? [{say: "Ouça o número e toque nele!"}] : undefined,
+    kind: "plain",
+    prompt: "Ouça com atenção 👂",
+    big: "🔊 " + words[ans].toUpperCase(),
     options: numOpts(ans, 3, 1, 9),
     answer: ans,
-    howto: "Ligue o nome ao símbolo.",
+    howto: "Ligue o som ao símbolo.",
     audioPrompt: `Encontre o ${ans}!`,
-    explain: "Pense em como a gente desenha esse número quando escreve.",
+    explain: "Ligue o som ao formato do número.",
   };
 }
 
 export function gN1_07(lvl: number): Question {
-  const base = ri(1, 8);
-  const ans = base + 1;
-  
-  if (lvl <= 2) {
-    return {
-      tutorial: lvl === 1 ? [
-        { say: "A reta numérica nos ajuda a ver a ordem." },
-        { say: `O que vem logo depois do ${base}?`, show: { saltarDe: base } }
-      ] : undefined,
-      kind: "numberline",
-      nlStart: Math.max(1, base - 2),
-      nlEnd: base + 4,
-      nlStartPos: base,
-      prompt: `Quem vem logo DEPOIS do ${base}?`,
-      options: numOpts(ans, 3, 1, 10),
-      answer: ans,
-      howto: "Dê um salto para a frente na reta numérica.",
-      audioPrompt: "Quem vem depois?",
-      explain: "Olha para a reta e dê um salto para a frente a partir do número.",
-    };
-  } else {
-    return {
-      tutorial: undefined,
-      kind: "plain",
-      prompt: `Quem vem logo DEPOIS do ${base}?`,
-      big: `${base} ➔ ?`,
-      options: numOpts(ans, 3, 1, 10),
-      answer: ans,
-      howto: "O sucessor é sempre um a mais.",
-      audioPrompt: "Quem vem logo depois?",
-      explain: "Pense no número que você fala em seguida ao contar para a frente.",
-    };
-  }
+  return Composer.generate(N1_07, "a");
 }
 
 export function gN1_09(lvl: number): Question {

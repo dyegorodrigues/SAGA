@@ -409,3 +409,58 @@ A arquitetura anterior dependia de `generators.ts` (uma lista gigante de funçõ
 **Execução (Act/Verify):**
 - Criado `Composer.ts` com geradores iniciais para `emojirow`, `numberline` e `bond`.
 - Criado `FichaRenderer.tsx` com o switch de roteamento para as primitivas.
+
+## 9. Fiação (Wiring) das Fichas N1 Iniciais e Conserto do GameLoop
+**Data:** 25 de julho de 2026
+
+**Constatação:**
+O GameLoop quebrou momentaneamente por um erro de colisão de interfaces entre os adapters. Além disso, as demais fichas fundacionais recém-criadas (N1.02, N1.03, N1.04, N1.07 e N1.10) ainda estavam dependendo do modo hardcoded ("Falso Verde") no `generators.ts`.
+
+**Decisão (Fable):**
+1. **Arquiteto / QA:** Corrigir os conflitos em `DragGroup` para manter compatibilidade com a assinatura anterior enquanto suporta o `uiProps` limpo gerado pelo `Composer`. Injetar um fallback elegante no GameLoop para engolir qualquer inconsistência em blocos legados.
+2. **Engenheiro:** Atualizar `generators.ts` para que todos os IDs primários (N1.01 a N1.04, N1.07 e N1.10) utilizem o `Composer.generate`, habilitando que o FichaRenderer intercepte 100% dessas invocações no front-end.
+3. Consertar a porta de proxy do vite que colidiu, restaurando o serviço 0.0.0.0:3000
+
+**Execução:**
+- Refatorado `<DragGroup />` no `primitives/`.
+- Fichas ativadas no motor de proxy: `N1.01`, `N1.02`, `N1.03`, `N1.04`, `N1.07` e `N1.10`.
+- O servidor de desenvolvimento foi consertado e restaurado perfeitamente.
+
+## 10. Refinamento Pedagógico e Correção de Bugs (Escada N1)
+**Data:** 25 de julho de 2026
+
+**Constatação:**
+O usuário relatou com muita precisão que as fichas iniciais (N1.01 e N1.02) estavam "presas" ou confusas.
+1. `N1.01` (DragGroup) mostrava apenas "maçãs e coelhos", sem instrução clara do que fazer, transformando-se num clicker sem sentido.
+2. `N1.02` (Canto Numérico - EmojiRow) ficava travado porque não possuía modo interativo nem botão de "Continuar", deixando a criança num dead-end sem saber como prosseguir.
+3. Além disso, ao usar o painel administrador ("todas as opções habilitadas") e entrar no nível 3+ de N1.02/N1.03 (que só possuem a micro `a`), o aplicativo "bugou a tela" (White Screen) devido a um lançamento de erro no `Composer.ts`.
+
+**Decisão (O que faremos - Fable Decide):**
+- **Arquiteto:** Modificar o `Composer.ts` para ser resiliente a micros faltantes (fazer fallback para a primeira micro da ficha em vez de lançar um erro fatal). Adicionar aleatoriedade de ícones em `DragGroup` e `EmojiRow`.
+- **Neuro-Pedagogo:** A correspondência 1-a-1 (N1.01) e o canto numérico (N1.02) dependem da ação coordenada. Adicionaremos áudios tutoriais (ex: "Toque para entregar uma comidinha para cada um!"). No N1.02, habilitaremos a propriedade `interactive_count: true`.
+- **UX Infantil:** Os ícones variarão semanticamente (Osso -> Cachorro, etc.).
+- **QA:** Teste de robustez no Composer.
+
+**Execução (Act/Verify):**
+- Modificados `N1.01.ts` e `N1.02.ts` com tutoriais e parâmetros interativos.
+- `Composer.ts` refatorado para suportar fallback e injetar opções semânticas.
+
+## 11. Estabilidade e Robustez de Interação UI (Fichas N1)
+**Data:** 25 de julho de 2026
+
+**Constatação:**
+Múltiplas falhas críticas na interação tátil e estado foram encontradas baseadas no feedback do usuário:
+1. `EmojiRow` sem áudio falado nos modos interactivos, e travando ao terminar de contar (falta de despacho final adequado).
+2. Bug do "Ghost Clicking" onde opções eram clicadas repetidamente invisivelmente, causado por efeitos colaterais de re-renderização (`useEffect` assíncrono em `DragGroup`).
+3. `generators.ts` (N1.05) injetando o emoji da comparação (ex: Biscoito) no slot `big` (texto em destaque).
+4. O componente `GameLoop.tsx` não estava extraindo a propriedade `tutorial` para as novas Fichas via `Composer`, bloqueando a exibição do tutorial guiado da mascote.
+
+**Decisão (Fable):**
+- Corrigir a injeção do `hasTutorial` e `hasAulinha` alterando a validação baseada puramente em chaves de strings estáticas (`LEGACY_CHOREOGRAPHIES`) para verificar a presença estrutural de `q.tutorial`.
+- Sanear estado de `DragGroup` via flag síncrona `isAnswered` acoplada ao ciclo de reset para matar o vazamento de memória visual.
+- Instrumentar `EmojiRow` para ler os números via áudio em voz alta a cada toque, despachando o evento `onAnswer` pontualmente ao encostar no último item sem falhas fantasmas.
+
+**Execução:**
+- Funções de tutorial e GameLoop modernizadas para ler a nova arquitetura híbrida de `FichaCompetencia`.
+- N1.05 limpo, N1.01 e N1.02 robustecidos.
+- Sistema estável.

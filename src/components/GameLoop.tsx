@@ -49,6 +49,7 @@ import { InteractiveVertical } from "./InteractiveVertical";
 import { GhostHand } from "./GhostHand";
 import JourneyScene from "./scenes/JourneyScene";
 import PlaceScene, { Place } from "./scenes/PlaceScene";
+import { FichaRenderer } from "./FichaRenderer";
 
 interface GameProps {
   kid: Kid;
@@ -220,11 +221,11 @@ export function GameLoop({
   };
   // decidida UMA vez na montagem: a 1ª questão da missão ganha aula automática se a
   // criança nunca viu a aulinha deste kind (depois disso, só botão/algoritmo)
-  const [autoAula, setAutoAula] = useState(() => hasAulinha(q.kind) && !aulaSeen(kid.id, q.kind));
+  const [autoAula, setAutoAula] = useState(() => hasAulinha(q) && !aulaSeen(kid.id, q.kind));
   
   // Update autoAula state on question change
   useEffect(() => {
-    setAutoAula(idx === 0 ? (hasAulinha(q.kind) && !aulaSeen(kid.id, q.kind)) : false);
+    setAutoAula(idx === 0 ? (hasAulinha(q) && !aulaSeen(kid.id, q.kind)) : false);
   }, [q, idx, kid.id]);
 
   useEffect(() => {
@@ -441,7 +442,7 @@ export function GameLoop({
       setAulaSuggest(false);
     } else {
       wrongStreakRef.current++;
-      if (wrongStreakRef.current >= 2 && hasAulinha(q.kind)) setAulaSuggest(true);
+      if (wrongStreakRef.current >= 2 && hasAulinha(q)) setAulaSuggest(true);
     }
 
     if (right) {
@@ -897,7 +898,11 @@ export function GameLoop({
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}
         <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
-          {q.kind === "count" && q.emoji && q.n != null && (
+          {q.uiProps ? (
+            <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} />
+          ) : (
+            <>
+              {q.kind === "count" && q.emoji && q.n != null && (
             <div className="flex flex-col items-center gap-3">
               <EmojiRow emoji={q.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />                                        
             </div>
@@ -1191,6 +1196,8 @@ export function GameLoop({
               <JourneyScene journey={q.journey} sound={sound} onDone={() => setJourneyDone(true)} />
             )
           )}
+          </>
+          )}
 
         </div>
         </>
@@ -1200,7 +1207,7 @@ export function GameLoop({
       {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
         <>
       {/* AULINHA 🎬 re-oferecida pelo algoritmo: 2 erros seguidos → convite gentil */}
-      {aulaSuggest && !status && hasAulinha(q.kind) && guidedIdx === null && guidedNarr === null && (
+      {aulaSuggest && !status && hasAulinha(q) && guidedIdx === null && guidedNarr === null && (
         <div className="flex justify-center mt-3">
           <button
             onClick={() => playAulinha(false)}
@@ -1217,7 +1224,7 @@ export function GameLoop({
       )}
 
       {/* Tutorial guiado 👉 (generalizado): a mãozinha do Contar, para as cenas novas */}
-      {hasTutorial(q.kind) && !status && (
+      {hasTutorial(q) && !status && (
         guidedNarr !== null ? (
           <div
             className="mt-3 mx-auto p-3 rounded-2xl text-center mk-optin"

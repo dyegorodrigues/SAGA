@@ -57,6 +57,8 @@ export interface Question {
   big?: string | null;
   options?: Option[];
   answer: any;
+  uiProps?: any;
+  evaluate?: (ans: any) => boolean;
   emoji?: string;
   // For NumberLine
   nlStart?: number;

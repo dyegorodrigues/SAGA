@@ -8,7 +8,10 @@ export interface TutStep {
   sync?: "junto" | "depois";
 }
 
-export const hasTutorial = (kind: string): boolean => kind in LEGACY_CHOREOGRAPHIES;
+export const hasTutorial = (q: Question | string): boolean => {
+  if (typeof q === 'string') return q in LEGACY_CHOREOGRAPHIES;
+  return (q.tutorial && q.tutorial.length > 0) || q.kind in LEGACY_CHOREOGRAPHIES;
+};
 
 export const tutorialSteps = (q: Question): TutStep[] => {
   if (q.tutorial && Array.isArray(q.tutorial)) {
@@ -17,7 +20,7 @@ export const tutorialSteps = (q: Question): TutStep[] => {
   return LEGACY_CHOREOGRAPHIES[q.kind] || [];
 };
 
-export const hasAulinha = (kind: string): boolean => hasTutorial(kind);
+export const hasAulinha = (q: Question | string): boolean => hasTutorial(q);
 
 const AULA_KEY = "mk-aula-seen-v1";
 type AulaStore = Pick<Storage, "getItem" | "setItem">;

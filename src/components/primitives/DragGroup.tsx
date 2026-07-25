@@ -1,24 +1,50 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Question } from '../../types';
 import { tokens, UIState } from '../../styles/tokens';
 
-export function DragGroup({ q, onAnswer, disabled, state = 'ocioso' }: { q: Question; onAnswer: (val: any) => void; disabled: boolean; state?: UIState }) {
-  const [itemsLeft, setItemsLeft] = useState(q.dividend ?? 0);
-  const [boxes, setBoxes] = useState<number[]>(Array(q.divisor ?? 2).fill(0));
+export function DragGroup({ 
+  sourceCount, 
+  destCount, 
+  sourceEmoji = "🍎", 
+  destEmoji = "🐰", 
+  onAnswer, 
+  disabled, 
+  state = 'ocioso',
+  q // for backward compatibility
+}: { 
+  sourceCount?: number; 
+  destCount?: number; 
+  sourceEmoji?: string; 
+  destEmoji?: string; 
+  onAnswer?: (val: any) => void; 
+  disabled?: boolean; 
+  state?: UIState;
+  q?: any;
+}) {
+  const actualSourceCount = sourceCount ?? q?.dividend ?? 0;
+  const actualDestCount = destCount ?? q?.divisor ?? 2;
+  const actualSourceEmoji = sourceEmoji ?? q?.emoji ?? "🍎";
+  const actualDestEmoji = destEmoji ?? "🐰";
 
+  const [itemsLeft, setItemsLeft] = useState(actualSourceCount);
+  const [boxes, setBoxes] = useState<number[]>(Array(actualDestCount).fill(0));
+  const [isAnswered, setIsAnswered] = useState(false);
+  
   const reset = () => {
-    setItemsLeft(q.dividend ?? 0);
-    setBoxes(Array(q.divisor ?? 2).fill(0));
+    setItemsLeft(actualSourceCount);
+    setBoxes(Array(actualDestCount).fill(0));
+    setIsAnswered(false);
   };
-
+  
   useEffect(() => {
     reset();
-  }, [q]);
-
+  }, [actualSourceCount, actualDestCount]);
+  
   const handleBoxClick = (i: number) => {
     if (disabled) return;
-    if (itemsLeft > 0) {
+    // se for legacy (q.dividend), aceita múltiplos itens, senão 1 a 1
+    const isLegacy = !!q;
+    if (itemsLeft > 0 && (isLegacy || boxes[i] === 0)) {
       setItemsLeft(l => l - 1);
       setBoxes(b => {
         const nb = [...b];
@@ -34,16 +60,27 @@ export function DragGroup({ q, onAnswer, disabled, state = 'ocioso' }: { q: Ques
       });
     }
   };
-
+  
   useEffect(() => {
-    if (itemsLeft === 0 && !disabled) {
-      const allEqual = boxes.every(v => v === boxes[0]);
-      if (allEqual) {
-        onAnswer(boxes[0]);
+    if (!disabled && onAnswer && !isAnswered) {
+      if (q) {
+        if (itemsLeft === 0) {
+          const allEqual = boxes.every(v => v === boxes[0]);
+          if (allEqual) {
+            setIsAnswered(true);
+            onAnswer(boxes[0]);
+          }
+        }
+      } else {
+        const allFilled = boxes.every(v => v === 1);
+        if (allFilled) {
+          setIsAnswered(true);
+          onAnswer(actualDestCount);
+        }
       }
     }
-  }, [itemsLeft, boxes, disabled, onAnswer]);
-
+  }, [itemsLeft, boxes, disabled, onAnswer, actualDestCount, q, isAnswered]);
+  
   return (
     <div className={`w-full flex flex-col items-center gap-6 mt-4 select-none ${tokens.estado[state]}`}>
       <div 
@@ -62,49 +99,43 @@ export function DragGroup({ q, onAnswer, disabled, state = 'ocioso' }: { q: Ques
             animate={{ scale: 1 }}
             className="text-3xl cursor-pointer hover:scale-110 active:scale-95 transition-transform"
           >
-            {q.emoji || "🍎"}
+            {actualSourceEmoji}
           </motion.div>
         ))}
         {itemsLeft === 0 && (
           <div className="font-bold w-full text-center" style={{ color: tokens.cor.texto.secundario }}>Nenhum sobrando!</div>
         )}
       </div>
-
       <div className="flex justify-center gap-4 w-full flex-wrap">
         {boxes.map((count, i) => (
           <div 
             key={`box-${i}`}
             onClick={() => handleBoxClick(i)}
-            className="flex-1 flex flex-wrap content-start p-2 gap-1 cursor-pointer transition-colors shadow-sm hover:brightness-95"
+            className="flex-1 flex flex-col items-center justify-center p-2 gap-1 cursor-pointer transition-colors shadow-sm hover:brightness-95 relative"
             style={{
               minWidth: tokens.tamanho.alvo,
-              minHeight: '100px',
-              backgroundColor: tokens.cor.superficie.cartao,
+              minHeight: '80px',
+              backgroundColor: count > 0 ? tokens.cor.elementos.preenchimento : tokens.cor.superficie.cartao,
               borderColor: tokens.cor.elementos.marcador,
               borderWidth: 3,
               borderRadius: '12px'
             }}
           >
-            {Array.from({ length: count }).map((_, j) => (
+            {!q && <div className="text-3xl opacity-30 absolute">{actualDestEmoji}</div>}
+            {count > 0 && Array.from({ length: count }).map((_, j) => (
               <motion.div
                 key={`box-${i}-${j}`}
                 layout
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="text-2xl"
+                className={`text-3xl ${!q ? 'z-10' : ''}`}
               >
-                {q.emoji || "🍎"}
+                {actualSourceEmoji}
               </motion.div>
             ))}
           </div>
         ))}
       </div>
-      
-      {!disabled && (
-        <div className="text-sm font-medium" style={{ color: tokens.cor.texto.secundario }}>
-          Toque nas caixas para guardar!
-        </div>
-      )}
     </div>
   );
 }

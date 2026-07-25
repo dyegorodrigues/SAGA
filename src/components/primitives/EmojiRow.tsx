@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { tokens, UIState } from '../../styles/tokens';
+import { speak } from '../Mascot';
 
 export interface EmojiRowProps {
   emoji: string;
@@ -15,6 +16,7 @@ export interface EmojiRowProps {
   
   // Touch Count Mode (N1.04)
   interactiveCount?: boolean;
+  disabled?: boolean;
   onItemTouch?: (count: number) => void;
 }
 
@@ -27,7 +29,8 @@ export function EmojiRow({
   state = 'ocioso',
   flashDurationMs,
   interactiveCount,
-  onItemTouch
+  onItemTouch,
+  disabled
 }: EmojiRowProps) {
   
   const [isFlashed, setIsFlashed] = useState(false);
@@ -52,18 +55,19 @@ export function EmojiRow({
   }, [n, interactiveCount]);
 
   const handleTouch = (idx: number) => {
-    if (!interactiveCount) return;
+    if (!interactiveCount || disabled) return;
     // Only allow touching the *next* item in sequence
     if (idx === touchedCount) {
       const newCount = touchedCount + 1;
       setTouchedCount(newCount);
-      if (onItemTouch) onItemTouch(newCount);
+      speak(newCount.toString());
+      if (onItemTouch && newCount === n) { setTimeout(() => onItemTouch(newCount), 800); }
     }
   };
 
   return (
     <div 
-      className={`flex flex-wrap items-center justify-center gap-2 relative py-4 ${tokens.estado[state]}`} 
+      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-12 relative py-6 ${tokens.estado[state]}`} 
       style={{ maxWidth: small ? 150 : "100%", minHeight: '80px' }}
     >
       <AnimatePresence mode="popLayout">
@@ -136,9 +140,10 @@ export function EmojiRow({
             className="flex items-center justify-center p-4 rounded-xl shadow-md"
             style={{ backgroundColor: tokens.cor.elementos.preenchimento, border: `3px solid ${tokens.cor.elementos.borda}` }}
           >
-            <span className="text-3xl font-bold" style={{ color: tokens.cor.texto.secundario }}>
-              📦 Ocultos
-            </span>
+            <div className="flex flex-col items-center gap-2">
+              <span className="text-5xl">🙈</span>
+              <span className="text-sm font-bold" style={{ color: tokens.cor.texto.secundario }}>Onde foram?</span>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

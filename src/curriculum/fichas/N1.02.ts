@@ -16,7 +16,7 @@ export const N1_02: FichaCompetencia = {
       params: { 
         n_min: 5, 
         n_max: 5,
-        audio_prompt: "Vamos contar juntos? Um, dois, três, quatro, cinco!" 
+        audio_prompt: "Vamos contar juntos? Toque em um de cada vez!", tutorial: [{ say: "Toque nas figuras para cantarmos juntos!" }], interactive_count: true 
       },
       dominio: { acertos: 1, de: 1, sessoes: 1 }
     }

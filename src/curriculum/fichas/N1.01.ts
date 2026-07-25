@@ -16,7 +16,7 @@ export const N1_01: FichaCompetencia = {
       params: { 
         n_min: 3, 
         n_max: 5,
-        audio_prompt: "Dê um para cada!" 
+        audio_prompt: "Dê um para cada!", tutorial: [{ say: "Toque para entregar uma comidinha para cada um!" }] 
       },
       dominio: { acertos: 3, de: 3, sessoes: 1 }
     },
@@ -27,7 +27,7 @@ export const N1_01: FichaCompetencia = {
       params: { 
         n_min: 5, 
         n_max: 7,
-        audio_prompt: "Será que tem o suficiente para todos?",
+        audio_prompt: "Será que tem o suficiente para todos?", tutorial: [{ say: "Lembre-se: é apenas UM para cada um!" }],
         tem_sobra: true 
       }
     }
