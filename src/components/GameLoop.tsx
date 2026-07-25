@@ -1368,7 +1368,7 @@ export function GameLoop({
           </div>
         ) : (
           <>
-          {q.options && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && (<div className={`grid gap-3.5 ${q.options.length === 2 ? "grid-cols-2" : "grid-cols-2"}`}>
+          {q.options && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && (<div className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid grid-cols-2"}`}>
             {q.options.map((o, i) => {
               const isAnswer = o.value === q.answer;
               const picked = sel === o.value;
@@ -1433,8 +1433,8 @@ export function GameLoop({
                   ) : o.groups ? (
                     <div className="flex flex-col items-center gap-2 px-2 py-1">
                       {o.label && <span className="text-xl font-black">{o.label}</span>}
-                      <div className="scale-75 origin-center">
-                        <LinkingCubes groups={o.groups.map(g => ({n: g.n, color: g.color || "bg-blue-400"}))} />
+                      <div className="scale-[0.6] sm:scale-75 origin-center">
+                        <LinkingCubes groups={o.groups.map(g => ({n: g.n, color: g.color || "bg-blue-400"}))} numberAbove showPlus />
                       </div>
                     </div>
                   ) : (

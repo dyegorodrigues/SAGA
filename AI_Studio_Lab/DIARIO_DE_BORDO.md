@@ -63,3 +63,30 @@
   4. `GameLoop.tsx` atualizado para exibir o rótulo da opção E os grupos visuais simultaneamente (o texto `2 + 3` e os cubos).
   5. Textos e áudio do Visual Addition foram simplificados para focar puramente no cálculo. Emojis de animais e frutas injetados no Scattered.
 - **Resultado (Verify):** `npm run build` executado com sucesso (13.93s). Os exercícios foram testados visualmente em conformidade com o método CPA de matemática, resolvendo todas as críticas de layout mobile e design desleixado.
+
+## Intervenção e Arquitetura: Polimento Final dos Modelos IXL
+- **Ação:** Refinar a arte das peças matemáticas (Unifix Cubes), resolver duplicação de opções corretas no exercício de decomposição, e expandir a diversidade de imagens no Scattered/Visual Addition.
+- **Diagnóstico Arquitetural:** 
+  1. `LinkingCubes` (CSS) não estava com a qualidade "pixel art / flat" desejada e as cores estavam confusas. 
+  2. O `TakeApart` permitia que a opção "errada" fosse uma soma comutativa válida da decomposição (ex: mostrar `1+3` e `3+1`). Além disso, não exibia a barra original inteira antes da barra separada.
+  3. `Scattered` não tinha bibliotecas ricas de assets visuais para rotacionar, tornando os exercícios monótonos.
+- **Implementação Realizada (Act & Prove):**
+  1. `LinkingCubes` reescrito para utilizar primitivas `<svg>` nítidas no estilo pixel art, com iluminação flat e cores vibrantes (`blue-400` e `rose-400`), removendo o "bolo de divs".
+  2. A mecânica de `gIXL_TakeApart` agora gera a barra inteira (Total) acima da barra segmentada. Os números correspondentes (`numberAbove`) são exibidos diretamente sobre os blocos, separados por `+`.
+  3. O loop `while` da opção errada (`wrongA + wrongB`) no gerador foi forçado matematicamente a ter uma soma diferente da soma total, impossibilitando ambiguidade de respostas iguais.
+  4. Expandidas 6 categorias semânticas no gerador `Scattered` (Animais, Frutas, Veículos, Bolas, Flores, Doces) rotacionando mais de 45 representações iconográficas.
+- **Resultado (Verify):** `npm run build` aprovado. Exercícios validados, apresentando fidelidade quase idêntica ao método visual unifix de blocos acopláveis.
+
+## Intervenção: Correção de Layout, Labels e TenFrame (IXL Models)
+- **Ação:** Arrumar regressões de renderização em tablets/smartphones e bugs lógicos.
+- **Diagnóstico Arquitetural:**
+  1. O loop de renderização do `GameLoop` forçava um `grid-cols-2` mesmo para opções largas (como os Linking Cubes do `TakeApart`), fazendo-os se sobreporem e quebrar a UI no modo portrait.
+  2. As opções de respostas (`o.label`) com a letra `A` e `B` no gerador de sentença e a string da soma `a + b` estavam sujando o `<button>` acima do bloco visual de Linking Cubes.
+  3. No `TakeApart.tsx` (a visualização do problema) a criança não via a conexão da fórmula matemática (`total = a + b`) com os blocos porque a string não tinha a mesma cor das peças.
+  4. `TenFrame` recebia a prop errada (`n` ao invés de `filled`) no renderizador, fazendo a bandeja aparecer sempre vazia.
+- **Implementação Realizada (Act & Prove):**
+  1. Injetada lógica dinâmica (`isFlexCol`) no container de botões de `GameLoop.tsx`: se houver `o.groups` na opção, o layout usa `flex-col` para empilhar verticalmente e não amassar as alternativas.
+  2. Retiradas as labels residuais (`"a"`, `"b"`, `"1+2"`, etc) dos generators para que a engine apenas exiba os componentes visuais limpos.
+  3. Editado o `TakeApart.tsx` e mapeadas as cores do texto `<span>` para `<span className="text-purple-600">`, `blue-500` e `rose-500` de forma simétrica com os `LinkingCubes`.
+  4. Fix na prop de `<TenFrame filled={question.n!} />` em `FichaRenderer.tsx`.
+- **Resultado (Verify):** A bandeja volta a exibir blocos preenchidos para sumir e treinar memória (missing addend). As alternativas de cubo não colidem mais em telas menores, e estão livres de texto desnecessário.

@@ -15,19 +15,25 @@ export function TakeApart({ total, knownSplit }: TakeApartProps) {
           <p className="text-sm md:text-lg font-bold text-slate-500 mb-1 text-center" style={{ fontFamily: FONT }}>
             Aqui está uma maneira de separar {total}:
           </p>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col items-center justify-center gap-6">
+            <div className="scale-[0.8] md:scale-90 origin-center">
+               <LinkingCubes groups={[{ n: total, color: "bg-purple-400" }]} />
+            </div>
+            
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4">
             <div className="text-3xl md:text-4xl font-black text-slate-700 whitespace-nowrap" style={{ fontFamily: FONT }}>
-              {total} = {knownSplit.a} + {knownSplit.b}
+              <span className="text-purple-600">{total}</span> = <span className="text-blue-500">{knownSplit.a}</span> + <span className="text-rose-500">{knownSplit.b}</span>
             </div>
             <div className="scale-[0.8] md:scale-90 origin-center">
-               <LinkingCubes 
+               <LinkingCubes numberAbove showPlus 
                  groups={[
-                   { n: knownSplit.a, color: "bg-emerald-400" }, 
-                   { n: knownSplit.b, color: "bg-indigo-400" }
+                   { n: knownSplit.a, color: "bg-blue-400" }, 
+                   { n: knownSplit.b, color: "bg-rose-400" }
                  ]} 
                />
             </div>
           </div>
+        </div>
         </div>
       )}
       

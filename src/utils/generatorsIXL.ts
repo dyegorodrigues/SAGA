@@ -5,12 +5,14 @@ export function gIXL_VisualAddition(lvl: number): Question {
   const a = Math.floor(Math.random() * 4) + 1;
   const b = Math.floor(Math.random() * 4) + 1;
   const total = a + b;
-  const isBirds = Math.random() > 0.5;
+  const emojis = ["🐦", "🐨", "🐸", "🐳", "🐢", "🐙", "🐞", "🐛", "🦋", "🐌", "🍎", "🍕", "🍔", "🎈"];
+  const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+
   return {
     kind: "visual-addition",
     a,
     b,
-    emoji: isBirds ? "🐦" : "🐨",
+    emoji,
     n: total, // we use this for internal consistency or answer
     prompt: `Quanto é ${a} + ${b}?`,
     audioPrompt: `Quanto é ${a} mais ${b}?`,
@@ -24,11 +26,18 @@ export function gIXL_VisualAddition(lvl: number): Question {
 
 export function gIXL_Scattered(lvl: number): Question {
   const n = Math.floor(Math.random() * 6) + 3;
-  const isAnimal = Math.random() > 0.5;
-  const animals = ["🐵", "🦁", "🐯", "🐼", "🐶", "🐱"];
-  const fruits = ["🍌", "🍎", "🍓", "🍇", "🍉", "🍍"];
-  const emoji = isAnimal ? animals[Math.floor(Math.random() * animals.length)] : fruits[Math.floor(Math.random() * fruits.length)];
-  const name = isAnimal ? "animais" : "frutas";
+  const categories = [
+    { items: ["🐵", "🦁", "🐯", "🐼", "🐶", "🐱", "🦊", "🐻", "🐸"], name: "animais" },
+    { items: ["🍌", "🍎", "🍓", "🍇", "🍉", "🍍", "🍒", "🥝"], name: "frutas" },
+    { items: ["🚗", "🚕", "🚙", "🚌", "🚒", "🚑", "🚜"], name: "veículos" },
+    { items: ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏉"], name: "bolas" },
+    { items: ["🍩", "🍪", "🎂", "🍰", "🧁", "🍫", "🍬", "🍭"], name: "doces" },
+    { items: ["🌺", "🌻", "🌹", "🌷", "🌼", "🌸"], name: "flores" }
+  ];
+  const cat = categories[Math.floor(Math.random() * categories.length)];
+  const emoji = cat.items[Math.floor(Math.random() * cat.items.length)];
+  const name = cat.name;
+
   return {
     kind: "scattered",
     n,
@@ -55,18 +64,18 @@ export function gIXL_LinkingCubesSentence(lvl: number): Question {
       wrongA = Math.floor(Math.random() * 4) + 1;
       wrongB = Math.floor(Math.random() * 4) + 1;
     }
-    return [{ n: wrongA, color: "bg-emerald-400" }, { n: wrongB, color: "bg-indigo-400" }];
+    return [{ n: wrongA, color: "bg-blue-400" }, { n: wrongB, color: "bg-rose-400" }];
   };
   
-  const rightGroups = [{ n: a, color: "bg-emerald-400" }, { n: b, color: "bg-indigo-400" }];
+  const rightGroups = [{ n: a, color: "bg-blue-400" }, { n: b, color: "bg-rose-400" }];
   
   return {
-    kind: "plain", // We just use plain to show the prompt and the options will have the groups
+    kind: "plain", big: true,
     prompt: `Qual imagem mostra ${a} + ${b} = ${total}?`,
     audioPrompt: `Ache a imagem que mostra ${a} mais ${b} igual a ${total}.`,
     options: [
-      { label: `a`, value: "right", groups: rightGroups },
-      { label: `b`, value: "wrong1", groups: makeWrongGroups() },
+      { label: "", value: "right", groups: rightGroups },
+      { label: "", value: "wrong1", groups: makeWrongGroups() },
     ].sort(() => Math.random() - 0.5),
     answer: "right"
   };
@@ -85,7 +94,7 @@ export function gIXL_TakeApart(lvl: number): Question {
   }
   
   let wrongA = newA, wrongB = newB;
-  while((wrongA === newA && wrongB === newB) || (wrongA === a && wrongB === b) || (wrongA + wrongB !== total)) {
+  while((wrongA === newA && wrongB === newB) || (wrongA === a && wrongB === b) || (wrongA + wrongB === total)) {
     // Generate a wrong combination that still sums to total? No, generate a wrong combination that doesn't sum to total, or sums to total but is the same as the original.
     // IXL shows different block combinations.
     wrongA = Math.floor(Math.random() * total) + 1;
@@ -101,14 +110,14 @@ export function gIXL_TakeApart(lvl: number): Question {
     audioPrompt: "Qual é a outra maneira de separar os blocos?",
     options: [
       { 
-        label: `${newA} + ${newB}`, 
+        label: "", 
         value: "right",
-        groups: [{ n: newA, color: "bg-emerald-400" }, { n: newB, color: "bg-indigo-400" }]
+        groups: [{ n: newA, color: "bg-blue-400" }, { n: newB, color: "bg-rose-400" }]
       },
       { 
-        label: `${wrongA} + ${wrongB}`, 
+        label: "", 
         value: "wrong",
-        groups: [{ n: wrongA, color: "bg-emerald-400" }, { n: wrongB, color: "bg-indigo-400" }]
+        groups: [{ n: wrongA, color: "bg-blue-400" }, { n: wrongB, color: "bg-rose-400" }]
       }
     ].sort(() => Math.random() - 0.5),
     answer: "right"

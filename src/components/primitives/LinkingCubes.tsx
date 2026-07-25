@@ -4,6 +4,8 @@ import { FONT } from "../Mascot";
 export interface LinkingCubesProps {
   groups: { n: number; color: string }[];
   showNumbers?: boolean;
+  numberAbove?: boolean;
+  showPlus?: boolean;
 }
 
 const COLOR_MAP: Record<string, string> = {
@@ -15,7 +17,7 @@ const COLOR_MAP: Record<string, string> = {
   "bg-purple-400": "#c084fc",
 };
 
-export function LinkingCubes({ groups, showNumbers = false }: LinkingCubesProps) {
+export function LinkingCubes({ groups, showNumbers = false, numberAbove = false, showPlus = false }: LinkingCubesProps) {
   const renderCubes = (n: number, colorClass: string) => {
     const hexColor = COLOR_MAP[colorClass] || colorClass || "#34d399";
     
@@ -41,18 +43,36 @@ export function LinkingCubes({ groups, showNumbers = false }: LinkingCubesProps)
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="flex items-center" style={{ paddingRight: 8 }}>
+    <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-row items-end" style={{ paddingRight: 8 }}>
         {groups.map((g, idx) => (
-          <div key={idx} className="flex items-center">
-            {renderCubes(g.n, g.color)}
-            {/* If there are multiple groups and we want to show a split, add a clear margin */}
-            {idx < groups.length - 1 && <div className="w-4" />}
-          </div>
+          <React.Fragment key={idx}>
+            <div className="flex flex-col items-center gap-2">
+              {numberAbove && (
+                <div className="text-3xl font-black text-slate-700" style={{ fontFamily: FONT }}>
+                  {g.n}
+                </div>
+              )}
+              <div className="flex items-center">
+                {renderCubes(g.n, g.color)}
+              </div>
+            </div>
+            
+            {/* Space or Plus between groups */}
+            {idx < groups.length - 1 && (
+              <div className="flex items-center justify-center px-4 mb-2">
+                {showPlus ? (
+                  <span className="text-4xl font-black text-slate-400" style={{ fontFamily: FONT }}>+</span>
+                ) : (
+                  <div className="w-4" />
+                )}
+              </div>
+            )}
+          </React.Fragment>
         ))}
       </div>
       
-      {showNumbers && (
+      {showNumbers && !numberAbove && (
         <div className="flex gap-4 items-center mt-2 text-4xl font-black text-slate-700" style={{ fontFamily: FONT }}>
           {groups.map((g, idx) => (
             <React.Fragment key={idx}>

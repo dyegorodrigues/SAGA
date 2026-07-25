@@ -55,7 +55,7 @@ export function FichaRenderer({ question, onAnswer, disabled }: FichaRendererPro
     case 'draggroup':
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
     case 'tenframe':
-      return <div className="flex justify-center"><TenFrame {...uiProps} /></div>;
+      return <div className="flex justify-center"><TenFrame filled={question.n!} {...uiProps} /></div>;
     case 'visual-addition':
       return <VisualAddition a={question.a!} b={question.b!} emojiA={question.emoji} emojiB={question.emoji} {...uiProps} />;
     case 'scattered':
