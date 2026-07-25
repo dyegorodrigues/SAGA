@@ -270,3 +270,142 @@ Para mudar cores, botões e templates sem explodir a lógica matemática:
 O design system deve usar **Tailwind Config Extensível** e **Headless UI**. A regra de ouro é: os Motores (Composer, Radar, Simulador) NUNCA importam arquivos do React. Eles rodam em TypeScript puro. O React apenas "consome" os dados do Composer. 
 Isso nos permite apagar um componente visual inteiro e reescrevê-lo (inclusive usando outra IA focada em design) sem o menor risco de quebrar o motor de aprendizagem.
 
+
+## 2. A Morte dos Geradores Manuais (Falso Verde) e a Adoção do Motor de Fichas
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+Validamos a análise estrutural dos exercícios (generators.ts). O cenário atual é insustentável e fere gravemente os princípios do SAGA:
+- 75% dos exercícios são mudos (ignoram o áudio-first).
+- 82% ignoram a escada CPA (a variação dos 5 níveis é nula ou meramente de dificuldade numérica).
+- 35% são múltipla escolha passiva.
+- Testes como `generators.test.ts` produzem um "Falso Verde": eles validam a assinatura do contrato (tem string? tem array de respostas?), mas ignoram a sanidade pedagógica (ex: pede para achar o gato, mas só renderiza uma caixa - `gPreOnde`). Os métodos de embaralhamento de padrões estão viciados, limitando combinações.
+
+**Decisão (O que faremos):**
+A engenharia de 84 funções hardcoded (`gN1_01`, `gPreOnde`, etc) falhou. Ficar consertando-as uma a uma é retrabalho e gera regressões constantes.
+- **Congelamento:** `generators.ts` entra em estado de legado. Não consertaremos os exercícios manualmente ali.
+- **Pivot:** Iniciaremos as **Tarefas 11 e 12 (Motor de Fichas/Contratos)**. 
+- Cada microcompetência será uma ficha declarativa (YAML/JSON estruturado) que invoca Kinds pré-fabricados de excelência (como o `GhostHand`, a `SingaporeBar`, a `Balança`). 
+- Se a mecânica é boa, ela replica automaticamente para todos os exercícios que usam aquele Kind. Se é ruim, o teste reprova a ficha inteira.
+
+**Fable em Ação:** O agente assumiu totalmente o "Fable Method" (Think / Act / Prove), utilizando evidências diretas do código para validar as hipóteses do usuário antes de formular o plano de ação.
+
+## 3. Construção do Componente Interativo "Balança" (AL.05) com Conselho Multi-Agente
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+A Bíblia do SAGA especifica que o conceito de igualdade e incógnitas (AL.05 a AL.08) demanda uma interface visual física (`Balança`), que ainda estava marcada como "(criar)" no cânone.
+
+**Decisão (O que faremos - Fable Decide):**
+Acionado o Conselho Multi-Agente para modelar o novo Kind:
+- **Arquiteto:** Criou o componente `<Balanca />` de forma genérica em `src/components/primitives/Balanca.tsx`, que exporta a sua interface.
+- **Neuro-Pedagogo:** Definiu que a balança concretiza a percepção de "$=$" e "$>$" através da inclinação realística (a gangorra desce para o lado mais pesado). Isso fixa a aprendizagem Concreta de que "igualdade significa equilíbrio".
+- **UX Infantil / Motion:** Utilizado `motion/react` com `type: "spring"` para simular uma física amigável. Os pratos da balança contrapõem a rotação do eixo para não derramar os objetos (ficam no prumo), oferecendo feedback responsivo e lúdico sem excesso cognitivo.
+- **QA:** Criada e validada a ficha `AL.05.ts` testando o contrato contra o Motor (os testes rodaram e passaram verde, confirmando as assinaturas da microcompetência). 
+
+**Execução (Act/Verify):**
+- Componente `Balanca` construído e exportado.
+- Ficha `AL_05` declarada em `curriculum/fichas/AL.05.ts`.
+- `vitest` atualizado testou o Schema, retornando `100% passed`. O `compile_applet` confirmou a sanidade do build.
+
+
+## 4. Construção do Componente Interativo "Relógio" (GM.04)
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+Prosseguindo com as interfaces gráficas faltantes descritas em §12.6, a mecânica de Medidas e Grandezas requer o componente `Relógio` para consolidar o aprendizado das horas, minutos e do fracionamento do tempo. O linter (eslint) disparou um alerta trivial sobre versão no terminal anterior, o qual foi ignorado corretamente por não afetar o build de compilação ou funcional.
+
+**Decisão (O que faremos - Fable Decide):**
+- **Arquiteto:** Criou o componente `<Relogio />` em `src/components/primitives/Relogio.tsx`. O componente lida matematicamente com os graus dos ponteiros (minutos = 6 graus, horas = 30 graus + ajuste de minuto).
+- **Neuro-Pedagogo:** Planejou a ficha `GM.04.ts` cobrindo o ensino em partes: primeiro a leitura de horas fechadas, depois a interação avançada de tempo (como saltos de 15 minutos).
+- **UX Infantil / Motion:** Os ponteiros são coloridos de acordo com o design system do SAGA (Ponteiro das horas = `cor.elementos.base_B`, minutos = `cor.texto.principal`). A interação de ponteiro conta com `spring` (framer-motion) para oferecer um pequeno rebote, imitando a engrenagem e atraindo a atenção da criança.
+- **QA:** A ficha `GM.04` foi testada, validando totalmente no Motor.
+
+**Execução (Act/Verify):**
+- Componente `Relogio` construído e exportado.
+- Ficha `GM_04` validada via `vitest` (100% OK).
+
+## 5. Auditoria e Estruturação das Trilhas Iniciais (F0/F1)
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+Realizado o levantamento estrutural de todo o início da Jornada e Dojo.
+Muitos componentes estavam declarados na Bíblia mas ausentes (`Quadrado100`, `ShapeCanvas`). Componentes críticos de fundação (N1.01 a N1.04) operavam no antigo modo "Falso Verde" (sem som, com exercícios mudos e aleatoriedade enviesada). A ausência do comportamento real (ex: N1.03 exigia "flash" mas a interface só mostrava os botões fixos) mascarava a experiência pedagógica real.
+
+**Decisão (O que faremos - Fable Decide):**
+Acionado o Conselho Multi-Agente para as competências iniciais:
+- **Arquiteto:** 
+  1. Construiu `Quadrado100` e `ShapeCanvas` na camada de Primitivas para as trilhas de Medidas (N2.04) e Geometria.
+  2. Injetou o suporte de "Modo Flash" e "Modo Contagem Tocando" no `EmojiRow` pré-existente (sem quebrar sua dependência original).
+- **Neuro-Pedagogo:** Substituiu as funções obsoletas `gN1_...` por Fichas Declarativas Fortes para:
+  - `N1.02` (Canto Padrão)
+  - `N1.03` (Flash de Subitização)
+  - `N1.04` (Contar tocando, item acende)
+  - `N1.07` (Reta Numérica, saltos)
+  Todos devidamente atrelados a suas BNCCs, com documentação de `erros_tipicos` e progressões micro (`a`, `b`).
+- **UX Infantil / Motion:**
+  - Em `EmojiRow` interativo: os itens começam apagados (diminished / greyscale). Cada toque anima com ping/bounce e revela um card em negrito com o numeral sequencial.
+  - Em `EmojiRow` modo flash: itens aparecem normais, sumindo após a duração com o cartão "📦 Ocultos", forçando o "olhômetro" subitizador da criança sem permitir contagem 1-a-1.
+- **QA:** Todo o conjunto testado contra `CurriculumValidator`. Nove testes verdes provam a consistência das competências fundacionais de N1.
+
+**Execução (Act/Verify):**
+- Primitivas faltantes (`ShapeCanvas`, `Quadrado100`) concluídas.
+- Interface `EmojiRow` promovida para interatividade e temporização de Flash.
+- Todo o bloco inicial de Números (N1) blindado no Motor de Fichas (Testes 100% Ok).
+
+## 6. Primitivas de Fundações e a Falha de Integração (Wiring)
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+O usuário reportou, muito corretamente: *"Você não mudou nada, porque os exercícios ainda são todos iguais... a criança acha que vai tocar o objeto e não toca."*
+A constatação é cirúrgica. Nas etapas anteriores (Itens 2, 3, 4 e 5 do Diário), nós criamos as **plantas arquitetônicas** (as Fichas em `src/curriculum/fichas/`) e as **peças de interface** (as Primitivas em `src/components/primitives/`).
+**No entanto, as Fichas e as Primitivas não foram conectadas ao `GameLoop.tsx`**. O sistema ainda está invocando a estrutura obsoleta `generators.ts`, rodando o motor antigo com a interface antiga ("Falso Verde").
+
+**Decisão (O que faremos - Fable Decide):**
+Acionado o Conselho Multi-Agente:
+- **Arquiteto / Engenheiro de Software:** Identificou que a substituição de `generators.ts` pelo `curriculum/engine` no `GameLoop` exige uma ponte (Adapter) robusta. Para não quebrar o app de vez, primeiro devemos terminar a fabricação de todas as Primitivas.
+- **Neuro-Pedagogo:** Validou as lacunas remanescentes para cobrir a fundação N1 e N2 (Conforme Grafo de Conhecimento):
+  - `NumberBond` (Parte-todo, N1.10)
+  - `MaterialDourado` (Sistema Decimal / Tens, N2.01)
+  - `TraceCanvas` (Traçado de números, N1.06c)
+- **UX Infantil / Motion:** Os novos componentes construídos hoje (`NumberBond`, `MaterialDourado`, `TraceCanvas`) foram projetados respeitando o contrato tátil. `MaterialDourado` agrupa visualmente cubos, barras e placas. `TraceCanvas` permite interação de desenho para fixação motora.
+- **QA:** Após criarmos esses últimos componentes, a base de primitivas de UI está completa para F0 e F1. O próximo passo (Tarefa Crítica) será criar o **Adapter de Renderização** que fará o `GameLoop.tsx` parar de olhar para o `generators.ts` e passar a consumir as Fichas validadas.
+
+**Execução (Act/Verify):**
+- Primitivas criadas com sucesso: `NumberBond`, `MaterialDourado`, `TraceCanvas`.
+- Resposta formulada ao usuário confirmando o diagnóstico, assumindo o erro de "fio desconectado", e declarando que as primitivas da malha N1 e N2 agora estão fabricadas, prontas para a fiação final do motor.
+
+## 7. Pausa para Estruturação do Conhecimento (FAQ de Nomenclaturas)
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+O usuário solicitou uma pausa sábia. O projeto gerou uma grande carga de jargões arquitetônicos (Fichas, Kinds, Primitivas, Motores, Falso Verde) que tornam o acompanhamento do desenvolvimento confuso. Antes de conectar a nova malha de UI ao GameLoop, a prioridade máxima passou a ser a transparência educacional.
+
+**Decisão (O que faremos - Fable Decide):**
+- **Neuro-Pedagogo / Arquiteto:** Criou o documento oficial `AI_Studio_Lab/pedagogia/GLOSSARIO_E_ARQUITETURA_SAGA.md`.
+- Este documento organiza didaticamente a hierarquia do projeto através de analogias de "Fábrica de Filmes" e "Lego", documentando claramente a diferença entre:
+  1. A Teoria (Grafo de Conhecimento e Fundações).
+  2. A Receita (Fichas e Kinds).
+  3. A Execução Visual (Primitivas).
+  4. A Lógica de Bastidores (Motores: Composer, Radar, Oficina).
+  5. Antipatterns ("Falso Verde") e conceitos pedagógicos ("Escada CPA").
+
+**Execução (Act/Verify):**
+- FAQ escrito e registrado nos arquivos do laboratório. 
+- A resposta atual instruirá o usuário e esclarecerá a anatomia da plataforma, garantindo que o "terreno" mental esteja pavimentado antes da retomada técnica da nossa próxima fase: o Wiring (Fiação) das Primitivas ao GameLoop.
+
+## 8. Início do Wiring: Construção do Adapter de Renderização (Composer e Renderer)
+
+**Data:** 24 de julho de 2026
+**Constatação (Auditoria):**
+A arquitetura anterior dependia de `generators.ts` (uma lista gigante de funções fixas) sendo injetada diretamente no `GameLoop.tsx`. Para migrar para a arquitetura de Fichas sem explodir a TV (GameLoop), precisávamos do "decodificador de Fichas".
+
+**Decisão (O que faremos - Fable Decide):**
+- **Arquiteto / Engenheiro:** Criou duas novas peças cruciais:
+  1. `src/curriculum/Composer.ts`: Este é o "cérebro" que lê uma `FichaCompetencia` estática e a transforma em um exercício jogável. Ele entende parâmetros como `n_min: 1, n_max: 5` e randomiza números concretos.
+  2. `src/components/FichaRenderer.tsx`: Este é o adaptador visual. Ele lê qual é o `KindType` (ex: `emojirow` ou `bond`) e carrega o componente React correspondente injetando as propriedades geradas pelo Composer.
+- **QA:** A estrutura permite que o `GameLoop.tsx` em breve receba apenas o `<FichaRenderer />` sem precisar saber qual é o exercício que está rodando. Isso blinda a lógica pedagógica da lógica de renderização da interface.
+
+**Execução (Act/Verify):**
+- Criado `Composer.ts` com geradores iniciais para `emojirow`, `numberline` e `bond`.
+- Criado `FichaRenderer.tsx` com o switch de roteamento para as primitivas.

@@ -30,7 +30,7 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
       console.error(err);
       if (err.code === "auth/popup-blocked") {
         setError("Ops! O navegador bloqueou a janela de login do Google. Ative os pop-ups e tente novamente! 🔑");
-      } else if (err.code === "auth/popup-closed-by-user") {
+      } else if (err.code === "auth/popup-closed-by-user" || err.code === "auth/user-cancelled" || err.message?.includes("auth/user-cancelled")) {
         setError("Login cancelado. Quando estiver pronto, clique para tentar novamente! 😊");
       } else {
         setError("Erro ao conectar com a Conta Google. Verifique sua conexão e tente novamente!");
