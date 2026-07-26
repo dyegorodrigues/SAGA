@@ -126,7 +126,7 @@ export function KidHomeScreen({
 
     return {
       track: bestTrack,
-      reason: "Próximo portal secreto pronto para ser explorado por você! 🚀",
+      reason: "O Sensei separou este exercício para você treinar hoje! 🦊",
     };
   }, [tracks, prog]);
 
@@ -332,7 +332,7 @@ export function KidHomeScreen({
                 <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.6s_ease-in-out_infinite]" />
                 <div className="flex items-center justify-between gap-3 mb-1.5">
                   <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-md inline-block">
-                    🎓 O professor preparou pra você
+                    🎓 O Sensei preparou pra você
                   </span>
                   <span className="text-2xl animate-bounce">📚</span>
                 </div>
@@ -355,7 +355,7 @@ export function KidHomeScreen({
               <div className="flex items-center gap-2 mb-3 pl-1">
                 <span className="text-xl">📅</span>
                 <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  Missões Diárias
+                  Tarefas do Sensei
                 </span>
               </div>
               
@@ -381,7 +381,7 @@ export function KidHomeScreen({
                     {rec.track.name}
                   </div>
                   <div className="text-xs font-bold mt-1 leading-snug text-blue-900/80">
-                    {rec.reason || 'Sua missão diária de revisão espaçada!'}
+                    {rec.reason || 'Sua missão de revisão!'}
                   </div>
                 </button>
               )}
@@ -461,14 +461,18 @@ export function KidHomeScreen({
                   <div className="text-3xl mb-1">➖</div>
                   <div className="font-black text-indigo-700">Academia da<br/>Subtração</div>
                 </button>
-                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
-                  <div className="text-3xl mb-1">✖️</div>
-                  <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
-                </button>
-                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
-                  <div className="text-3xl mb-1">➗</div>
-                  <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
-                </button>
+                {kid.grade !== "pre" && (
+                  <>
+                    <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
+                      <div className="text-3xl mb-1">✖️</div>
+                      <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
+                    </button>
+                    <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
+                      <div className="text-3xl mb-1">➗</div>
+                      <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
+                    </button>
+                  </>
+                )}
               </div>
             </div>
 
@@ -485,7 +489,7 @@ export function KidHomeScreen({
                   const strandTracks = tracks.filter(t => t.id.startsWith(strand) && (prog[t.id]?.stars || 0) > 0);
                   if (strandTracks.length === 0) return null;
                   const titles: Record<string, string> = {
-                    'N1': 'Senso Numérico e Contagem',
+                    'N1': 'Alfabetização e Quantificação',
                     'N2': 'Sistema Decimal',
                     'N3': 'Adição e Subtração',
                     'N4': 'Multiplicação e Divisão',
@@ -510,16 +514,16 @@ export function KidHomeScreen({
             {/* 3. DESAFIO DO MESTRE (Misto / Livre) */}
             <div className="mt-10 mb-6">
               <div className="flex items-center gap-2 mb-3 pl-1">
-                <span className="text-xl">👑</span>
+                <span className="text-xl">🦊</span>
                 <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  O Desafio do Mestre
+                  O Desafio do Sensei
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
                 Tudo misturado! Teste seus reflexos com tudo que você já aprendeu.
               </p>
               
-              {/* Desafio Misto 👑 */}
+              {/* Desafio do Sensei 🦊 */}
             <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: mixedDoneToday ? "#CBD5E1" : "#7C3AED", boxShadow: mixedDoneToday ? "0 6px 0 #CBD5E1" : "0 6px 0 #5B21B6" }}>
               <button
                 onClick={() => {
@@ -542,12 +546,12 @@ export function KidHomeScreen({
                 )}
                 <div className="flex items-center justify-between gap-3 mb-1.5">
                   <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block border-2 ${mixedDoneToday ? "text-slate-500 bg-slate-100 border-slate-200" : "text-purple-900 bg-purple-200 border-purple-300"}`}>
-                    {mixedDoneToday ? "✅ Desafio de hoje completo!" : "👑 Desafio especial do dia"}
+                    {mixedDoneToday ? "✅ Desafio de hoje completo!" : "🦊 Desafio especial do dia"}
                   </span>
                   <span className={`text-2xl ${mixedDoneToday ? "" : "animate-bounce"}`}>🏆</span>
                 </div>
                 <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: mixedDoneToday ? "#64748B" : "#4C1D95" }}>
-                  Desafio Misto 👑
+                  Desafio Misto 🦊
                 </div>
                 <div className={`text-xs font-bold mt-1 leading-snug ${mixedDoneToday ? "text-slate-400" : "text-purple-900/80"}`}>
                   {mixedDoneToday
@@ -557,38 +561,14 @@ export function KidHomeScreen({
                 {!mixedDoneToday && (
                   <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-purple-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
                     <span>Enfrentar o Desafio</span>
-                    <span>👑</span>
+                    <span>🦊</span>
                   </div>
                 )}
               </button>
             </div>
 
-              {/* Dojo Matemático 🥋 */}
-            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#E11D48", boxShadow: "0 6px 0 #9F1239" }}>
-              <button
-                onClick={() => {
-                  sfx.level();
-                  onDojo();
-                }}
-                className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5"
-                style={{ background: "linear-gradient(135deg, #FFE4E6 0%, #FECDD3 100%)" }}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-black tracking-widest uppercase text-rose-900/60 bg-rose-900/10 px-2 py-0.5 rounded-full">
-                    ⚡ Foco & Velocidade
-                  </span>
-                  <span className="text-2xl animate-pulse">🥋</span>
-                </div>
-                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#9F1239" }}>
-                  Modo Dojo Livre
-                </div>
-                <div className="text-xs font-bold mt-1 leading-snug text-rose-900/80">
-                  Treine sua velocidade e reflexos! Responda o mais rápido que puder para ganhar o título de Gênio. ⚡
-                </div>
-              </button>
-            </div>
+              </div>
           </div>
-        </div>
         )}
 
         {activeShellTab === "oficina" && (

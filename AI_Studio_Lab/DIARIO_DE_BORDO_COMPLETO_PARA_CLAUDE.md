@@ -78,3 +78,36 @@
 3. **Tutorial de Correspondência ("DragGroup"):** A interface visual do "Como fazer?" para os exercícios de arrastar (`DragGroup`) tinha se perdido devido a uma falha no patch anterior que tentou injetar a DIV. Aplicado novamente com âncoragem correta de Regex, de forma que a instrução "Dê uma comidinha para cada bichinho! 👇👇👇" agora aparece sobre as caixas ao carregar a página.
 4. **Problema do "Mudo" no 1º exercício:** Entendido que a falta de voz ao atualizar a página no meio de uma partida é causada pela política de Autoplay dos navegadores, não por bug interno do engine.
 5. **Limpeza do Workspace:** Excluídos arquivos de script órfãos (`.cjs`, `.sh`, `.zip`, `.js` e `.ts` de testes) da raiz do projeto para limpar o File Explorer.
+
+# Registro de Atendimento de Solicitações do Usuário (Sessão Atual)
+## Evoluções da Aba Tutor e Dojo
+- **Problema Relatado:** Textos confusos ("O professor", "portal secreto"), seções redundantes no Dojo ("Modo Dojo Livre" vs "Desafio Misto"), e alunos da pré-escola vendo academias de "Multiplicação" e "Divisão".
+- **Diagnóstico (Evidence & Decide):** A aba Tutor possuía hardcodes e placeholders de desenvolvimento. O algoritmo do Dojo não filtrava `kid.grade` para renderização visual das academias, expondo crianças de 4 anos a conceitos que devem estar ocultos no estágio inicial.
+- **Ação (Act):**
+  - **Tutor:** Refatorado para `🎓 O Sensei preparou pra você` e `Tarefas do Sensei`.
+  - **Dojo:** Removido o botão "Modo Dojo Livre" que causava redundância. Unificado como `Desafio do Sensei 🦊`.
+  - **Dojo (Academias):** Adicionado `if (kid.grade !== "pre")` para ocultar os botões de multiplicação e divisão.
+  - **Treinos Específicos:** Renomeado o módulo lógico interno "N1" para a string correta na UI: `Alfabetização e Quantificação` ao invés de apenas `Senso Numérico`.
+- **Evolução Arquitetural de Dados (Analytics):**
+  - **Problema Relatado:** Necessidade de registrar todos os erros, tempo, clique, para um futuro motor adaptativo e dashboard dos pais.
+  - **Diagnóstico e Planejamento:** Atualmente o `GameLoop.tsx` calcula `ms` (tempo de reação) e `right` (acerto). Isso alimenta o `Progress` atual. Para o tracking atômico, definimos que uma nova camada (ex: `PlaySessions` e `TelemetryLogs` no Firestore) será necessária no futuro para estocar cada interação atômica. Já foram criadas as variáveis base (`rt_max_s`) que permitirão esse tráfego de dados milimétrico.
+
+## Status Atual
+- UI da Aba Tutor e Dojo ajustadas e validadas, com botões dinâmicos com base em `kid.grade`.
+- Próximo passo aguardando direcionamento do usuário (possivelmente a aba Jornada).
+
+## Reunião do Conselho Fable (26 Julho 2026) - Alinhamento de Rota e Correção de Comunicação
+**Classificação (Classify):** O usuário reportou grave insatisfação com a comunicação do agente (respostas curtas, em inglês, ignorando a diretriz de detalhamento) e levantou pontos cruciais sobre arquitetura de software (arquivos monolíticos), telemetria no Firebase, e a lógica de bloqueio de disciplinas (Dojo).
+**Evidência (Evidence):**
+1. O agente respondeu de forma excessivamente resumida e fora do idioma (violando o pedido de detalhamento do usuário, apesar de seguir as diretrizes base do sistema).
+2. O filtro de Multiplicação/Divisão foi feito de forma hardcoded (`kid.grade !== 'pre'`) em vez de usar o algoritmo de domínios pré-requisitos (DAG).
+3. A base de código (`App.tsx`, `GameLoop.tsx`, `KidHomeScreen.tsx`) está se tornando monolítica e precisa de auditoria/modularização.
+**Decisão (Decide - Conselho Fable):**
+- **Arquiteto & Engenheiro de Software:** O hardcode no Dojo foi um erro conceitual. O sistema deve usar a progressão do DAG para destravar módulos, não a idade pura. Concordamos que é necessária uma mega auditoria na arquitetura de pastas. Os monólitos precisam ser quebrados em `features` menores para evitar falhas de orquestração.
+- **Neuro-Pedagogo e Tutor:** A lógica de sugerir apenas *um* exercício na aba Tutor é intencional (microcompetência por sessão), evitando sobrecarga cognitiva. O bloqueio de disciplinas avançadas deve ser natural (a criança não vê até estar pronta).
+- **UX Infantil:** O design atual da aba Tutor, Jornada e Dojo será o próximo alvo de reestruturação visual (forense visual), organizando a "mistureba" apontada pelo usuário.
+- **QA:** Todo o log atômico (telemetria) será desenhado para injetar no Firebase sem impactar a performance do jogo.
+
+**Plano de Ação Imediato:**
+1. Escrever um relatório detalhado e exaustivo em PT-BR para o usuário, abordando todos os pontos (Arquitetura, Telemetria, Lógica do Dojo, Tutor).
+2. Preparar a Mega Auditoria de Arquitetura (Mapear monólitos, arquivos fantasmas).
