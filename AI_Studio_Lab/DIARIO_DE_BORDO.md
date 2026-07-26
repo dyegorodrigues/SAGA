@@ -17,3 +17,11 @@ Foi validado o plano arquitetural para o tracking atômico. Para possibilitar o 
 - **Telemetria Atômica**: Adicionada função de envio assíncrono para o Firestore (coleção `userStates/{userId}/Kids/{kidId}/TelemetryLogs`) no arquivo `src/lib/firebase.ts`. Ela registra cada resposta sem bloquear a interface de usuário.
 - **Modularização**: O arquivo gigante `KidHomeScreen.tsx` foi fatiado. O `switch/case` de abas agora utiliza componentes dedicados em `src/components/home/`: `SenseiTab`, `JourneyTab`, `DojoTab`, `OficinaTab`, `PerfilTab`.
 - **Limpeza**: Arquivos temporários criados por ferramentas (`patch_gameloop.cjs`, `add_telemetry.cjs`, `sensei_block.txt`, etc) foram devidamente apagados para não poluir o explorador.
+
+### Atualização Estrutural de Agentes (A Tríade de Orquestração)
+- **Desafio**: O usuário identificou lacunas de comportamento no agente Gemini (esquecimento de limpar o workspace, falhas de leitura do MD e arquivos monolíticos) e pediu uma revisão profunda do `AGENTS.md`. 
+- **Solução (A Tríade)**: Evoluímos a estrutura de um único arquivo de regras para três pilares:
+  1. `AGENTS.md` (Cérebro Central): Protocolo Fable melhorado com estratégia de Fallback/Rollback (desistir e documentar após 3 erros) e regras de componentização (Anti-Monólito).
+  2. `GEMINI.md` (Operacional): Instruções duras para o próprio agente AI Studio, incluindo a **Regra Absoluta de Limpeza** (nunca deixar lixo `.cjs` ou `.txt` no final do turno) e uso obrigatório de background tasks.
+  3. `CLAUDE.md` (Roteador): Regras de sincronia para garantir que a IA externa leia os relatórios do Gemini.
+- **Resultado**: Sistema purificado e regras de orquestração aprimoradas para diminuir erros sistêmicos.
