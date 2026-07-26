@@ -18,6 +18,7 @@ export interface EmojiRowProps {
   interactiveCount?: boolean;
   disabled?: boolean;
   crossedOut?: boolean;
+  promptDone?: boolean;
   onItemTouch?: (count: number) => void;
 }
 
@@ -32,7 +33,8 @@ export function EmojiRow({
   interactiveCount,
   onItemTouch,
   disabled,
-  crossedOut
+  crossedOut,
+  promptDone = true
 }: EmojiRowProps) {
   
   const [isFlashed, setIsFlashed] = useState(false);
@@ -40,7 +42,7 @@ export function EmojiRow({
 
   // Flash logic
   useEffect(() => {
-    if (flashDurationMs && flashDurationMs > 0) {
+    if (flashDurationMs && flashDurationMs > 0 && promptDone) {
       setIsFlashed(false); // reset
       const timer = setTimeout(() => {
         setIsFlashed(true); // hide items after flash

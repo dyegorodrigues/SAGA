@@ -245,7 +245,7 @@ export function MascotRenderer({
         <g className={stage === 1 ? eggAnimClass : bodyAnimClass}>
 
           <ellipse cx="50" cy="85" rx="20" ry="5" fill="rgba(0,0,0,0.2)" />
-          <image href={pngUrl} x="15" y="10" width="70" height="70" />
+          <image href={pngUrl} x="15" y="10" width="70" height="70" style={pngUrl.endsWith(".jpg") ? { mixBlendMode: "multiply" } : {}} />
         </g>
 
       )}

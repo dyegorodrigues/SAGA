@@ -253,10 +253,12 @@ export function GameLoop({
   // decidida UMA vez na montagem: a 1ª questão da missão ganha aula automática se a
   // criança nunca viu a aulinha deste kind (depois disso, só botão/algoritmo)
   const [autoAula, setAutoAula] = useState(() => hasAulinha(q) && !aulaSeen(kid.id, q.kind));
+  const [promptDone, setPromptDone] = useState(!sound);
   
   // Update autoAula state on question change
   useEffect(() => {
     setAutoAula(idx === 0 ? (hasAulinha(q) && !aulaSeen(kid.id, q.kind)) : false);
+    setPromptDone(!sound);
   }, [q, idx, kid.id]);
 
   useEffect(() => {
@@ -404,7 +406,7 @@ export function GameLoop({
       const speechId = q.kind + "|" + q.prompt;
       if (lastSpokenPromptRef.current !== speechId) {
         lastSpokenPromptRef.current = speechId;
-        speak(qSpeech(q, idx === 0), q.lang ? { lang: q.lang } : {});
+        speak(qSpeech(q, idx === 0), { ...(q.lang ? { lang: q.lang } : {}), onEnd: () => setPromptDone(true) });
       }
     }
   }, [q, done, autoAula]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -934,7 +936,7 @@ export function GameLoop({
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}
         <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
           {q.uiProps ? (
-            <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} />
+            <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} promptDone={promptDone} />
 
           ) : (
             <>

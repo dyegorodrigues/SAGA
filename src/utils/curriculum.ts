@@ -74,17 +74,17 @@ const GENERATOR_MAP: Record<string, (lvl: number) => Question> = {
 };
 
 const ISLAND_INFO: Record<string, { icon: string, color: string, dark: string, islandId: string, lvlSkills: string[] }> = {
-  "N1": { icon: "🔢", color: C.pink, dark: C.pinkDark, islandId: "num", lvlSkills: ["Visual", "Mental", "Abstrato", "Dojo"] },
-  "N2": { icon: "💯", color: C.ocean, dark: C.oceanDark, islandId: "num", lvlSkills: ["Material", "Identificar", "Compor", "Dojo"] },
-  "N3": { icon: "➕", color: C.mint, dark: C.mintDark, islandId: "op", lvlSkills: ["Concreto", "Mental", "Armado", "Dojo"] },
-  "N4": { icon: "✖️", color: C.grape, dark: C.grapeDark, islandId: "op", lvlSkills: ["Grupos", "Arranjos", "Mental", "Dojo"] },
-  "N5": { icon: "🍕", color: C.melon, dark: C.melonDark, islandId: "num", lvlSkills: ["Partes", "Comparar", "Somar", "Dojo"] },
-  "N6": { icon: "📊", color: C.sun, dark: C.sunDark, islandId: "num", lvlSkills: ["Fração", "Decimal", "Porcento", "Dojo"] },
-  "N7": { icon: "➖", color: C.pink, dark: C.pinkDark, islandId: "num", lvlSkills: ["Reta", "Somar", "Subtrair", "Dojo"] },
-  "AL": { icon: "⚖️", color: C.sun, dark: C.sunDark, islandId: "logica", lvlSkills: ["Padrões", "Equilíbrio", "Equação", "Dojo"] },
-  "GE": { icon: "🔺", color: C.melon, dark: C.melonDark, islandId: "logica", lvlSkills: ["Formas", "Espaço", "Sólidos", "Dojo"] },
-  "GM": { icon: "📏", color: "#2E8B57", dark: "#1E5E3A", islandId: "real", lvlSkills: ["Medidas", "Horas", "Dinheiro", "Dojo"] },
-  "PE": { icon: "📈", color: C.ocean, dark: C.oceanDark, islandId: "logica1", lvlSkills: ["Gráficos", "Tabelas", "Média", "Dojo"] },
+  "N1": { icon: "🔢", color: C.pink, dark: C.pinkDark, islandId: "N1", lvlSkills: ["Visual", "Mental", "Abstrato", "Dojo"] },
+  "N2": { icon: "💯", color: C.ocean, dark: C.oceanDark, islandId: "N2", lvlSkills: ["Material", "Identificar", "Compor", "Dojo"] },
+  "N3": { icon: "➕", color: C.mint, dark: C.mintDark, islandId: "N3", lvlSkills: ["Concreto", "Mental", "Armado", "Dojo"] },
+  "N4": { icon: "✖️", color: C.grape, dark: C.grapeDark, islandId: "N4", lvlSkills: ["Grupos", "Arranjos", "Mental", "Dojo"] },
+  "N5": { icon: "🍕", color: C.melon, dark: C.melonDark, islandId: "N5", lvlSkills: ["Partes", "Comparar", "Somar", "Dojo"] },
+  "N6": { icon: "📊", color: C.sun, dark: C.sunDark, islandId: "N6", lvlSkills: ["Fração", "Decimal", "Porcento", "Dojo"] },
+  "N7": { icon: "➖", color: C.pink, dark: C.pinkDark, islandId: "N7", lvlSkills: ["Reta", "Somar", "Subtrair", "Dojo"] },
+  "AL": { icon: "⚖️", color: C.sun, dark: C.sunDark, islandId: "AL", lvlSkills: ["Padrões", "Equilíbrio", "Equação", "Dojo"] },
+  "GE": { icon: "🔺", color: C.melon, dark: C.melonDark, islandId: "GE", lvlSkills: ["Formas", "Espaço", "Sólidos", "Dojo"] },
+  "GM": { icon: "📏", color: "#2E8B57", dark: "#1E5E3A", islandId: "GM", lvlSkills: ["Medidas", "Horas", "Dinheiro", "Dojo"] },
+  "PE": { icon: "📈", color: C.ocean, dark: C.oceanDark, islandId: "PE", lvlSkills: ["Gráficos", "Tabelas", "Média", "Dojo"] },
 };
 
 const FAIXAS_INFO: Record<string, { id: string, name: string, description: string }> = {
@@ -140,14 +140,16 @@ export const TRACKS_ANO1 = CURRICULUM.find(m => m.id === 'F1')?.tracks || [];
 export const TRACKS_ANO2 = CURRICULUM.find(m => m.id === 'F2')?.tracks || [];
 
 export const ISLAND_DEFS: Record<string, { title: string, subtitle: string, color: string }> = {
-  "alfa": { title: "Alfabetização Numérica", subtitle: "A base de tudo", color: "from-green-400 to-emerald-600" },
-  "grand": { title: "Noções de Grandeza", subtitle: "Comparar e ordenar", color: "from-blue-400 to-indigo-600" },
-  "logica": { title: "Raciocínio Lógico & Espaço", subtitle: "Padrões, formas e posições", color: "from-amber-400 to-orange-600" },
-  "tempo": { title: "Noções de Tempo", subtitle: "Dias e calendários", color: "from-sky-400 to-blue-600" },
-  "op": { title: "Primeiras Operações", subtitle: "Juntar e tirar", color: "from-rose-400 to-pink-600" },
-  "num": { title: "Números e Sequências", subtitle: "Até 100 e além", color: "from-blue-500 to-indigo-700" },
-  "op1": { title: "Operações e Estratégias", subtitle: "Somas rápidas e lógicas", color: "from-rose-500 to-pink-700" },
-  "logica1": { title: "Lógica Aplicada", subtitle: "Problemas e gráficos", color: "from-amber-500 to-orange-700" },
-  "real": { title: "Mundo Real", subtitle: "Dinheiro e horas", color: "from-emerald-500 to-teal-700" },
+  "N1": { title: "Senso Numérico e Contagem", subtitle: "A base de tudo", color: "from-green-400 to-emerald-600" },
+  "N2": { title: "Sistema Decimal", subtitle: "Valor posicional", color: "from-blue-400 to-indigo-600" },
+  "N3": { title: "Adição e Subtração", subtitle: "Juntar e tirar", color: "from-rose-400 to-pink-600" },
+  "N4": { title: "Multiplicação e Divisão", subtitle: "Agrupar e repartir", color: "from-amber-400 to-orange-600" },
+  "N5": { title: "Frações", subtitle: "Partes do todo", color: "from-purple-400 to-fuchsia-600" },
+  "N6": { title: "Decimais e Porcentagem", subtitle: "Além do inteiro", color: "from-sky-400 to-blue-600" },
+  "N7": { title: "Números Negativos", subtitle: "Abaixo de zero", color: "from-slate-400 to-slate-600" },
+  "AL": { title: "Álgebra e Padrões", subtitle: "Lógica matemática", color: "from-yellow-400 to-amber-600" },
+  "GE": { title: "Geometria", subtitle: "Formas e espaço", color: "from-pink-400 to-rose-600" },
+  "GM": { title: "Grandezas e Medidas", subtitle: "Mundo real", color: "from-teal-400 to-emerald-600" },
+  "PE": { title: "Estatística", subtitle: "Dados e gráficos", color: "from-indigo-400 to-violet-600" },
   "default": { title: "Novas Aventuras", subtitle: "Módulos extras", color: "from-purple-400 to-fuchsia-600" }
 };

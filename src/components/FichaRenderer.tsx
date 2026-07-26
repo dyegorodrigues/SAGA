@@ -22,9 +22,10 @@ interface FichaRendererProps {
   question: Question;
   onAnswer: (answer: any, isCorrect: boolean) => void;
   disabled?: boolean;
+  promptDone?: boolean;
 }
 
-export function FichaRenderer({ question, onAnswer, disabled }: FichaRendererProps) {
+export function FichaRenderer({ question, onAnswer, disabled, promptDone = true }: FichaRendererProps) {
   const { kind, uiProps, evaluate } = question;
 
   const handleInteract = (val: any) => {
@@ -35,7 +36,7 @@ export function FichaRenderer({ question, onAnswer, disabled }: FichaRendererPro
 
   switch (kind) {
     case 'emojirow':
-      return <div className="flex justify-center"><EmojiRow {...uiProps} onItemTouch={handleInteract} disabled={disabled} /></div>;
+      return <div className="flex justify-center"><EmojiRow {...uiProps} onItemTouch={handleInteract} disabled={disabled} promptDone={promptDone} /></div>;
       
     case 'bond':
       return <div className="flex justify-center"><NumberBond {...uiProps} /></div>;

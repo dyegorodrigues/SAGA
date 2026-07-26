@@ -77,7 +77,7 @@ export function KidHomeScreen({
   }, [tracks, prog]);
 
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
-  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "escola" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "jornada") as any);
+  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "jornada") as any);
   React.useEffect(() => { window.localStorage.setItem("mk-active-tab", activeShellTab); }, [activeShellTab]);
   const [pickerTrack, setPickerTrack] = useState<Track | null>(null);
 
@@ -357,30 +357,7 @@ export function KidHomeScreen({
                />
             </div>
 
-            {/* Outros Mundos / Matérias */}
-            <div className="mt-12 mb-10">
-               <div className="text-center mb-6 mt-8">
-                 <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Outros Mundos</h2>
-                 <p className="text-sm font-bold text-slate-500 mt-1">Explore novos conhecimentos!</p>
-               </div>
-               {SUBJECTS.filter(s => s.id !== 'mat').map(subj => {
-                 const allTks = ["pre", "ano1", "ano2"].flatMap(g => subj.tracks[g as "pre" | "ano1" | "ano2"] || []);
-                 const tks = Array.from(new Map(allTks.map(t => [t.id, t])).values());
-                 if (!tks || tks.length === 0) return null;
-                 return (
-                   <div key={subj.id} className="mb-8">
-                     <h3 className="text-lg font-bold text-slate-700 mb-3 px-2 flex items-center gap-2">
-                       <span>{subj.icon}</span> {subj.nome}
-                     </h3>
-                     <LearningPath
-                         tracks={tks}
-                        progOf={(id) => prog[id] || FRESH()}
-                        onSelectTrack={onTrack}
-                     />
-                   </div>
-                 );
-               })}
-            </div>
+            
 
           </div>
         )}
@@ -469,7 +446,7 @@ export function KidHomeScreen({
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3.5">
-                {tracks.filter(t => ["soma", "sub", "dezenas", "canto", "contar", "vizinhos", "moldura"].includes(t.id)).map(renderTrackCard)}
+                {tracks.filter(t => ["N1.11", "N3.05", "N3.06", "N3.08", "N1.08", "N2.02"].includes(t.id)).map(renderTrackCard)}
               </div>
             </div>
 
@@ -477,39 +454,7 @@ export function KidHomeScreen({
         )}
 
         
-        {activeShellTab === "escola" && (
-          <div className="animate-[mkPop_0.25s_ease-out_1]">
-            <div className="text-center mb-6 mt-2"> 
-               <h2 className="text-2xl font-black text-sky-900" style={{ fontFamily: FONT }}>Modo Escola</h2>
-               <p className="text-sm font-bold text-slate-500 mt-1">Todas as matérias e exercícios 📚</p>
-            </div>
-            
-            {/* As aventuras, organizadas por matéria (SUBJECTS = cartuchos do console) */}
-            {SUBJECTS.map((subject) => {
-              const allSubjectTracks = ["pre", "ano1", "ano2"].flatMap(g => subject.tracks[g as "pre" | "ano1" | "ano2"] || []);
-              const subjectTracks = Array.from(new Map(allSubjectTracks.map(t => [t.id, t])).values());
-              if (!subjectTracks.length) return null;
-              return (
-                <div key={subject.id} className="mb-6">
-                  <div className="flex items-center gap-2 mb-3 pl-1">
-                    <span className="text-xl">{subject.icon}</span>
-                    <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                      {subject.nome}
-                    </span>
-                    {subject.novo && (
-                      <span className="text-[10px] font-black text-white bg-gradient-to-r from-purple-500 to-pink-500 px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse">
-                        Novo! ✨
-                      </span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-2 gap-3.5">
-                    {subjectTracks.map((t) => renderTrackCard(t))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        
 
         {activeShellTab === "oficina" && (
           <div className="animate-[mkPop_0.25s_ease-out_1]">
@@ -627,7 +572,6 @@ export function KidHomeScreen({
         
         {[
           { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },
-          { id: "escola", label: "Escola", icon: "📚", color: "text-sky-600", activeBg: "bg-sky-50" },
           { id: "dojo", label: "Dojo", icon: "🥋", color: "text-purple-600", activeBg: "bg-purple-50" },
           { id: "oficina", label: "Oficina", icon: "🔧", color: "text-emerald-600", activeBg: "bg-emerald-50" },
           { id: "perfil", label: "Perfil", icon: "👤", color: "text-amber-600", activeBg: "bg-amber-50" },

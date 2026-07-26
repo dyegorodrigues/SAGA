@@ -11,7 +11,7 @@
  * automaticamente; senão, cai no desenho SVG (DragonMascot / bases antigas).
  */
 
-const pngModules = import.meta.glob("../../assets/mascotes/*.png", {
+const pngModules = import.meta.glob(["../../assets/mascotes/*.png", "../../assets/images/*.jpg"], {
   eager: true,
   query: "?url",
   import: "default",
@@ -23,7 +23,7 @@ const ALIAS: Record<string, string> = {
 };
 
 export function getMascotPng(theme: string, stage: number): string | null {
-  const prefixes = [`${ALIAS[theme] || theme}-${stage}`, `${theme}-${stage}`];
+  const prefixes = [`${ALIAS[theme] || theme}-${stage}`, `${theme}-${stage}`, `${theme}_stage${stage}_nobg`];
   for (const [path, url] of Object.entries(pngModules)) {
     const file = path.split("/").pop() || "";
     if (prefixes.some((p) => file.startsWith(p))) return url;

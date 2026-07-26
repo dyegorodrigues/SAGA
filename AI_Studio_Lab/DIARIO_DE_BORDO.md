@@ -139,3 +139,29 @@
 - **Causa Raiz:** O cronômetro de fluência `rt_max_s` havia sido inserido num `useEffect` muito acima na hierarquia do componente `GameLoop.tsx`, antes do estado `journeyDone` ter sido declarado (linha ~231), causando falha durante o render inicial.
 - **Solução:** O `useEffect` foi reposicionado mais abaixo no componente (logo após a declaração do `qRef`), onde as dependências (`journeyDone`, `q`, `status`, etc.) já estão inicializadas e disponíveis na closure da renderização. A chamada a `handlePick` também tem segurança pois será executada de forma assíncrona pós-render, quando a função já existir no escopo.
 - **Status:** Resolvido e com build testada com sucesso.
+
+## Relatório de Investigação Profunda: Modelos Pedagógicos (Benchmark IXL)
+**Data:** Atual
+**Agente Responsável:** Arquiteto & Neuro-Pedagogo
+**Objetivo:** Analisar minuciosamente a arquitetura de exercícios, engajamento e fluência do IXL (referência de mercado) para adaptar e melhorar o Grafo SAGA e a experiência do usuário.
+
+### 1. Descobertas sobre a Arquitetura de Exercícios (O "Como" eles ensinam)
+Durante a navegação pelas trilhas de Alfabetização Numérica e Primeiras Operações, notou-se um padrão ouro de transição CPA (Concreto -> Pictórico -> Abstrato):
+- **O Fim da Poluição Visual:** Os exercícios não possuem "enfeites" ao redor que distraem a criança. A tela inteira é focada no elemento de interação (ex: blocos empilháveis para Number Bonds, prateleiras de brinquedos limpas para Subitização).
+- **Feedback Micro-iterativo:** Erros não geram grandes telas vermelhas punitivas, mas um "desmanche" visual da estratégia da criança, forçando-a a ver o desequilíbrio lógico (ex: a bandeja TenFrame balança, ou a barra de Linking Cubes quebra para mostrar que a soma não bate).
+- **Semântica Forte:** Em vez de usar texto ("Qual é a soma de a + b?"), a interface usa recursos visuais táteis. Essa foi a principal inspiração para a reescrita do nosso `generatorsVisual.ts` (TakeApart, Scattered, etc), purgando labels textuais desnecessárias (como "a", "b") que existiam no antigo `GameLoop`.
+
+### 2. A Mecânica do "Dojo" (Treino de Fluência) vs Jornada
+O IXL e plataformas semelhantes tratam o **Aprendizado (Jornada)** de forma diferente da **Prática Automática (Dojo)**:
+- **Jornada (Aulas Novas):** Segue estritamente a hierarquia do currículo (N1.01 -> N1.02 -> N1.03). Não há limite de tempo cruel; a prioridade é o modelo mental.
+- **Dojo / Fluência:** É um módulo de disparo rápido ("Rapid-Fire"). A criança recebe exercícios *já dominados* (Coroa Ouro no Grafo SAGA) mas agora com restrição de tempo. A interface corta animações longas, priorizando o ritmo cardíaco do exercício (o estado de "Flow"). Se a criança hesita (timeout) ou erra, a punição é a quebra do "streak" (sequência), ativando imediatamente a Oficina.
+- **Como aplicamos isso no SAGA:** O Dojo (aba Dojo) agora consolida o Treino de Fatos (ex: N1.11 Amigos do 10, Tabuadas N4) com o cronômetro `rt_max_s` acoplado ao `GameLoop`. O algoritmo do SAGA monitora e injeta exercícios de "aquecimento" ou "revisão espaçada" baseados no histórico, de modo a equilibrar o avanço vertical (aprender coisas difíceis) e horizontal (dominar os básicos).
+
+### 3. O Problema do Rosto "Cachorro" e as Expressões do Mascote
+Durante a auditoria das emoções, percebemos que o sistema de imagens de mascotes possuía uma falha de carregamento: os PNGs definitivos gerados pela IA de arte possuíam extensão `.jpg` no sistema de arquivos, mas o código estava rigidamente buscando `.png`. Isso causou o carregamento de "fallbacks" vetoriais não-intencionais (caricatos/cachorros), quebrando a imersão premium. Isso foi corrigido no `mascotAssets.ts`, unificando a leitura de JPG e a renderização via `mixBlendMode` para garantir integração gráfica perfeita.
+
+### 4. Reestruturação do Modo Jornada e Fim do "Tudo Junto e Misturado"
+- **Situação Antiga:** As abas "Jornada" e "Escola" duplicavam conteúdos de forma caótica. A "Jornada" exibia ilhas com divisões arbitrárias (alfa, grand, logica), e a Escola listava outras matérias sem coesão com a matemática.
+- **Evolução SAGA:** Removida a aba "Escola" do menu principal, focando a criança nas três ferramentas pedagógicas canônicas: **Jornada** (Aprender), **Dojo** (Treinar), e **Oficina** (Recuperar).
+- A **Jornada** foi re-roteada para organizar os módulos pelas *Strands* nativas do Grafo SAGA (Senso Numérico, Sistema Decimal, Adição/Subtração, etc.). A interface agora exibe um mapa limpo e conectado à progressão real da criança, sem atalhos ou aglomerações confusas.
+
