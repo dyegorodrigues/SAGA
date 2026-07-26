@@ -8,15 +8,15 @@ import { VisualAddition } from './primitives/VisualAddition';
 import { ScatteredItems } from './primitives/ScatteredItems';
 import { LinkingCubes } from './primitives/LinkingCubes';
 import { TakeApart } from './primitives/TakeApart';
-import { NumberBond } from './NumberBond';
-import { NumberLine } from './NumberLine';
-import { InteractiveNumberLine } from './InteractiveNumberLine';
-import { Quadrado100 } from './Quadrado100';
-import { ShapeCanvas } from './ShapeCanvas';
-import { Relogio } from './Relogio';
-import { Balanca } from './Balanca';
-import { MaterialDourado } from './MaterialDourado';
-import { DragGroup } from './DragGroup';
+import { NumberBond } from './primitives/NumberBond';
+import { NumberLine } from './primitives/NumberLine';
+import { InteractiveNumberLine } from './primitives/InteractiveNumberLine';
+import { Quadrado100 } from './primitives/Quadrado100';
+import { ShapeCanvas } from './primitives/ShapeCanvas';
+import { Relogio } from './primitives/Relogio';
+import { Balanca } from './primitives/Balanca';
+import { MaterialDourado } from './primitives/MaterialDourado';
+import { DragGroup } from './primitives/DragGroup';
 
 interface FichaRendererProps {
   question: Question;

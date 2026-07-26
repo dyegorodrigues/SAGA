@@ -219,3 +219,17 @@ export interface State {
   sound: boolean;
   customTracks?: any[];
 }
+
+export interface TelemetryLog {
+  kidId: string;
+  timestamp: number;
+  trackId: string;
+  qIndex: number;
+  qPrompt: string;
+  expectedAnswer: string;
+  givenAnswer: string;
+  reactionTimeMs: number;
+  isCorrect: boolean;
+  misconceptionTags?: string[];
+  tutState?: string;
+}

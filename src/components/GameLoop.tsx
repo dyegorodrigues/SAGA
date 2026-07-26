@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Kid, Track, Question, Progress } from "../types";
 import { RapidFire } from "./exercises/RapidFire";
-import { SingaporeBars } from "./exercises/SingaporeBars";
+import { SingaporeBars } from "./primitives/SingaporeBars";
 import { commitProgress } from "../utils/progressEngine";
-import { auth } from "../lib/firebase";
+import { auth, logTelemetryToCloud } from "../lib/firebase";
 import {
   C,
   FONT,
@@ -41,11 +41,11 @@ import EmotionScene, { Emotion } from "./scenes/EmotionScene";
 import PersonLifeScene from "./scenes/PersonLifeScene";
 import AnimalLifeScene from "./scenes/AnimalLifeScene";
 import NestScene from "./scenes/NestScene";
-import { NumberLine } from "./NumberLine";
-import { InteractiveNumberLine } from "./InteractiveNumberLine";
-import { DragGroup } from "./DragGroup";
-import { ArrayGrid } from "./ArrayGrid";
-import { InteractiveVertical } from "./InteractiveVertical";
+import { NumberLine } from "./primitives/NumberLine";
+import { InteractiveNumberLine } from "./primitives/InteractiveNumberLine";
+import { DragGroup } from "./primitives/DragGroup";
+import { ArrayGrid } from "./primitives/ArrayGrid";
+import { InteractiveVertical } from "./primitives/InteractiveVertical";
 import { VisualAddition } from "./primitives/VisualAddition";
 import { ScatteredItems } from "./primitives/ScatteredItems";
 import { LinkingCubes } from "./primitives/LinkingCubes";
@@ -572,6 +572,33 @@ export function GameLoop({
     if (right && q.kind === "rapid-fire" && durationMs <= 3000 && p.lvl < 5) {
       // Speed bonus helps level up faster
       if (p.streak < 3) p.streak = 3; 
+    }
+
+    
+    // FIREBASE ATOMIC TELEMETRY
+    try {
+      const qPromptText = q.kind === "story" ? String(q.story) : String(q.prompt || "") + (q.kind === "math" ? " " + String(q.expr) : "");
+      let misconceptionTag = undefined;
+      if (q.options) {
+         const pickedOpt = q.options.find((o: any) => o.value === val);
+         if (pickedOpt && pickedOpt.misconception) misconceptionTag = pickedOpt.tag || pickedOpt.misconception;
+      }
+
+      logTelemetryToCloud({
+        kidId: kid.id,
+        timestamp: Date.now(),
+        trackId: track.id,
+        qIndex: idx,
+        qPrompt: qPromptText.substring(0, 200),
+        expectedAnswer: String(q.answer),
+        givenAnswer: String(val),
+        reactionTimeMs: durationMs,
+        isCorrect: right,
+        misconceptionTags: misconceptionTag ? [misconceptionTag] : [],
+        tutState: tutShow !== null ? "guided" : "hide"
+      });
+    } catch(e) {
+       console.warn("Failed to dispatch telemetry", e);
     }
 
     if (!q.isFallback) {

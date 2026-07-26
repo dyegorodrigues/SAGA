@@ -12,3 +12,8 @@ Foi validado o plano arquitetural para o tracking atômico. Para possibilitar o 
 - O loop de jogo atual (`GameLoop.tsx`) utiliza os `rt_max_s` para medir velocidade e já sabe quando há erro.
 - A arquitetura futura de Firestore necessita não apenas salvar a progressão agregada (`prog: Progress`), mas disparar eventos granulares para uma subcoleção `TelemetryLogs` ou `PlaySessions`, registrando o log exato de cada `Question`, resposta escolhida, e o `timestamp`/delay, permitindo a construção do **Dashboard Avançado para os Pais** e relatórios pedagógicos evolutivos.
 
+
+### Atualização (Telemetria e Modularização)
+- **Telemetria Atômica**: Adicionada função de envio assíncrono para o Firestore (coleção `userStates/{userId}/Kids/{kidId}/TelemetryLogs`) no arquivo `src/lib/firebase.ts`. Ela registra cada resposta sem bloquear a interface de usuário.
+- **Modularização**: O arquivo gigante `KidHomeScreen.tsx` foi fatiado. O `switch/case` de abas agora utiliza componentes dedicados em `src/components/home/`: `SenseiTab`, `JourneyTab`, `DojoTab`, `OficinaTab`, `PerfilTab`.
+- **Limpeza**: Arquivos temporários criados por ferramentas (`patch_gameloop.cjs`, `add_telemetry.cjs`, `sensei_block.txt`, etc) foram devidamente apagados para não poluir o explorador.

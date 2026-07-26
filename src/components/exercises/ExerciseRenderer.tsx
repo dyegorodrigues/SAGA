@@ -2,7 +2,7 @@ import React from "react";
 import { Question } from "../../types";
 import { LegacyExercise } from "./LegacyExercise";
 import { RapidFire } from "./RapidFire";
-import { SingaporeBars } from "./SingaporeBars";
+import { SingaporeBars } from "../primitives/SingaporeBars";
 
 interface Props {
   q: Question;

@@ -1,8 +1,16 @@
 import React, { useMemo, useState } from "react";
 import { State, Kid, Track } from "../types";
+import { computeUnlockStatus } from "../utils/unlockEngine";
 import { C, FONT, CoinChip, LevelDots, sfx, FRESH, TOTAL_STICKERS, THEMES, Mascote } from "./Mascot";
 import { MascotEvolutionCard, getKidLifetimeStars, getMascotStage } from "./MascotEvolution";
 import { LearningPath } from "./LearningPath";
+
+import { SenseiTab } from "./home/SenseiTab";
+import { JourneyTab } from "./home/JourneyTab";
+import { DojoTab } from "./home/DojoTab";
+import { OficinaTab } from "./home/OficinaTab";
+import { PerfilTab } from "./home/PerfilTab";
+
 import { SUBJECTS } from "../subjects";
 import { planAula } from "../utils/composer";
 
@@ -66,6 +74,7 @@ export function KidHomeScreen({
   onSpendCoins,
 }: KidHomeProps) {
   const prog = state.progress[kid.id] || {};
+  const unlockStatus = computeUnlockStatus(prog);
   const themeObj = THEMES[kid.theme] || THEMES.classico;
 
   // ▶️ MINHA AULA 📚: o plano do dia pro card (barato — escolhe trilhas, não gera questão)
@@ -278,408 +287,36 @@ export function KidHomeScreen({
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 scrollbar-hide">
         
+        
         {activeShellTab === "sensei" && (
-          <div className="animate-[mkPop_0.25s_ease-out_1]">
-            <div className="text-center mb-6 mt-2">
-               <h2 className="text-2xl font-black text-blue-900" style={{ fontFamily: FONT }}>O Tutor SAGA</h2>
-               <p className="text-sm font-bold text-slate-500 mt-1">Plano de estudos diário 🦊</p>
-            </div>
-            
-            {/* 🎒 MATRÍCULA (E3) */}
-            {/* 🎒 MATRÍCULA (E3) */}
-            {Object.keys(prog).length === 0 && (
-              <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#0EA5E9", boxShadow: "0 6px 0 #0369A1" }}>
-                <button
-                  onClick={() => {
-                    sfx.level();
-                    onMatricula();
-                  }}
-                  className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-                  style={{ background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)" }}
-                >
-                  <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.4s_ease-in-out_infinite]" />
-                  <div className="flex items-center justify-between gap-3 mb-1.5">
-                    <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-sky-900 bg-sky-200 border-2 border-sky-300 rounded-md inline-block">
-                      ✨ Sua primeira aventura
-                    </span>
-                    <span className="text-2xl animate-bounce">🎒</span>
-                  </div>
-                  <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#0C4A6E" }}>
-                    Missão de Boas-Vindas
-                  </div>
-                  <div className="text-xs font-bold mt-1 leading-snug text-sky-900/80">
-                    {kid.petName || "Seu mascote"} quer te conhecer! Mostre o que você já sabe — sem pressa, é só diversão. 🌟
-                  </div>
-                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-sky-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-                    <span>Vamos lá!</span>
-                    <span>🚀</span>
-                  </div>
-                </button>
-              </div>
-            )}
-
-            {/* ▶️ MINHA AULA (E2) */}
-            {Object.keys(prog).length > 0 && (
-              <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3" }}>
-              <button
-                onClick={() => {
-                  sfx.level();
-                  onAula();
-                }}
-                className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-                style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
-              >
-                <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.6s_ease-in-out_infinite]" />
-                <div className="flex items-center justify-between gap-3 mb-1.5">
-                  <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-md inline-block">
-                    🎓 O Sensei preparou pra você
-                  </span>
-                  <span className="text-2xl animate-bounce">📚</span>
-                </div>
-                <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#312E81" }}>
-                  ▶️ MINHA AULA
-                </div>
-                <div className="text-xs font-bold mt-1 leading-snug text-indigo-900/80">
-                  {aulaPlan.resumo} · começa fácil e termina na brincadeira! ✨
-                </div>
-                <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-indigo-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-                  <span>Começar a Aula</span>
-                  <span>▶</span>
-                </div>
-              </button>
-            </div>
-            )}
-
-            {/* 1. MISSÕES DIÁRIAS (Cronograma do Dia) */}
-            <div className="mt-8">
-              <div className="flex items-center gap-2 mb-3 pl-1">
-                <span className="text-xl">📅</span>
-                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  Tarefas do Sensei
-                </span>
-              </div>
-              
-              {rec && (
-                <button
-                  onClick={() => {
-                    sfx.tick();
-                    onTrack(rec.track);
-                  }}
-                  className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2"
-                  style={{
-                    background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
-                    borderColor: '#3B82F6',
-                    boxShadow: '0 6px 0 #2563EB',
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-3 mb-1.5">
-                    <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-blue-900 bg-blue-200 border-2 border-blue-300">
-                      💡 Sugestão do Sensei
-                    </span>
-                  </div>
-                  <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E3A8A' }}>
-                    {rec.track.name}
-                  </div>
-                  <div className="text-xs font-bold mt-1 leading-snug text-blue-900/80">
-                    {rec.reason || 'Sua missão de revisão!'}
-                  </div>
-                </button>
-              )}
-            </div>
-
-            {/* SUGESTAO OFICINA */}
-            {aulaPlan.resgates.length > 0 && (
-               <div className="mt-8 mb-4">
-                  <div className="flex items-center gap-2 mb-3 pl-1">
-                    <span className="text-xl">🚑</span>
-                    <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                      Oficina de Resgate
-                    </span>
-                  </div>
-                  <button onClick={() => { sfx.tick(); setActiveShellTab("oficina"); }} className="w-full bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between shadow-[0_4px_0_#34D399] active:translate-y-1 active:shadow-none transition-all text-left">
-                     <div>
-                       <div className="font-black text-emerald-900 text-lg" style={{ fontFamily: FONT }}>Missões de Resgate!</div>
-                       <div className="text-xs text-emerald-700 font-bold mt-1">O Guardião da Ponte identificou {aulaPlan.resgates.length} conceitos para revisar.</div>
-                     </div>
-                     <span className="text-4xl">🔧</span>
-                  </button>
-               </div>
-            )}
-          </div>
+          <SenseiTab 
+            kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec} 
+            onMatricula={onMatricula} onAula={onAula} onTrack={onTrack} setActiveShellTab={(t: any) => setActiveShellTab(t)} 
+          />
         )}
-
-
         {activeShellTab === "jornada" && (
-          <div className="animate-[mkPop_0.25s_ease-out_1]">
-            {/* Mundo SAGA */}
-            <div className="mb-10">
-               <div className="text-center mb-6 mt-8">
-                 <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Mundo SAGA</h2>
-                 <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha para dominar os números!</p>
-               </div>
-               <LearningPath 
-                  tracks={(() => {
-                    const mat = SUBJECTS.find(s => s.id === 'mat');
-                    if (!mat) return [];
-                    const allMat = ["pre", "ano1", "ano2"].flatMap(g => mat.tracks[g as "pre" | "ano1" | "ano2"] || []);
-                    return Array.from(new Map(allMat.map(t => [t.id, t])).values());
-                  })()}
-                  progOf={(id) => prog[id] || FRESH()}
-                  onSelectTrack={onTrack}
-               />
-            </div>
-
-            
-
-          </div>
+          <JourneyTab prog={prog} onTrack={onTrack} />
         )}
-
         {activeShellTab === "dojo" && (
-          <div className="animate-[mkPop_0.25s_ease-out_1]">
-            <div className="text-center mb-6 mt-2">
-               <h2 className="text-2xl font-black text-purple-900" style={{ fontFamily: FONT }}>Dojo Matemático</h2>
-               <p className="text-sm font-bold text-slate-500 mt-1">Treine sua fluência e velocidade! ⚡</p>
-            </div>
-
-            {/* 1. ACADEMIAS DE OPERAÇÕES (Ginástica Matemática) */}
-            <div className="mt-8">
-              <div className="flex items-center gap-2 mb-3 pl-1">
-                <span className="text-xl">🏋️</span>
-                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  As Academias
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
-                Ginástica pura. O sistema adapta a dificuldade com imagens ou apenas números, de acordo com seu domínio.
-              </p>
-              <div className="grid grid-cols-2 gap-3.5">
-                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FECDD3'}}>
-                  <div className="text-3xl mb-1">➕</div>
-                  <div className="font-black text-rose-700">Academia da<br/>Adição</div>
-                </button>
-                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #C7D2FE'}}>
-                  <div className="text-3xl mb-1">➖</div>
-                  <div className="font-black text-indigo-700">Academia da<br/>Subtração</div>
-                </button>
-                {kid.grade !== "pre" && (
-                  <>
-                    <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
-                      <div className="text-3xl mb-1">✖️</div>
-                      <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
-                    </button>
-                    <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
-                      <div className="text-3xl mb-1">➗</div>
-                      <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* 2. TREINOS ESPECÍFICOS (Cirúrgicos) */}
-            <div className="mt-8">
-              <div className="flex items-center gap-2 mb-3 pl-1">
-                <span className="text-xl">🎯</span>
-                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  Treinos Específicos
-                </span>
-              </div>
-              <div className="grid grid-cols-1 gap-6">
-                {['N1', 'N2', 'N3', 'N4', 'N5', 'N6'].map(strand => {
-                  const strandTracks = tracks.filter(t => t.id.startsWith(strand) && (prog[t.id]?.stars || 0) > 0);
-                  if (strandTracks.length === 0) return null;
-                  const titles: Record<string, string> = {
-                    'N1': 'Alfabetização e Quantificação',
-                    'N2': 'Sistema Decimal',
-                    'N3': 'Adição e Subtração',
-                    'N4': 'Multiplicação e Divisão',
-                    'N5': 'Frações',
-                    'N6': 'Decimais e Porcentagem'
-                  };
-                  return (
-                    <details key={strand} className="bg-white rounded-2xl shadow-sm border-2 border-slate-100 overflow-hidden group">
-                      <summary className="p-4 font-black text-slate-700 cursor-pointer list-none flex justify-between items-center" style={{ fontFamily: FONT }}>
-                        {titles[strand]}
-                        <span className="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
-                      </summary>
-                      <div className="p-4 pt-0 grid grid-cols-2 gap-3 bg-slate-50 border-t-2 border-slate-100">
-                        {strandTracks.map(renderTrackCard)}
-                      </div>
-                    </details>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 3. DESAFIO DO MESTRE (Misto / Livre) */}
-            <div className="mt-10 mb-6">
-              <div className="flex items-center gap-2 mb-3 pl-1">
-                <span className="text-xl">🦊</span>
-                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  O Desafio do Sensei
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
-                Tudo misturado! Teste seus reflexos com tudo que você já aprendeu.
-              </p>
-              
-              {/* Desafio do Sensei 🦊 */}
-            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: mixedDoneToday ? "#CBD5E1" : "#7C3AED", boxShadow: mixedDoneToday ? "0 6px 0 #CBD5E1" : "0 6px 0 #5B21B6" }}>
-              <button
-                onClick={() => {
-                  if (mixedDoneToday) {
-                    sfx.tick();
-                    return;
-                  }
-                  sfx.level();
-                  onMixed();
-                }}
-                className={`w-full text-left p-4 select-none relative transition-all ${mixedDoneToday ? "cursor-default" : "cursor-pointer active:translate-y-0.5"}`}
-                style={{
-                  background: mixedDoneToday
-                    ? "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)"
-                    : "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
-                }}
-              >
-                {!mixedDoneToday && (
-                  <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3.2s_ease-in-out_infinite]" />
-                )}
-                <div className="flex items-center justify-between gap-3 mb-1.5">
-                  <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block border-2 ${mixedDoneToday ? "text-slate-500 bg-slate-100 border-slate-200" : "text-purple-900 bg-purple-200 border-purple-300"}`}>
-                    {mixedDoneToday ? "✅ Desafio de hoje completo!" : "🦊 Desafio especial do dia"}
-                  </span>
-                  <span className={`text-2xl ${mixedDoneToday ? "" : "animate-bounce"}`}>🏆</span>
-                </div>
-                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: mixedDoneToday ? "#64748B" : "#4C1D95" }}>
-                  Desafio Misto 🦊
-                </div>
-                <div className={`text-xs font-bold mt-1 leading-snug ${mixedDoneToday ? "text-slate-400" : "text-purple-900/80"}`}>
-                  {mixedDoneToday
-                    ? "Você venceu o chefão de hoje! Volte amanhã para um novo desafio. ✨"
-                    : "10 perguntas de TODAS as suas trilhas — e as moedinhas valem EM DOBRO! 🪙🪙"}
-                </div>
-                {!mixedDoneToday && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-purple-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-                    <span>Enfrentar o Desafio</span>
-                    <span>🦊</span>
-                  </div>
-                )}
-              </button>
-            </div>
-
-              </div>
-          </div>
+          <DojoTab 
+            prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} 
+            onMixed={onMixed} renderTrackCard={renderTrackCard} 
+          />
         )}
-
         {activeShellTab === "oficina" && (
-          <div className="animate-[mkPop_0.25s_ease-out_1]">
-            <div className="text-center mb-6 mt-2">
-               <h2 className="text-2xl font-black text-emerald-900" style={{ fontFamily: FONT }}>Oficina</h2>
-               <p className="text-sm font-bold text-slate-500 mt-1">Aventura e Recuperação 🔧</p>
-            </div>
-            {aulaPlan.resgates.length === 0 ? (
-               <div className="text-center p-8 border-4 border-dashed border-slate-200 rounded-3xl bg-slate-50">
-                 <span className="text-4xl mb-4 block opacity-50">✨</span>
-                 <p className="text-sm font-bold text-slate-400">Nenhuma missão de resgate necessária no momento. Você está indo super bem!</p>
-               </div>
-            ) : (
-               <div className="space-y-4">
-                 <p className="text-xs font-bold text-center text-slate-500">O Guardião da Ponte precisa de você nestas missões antigas:</p>
-                 {aulaPlan.resgates.map((r, i) => (
-                   <button 
-                     key={i}
-                     onClick={() => { sfx.level(); onTrack(r.track); }}
-                     className="w-full bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between shadow-sm active:scale-95 transition-all text-left"
-                   >
-                      <div>
-                        <div className="text-[10px] font-black text-emerald-700 uppercase bg-emerald-200 px-2 py-0.5 rounded-md inline-block mb-1">
-                          Revisão {r.track.id}
-                        </div>
-                        <div className="font-black text-emerald-900">{r.track.name}</div>
-                        <div className="text-xs text-emerald-700 font-bold mt-0.5">Recupere suas estrelas!</div>
-                      </div>
-                      <span className="text-2xl">🔧</span>
-                   </button>
-                 ))}
-               </div>
-            )}
-          </div>
+          <OficinaTab aulaPlan={aulaPlan} onTrack={onTrack} />
         )}
-
         {activeShellTab === "perfil" && (
-          <div className="animate-[mkPop_0.25s_ease-out_1]">
-            <div className="text-center mb-6 mt-2">
-               <h2 className="text-2xl font-black text-amber-900" style={{ fontFamily: FONT }}>Meu Perfil</h2>
-               <p className="text-sm font-bold text-slate-500 mt-1">Sua coleção e mascote 🌟</p>
-            </div>
-            
-            <div className="mb-4">
-              <MascotEvolutionCard 
-                 kid={kid} 
-                 state={state} 
-                 onUpdateKid={onUpdateKid} 
-                 coins={coins} 
-               />
-            </div>
-            
-            <div className="mb-4">
-              <button
-                onClick={() => {
-                  sfx.level();
-                  setTempBg(kid.bgAccessory || "none");
-                  setTempInventory(kid.inventory || []);
-                  setTempCoins(coins);
-                  setCoinsSpent(0);
-                  setShowWardrobe(true);
-                }}
-                className="w-full select-none transition-all active:translate-y-1 active:scale-[0.98] py-3.5 text-sm font-black text-amber-950 cursor-pointer flex items-center justify-center gap-2 border-b-4 border-amber-600 rounded-2xl animate-pulse"
-                style={{
-                  fontFamily: FONT,
-                  background: "linear-gradient(135deg, #FEF08A 0%, #FDE047 100%)",
-                  boxShadow: `0 2px 0 #CA8A04`,
-                }}
-              >
-                <span>🎨 Mudar Cenário do Mascote 🌟</span>
-              </button>
-            </div>
-
-            <button
-              onClick={() => {
-                sfx.tick();
-                onAlbum();
-              }}
-              className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all mb-4 card-block border-2"
-              style={{ background: "linear-gradient(135deg, #FDF2F8 0%, #FCE7F3 100%)", borderColor: "#F472B6", boxShadow: "0 6px 0 #DB2777" }}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-pink-900 bg-pink-200 border-2 border-pink-300 rounded-md inline-block">
-                  Sua Coleção
-                </span>
-                <span className="text-2xl">📖</span>
-              </div>
-              <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#831843" }}>
-                Álbum de Figurinhas
-              </div>
-              <div className="text-xs font-bold mt-1 text-pink-900/80">
-                Você tem {albumCount} de {TOTAL_STICKERS} figurinhas! Complete as páginas.
-              </div>
-            </button>
-            
-            <button
-              onClick={() => {
-                sfx.tick();
-                onBack();
-              }}
-              className="w-full text-center p-3 mt-4 text-sm font-black text-slate-400 active:text-slate-600"
-            >
-              Sair
-            </button>
-          </div>
+          <PerfilTab 
+            kid={kid} state={state} coins={coins} albumCount={albumCount} 
+            onUpdateKid={onUpdateKid} onAlbum={onAlbum} onBack={onBack}
+            setShowWardrobe={setShowWardrobe} setTempBg={setTempBg} setTempInventory={setTempInventory}
+            setTempCoins={setTempCoins} setCoinsSpent={setCoinsSpent}
+          />
         )}
-
       </div>
-
       <div className="bg-white border-t-2 border-slate-100 flex p-2 pb-5 shrink-0 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+
         {[
           { id: "sensei", label: "Tutor", icon: "🦊", color: "text-blue-600", activeBg: "bg-blue-50" },
           { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },

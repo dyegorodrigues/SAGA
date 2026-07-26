@@ -111,3 +111,68 @@
 **Plano de Ação Imediato:**
 1. Escrever um relatório detalhado e exaustivo em PT-BR para o usuário, abordando todos os pontos (Arquitetura, Telemetria, Lógica do Dojo, Tutor).
 2. Preparar a Mega Auditoria de Arquitetura (Mapear monólitos, arquivos fantasmas).
+
+# MEGA AUDITORIA E SANEAMENTO ARQUITETURAL (26 Julho 2026)
+Conduzida sob exigência estrita do usuário para investigar arquivos fantasmas, falhas de conexão, monólitos e corrigir as falhas de comunicação e de lógica (Dojo).
+
+## 1. Mapeamento e Expurgo de Arquivos Fantasmas (Zombies)
+**Problema:** Devido a refatorações anteriores (migração de componentes para pastas organizadas como `primitives/` e `exercises/`), o diretório `src/components/` foi deixado com arquivos residuais de 1 a 2 linhas que atuavam como proxies de exportação (ex: `ShapeCanvas.tsx`, `NumberBond.tsx`, `Balanca.tsx`, etc.). Isso causou confusão no mapeamento de dependências e falsos alertas no compilador.
+**Ação Cirúrgica Executada:**
+- Rastreamos todas as dependências no projeto. Encontramos que o arquivo central `FichaRenderer.tsx` e o `GameLoop.tsx` ainda dependiam desses proxies.
+- Reescrevemos as importações de `FichaRenderer.tsx`, `GameLoop.tsx`, `GalleryScreen.tsx` e `ExerciseRenderer.tsx` para apontar diretamente para a fonte real em `./primitives/` e `./exercises/`.
+- **Exclusão:** Deletamos com segurança 13 arquivos fantasmas do diretório raiz de componentes.
+
+## 2. Auditoria dos Monólitos e Plano de Desacoplamento
+**Problema:** O código-fonte centralizou-se perigosamente em dois monólitos principais que dificultam a manutenção e injeção de IA:
+- `GameLoop.tsx` (1574 linhas): Contém não apenas a lógica de controle de estado (Tempo, Áudio, Acertos), mas um switch hardcoded colossal (linhas 937 a 1540) para renderizar todas as interfaces de exercícios legados.
+- `KidHomeScreen.tsx` (873 linhas): Uma única função renderizando 5 abas distintas e complexas (Tutor, Jornada, Dojo, Oficina, Perfil).
+**Diagnóstico:** A aplicação não está modularizada porque durante a evolução natural do MVP e a injeção rápida de novas lógicas, preferiu-se acoplar o estado no mesmo arquivo (prop-drilling) para garantir estabilidade funcional imediata. Contudo, agora isso gera lentidão.
+**Decisão:** O próximo passo do projeto (após aprovação do usuário) será quebrar o `KidHomeScreen` em `/src/components/home/SenseiTab.tsx`, `JourneyTab.tsx`, etc., usando contextos ou passagem direta de props de forma segura.
+
+## 3. Correção Lógica do Dojo (DAG vs Grade)
+**Problema:** No Dojo, o bloqueio das Academias de Multiplicação e Divisão estava sendo feito de forma hardcoded (`kid.grade !== "pre"`). O usuário apontou com precisão cirúrgica a falha metodológica: o motor não deveria olhar a idade, mas se a criança possui os "domínios necessários".
+**Ação Cirúrgica Executada:**
+- Integramos o `computeUnlockStatus(prog)` dentro do `KidHomeScreen.tsx`.
+- Modificamos a trava visual para verificar se algum nó do grafo da trilha `N4` (Multiplicação/Divisão) está `opened` (descoberto) ou `dominated` (dominado). 
+- Resultado: O sistema agora age de forma orgânica. Uma criança da alfabetização não verá multiplicação até que sua teia de progressão a destrave naturalmente.
+
+## 4. Verificação de Conexões e Qualidade (QA)
+- Compilação executada via `npm run build` e tipagem estática testada via `tsc --noEmit`. O código está 100% limpo, sem quebras de dependências.
+
+
+## 5. Planejamento Arquitetural de Telemetria (Firebase)
+**Objetivo:** Eliminar a falta de rastreabilidade (onde o sistema atual só guarda `prog: Progress` de forma condensada) e passar a armazenar o fluxo de consciência da criança, os erros exatos, e tempo de reação (`rt_max_s`).
+**Modelo de Dados Proposto:**
+- **Coleção `Kids` (Atual):** Manteremos os dados consolidados para não quebrar a performance de leitura (`kid.progress`, `kid.coins`).
+- **Nova Sub-Coleção `TelemetryLogs`:** Cada vez que a criança concluir um exercício (dentro da função `GameLoop.tsx` > `onCommit`), uma chamada de fundo assíncrona será disparada para o Firebase.
+- **Payload Atômico:**
+  ```typescript
+  {
+     kidId: string;
+     timestamp: number; // ISO Date
+     trackId: string; // ex: N1.01
+     qIndex: number; // qual era a pergunta
+     qPrompt: string; // "Qual é maior?"
+     expectedAnswer: string;
+     givenAnswer: string; // o que a criança tocou (mostra a falha exata)
+     reactionTimeMs: number; 
+     isCorrect: boolean;
+     misconceptionTags?: string[]; // (RadarEngine)
+  }
+  ```
+- **Por que essa arquitetura?** 
+  - Isso garante que o motor principal não fique pesado. A UI continua responsiva.
+  - A subcoleção será a base fundamental de onde o Dashboard dos Pais lerá os dados (e usaremos agregação ou Firebase Functions para criar relatórios analíticos).
+
+**FIM DA MEGA AUDITORIA E SANEAMENTO.**
+
+## 6. Criação e Configuração da Telemetria (Concluído)
+- **Ação:** O payload foi mapeado no `src/types.ts` (`TelemetryLog`) cobrindo `kidId`, `timestamp`, `expectedAnswer`, `givenAnswer`, `reactionTimeMs`, `misconceptionTags`, etc.
+- A função `logTelemetryToCloud` foi injetada no `src/lib/firebase.ts` para gravar de forma atômica na sub-coleção `userStates/${userId}/Kids/${kidId}/TelemetryLogs`.
+- No `GameLoop.tsx`, a telemetria é disparada logo antes do commit. Se a criança erra, identificamos a tag da `misconception` específica pela opção clicada e enviamos. Se acerta, mandamos o tempo de reação, o que alimentará relatórios analíticos sem causar atraso (background promise).
+
+## 7. Modularização Home (Em progresso)
+- Criada a pasta `src/components/home/`.
+- Extraída a primeira aba monolítica (`SenseiTab.tsx`). Vamos extrair o restante e limpar o `KidHomeScreen.tsx`.
+- Tudo seguindo o princípio da componentização inteligente para as IA futuras não quebrarem a orquestração de arquivos ao adicionar funcionalidades menores.
+
