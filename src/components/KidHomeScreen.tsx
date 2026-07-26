@@ -445,8 +445,27 @@ export function KidHomeScreen({
                   Treinos Específicos
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-3.5">
-                {tracks.filter(t => ["N1.11", "N3.05", "N3.06", "N3.08", "N1.08", "N2.02"].includes(t.id)).map(renderTrackCard)}
+              <div className="grid grid-cols-1 gap-6">
+                {['N1', 'N2', 'N3', 'N4', 'N5', 'N6'].map(strand => {
+                  const strandTracks = tracks.filter(t => t.id.startsWith(strand) && (prog[t.id]?.stars || 0) > 0);
+                  if (strandTracks.length === 0) return null;
+                  const titles: Record<string, string> = {
+                    'N1': 'Senso Numérico e Contagem',
+                    'N2': 'Sistema Decimal',
+                    'N3': 'Adição e Subtração',
+                    'N4': 'Multiplicação e Divisão',
+                    'N5': 'Frações',
+                    'N6': 'Decimais e Porcentagem'
+                  };
+                  return (
+                    <div key={strand} className="bg-white rounded-2xl p-4 shadow-sm border-2 border-slate-100">
+                      <h3 className="text-lg font-black text-slate-700 mb-3" style={{ fontFamily: FONT }}>{titles[strand]}</h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {strandTracks.map(renderTrackCard)}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

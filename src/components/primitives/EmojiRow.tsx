@@ -37,19 +37,26 @@ export function EmojiRow({
   promptDone = true
 }: EmojiRowProps) {
   
-  const [isFlashed, setIsFlashed] = useState(false);
+  const [phase, setPhase] = useState<'waiting' | 'flashing' | 'done'>(
+    !promptDone && flashDurationMs ? 'waiting' : (flashDurationMs ? 'flashing' : 'done')
+  );
   const [touchedCount, setTouchedCount] = useState(0);
 
-  // Flash logic
   useEffect(() => {
-    if (flashDurationMs && flashDurationMs > 0 && promptDone) {
-      setIsFlashed(false); // reset
-      const timer = setTimeout(() => {
-        setIsFlashed(true); // hide items after flash
-      }, flashDurationMs);
-      return () => clearTimeout(timer);
+    if (flashDurationMs && flashDurationMs > 0) {
+      if (promptDone) {
+        setPhase('flashing');
+        const timer = setTimeout(() => {
+          setPhase('done');
+        }, flashDurationMs);
+        return () => clearTimeout(timer);
+      } else {
+        setPhase('waiting');
+      }
+    } else {
+      setPhase('done');
     }
-  }, [flashDurationMs, n, emoji]);
+  }, [promptDone, flashDurationMs, n, emoji]);
 
   // Reset touch count
   useEffect(() => {
@@ -73,7 +80,7 @@ export function EmojiRow({
       style={{ maxWidth: small ? 150 : "100%", minHeight: '80px' }}
     >
       <AnimatePresence mode="popLayout">
-        {!isFlashed ? (
+        { (phase === 'flashing' || !flashDurationMs) ? (
           Array.from({ length: n }).map((_, i) => {
             const isHighlighted = highlightIndex === i || (interactiveCount && i === touchedCount);
             

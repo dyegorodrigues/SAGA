@@ -165,3 +165,24 @@ Durante a auditoria das emoções, percebemos que o sistema de imagens de mascot
 - **Evolução SAGA:** Removida a aba "Escola" do menu principal, focando a criança nas três ferramentas pedagógicas canônicas: **Jornada** (Aprender), **Dojo** (Treinar), e **Oficina** (Recuperar).
 - A **Jornada** foi re-roteada para organizar os módulos pelas *Strands* nativas do Grafo SAGA (Senso Numérico, Sistema Decimal, Adição/Subtração, etc.). A interface agora exibe um mapa limpo e conectado à progressão real da criança, sem atalhos ou aglomerações confusas.
 
+
+## Correção e Reestruturação Profunda (Fase Dojo e Sincronia de Áudio)
+**Data:** Atual
+**Agente Responsável:** Arquiteto & UX Infantil
+
+### 1. Problema: Oftalmoscópio (Subitização Flash) Atropelando o Áudio
+- **Análise do QA:** O usuário reportou que no Olhômetro (ex: N1.03), a tela piscava e desaparecia as imagens *antes* ou *durante* a reprodução da instrução em áudio ("Atenção, eles vão sumir rapidinho"). O exercício ocorria rápido demais e, quando a fala terminava, não havia mais o que ser visto.
+- **Solução Arquitetural:** O primitivo `EmojiRow.tsx` (e `FichaRenderer.tsx`) foi refatorado. Inserimos uma máquina de estados (`phase: 'waiting' | 'flashing' | 'done'`). As imagens permanecem **escondidas** enquanto `promptDone` for falso (ou seja, enquanto o áudio fala). Somente quando o áudio notifica a conclusão (`onEnd`), o componente transita para o estado `flashing`, exibe os emojis pelo tempo de `flashDurationMs`, e então os esconde. 
+- **Prova:** Agora a criança escuta toda a instrução primeiro. O flash só dispara com ela atenta e olhando para a tela, respeitando o tempo cognitivo.
+
+### 2. O Rosto de "Cachorro"
+- **Investigação:** O usuário citou que "o rosto fica de cachorro em vários e não apresenta o que tinha que apresentar". Após varrer o código de ponta a ponta (`MascotRenderer`, `EmotionScene`, `mascotAssets`), não há fallbacks de desenho de cachorro no mascote principal (o fallback é o Dragão ou o avatar Clássico). O único local onde `🐶` aparece são nas listas de contagem (gerador `gVis_Scattered`) ou de pareamento simples (N1.01: parear ossos 🦴 com cachorros 🐶). 
+- **Conclusão Técnica:** Acreditamos que o usuário está se deparando com as questões de reconhecimento e pareamento, onde a matriz de pares seleciona o emoji do cachorro aleatoriamente. Outra possibilidade é o Avatar escolhido no painel de pais para a criança ser o emoji `🐶`. 
+
+### 3. Re-engenharia do Modo DOJO (A Academia de Fluência)
+- **Problema:** O Dojo listava "Treinos Específicos" de forma genérica (os botões N1.11, N3.05, etc. apareciam embolados ou com IDs antigos do motor de testes). Não havia a separação por tipo de conta aritmética como na visão idealizada pelo usuário ("aqui tu pode escolher conforme o tipo de conta").
+- **Solução Arquitetural:** 
+  1. O algoritmo do Dojo em `KidHomeScreen.tsx` foi inteiramente reescrito.
+  2. Ele agora lê dinamicamente as trilhas que a criança já destravou (`stars > 0`) e as agrupa rigorosamente por eixos: **Senso Numérico, Sistema Decimal, Adição e Subtração, Multiplicação, Frações**, etc.
+  3. Cada bloco de conta (ex: Adição e Subtração) contém os botões específicos de "Treino de Fatos" para aquela categoria (ex: "Amigos do 10", "Dobros", etc).
+  4. Isso concretiza a mecânica: O algoritmo *Jornada* empurra para frente (vertical); O *Dojo* permite ir para trás e treinar fundamentos básicos (horizontal), organizados por operação matemática.
