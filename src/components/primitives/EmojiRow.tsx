@@ -157,8 +157,8 @@ export function EmojiRow({
             {!disabled && (
               <button
                 onClick={() => {
-                  setIsFlashed(false);
-                  setTimeout(() => setIsFlashed(true), 1200);
+                  setPhase('waiting');
+                  setTimeout(() => setPhase('flashing'), 100);
                 }}
                 className="mt-2 select-none cursor-pointer active:translate-y-0.5 transition-all"
                 style={{ fontFamily: 'inherit', fontWeight: 800, fontSize: 13, color: tokens.cor.elementos.marcador, background: "#F1EDFF", border: `2px solid ${tokens.cor.elementos.marcador}`, borderRadius: 12, padding: "6px 14px" }}

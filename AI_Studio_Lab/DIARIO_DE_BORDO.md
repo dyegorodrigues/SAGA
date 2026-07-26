@@ -186,3 +186,29 @@ Durante a auditoria das emoções, percebemos que o sistema de imagens de mascot
   2. Ele agora lê dinamicamente as trilhas que a criança já destravou (`stars > 0`) e as agrupa rigorosamente por eixos: **Senso Numérico, Sistema Decimal, Adição e Subtração, Multiplicação, Frações**, etc.
   3. Cada bloco de conta (ex: Adição e Subtração) contém os botões específicos de "Treino de Fatos" para aquela categoria (ex: "Amigos do 10", "Dobros", etc).
   4. Isso concretiza a mecânica: O algoritmo *Jornada* empurra para frente (vertical); O *Dojo* permite ir para trás e treinar fundamentos básicos (horizontal), organizados por operação matemática.
+
+## Reunião de Planejamento: O Motor de Ginástica Adaptativa (Dojo)
+**Data:** Atual
+**Agente Responsável:** Arquiteto & Neuro-Pedagogo
+
+- **Aviso de Correção de Comportamento:** O usuário nos alertou (com razão) que estávamos apenas executando tarefas no modo "silencioso" e gerando resumos frios, ignorando os pedidos de debate, ideias e planejamento (Plan-First) solicitados no chat. Reajustamos a postura para responder em PT-BR, com detalhamento humano, seguindo as diretrizes do `AGENTS.md`.
+- **Demanda do Usuário:** Repensar a estrutura do Dojo. Em vez de apenas exibir as trilhas curriculares estáticas (Senso Numérico, etc), o Dojo precisa ter módulos de "Ginástica Mental" focados nas operações brutas (Adição, Subtração, Multiplicação).
+- **Mecânica Exigida:** 
+  1. Escalabilidade dinâmica (Adaptativa): Começa fácil (1+1, 2+2), evolui para níveis difíceis.
+  2. Escada CRA embutida: Começa com desenhos, passa para desenhos+números, vai para abstrato puro. Se a criança errar no abstrato, o sistema dá um "step-down" e traz os desenhos de volta.
+  3. Serve tanto para crianças no básico (nivelação) quanto para quem já domina (aquecimento rápido).
+- **Decisão (Fase Plan):** Escrito o documento `AI_Studio_Lab/PROPOSTA_DOJO_ADAPTATIVO.md` detalhando como a arquitetura do "AdaptiveComposer" funcionaria. Nenhuma linha de código fonte será alterada até que o usuário valide esta visão.
+
+## Implementação UI: Trindade Pedagógica (Dojo)
+**Data:** Atual
+**Agente Responsável:** Arquiteto & UX Infantil
+
+- **Ajuste Conforme Feedback:** O usuário apontou que a proposta anterior ignorou a "Missão Diária" (o tutor empurrando exercícios baseados na Jornada) e não separou corretamente o "Desafio do Mestre" da "Ginástica". Ele também reforçou que a progressão é **estritamente por Domínio e não por Idade**, e pontuou a distinção clara da **Oficina** (que foca em erros estruturais e diagnósticos).
+- **Ação (Act):** 
+  1. O documento de Arquitetura `ARQUITETURA_JORNADA_VS_DOJO.md` foi totalmente reescrito para oficializar a Trindade: Jornada (Aprender), Dojo (Ginástica), Oficina (UTI/Resgate).
+  2. O componente `KidHomeScreen.tsx` foi editado para refletir a nova estrutura visual da aba Dojo:
+     - Topo (Desafio Misto / Ápice).
+     - Seção 1: Missões Diárias (O card do Sensei indicando o que treinar hoje).
+     - Seção 2: As Academias (Cards gigantes ➕ ➖ ✖️ ➗ para a ginástica bidimensional adaptativa - UI preparada).
+     - Seção 3: Treinos Específicos (N1, N2, N3...) agora guardados dentro de "Sanfonas" (details/summary) para limpar a interface e servirem apenas como ferramenta de precisão cirúrgica.
+- **Resultado:** A interface agora respeita hierarquicamente a orquestração do Tutor, separando o macro (Academias) do micro (Treinos Específicos), sem perder o gancho diário de revisão da Jornada.

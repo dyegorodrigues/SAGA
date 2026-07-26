@@ -77,7 +77,7 @@ export function KidHomeScreen({
   }, [tracks, prog]);
 
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
-  const [activeShellTab, setActiveShellTab] = useState<"jornada" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "jornada") as any);
+  const [activeShellTab, setActiveShellTab] = useState<"sensei" | "jornada" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "sensei") as any);
   React.useEffect(() => { window.localStorage.setItem("mk-active-tab", activeShellTab); }, [activeShellTab]);
   const [pickerTrack, setPickerTrack] = useState<Track | null>(null);
 
@@ -245,12 +245,14 @@ export function KidHomeScreen({
       {/* HEADER GLOBALS (Coin & Name) */}
       <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2.5 bg-white border-b-2 border-slate-100 shrink-0">
         <div className="flex-1 text-left px-1">
-          <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 700, color: C.ink }}>
-            Oi, {kid.name}! {kid.avatar}
-          </div>
-          <div className="text-xs text-slate-500 font-bold">
-            Portal de Aventuras
-          </div>
+          <button onClick={() => { sfx.tick(); setActiveShellTab('perfil'); }} className="active:scale-95 transition-transform text-left">
+            <div style={{ fontFamily: FONT, fontSize: 20, fontWeight: 700, color: C.ink }}>
+              Oi, {kid.name}! {kid.avatar}
+            </div>
+            <div className="text-xs text-slate-500 font-bold underline decoration-slate-300 underline-offset-2">
+              Ver Meu Perfil 🌟
+            </div>
+          </button>
         </div>
         <div className="flex items-center gap-1.5">
           {streak >= 2 && (
@@ -275,8 +277,15 @@ export function KidHomeScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 scrollbar-hide">
-        {activeShellTab === "jornada" && (
+        
+        {activeShellTab === "sensei" && (
           <div className="animate-[mkPop_0.25s_ease-out_1]">
+            <div className="text-center mb-6 mt-2">
+               <h2 className="text-2xl font-black text-blue-900" style={{ fontFamily: FONT }}>O Tutor SAGA</h2>
+               <p className="text-sm font-bold text-slate-500 mt-1">Plano de estudos diário 🦊</p>
+            </div>
+            
+            {/* 🎒 MATRÍCULA (E3) */}
             {/* 🎒 MATRÍCULA (E3) */}
             {Object.keys(prog).length === 0 && (
               <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#0EA5E9", boxShadow: "0 6px 0 #0369A1" }}>
@@ -309,8 +318,9 @@ export function KidHomeScreen({
               </div>
             )}
 
-            {/* ▶️ MINHA AULA 📚 */}
-            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3" }}>
+            {/* ▶️ MINHA AULA (E2) */}
+            {Object.keys(prog).length > 0 && (
+              <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3" }}>
               <button
                 onClick={() => {
                   sfx.level();
@@ -338,7 +348,69 @@ export function KidHomeScreen({
                 </div>
               </button>
             </div>
+            )}
 
+            {/* 1. MISSÕES DIÁRIAS (Cronograma do Dia) */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <span className="text-xl">📅</span>
+                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                  Missões Diárias
+                </span>
+              </div>
+              
+              {rec && (
+                <button
+                  onClick={() => {
+                    sfx.tick();
+                    onTrack(rec.track);
+                  }}
+                  className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2"
+                  style={{
+                    background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+                    borderColor: '#3B82F6',
+                    boxShadow: '0 6px 0 #2563EB',
+                  }}
+                >
+                  <div className="flex items-center justify-between gap-3 mb-1.5">
+                    <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-blue-900 bg-blue-200 border-2 border-blue-300">
+                      💡 Sugestão do Sensei
+                    </span>
+                  </div>
+                  <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E3A8A' }}>
+                    {rec.track.name}
+                  </div>
+                  <div className="text-xs font-bold mt-1 leading-snug text-blue-900/80">
+                    {rec.reason || 'Sua missão diária de revisão espaçada!'}
+                  </div>
+                </button>
+              )}
+            </div>
+
+            {/* SUGESTAO OFICINA */}
+            {aulaPlan.resgates.length > 0 && (
+               <div className="mt-8 mb-4">
+                  <div className="flex items-center gap-2 mb-3 pl-1">
+                    <span className="text-xl">🚑</span>
+                    <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                      Oficina de Resgate
+                    </span>
+                  </div>
+                  <button onClick={() => { sfx.tick(); setActiveShellTab("oficina"); }} className="w-full bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between shadow-[0_4px_0_#34D399] active:translate-y-1 active:shadow-none transition-all text-left">
+                     <div>
+                       <div className="font-black text-emerald-900 text-lg" style={{ fontFamily: FONT }}>Missões de Resgate!</div>
+                       <div className="text-xs text-emerald-700 font-bold mt-1">O Guardião da Ponte identificou {aulaPlan.resgates.length} conceitos para revisar.</div>
+                     </div>
+                     <span className="text-4xl">🔧</span>
+                  </button>
+               </div>
+            )}
+          </div>
+        )}
+
+
+        {activeShellTab === "jornada" && (
+          <div className="animate-[mkPop_0.25s_ease-out_1]">
             {/* Mundo SAGA */}
             <div className="mb-10">
                <div className="text-center mb-6 mt-8">
@@ -368,7 +440,86 @@ export function KidHomeScreen({
                <h2 className="text-2xl font-black text-purple-900" style={{ fontFamily: FONT }}>Dojo Matemático</h2>
                <p className="text-sm font-bold text-slate-500 mt-1">Treine sua fluência e velocidade! ⚡</p>
             </div>
-            {/* Desafio Misto 👑 */}
+
+            {/* 1. ACADEMIAS DE OPERAÇÕES (Ginástica Matemática) */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <span className="text-xl">🏋️</span>
+                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                  As Academias
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
+                Ginástica pura. O sistema adapta a dificuldade com imagens ou apenas números, de acordo com seu domínio.
+              </p>
+              <div className="grid grid-cols-2 gap-3.5">
+                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FECDD3'}}>
+                  <div className="text-3xl mb-1">➕</div>
+                  <div className="font-black text-rose-700">Academia da<br/>Adição</div>
+                </button>
+                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #C7D2FE'}}>
+                  <div className="text-3xl mb-1">➖</div>
+                  <div className="font-black text-indigo-700">Academia da<br/>Subtração</div>
+                </button>
+                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
+                  <div className="text-3xl mb-1">✖️</div>
+                  <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
+                </button>
+                <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
+                  <div className="text-3xl mb-1">➗</div>
+                  <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
+                </button>
+              </div>
+            </div>
+
+            {/* 2. TREINOS ESPECÍFICOS (Cirúrgicos) */}
+            <div className="mt-8">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <span className="text-xl">🎯</span>
+                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                  Treinos Específicos
+                </span>
+              </div>
+              <div className="grid grid-cols-1 gap-6">
+                {['N1', 'N2', 'N3', 'N4', 'N5', 'N6'].map(strand => {
+                  const strandTracks = tracks.filter(t => t.id.startsWith(strand) && (prog[t.id]?.stars || 0) > 0);
+                  if (strandTracks.length === 0) return null;
+                  const titles: Record<string, string> = {
+                    'N1': 'Senso Numérico e Contagem',
+                    'N2': 'Sistema Decimal',
+                    'N3': 'Adição e Subtração',
+                    'N4': 'Multiplicação e Divisão',
+                    'N5': 'Frações',
+                    'N6': 'Decimais e Porcentagem'
+                  };
+                  return (
+                    <details key={strand} className="bg-white rounded-2xl shadow-sm border-2 border-slate-100 overflow-hidden group">
+                      <summary className="p-4 font-black text-slate-700 cursor-pointer list-none flex justify-between items-center" style={{ fontFamily: FONT }}>
+                        {titles[strand]}
+                        <span className="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+                      </summary>
+                      <div className="p-4 pt-0 grid grid-cols-2 gap-3 bg-slate-50 border-t-2 border-slate-100">
+                        {strandTracks.map(renderTrackCard)}
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3. DESAFIO DO MESTRE (Misto / Livre) */}
+            <div className="mt-10 mb-6">
+              <div className="flex items-center gap-2 mb-3 pl-1">
+                <span className="text-xl">👑</span>
+                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+                  O Desafio do Mestre
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
+                Tudo misturado! Teste seus reflexos com tudo que você já aprendeu.
+              </p>
+              
+              {/* Desafio Misto 👑 */}
             <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: mixedDoneToday ? "#CBD5E1" : "#7C3AED", boxShadow: mixedDoneToday ? "0 6px 0 #CBD5E1" : "0 6px 0 #5B21B6" }}>
               <button
                 onClick={() => {
@@ -411,8 +562,8 @@ export function KidHomeScreen({
                 )}
               </button>
             </div>
-            
-            {/* Dojo Matemático 🥋 */}
+
+              {/* Dojo Matemático 🥋 */}
             <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#E11D48", boxShadow: "0 6px 0 #9F1239" }}>
               <button
                 onClick={() => {
@@ -436,44 +587,9 @@ export function KidHomeScreen({
                 </div>
               </button>
             </div>
-
-            {/* Treinos Específicos */}
-            <div className="mt-8">
-              <div className="flex items-center gap-2 mb-3 pl-1">
-                <span className="text-xl">🎯</span>
-                <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                  Treinos Específicos
-                </span>
-              </div>
-              <div className="grid grid-cols-1 gap-6">
-                {['N1', 'N2', 'N3', 'N4', 'N5', 'N6'].map(strand => {
-                  const strandTracks = tracks.filter(t => t.id.startsWith(strand) && (prog[t.id]?.stars || 0) > 0);
-                  if (strandTracks.length === 0) return null;
-                  const titles: Record<string, string> = {
-                    'N1': 'Senso Numérico e Contagem',
-                    'N2': 'Sistema Decimal',
-                    'N3': 'Adição e Subtração',
-                    'N4': 'Multiplicação e Divisão',
-                    'N5': 'Frações',
-                    'N6': 'Decimais e Porcentagem'
-                  };
-                  return (
-                    <div key={strand} className="bg-white rounded-2xl p-4 shadow-sm border-2 border-slate-100">
-                      <h3 className="text-lg font-black text-slate-700 mb-3" style={{ fontFamily: FONT }}>{titles[strand]}</h3>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {strandTracks.map(renderTrackCard)}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
           </div>
+        </div>
         )}
-
-        
-        
 
         {activeShellTab === "oficina" && (
           <div className="animate-[mkPop_0.25s_ease-out_1]">
@@ -481,7 +597,6 @@ export function KidHomeScreen({
                <h2 className="text-2xl font-black text-emerald-900" style={{ fontFamily: FONT }}>Oficina</h2>
                <p className="text-sm font-bold text-slate-500 mt-1">Aventura e Recuperação 🔧</p>
             </div>
-
             {aulaPlan.resgates.length === 0 ? (
                <div className="text-center p-8 border-4 border-dashed border-slate-200 rounded-3xl bg-slate-50">
                  <span className="text-4xl mb-4 block opacity-50">✨</span>
@@ -498,11 +613,12 @@ export function KidHomeScreen({
                    >
                       <div>
                         <div className="text-[10px] font-black text-emerald-700 uppercase bg-emerald-200 px-2 py-0.5 rounded-md inline-block mb-1">
-                          Missão Especial
+                          Revisão {r.track.id}
                         </div>
-                        <div className="font-bold text-emerald-900 text-lg" style={{ fontFamily: FONT }}>{r.track.name}</div>
+                        <div className="font-black text-emerald-900">{r.track.name}</div>
+                        <div className="text-xs text-emerald-700 font-bold mt-0.5">Recupere suas estrelas!</div>
                       </div>
-                      <span className="text-3xl animate-bounce">🛡️</span>
+                      <span className="text-2xl">🔧</span>
                    </button>
                  ))}
                </div>
@@ -516,8 +632,7 @@ export function KidHomeScreen({
                <h2 className="text-2xl font-black text-amber-900" style={{ fontFamily: FONT }}>Meu Perfil</h2>
                <p className="text-sm font-bold text-slate-500 mt-1">Sua coleção e mascote 🌟</p>
             </div>
-
-            {/* Mascot in 3 Layers (Replaced old bolinha evolution card) */}
+            
             <div className="mb-4">
               <MascotEvolutionCard 
                  kid={kid} 
@@ -548,7 +663,6 @@ export function KidHomeScreen({
               </button>
             </div>
 
-            {/* Álbum */}
             <button
               onClick={() => {
                 sfx.tick();
@@ -570,32 +684,28 @@ export function KidHomeScreen({
                 Você tem {albumCount} de {TOTAL_STICKERS} figurinhas! Complete as páginas.
               </div>
             </button>
-
-            {/* Logout/Back Button */}
+            
             <button
               onClick={() => {
                 sfx.tick();
                 onBack();
               }}
-              className="w-full bg-slate-200 border-2 border-slate-300 text-slate-700 font-black py-4 px-6 rounded-2xl shadow-sm hover:bg-slate-300 transition-all cursor-pointer mt-4"
-              style={{ fontFamily: FONT }}
+              className="w-full text-center p-3 mt-4 text-sm font-black text-slate-400 active:text-slate-600"
             >
-              ⬅️ Trocar de Jogador
+              Sair
             </button>
           </div>
         )}
+
       </div>
 
-      {/* BOTTOM TAB BAR */}
-      <div className="absolute bottom-0 left-0 w-full bg-white border-t-2 border-slate-200 px-2 py-2 flex items-center justify-around z-20 pb-safe">
-        
+      <div className="bg-white border-t-2 border-slate-100 flex p-2 pb-5 shrink-0 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
         {[
+          { id: "sensei", label: "Tutor", icon: "🦊", color: "text-blue-600", activeBg: "bg-blue-50" },
           { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },
           { id: "dojo", label: "Dojo", icon: "🥋", color: "text-purple-600", activeBg: "bg-purple-50" },
           { id: "oficina", label: "Oficina", icon: "🔧", color: "text-emerald-600", activeBg: "bg-emerald-50" },
-          { id: "perfil", label: "Perfil", icon: "👤", color: "text-amber-600", activeBg: "bg-amber-50" },
         ].map(tab => {
-
           const isActive = activeShellTab === tab.id;
           return (
             <button

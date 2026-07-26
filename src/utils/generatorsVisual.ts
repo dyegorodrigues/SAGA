@@ -70,7 +70,7 @@ export function gVis_LinkingCubesSentence(lvl: number): Question {
   const rightGroups = [{ n: a, color: "bg-blue-400" }, { n: b, color: "bg-rose-400" }];
   
   return {
-    kind: "plain", big: true,
+    kind: "plain",  
     prompt: `Qual imagem mostra ${a} + ${b} = ${total}?`,
     audioPrompt: `Ache a imagem que mostra ${a} mais ${b} igual a ${total}.`,
     options: [

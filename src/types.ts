@@ -1,5 +1,6 @@
 export interface Kid {
   id: string;
+  rt_max_s?: number;
   name: string;
   avatar: string;
   grade: "pre" | "ano1" | "ano2";
@@ -46,6 +47,7 @@ export interface Option {
 }
 
 export interface Question {
+  rt_max_s?: number;
   /** A fala que introduz o exercício (narração principal) */
   audioPrompt?: string;
   /** Array de falas em estágios, quando o jogo narra passo-a-passo (ex: I-do/We-do) */
@@ -113,6 +115,7 @@ export interface Question {
 
 export interface Track {
   id: string;
+  rt_max_s?: number;
   name: string;
   icon: string;
   color: string;
@@ -167,6 +170,7 @@ export interface Progress {
 
 export interface FactStrength {
   fact_id: string;
+  rt_max_s?: number;
   forca: number; // 0-5
   rt_medio: number;
   ultima_vez: string;
@@ -175,6 +179,7 @@ export interface FactStrength {
 
 export interface ProcStrength {
   proc_id: string;
+  rt_max_s?: number;
   precisao: number;
   passo_fraco?: string;
   tempo_medio: number;
