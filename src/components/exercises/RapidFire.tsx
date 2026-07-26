@@ -4,13 +4,14 @@ import { C } from "../Mascot";
 import { motion } from "motion/react";
 
 interface Props {
+  timeLeft?: number | null;
   q: Question;
   onAnswer: (val: any) => void;
   disabled: boolean;
 }
 
-export function RapidFire({ q, onAnswer, disabled }: Props) {
-  // O Dojo de Velocidade (Nível 4)
+export function RapidFire({ q, onAnswer, disabled, timeLeft }: Props) {
+  // O Dojo de Velocidade {timeLeft != null ? ` - ${timeLeft}s` : ""} (Nível 4)
   // Conta no centro, botões gigantes. Sem frufru.
   
   return (

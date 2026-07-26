@@ -147,20 +147,7 @@ export function moneyOpts(ans: number, count: number, step: number) {
 
 
 export function gN3_01(lvl: number): Question {
-  const totals = [4, 5, 7, 10, 10];
-  const tot = totals[(lvl - 1) % totals.length];
-  const a = ri(1, tot - 1);
-  const b = ri(1, tot - a);
-  return {
-    kind: "sum",
-    prompt: "Quantos ficam juntos?",
-    emoji: pickEmo(),
-    a,
-    b,
-    options: numOpts(a + b, 3, 1, tot + 2),
-    answer: a + b,
-    explain: `Junte tudo e conte: ${a} e mais ${b} fazem ${a + b}!`,
-  };
+  return gVis_VisualAddition(lvl);
 }
 
 /* ---------------- geradores: 1º ANO (6 anos) ---------------- */
@@ -203,59 +190,7 @@ export function gN1_12(lvl: number): Question {
 }
 
 export function gN3_03(lvl: number): Question {
-  if (lvl === 1) {
-    const a = ri(1, 5), b = ri(1, 5);
-    return {
-      kind: "sum",
-      prompt: "Quanto é a soma?",
-      emoji: pickEmo(),
-      a,
-      b,
-      options: numOpts(a + b, 4, 1, 12),
-      answer: a + b,
-      explain: `Junte tudo e conte: ${a} e mais ${b} fazem ${a + b}!`,
-    };
-  }
-  // estratégia ensinada ao errar: começar do maior e contar nos dedos (counting on)
-  const eSoma = (a: number, b: number) =>
-    `Guarde o ${Math.max(a, b)} na cabeça e conte mais ${Math.min(a, b)} nos dedos: dá ${a + b}!`;
-  if (lvl === 2) {
-    const a = ri(1, 9), b = ri(1, Math.max(1, 10 - a));
-    return {
-      kind: "singapore-bars",
-      prompt: "Junte os blocos!",
-      a,
-      b,
-      options: numOpts(a + b, 3, 0, 15),
-      answer: a + b,
-      explain: eSoma(a, b)
-    };
-  }
-  if (lvl === 3) {
-    const a = ri(3, 15), b = ri(2, Math.max(2, 20 - a));
-    return mathQ(`${a} + ${b} = ?`, a + b, 2, 22, eSoma(a, b));
-  }
-  if (lvl === 4) {
-    const a = ri(1, 9);
-    const total = ri(a + 1, 12);
-    return {
-      kind: "math",
-      prompt: "Qual número falta?",
-      expr: `${a} + ▢ = ${total}`,
-      options: numOpts(total - a, 4, 1, 12),
-      answer: total - a,
-      explain: `Do ${a} até o ${total}, conte nos dedos: faltam ${total - a}!`,
-    };
-  }
-  const a = ri(2, 20), b = ri(1, 9);
-  return {
-    kind: "rapid-fire",
-    prompt: "Dojo de Velocidade!",
-    expr: `${a} + ${b}`,
-    options: numOpts(a + b, 3, a, a + 15),
-    answer: a + b,
-    explain: eSoma(a, b)
-  };
+  return gVis_LinkingCubesSentence(lvl);
 }
 
 export function gN3_04(lvl: number): Question {
@@ -760,7 +695,7 @@ export function gN1_01(lvl: number): Question {
 }
 
 export function gN1_02(lvl: number): Question {
-  return Composer.generate(N1_02, lvl <= 2 ? "a" : "b");
+  return gVis_Scattered(lvl);
 }
 
 export function gN1_03(lvl: number): Question {
@@ -842,7 +777,7 @@ export function gN1_07(lvl: number): Question {
 import { N1_08 } from "../curriculum/fichas/N1.08";
 import { N1_09 } from "../curriculum/fichas/N1.09";
 export function gN1_09(lvl: number): Question {
-  return Composer.generate(N1_09, "a");
+  return gVis_Sequence(lvl);
 }
 export function gN1_08(lvl: number): Question {
   const n = ri(5, 10);

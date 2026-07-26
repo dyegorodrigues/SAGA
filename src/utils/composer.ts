@@ -15,7 +15,7 @@ import { computeUnlockStatus } from "./unlockEngine";
  * 5. FECHO (Closure): 1 questão fácil/lúdica para encerrar com um sorriso.
  */
 
-export const FLUENCY_IDS = ["canto", "simbolos", "soma", "sub", "contar", "seq", "vizinhos", "dezenas", "moldura", "amigos"];
+export const FLUENCY_IDS = ["N1.01", "N1.02", "N1.11", "N3.01", "N3.02", "N3.06", "N3.07", "N3.08", "N4.03", "N4.06", "N4.07"];
 const FUN_IDS = ["padroes", "intruso", "olho", "formas", "logica", "graficos"];
 
 // Total de questões varia por faixa etária, mas vamos usar um total em torno de 10-12

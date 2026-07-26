@@ -90,3 +90,37 @@
   3. Editado o `TakeApart.tsx` e mapeadas as cores do texto `<span>` para `<span className="text-purple-600">`, `blue-500` e `rose-500` de forma simétrica com os `LinkingCubes`.
   4. Fix na prop de `<TenFrame filled={question.n!} />` em `FichaRenderer.tsx`.
 - **Resultado (Verify):** A bandeja volta a exibir blocos preenchidos para sumir e treinar memória (missing addend). As alternativas de cubo não colidem mais em telas menores, e estão livres de texto desnecessário.
+
+## Integração: Geradores Visuais (ex-IXL) ao Sistema Central SAGA
+- **Ação:** Apagar o nome provisório "IXL", integrar perfeitamente os geradores visuais criados nas engrenagens do DAG (Grafo SAGA) e substituir exercícios antigos de `generators.ts` / `generatorsF1.ts`.
+- **Diagnóstico Arquitetural:** 
+  1. O motor gerador de perguntas "IXL" estava isolado e hardcoded no final de `curriculum.ts`.
+  2. Mecânicas ricas de Subitização (`Scattered`), Adição Visual, Number Bonds (`TakeApart`) e Tenframes faltavam nas engrenagens N1 e N3 nativas.
+- **Implementação Realizada (Act & Prove):**
+  1. `generatorsIXL.ts` renomeado para `generatorsVisual.ts`.
+  2. Substituição integral do exercício de `N1.02` (Contagem com Cardinalidade) pelo `gVis_Scattered`.
+  3. Substituição do exercício `N3.01` (Adição concreta até 10) pelo `gVis_VisualAddition`.
+  4. Substituição do exercício `N3.03` (Counting on) pelo elegante modelo visual `gVis_LinkingCubesSentence`.
+  5. Atualização da `N1.10` (Parte-todo / Number Bonds) para utilizar o sistema super visual `gVis_TakeApart` (o exercício da bandeja roxa).
+  6. Substituição da `N1.11` (Amigos do 10) pelo `gVis_MissingAddendFrame` (bandeja tenframe com blocos faltantes).
+  7. Atualização do `gN1_09` (Contagem até 20 e a partir de N) para usar `gVis_Sequence`.
+  8. O motor do IXL foi purgado do currículo (`curriculum.ts`); agora o DAG consome essas mecânicas visualmente polidas naturalmente, conectando-se à base de dados pedagógica (`grafoSaga.json`).
+- **Resultado (Verify):** A build rodou perfeitamente. Nenhuma "gambiarra" de múltiplos motores concorrentes — tudo orquestrado na função `Composer` e nos `generators.ts` nativos.
+
+## Plano Estratégico: O Modo Dojo
+- **Análise da Demanda:** O usuário corretamente apontou que o Modo Dojo (Treino de Fluência) está documentado na Bíblia e no `DOJO_SAGA.md`, mas ainda não existe fisicamente na aplicação.
+- **Passos para Construção do Dojo:**
+  1. Criar a interface do "Templo" na navegação principal (separada do Mapa de Aulas).
+  2. Implementar a mecânica de "Treino do Mestre", gerando rounds curtos focados apenas em fatos (Amigos do 10, Tabuadas, etc).
+  3. Implementar a lógica de tempo limite (rt_max_s) e penalidade sem punição (se não responder a tempo, exibe a estratégia).
+  4. Persistir a métrica de força do fato no banco de dados, retroalimentando as aulas regulares.
+
+## Atualização: Acoplamento do Modo Dojo e Cronômetro de Fluência
+- **Ação:** Implementado o sistema de `rt_max_s` (limite de tempo de fluência) diretamente no motor principal `GameLoop.tsx`.
+- **Implementação Realizada (Act & Prove):**
+  1. Adicionado o estado `timeLeft` ao `GameLoop`.
+  2. Implementado um `useEffect` que decreciona o tempo se a questão for do tipo `rapid-fire` e tiver um `rt_max_s`.
+  3. Alterada a lógica de "Erro Suave" (Layer 1) no `handlePick` para que um "timeout" não conte como um erro padrão com múltiplas chances, mas engatilhe imediatamente a explicação pedagógica.
+  4. Passado o `timeLeft` visual para o componente `RapidFire.tsx` exibir o cronômetro descendo na tela.
+  5. Atualizado os velhos `FLUENCY_IDS` baseados em strings hardcoded ("soma", "canto") para usar os IDs reais do Grafo SAGA ("N1.11", "N3.06", etc) no `composer.ts`.
+- **Resultado:** O Dojo agora possui sua funcionalidade base de "Treino do Mestre" rápida e cronometrada, e perfeitamente ligada ao DAG sem gerar desconexões de arquitetura.

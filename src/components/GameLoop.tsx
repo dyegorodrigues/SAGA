@@ -162,8 +162,10 @@ export function GameLoop({
   const [sel, setSel] = useState<any>(null);
   const [stars, setStars] = useState(0);
   const [ok, setOk] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+
   const [done, setDone] = useState(false);
   const [bonus, setBonus] = useState(0);
   const [replays, setReplays] = useState(0);
@@ -172,6 +174,29 @@ export function GameLoop({
   const lastSpokenPromptRef = useRef<string | null>(null);
 
   // Pula na hora: corta a voz e vai para a próxima (criança no comando do ritmo)
+  
+  useEffect(() => {
+    if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
+      setTimeLeft(q.rt_max_s);
+      const iv = setInterval(() => {
+        setTimeLeft((v) => {
+          if (v && v > 1) return v - 1;
+          clearInterval(iv);
+          return 0;
+        });
+      }, 1000);
+      return () => clearInterval(iv);
+    } else {
+      setTimeLeft(null);
+    }
+  }, [q, status, done, journeyDone]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && !status && !done) {
+      handlePick('__timeout__', false);
+    }
+  }, [timeLeft, status, done]);
+
   const advanceNow = () => {
     if (!advanceRef.current) return;
     stopSpeak();
@@ -411,7 +436,7 @@ export function GameLoop({
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
-    if (!right && (q.options || q.groups)) {
+    if (!right && val !== '__timeout__' && (q.options || q.groups)) {
       if (qErrors === 0) {
         setQErrors(1);
         setHiddenOpts((prev) => [...prev, val]);
@@ -901,7 +926,7 @@ export function GameLoop({
 
       <div className="relative">
         {status === "right" && <Burst />}
-        {q.kind === "rapid-fire" && <RapidFire q={q} onAnswer={handlePick} disabled={status !== null} />}
+        {q.kind === "rapid-fire" && <RapidFire q={q} onAnswer={handlePick} disabled={status !== null} timeLeft={timeLeft} />}
         {q.kind === "singapore-bars" && <SingaporeBars q={q} onAnswer={handlePick} disabled={status !== null} />}
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>

@@ -26,7 +26,7 @@ export function buildDojoTrack(tracks: Track[], progOf: ProgOf): Track {
       // Força o tipo como rapid-fire para garantir que use o layout Dojo (sem frescura)
       // if it's already an equation. Se for count, não faz sentido.
       if (q.expr) {
-         return { ...q, kind: "rapid-fire" };
+         return { ...q, kind: "rapid-fire", rt_max_s: 5 };
       }
       return q;
     },

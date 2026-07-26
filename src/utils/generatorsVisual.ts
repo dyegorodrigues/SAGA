@@ -1,7 +1,7 @@
 import { Question } from "../types";
 import { numOpts, pickEmo } from "./generators";
 
-export function gIXL_VisualAddition(lvl: number): Question {
+export function gVis_VisualAddition(lvl: number): Question {
   const a = Math.floor(Math.random() * 4) + 1;
   const b = Math.floor(Math.random() * 4) + 1;
   const total = a + b;
@@ -24,7 +24,7 @@ export function gIXL_VisualAddition(lvl: number): Question {
   };
 }
 
-export function gIXL_Scattered(lvl: number): Question {
+export function gVis_Scattered(lvl: number): Question {
   const n = Math.floor(Math.random() * 6) + 3;
   const categories = [
     { items: ["🐵", "🦁", "🐯", "🐼", "🐶", "🐱", "🦊", "🐻", "🐸"], name: "animais" },
@@ -52,7 +52,7 @@ export function gIXL_Scattered(lvl: number): Question {
   };
 }
 
-export function gIXL_LinkingCubesSentence(lvl: number): Question {
+export function gVis_LinkingCubesSentence(lvl: number): Question {
   const a = Math.floor(Math.random() * 4) + 1;
   const b = Math.floor(Math.random() * 4) + 1;
   const total = a + b;
@@ -81,7 +81,7 @@ export function gIXL_LinkingCubesSentence(lvl: number): Question {
   };
 }
 
-export function gIXL_TakeApart(lvl: number): Question {
+export function gVis_TakeApart(lvl: number): Question {
   const total = Math.floor(Math.random() * 4) + 4; // 4 to 7
   let a = Math.floor(Math.random() * (total - 1)) + 1;
   const b = total - a;
@@ -124,7 +124,7 @@ export function gIXL_TakeApart(lvl: number): Question {
   };
 }
 
-export function gIXL_Sequence(lvl: number): Question {
+export function gVis_Sequence(lvl: number): Question {
   const start = Math.floor(Math.random() * 80) + 10;
   return {
     kind: "plain",
@@ -140,7 +140,7 @@ export function gIXL_Sequence(lvl: number): Question {
   };
 }
 
-export function gIXL_MissingAddendFrame(lvl: number): Question {
+export function gVis_MissingAddendFrame(lvl: number): Question {
   const current = Math.floor(Math.random() * 9) + 1;
   const missing = 10 - current;
   return {

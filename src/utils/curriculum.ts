@@ -8,7 +8,6 @@ import {
 import { gN1_10, gN1_11, gN2_02, gN3_05, gN3_06, gN3_07, gN3_08, gN3_09 } from "./generatorsF1";
 import { gN2_04, gN2_05, gN3_11, gN3_12, gN3_13, gN4_01, gN4_02, gN4_05 } from "./generatorsF2";
 import { C } from "../components/Mascot";
-import { gIXL_VisualAddition, gIXL_Scattered, gIXL_LinkingCubesSentence, gIXL_TakeApart, gIXL_Sequence, gIXL_MissingAddendFrame } from "./generatorsIXL";
 import { GrafoSaga } from "./grafoSaga";
 
 export interface CurriculumModule {
@@ -139,15 +138,6 @@ export function getTrackById(id: string): Track | undefined {
 export const TRACKS_PRE = CURRICULUM.find(m => m.id === 'F0')?.tracks || [];
 export const TRACKS_ANO1 = CURRICULUM.find(m => m.id === 'F1')?.tracks || [];
 export const TRACKS_ANO2 = CURRICULUM.find(m => m.id === 'F2')?.tracks || [];
-export const TRACKS_IXL: Track[] = [
-  { id: "IXL.06", name: "IXL: Faltam para 10", icon: "🔳", color: C.pink, dark: C.pinkDark, island: "num", gen: gIXL_MissingAddendFrame },
-  { id: "IXL.01", name: "IXL: Soma Visual", icon: "🐦", color: C.pink, dark: C.pinkDark, island: "num", gen: gIXL_VisualAddition },
-  { id: "IXL.02", name: "IXL: Contagem Espalhada", icon: "⭐", color: C.ocean, dark: C.oceanDark, island: "num", gen: gIXL_Scattered },
-  { id: "IXL.03", name: "IXL: Unifix Cubes", icon: "🔗", color: C.mint, dark: C.mintDark, island: "op", gen: gIXL_LinkingCubesSentence },
-  { id: "IXL.04", name: "IXL: Decomposição", icon: "🧩", color: C.grape, dark: C.grapeDark, island: "op", gen: gIXL_TakeApart },
-  { id: "IXL.05", name: "IXL: Sequência", icon: "🔢", color: C.sun, dark: C.sunDark, island: "num", gen: gIXL_Sequence }
-];
-CURRICULUM.push({ id: "IXL", name: "Demonstração IXL", description: "Testes dos motores pedagógicos IXL", tracks: TRACKS_IXL });
 
 export const ISLAND_DEFS: Record<string, { title: string, subtitle: string, color: string }> = {
   "alfa": { title: "Alfabetização Numérica", subtitle: "A base de tudo", color: "from-green-400 to-emerald-600" },
