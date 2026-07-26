@@ -1,3 +1,4 @@
+import { gVis_Scattered, gVis_VisualAddition, gVis_LinkingCubesSentence, gVis_Sequence } from "./generatorsVisual";
 import { N1_01 } from "../curriculum/fichas/N1.01";
 import { Composer } from "../curriculum/Composer";
 

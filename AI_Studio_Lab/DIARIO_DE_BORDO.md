@@ -124,3 +124,18 @@
   4. Passado o `timeLeft` visual para o componente `RapidFire.tsx` exibir o cronômetro descendo na tela.
   5. Atualizado os velhos `FLUENCY_IDS` baseados em strings hardcoded ("soma", "canto") para usar os IDs reais do Grafo SAGA ("N1.11", "N3.06", etc) no `composer.ts`.
 - **Resultado:** O Dojo agora possui sua funcionalidade base de "Treino do Mestre" rápida e cronometrada, e perfeitamente ligada ao DAG sem gerar desconexões de arquitetura.
+
+## Correção de Bug e Conexões Arquiteturais
+- **Erro:** `Uncaught ReferenceError: gVis_Scattered is not defined`
+- **Causa Raiz:** Em uma alteração anterior no `generators.ts` a manipulação via script acidentalmente sobrescreveu os imports dos geradores visuais.
+- **Solução:** O módulo `gVis_Scattered` (junto com os demais geradores) foi propriamente importado da biblioteca `generatorsVisual.ts` dentro de `generators.ts`.
+- **Arquitetura (Grafo e Fluência):** 
+  - Todo o ecossistema (escola/aulas, Dojo, e mecânicas visuais) converge sob os mesmos identificadores canônicos definidos no `grafo_saga.json`.
+  - A Aula ("Jornada") ensina a lógica (Escada CPA), o Dojo ("Academia") automatiza sem depender das mesmas amarras de progressão vertical. Tudo conectado.
+- **Status:** Testes ok (Build verde), conectividade validada com sucesso.
+
+## Correção de Bug: Initialization ReferenceError
+- **Erro:** `Uncaught ReferenceError: Cannot access 'journeyDone' before initialization`
+- **Causa Raiz:** O cronômetro de fluência `rt_max_s` havia sido inserido num `useEffect` muito acima na hierarquia do componente `GameLoop.tsx`, antes do estado `journeyDone` ter sido declarado (linha ~231), causando falha durante o render inicial.
+- **Solução:** O `useEffect` foi reposicionado mais abaixo no componente (logo após a declaração do `qRef`), onde as dependências (`journeyDone`, `q`, `status`, etc.) já estão inicializadas e disponíveis na closure da renderização. A chamada a `handlePick` também tem segurança pois será executada de forma assíncrona pós-render, quando a função já existir no escopo.
+- **Status:** Resolvido e com build testada com sucesso.

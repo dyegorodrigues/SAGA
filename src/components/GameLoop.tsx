@@ -175,28 +175,6 @@ export function GameLoop({
 
   // Pula na hora: corta a voz e vai para a próxima (criança no comando do ritmo)
   
-  useEffect(() => {
-    if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
-      setTimeLeft(q.rt_max_s);
-      const iv = setInterval(() => {
-        setTimeLeft((v) => {
-          if (v && v > 1) return v - 1;
-          clearInterval(iv);
-          return 0;
-        });
-      }, 1000);
-      return () => clearInterval(iv);
-    } else {
-      setTimeLeft(null);
-    }
-  }, [q, status, done, journeyDone]);
-
-  useEffect(() => {
-    if (timeLeft === 0 && !status && !done) {
-      handlePick('__timeout__', false);
-    }
-  }, [timeLeft, status, done]);
-
   const advanceNow = () => {
     if (!advanceRef.current) return;
     stopSpeak();
@@ -238,6 +216,29 @@ export function GameLoop({
   const wrongStreakRef = useRef(0);
   const aulaEndRef = useRef<null | (() => void)>(null);
   const qRef = useRef<Question>(q);
+
+  useEffect(() => {
+    if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
+      setTimeLeft(q.rt_max_s);
+      const iv = setInterval(() => {
+        setTimeLeft((v) => {
+          if (v && v > 1) return v - 1;
+          clearInterval(iv);
+          return 0;
+        });
+      }, 1000);
+      return () => clearInterval(iv);
+    } else {
+      setTimeLeft(null);
+    }
+  }, [q, status, done, journeyDone]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && !status && !done) {
+      handlePick('__timeout__', false);
+    }
+  }, [timeLeft, status, done]);
+
   qRef.current = q;
   // timers das aulinhas: registrados aqui e LIMPOS ao trocar de questão (aula nunca
   // "vaza" para a questão seguinte falando números da anterior)
