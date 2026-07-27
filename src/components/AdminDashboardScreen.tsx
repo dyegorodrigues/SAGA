@@ -7,6 +7,7 @@ import { GrafoSaga, SagaNode } from '../utils/grafoSaga';
 import { FONT, sfx } from './Mascot';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { SandboxModal } from './admin/SandboxModal';
 
 interface AdminDashboardScreenProps {
   state: State;
@@ -27,6 +28,9 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
     }
   });
   const [selectedNode, setSelectedNode] = useState<SagaNode | null>(null);
+  
+  const [filterStrand, setFilterStrand] = useState<string>("ALL");
+  const [filterStatus, setFilterStatus] = useState<"ALL" | "IMPLEMENTED" | "NOT_IMPLEMENTED">("ALL");
 
   const handleGeneralNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -112,9 +116,50 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
               <h2 className="text-white text-lg font-black mb-2">Visão Geral do Grafo Pedagógico (GrafoSaga)</h2>
               <p className="text-slate-400 text-sm mb-6">Aqui você pode visualizar todas as microcompetências mapeadas na Bíblia, ver o que já foi implementado e testar os módulos.</p>
               
+              <div className="flex flex-wrap gap-4 mb-8 bg-slate-900 p-4 rounded-xl border border-slate-700">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Eixo:</span>
+                  <select 
+                    value={filterStrand} 
+                    onChange={e => setFilterStrand(e.target.value)}
+                    className="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="ALL">Todos os Eixos</option>
+                    {Array.from(new Set(GrafoSaga.nodes.map(n => n.strand))).sort().map(s => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Status:</span>
+                  <select 
+                    value={filterStatus} 
+                    onChange={e => setFilterStatus(e.target.value as any)}
+                    className="bg-slate-800 border border-slate-600 text-white text-sm rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500"
+                  >
+                    <option value="ALL">Todos</option>
+                    <option value="IMPLEMENTED">Apenas Implementados</option>
+                    <option value="NOT_IMPLEMENTED">Não Implementados (Pendente)</option>
+                  </select>
+                </div>
+              </div>
+              
               <div className="space-y-8">
                 {["F0", "F1", "F2", "F3", "F4"].map(faixa => {
-                  const nodesInFaixa = GrafoSaga.nodes.filter(n => n.faixa === faixa);
+                  let nodesInFaixa = GrafoSaga.nodes.filter(n => n.faixa === faixa);
+                  
+                  if (filterStrand !== "ALL") {
+                    nodesInFaixa = nodesInFaixa.filter(n => n.strand === filterStrand);
+                  }
+                  
+                  if (filterStatus !== "ALL") {
+                    nodesInFaixa = nodesInFaixa.filter(n => {
+                      const isImp = !!getTrackById(n.id);
+                      return filterStatus === "IMPLEMENTED" ? isImp : !isImp;
+                    });
+                  }
+                  
                   if (nodesInFaixa.length === 0) return null;
                   
                   const implementedCount = nodesInFaixa.filter(n => !!getTrackById(n.id)).length;
@@ -199,8 +244,8 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
         {/* TAB 3: Docs */}
         {activeTab === "docs" && (
           <div className="max-w-4xl mx-auto pb-20">
-            <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl prose prose-invert prose-indigo" style={{ position: "relative", zIndex: 10 }}>
-              <div className="markdown-body">
+            <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-xl overflow-hidden relative">
+              <div className="markdown-body" style={{ color: '#24292e', backgroundColor: '#ffffff' }}>
                 <Markdown remarkPlugins={[remarkGfm]}>{DOCS_TEXT}</Markdown>
               </div>
             </div>
@@ -248,50 +293,13 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
 
         {/* NODE DETAIL MODAL */}
         {selectedNode && (
-          <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-            <div className="bg-slate-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-slate-700 shadow-2xl">
-              <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/80 rounded-t-2xl">
-                <div>
-                  <div className="text-xs font-bold text-indigo-400 tracking-widest">{selectedNode.id} - Faixa {selectedNode.faixa}</div>
-                  <h2 className="text-xl font-black text-white">{selectedNode.nome}</h2>
-                </div>
-                <button 
-                  onClick={() => setSelectedNode(null)}
-                  className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white hover:bg-slate-600 transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Detalhes</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
-                      <div className="text-xs text-slate-500 mb-1">Strand</div>
-                      <div className="text-slate-300 font-bold">{selectedNode.strand}</div>
-                    </div>
-                    <div className="bg-slate-900 p-3 rounded-lg border border-slate-700">
-                      <div className="text-xs text-slate-500 mb-1">Pré-requisitos</div>
-                      <div className="text-amber-400 font-medium">{selectedNode.prereqs?.join(', ') || 'Nenhum'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Anotações da Auditoria</h3>
-                  <textarea
-                    value={nodeNotes[selectedNode.id] || ''}
-                    onChange={(e) => handleNodeNoteChange(selectedNode.id, e.target.value)}
-                    placeholder="Anote bugs, lacunas didáticas ou ideias para este nó específico..."
-                    className="w-full h-32 bg-slate-900 border border-slate-700 rounded-xl p-3 text-slate-300 text-sm resize-none focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <SandboxModal
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
+            nodeNote={nodeNotes[selectedNode.id] || ""}
+            onNoteChange={handleNodeNoteChange}
+          />
         )}
-
       </div>
     </div>
   );

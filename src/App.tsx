@@ -21,7 +21,7 @@ import { ParentDashboard } from "./components/ParentDashboard";
 import { getKidLifetimeStars, getMascotStage } from "./components/MascotEvolution";
 import { computeUnlockStatus } from "./curriculum/motores/unlockEngine";
 
-import { tracksForGrade } from "./subjects";
+import { tracksForGrade, SUBJECTS } from "./subjects";
 import { buildMixedTrack } from "./curriculum/motores/mixedChallenge";
 import { dojo_add } from "./curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "./curriculum/fichas/dojo/sensei/dojo_sub";
@@ -255,7 +255,7 @@ export default function App() {
     if (!state || screen.name !== "game" || (screen.track !== "mista" && screen.track !== "mixed") || !screen.kid) return null;
     const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
-    const base = tracksForGrade(kid.grade);
+    const base = SUBJECTS.find(s => s.id === "mat")?.tracks[kid.grade] || [];
     const progOf = (tid: string) => {
       const kp = (state.progress[kid.id] || {})[tid];
       return kp ? { ...kp } : { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
@@ -270,7 +270,7 @@ export default function App() {
     if (!state || screen.name !== "game" || screen.track !== "aula" || !screen.kid) return null;
     const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
-    const base = tracksForGrade(kid.grade);
+    const base = SUBJECTS.find(s => s.id === "mat")?.tracks[kid.grade] || [];
     const progOf = (tid: string) => {
       const kp = (state.progress[kid.id] || {})[tid];
       return kp ? { ...kp } : { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
@@ -285,7 +285,7 @@ export default function App() {
     if (!state || screen.name !== "game" || screen.track !== "dojo" || !screen.kid) return null;
     const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
-    const base = tracksForGrade(kid.grade);
+    const base = SUBJECTS.find(s => s.id === "mat")?.tracks[kid.grade] || [];
     const progOf = (tid: string) => {
       const kp = (state.progress[kid.id] || {})[tid];
       return kp ? { ...kp } : { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
@@ -301,7 +301,7 @@ export default function App() {
     if (!state || screen.name !== "game" || screen.track !== "matricula" || !screen.kid) return null;
     const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
-    return buildMatriculaTrack(tracksForGrade(kid.grade));
+    return buildMatriculaTrack(SUBJECTS.find(s => s.id === "mat")?.tracks[kid.grade] || []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen.name, screen.kid, screen.track]);
   // acertos da matrícula na ordem da escada (reiniciado no 1º commit da missão)
