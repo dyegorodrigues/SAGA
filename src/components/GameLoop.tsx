@@ -116,6 +116,7 @@ export function GameLoop({
   const [stars, setStars] = useState(0);
   const [ok, setOk] = useState(0);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
+  const [isTimeout, setIsTimeout] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -185,12 +186,6 @@ export function GameLoop({
       setTimeLeft(null);
     }
   }, [q, status, done, journeyDone]);
-
-  useEffect(() => {
-    if (timeLeft === 0 && !status && !done) {
-      handlePick('__timeout__', false);
-    }
-  }, [timeLeft, status, done]);
 
   qRef.current = q;
   // timers das aulinhas: registrados aqui e LIMPOS ao trocar de questão (aula nunca
@@ -385,6 +380,7 @@ export function GameLoop({
   const answeredRef = useRef(false);
 
   const handlePick = (val: any, forcedRight?: boolean) => {
+    if (val === "__timeout__") setIsTimeout(true);
     if (status || answeredRef.current) return;
     
     // forcedRight: usado por interações que decidem o acerto por conta própria (ex.: `order`)
@@ -606,6 +602,7 @@ export function GameLoop({
         setQ(drawQuestion(track, p, exactLvl ? p.lvl : nextIdx < WARMUP_QUESTIONS ? warmupLvl(p.lvl) : p.lvl, exactLvl));
         setStatus(null);
         setSel(null);
+        setIsTimeout(false);
         setToast(null);
         setMsg(null);
       }
@@ -619,16 +616,16 @@ export function GameLoop({
         pitch: right ? 1.3 : 1.05,
         onEnd: () => {
           // acerto: passa quase na hora; erro com explicação: respira mais
-          setTimeout(() => advanceRef.current && advanceRef.current(), showExplain ? 700 : right ? 250 : 500);
+          if (val !== "__timeout__") setTimeout(() => advanceRef.current && advanceRef.current(), showExplain ? 700 : right ? 250 : 500);
         }
       });
       // rede de segurança: se a voz falhar TOTALMENTE, o app não trava (tempo folgado
       // pra jamais atropelar uma explicação em curso; o botão Avançar segue na tela).
       // Só dispara se AINDA formos a transição pendente (nunca a da próxima questão).
-      setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, showExplain ? 18000 : 8000);
+      if (val !== "__timeout__") setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, showExplain ? 18000 : 8000);
     } else {
       // sem som, dá tempo de LER a explicação antes de passar
-      setTimeout(() => advanceRef.current && advanceRef.current(), showExplain ? 3200 : right ? 900 : 1600);
+      if (val !== "__timeout__") setTimeout(() => advanceRef.current && advanceRef.current(), showExplain ? 3200 : right ? 900 : 1600);
     }
   };
 

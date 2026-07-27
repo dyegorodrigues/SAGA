@@ -1,10 +1,16 @@
-import React from "react";
-import { Track } from "../../types";
-import { FONT, sfx } from "../Mascot";
-import { SUBJECTS } from "../../subjects";
+import React, { useMemo } from "react";
+import { Track, Progress } from "../../types";
 import { UnlockStatus } from "../../utils/unlockEngine";
+import { C, FONT, sfx } from "../Mascot";
+import { SUBJECTS } from "../../subjects";
+import { dojo_add } from "../../curriculum/fichas/dojo_add";
+import { dojo_sub } from "../../curriculum/fichas/dojo_sub";
+import { dojo_mul } from "../../curriculum/fichas/dojo_mul";
+import { dojo_div } from "../../curriculum/fichas/dojo_div";
 
 interface Props {
+  onOpenPicker: (t: Track) => void;
+  onTrack: (t: Track) => void;
   prog: Record<string, any>;
   unlockStatus: UnlockStatus;
   mixedDoneToday: boolean;
@@ -12,15 +18,13 @@ interface Props {
   renderTrackCard: (t: Track) => React.ReactNode;
 }
 
-export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTrackCard }: Props) {
+export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTrackCard, onTrack, onOpenPicker }: Props) {
   const tracks = (() => {
     const mat = SUBJECTS.find(s => s.id === 'mat');
     if (!mat) return [];
     const allMat = ["pre", "ano1", "ano2"].flatMap(g => mat.tracks[g as "pre" | "ano1" | "ano2"] || []);
     return Array.from(new Map(allMat.map(t => [t.id, t])).values());
   })();
-
-  const multUnlocked = unlockStatus.opened.some(id => id.startsWith("N4")) || unlockStatus.dominated.some(id => id.startsWith("N4"));
 
   return (
     <div className="animate-[mkPop_0.25s_ease-out_1]">
@@ -41,26 +45,22 @@ export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTra
           Ginástica pura. O sistema adapta a dificuldade com imagens ou apenas números, de acordo com seu domínio.
         </p>
         <div className="grid grid-cols-2 gap-3.5">
-          <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FECDD3'}}>
+          <button onClick={() => { sfx.tick(); onOpenPicker(dojo_add); }} className="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FECDD3'}}>
             <div className="text-3xl mb-1">➕</div>
             <div className="font-black text-rose-700">Academia da<br/>Adição</div>
           </button>
-          <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #C7D2FE'}}>
+          <button onClick={() => { sfx.tick(); onOpenPicker(dojo_sub); }} className="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #C7D2FE'}}>
             <div className="text-3xl mb-1">➖</div>
             <div className="font-black text-indigo-700">Academia da<br/>Subtração</div>
           </button>
-          {multUnlocked && (
-            <>
-              <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
-                <div className="text-3xl mb-1">✖️</div>
-                <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
-              </button>
-              <button onClick={() => sfx.wrong()} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
-                <div className="text-3xl mb-1">➗</div>
-                <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
-              </button>
-            </>
-          )}
+          <button onClick={() => { sfx.tick(); onOpenPicker(dojo_mul); }} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
+            <div className="text-3xl mb-1">✖️</div>
+            <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
+          </button>
+          <button onClick={() => { sfx.tick(); onOpenPicker(dojo_div); }} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
+            <div className="text-3xl mb-1">➗</div>
+            <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
+          </button>
         </div>
       </div>
 
@@ -154,6 +154,23 @@ export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTra
           </button>
         </div>
       </div>
+
+      <div className="mt-8 pt-6 border-t-2 border-slate-100">
+        <h3 className="text-lg font-black text-slate-700 mb-3" style={{ fontFamily: FONT }}>Suas Estatísticas no Dojo</h3>
+        <div className="flex gap-3">
+          <div className="flex-1 bg-white border-2 border-slate-100 rounded-2xl p-4 text-center shadow-sm">
+            <div className="text-3xl mb-1">🎯</div>
+            <div className="text-2xl font-black text-slate-800" style={{ fontFamily: FONT }}>{Object.values(prog).reduce((a, p) => a + (p.ok || 0), 0)}</div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Acertos Totais</div>
+          </div>
+          <div className="flex-1 bg-white border-2 border-slate-100 rounded-2xl p-4 text-center shadow-sm">
+            <div className="text-3xl mb-1">⚔️</div>
+            <div className="text-2xl font-black text-slate-800" style={{ fontFamily: FONT }}>{Object.values(prog).reduce((a, p) => a + (p.tot || 0), 0)}</div>
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Desafios</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

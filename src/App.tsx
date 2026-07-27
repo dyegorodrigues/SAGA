@@ -23,6 +23,11 @@ import { computeUnlockStatus } from "./utils/unlockEngine";
 
 import { tracksForGrade } from "./subjects";
 import { buildMixedTrack } from "./utils/mixedChallenge";
+import { dojo_add } from "./curriculum/fichas/dojo_add";
+import { dojo_sub } from "./curriculum/fichas/dojo_sub";
+import { dojo_mul } from "./curriculum/fichas/dojo_mul";
+import { dojo_div } from "./curriculum/fichas/dojo_div";
+const dojoTracks = [dojo_add, dojo_sub, dojo_mul, dojo_div];
 import { buildDojoTrack } from "./utils/dojoMode";
 import { buildAulaTrack } from "./utils/composer";
 import { buildMatriculaTrack, seedFromResults } from "./utils/matricula";
@@ -734,7 +739,7 @@ export default function App() {
     let found = getTracksForKid(kidObj).find((t) => t.id === screen.track);
     if (!found) {
       const allTracks = ["pre", "ano1", "ano2"].flatMap(g => tracksForGrade(g as any));
-      found = allTracks.find((t) => t.id === screen.track);
+      found = allTracks.find((t) => t.id === screen.track) || dojoTracks.find(t => t.id === screen.track);
     }
     if (!found) {
       console.error("TRACK NOT FOUND:", screen.track);

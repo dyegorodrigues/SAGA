@@ -87,8 +87,8 @@ export function gMundoQuant(lvl: number): Question {
   const modes: { mais: boolean; w: string }[] = [
     { mais: true, w: "MAIS" },
     { mais: false, w: "MENOS" },
-    { mais: true, w: "MUITO" },
-    { mais: false, w: "POUCO" },
+    { mais: true, w: "MAIS" },
+    { mais: false, w: "MENOS" },
     { mais: true, w: "MAIS" },
   ];
   const m = modes[(lvl - 1) % 5];
@@ -107,8 +107,8 @@ export function gMundoQuant(lvl: number): Question {
     groups: [{ emoji: ea, n: a }, { emoji: eb, n: b }],
     howto: `Olhe rápido, sem contar: onde tem ${m.w.toLowerCase()}?`,
     explain: m.mais
-      ? `${Math.max(a, b)} é MUITO — mais que ${Math.min(a, b)}!`
-      : `${Math.min(a, b)} é POUCO — menos que ${Math.max(a, b)}!`,
+      ? `${Math.max(a, b)} tem MAIS que ${Math.min(a, b)}!`
+      : `${Math.min(a, b)} tem MENOS que ${Math.max(a, b)}!`,
     options: [{ value: 0 }, { value: 1 }],
     answer,
   };

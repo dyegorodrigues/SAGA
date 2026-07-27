@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useMemo } from "react";
+
 import { State, Kid } from "../../types";
 import { FONT, sfx, TOTAL_STICKERS } from "../Mascot";
 import { MascotEvolutionCard } from "../MascotEvolution";
@@ -18,11 +19,33 @@ interface Props {
   setCoinsSpent: (val: number) => void;
 }
 
+
 export function PerfilTab({ 
   kid, state, coins, albumCount, 
   onUpdateKid, onAlbum, onBack, 
   setShowWardrobe, setTempBg, setTempInventory, setTempCoins, setCoinsSpent 
 }: Props) {
+  const stats = useMemo(() => {
+    const logs = state.log[kid.id] || [];
+    const activeDays = logs.length;
+    let totQuestions = 0;
+    let totStars = 0;
+    
+    // Sum from progress to get absolute totals, logs might have been truncated? No, logs are per day.
+    const kidProg = state.progress[kid.id] || {};
+    for (const trackId of Object.keys(kidProg)) {
+      if (kidProg[trackId].ok) totQuestions += kidProg[trackId].ok; // only right ones? or tot
+    }
+    // Alternatively sum from logs
+    let logQuestions = 0;
+    logs.forEach(l => {
+      logQuestions += l.tot || 0;
+      totStars += l.stars || 0;
+    });
+
+    return { days: activeDays, questions: logQuestions > totQuestions ? logQuestions : totQuestions, stars: totStars };
+  }, [kid.id, state.log, state.progress]);
+
   return (
     <div className="animate-[mkPop_0.25s_ease-out_1]">
       <div className="text-center mb-6 mt-2"> 
@@ -30,6 +53,9 @@ export function PerfilTab({
          <p className="text-sm font-bold text-slate-500 mt-1">Sua coleção e mascote 🌟</p>
       </div>
       
+      
+      
+
       <div className="mb-4">
         <MascotEvolutionCard
             kid={kid}

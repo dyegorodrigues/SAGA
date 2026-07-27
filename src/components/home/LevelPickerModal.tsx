@@ -7,19 +7,25 @@ interface LevelPickerModalProps {
   prog: Record<string, Progress>;
   onClose: () => void;
   onTrackLvl: (t: Track, lvl: number) => void;
+  onTrack?: (t: Track) => void;
 }
 
-export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl }: LevelPickerModalProps) {
+export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTrack }: LevelPickerModalProps) {
+  const levels = pickerTrack.lvlSkills ? pickerTrack.lvlSkills.map((_, i) => i + 1) : [1, 2, 3, 4, 5];
+
   // Amostra do que cada nível pergunta (gera 1 questão-exemplo por nível)
+  
   const pickerSamples = useMemo(() => {
-    return [1, 2, 3, 4, 5].map((lvl) => {
+    return levels.map((lvl) => {
       try {
-        return pickerTrack.gen(lvl).prompt;
+        const q = pickerTrack.gen(lvl);
+        return q.expr || q.prompt || q.big || "";
       } catch {
         return "";
       }
     });
-  }, [pickerTrack]);
+  }, [pickerTrack, levels]);
+
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -47,8 +53,24 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl }: Lev
             Escolha o nível de dificuldade para jogar agora! 🎯
           </p>
         </div>
+
+        {onTrack && (
+          <button
+            onClick={() => {
+              sfx.level();
+              onClose();
+              onTrack(pickerTrack);
+            }}
+            className="w-full mb-3 flex items-center justify-center gap-2 p-3 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-indigo-700 font-black active:translate-y-0.5 transition-all shadow-sm"
+            style={{ fontFamily: FONT }}
+          >
+            <span className="text-xl">🧠</span>
+            Treino Inteligente (Automático)
+          </button>
+        )}
+
         <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-          {[1, 2, 3, 4, 5].map((lvl) => {
+          {levels.map((lvl) => {
             const p = prog[pickerTrack.id] || FRESH();
             const won = lvl <= p.maxLvl;
             const atual = lvl === p.lvl;
@@ -74,7 +96,7 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl }: Lev
                 >
                   {p.dom && lvl === 5 ? "👑" : lvl}
                 </span>
-                <span className="flex-1 min-w-0">
+                                <span className="flex-1 min-w-0">
                   <span className="block text-xs font-black" style={{ fontFamily: FONT, color: C.ink }}>
                     Nível {lvl}
                     {pickerTrack.lvlSkills?.[lvl - 1] && (
@@ -83,6 +105,9 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl }: Lev
                     {atual && <span className="ml-1.5 text-[10px] font-black uppercase px-1.5 py-0.5 rounded-md text-white" style={{ background: pickerTrack.color }}>atual</span>}
                     {p.dom && lvl === 5 && <span className="ml-1.5 text-[10px]">👑</span>}
                   </span>
+                  {pickerSamples[lvl - 1] && (
+                    <span className="block text-[10px] text-slate-500 font-bold truncate mt-0.5">Ex: {pickerSamples[lvl - 1]}</span>
+                  )}
                 </span>
                 <span className="text-slate-300 font-black">▶</span>
               </button>
