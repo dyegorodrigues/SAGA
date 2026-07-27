@@ -7,6 +7,22 @@ export const N1_07: FichaCompetencia = {
   faixa: "F1",
   prereqs: ["N1.04", "N1.06"],
   bncc: "EF01MA01",
+  
+  howto: "Pense no próximo número da contagem. É o mesmo que dar um salto para frente.",
+  explain: "Um a mais é o número que vem logo depois quando contamos.",
+  distratores: [
+    { regra: "n", tag: "REPETE_ORIGINAL" },
+    { regra: "n+2", tag: "ERRO_DE_SALTO" },
+    { regra: "n-1", tag: "DIRECAO_ERRADA" }
+  ],
+  niveis: {
+    1: { primitiva: "numberline", andaime: "mao_fantasma" },
+    2: { primitiva: "numberline", andaime: "alto" },
+    3: { primitiva: "numberline", andaime: "medio" },
+    4: { primitiva: "plain", andaime: "minimo" },
+    5: { primitiva: "plain", rt_alvo: 3000 }
+  },
+
   micros: [
     {
       id: "a",
@@ -16,7 +32,8 @@ export const N1_07: FichaCompetencia = {
         start: 1, 
         end: 10,
         jump_size: 1,
-        audio_prompt: "O sapinho está no número! Qual número vem DEPOIS?", tutorial: [{say: "Arraste o sapinho UM número para frente!"}] 
+        audio_prompt: "O sapinho está no número! Qual número vem DEPOIS?", 
+        tutorial: [{fala: "Arraste o sapinho UM número para frente!"}] 
       },
       dominio: { acertos: 4, de: 5, sessoes: 2 }
     }

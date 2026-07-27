@@ -6,7 +6,22 @@ export const AL_05: FichaCompetencia = {
   strand: "AL",
   faixa: "F2",
   prereqs: ["N1.11", "N3.01"],
-  bncc: "EF01MA11", // Descrever, por escrito ou oralmente, padroes e elementos ausentes em sequencias matematicas
+  bncc: "EF01MA11",
+  
+  howto: "Os dois lados da balança precisam ter o mesmo peso total para ela ficar reta.",
+  explain: "Se um lado está mais baixo, significa que ele está mais pesado. Adicione no outro lado para equilibrar.",
+  distratores: [
+    { regra: "n+1", tag: "OFF_BY_ONE" },
+    { regra: "n-1", tag: "OFF_BY_ONE" }
+  ],
+  niveis: {
+    1: { primitiva: "balanca", andaime: "mao_fantasma" },
+    2: { primitiva: "balanca", andaime: "alto" },
+    3: { primitiva: "plain", andaime: "medio" },
+    4: { primitiva: "plain", andaime: "minimo" },
+    5: { primitiva: "plain", rt_alvo: 5000 }
+  },
+
   micros: [
     {
       id: "a",

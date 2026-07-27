@@ -135,6 +135,8 @@ export class Composer {
     }
 
     return {
+      howto: ficha.howto,
+      explain: ficha.explain,
       kind,
       prompt: params.audio_prompt || "Responda:",
       audioPrompt: params.audio_prompt,

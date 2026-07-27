@@ -33,3 +33,11 @@ Foi validado o plano arquitetural para o tracking atômico. Para possibilitar o 
   - **Modais Extraídos:** `LevelPickerModal` (seletor de nível) e `WardrobeModal` (escolha de cenários) também foram refatorados, isolando os estados `showWardrobe`, controle de `inventory`, compras de cenário, e amostragem de dificuldades (`pickerSamples`).
   - **Impacto:** O arquivo `KidHomeScreen.tsx` foi reduzido de ~873 linhas para meras ~307 linhas, transformando-se de fato em um orquestrador (router das abas) em vez de acumular estado da UI inteira.
 - **Limpeza:** A compilação (`tsc --noEmit`) rodou com sucesso sem quebrar dependências, provando a qualidade da componentização, e todos os arquivos de procedimento (`fix.cjs`, etc) foram apagados do repositório conforme ditam as novas regras.
+
+### Erradicação do Monólito GameLoop (26 Julho 2026 - Conclusão)
+- **Desafio:** `GameLoop.tsx` era o último grande monólito do sistema, com 1601 linhas, devido a uma estrutura condicional gigante de JSX (Switch de Tipos) que renderizava dezenas de mini-games diretamente no corpo do componente.
+- **Ação:**
+  - Extraí 600+ linhas de lógica de interface para um novo componente injetado na arquitetura: `src/components/gameloop/GameLoopExerciseRenderer.tsx`.
+  - Desacoplei as mais de 16 dependências de cenas (`SyllableScene`, `WeatherScene`, etc.) e primitivas (`NumberLine`, `ArrayGrid`, etc.) do orquestrador principal, injetando-as apenas no renderizador filho.
+  - Ajustei todos os estados internos locais (como as _props_ `aulaSuggest`, `guidedNarr`, e variáveis transitórias da Aulinha) para serem transmitidos reativamente ao renderizador.
+- **Impacto e Resiliência:** `GameLoop.tsx` foi enxugado em 40% e agora foca estritamente em progressão, áudio e telemetria, delegando renderização. A compilação `npx tsc --noEmit` completou com exatidão (`0 errors`), provando que a tipagem TypeScript permaneceu intacta e sem pontas soltas. Todos os scripts locais foram obliterados em respeito ao protocolo.

@@ -5,18 +5,32 @@ export const N1_01: FichaCompetencia = {
   nome: "Parear 1-a-1 (um pra cada)",
   strand: "N1",
   faixa: "F0",
-  prereqs: [], // Primeira competência, sem pré-requisito
-  bncc: "EI03ET07", // Educação Infantil
+  prereqs: [],
+  bncc: "EI03ET07",
   excecaoCPA: "perceptual",
+  
+  howto: "Um para cada. Coloque com cuidado para não faltar nem sobrar nas vagas.",
+  explain: "Você colocou mais de um no mesmo lugar. É só UM para cada!",
+  distratores: [], // Produção
+  
+  niveis: {
+    1: { primitiva: "draggroup", andaime: "mao_fantasma" },
+    2: { primitiva: "draggroup", andaime: "alto" },
+    3: { primitiva: "draggroup", andaime: "medio" },
+    4: { primitiva: "draggroup", andaime: "minimo" },
+    5: { primitiva: "draggroup", rt_alvo: 4000 }
+  },
+
   micros: [
     {
       id: "a",
       alvo: "pareamento simples com poucos elementos",
-      kinds: ["draggroup"], // Usa interação de arrastar (física)
+      kinds: ["draggroup"],
       params: { 
         n_min: 3, 
         n_max: 5,
-        audio_prompt: "Dê uma comidinha para cada bichinho!", tutorial: [{ say: "Toque nas caixinhas para colocar uma comidinha em cada!" }] 
+        audio_prompt: "Dê uma comidinha para cada bichinho!", 
+        tutorial: [{ fala: "Toque nas caixinhas para colocar uma comidinha em cada!" }] 
       },
       dominio: { acertos: 3, de: 3, sessoes: 1 }
     },
@@ -27,7 +41,8 @@ export const N1_01: FichaCompetencia = {
       params: { 
         n_min: 5, 
         n_max: 7,
-        audio_prompt: "Entregue uma comidinha para cada. Será que vai sobrar?", tutorial: [{ say: "Lembre-se de colocar só UMA comidinha em cada bichinho!" }],
+        audio_prompt: "Entregue uma comidinha para cada. Será que vai sobrar?", 
+        tutorial: [{ fala: "Lembre-se de colocar só UMA comidinha em cada bichinho!" }],
         tem_sobra: true 
       }
     }

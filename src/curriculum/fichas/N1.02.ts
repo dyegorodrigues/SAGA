@@ -8,6 +8,19 @@ export const N1_02: FichaCompetencia = {
   prereqs: [], 
   bncc: "EI03ET07", 
   excecaoCPA: "perceptual", // É apenas recitação verbal, sem correspondência física 1-a-1
+  
+  howto: "Falar o número junto com o disparo.",
+  explain: "Espere o estouro para falar o próximo número.",
+  distratores: [],
+  
+  niveis: {
+    1: { primitiva: "emojirow", andaime: "mao_fantasma" },
+    2: { primitiva: "emojirow", andaime: "alto" },
+    3: { primitiva: "emojirow", andaime: "medio" },
+    4: { primitiva: "plain", andaime: "minimo" }, // voz apenas
+    5: { primitiva: "plain", rt_alvo: 2000 }
+  },
+
   micros: [
     {
       id: "a",
@@ -16,7 +29,9 @@ export const N1_02: FichaCompetencia = {
       params: { 
         n_min: 5, 
         n_max: 5,
-        audio_prompt: "Vamos contar juntos? Toque em um de cada vez!", tutorial: [{ say: "Toque nas figuras para cantarmos juntos!" }], interactive_count: true 
+        audio_prompt: "Vamos contar juntos? Toque em um de cada vez!", 
+        tutorial: [{ fala: "Toque nas figuras para cantarmos juntos!" }], 
+        interactive_count: true 
       },
       dominio: { acertos: 1, de: 1, sessoes: 1 }
     }

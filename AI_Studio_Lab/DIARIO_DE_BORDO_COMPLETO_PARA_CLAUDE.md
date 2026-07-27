@@ -183,3 +183,9 @@ Conduzida sob exigência estrita do usuário para investigar arquivos fantasmas,
 - Adicionalmente, os modais internos também foram desacoplados para `LevelPickerModal.tsx` e `WardrobeModal.tsx`.
 - Essa nova arquitetura simplifica o entendimento e reduz a probabilidade de um LLM interromper a geração de código (limites de token) ao editar a aba principal do jogo.
 - **Tipagem:** A compilação `npx tsc --noEmit` confirmou zero quebras. Os tipos permanecem integrados perfeitamente.
+
+## 9. Modularização Final do GameLoop (26 Julho 2026)
+- **Refatoração Cirúrgica:** O arquivo `GameLoop.tsx` (que possuía 1601 linhas) teve seu core visual desacoplado.
+- Toda a árvore JSX que processava `q.kind` (cenários, primitivas matemáticas e modos tutoriais guiados) foi extraída para o novo `src/components/gameloop/GameLoopExerciseRenderer.tsx`.
+- **Organização de Imports:** O `GameLoop.tsx` parou de importar a miríade de primitivas e cenas, passando essa responsabilidade para o Renderizador.
+- **Testes:** Compilação TS validada e totalmente limpa. Workspace mantido estritamente higienizado.

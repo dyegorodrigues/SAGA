@@ -40,7 +40,8 @@ export function EmojiRow({
   const [phase, setPhase] = useState<'waiting' | 'flashing' | 'done'>(
     !promptDone && flashDurationMs ? 'waiting' : (flashDurationMs ? 'flashing' : 'done')
   );
-  const [touchedCount, setTouchedCount] = useState(0);
+  const [touchedItems, setTouchedItems] = useState<Set<number>>(new Set());
+  const touchedCount = touchedItems.size;
 
   useEffect(() => {
     if (flashDurationMs && flashDurationMs > 0) {
@@ -60,17 +61,20 @@ export function EmojiRow({
 
   // Reset touch count
   useEffect(() => {
-    setTouchedCount(0);
+    setTouchedItems(new Set());
   }, [n, interactiveCount, emoji]);
 
   const handleTouch = (idx: number) => {
     if (!interactiveCount || disabled) return;
-    // Only allow touching the *next* item in sequence
-    if (idx === touchedCount) {
-      const newCount = touchedCount + 1;
-      setTouchedCount(newCount);
+    if (!touchedItems.has(idx)) {
+      const newItems = new Set(touchedItems);
+      newItems.add(idx);
+      setTouchedItems(newItems);
+      const newCount = newItems.size;
       speak(newCount.toString());
       if (onItemTouch && newCount === n) { setTimeout(() => onItemTouch(newCount), 800); }
+    } else {
+      speak("esse já contamos!");
     }
   };
 
@@ -82,10 +86,10 @@ export function EmojiRow({
       <AnimatePresence mode="popLayout">
         { (phase === 'flashing' || !flashDurationMs) ? (
           Array.from({ length: n }).map((_, i) => {
-            const isHighlighted = highlightIndex === i || (interactiveCount && i === touchedCount);
+            const isHighlighted = highlightIndex === i || (interactiveCount && !touchedItems.has(i));
             
             // In touch mode, items are dimmed until touched
-            const isTouched = interactiveCount ? i < touchedCount : true;
+            const isTouched = interactiveCount ? touchedItems.has(i) : true;
             
             return (
               <motion.span 
@@ -98,7 +102,7 @@ export function EmojiRow({
                 }}
                 exit={{ scale: 0, opacity: 0 }}
                 onClick={() => handleTouch(i)}
-                className={`relative inline-block ${interactiveCount && i === touchedCount ? 'cursor-pointer' : ''}`}
+                className={`relative inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''}`}
                 style={{
                   zIndex: isHighlighted ? 20 : 1,
                   fontSize: small ? '24px' : tokens.tamanho.base,

@@ -7,6 +7,20 @@ export const GM_04: FichaCompetencia = {
   faixa: "F2",
   prereqs: ["N2.01", "AL.01"],
   bncc: "EF02MA18", 
+  
+  howto: "O ponteiro pequeno marca a hora. O grande marca os minutos.",
+  explain: "Cuidado para não confundir: o ponteiro curto e grosso aponta a hora. O ponteiro longo aponta os minutos.",
+  distratores: [
+    { regra: "inverte_ponteiros", tag: "TROCA_PONTEIROS" }
+  ],
+  niveis: {
+    1: { primitiva: "relogio", andaime: "mao_fantasma" },
+    2: { primitiva: "relogio", andaime: "alto" },
+    3: { primitiva: "relogio", andaime: "medio" }, // Reading instead of dragging
+    4: { primitiva: "plain", andaime: "minimo" },
+    5: { primitiva: "plain", rt_alvo: 5000 }
+  },
+
   micros: [
     {
       id: "a",
