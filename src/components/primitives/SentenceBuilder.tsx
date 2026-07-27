@@ -43,7 +43,7 @@ export function SentenceBuilder({ expected, pieces, onComplete, disabled }: Sent
             onClick={() => handleSlotClick(i)}
             className="w-16 h-20 rounded-xl flex items-center justify-center font-black text-4xl cursor-pointer"
             style={{
-              backgroundColor: s ? tokens.cor.elementos.fundo : tokens.cor.fundo.secundario,
+              backgroundColor: s ? tokens.cor.superficie.fundo : tokens.cor.superficie.cartao,
               border: `3px ${s ? 'solid' : 'dashed'} ${tokens.cor.elementos.borda}`,
               color: tokens.cor.texto.principal
             }}
@@ -67,7 +67,7 @@ export function SentenceBuilder({ expected, pieces, onComplete, disabled }: Sent
             disabled={disabled}
             className="w-16 h-16 rounded-xl flex items-center justify-center font-black text-3xl shadow-sm"
             style={{
-              backgroundColor: tokens.cor.elementos.fundo,
+              backgroundColor: tokens.cor.superficie.fundo,
               color: tokens.cor.texto.principal,
               border: `2px solid ${tokens.cor.elementos.borda}`
             }}

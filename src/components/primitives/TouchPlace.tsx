@@ -32,7 +32,7 @@ export function TouchPlace({ emoji, targetCount, trayCount, onComplete }: TouchP
       <div 
         className="relative w-full min-h-[200px] p-6 rounded-3xl flex flex-wrap justify-center items-center gap-4"
         style={{
-          backgroundColor: tokens.cor.fundo.secundario,
+          backgroundColor: tokens.cor.superficie.cartao,
           border: `2px dashed ${tokens.cor.elementos.borda}`
         }}
       >
@@ -64,7 +64,7 @@ export function TouchPlace({ emoji, targetCount, trayCount, onComplete }: TouchP
       {/* Bandeja */}
       <div 
         className="w-full p-4 rounded-2xl flex flex-wrap justify-center gap-2"
-        style={{ backgroundColor: tokens.cor.fundo.primario, border: `2px solid ${tokens.cor.elementos.borda}` }}
+        style={{ backgroundColor: tokens.cor.superficie.fundo, border: `2px solid ${tokens.cor.elementos.borda}` }}
       >
         {Array.from({ length: trayCount - placedCount }).map((_, i) => (
           <motion.button

@@ -23,10 +23,10 @@ export function StoryPanel({ step, p1Illustration, p1Text, p2Illustration, p2Tex
             className="w-full flex flex-col rounded-3xl overflow-hidden shadow-sm"
             style={{ border: `2px solid ${tokens.cor.elementos.borda}` }}
           >
-            <div className="p-6 min-h-[120px] flex items-center justify-center" style={{ backgroundColor: tokens.cor.fundo.secundario }}>
+            <div className="p-6 min-h-[120px] flex items-center justify-center" style={{ backgroundColor: tokens.cor.superficie.cartao }}>
               {p1Illustration}
             </div>
-            <div className="p-4 text-center font-bold text-lg" style={{ backgroundColor: tokens.cor.elementos.fundo, color: tokens.cor.texto.principal }}>
+            <div className="p-4 text-center font-bold text-lg" style={{ backgroundColor: tokens.cor.superficie.fundo, color: tokens.cor.texto.principal }}>
               {p1Text}
             </div>
           </motion.div>
@@ -42,10 +42,10 @@ export function StoryPanel({ step, p1Illustration, p1Text, p2Illustration, p2Tex
             className="w-full flex flex-col rounded-3xl overflow-hidden shadow-sm"
             style={{ border: `2px solid ${tokens.cor.elementos.borda}` }}
           >
-            <div className="p-6 min-h-[120px] flex items-center justify-center" style={{ backgroundColor: tokens.cor.fundo.secundario }}>
+            <div className="p-6 min-h-[120px] flex items-center justify-center" style={{ backgroundColor: tokens.cor.superficie.cartao }}>
               {p2Illustration}
             </div>
-            <div className="p-4 text-center font-bold text-lg" style={{ backgroundColor: tokens.cor.elementos.fundo, color: tokens.cor.texto.principal }}>
+            <div className="p-4 text-center font-bold text-lg" style={{ backgroundColor: tokens.cor.superficie.fundo, color: tokens.cor.texto.principal }}>
               {p2Text}
             </div>
           </motion.div>
@@ -59,7 +59,7 @@ export function StoryPanel({ step, p1Illustration, p1Text, p2Illustration, p2Tex
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="w-full p-6 rounded-3xl text-center font-black text-2xl shadow-sm"
-            style={{ backgroundColor: tokens.cor.elementos.primario, color: tokens.cor.texto.inverso, border: `2px solid ${tokens.cor.elementos.borda}` }}
+            style={{ backgroundColor: tokens.cor.elementos.marcador, color: tokens.cor.texto.inverso, border: `2px solid ${tokens.cor.elementos.borda}` }}
           >
             {p3Text}
           </motion.div>

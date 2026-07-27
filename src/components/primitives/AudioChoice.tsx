@@ -35,7 +35,7 @@ export function AudioChoice({ audioPrompt, options, onSelect, disabled }: AudioC
         disabled={disabled}
         className="w-40 h-40 rounded-full flex items-center justify-center shadow-lg relative"
         style={{
-          backgroundColor: tokens.cor.elementos.primario,
+          backgroundColor: tokens.cor.elementos.marcador,
           border: `4px solid ${tokens.cor.elementos.borda}`,
           color: tokens.cor.texto.inverso
         }}
@@ -44,7 +44,7 @@ export function AudioChoice({ audioPrompt, options, onSelect, disabled }: AudioC
         {isPlaying && (
           <span 
             className="absolute inset-0 rounded-full animate-ping pointer-events-none" 
-            style={{ border: `4px solid ${tokens.cor.elementos.primario}`, opacity: 0.5 }}
+            style={{ border: `4px solid ${tokens.cor.elementos.marcador}`, opacity: 0.5 }}
           />
         )}
       </motion.button>
@@ -60,7 +60,7 @@ export function AudioChoice({ audioPrompt, options, onSelect, disabled }: AudioC
             disabled={disabled}
             className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-md font-black text-3xl"
             style={{
-              backgroundColor: tokens.cor.elementos.fundo,
+              backgroundColor: tokens.cor.superficie.fundo,
               color: tokens.cor.texto.principal,
               border: `2px solid ${tokens.cor.elementos.borda}`
             }}

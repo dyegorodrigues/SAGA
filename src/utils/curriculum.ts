@@ -151,5 +151,9 @@ export const ISLAND_DEFS: Record<string, { title: string, subtitle: string, colo
   "GE": { title: "Geometria", subtitle: "Formas e espaço", color: "from-pink-400 to-rose-600" },
   "GM": { title: "Grandezas e Medidas", subtitle: "Mundo real", color: "from-teal-400 to-emerald-600" },
   "PE": { title: "Estatística", subtitle: "Dados e gráficos", color: "from-indigo-400 to-violet-600" },
+  "port": { title: "Português", subtitle: "Letras, Sons e Palavras", color: "from-pink-400 to-rose-600" },
+  "eng": { title: "Inglês", subtitle: "Primeiras palavras", color: "from-blue-400 to-cyan-600" },
+  "sci": { title: "Ciências", subtitle: "Descobrindo o mundo", color: "from-lime-400 to-green-600" },
+  "mundo": { title: "Meu Mundo", subtitle: "Eu e a natureza", color: "from-orange-400 to-amber-600" },
   "default": { title: "Novas Aventuras", subtitle: "Módulos extras", color: "from-purple-400 to-fuchsia-600" }
 };

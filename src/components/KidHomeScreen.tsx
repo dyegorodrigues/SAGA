@@ -234,7 +234,7 @@ export function KidHomeScreen({
           />
         )}
         {activeShellTab === "jornada" && (
-          <JourneyTab prog={prog} onTrack={onTrack} />
+          <JourneyTab kid={kid} prog={prog} onTrack={onTrack} />
         )}
         {activeShellTab === "dojo" && (
           <DojoTab 
