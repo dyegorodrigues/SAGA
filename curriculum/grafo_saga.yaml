@@ -112,12 +112,17 @@ nodes:
   - { id: GE.10, nome: "Volume e vistas",                        strand: GE, faixa: F4, prereqs: [GE.04, GM.08] }
   - { id: PE.04, nome: "Estatística e probabilidade (contagem)", strand: PE, faixa: F4, prereqs: [PE.03, N6.03] }
 
-# ---------- Trilhas de fluência (Dojo) ----------
-# Duas famílias: FD = fluência de FATO (recordação atômica, medida por rt).
-#                PD = fluência de PROCEDIMENTO (algoritmo armado, medida por precisão + tempo + passo_fraco).
-# Spec completa em DOJO_SAGA.md. Regra: trilha abre <=> competência-mãe em nível >= 4.
+# ---------- Trilhas de fluência (Dojo - Templos de Operações) ----------
+# Os Templos (dojo_add, dojo_sub, dojo_mul, dojo_div) são trilhas contínuas e híbridas 
+# que englobam tanto Fatos (FD) quanto Procedimentos (PD) em uma única escada de 10 níveis (lvlSkills).
+# Eles são usados na Aba Dojo (Dojo Sensei) para treino focado por operação.
 fluency:
-  # -- Família FD: fatos --
+  - { id: dojo_add, nome: "Templo da Adição", familia: HIBRIDO, degraus: ["Até 5", "Até 10", "Amigos do 10", "Passando de 10", "Dezena + Unidade", "2D + 1D (Sem Vai 1)", "2D + 1D (Com Vai 1)", "Dezenas Exatas", "2D + 2D (Sem Vai 1)", "2D + 2D (Com Vai 1)"] }
+  - { id: dojo_sub, nome: "Templo da Subtração", familia: HIBRIDO, degraus: ["Tirar de até 5", "Tirar de até 10", "Metades", "Diferença pequena", "Tirar 10", "2D - 1D (Sem Emprestar)", "2D - 1D (Com Emprestar)", "Subtrair Dezenas", "2D - 2D (Sem Emprestar)", "2D - 2D (Com Emprestar)"] }
+  - { id: dojo_mul, nome: "Templo da Multiplicação", familia: HIBRIDO, degraus: ["Dobros", "Vezes 10", "Vezes 5", "Tabuada 2, 5, 10", "Tabuada 3 e 4", "Quadrados (3x3, 4x4)", "Tabuada 6, 7, 8, 9", "2D x 10", "2D x 1D (Sem Vai)", "2D x 1D (Com Vai)"] }
+  - { id: dojo_div, nome: "Templo da Divisão", familia: HIBRIDO, degraus: ["Metades (Até 20)", "Dividir por 10", "Dividir por 5", "Divisão 2, 5, 10", "Divisão 3 e 4", "Quadrados Inversos", "Divisão 6, 7, 8, 9", "2D ÷ 10", "2D ÷ 1D (Exata)", "Divisão com Resto"] }
+
+  # -- Família FD: fatos (Micropassos do Engine Automático) --
   - { id: FD1, familia: FD, nome: "Amigos do 10",                 destrava: { N1.11: 4 }, rt_max_s: 3 }
   - { id: FD2, familia: FD, nome: "Dobros e quase-dobros",        destrava: { N3.06: 4 }, rt_max_s: 3 }
   - { id: FD3, familia: FD, nome: "+/− até 20",                   destrava: { N3.07: 4, N3.08: 4 }, rt_max_s: 4 }

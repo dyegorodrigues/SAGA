@@ -108,6 +108,35 @@ export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTra
       {mode === 'sensei' && (
         <div className="animate-[mkPop_0.2s_ease-out_1]">
 
+          {/* TREINO INTELIGENTE */}
+          <div className="mb-8">
+            <button
+              onClick={() => {
+                sfx.level();
+                onMixed();
+              }}
+              className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
+              style={{
+                background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+                borderColor: '#94A3B8',
+                boxShadow: '0 4px 0 #64748B',
+              }}
+            >
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-slate-800 bg-slate-200 border-2 border-slate-300">
+                  🧠 Treino Automático
+                </span>
+                <span className="text-2xl">🤖</span>
+              </div>
+              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E293B' }}>
+                Treino Inteligente
+              </div>
+              <div className="text-xs font-bold mt-1 leading-snug text-slate-600">
+                O algoritmo escolhe a melhor combinação de exercícios baseada no seu progresso!
+              </div>
+            </button>
+          </div>
+
           {/* 1. TEMPLOS DE OPERAÇÕES */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3 pl-1">
@@ -138,6 +167,36 @@ export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTra
               </button>
             </div>
           </div>
+          
+          {/* DESAFIO DO MESTRE NO FINAL */}
+          <div className="mt-8">
+            <button
+              onClick={() => {
+                sfx.level();
+                onMixed();
+              }}
+              className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
+              style={{
+                background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
+                borderColor: '#EA580C',
+                boxShadow: '0 4px 0 #C2410C',
+              }}
+            >
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-orange-900 bg-orange-200 border-2 border-orange-300">
+                  🦊 Desafio do Mestre
+                </span>
+                <span className="text-2xl">🏆</span>
+              </div>
+              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#9A3412' }}>
+                Treino Mestre (Misto)
+              </div>
+              <div className="text-xs font-bold mt-1 leading-snug text-orange-900/80">
+                Tudo misturado! Teste seus reflexos com todos os tópicos que você já aprendeu. As moedinhas valem EM DOBRO! 🪙🪙
+              </div>
+            </button>
+          </div>
+
         </div>
       )}
 

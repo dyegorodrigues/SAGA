@@ -311,7 +311,9 @@ Objetivo: poder mudar paleta, fonte, elementos e o estilo inteiro do app (ex.: v
 1. **Desbloqueio** (unlock_engine): regra única do §5. O mapa pinta ilhas: 🔒 travada · 🌱 aberta · 🔥 fronteira ativa · 👑 dominada.
 2. **Seleção da fronteira** (composer, mantido): entre abertas e não dominadas, a de pior precisão; se tudo dominado, a próxima virgem do grafo.
 3. **Revisão espaçada** (review_planner): intervalos **2 → 4 → 7 → 12 → 21 → 45 dias** por competência dominada (já especificados no código — agora executados de verdade). Falhou na revisão? Recolocar na fila de resgate e, se falhar 2×, reabrir como fronteira (decair `dom` visualmente é proibido — a coroa fica, o treino volta).
-4. **Dojo:** pilar autônomo. Agora formalmente bifurcado em **Dojo Garden 🪴** (para a fase CRA, pareamento, pré-simbólico e transição) e **Dojo Sensei 🦊** (Academias de ginástica pura para as 4 operações, fatos (FD) e procedimentos armados multi-dígito (PD)). Spec completa em `DOJO_SAGA.md`.
+4. **Dojo:** pilar autônomo. Agora formalmente bifurcado em **Dojo Garden 🪴** (para a fase CRA, pareamento, pré-simbólico e transição) e **Dojo Sensei 🦊** (Academias de ginástica pura para as 4 operações, fatos (FD) e procedimentos armados multi-dígito (PD)).
+   - **Os Templos de Operações:** O Dojo Sensei é estruturado em trilhas contínuas e híbridas (ex: `dojo_add`, `dojo_sub`, `dojo_mul`, `dojo_div`). Cada "Templo" engloba Fatos e Procedimentos em uma mesma escada de 10 níveis (`lvlSkills`), garantindo que o treino de uma operação não seja quebrado em pequenos pedaços na interface.
+   - Estas estruturas vivem em `src/curriculum/fichas/dojo/sensei/` e estão mapeadas no Grafo (`grafo_saga.yaml`) dentro do bloco `fluency` com a marcação `familia: HIBRIDO`. Spec completa em `DOJO_SAGA.md`.
 5. **Anti-travamento (a resposta ao teu medo):**
    - Sempre ≥ 3 strands com ilha aberta. Se o grafo afunilar, abrir a próxima raiz de outra strand.
    - Frustração detectada (2 sessões seguidas com precisão < 50% na mesma fronteira, ou `skips` ≥ 2) → trocar a fronteira de strand na próxima sessão + injetar microtutoria do pré-req mais frágil (menor `maxLvl` entre os pré-reqs).

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Question } from '../../types';
 import { tokens, UIState } from '../../styles/tokens';
 
 export function InteractiveNumberLine({ q, start: _start, end: _end, startPos: _startPos, emoji: _emoji, onAnswer, disabled, state = 'ocioso' }: { q?: any; start?: number; end?: number; startPos?: number; emoji?: string; onAnswer: (val: any) => void; disabled: boolean; state?: UIState }) {
@@ -12,8 +11,11 @@ export function InteractiveNumberLine({ q, start: _start, end: _end, startPos: _
   const [pos, setPos] = useState((sp !== undefined ? sp - start : 0));
   
   useEffect(() => {
-    setPos(sp !== undefined ? sp - start : 0);
-  }, [q, start, sp]);
+    // Only reset position if NOT disabled, to preserve the user's final answer during the "right/wrong" state
+    if (!disabled) {
+      setPos(sp !== undefined ? sp - start : 0);
+    }
+  }, [q, start, sp, disabled]);
   
   const lineRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -36,49 +38,46 @@ export function InteractiveNumberLine({ q, start: _start, end: _end, startPos: _
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging) return;
+    if (!isDragging || disabled) return;
     updateFromClientX(e.clientX);
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDragging) return;
     setIsDragging(false);
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
   };
 
-  const handleClick = (step: number) => {
-    if (disabled) return;
-    setPos(step);
-  };
-
   return (
     <div className={`w-full py-12 px-8 select-none ${tokens.estado[state]}`}>
+      {/* Container expanded to make dragging much easier on mobile */}
       <div 
-        className="relative w-full h-4 touch-none cursor-pointer" 
+        className="relative w-full h-16 touch-none cursor-pointer flex items-center" 
         ref={lineRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        {/* Track */}
+        {/* Track Line */}
         <div 
-           className="absolute inset-0 rounded-full pointer-events-none" 
-           style={{ backgroundColor: tokens.cor.elementos.borda }}
+           className="absolute left-0 right-0 h-4 rounded-full pointer-events-none" 
+           style={{ backgroundColor: disabled ? tokens.cor.elementos.borda : tokens.cor.elementos.base_A, opacity: disabled ? 0.5 : 0.3 }}
         />
         
-        {/* Ticks */}
+        {/* Ticks and Labels */}
         {Array.from({ length: length + 1 }).map((_, i) => (
           <div
             key={i}
-            className="absolute top-0 w-1 h-8 pointer-events-none"
+            className="absolute h-8 pointer-events-none flex flex-col items-center justify-start"
             style={{ 
                left: `${i * stepWidth}%`, 
                transform: 'translateX(-50%)',
-              backgroundColor: tokens.cor.texto.secundario
             }}
           >
+            <div className="w-1.5 h-6 rounded-full" style={{ backgroundColor: tokens.cor.texto.secundario, opacity: 0.5 }} />
             <span 
-              className="absolute top-10 left-1/2 -translate-x-1/2 font-bold text-xl pointer-events-none"
+              className="mt-2 font-black text-2xl pointer-events-none"
               style={{ color: tokens.cor.texto.principal }}
             >
               {start + i}
@@ -86,33 +85,31 @@ export function InteractiveNumberLine({ q, start: _start, end: _end, startPos: _
           </div>
         ))}
         
-        {/* Draggable Thumb */}
+        {/* Draggable Thumb / Frog */}
         <motion.div
           animate={{ left: `${pos * stepWidth}%` }}
-          transition={{ type: "spring", stiffness: 400, damping: 30 }}
-          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white font-bold pointer-events-none"
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          className="absolute -translate-x-1/2 -translate-y-6 w-16 h-16 rounded-full shadow-lg flex items-center justify-center text-white font-bold pointer-events-none z-10"
           style={{            
-            backgroundColor: tokens.cor.elementos.base_A,
-            zIndex: 10
+            backgroundColor: disabled ? '#94A3B8' : tokens.cor.elementos.base_A,
+            border: `4px solid ${disabled ? '#CBD5E1' : '#FFFFFF'}`,
+            fontSize: '32px'
           }}
         >
           {_emoji ?? q?.emoji ?? "🐸"}
         </motion.div>
       </div>
 
-      {!disabled && (
-        <div className="mt-20 flex justify-center">
+      <div className="mt-20 flex justify-center h-16">
+        {!disabled && (
           <button
             onClick={() => onAnswer(start + pos)}
-            className={`px-8 py-3 rounded-full text-xl font-black shadow-md hover:scale-105 active:scale-95 transition-all ${tokens.cor.acao.primaria}`}
-            style={{ 
-              color: 'white'
-            }}
+            className={`px-10 py-4 rounded-full text-2xl font-black shadow-md hover:scale-105 active:scale-95 transition-all ${tokens.cor.acao.primaria} text-white`}
           >
-            CONFIRMAR {start + pos}
+            CONFIRMAR: {start + pos}
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

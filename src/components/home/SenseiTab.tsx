@@ -56,29 +56,29 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
 
       {/* ▶️ MINHA AULA -> A AULA DO MESTRE */}
       {Object.keys(prog).length > 0 && (
-        <div className="mb-8 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3", borderRadius: 24 }}>
+        <div className="mb-8 relative overflow-hidden card-block border-2" style={{ borderColor: "#E2E8F0", boxShadow: "0 6px 0 #CBD5E1", borderRadius: 24 }}>
           <button
             onClick={() => {
               sfx.level();
               onAula();
             }}
             className="w-full text-left p-5 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-            style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
+            style={{ background: "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" }}
           >
             <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3s_ease-in-out_infinite]" />
             <div className="flex items-center justify-between gap-3 mb-2">
-              <span className="text-xs font-black uppercase tracking-wider px-3 py-1.5 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-lg inline-block shadow-sm">
+              <span className="text-xs font-black uppercase tracking-wider px-3 py-1.5 text-slate-800 bg-slate-200 border-2 border-slate-300 rounded-lg inline-block shadow-sm">
                 🎓 O Sensei preparou pra você
               </span>
               <span className="text-3xl animate-bounce">📚</span>
             </div>
-            <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 24, color: "#312E81", marginBottom: 4 }}>
+            <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 24, color: "#1E293B", marginBottom: 4 }}>
               A Lição do Dia
             </div>
-            <div className="text-sm font-bold mt-1 leading-snug text-indigo-900/80 mb-4">
+            <div className="text-sm font-bold mt-1 leading-snug text-slate-600 mb-4">
               {aulaPlan.resumo} · A jornada é contínua, jogue quantas vezes quiser! ✨
             </div>
-            <div className="mt-2 inline-flex items-center justify-center w-full gap-2 text-sm font-black text-white bg-indigo-600 px-5 py-3 rounded-xl shadow-md hover:scale-[1.02] active:scale-95 transition-transform">
+            <div className="mt-2 inline-flex items-center justify-center w-full gap-2 text-sm font-black text-white bg-slate-800 px-5 py-3 rounded-xl shadow-md hover:scale-[1.02] active:scale-95 transition-transform">
               <span>Iniciar Sessão de Estudos</span>
               <span className="text-lg">▶</span>
             </div>
@@ -90,13 +90,40 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
       <div className="mt-8 bg-white p-5 rounded-3xl shadow-sm border-2 border-slate-100">
         <div className="flex items-center gap-2 mb-1 pl-1">
           <span className="text-2xl">📋</span>
-          <span className="font-black text-slate-700" style={{ fontFamily: FONT, fontSize: 18 }}>
+          <span className="font-black text-slate-800" style={{ fontFamily: FONT, fontSize: 18 }}>
             Tarefas do Sensei
           </span>
         </div>
         <p className="text-xs font-bold text-slate-500 mb-5 pl-1">Mergulhe no Dojo para dominar estas habilidades.</p>
         
         <div className="flex flex-col gap-4">
+          {/* Treino Inteligente */}
+          <button
+            onClick={() => {
+              sfx.level();
+              onMixed();
+            }}
+            className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
+            style={{
+              background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+              borderColor: '#94A3B8',
+              boxShadow: '0 4px 0 #64748B',
+            }}
+          >
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-slate-800 bg-slate-200 border-2 border-slate-300">
+                🧠 Treino Automático
+              </span>
+              <span className="text-2xl">🤖</span>
+            </div>
+            <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E293B' }}>
+              Treino Inteligente
+            </div>
+            <div className="text-xs font-bold mt-1 leading-snug text-slate-600">
+              O algoritmo escolhe a melhor combinação de exercícios baseada no seu progresso!
+            </div>
+          </button>
+
           {/* Desafio do Mestre */}
           <button
             onClick={() => {
@@ -106,8 +133,8 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
             className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
             style={{
               background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
-              borderColor: '#EA580C',
-              boxShadow: '0 4px 0 #C2410C',
+              borderColor: '#F97316',
+              boxShadow: '0 4px 0 #EA580C',
             }}
           >
             <div className="flex items-center justify-between gap-3 mb-2">
@@ -133,21 +160,21 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
               }}
               className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
               style={{
-                background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
-                borderColor: '#2563EB',
-                boxShadow: '0 4px 0 #1D4ED8',
+                background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
+                borderColor: '#22C55E',
+                boxShadow: '0 4px 0 #16A34A',
               }}
             >
               <div className="flex items-center justify-between gap-3 mb-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-blue-900 bg-blue-200 border-2 border-blue-300">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-green-900 bg-green-200 border-2 border-green-300">
                   🎯 Foco Específico
                 </span>
                 <span className="text-2xl">🥋</span>
               </div>
-              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E3A8A' }}>
+              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#166534' }}>
                 {rec.track.name}
               </div>
-              <div className="text-xs font-bold mt-1 leading-snug text-blue-900/80">
+              <div className="text-xs font-bold mt-1 leading-snug text-green-900/80">
                 {rec.reason || 'Sua missão de foco do dia no Dojo!'}
               </div>
             </button>
@@ -157,14 +184,14 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
 
       {/* 3. SUGESTAO OFICINA */}
       {aulaPlan.resgates.length > 0 && (
-         <div className="mt-8 mb-6 bg-emerald-50/50 p-5 rounded-3xl border-2 border-emerald-100">
+         <div className="mt-6 mb-6 bg-slate-50 p-5 rounded-3xl border-2 border-slate-200">
             <div className="flex items-center gap-2 mb-1 pl-1">
               <span className="text-2xl">🚑</span>
-              <span className="font-black text-emerald-800" style={{ fontFamily: FONT, fontSize: 18 }}>
+              <span className="font-black text-slate-800" style={{ fontFamily: FONT, fontSize: 18 }}>
                 Oficina de Resgate
               </span>
             </div>
-            <p className="text-xs font-bold text-emerald-600/80 mb-4 pl-1">
+            <p className="text-xs font-bold text-slate-500 mb-4 pl-1">
               Hora de consertar os motores.
             </p>
 
@@ -172,19 +199,19 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
               onClick={() => { sfx.tick(); setActiveShellTab("oficina"); }} 
               className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2 bg-white"
               style={{
-                borderColor: '#10B981',
-                boxShadow: '0 4px 0 #059669',
+                borderColor: '#94A3B8',
+                boxShadow: '0 4px 0 #64748B',
               }}
             >
                <div className="flex items-center justify-between gap-3 mb-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-emerald-900 bg-emerald-100 border-2 border-emerald-200">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-slate-700 bg-slate-200 border-2 border-slate-300">
                     🔧 Reparos Necessários
                   </span>
                   <span className="text-2xl animate-pulse">🛠️</span>
                </div>
                <div>
-                 <div className="font-black text-emerald-900 text-lg" style={{ fontFamily: FONT }}>Missões de Resgate!</div>
-                 <div className="text-xs text-emerald-700 font-bold mt-1">O algoritmo identificou {aulaPlan.resgates.length} conceitos importantes para revisar e fixar.</div>
+                 <div className="font-black text-slate-800 text-lg" style={{ fontFamily: FONT }}>Missões de Resgate!</div>
+                 <div className="text-xs text-slate-600 font-bold mt-1">O algoritmo identificou {aulaPlan.resgates.length} conceitos importantes para revisar e fixar.</div>
                </div>
             </button>
          </div>
