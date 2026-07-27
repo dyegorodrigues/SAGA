@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Kid, Track, Question, Progress } from "../types";
-import { commitProgress } from "../utils/progressEngine";
+import { commitProgress } from "../curriculum/motores/progressEngine";
 import { auth, logTelemetryToCloud } from "../lib/firebase";
 import {
   C, FONT, BODY, Mascote, StarChip, ProgressBar, SoundBtn, Burst, sfx, speak, stopSpeak, pickVoice, applyTheme, pickPraise, PRAISE, OOPS, THEMES,
@@ -92,7 +92,7 @@ const shuffle = (arr: any[]) => {
   return a;
 };
 
-import { trackMisconception } from "../utils/radarEngine";
+import { trackMisconception } from "../curriculum/motores/radarEngine";
 
 export function GameLoop({
   kid,

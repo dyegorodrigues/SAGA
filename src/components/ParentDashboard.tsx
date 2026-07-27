@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { State, Kid, Track } from "../types";
-import { CURRICULUM } from "../utils/curriculum";
+import { CURRICULUM } from "../curriculum/motores/curriculum";
 import { auth, linkAnonymousWithGoogle } from "../lib/firebase";
 import { C, FONT, StarChip, LevelDots, SoundBtn, MiniBars, StatChip, calcStreak, sumWindow, accWindow, TOTAL_STICKERS, sfx, THEME_EMOJIS, THEMES, Mascote } from "./Mascot";
 import { PedagogicalEditor } from "./PedagogicalEditor";

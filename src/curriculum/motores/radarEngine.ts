@@ -6,7 +6,7 @@
  * Força 1: 1 dia, Força 2: 2 dias, Força 3: 4 dias, Força 4: 9 dias, Força 5: 21 dias.
  */
 
-import { Progress } from "../types";
+import { Progress } from "../../types";
 
 export const SPACING_INTERVALS: Record<number, number> = {
   1: 1,

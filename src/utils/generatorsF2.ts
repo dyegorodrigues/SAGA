@@ -1,6 +1,6 @@
 import { Question, Option } from "../types";
-import { ri, pick, shuffle } from "./generators";
-import { numOpts } from "./generatorsF1";
+import { ri, pick, shuffle } from "../utils/generators";
+import { numOpts } from "../utils/generatorsF1";
 import { MisconceptionTag } from "../constants/misconceptions";
 
 // ================= F2 GENERATORS ================= //

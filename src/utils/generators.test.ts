@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { TRACKS_PRE, TRACKS_ANO1 } from "./curriculum";
+import { TRACKS_PRE, TRACKS_ANO1 } from "../curriculum/motores/curriculum";
 
 /**
  * A cinta de segurança do Matemágica (Constituição, regra 5).

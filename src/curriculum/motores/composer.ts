@@ -1,4 +1,4 @@
-import { Question, Track, Progress } from "../types";
+import { Question, Track, Progress } from "../../types";
 import { computeUnlockStatus } from "./unlockEngine";
 
 /**

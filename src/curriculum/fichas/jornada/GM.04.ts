@@ -1,4 +1,4 @@
-import { FichaCompetencia } from "../schema";
+import { FichaCompetencia } from "../../schema";
 
 export const GM_04: FichaCompetencia = {
   id: "GM.04",

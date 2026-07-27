@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { computeUnlockStatus } from "./unlockEngine";
+import { computeUnlockStatus } from "../curriculum/motores/unlockEngine";
 
 describe("unlockEngine", () => {
   it("opens root nodes (no prereqs) when no progress exists", () => {

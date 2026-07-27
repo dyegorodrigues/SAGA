@@ -1,6 +1,6 @@
 import { Question } from "../types";
-import { ri, pick, shuffle } from "./generators";
-import { gVis_TakeApart, gVis_MissingAddendFrame } from "./generatorsVisual";
+import { ri, pick, shuffle } from "../utils/generators";
+import { gVis_TakeApart, gVis_MissingAddendFrame } from "../utils/generatorsVisual";
 
 export const numOpts = (ans: any, ...distractors: any[]) => {
   let res = [ans, ...distractors].filter(x => x != null && x !== ans);

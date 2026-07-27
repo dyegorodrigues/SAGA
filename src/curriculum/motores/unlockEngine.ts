@@ -1,5 +1,5 @@
-import { GrafoSaga } from "./grafoSaga";
-import { Progress } from "../types";
+import { GrafoSaga } from "../../utils/grafoSaga";
+import { Progress } from "../../types";
 
 export interface UnlockStatus {
   locked: string[];

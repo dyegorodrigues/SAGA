@@ -1,5 +1,5 @@
-import { Question, Track } from "../../types";
-import { ri, pick } from "../../utils/generators";
+import { Question, Track } from "../../../../types";
+import { ri, pick } from "../../../../utils/generators";
 
 export const gDojoMul = (lvl: number): Question => {
   let a = 0, b = 0;

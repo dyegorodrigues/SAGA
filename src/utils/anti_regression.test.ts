@@ -23,7 +23,7 @@ describe('Anti-Regression Specs', () => {
   });
 
   it('4. Mascot framing must be a rounded rectangle, not a circular clip-path', () => {
-    const mascotEvolutionCode = fs.readFileSync(path.join(__dirname, '../components/MascotEvolution.tsx'), 'utf-8');
+    const mascotEvolutionCode = fs.readFileSync(path.join(__dirname, '../../components/MascotEvolution.tsx'), 'utf-8');
     const mascotRendererCode = fs.readFileSync(path.join(__dirname, '../components/mascots/MascotRenderer.tsx'), 'utf-8');
     expect(mascotEvolutionCode).toMatch(/rounded-[23]xl/);
     expect(mascotRendererCode).not.toMatch(/<clipPath id="bg-clip"><circle/);

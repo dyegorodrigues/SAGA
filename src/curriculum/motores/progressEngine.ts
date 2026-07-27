@@ -1,4 +1,4 @@
-import { Progress, Question } from "../types";
+import { Progress, Question } from "../../types";
 
 export interface CommitResult {
   p: Progress;

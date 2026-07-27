@@ -1,5 +1,5 @@
 import { Track } from "../types";
-import { TRACKS_PRE, TRACKS_ANO1, TRACKS_ANO2 } from "../utils/curriculum";
+import { TRACKS_PRE, TRACKS_ANO1, TRACKS_ANO2 } from "../curriculum/motores/curriculum";
 import { TRACKS_MAT_ELITE_PRE, TRACKS_MAT_ELITE_ANO1 } from "./matElite";
 import { TRACKS_LOGICA_ANO1 } from "./logica";
 import { TRACKS_PORT_PRE, TRACKS_PORT_ANO1 } from "./port";

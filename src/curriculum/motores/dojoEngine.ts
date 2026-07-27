@@ -1,4 +1,4 @@
-import { FactStrength, ProcStrength } from "../types";
+import { FactStrength, ProcStrength } from "../../types";
 
 export interface DojoCandidate {
   id: string;

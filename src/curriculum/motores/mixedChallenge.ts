@@ -1,4 +1,4 @@
-import { Question, Track, Progress } from "../types";
+import { Question, Track, Progress } from "../../types";
 
 /**
  * Desafio Misto 👑 (Parte E, item 3 do plano diretor)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { State, Track } from '../types';
-import { CURRICULUM, ISLAND_DEFS, getTrackById } from '../utils/curriculum';
+import { CURRICULUM, ISLAND_DEFS, getTrackById } from "../curriculum/motores/curriculum";
 import { AdminGodPanel } from './AdminGodPanel';
 import { DOCS_TEXT } from '../docsText';
 import { GrafoSaga, SagaNode } from '../utils/grafoSaga';
@@ -198,7 +198,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
         {/* TAB 3: Docs */}
         {activeTab === "docs" && (
           <div className="max-w-4xl mx-auto pb-20">
-            <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl prose prose-invert prose-indigo">
+            <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl prose prose-invert prose-indigo" style={{ position: "relative", zIndex: 10 }}>
               <div className="markdown-body">
                 <Markdown>{DOCS_TEXT}</Markdown>
               </div>

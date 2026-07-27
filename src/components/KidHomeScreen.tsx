@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { State, Kid, Track } from "../types";
-import { computeUnlockStatus } from "../utils/unlockEngine";
+import { computeUnlockStatus } from "../curriculum/motores/unlockEngine";
 import { C, FONT, CoinChip, LevelDots, sfx, FRESH, TOTAL_STICKERS, THEMES, Mascote } from "./Mascot";
 import { MascotEvolutionCard, getKidLifetimeStars, getMascotStage } from "./MascotEvolution";
 import { LearningPath } from "./LearningPath";
@@ -14,7 +14,7 @@ import { LevelPickerModal } from "./home/LevelPickerModal";
 import { WardrobeModal } from "./home/WardrobeModal";
 
 import { SUBJECTS } from "../subjects";
-import { planAula } from "../utils/composer";
+import { planAula } from "../curriculum/motores/composer";
 
 interface KidHomeProps {
   state: State;

@@ -1,12 +1,12 @@
-import { gVis_Scattered, gVis_VisualAddition, gVis_LinkingCubesSentence, gVis_Sequence } from "./generatorsVisual";
-import { N1_01 } from "../curriculum/fichas/N1.01";
+import { gVis_Scattered, gVis_VisualAddition, gVis_LinkingCubesSentence, gVis_Sequence } from "../utils/generatorsVisual";
+import { N1_01 } from "../curriculum/fichas/jornada/N1.01";
 import { Composer } from "../curriculum/Composer";
 
-import { N1_02 } from "../curriculum/fichas/N1.02";
-import { N1_03 } from "../curriculum/fichas/N1.03";
-import { N1_04 } from "../curriculum/fichas/N1.04";
-import { N1_07 } from "../curriculum/fichas/N1.07";
-import { N1_10 } from "../curriculum/fichas/N1.10";
+import { N1_02 } from "../curriculum/fichas/jornada/N1.02";
+import { N1_03 } from "../curriculum/fichas/jornada/N1.03";
+import { N1_04 } from "../curriculum/fichas/jornada/N1.04";
+import { N1_07 } from "../curriculum/fichas/jornada/N1.07";
+import { N1_10 } from "../curriculum/fichas/jornada/N1.10";
 import { Question, Track } from "../types";
 import {
   C,
@@ -775,8 +775,8 @@ export function gN1_07(lvl: number): Question {
   return Composer.generate(N1_07, "a");
 }
 
-import { N1_08 } from "../curriculum/fichas/N1.08";
-import { N1_09 } from "../curriculum/fichas/N1.09";
+import { N1_08 } from "../curriculum/fichas/jornada/N1.08";
+import { N1_09 } from "../curriculum/fichas/jornada/N1.09";
 export function gN1_09(lvl: number): Question {
   return gVis_Sequence(lvl);
 }

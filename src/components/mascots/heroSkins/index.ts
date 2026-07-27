@@ -1,5 +1,5 @@
 import type React from "react";
-import type { SkinCtx } from "./types";
+import type { SkinCtx, LimbConfig } from "./types";
 import { skinHomemAranha, skinBatman, skinPanteraNegra } from "./marvel1";
 import { skinHulk, skinBruxo, skinFutebol, skinHomemFerro } from "./squad1";
 import { skinCapitaoAmerica, skinElsa, skinPikachu, skinThor, skinClassico } from "./squad2";
@@ -11,7 +11,7 @@ import { skinHomemFerroPixel } from "./pixelIron";
 import { skinHulkPixel } from "./pixelHulk";
 import { skinDragaoFogo } from "./dragon";
 
-export type { SkinCtx, LimbConfig } from "./types";
+export type { SkinCtx, LimbConfig } from "../../../types";
 
 /** despacho por tema (Constituição regra 4: cada arquivo de personagem fica pequeno). */
 export const SKIN_RENDERERS: Record<string, (ctx: SkinCtx) => React.ReactNode> = {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Track, Progress } from '../types';
-import { computeUnlockStatus } from '../utils/unlockEngine';
-import { ISLAND_DEFS } from '../utils/curriculum';
+import { computeUnlockStatus } from "../curriculum/motores/unlockEngine";
+import { ISLAND_DEFS } from "../curriculum/motores/curriculum";
 import { C, FONT, sfx } from './Mascot';
 
 interface Props {

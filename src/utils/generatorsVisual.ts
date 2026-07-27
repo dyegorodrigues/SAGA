@@ -1,5 +1,5 @@
 import { Question } from "../types";
-import { numOpts, pickEmo } from "./generators";
+import { numOpts, pickEmo } from "../utils/generators";
 
 export function gVis_VisualAddition(lvl: number): Question {
   const a = Math.floor(Math.random() * 4) + 1;

@@ -1,5 +1,5 @@
-import { Question, Track } from "../../types";
-import { ri } from "../../utils/generators"; // using random int
+import { Question, Track } from "../../../../types";
+import { ri } from "../../../../utils/generators"; // using random int
 
 export const gDojoAdd = (lvl: number): Question => {
   let a = 0, b = 0;

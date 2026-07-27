@@ -1,7 +1,7 @@
 import { Progress } from "../types";
 type ProgOf = (trackId: string) => Progress;
 import { Question, Track } from "../types";
-import { FLUENCY_IDS } from "./composer";
+import { FLUENCY_IDS } from "../curriculum/motores/composer";
 
 export function buildDojoTrack(tracks: Track[], progOf: ProgOf): Track {
   // Apenas trilhas de fluência (soma, subtração) que possuem rapid-fire

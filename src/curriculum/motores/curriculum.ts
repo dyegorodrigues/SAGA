@@ -1,14 +1,14 @@
-import { Track } from "../types";
-import { Question } from "../types";
+import { Track } from "../../types";
+import { Question } from "../../types";
 import {
   gN1_12, gN3_03, gN3_04, gN2_03, gAL_03, gN2_01, gGM_03, gGM_04, gN3_10, gPE_01,
   gN1_01, gN1_02, gN1_03, gN1_04, gN1_05, gN1_06, gN1_07, gN1_08, gN1_09, gAL_01, gAL_02, gGE_01, gGE_02, gGM_02,
   gN3_01, gN3_02
-} from "./generators";
-import { gN1_10, gN1_11, gN2_02, gN3_05, gN3_06, gN3_07, gN3_08, gN3_09 } from "./generatorsF1";
-import { gN2_04, gN2_05, gN3_11, gN3_12, gN3_13, gN4_01, gN4_02, gN4_05 } from "./generatorsF2";
-import { C } from "../components/Mascot";
-import { GrafoSaga } from "./grafoSaga";
+} from "../../utils/generators";
+import { gN1_10, gN1_11, gN2_02, gN3_05, gN3_06, gN3_07, gN3_08, gN3_09 } from "../../utils/generatorsF1";
+import { gN2_04, gN2_05, gN3_11, gN3_12, gN3_13, gN4_01, gN4_02, gN4_05 } from "../../utils/generatorsF2";
+import { C } from "../../components/Mascot";
+import { GrafoSaga } from "../../utils/grafoSaga";
 
 export interface CurriculumModule {
   id: string;

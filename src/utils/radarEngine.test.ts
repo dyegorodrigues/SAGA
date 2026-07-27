@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Progress } from "../types";
-import { evaluateSpacedRepetition, getDueReviews, getRescueItems, trackMisconception } from "./radarEngine";
+import { evaluateSpacedRepetition, getDueReviews, getRescueItems, trackMisconception } from "../curriculum/motores/radarEngine";
 
 describe("RadarEngine - Motor de Diagnóstico e Revisão Espaçada (§11.4)", () => {
   it("erro isolado NÃO dispara resgate (Camada 1, §8.1)", () => {

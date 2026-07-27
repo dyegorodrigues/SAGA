@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DojoEngine, DojoCandidate } from "./dojoEngine";
+import { DojoEngine, DojoCandidate } from "../curriculum/motores/dojoEngine";
 import { FactStrength, ProcStrength } from "../types";
 
 describe("DojoEngine - Pilar de Fluência (§3 e §4)", () => {

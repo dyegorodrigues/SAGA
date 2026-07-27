@@ -1,5 +1,5 @@
 import React from "react";
-import type { SkinCtx } from "./types";
+import type { SkinCtx, LimbConfig } from "./types";
 
 export function skinHomemAranhaPixel(ctx: SkinCtx) {
   const { theme, stage, color, bx, by, bw, bh, br, animation, isHappy, armY, legY, isBaby, isTeen, isHero, isLegend, renderLimbs, drawPixelArt } = ctx;

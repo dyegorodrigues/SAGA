@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { buildMixedQuestions, buildMixedTrack, MIXED_TOTAL } from "./mixedChallenge";
-import { TRACKS_ANO1 } from "./curriculum";
+import { buildMixedQuestions, buildMixedTrack, MIXED_TOTAL } from "../curriculum/motores/mixedChallenge";
+import { TRACKS_ANO1 } from "../curriculum/motores/curriculum";
 import { Progress } from "../types";
 
 const progFactory = (overrides: Partial<Record<string, Partial<Progress>>> = {}) => {
