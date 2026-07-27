@@ -50,3 +50,7 @@ Foi validado o plano arquitetural para o tracking atômico. Para possibilitar o 
   1. Redesenhar o `DojoTab.tsx` para a estrutura *Garden* vs *Sensei* com navegação in-window.
   2. Atualizar o `BIBLIA_DO_SAGA.md` e o mapa de currículo para oficializar as estruturas de geração do Dojo (`dojo_*.ts`), conectando-os aos motores cânonicos.
   3. Expandir o modelo de estatísticas (no state/telemetria) para suportar baterias e métricas de desempenho mais aprofundadas.
+
+### 🚨 ALERTA CRÍTICO: FALHA DE CONTEXTO E BUG DO AGENTE (26 Julho 2026)
+Durante as refatorações da Home e do GameLoop, o agente perdeu contexto crítico de discussões anteriores sobre UI/UX da aba Tutor, arquitetura de Jornada/Diagnóstico e ajustes na aba Admin God. 
+**Ação Imediata para a Próxima Sessão:** LEIA O ARQUIVO `AI_Studio_Lab/TRANSICAO_DEBUG.md` OBRIGATORIAMENTE antes de escrever qualquer código. Ele contém o plano exato de recuperação.

@@ -6,6 +6,7 @@ import { DOCS_TEXT } from '../docsText';
 import { GrafoSaga, SagaNode } from '../utils/grafoSaga';
 import { FONT, sfx } from './Mascot';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface AdminDashboardScreenProps {
   state: State;
@@ -200,7 +201,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
           <div className="max-w-4xl mx-auto pb-20">
             <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl prose prose-invert prose-indigo" style={{ position: "relative", zIndex: 10 }}>
               <div className="markdown-body">
-                <Markdown>{DOCS_TEXT}</Markdown>
+                <Markdown remarkPlugins={[remarkGfm]}>{DOCS_TEXT}</Markdown>
               </div>
             </div>
           </div>

@@ -1440,4 +1440,21 @@ Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada C
 *Changelog: v2.0 (jul/2026) — detalhamento completo de todos os assuntos no padrão da divisão; novas didáticas: Fundação N1/N2, Decimais/Porcentagem/Proporção, Inteiros (N7), Dados/Probabilidade, Método de Barras; seção A Criança Real (limites de desenvolvimento); mapa de confluências.*
 *v2.1 (jul/2026) — Contrato de Ensino: modelo de erro reformulado para duas camadas (resposta imediata leve que preserva o fluxo + remediação profunda por padrão, no momento certo). Regra-mãe "o fluxo é sagrado". Os E1/E2/E3 por assunto passam a descrever o CONTEÚDO de cada nível; o QUANDO é governado centralmente. Andaime de ensino distinguido de resposta a erro.*
 *v2.2 (jul/2026) — Fundação N1.02: exercício-âncora Canhão de Balões (contar = tiro + numeral + som, semente da correspondência 1-a-1 e da cardinalidade) e a ordem correta da contagem (o 1 antes do 0; zero nasce concreto como "vazio", depois da cardinalidade).*
+
+## § ARQUITETURA DO SISTEMA E COMPONENTIZAÇÃO FRONTEND (Julho 2026)
+
+A arquitetura visual e de estados do SAGA foi refatorada para ser **Estritamente Componentizada e Anti-Monolítica**. O antigo "GameLoop gigante" foi desmembrado em componentes separados que garantem previsibilidade e facilitam auditorias.
+
+**Árvore de Componentes Atual:**
+- \`App.tsx\`: Roteador principal de estado. Controla a troca entre telas cheias (Login, KidHomeScreen, AdminDashboardScreen, GameLoopExerciseRenderer).
+- \`KidHomeScreen.tsx\`: O Shell do Estudante. Roteia internamente as cinco abas principais e exibe o Mascote:
+  1. \`SenseiTab.tsx\`: **O Tutor SAGA.** Responsável pelo plano de estudos diário. Agrupa "A Lição do Dia", o "Treino Mestre (Misto)" e as missões de Foco Específico em uma interface fluida, sem travas temporais (loop contínuo).
+  2. \`JourneyTab.tsx\`: **Jornada (O Grafo).** Exibe a trilha de aprendizagem visual (*LearningPath*) com diagnóstico dinâmico de tempo estimado e porcentagem de domínio por nível.
+  3. \`DojoTab.tsx\`: **A Academia de Fluência.** Onde moram as trilhas de "Ginástica Pura" e os Templos de Operações (treino isolado de fatos).
+  4. \`OficinaTab.tsx\`: **Resgate.** Visualização dedicada para missões de resgate e conserto de lacunas conceituais detectadas pelo algoritmo.
+  5. \`PerfilTab.tsx\`: **Álbum & Pets.** Gestão de conquistas e customização do mascote.
+- \`GameLoopExerciseRenderer.tsx\`: O Renderizador Agonóstico. Executa as aulas interativas de 7-12 blocos, microtutoriais, e emite o feedback sensorial de acordo com o \`curriculum.ts\`.
+- \`AdminDashboardScreen.tsx\` & \`AdminGodPanel.tsx\`: Camada de Developer Tools para auditoria profunda de currículo, visualização do grafo pedagógico, testes instantâneos de níveis das competências, simulações de UI, exportação de log, e renderização destas diretrizes.
+\`;
+
 `;

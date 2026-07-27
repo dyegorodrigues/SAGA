@@ -10,10 +10,11 @@ interface Props {
   onMatricula: () => void;
   onAula: () => void;
   onTrack: (t: Track) => void;
+  onMixed: () => void;
   setActiveShellTab: (tab: any) => void;
 }
 
-export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTrack, setActiveShellTab }: Props) {
+export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTrack, onMixed, setActiveShellTab }: Props) {
   return (
     <div className="animate-[mkPop_0.25s_ease-out_1]">
       <div className="text-center mb-6 mt-2"> 
@@ -53,90 +54,138 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
         </div>
       )}
 
-      {/* ▶️ MINHA AULA (E2) */}
+      {/* ▶️ MINHA AULA -> A AULA DO MESTRE */}
       {Object.keys(prog).length > 0 && (
-        <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3" }}>
-        <button
-          onClick={() => {
-            sfx.level();
-            onAula();
-          }}
-          className="w-full text-left p-4 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
-          style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
-        >
-          <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_2.6s_ease-in-out_infinite]" />
-          <div className="flex items-center justify-between gap-3 mb-1.5">
-            <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-md inline-block">
-              🎓 O Sensei preparou pra você
-            </span>
-            <span className="text-2xl animate-bounce">📚</span>
-          </div>
-          <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#312E81" }}>
-            ▶️ MINHA AULA
-          </div>
-          <div className="text-xs font-bold mt-1 leading-snug text-indigo-900/80">
-            {aulaPlan.resumo} · começa fácil e termina na brincadeira! ✨
-          </div>
-          <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-indigo-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-            <span>Começar a Aula</span>
-            <span>▶</span>
-          </div>
-        </button>
-      </div>
+        <div className="mb-8 relative overflow-hidden card-block border-2" style={{ borderColor: "#4F46E5", boxShadow: "0 6px 0 #3730A3", borderRadius: 24 }}>
+          <button
+            onClick={() => {
+              sfx.level();
+              onAula();
+            }}
+            className="w-full text-left p-5 select-none relative cursor-pointer active:translate-y-0.5 transition-all"
+            style={{ background: "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
+          >
+            <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3s_ease-in-out_infinite]" />
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <span className="text-xs font-black uppercase tracking-wider px-3 py-1.5 text-indigo-900 bg-indigo-200 border-2 border-indigo-300 rounded-lg inline-block shadow-sm">
+                🎓 O Sensei preparou pra você
+              </span>
+              <span className="text-3xl animate-bounce">📚</span>
+            </div>
+            <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 24, color: "#312E81", marginBottom: 4 }}>
+              A Lição do Dia
+            </div>
+            <div className="text-sm font-bold mt-1 leading-snug text-indigo-900/80 mb-4">
+              {aulaPlan.resumo} · A jornada é contínua, jogue quantas vezes quiser! ✨
+            </div>
+            <div className="mt-2 inline-flex items-center justify-center w-full gap-2 text-sm font-black text-white bg-indigo-600 px-5 py-3 rounded-xl shadow-md hover:scale-[1.02] active:scale-95 transition-transform">
+              <span>Iniciar Sessão de Estudos</span>
+              <span className="text-lg">▶</span>
+            </div>
+          </button>
+        </div>
       )}
 
-      {/* 1. MISSÕES DIÁRIAS (Cronograma do Dia) */}
-      <div className="mt-8">
-        <div className="flex items-center gap-2 mb-3 pl-1">
-          <span className="text-xl">📅</span>
-          <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+      {/* 2. TAREFAS DO SENSEI */}
+      <div className="mt-8 bg-white p-5 rounded-3xl shadow-sm border-2 border-slate-100">
+        <div className="flex items-center gap-2 mb-1 pl-1">
+          <span className="text-2xl">📋</span>
+          <span className="font-black text-slate-700" style={{ fontFamily: FONT, fontSize: 18 }}>
             Tarefas do Sensei
           </span>
         </div>
+        <p className="text-xs font-bold text-slate-500 mb-5 pl-1">Mergulhe no Dojo para dominar estas habilidades.</p>
         
-        {rec && (
+        <div className="flex flex-col gap-4">
+          {/* Desafio do Mestre */}
           <button
             onClick={() => {
-              sfx.tick();
-              onTrack(rec.track);
+              sfx.level();
+              onMixed();
             }}
-            className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2"
+            className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
             style={{
-              background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
-              borderColor: '#3B82F6',
-              boxShadow: '0 6px 0 #2563EB',
+              background: 'linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)',
+              borderColor: '#EA580C',
+              boxShadow: '0 4px 0 #C2410C',
             }}
           >
-            <div className="flex items-center justify-between gap-3 mb-1.5">
-              <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-blue-900 bg-blue-200 border-2 border-blue-300">
-                💡 Sugestão do Sensei
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-orange-900 bg-orange-200 border-2 border-orange-300">
+                🦊 Desafio do Mestre
               </span>
+              <span className="text-2xl">🏆</span>
             </div>
-            <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E3A8A' }}>
-              {rec.track.name}
+            <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#9A3412' }}>
+              Treino Mestre (Misto)
             </div>
-            <div className="text-xs font-bold mt-1 leading-snug text-blue-900/80">
-              {rec.reason || 'Sua missão de revisão!'}
+            <div className="text-xs font-bold mt-1 leading-snug text-orange-900/80">
+              Tudo misturado! Teste seus reflexos com todos os tópicos que você já aprendeu. As moedinhas valem EM DOBRO! 🪙🪙
             </div>
           </button>
-        )}
+
+          {/* Foco Específico */}
+          {rec && (
+            <button
+              onClick={() => {
+                sfx.tick();
+                onTrack(rec.track);
+              }}
+              className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
+              style={{
+                background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+                borderColor: '#2563EB',
+                boxShadow: '0 4px 0 #1D4ED8',
+              }}
+            >
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-blue-900 bg-blue-200 border-2 border-blue-300">
+                  🎯 Foco Específico
+                </span>
+                <span className="text-2xl">🥋</span>
+              </div>
+              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: '#1E3A8A' }}>
+                {rec.track.name}
+              </div>
+              <div className="text-xs font-bold mt-1 leading-snug text-blue-900/80">
+                {rec.reason || 'Sua missão de foco do dia no Dojo!'}
+              </div>
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* SUGESTAO OFICINA */}
+      {/* 3. SUGESTAO OFICINA */}
       {aulaPlan.resgates.length > 0 && (
-         <div className="mt-8 mb-4">
-            <div className="flex items-center gap-2 mb-3 pl-1">
-              <span className="text-xl">🚑</span>
-              <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
+         <div className="mt-8 mb-6 bg-emerald-50/50 p-5 rounded-3xl border-2 border-emerald-100">
+            <div className="flex items-center gap-2 mb-1 pl-1">
+              <span className="text-2xl">🚑</span>
+              <span className="font-black text-emerald-800" style={{ fontFamily: FONT, fontSize: 18 }}>
                 Oficina de Resgate
               </span>
             </div>
-            <button onClick={() => { sfx.tick(); setActiveShellTab("oficina"); }} className="w-full bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between shadow-[0_4px_0_#34D399] active:translate-y-1 active:shadow-none transition-all text-left">
+            <p className="text-xs font-bold text-emerald-600/80 mb-4 pl-1">
+              Hora de consertar os motores.
+            </p>
+
+            <button 
+              onClick={() => { sfx.tick(); setActiveShellTab("oficina"); }} 
+              className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2 bg-white"
+              style={{
+                borderColor: '#10B981',
+                boxShadow: '0 4px 0 #059669',
+              }}
+            >
+               <div className="flex items-center justify-between gap-3 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-emerald-900 bg-emerald-100 border-2 border-emerald-200">
+                    🔧 Reparos Necessários
+                  </span>
+                  <span className="text-2xl animate-pulse">🛠️</span>
+               </div>
                <div>
                  <div className="font-black text-emerald-900 text-lg" style={{ fontFamily: FONT }}>Missões de Resgate!</div>
-                 <div className="text-xs text-emerald-700 font-bold mt-1">O Guardião da Ponte identificou {aulaPlan.resgates.length} conceitos para revisar.</div>
+                 <div className="text-xs text-emerald-700 font-bold mt-1">O algoritmo identificou {aulaPlan.resgates.length} conceitos importantes para revisar e fixar.</div>
                </div>
-               <span className="text-4xl">🔧</span>
             </button>
          </div>
       )}

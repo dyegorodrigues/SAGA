@@ -107,12 +107,13 @@ export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTra
 
       {mode === 'sensei' && (
         <div className="animate-[mkPop_0.2s_ease-out_1]">
-          {/* 1. ACADEMIAS DE OPERAÇÕES */}
+
+          {/* 1. TEMPLOS DE OPERAÇÕES */}
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3 pl-1">
-              <span className="text-xl">🏋️</span>
+              <span className="text-xl">⛩️</span>
               <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                As Academias
+                Os Templos
               </span>
             </div>
             <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
@@ -121,75 +122,19 @@ export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTra
             <div className="grid grid-cols-2 gap-3.5">
               <button onClick={() => { sfx.tick(); onOpenPicker(dojo_add); }} className="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FECDD3'}}>
                 <div className="text-3xl mb-1">➕</div>
-                <div className="font-black text-rose-700">Academia da<br/>Adição</div>
+                <div className="font-black text-rose-700">Templo da<br/>Adição</div>
               </button>
               <button onClick={() => { sfx.tick(); onOpenPicker(dojo_sub); }} className="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #C7D2FE'}}>
                 <div className="text-3xl mb-1">➖</div>
-                <div className="font-black text-indigo-700">Academia da<br/>Subtração</div>
+                <div className="font-black text-indigo-700">Templo da<br/>Subtração</div>
               </button>
               <button onClick={() => { sfx.tick(); onOpenPicker(dojo_mul); }} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #FDE68A'}}>
                 <div className="text-3xl mb-1">✖️</div>
-                <div className="font-black text-amber-700">Academia da<br/>Multiplicação</div>
+                <div className="font-black text-amber-700">Templo da<br/>Multiplicação</div>
               </button>
               <button onClick={() => { sfx.tick(); onOpenPicker(dojo_div); }} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{boxShadow: '0 4px 0 #A7F3D0'}}>
                 <div className="text-3xl mb-1">➗</div>
-                <div className="font-black text-emerald-700">Academia da<br/>Divisão</div>
-              </button>
-            </div>
-          </div>
-
-          {/* 3. DESAFIO DO MESTRE */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3 pl-1">
-              <span className="text-xl">🦊</span>
-              <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
-                O Desafio do Sensei
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
-              Tudo misturado! Teste seus reflexos com tudo que você já aprendeu.
-            </p>
-            
-            <div className="mb-5 relative overflow-hidden card-block border-2" style={{ borderColor: mixedDoneToday ? "#CBD5E1" : "#7C3AED", boxShadow: mixedDoneToday ? "0 6px 0 #CBD5E1" : "0 6px 0 #5B21B6" }}>
-              <button
-                onClick={() => {
-                  if (mixedDoneToday) {
-                    sfx.tick();
-                    return;
-                  }
-                  sfx.level();
-                  onMixed();
-                }}
-                className={`w-full text-left p-4 select-none relative transition-all ${mixedDoneToday ? "cursor-default" : "cursor-pointer active:translate-y-0.5"}`}
-                style={{
-                  background: mixedDoneToday
-                    ? "linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)"
-                    : "linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%)",
-                }}
-              >
-                {!mixedDoneToday && (
-                  <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3.2s_ease-in-out_infinite]" />
-                )}
-                <div className="flex items-center justify-between gap-3 mb-1.5">
-                  <span className={`text-xs font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block border-2 ${mixedDoneToday ? "text-slate-500 bg-slate-100 border-slate-200" : "text-purple-900 bg-purple-200 border-purple-300"}`}>
-                    {mixedDoneToday ? "✅ Desafio de hoje completo!" : "🦊 Desafio especial do dia"}
-                  </span>
-                  <span className={`text-2xl ${mixedDoneToday ? "" : "animate-bounce"}`}>🏆</span>
-                </div>
-                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: mixedDoneToday ? "#64748B" : "#4C1D95" }}>
-                  Desafio Misto 🦊
-                </div>
-                <div className={`text-xs font-bold mt-1 leading-snug ${mixedDoneToday ? "text-slate-400" : "text-purple-900/80"}`}>
-                  {mixedDoneToday
-                    ? "Você venceu o chefão de hoje! Volte amanhã para um novo desafio. ✨"
-                    : "10 perguntas de TODAS as suas trilhas — e as moedinhas valem EM DOBRO! 🪙🪙"}
-                </div>
-                {!mixedDoneToday && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-extrabold text-white bg-purple-600 px-4 py-1.5 rounded-md shadow-sm hover:scale-105 active:scale-95 transition-transform">
-                    <span>Enfrentar o Desafio</span>
-                    <span>🦊</span>
-                  </div>
-                )}
+                <div className="font-black text-emerald-700">Templo da<br/>Divisão</div>
               </button>
             </div>
           </div>

@@ -252,8 +252,8 @@ export default function App() {
   // Desafio Misto 👑: as 10 questões são montadas UMA vez ao entrar na missão
   // (o App re-renderiza a cada resposta; sem memo, a lista seria re-sorteada).
   const mixedTrack = useMemo(() => {
-    if (!state || screen.name !== "game" || screen.track !== "mista" || !screen.kid) return null;
-    const kid = state.kids.find((k) => k.id === screen.kid);
+    if (!state || screen.name !== "game" || (screen.track !== "mista" && screen.track !== "mixed") || !screen.kid) return null;
+    const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
     const base = tracksForGrade(kid.grade);
     const progOf = (tid: string) => {
@@ -268,7 +268,7 @@ export default function App() {
   // UMA vez ao entrar (aquecimento → resgate/fronteira/fluência → fecho lúdico).
   const aulaTrack = useMemo(() => {
     if (!state || screen.name !== "game" || screen.track !== "aula" || !screen.kid) return null;
-    const kid = state.kids.find((k) => k.id === screen.kid);
+    const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
     const base = tracksForGrade(kid.grade);
     const progOf = (tid: string) => {
@@ -283,7 +283,7 @@ export default function App() {
   // Dojo Mode 🥋
   const dojoBuild = useMemo(() => {
     if (!state || screen.name !== "game" || screen.track !== "dojo" || !screen.kid) return null;
-    const kid = state.kids.find((k) => k.id === screen.kid);
+    const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
     const base = tracksForGrade(kid.grade);
     const progOf = (tid: string) => {
@@ -299,7 +299,7 @@ export default function App() {
   // nível real de cada trilha (fim do "todo mundo começa do 1").
   const matriculaBuild = useMemo(() => {
     if (!state || screen.name !== "game" || screen.track !== "matricula" || !screen.kid) return null;
-    const kid = state.kids.find((k) => k.id === screen.kid);
+    const kid = state.kids.find((k) => k.id === screen.kid) || state.kids[0];
     if (!kid) return null;
     return buildMatriculaTrack(tracksForGrade(kid.grade));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -418,7 +418,7 @@ export default function App() {
     );
   }
 
-  const kidById = (id: string) => state.kids.find((k) => k.id === id)!;
+  const kidById = (id: string) => state.kids.find((k) => k.id === id) || state.kids[0];
   
   const getTracksForKid = (k: Kid): Track[] => {
     // Phase 1: No age/grade locks! All tracks unlock purely by mastery via the DAG.
@@ -690,7 +690,7 @@ export default function App() {
             onTrack={(t) => setScreen({ name: "game", kid: screen.kid, track: t.id })}
             onTrackLvl={(t, lvl) => setScreen({ name: "game", kid: screen.kid, track: t.id, lvl })}
             onMixed={() => {
-            setScreen({ name: "game", kid: screen.kid, track: "mixed" });
+            setScreen({ name: "game", kid: screen.kid, track: "mista" });
           }}
           onDojo={() => {
             setScreen({ name: "game", kid: screen.kid, track: "dojo" });

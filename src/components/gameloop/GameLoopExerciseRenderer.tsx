@@ -2,10 +2,11 @@ import React from "react";
 import { Question } from "../../types";
 import { RapidFire } from "../exercises/RapidFire";
 import { SingaporeBars } from "../primitives/SingaporeBars";
+import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
   C, FONT, EmojiRow, BigText, Burst, TenFrame, sfx, speak, BODY,
-  NumberBond, TensDots, ShapeSVG, MoneyNote, MoneyCoin, SceneSVG
+  TensDots, ShapeSVG, MoneyNote, MoneyCoin, SceneSVG
 } from "../Mascot";
 import { NumberLine } from "../primitives/NumberLine";
 import { InteractiveNumberLine } from "../primitives/InteractiveNumberLine";
@@ -272,7 +273,12 @@ export function GameLoopExerciseRenderer({
 
           {q.kind === "array" && <ArrayGrid q={q} />}
           {q.kind === "bond" && q.a != null && q.b != null && (
-            <NumberBond whole={q.a} part={q.b} missingWhole={q.big === "topo"} />
+            <NumberBond 
+              whole={q.big === "topo" ? '?' : q.a} 
+              part1={q.b} 
+              part2={q.big === "topo" ? (q.a - q.b) : '?'} 
+              interactivePart={q.big === "topo" ? "whole" : "part2"}
+            />
           )}
 
           {q.kind === "numberline" && <NumberLine min={q.nlStart} max={q.nlEnd} targetValue={q.nlTarget} currentValue={typeof tutShow === "number" ? tutShow : (q.nlStartPos ?? null)} onValueClick={status === null ? handlePick : undefined} />}

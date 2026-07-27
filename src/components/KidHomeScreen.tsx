@@ -230,7 +230,7 @@ export function KidHomeScreen({
         {activeShellTab === "sensei" && (
           <SenseiTab 
             kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec} 
-            onMatricula={onMatricula} onAula={onAula} onTrack={onTrack} setActiveShellTab={(t: any) => setActiveShellTab(t)} 
+            onMatricula={onMatricula} onAula={onAula} onTrack={onTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)} 
           />
         )}
         {activeShellTab === "jornada" && (

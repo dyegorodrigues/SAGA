@@ -11,7 +11,7 @@ import { skinHomemFerroPixel } from "./pixelIron";
 import { skinHulkPixel } from "./pixelHulk";
 import { skinDragaoFogo } from "./dragon";
 
-export type { SkinCtx, LimbConfig } from "../../../types";
+export type { SkinCtx, LimbConfig } from "./types";
 
 /** despacho por tema (Constituição regra 4: cada arquivo de personagem fica pequeno). */
 export const SKIN_RENDERERS: Record<string, (ctx: SkinCtx) => React.ReactNode> = {
