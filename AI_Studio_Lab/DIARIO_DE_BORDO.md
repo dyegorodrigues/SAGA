@@ -41,3 +41,12 @@ Foi validado o plano arquitetural para o tracking atômico. Para possibilitar o 
   - Desacoplei as mais de 16 dependências de cenas (`SyllableScene`, `WeatherScene`, etc.) e primitivas (`NumberLine`, `ArrayGrid`, etc.) do orquestrador principal, injetando-as apenas no renderizador filho.
   - Ajustei todos os estados internos locais (como as _props_ `aulaSuggest`, `guidedNarr`, e variáveis transitórias da Aulinha) para serem transmitidos reativamente ao renderizador.
 - **Impacto e Resiliência:** `GameLoop.tsx` foi enxugado em 40% e agora foca estritamente em progressão, áudio e telemetria, delegando renderização. A compilação `npx tsc --noEmit` completou com exatidão (`0 errors`), provando que a tipagem TypeScript permaneceu intacta e sem pontas soltas. Todos os scripts locais foram obliterados em respeito ao protocolo.
+
+## Alinhamento Arquitetural e Pedagógico do Dojo (Feedback do Usuário)
+- **Problema de UX/Pedagogia**: A aba Dojo perdeu a transição essencial do Concreto para o Abstrato (CRA). O usuário sugeriu uma divisão clara: **Dojo Garden** (focado no progresso CRA: concreto, concreto+abstrato, mental) e **Dojo Sensei** (focado apenas em fluência/abstrato final). Além disso, os botões das academias não devem ficar soltos poluindo a tela, mas organizados dentro de uma janela/modal que alterne essas variações.
+- **Problema de Documentação Cânonica**: Foram criadas "fichas" (ex: `dojo_add.ts`) que não estão devidamente mapeadas no Grafo de Conhecimento, na Bíblia ou no documento principal. Isso gera um "ponto cego" na arquitetura, perigoso para auditorias futuras ou para novos agentes que não saberão como a lógica e os exercícios do Dojo se comunicam com o resto do sistema.
+- **Problema nas Estatísticas**: As métricas exibidas na home (ex: "Acertos totais" e "344 Desafios") são rasas. A pedagogia exige métricas mais sofisticadas e precisas: ciclos/baterias completadas, velocidade/tempo de reação e precisão, não apenas a soma crua.
+- **Plano de Ação Próximo Turno**:
+  1. Redesenhar o `DojoTab.tsx` para a estrutura *Garden* vs *Sensei* com navegação in-window.
+  2. Atualizar o `BIBLIA_DO_SAGA.md` e o mapa de currículo para oficializar as estruturas de geração do Dojo (`dojo_*.ts`), conectando-os aos motores cânonicos.
+  3. Expandir o modelo de estatísticas (no state/telemetria) para suportar baterias e métricas de desempenho mais aprofundadas.
