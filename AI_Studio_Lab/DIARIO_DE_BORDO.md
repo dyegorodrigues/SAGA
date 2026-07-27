@@ -25,3 +25,11 @@ Foi validado o plano arquitetural para o tracking atômico. Para possibilitar o 
   2. `GEMINI.md` (Operacional): Instruções duras para o próprio agente AI Studio, incluindo a **Regra Absoluta de Limpeza** (nunca deixar lixo `.cjs` ou `.txt` no final do turno) e uso obrigatório de background tasks.
   3. `CLAUDE.md` (Roteador): Regras de sincronia para garantir que a IA externa leia os relatórios do Gemini.
 - **Resultado**: Sistema purificado e regras de orquestração aprimoradas para diminuir erros sistêmicos.
+
+### Conclusão da Mega Auditoria de Componentização (26 Julho 2026 - Etapa Final)
+- **Problema Inicial:** O componente `KidHomeScreen.tsx` e o `GameLoop.tsx` haviam se tornado monólitos pesados (quase 900 e 1500 linhas respectivamente), dificultando a injeção de IA, rastreabilidade e causando o que foi apontado pelo usuário como "arquivos gigantes e lentidão".
+- **Execução Front-End (Home):**
+  - **Abas Extratadas (Tabs):** O conteúdo da Home (SenseiTab, JourneyTab, DojoTab, OficinaTab, PerfilTab) foi componentizado com êxito na nova pasta `src/components/home/`.
+  - **Modais Extraídos:** `LevelPickerModal` (seletor de nível) e `WardrobeModal` (escolha de cenários) também foram refatorados, isolando os estados `showWardrobe`, controle de `inventory`, compras de cenário, e amostragem de dificuldades (`pickerSamples`).
+  - **Impacto:** O arquivo `KidHomeScreen.tsx` foi reduzido de ~873 linhas para meras ~307 linhas, transformando-se de fato em um orquestrador (router das abas) em vez de acumular estado da UI inteira.
+- **Limpeza:** A compilação (`tsc --noEmit`) rodou com sucesso sem quebrar dependências, provando a qualidade da componentização, e todos os arquivos de procedimento (`fix.cjs`, etc) foram apagados do repositório conforme ditam as novas regras.

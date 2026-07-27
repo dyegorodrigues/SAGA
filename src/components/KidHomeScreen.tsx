@@ -10,6 +10,8 @@ import { JourneyTab } from "./home/JourneyTab";
 import { DojoTab } from "./home/DojoTab";
 import { OficinaTab } from "./home/OficinaTab";
 import { PerfilTab } from "./home/PerfilTab";
+import { LevelPickerModal } from "./home/LevelPickerModal";
+import { WardrobeModal } from "./home/WardrobeModal";
 
 import { SUBJECTS } from "../subjects";
 import { planAula } from "../utils/composer";
@@ -36,23 +38,6 @@ interface KidHomeProps {
   onUpdateKid: (kid: Kid, coinsToSpend?: number) => void;
   onSpendCoins: (amount: number) => void;
 }
-
-interface WardrobeItem {
-  id: string;
-  name: string;
-  emoji: string;
-  cost: number;
-  type: "bg";
-}
-
-const WARDROBE_ITEMS: WardrobeItem[] = [
-  // Cenários de Fundo
-  { id: "none", name: "Fundo Padrão", emoji: "🏠", cost: 0, type: "bg" },
-  { id: "parque", name: "Parque Verdejante", emoji: "🌳", cost: 6, type: "bg" },
-  { id: "campo", name: "Campo de Futebol", emoji: "🏟️", cost: 12, type: "bg" },
-  { id: "espaco", name: "Espaço Cósmico", emoji: "🌌", cost: 18, type: "bg" },
-  { id: "castelo", name: "Castelo Encantado", emoji: "🏰", cost: 25, type: "bg" },
-];
 
 export function KidHomeScreen({
   state,
@@ -94,10 +79,7 @@ export function KidHomeScreen({
   
   // Wardrobe states
   const [showWardrobe, setShowWardrobe] = useState(false);
-  const [viewMode, setViewMode] = useState<"path" | "list">("path");
-  const [tempOutfit] = useState("none");
   const [tempBg, setTempBg] = useState(kid.bgAccessory || "none");
-  const [activeTab] = useState<"bg">("bg");
 
   // Local transaction cart states for wardrobe
   const [tempInventory, setTempInventory] = useState<string[]>(kid.inventory || []);
@@ -141,17 +123,6 @@ export function KidHomeScreen({
 
   // Amostra do que cada nível pergunta (gera 1 questão-exemplo por nível — memoizada
   // para os textos não trocarem a cada render enquanto o seletor está aberto)
-  const pickerSamples = useMemo(() => {
-    if (!pickerTrack) return [];
-    return [1, 2, 3, 4, 5].map((lvl) => {
-      try {
-        return pickerTrack.gen(lvl).prompt;
-      } catch {
-        return "";
-      }
-    });
-  }, [pickerTrack]);
-
   // Trilhas do editor pedagógico (não pertencem a nenhuma matéria registrada)
   const subjectIds = new Set(SUBJECTS.flatMap((s) => (s.tracks[kid.grade] || []).map((t) => t.id)));
   const customTracks = tracks.filter((t) => !subjectIds.has(t.id));
@@ -215,38 +186,6 @@ export function KidHomeScreen({
         </div>
       </button>
     );
-  };
-
-  const handleBuyOrEquip = (item: WardrobeItem) => {
-    const isUnlocked = item.cost === 0 || tempInventory.includes(item.id);
-
-    if (isUnlocked) {
-      sfx.tick();
-      setTempBg(item.id);
-    } else {
-      if (tempCoins >= item.cost) {
-        sfx.level();
-        setTempCoins(tempCoins - item.cost);
-        setCoinsSpent(coinsSpent + item.cost);
-        setTempInventory([...tempInventory, item.id]);
-        setTempBg(item.id);
-      } else {
-        sfx.wrong();
-        alert("Você precisa de mais moedinhas para comprar este item! Complete missões! 🪙💪");
-      }
-    }
-  };
-
-  const handleSaveWardrobe = () => {
-    sfx.level();
-    const updatedKid = {
-      ...kid,
-      outfit: tempOutfit,
-      bgAccessory: tempBg,
-      inventory: tempInventory,
-    };
-    onUpdateKid(updatedKid, coinsSpent);
-    setShowWardrobe(false);
   };
 
   return (
@@ -337,173 +276,31 @@ export function KidHomeScreen({
         })}
       </div>
 
-      {/* Trazemos o Picker modal e Wardrobe modal (igual estava) */}
+      {/* Trazemos o Picker modal e Wardrobe modal */}
       {pickerTrack && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white card-block border-4 p-6 max-w-sm w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]" style={{ borderColor: pickerTrack.color }}>
-            <button
-              onClick={() => {
-                sfx.tick();
-                setPickerTrack(null);
-              }}
-              className="absolute top-3.5 right-3.5 w-9 h-9 rounded-md border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
-            >
-              ✕
-            </button>
-            <div className="text-center mb-5 mt-2">
-              <div
-                className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-4xl mb-3 shadow-sm border-b-4"
-                style={{ background: pickerTrack.color, color: "#fff", borderColor: pickerTrack.dark }}
-              >
-                {pickerTrack.icon}
-              </div>
-              <h3 className="text-xl font-black text-slate-800" style={{ fontFamily: FONT }}>
-                {pickerTrack.name}
-              </h3>
-              <p className="text-xs text-slate-500 font-bold mt-1">
-                Escolha o nível de dificuldade para jogar agora! 🎯
-              </p>
-            </div>
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
-              {[1, 2, 3, 4, 5].map((lvl) => {
-                const p = prog[pickerTrack.id] || FRESH();
-                const won = lvl <= p.maxLvl;
-                const atual = lvl === p.lvl;
-                return (
-                  <button
-                    key={lvl}
-                    onClick={() => {
-                      sfx.level();
-                      setPickerTrack(null);
-                      onTrackLvl(pickerTrack, lvl);
-                    }}
-                    className="w-full flex items-center gap-3 p-2.5 rounded-2xl border-2 text-left transition-all cursor-pointer active:translate-y-0.5 hover:bg-slate-50"
-                    style={{ borderColor: atual ? pickerTrack.color : "#E2E8F0", background: atual ? `${pickerTrack.color}14` : "#fff" }}
-                  >
-                    <span
-                      className="w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black text-base border-2"
-                      style={{
-                        fontFamily: FONT,
-                        background: won ? pickerTrack.color : "#F1F5F9",
-                        borderColor: won ? pickerTrack.dark : "#E2E8F0",
-                        color: won ? "#fff" : "#94A3B8",
-                      }}
-                    >
-                      {p.dom && lvl === 5 ? "👑" : lvl}
-                    </span>
-                    <span className="flex-1 min-w-0">
-                      <span className="block text-xs font-black" style={{ fontFamily: FONT, color: C.ink }}>
-                        Nível {lvl}
-                        {pickerTrack.lvlSkills?.[lvl - 1] && (
-                          <span className="font-bold text-slate-600"> · {pickerTrack.lvlSkills[lvl - 1]}</span>
-                        )}
-                        {atual && <span className="ml-1.5 text-[10px] font-black uppercase px-1.5 py-0.5 rounded-md text-white" style={{ background: pickerTrack.color }}>atual</span>}
-                        {p.dom && lvl === 5 && <span className="ml-1.5 text-[10px]">👑</span>}
-                      </span>
-                    </span>
-                    <span className="text-slate-300 font-black">▶</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <LevelPickerModal
+          pickerTrack={pickerTrack}
+          prog={prog}
+          onClose={() => setPickerTrack(null)}
+          onTrackLvl={onTrackLvl}
+        />
       )}
 
       {showWardrobe && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white card-block border-4 border-amber-300 p-6 max-w-md w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]">
-            <button
-              onClick={() => {
-                sfx.tick();
-                setShowWardrobe(false);
-              }}
-              className="absolute top-3.5 right-3.5 w-9 h-9 rounded-md border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
-            >
-              ✕
-            </button>
-            <div className="text-center mb-4">
-              <h3 className="text-xl font-black text-amber-950" style={{ fontFamily: FONT }}>
-                Cenário Mágico 🌌
-              </h3>
-              <p className="text-xs text-slate-500 font-bold">
-                Mude o cenário de fundo do seu mascote com suas estrelas!
-              </p>
-            </div>
-            <div className="relative w-40 h-40 rounded-md mx-auto bg-slate-50 border-4 border-slate-100 flex items-center justify-center shadow-inner mb-4 overflow-hidden">
-              <Mascote theme={kid.theme} size={140} outfit="none" bgAccessory={tempBg} stage={stageNum} kid={kid} />
-            </div>
-            <div className="flex items-center justify-between gap-2 mb-4 bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
-              <span className="text-xs font-black text-slate-600 uppercase" style={{ fontFamily: FONT }}>Suas Moedinhas:</span>
-              <CoinChip n={tempCoins} />
-            </div>
-            <div className="flex-1 overflow-y-auto space-y-2 pr-1 scrollbar-thin">
-              {WARDROBE_ITEMS.map((item) => {
-                const isUnlocked = item.cost === 0 || tempInventory.includes(item.id);
-                const isSelected = tempBg === item.id;
-                return (
-                  <div
-                    key={item.id}
-                    className={`flex items-center justify-between p-2.5 rounded-2xl border-2 transition-all ${
-                      isSelected
-                        ? "bg-amber-50/70 border-amber-400 shadow-sm"
-                        : "bg-white border-slate-100"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 text-left">
-                      <span className="text-2xl w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm">
-                        {item.emoji}
-                      </span>
-                      <div>
-                        <div className="text-xs font-black text-slate-800" style={{ fontFamily: FONT }}>
-                           {item.name}
-                        </div>
-                        <div className="text-[10px] text-slate-400 font-bold">
-                          {item.cost === 0 ? "Grátis / Padrão" : `Custa ${item.cost} moedinhas`}
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      {isSelected ? (
-                        <span className="text-[11px] font-black text-emerald-600 bg-emerald-50 border-2 border-emerald-300/60 px-3 py-1.5 rounded-xl uppercase tracking-wider">
-                          Equipado
-                        </span>
-                      ) : isUnlocked ? (
-                        <button
-                          onClick={() => handleBuyOrEquip(item)}
-                          className="text-[11px] font-black text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 px-4 py-1.5 rounded-xl uppercase tracking-wider cursor-pointer"
-                        >
-                          Usar
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleBuyOrEquip(item)}
-                          disabled={tempCoins < item.cost}
-                          className={`text-[11px] font-black px-3 py-1.5 rounded-xl uppercase tracking-wider cursor-pointer transition-all ${
-                            tempCoins >= item.cost
-                              ? "text-amber-900 bg-amber-100 hover:bg-amber-200 border-2 border-amber-300"
-                              : "text-slate-400 bg-slate-100 border-2 border-slate-200 cursor-not-allowed"
-                          }`}
-                        >
-                          Comprar 🪙{item.cost}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-5 pt-3 border-t border-slate-100">
-              <button
-                onClick={handleSaveWardrobe}
-                className="w-full bg-emerald-500 text-white font-black py-3.5 px-5 rounded-2xl shadow-md border-b-4 border-emerald-700 active:translate-y-0.5 active:border-b-2 transition-all text-sm cursor-pointer"
-                style={{ fontFamily: FONT }}
-              >
-                Confirmar Cenário! 👍
-              </button>
-            </div>
-          </div>
-        </div>
+        <WardrobeModal
+          kid={kid}
+          stageNum={stageNum}
+          onClose={() => setShowWardrobe(false)}
+          onUpdateKid={onUpdateKid}
+          tempBg={tempBg}
+          setTempBg={setTempBg}
+          tempInventory={tempInventory}
+          setTempInventory={setTempInventory}
+          tempCoins={tempCoins}
+          setTempCoins={setTempCoins}
+          coinsSpent={coinsSpent}
+          setCoinsSpent={setCoinsSpent}
+        />
       )}
     </div>
   );

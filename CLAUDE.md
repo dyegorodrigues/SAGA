@@ -12,6 +12,6 @@ Este arquivo orienta você (Claude) no desenvolvimento externo.
 ## Protocolo de Sincronia para Claude
 1. **Leia os Diários:** Antes de iniciar qualquer codificação ou análise, leia `AI_Studio_Lab/DIARIO_DE_BORDO_COMPLETO_PARA_CLAUDE.md` e `AI_Studio_Lab/DIARIO_DE_BORDO.md` para entender as últimas decisões tomadas pelo Gemini ou pelo usuário.
 2. **Respeite o Cânone:** Todas as definições curriculares e pedagógicas estão em `/AI_Studio_Lab/pedagogia/`. Não as ignore ou reescreva sem evidências fortes.
-3. **Mantenha a Limpeza:** O Gemini é cobrado por manter o workspace limpo (sem scripts de parser perdidos). Siga o mesmo rigor, comitando código limpo e arquitetado em pequenos componentes (anti-monólito).
+3. **Mantenha a Limpeza:** O Gemini é cobrado por manter o workspace limpo. Siga o mesmo rigor, comitando código limpo e arquitetado em pequenos componentes (anti-monólito).
 
 *Para regras detalhadas de implementação, consulte o `AGENTS.md`.*
