@@ -31,6 +31,7 @@ export const AudioPlayer = {
     
     console.log(`[Luna Studio Fallback TTS] ${text}`);
     
+    if (!text) return;
     const cleanText = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2B55}\u{2934}-\u{2935}\u{2B05}-\u{2B07}\u{2B1B}-\u{2B1C}\u{FE0F}]/gu, '').trim();
     const u = new SpeechSynthesisUtterance(cleanText);
     u.lang = "pt-BR";

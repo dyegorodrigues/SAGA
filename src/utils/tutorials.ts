@@ -8,19 +8,21 @@ export interface TutStep {
   sync?: "junto" | "depois";
 }
 
-export const hasTutorial = (q: Question | string): boolean => {
+export const hasTutorial = (q: Question | string | undefined | null): boolean => {
+  if (!q) return false;
   if (typeof q === 'string') return q in LEGACY_CHOREOGRAPHIES;
   return (q.tutorial && q.tutorial.length > 0) || q.kind in LEGACY_CHOREOGRAPHIES;
 };
 
-export const tutorialSteps = (q: Question): TutStep[] => {
+export const tutorialSteps = (q: Question | undefined | null): TutStep[] => {
+  if (!q) return [];
   if (q.tutorial && Array.isArray(q.tutorial)) {
     return q.tutorial;
   }
   return LEGACY_CHOREOGRAPHIES[q.kind] || [];
 };
 
-export const hasAulinha = (q: Question | string): boolean => hasTutorial(q);
+export const hasAulinha = (q: Question | string | undefined | null): boolean => hasTutorial(q);
 
 const AULA_KEY = "mk-aula-seen-v1";
 type AulaStore = Pick<Storage, "getItem" | "setItem">;

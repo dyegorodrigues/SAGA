@@ -125,3 +125,17 @@ Durante as refatorações da Home e do GameLoop, o agente perdeu contexto críti
 **3. O Alinhamento da Componentização (A Raiz da Bagunça)**
 - Todo esse caos (bugs do sapinho, do macaquinho, do gato) surgiu porque o renderizador (`GameLoopExerciseRenderer.tsx`) cresceu absorvendo as lógicas individuais que deveriam pertencer à arquitetura das Fichas. As fichas não ditavam o estado, elas apenas entregavam os parâmetros, e o `GameLoop` se matava para adivinhar a ordem dos eventos (como o timer do macaquinho). 
 - O próximo passo vital para resolver esse *Gargalo Supremo* (e dar espaço ao Data Design) é mover o motor de tempo e as etapas (Stages) diretamente para o contrato da Ficha (ex: `Ficha.timeline = [ { t: 0, show: "macaco" }, { t: 1500, show: "items" } ]`). O *renderizador* não deve "pensar", ele deve apenas "obedecer" ao roteiro.
+
+### Hotfix: Crash de Undefined no Áudio e Tutoriais (28 Julho 2026 - Turno 3)
+
+**O Problema (Crash):**
+- A interface quebrava (White Screen of Death) com dois erros no console:
+  1. `Uncaught TypeError: Cannot read properties of undefined (reading 'replace')`
+  2. `Uncaught TypeError: Cannot read properties of undefined (reading 'tutorial')`
+
+**A Causa e Correção:**
+- As funções de verificação de tutorial (`hasTutorial`, `tutorialSteps` em `src/utils/tutorials.ts`) assumiam que o objeto `q` (Question) sempre estaria presente, mas durante certas transições de estado do React, o `q` ficava temporariamente como `undefined`, estourando a aplicação ao tentar acessar `q.tutorial`. Adicionado guard clauses (`if (!q) return false;`).
+- O mesmo acontecia no sistema de Text-to-Speech (Fallback) em `src/components/AudioPlayer.tsx`, onde se tentava invocar `.replace()` em uma string `text` vazia ou indefinida. Adicionado guard clause (`if (!text) return;`).
+
+**Resultado:**
+- Os TypeErrors de transição foram neutralizados e a robustez geral do ambiente React/GameLoop foi fortalecida.
