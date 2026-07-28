@@ -677,22 +677,32 @@ export function gGM_04(lvl: number): Question {
 
 
 export function gAL_02(lvl: number): Question {
-  return gPrePadrao(lvl);
+  const isCores = Math.random() > 0.5;
+  const A = isCores ? "🔴" : "🍎";
+  const B = isCores ? "🔵" : "🍌";
+  return { kind: "pattern", prompt: "O que vem a seguir?", shown: [A, B, A, B, A], options: [{label:A, value:A}, {label:B, value:B}], answer: B };
 }
 export function gGE_01(lvl: number): Question {
-  return gPreOnde(lvl);
+  const isOnTop = Math.random() > 0.5;
+  return { 
+    kind: "plain", 
+    big: isOnTop ? "🐈\n📦" : "📦\n🐈", 
+    prompt: "O gato está EM CIMA ou EMBAIXO da caixa?", 
+    options: [{label:"Em cima", value:"Em cima"}, {label:"Embaixo", value:"Embaixo"}], 
+    answer: isOnTop ? "Em cima" : "Embaixo" 
+  };
 }
 export function gGE_02(lvl: number): Question {
-  return gPreFormas(lvl);
+  return { kind: "plain", big: "🔴 ou 🟥 ?", prompt: "Qual é o círculo?", options: [{label:"🔴", value:"circ"}, {label:"🟥", value:"quad"}], answer: "circ" };
 }
 export function gGM_02(lvl: number): Question {
-  return gPreCalendario(lvl);
+  return { kind: "plain", big: "Manhã ou Noite?", prompt: "Qual parte do dia é agora?", options: [{label:"Manhã", value:"morning"}, {label:"Noite", value:"night"}], answer: "morning" };
 }
 
 // --- FUNDAÇÃO SAGA: N1.01 a N1.09 ---
 export function gN1_01(lvl: number): Question {
   const microId = lvl <= 2 ? "a" : "b";
-  return Composer.generate(N1_01, microId);
+  return Composer.generate(N1_01, lvl, microId);
 }
 
 export function gN1_02(lvl: number): Question {
@@ -700,11 +710,11 @@ export function gN1_02(lvl: number): Question {
 }
 
 export function gN1_03(lvl: number): Question {
-  return Composer.generate(N1_03, lvl <= 2 ? "a" : "b");
+  return Composer.generate(N1_03, lvl, lvl <= 2 ? "a" : "b");
 }
 
 export function gN1_04(lvl: number): Question {
-  return Composer.generate(N1_04, lvl <= 2 ? "a" : "b");
+  return Composer.generate(N1_04, lvl, lvl <= 2 ? "a" : "b");
 }
 
 export function gN1_05(lvl: number): Question {
@@ -772,55 +782,21 @@ export function gN1_06(lvl: number): Question {
 }
 
 export function gN1_07(lvl: number): Question {
-  return Composer.generate(N1_07, "a");
+  return Composer.generate(N1_07, lvl, "a");
 }
 
 import { N1_08 } from "../curriculum/fichas/jornada/N1.08";
 import { N1_09 } from "../curriculum/fichas/jornada/N1.09";
+import { AL_01 } from "../curriculum/fichas/jornada/AL.01";
 export function gN1_09(lvl: number): Question {
   return gVis_Sequence(lvl);
 }
 export function gN1_08(lvl: number): Question {
-  const n = ri(5, 10);
-  return {
-    tutorial: lvl === 1 ? [{ say: "Esta é a caixa mágica! Se a primeira linha estiver cheia, tem 5!" }] : undefined,
-    excecaoCPA: "perceptual",
-    kind: "tenframe",
-    uiProps: { flashDurationMs: 1500 },
-    prompt: "A Caixa Mágica abriu e fechou! Quantos você viu?",
-    emoji: pickEmo(),
-    n,
-    options: numOpts(n, 3, 1, 8),
-    answer: n,
-    howto: "Preste muita atenção e tente não contar um por um.",
-    audioPrompt: "Quantos viu?",
-    explain: "Tente lembrar da imagem que piscou na caixa sem contar de um em um.",
-  };
+  return Composer.generate(N1_08, lvl, "a");
 }
 
 export function gAL_01(lvl: number): Question {
-  return gPreIntruso(lvl);
+  return Composer.generate(AL_01, lvl, "a");
 }
 
 
-export function gPrePadrao(lvl: number): any {
-  const isCores = Math.random() > 0.5;
-  const A = isCores ? "🔴" : "🍎";
-  const B = isCores ? "🔵" : "🍌";
-  return { kind: "pattern", prompt: "O que vem a seguir?", shown: [A, B, A, B, A], options: [{label:A, value:A}, {label:B, value:B}], answer: B };
-}
-export function gPreOnde(lvl: number): any {
-  return { kind: "plain", big: "📦", prompt: "O gato está EM CIMA ou EMBAIXO da caixa?", options: [{label:"Em cima", value:"Em cima"}, {label:"Embaixo", value:"Embaixo"}], answer: "Em cima" };
-}
-export function gPreFormas(lvl: number): any {
-  return { kind: "shapes", prompt: "Qual é o círculo?", options: [{label:"🔴", shape:"circ", color:"red", value:"circ"}, {label:"🟥", shape:"quad", color:"red", value:"quad"}], answer: "circ" };
-}
-export function gPreCalendario(lvl: number): any {
-  return { kind: "daypart", big: "morning", prompt: "Qual parte do dia é agora?", options: [{label:"Manhã", value:"morning"}, {label:"Noite", value:"night"}], answer: "morning" };
-}
-export function gPreMais(lvl: number): any {
-  return { kind: "plain", big: "🍎", prompt: "Qual é mais: 5 maçãs ou 3 maçãs?", options: [{label:"5 maçãs", value:5}, {label:"3 maçãs", value:3}], answer: 5 };
-}
-export function gPreIntruso(lvl: number): any {
-  return { kind: "plain", big: "🐶", prompt: "Quem não é animal?", options: [{label:"Gato", value:"gato"}, {label:"Carro", value:"carro"}], answer: "carro" };
-}

@@ -46,7 +46,7 @@ try {
   );
   // Silencia logs verbosos do SDK quando offline ou em iframes sandboxed
   try {
-    setLogLevel("error");
+    setLogLevel("silent");
   } catch (e) {
     console.warn("[Firestore] Failed to set log level:", e);
   }

@@ -236,40 +236,7 @@ export function GameLoopExerciseRenderer({
             </div>
           )}
 
-          {q.kind === "blend" && q.shown && q.shown.length === 2 && (
-            <SyllableScene
-              c={q.shown[0]}
-              v={q.shown[1]}
-              syllable={String(q.answer).toLowerCase()}
-              revealed={status !== null}
-              right={status === "right"}
-            />
-          )}
 
-          {/* Durante a AULINHA, o passo pode trocar a cena (tutShow): a imagem acompanha a voz */}
-          {q.kind === "weather" && q.big && (
-            <div className="flex justify-center"><WeatherScene type={(tutShow ?? q.big) as Weather} /></div>
-          )}
-
-          {q.kind === "grow" && q.n != null && (
-            <div className="flex justify-center"><GrowthScene stage={(tutShow ?? q.n) as 1 | 2 | 3 | 4} /></div>
-          )}
-
-          {q.kind === "daypart" && q.big && (
-            <div className="flex justify-center"><DayPartScene type={(tutShow ?? q.big) as DayPart} /></div>
-          )}
-
-          {q.kind === "emotion" && q.big && (
-            <div className="flex justify-center"><EmotionScene type={(tutShow ?? q.big) as Emotion} /></div>
-          )}
-
-          {q.kind === "lifestage" && q.n != null && (
-            <div className="flex justify-center"><PersonLifeScene stage={(tutShow ?? q.n) as 1 | 2 | 3 | 4} /></div>
-          )}
-
-          {q.kind === "animal" && q.n != null && (
-            <div className="flex justify-center"><AnimalLifeScene stage={(tutShow ?? q.n) as 1 | 2 | 3 | 4} /></div>
-          )}
 
           {q.kind === "array" && <ArrayGrid q={q} />}
           {q.kind === "bond" && q.a != null && q.b != null && (
@@ -382,23 +349,6 @@ export function GameLoopExerciseRenderer({
             </div>
           )}
 
-          {q.kind === "scene" && q.items && (
-            <SceneSVG items={q.items} />
-          )}
-
-          {/* journey (viagem narrada): a viagem enquanto roda; a cena final ao terminar */}
-          {q.kind === "journey" && q.journey && (
-            journeyDone ? (
-              <div className="flex flex-col items-center gap-2">
-                <PlaceScene slot={q.big as Place} size={200} />
-                <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: C.ink }}>
-                  {q.journey[q.journey.length - 1].label}
-                </div>
-              </div>
-            ) : (
-              <JourneyScene journey={q.journey} sound={sound} onDone={() => setJourneyDone(true)} />
-            )
-          )}
           </>
           )}
 
@@ -450,12 +400,7 @@ export function GameLoopExerciseRenderer({
 
       {/* Answer Button Grid Options */}
       <div className="mt-5">
-        {q.kind === "journey" && !journeyDone ? (
-          // durante a viagem: sem opções ainda — a criança só viaja e escuta
-          <div className="text-center py-2" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 13, color: C.sub }}>
-            🚀 Boa viagem! No fim você responde.
-          </div>
-        ) : q.kind === "flash" && !flashHidden ? (
+        {q.kind === "flash" && !flashHidden ? (
           // durante o relance: sem números na tela, só o convite a OLHAR
           <div className="text-center py-4" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.grape }}>
             👀 Olhe rápido...
@@ -603,11 +548,7 @@ export function GameLoopExerciseRenderer({
                       {armed ? "👂" : "🔊"}
                     </span>
                   )}
-                  {q.kind === "shapes" && o.shape && o.color ? (
-                    <span className="mk-pulse inline-block" style={{ animationDelay: `${i * 260}ms` }}>
-                      <ShapeSVG id={o.shape} color={o.color} />
-                    </span>
-                  ) : o.groups ? (
+                  {o.groups ? (
                     <div className="flex flex-col items-center gap-2 px-2 py-1">
                       {o.label && <span className="text-xl font-black">{o.label}</span>}
                       <div className="scale-[0.6] sm:scale-75 origin-center">
@@ -615,7 +556,7 @@ export function GameLoopExerciseRenderer({
                       </div>
                     </div>
                   ) : (
-                    <span style={{ fontSize: q.kind === "pattern" ? 36 : String(o.label).length > 2 ? 24 : 34 }}>
+                    <span style={{ fontSize: String(o.label).length > 2 ? 24 : 34 }}>
                       {o.label}
                     </span>
                   )}

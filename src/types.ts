@@ -233,4 +233,5 @@ export interface TelemetryLog {
   isCorrect: boolean;
   misconceptionTags?: string[];
   tutState?: string;
+  hintsUsed?: number;
 }

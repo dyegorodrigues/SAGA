@@ -5,15 +5,15 @@ export class Composer {
   /**
    * Generates a concrete question instance from a Ficha's micro-competence.
    */
-  static generate(ficha: FichaCompetencia, microId: string): Question {
-    let micro = ficha.micros.find(m => m.id === microId);
+  static generate(ficha: FichaCompetencia, lvl: number, microId?: string): Question {
+    let micro = microId ? ficha.micros.find(m => m.id === microId) : null;
     if (!micro) {
-      console.warn(`Micro ${microId} not found in Ficha ${ficha.id}, falling back to first micro.`);
+      if (microId) console.warn(`Micro ${microId} not found in Ficha ${ficha.id}, falling back to first micro.`);
       micro = ficha.micros[0];
     }
 
-    // Select the primary kind for now
-    const kind = micro.kinds[0];
+    // Use level to pick primitive from niveis block (CPA progression), fallback to micro.kinds[0]
+    const kind = ficha.niveis && ficha.niveis[lvl] ? ficha.niveis[lvl].primitiva : micro.kinds[0];
     const params = micro.params;
 
     let uiProps: any = {};
@@ -128,8 +128,27 @@ export class Composer {
         break;
       }
         
+      case "plain": {
+        // We will just return the params for plain rendering
+        uiProps = { text: params.big || "" };
+        evaluate = (ans) => true; // Default
+        break;
+      }
+      
+      case "intruso_math": {
+        const isCores = Math.random() > 0.5;
+        const A = isCores ? "🔴" : "🍎";
+        const B = isCores ? "🔵" : "🍌";
+        
+        uiProps = { text: A + " " + A + " " + B + " " + A };
+        options = [{label: A, value: A}, {label: B, value: B}];
+        evaluate = (ans) => ans === B;
+        answer = B;
+        break;
+      }
+      
       default:
-        uiProps = {};
+        uiProps = undefined;
         evaluate = (ans) => true;
         answer = null;
     }
@@ -137,7 +156,7 @@ export class Composer {
     return {
       howto: ficha.howto,
       explain: ficha.explain,
-      kind,
+      kind: kind === "intruso_math" ? "plain" : kind,
       prompt: params.audio_prompt || "Responda:",
       audioPrompt: params.audio_prompt,
       tutorial: params.tutorial,

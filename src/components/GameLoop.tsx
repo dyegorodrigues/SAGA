@@ -155,6 +155,7 @@ export function GameLoop({
     const [orderShake, setOrderShake] = useState<any>(null);
   // kind `flash` (subitização): o grupo aparece por ~2s e some — "quantos eram?"
   const [flashHidden, setFlashHidden] = useState(false);
+  const [hintsUsed, setHintsUsed] = useState(0);
   // tutorial guiado 👉 generalizado: legenda do passo atual (null = parado)
   const [guidedNarr, setGuidedNarr] = useState<string | null>(null);
   // aula com IMAGENS: cena que o passo atual do tutorial manda mostrar (null = a da questão)
@@ -234,7 +235,10 @@ export function GameLoop({
   const startGuidedTutorial = (isAuto: boolean = true) => {
     if (guidedNarr !== null || status) return;
     const steps = tutorialSteps(q);
-    if (!steps.length) return;
+    if (!steps.length) {
+      fireAulaEnd();
+      return;
+    }
     sfx.level();
     const q0 = qRef.current;
     let i = 0;
@@ -312,16 +316,22 @@ export function GameLoop({
   const peekMs = (q.n ?? 0) <= 3 ? 2000 : (q.n ?? 0) <= 5 ? 1700 : 1400;
   useEffect(() => {
     if (q.kind !== "flash") return;
+    if (!promptDone) {
+      setFlashHidden(true);
+      return;
+    }
+    setHintsUsed(0);
     setFlashHidden(false);
     const t = setTimeout(() => setFlashHidden(true), peekMs);
     return () => clearTimeout(t);
-  }, [q]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [q, promptDone]);
 
   // "Ver de novo": re-mostra o grupo por um instante (gentil — a faixa é pequena
   // de propósito, então reolhar não vira contagem lenta).
   const peekAgain = () => {
     if (status) return;
     if (sound) sfx.tick();
+    setHintsUsed(h => h + 1);
     setFlashHidden(false);
     setTimeout(() => setFlashHidden(true), 1200);
   };
@@ -544,7 +554,8 @@ export function GameLoop({
         reactionTimeMs: durationMs,
         isCorrect: right,
         misconceptionTags: misconceptionTag ? [misconceptionTag] : [],
-        tutState: tutShow !== null ? "guided" : "hide"
+        tutState: tutShow !== null ? "guided" : "hide",
+        hintsUsed
       });
     } catch(e) {
        console.warn("Failed to dispatch telemetry", e);
