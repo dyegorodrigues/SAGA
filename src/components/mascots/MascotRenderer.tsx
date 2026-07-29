@@ -5,6 +5,7 @@ import * as Bases from "./MascotBases";
 import * as Accs from "./MascotAccessories";
 import { DragonStage } from "./DragonMascot";
 import { getMascotPng } from "./mascotAssets";
+import { MascotV2Mini } from "../../engine/mascot-v2/MascotV2Mini";
 
 /**
  * REGRA PERMANENTE DE ARTE (Escola SVG — docs/plano-diretor-v2.md, Parte C):
@@ -40,12 +41,19 @@ export function MascotRenderer({
   transparentBg = false,
 }: MascotRendererProps) {
   const activeTheme = theme !== "classico" ? theme : (kid?.theme || "classico");
+  
+  if (activeTheme === "trex" || activeTheme === "trex2") {
+    return <MascotV2Mini size={size} animation={animation} activeTheme={activeTheme} />;
+  }
+
   const bodyColor = BODY_COLORS[activeTheme] || BODY_COLORS.classico;
   
   let activeOutfit = "none"; // Disable all outfits/accessories to prevent rendering bugs
   let activeBg = bgAccessory !== "default" ? bgAccessory : (kid?.bgAccessory || "default");
 
-  if (activeBg === "default" || activeBg === "none") {
+  if (transparentBg) {
+    activeBg = "none";
+  } else if (activeBg === "default" || activeBg === "none") {
     if (activeTheme === "heroi") activeBg = "espaco";
     else if (activeTheme === "hulk") activeBg = "parque";
     else if (activeTheme === "capitao_america") activeBg = "castelo";

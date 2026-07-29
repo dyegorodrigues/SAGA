@@ -155,14 +155,21 @@ export function EmojiRow({
             style={{ backgroundColor: tokens.cor.elementos.preenchimento, border: `3px solid ${tokens.cor.elementos.borda}` }}
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="text-7xl">🙈</span>
-              <span className="text-xl font-bold" style={{ color: tokens.cor.texto.secundario }}>Cadê?</span>
+              <span className="text-7xl">{phase === 'waiting' ? '👀' : '🙈'}</span>
+              <span className="text-xl font-bold" style={{ color: tokens.cor.texto.secundario }}>
+                {phase === 'waiting' ? 'Prepare-se...' : 'Cadê?'}
+              </span>
             </div>
-            {!disabled && (
+            {!disabled && phase === 'done' && (
               <button
                 onClick={() => {
                   setPhase('waiting');
-                  setTimeout(() => setPhase('flashing'), 100);
+                  setTimeout(() => {
+                    setPhase('flashing');
+                    if (flashDurationMs) {
+                      setTimeout(() => setPhase('done'), flashDurationMs);
+                    }
+                  }, 100);
                 }}
                 className="mt-2 select-none cursor-pointer active:translate-y-0.5 transition-all"
                 style={{ fontFamily: 'inherit', fontWeight: 800, fontSize: 13, color: tokens.cor.elementos.marcador, background: "#F1EDFF", border: `2px solid ${tokens.cor.elementos.marcador}`, borderRadius: 12, padding: "6px 14px" }}

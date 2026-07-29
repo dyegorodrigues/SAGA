@@ -1,0 +1,464 @@
+{
+  "meta": {
+    "image": "MAGOSHA_spritesheet_4096.png",
+    "size": {
+      "w": 4096,
+      "h": 4096
+    },
+    "grid": {
+      "cols": 6,
+      "rows": 4,
+      "cell_w": 512,
+      "cell_h": 512,
+      "spacing_x": 64,
+      "spacing_y": 64,
+      "margin": 80
+    },
+    "used_area": {
+      "w": 3552,
+      "h": 2400
+    },
+    "pivot": {
+      "normalized": {
+        "x": 0.5,
+        "y": 0.8984375
+      },
+      "pixels_in_cell": {
+        "x": 256,
+        "y": 460
+      },
+      "description": "bottom-center 0.9, pes em Y=460"
+    },
+    "fps": {
+      "walk_right": 10,
+      "walk_left": 10,
+      "idle_life": 6,
+      "combat": 8,
+      "default": 10
+    },
+    "character": "T-Rex MAGOSHA pixel art",
+    "background": "transparent 100%",
+    "no_overlap": true,
+    "no_debris": true
+  },
+  "frames": {
+    "walk_right_0": {
+      "frame": {
+        "x": 80,
+        "y": 80,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 0,
+      "flipped": false
+    },
+    "walk_right_1": {
+      "frame": {
+        "x": 656,
+        "y": 80,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 1,
+      "flipped": false
+    },
+    "walk_right_2": {
+      "frame": {
+        "x": 1232,
+        "y": 80,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 2,
+      "flipped": false
+    },
+    "walk_right_3": {
+      "frame": {
+        "x": 1808,
+        "y": 80,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 3,
+      "flipped": false
+    },
+    "walk_right_4": {
+      "frame": {
+        "x": 2384,
+        "y": 80,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 4,
+      "flipped": false
+    },
+    "walk_right_5": {
+      "frame": {
+        "x": 2960,
+        "y": 80,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 5,
+      "flipped": false
+    },
+    "walk_left_0": {
+      "frame": {
+        "x": 80,
+        "y": 656,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 0,
+      "flipped": true
+    },
+    "walk_left_1": {
+      "frame": {
+        "x": 656,
+        "y": 656,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 1,
+      "flipped": true
+    },
+    "walk_left_2": {
+      "frame": {
+        "x": 1232,
+        "y": 656,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 2,
+      "flipped": true
+    },
+    "walk_left_3": {
+      "frame": {
+        "x": 1808,
+        "y": 656,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 3,
+      "flipped": true
+    },
+    "walk_left_4": {
+      "frame": {
+        "x": 2384,
+        "y": 656,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 4,
+      "flipped": true
+    },
+    "walk_left_5": {
+      "frame": {
+        "x": 2960,
+        "y": 656,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 5,
+      "flipped": true
+    },
+    "idle_breathe": {
+      "frame": {
+        "x": 80,
+        "y": 1232,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 12,
+      "flipped": false
+    },
+    "idle_eat": {
+      "frame": {
+        "x": 656,
+        "y": 1232,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 13,
+      "flipped": false
+    },
+    "idle_sleep_curled": {
+      "frame": {
+        "x": 1232,
+        "y": 1232,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 14,
+      "flipped": false
+    },
+    "idle_sit": {
+      "frame": {
+        "x": 1808,
+        "y": 1232,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 15,
+      "flipped": false
+    },
+    "idle_lie": {
+      "frame": {
+        "x": 2384,
+        "y": 1232,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 17,
+      "flipped": false
+    },
+    "idle_wake": {
+      "frame": {
+        "x": 2960,
+        "y": 1232,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 16,
+      "flipped": false
+    },
+    "combat_punch": {
+      "frame": {
+        "x": 80,
+        "y": 1808,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 18,
+      "flipped": false
+    },
+    "combat_kick": {
+      "frame": {
+        "x": 656,
+        "y": 1808,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 19,
+      "flipped": false
+    },
+    "combat_defense": {
+      "frame": {
+        "x": 1232,
+        "y": 1808,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 20,
+      "flipped": false
+    },
+    "combat_biceps": {
+      "frame": {
+        "x": 1808,
+        "y": 1808,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 21,
+      "flipped": false
+    },
+    "combat_victory": {
+      "frame": {
+        "x": 2384,
+        "y": 1808,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 16,
+      "flipped": false
+    },
+    "combat_dizzy": {
+      "frame": {
+        "x": 2960,
+        "y": 1808,
+        "w": 512,
+        "h": 512
+      },
+      "pivot": {
+        "x": 0.5,
+        "y": 0.8984375,
+        "px_x": 256,
+        "px_y": 460
+      },
+      "source_index": 22,
+      "flipped": false
+    }
+  },
+  "animations": {
+    "walk_right": [
+      "walk_right_0",
+      "walk_right_1",
+      "walk_right_2",
+      "walk_right_3",
+      "walk_right_4",
+      "walk_right_5"
+    ],
+    "walk_left": [
+      "walk_left_0",
+      "walk_left_1",
+      "walk_left_2",
+      "walk_left_3",
+      "walk_left_4",
+      "walk_left_5"
+    ],
+    "idle_life": [
+      "idle_breathe",
+      "idle_eat",
+      "idle_sleep_curled",
+      "idle_sit",
+      "idle_lie",
+      "idle_wake"
+    ],
+    "combat": [
+      "combat_punch",
+      "combat_kick",
+      "combat_defense",
+      "combat_biceps",
+      "combat_victory",
+      "combat_dizzy"
+    ]
+  }
+}

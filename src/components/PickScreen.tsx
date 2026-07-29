@@ -41,6 +41,7 @@ const getDefaultPetName = (theme: string) => {
     homem_ferro_pixel: "Retro-Tin",
     homem_aranha_pixel: "Retro-Teia",
     hulk_pixel: "Retro-Hulk",
+    trex: "T-Rex God",
   };
   return names[theme] || "Bichinho";
 };
@@ -167,22 +168,12 @@ export function PickScreen({
       </div>
 
       {/* Beautiful graphic landscape of characters */}
-      <div className="relative h-44 my-4 -mx-4 overflow-hidden rounded-3xl bg-gradient-to-b from-sky-100 to-emerald-50 shadow-inner border border-blue-100">
-        <svg viewBox="0 0 60 60" style={{ position: "absolute", top: 12, right: 20, width: 50, height: 50 }}>
-          <g className="mk-spin-slow">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <rect key={i} x="28" y="1" width="4" height="12" rx="2" fill="#FFC531" transform={`rotate(${i * 45} 30 30)`} />
-            ))}
-          </g>
-          <circle cx="30" cy="30" r="13" fill="#FFD75E" stroke="#E8B420" strokeWidth="2" />
-        </svg>
-
-        {/* Hills background */}
-        <svg viewBox="0 0 400 70" preserveAspectRatio="none" style={{ position: "absolute", bottom: 0, left: 0, width: "100%", height: 72 }}>
-          <path d="M0 70 Q 100 6 210 42 T 400 26 L 400 70 Z" fill="#C6ECB0" />
-          <path d="M0 70 Q 140 30 260 56 T 400 48 L 400 70 Z" fill="#9BD46A" />
-        </svg>
-
+      <div className="relative h-44 my-4 -mx-4 overflow-hidden rounded-3xl shadow-inner border-2 border-indigo-100" style={{
+        backgroundImage: "url('/mascotes/trex/dojo_pixel_background.webp')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        imageRendering: "pixelated"
+      }}>
         {/* Mascot buttons */}
         {/* pt-4: overflow-x-auto também recorta no eixo Y — sem esta folga, a cabeça
             do mascote some quando a animação de flutuar sobe (a "parede invisível") */}
@@ -200,7 +191,7 @@ export function PickScreen({
                 style={{ background: "none", border: "none", cursor: "pointer", animationDelay: i ? "1.3s" : "0s" }}
                 className="mk-float focus:outline-none flex-shrink-0"
               >
-                <Mascote theme={k.theme} stage={stageNum} size={76} kid={k} />
+                <Mascote theme={k.theme} stage={stageNum} size={76} kid={k} transparentBg={true} />
               </button>
             );
           })}
@@ -511,14 +502,24 @@ export function PickScreen({
                   </label>
                   
                   {/* Miniature selected mascot review */}
-                  <div className="mb-3 p-2 bg-gradient-to-r from-indigo-50/50 to-white border border-indigo-100 rounded-xl flex items-center gap-3">
-                    <Mascote theme={newTheme} stage={5} size={64} />
-                    <div>
-                      <div className="text-xs font-black text-indigo-950" style={{ fontFamily: FONT }}>
-                        {THEMES[newTheme]?.nome || "Mascote"}
-                      </div>
-                      <div className="text-[9px] font-bold text-indigo-500">
-                        Acompanhante: {getDefaultPetName(newTheme)}
+                  <div className={`mb-3 p-2 border border-indigo-100 rounded-xl flex items-center gap-3 relative overflow-hidden ${newTheme !== 'trex' ? 'bg-gradient-to-r from-indigo-50/50 to-white' : ''}`}>
+                    {newTheme === 'trex' && (
+                      <div className="absolute inset-0 z-0 pointer-events-none" style={{
+                        backgroundImage: "url('/mascotes/trex/dojo_pixel_background.webp')",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center bottom",
+                        imageRendering: "pixelated"
+                      }} />
+                    )}
+                    <div className="relative z-10 flex items-center gap-3">
+                      <Mascote theme={newTheme} stage={5} size={64} />
+                      <div>
+                        <div className="text-xs font-black text-indigo-950" style={{ fontFamily: FONT }}>
+                          {THEMES[newTheme]?.nome || "Mascote"}
+                        </div>
+                        <div className="text-[9px] font-bold text-indigo-500">
+                          Acompanhante: {getDefaultPetName(newTheme)}
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -76,7 +76,13 @@ function getPetMood(kid: Kid, state: State) {
   return { emoji: "🥺", label: "Com saudade", phrase: (n: string) => `${n} está com olhinhos pidões de saudade de você!` };
 }
 
+import { MascotV2ProfileCard } from "../engine/mascot-v2/MascotV2ProfileCard";
+
 export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: MascotEvoProps) {
+  if (kid.theme === "trex" || kid.theme === "trex2") {
+    return <MascotV2ProfileCard kid={kid} state={state} onUpdateKid={onUpdateKid} coins={coins} />;
+  }
+  
   // Tamagotchi 2.0: uma única barra de energia (alimentação) + humor pelo streak
   const petEnergy = kid.petEnergy != null ? kid.petEnergy : 80;
   const petFood = kid.petFood != null ? kid.petFood : 0;
@@ -302,7 +308,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             <Mascote 
               theme={kid.theme} 
               stage={curStage.stage} 
-              size={"100%"}
+              size={150}
               kid={kid}
               bgAccessory={kid.bgAccessory} 
               animation={petAction === "playing" ? "happy" : "idle"}
@@ -480,6 +486,18 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
  * Custom scenic visual backdrops representing each character theme
  */
 function ScenicBackdrop({ theme }: { theme: string }) {
+  if (theme === "trex") {
+    return (
+      <div className="absolute inset-0 overflow-hidden select-none" style={{
+        backgroundImage: "url('/mascotes/trex/dojo_pixel_background.webp')",
+        backgroundSize: "cover",
+        backgroundPosition: "center bottom",
+        imageRendering: "pixelated"
+      }}>
+      </div>
+    );
+  }
+
   // Spider-Man backdrop
   if (theme === "homem_aranha") {
     return (

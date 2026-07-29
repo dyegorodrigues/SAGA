@@ -448,7 +448,7 @@ export const EmojiRowOld = ({
 );
 
 export const BigText = ({ children, size = 42 }: { children: React.ReactNode; size?: number }) => (
-  <div style={{ fontFamily: FONT, fontSize: size, fontWeight: 700, color: C.ink, textAlign: "center", letterSpacing: 1 }}>{children}</div>
+  <div style={{ fontFamily: FONT, fontSize: size, fontWeight: 700, color: C.ink, textAlign: "center", letterSpacing: 1, whiteSpace: "pre-line" }}>{children}</div>
 );
 
 /* ---------------- Album Stickers ---------------- */

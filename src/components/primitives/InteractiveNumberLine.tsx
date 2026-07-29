@@ -61,7 +61,7 @@ export function InteractiveNumberLine({ q, start: _start, end: _end, startPos: _
     <div className={`w-full py-12 px-8 select-none ${tokens.estado[state]}`}>
       {/* Container expanded to make dragging much easier on mobile */}
       <div 
-        className="relative w-full h-16 touch-none cursor-pointer flex items-center" 
+        className="relative w-full h-32 touch-none cursor-pointer flex items-center -mt-8 -mb-8" 
         ref={lineRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}

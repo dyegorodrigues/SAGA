@@ -15,12 +15,12 @@ import { Question, Track, Progress } from "../types";
  */
 
 /** habilidades-núcleo sondadas, em ordem de currículo (as que existirem na série) */
-const CORE_IDS = ["contar", "maismenos", "comp", "vizinhos", "seq", "soma", "tirar", "sub", "dezenas"];
+const CORE_IDS = ["N1.01", "N1.02", "N1.07", "N1.03", "N1.08", "N1.09", "N1.10", "N1.11", "N2.01"];
 /** senso numérico = pode sondar um pouco mais alto (é perceptual, não pune);
  *  operações (soma/subtração/dezenas) = SÓ sondas GENTIS e visuais (nível 1-2),
  *  nunca a subtração abstrata de nível 4 que massacra o iniciante. */
-const NUM_SENSE = new Set(["contar", "maismenos", "comp", "vizinhos", "seq"]);
-const probesFor = (id: string): [number, number] => (NUM_SENSE.has(id) ? [2, 3] : [1, 2]);
+const NUM_SENSE = new Set(["N1.01", "N1.02", "N1.07", "N1.03", "N1.08"]);
+const probesFor = (id: string): [number, number] => (NUM_SENSE.has(id) ? [1, 2] : [1, 2]);
 /** máximo de trilhas sondadas (mantém a missão curta e sem fadiga) */
 const MAX_TRACKS = 6;
 
@@ -60,7 +60,10 @@ export function buildMatriculaTrack(tracks: Track[]): { track: Track; ladder: Ma
       icon: "🎒",
       color: "#0EA5E9",
       dark: "#0369A1",
-      gen: () => qs[i++ % Math.max(1, qs.length)],
+      gen: () => {
+        if (qs.length === 0) return { kind: "plain", prompt: "Tudo pronto!", big: "🌟", options: [{ label: "1", value: 1 }], answer: 1 };
+        return qs[i++ % Math.max(1, qs.length)];
+      },
       totalQ: qs.length || 1,
     } as Track,
   };

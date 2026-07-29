@@ -25,6 +25,7 @@ const getDefaultPetName = (theme: string) => {
     capitao_america: "Capitãozinho",
     homem_ferro: "Latinha",
     bruxo: "Merlin",
+    trex: "T-Rex God",
   };
   return names[theme] || "Bichinho";
 };
@@ -299,14 +300,24 @@ export function SetupScreen({ initial, onDone, onLogout }: SetupProps) {
                       </label>
                       
                       {/* Active Mascot Display Panel */}
-                      <div className="mb-4 bg-gradient-to-b from-indigo-50 to-white border-2 border-indigo-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center">
-                        <Mascote theme={k.theme} stage={5} size={110} className="mb-2" />
-                        <span className="text-sm font-black text-indigo-950" style={{ fontFamily: FONT }}>
-                          {THEMES[k.theme]?.nome || "Mascote"}
-                        </span>
-                        <span className="text-[10px] font-bold text-indigo-500 mt-0.5 px-2 py-0.5 bg-indigo-50 rounded-full">
-                          Acompanhante: {getDefaultPetName(k.theme)} 🐾
-                        </span>
+                      <div className={`mb-4 border-2 border-indigo-100 rounded-2xl p-4 flex flex-col items-center justify-center text-center relative overflow-hidden ${k.theme !== 'trex' ? 'bg-gradient-to-b from-indigo-50 to-white' : ''}`}>
+                        {k.theme === 'trex' && (
+                          <div className="absolute inset-0 z-0 pointer-events-none" style={{
+                            backgroundImage: "url('/mascotes/trex/dojo_pixel_background.webp')",
+                            backgroundSize: "cover",
+                            backgroundPosition: "center bottom",
+                            imageRendering: "pixelated"
+                          }} />
+                        )}
+                        <div className="relative z-10 flex flex-col items-center">
+                          <Mascote theme={k.theme} stage={5} size={110} className="mb-2" transparentBg={true} />
+                          <span className="text-sm font-black text-indigo-950" style={{ fontFamily: FONT }}>
+                            {THEMES[k.theme]?.nome || "Mascote"}
+                          </span>
+                          <span className="text-[10px] font-bold text-indigo-500 mt-0.5 px-2 py-0.5 bg-indigo-50 rounded-full">
+                            Acompanhante: {getDefaultPetName(k.theme)} 🐾
+                          </span>
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 max-h-48 overflow-y-auto pr-1">

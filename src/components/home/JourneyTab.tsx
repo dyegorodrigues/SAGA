@@ -101,14 +101,14 @@ export function JourneyTab({ kid, prog, onTrack }: Props) {
          </div>
 
          {availableSubjects.length > 1 && (
-           <div className="flex justify-center gap-2 mb-6 overflow-x-auto pb-2 px-4 no-scrollbar">
+           <div className="flex flex-nowrap gap-2 mb-6 overflow-x-auto pb-4 px-1 mx-1 no-scrollbar" style={{ WebkitOverflowScrolling: 'touch' }}>
              {availableSubjects.map(s => (
                <button
                  key={s.id}
                  onClick={() => setActiveSubject(s.id)}
-                 className={`flex items-center gap-2 px-4 py-2 rounded-full font-bold whitespace-nowrap transition-all ${activeSubject === s.id ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold whitespace-nowrap transition-all shadow-sm shrink-0 border-2 ${activeSubject === s.id ? 'bg-indigo-600 border-indigo-700 text-white shadow-md scale-105' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                >
-                 <span className="text-lg">{s.icon}</span>
+                 <span className="text-xl">{s.icon}</span>
                  {s.nome}
                </button>
              ))}

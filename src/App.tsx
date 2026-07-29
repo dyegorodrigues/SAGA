@@ -37,6 +37,7 @@ import { LoginScreen } from "./components/LoginScreen";
 import { AdminGodPanel } from "./components/AdminGodPanel";
 import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
+import { MascotEnvironment } from "./engine/mascot-v2/MascotEnvironment";
 
 /* ============================================================
    MATEMÁGICA IA — Matemática Adaptativa & Tutoria Inteligente (PT-BR)
@@ -53,6 +54,13 @@ const getDefaultPetName = (theme: string) => {
     futebol: "Golzinho",
     musica: "Batuque",
     dino: "Dininho",
+    pantera_negra: "Panterinha",
+    thor: "Trovenho",
+    goku: "Gokuzinho",
+    homem_ferro_pixel: "Retro-Tin",
+    homem_aranha_pixel: "Retro-Teia",
+    hulk_pixel: "Retro-Hulk",
+    trex: "T-Rex God",
   };
   return names[theme] || "Bichinho";
 };
@@ -248,6 +256,28 @@ export default function App() {
     return false;
   });
   const [showAdmin, setShowAdmin] = useState(false);
+
+  // Verificacao de Rota Secreta Isolada (Mascote V2 Teste)
+  const isMascotV2Test = typeof window !== "undefined" && window.location.hash === "#teste-motor-v2";
+
+  if (isMascotV2Test) {
+    return (
+      <Shell>
+        <div className="pt-8">
+          <button 
+            onClick={() => {
+              window.location.hash = "";
+              window.location.reload();
+            }}
+            className="absolute top-4 left-4 bg-slate-800 text-white px-4 py-2 rounded-xl font-bold shadow z-50 hover:bg-slate-700"
+          >
+            ← Voltar para o App Normal
+          </button>
+          <MascotEnvironment />
+        </div>
+      </Shell>
+    );
+  }
 
   // Desafio Misto 👑: as 10 questões são montadas UMA vez ao entrar na missão
   // (o App re-renderiza a cada resposta; sem memo, a lista seria re-sorteada).

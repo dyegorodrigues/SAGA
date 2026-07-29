@@ -46,6 +46,8 @@ export const BODY_COLORS: Record<string, string> = {
   capitao_america_hd: "#2563EB", // HD Pixel Captain America Blue
   thor_hd: "#78716C",           // HD Pixel Thor Gray
   dragao_fogo: "#EF4444",       // Dragão de Fogo Red
+  trex: "#4ADE80",              // T-Rex Green
+  trex2: "#22D3EE",             // T-Rex 2 Cyan
 };
 
 export const THEME_EMOJIS: Record<string, string> = {
@@ -73,6 +75,8 @@ export const THEME_EMOJIS: Record<string, string> = {
   capitao_america_hd: "⭐️🛡️",
   thor_hd: "⚡️🔨",
   dragao_fogo: "🔥",
+  trex: "🦖",
+  trex2: "🦕",
 };
 
 export const EMO = ["🍎", "🐶", "⚽", "🍓", "🐟", "🚗", "🦆", "🌼", "🍪", "🎈", "🐞", "⭐"];
@@ -338,6 +342,28 @@ export const THEMES: Record<string, ThemeConfig> = {
       "Sensacional! Sua inteligência é quente como lava! 🌋",
       "Parabéns! Você resolveu essa questão com a força de um dragão lendário! 👑",
       "Espetacular! Um verdadeiro campeão dos dragões! 🐉✨"
+    ]
+  },
+  trex: {
+    nome: "T-Rex", icon: "🦖", bg: ["#E2F5D3", "#F4FFF0"], burst: ["🦖", "🌿", "⭐", "🦴", "✨"],
+    emojis: ["🦖", "🦕", "🌋", "🥚", "🦴", "🌴", "🐊", "🍖", "🌿", "⭐"],
+    praise: [
+      "Uau! Um acerto jurássico e gigante! 🦖",
+      "Sensacional! Que força incrível de dinossauro! 🦕",
+      "Você arrasou! Descoberta digna de um cientista! 🌋",
+      "Rawr! Que garra incrível! Nota dez! 🦴",
+      "Parabéns! Você é dino-demais! 🌟"
+    ]
+  },
+  trex2: {
+    nome: "T-Rex 2", icon: "🦕", bg: ["#E0F7FA", "#E0F2F1"], burst: ["🦕", "🌊", "⭐", "🌿", "✨"],
+    emojis: ["🦕", "🦖", "🌊", "🥚", "🐟", "🌴", "🐊", "🌿", "⭐", "💎"],
+    praise: [
+      "Uau! Um acerto aquático e gigante! 🦕",
+      "Sensacional! Que força incrível de dinossauro! 🌊",
+      "Você arrasou! Mergulho digno de um campeão! 💎",
+      "Splash! Que garra incrível! Nota dez! 🐟",
+      "Parabéns! Você é dino-demais! 🌟"
     ]
   },
 };

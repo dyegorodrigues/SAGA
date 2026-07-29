@@ -138,7 +138,7 @@ export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded }: Adm
         </div>
 
         {/* Tab Selection */}
-        <div className="bg-indigo-50 px-6 py-2.5 flex gap-4 border-b border-indigo-100">
+        <div className="bg-indigo-50 px-6 py-2.5 flex gap-4 border-b border-indigo-100 flex-wrap">
           <button
             onClick={() => {
               sfx.tick();
@@ -162,6 +162,17 @@ export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded }: Adm
             style={{ fontFamily: FONT }}
           >
             👥 Gestor de Perfis (Editar Stars & Unlocks)
+          </button>
+          <button
+            onClick={() => {
+              sfx.tick();
+              window.location.hash = "#teste-motor-v2";
+              window.location.reload();
+            }}
+            className="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer text-amber-800 bg-amber-200 hover:bg-amber-300 ml-auto"
+            style={{ fontFamily: FONT }}
+          >
+            🧪 Testar Motor Mascote V2 (SpriteSheet)
           </button>
         </div>
 

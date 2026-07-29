@@ -162,6 +162,35 @@ export function GameLoopExerciseRenderer({
             <BigText>{status === "right" && q.bigCompleted ? q.bigCompleted : q.big}</BigText>
           )}
 
+          {/* ----- SCENES ----- */}
+          {q.kind === "grow" && q.n != null && (
+            <div className="flex justify-center my-4"><GrowthScene stage={q.n} size={180} /></div>
+          )}
+          {q.kind === "weather" && q.big && (
+            <div className="flex justify-center my-4"><WeatherScene type={q.big as any} size={180} /></div>
+          )}
+          {q.kind === "lifestage" && q.n != null && (
+            <div className="flex justify-center my-4"><PersonLifeScene stage={q.n} size={180} /></div>
+          )}
+          {q.kind === "animal" && q.n != null && (
+            <div className="flex justify-center my-4"><AnimalLifeScene stage={q.n} size={180} /></div>
+          )}
+          {q.kind === "lugar" && q.big && (
+            <div className="flex justify-center my-4"><NestScene kind={q.big as any} size={180} /></div>
+          )}
+          {q.kind === "daypart" && q.big && (
+            <div className="flex justify-center my-4"><DayPartScene type={q.big as any} size={180} /></div>
+          )}
+          {q.kind === "emotion" && q.big && (
+            <div className="flex justify-center my-4"><EmotionScene type={q.big as any} size={180} /></div>
+          )}
+          {q.kind === "place" && q.big && (
+            <div className="flex justify-center my-4"><PlaceScene type={q.big as any} size={180} /></div>
+          )}
+          {q.kind === "journey" && (
+            <div className="flex justify-center my-4"><JourneyScene size={180} /></div>
+          )}
+
           {q.kind === "clock" && q.hour != null && q.minute != null && (
             <div className="flex flex-col items-center gap-4 py-2 select-none">
               <div className="relative w-44 h-44 rounded-md border-6 bg-white shadow-lg flex items-center justify-center transition-all" style={{ borderColor: C.line }}>
@@ -263,7 +292,7 @@ export function GameLoopExerciseRenderer({
 
           {q.kind === "flash" && q.emoji && q.n != null && (
             <div className="flex flex-col items-center justify-center gap-2" style={{ minHeight: 140 }}>
-              {!flashHidden ? (
+              {(!flashHidden || status === "right") ? (
                 <div className="flex flex-wrap items-center justify-center gap-2.5" style={{ maxWidth: 250 }}>
                   {Array.from({ length: q.n }).map((_, i) => (
                     <span key={i} className="mk-pop" style={{ fontSize: 42, animationDelay: `${i * 50}ms` }}>
@@ -273,9 +302,9 @@ export function GameLoopExerciseRenderer({
                 </div>
               ) : (
                 <>
-                  <div style={{ fontSize: 64, lineHeight: 1 }}>🙈</div>
-                  <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.sub }}>Quantos eram? 🤔</div>
-                  {!status && (
+                  <div style={{ fontSize: 64, lineHeight: 1 }}>{!promptDone ? '👀' : '🙈'}</div>
+                  <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.sub }}>{!promptDone ? 'Prepare-se...' : 'Quantos eram? 🤔'}</div>
+                  {promptDone && !status && (
                     <button
                       onClick={peekAgain}
                       className="mt-1 select-none cursor-pointer active:translate-y-0.5 transition-all"
@@ -400,7 +429,7 @@ export function GameLoopExerciseRenderer({
 
       {/* Answer Button Grid Options */}
       <div className="mt-5">
-        {q.kind === "flash" && !flashHidden ? (
+        {q.kind === "flash" && (!flashHidden && status !== "right") ? (
           // durante o relance: sem números na tela, só o convite a OLHAR
           <div className="text-center py-4" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.grape }}>
             👀 Olhe rápido...
@@ -519,11 +548,8 @@ export function GameLoopExerciseRenderer({
                   key={i}
                   onClick={() => {
                     if (status || isHidden) return;
-                    // toque duplo nas questões audíveis: 1º OUVE e arma; 2º confirma
-                    if (q.audibleOptions && armedOpt !== o.value) {
-                      setArmedOpt(o.value);
+                    if (q.audibleOptions) {
                       speak(String(o.say ?? o.label).toLowerCase(), q.lang ? { lang: q.lang } : {});
-                      return;
                     }
                     handlePick(o.value);
                   }}

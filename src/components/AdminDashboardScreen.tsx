@@ -77,7 +77,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
           </div>
         </div>
         
-        <div className="flex bg-slate-800 p-1 rounded-xl">
+        <div className="flex bg-slate-800 p-1 rounded-xl flex-wrap gap-1">
           <button 
             onClick={() => setActiveTab("curriculum")}
             className={`px-4 py-2 rounded-lg text-sm font-black transition-colors ${activeTab === 'curriculum' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
@@ -102,6 +102,16 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
             className={`px-4 py-2 rounded-lg text-sm font-black transition-colors ${activeTab === 'notes' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
           >
             📝 Anotações/Bugs
+          </button>
+          <button 
+            onClick={() => {
+              sfx.tick();
+              window.location.hash = "#teste-motor-v2";
+              window.location.reload();
+            }}
+            className="px-4 py-2 rounded-lg text-sm font-black transition-colors text-amber-900 bg-amber-400 hover:bg-amber-300 ml-auto"
+          >
+            🧪 Testar Mascote V2
           </button>
         </div>
       </div>

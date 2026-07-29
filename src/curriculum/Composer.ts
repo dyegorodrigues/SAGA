@@ -136,14 +136,31 @@ export class Composer {
       }
       
       case "intruso_math": {
-        const isCores = Math.random() > 0.5;
-        const A = isCores ? "🔴" : "🍎";
-        const B = isCores ? "🔵" : "🍌";
+        const pairs = [
+          ["🔴", "🔵"],
+          ["🍎", "🍌"],
+          ["🚗", "🚕"],
+          ["🐶", "🐱"],
+          ["🌞", "🌙"],
+          ["⭐", "💠"]
+        ];
+        const [A, B] = pairs[Math.floor(Math.random() * pairs.length)];
         
-        uiProps = { text: A + " " + A + " " + B + " " + A };
-        options = [{label: A, value: A}, {label: B, value: B}];
-        evaluate = (ans) => ans === B;
-        answer = B;
+        const intruder = Math.random() > 0.5 ? A : B;
+        const normal = intruder === A ? B : A;
+
+        const len = Math.floor(Math.random() * 2) + 4; // 4 or 5
+        const intruderPos = Math.floor(Math.random() * len);
+        
+        let seq = [];
+        for (let i = 0; i < len; i++) {
+          seq.push(i === intruderPos ? intruder : normal);
+        }
+        
+        uiProps = { text: seq.join(" ") };
+        options = [{label: A, value: A}, {label: B, value: B}].sort(() => Math.random() - 0.5);
+        evaluate = (ans) => ans === intruder;
+        answer = intruder;
         break;
       }
       
