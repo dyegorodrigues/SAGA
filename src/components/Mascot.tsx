@@ -69,7 +69,7 @@ export function Mascote({
       kid={kid}
       stage={stage}
       animation={animation}
-      
+      transparentBg={transparentBg}
     />
   );
 }

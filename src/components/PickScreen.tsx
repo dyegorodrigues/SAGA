@@ -175,9 +175,9 @@ export function PickScreen({
         imageRendering: "pixelated"
       }}>
         {/* Mascot buttons */}
-        {/* pt-4: overflow-x-auto também recorta no eixo Y — sem esta folga, a cabeça
-            do mascote some quando a animação de flutuar sobe (a "parede invisível") */}
-        <div style={{ position: "absolute", bottom: 6, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 32 }} className="overflow-x-auto px-4 pt-4 max-w-full">
+        {/* pt-8: folga extra para a cabeça do mascote não sumir quando flutuar. 
+            Sem overflow-x-auto, os mascotes quebrarem a linha (flex-wrap) e não sumirão das bordas. */}
+        <div style={{ position: "absolute", bottom: 6, left: 0, right: 0, display: "flex", justifyContent: "center", alignItems: "flex-end", gap: 32, flexWrap: "wrap" }} className="px-4 pt-8 max-w-full">
           {state.kids.map((k, i) => {
             const totalStars = getKidLifetimeStars(k.id, state);
             const stageNum = getMascotStage(totalStars).stage;
