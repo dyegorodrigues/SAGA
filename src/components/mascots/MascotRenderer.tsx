@@ -228,6 +228,25 @@ export function MascotRenderer({
           </g>
         )}
 
+        {activeBg === "espaco" && (
+          <g>
+            <rect x="0" y="0" width="100" height="100" fill="#0F172A" />
+            <circle cx="20" cy="30" r="1" fill="#FFF" opacity="0.8" />
+            <circle cx="80" cy="20" r="1.5" fill="#FFF" opacity="0.9" />
+            <circle cx="40" cy="15" r="0.8" fill="#FFF" opacity="0.6" />
+            <circle cx="70" cy="50" r="1.2" fill="#FFF" opacity="0.7" />
+            <circle cx="15" cy="70" r="1" fill="#FFF" opacity="0.8" />
+            
+            {/* Moon/Planet */}
+            <circle cx="85" cy="15" r="8" fill="#94A3B8" />
+            <circle cx="82" cy="12" r="2" fill="#CBD5E1" opacity="0.5" />
+            <circle cx="87" cy="17" r="1.5" fill="#64748B" opacity="0.5" />
+            
+            {/* Crater/Mountains */}
+            <ellipse cx="50" cy="110" rx="90" ry="40" fill="#1E293B" />
+            <ellipse cx="50" cy="110" rx="70" ry="30" fill="#334155" />
+          </g>
+        )}
         {activeBg === "parque" && (
           <g>
             <rect x="0" y="0" width="100" height="100" fill="#BAE6FD" />

@@ -512,7 +512,7 @@ export function PickScreen({
                       }} />
                     )}
                     <div className="relative z-10 flex items-center gap-3">
-                      <Mascote theme={newTheme} stage={5} size={64} />
+                      <Mascote theme={newTheme} stage={5} size={64} transparentBg={true} />
                       <div>
                         <div className="text-xs font-black text-indigo-950" style={{ fontFamily: FONT }}>
                           {THEMES[newTheme]?.nome || "Mascote"}
@@ -539,7 +539,7 @@ export function PickScreen({
                             : "bg-white border-slate-200 text-slate-500 hover:bg-slate-50"
                         }`}
                       >
-                        <Mascote theme={id} stage={1} size={28} />
+                      <Mascote theme={id} stage={1} size={28} transparentBg={true} />
                         <span className="truncate w-full text-center">{t.nome}</span>
                       </button>
                     ))}
