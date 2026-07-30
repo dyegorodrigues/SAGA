@@ -126,16 +126,13 @@ Durante as refatorações da Home e do GameLoop, o agente perdeu contexto críti
 - Todo esse caos (bugs do sapinho, do macaquinho, do gato) surgiu porque o renderizador (`GameLoopExerciseRenderer.tsx`) cresceu absorvendo as lógicas individuais que deveriam pertencer à arquitetura das Fichas. As fichas não ditavam o estado, elas apenas entregavam os parâmetros, e o `GameLoop` se matava para adivinhar a ordem dos eventos (como o timer do macaquinho). 
 - O próximo passo vital para resolver esse *Gargalo Supremo* (e dar espaço ao Data Design) é mover o motor de tempo e as etapas (Stages) diretamente para o contrato da Ficha (ex: `Ficha.timeline = [ { t: 0, show: "macaco" }, { t: 1500, show: "items" } ]`). O *renderizador* não deve "pensar", ele deve apenas "obedecer" ao roteiro.
 
-### Hotfix: Crash de Undefined no Áudio e Tutoriais (28 Julho 2026 - Turno 3)
+### Hotfix: Ajustes Finais do PickScreen e Transparência do Mascote (29 Julho 2026)
+- **Ajuste de Transparência:** Adicionado a prop `transparentBg={true}` na chamada do `Mascote` no `PickScreen.tsx` e `MascotRenderer.tsx` para evitar que cenários de fundo (caixas/gradientes) surjam de forma indesejada nos seletores de perfil e avatares.
+- **Flutuação sem Recorte:** Ajustado o container de mascotes no `PickScreen.tsx` (`pt-8` e `flex-wrap` sem `overflow-x-auto` nocivo), impedindo que a animação de flutuação corte a cabeça do mascote no topo da tela.
+- **Cenário Espaço:** Implementado o fundo vetorial limpo `{activeBg === "espaco"}` com efeito de estrelas e lua para heróis e mascotes espaciais.
+- **Compilação e Limpeza:** Executado `compile_applet` (100% verde) e sanitização de scripts temporários (`rm *.cjs *.txt *.sh`).
 
-**O Problema (Crash):**
-- A interface quebrava (White Screen of Death) com dois erros no console:
-  1. `Uncaught TypeError: Cannot read properties of undefined (reading 'replace')`
-  2. `Uncaught TypeError: Cannot read properties of undefined (reading 'tutorial')`
-
-**A Causa e Correção:**
-- As funções de verificação de tutorial (`hasTutorial`, `tutorialSteps` em `src/utils/tutorials.ts`) assumiam que o objeto `q` (Question) sempre estaria presente, mas durante certas transições de estado do React, o `q` ficava temporariamente como `undefined`, estourando a aplicação ao tentar acessar `q.tutorial`. Adicionado guard clauses (`if (!q) return false;`).
-- O mesmo acontecia no sistema de Text-to-Speech (Fallback) em `src/components/AudioPlayer.tsx`, onde se tentava invocar `.replace()` em uma string `text` vazia ou indefinida. Adicionado guard clause (`if (!text) return;`).
-
-**Resultado:**
-- Os TypeErrors de transição foram neutralizados e a robustez geral do ambiente React/GameLoop foi fortalecida.
+### Mapeamento da Arquitetura do Meta-Algoritmo e Transição para o Composer
+- **Diagnóstico do Legado:** Identificada a presença histórica do `generators.ts` coexistindo com o `Composer.ts`. O gerador legado permaneceu por ter funções de apoio (`ri`, `shuffle`, definições de categorias) e atalhos de jornadas não migradas.
+- **Plano de Extinção Segura do Legado:** Migração atômica de cada gerador isolado em Fichas Oficiais de Aprendizado (`src/curriculum/fichas/`), transferindo a orquestração 100% para o `Composer.ts`.
+- **Motor do Mascote T-Rex V2:** Estruturado em `src/engine/mascot-v2/` com SpriteSheets, Atlas JSON e motor de animações para garantir escalabilidade gráfica sem travamentos de UI.
