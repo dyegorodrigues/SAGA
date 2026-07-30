@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { planAula, composeAula, buildAulaTrack, getAulaTotal() } from "../curriculum/motores/composer";
+import { planAula, composeAula, buildAulaTrack, getAulaTotal } from "../curriculum/motores/composer";
 import { Track, Progress } from "../types";
 
 /** trilha-fantasma: toda questão assina o id da trilha no prompt (rastreável) */

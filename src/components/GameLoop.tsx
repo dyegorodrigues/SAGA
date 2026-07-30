@@ -655,24 +655,22 @@ export function GameLoop({
       }
     };
 
-    // A criança pode PULAR a qualquer momento tocando na tela (ver advanceNow)
+    // A criança pode PULAR a qualquer momento clicando no botão 'Avançar' ou tocando na tela
     advanceRef.current = doTransition;
 
     if (sound) {
       speak(fb, {
         pitch: right ? 1.3 : 1.05,
-        onEnd: () => {
-          // acerto: passa quase na hora; erro com explicação: respira mais
-          if (val !== "__timeout__") setTimeout(() => advanceRef.current && advanceRef.current(), showExplain ? 700 : right ? 250 : 500);
-        }
       });
-      // rede de segurança: se a voz falhar TOTALMENTE, o app não trava (tempo folgado
-      // pra jamais atropelar uma explicação em curso; o botão Avançar segue na tela).
-      // Só dispara se AINDA formos a transição pendente (nunca a da próxima questão).
-      if (val !== "__timeout__") setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, showExplain ? 18000 : 8000);
+      // Auto-avanço de segurança: 10 segundos se a criança não clicar no botão 'Avançar'
+      if (val !== "__timeout__") {
+        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
+      }
     } else {
-      // sem som, dá tempo de LER a explicação antes de passar
-      if (val !== "__timeout__") setTimeout(() => advanceRef.current && advanceRef.current(), showExplain ? 3200 : right ? 900 : 1600);
+      // Sem som: auto-avanço em 10s se não clicar no botão
+      if (val !== "__timeout__") {
+        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
+      }
     }
   };
 
