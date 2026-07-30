@@ -8,9 +8,10 @@ interface AdminGodPanelProps {
   state: State;
   onUpdateState: (newState: State) => void;
   onClose: () => void;
+  onTestMascotV2?: () => void;
 }
 
-export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded }: AdminGodPanelProps) {
+export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded, onTestMascotV2 }: AdminGodPanelProps) {
   const [selectedTheme, setSelectedTheme] = useState<string>("classico");
   const [selectedStage, setSelectedStage] = useState<1 | 2 | 3 | 4 | 5>(5);
   const [selectedOutfit, setSelectedOutfit] = useState<string>("default");
@@ -166,8 +167,7 @@ export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded }: Adm
           <button
             onClick={() => {
               sfx.tick();
-              window.location.hash = "#teste-motor-v2";
-              window.location.reload();
+              if (onTestMascotV2) onTestMascotV2();
             }}
             className="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer text-amber-800 bg-amber-200 hover:bg-amber-300 ml-auto"
             style={{ fontFamily: FONT }}

@@ -15,9 +15,10 @@ interface AdminDashboardScreenProps {
   onBack: () => void;
   onTestTrack: (trackId: string) => void;
   onTestTrackLvl: (trackId: string, lvl: number) => void;
+  onTestMascotV2?: () => void;
 }
 
-export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack, onTestTrackLvl }: AdminDashboardScreenProps) {
+export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack, onTestTrackLvl, onTestMascotV2 }: AdminDashboardScreenProps) {
   const [activeTab, setActiveTab] = useState<"curriculum" | "profiles" | "notes" | "docs">("curriculum");
   const [generalNotes, setGeneralNotes] = useState(() => localStorage.getItem("matemagica_dev_notes") || "");
   const [nodeNotes, setNodeNotes] = useState<Record<string, string>>(() => {
@@ -66,7 +67,11 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
       <div className="bg-slate-950 border-b border-slate-800 px-6 py-4 flex justify-between items-center shadow-lg shrink-0">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => { sfx.tick(); onBack(); }}
+            onClick={() => { 
+              if (typeof window !== "undefined") window.location.hash = "";
+              sfx.tick(); 
+              onBack(); 
+            }}
             className="w-10 h-10 bg-slate-800 hover:bg-slate-700 rounded-full flex items-center justify-center text-white font-bold transition-colors"
           >
             ←
@@ -106,10 +111,9 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
           <button 
             onClick={() => {
               sfx.tick();
-              window.location.hash = "#teste-motor-v2";
-              window.location.reload();
+              if (onTestMascotV2) onTestMascotV2();
             }}
-            className="px-4 py-2 rounded-lg text-sm font-black transition-colors text-amber-900 bg-amber-400 hover:bg-amber-300 ml-auto"
+            className="px-4 py-2 rounded-lg text-sm font-black transition-colors text-amber-900 bg-amber-400 hover:bg-amber-300 ml-auto cursor-pointer"
           >
             🧪 Testar Mascote V2
           </button>
@@ -247,6 +251,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
               onUpdateState={onUpdateState} 
               onClose={() => {}} 
               isEmbedded={true}
+              onTestMascotV2={onTestMascotV2}
             />
           </div>
         )}

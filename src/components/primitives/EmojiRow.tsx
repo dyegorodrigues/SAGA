@@ -155,9 +155,9 @@ export function EmojiRow({
             style={{ backgroundColor: tokens.cor.elementos.preenchimento, border: `3px solid ${tokens.cor.elementos.borda}` }}
           >
             <div className="flex flex-col items-center gap-2">
-              <span className="text-7xl">{phase === 'waiting' ? '👀' : '🙈'}</span>
+              <span className="text-7xl">{phase === 'waiting' ? '🙈' : '🙈'}</span>
               <span className="text-xl font-bold" style={{ color: tokens.cor.texto.secundario }}>
-                {phase === 'waiting' ? 'Prepare-se...' : 'Cadê?'}
+                {phase === 'waiting' ? 'Olhos fechados... 👀' : 'Quantos eram? 🤔'}
               </span>
             </div>
             {!disabled && phase === 'done' && (

@@ -136,3 +136,39 @@ Durante as refatorações da Home e do GameLoop, o agente perdeu contexto críti
 - **Diagnóstico do Legado:** Identificada a presença histórica do `generators.ts` coexistindo com o `Composer.ts`. O gerador legado permaneceu por ter funções de apoio (`ri`, `shuffle`, definições de categorias) e atalhos de jornadas não migradas.
 - **Plano de Extinção Segura do Legado:** Migração atômica de cada gerador isolado em Fichas Oficiais de Aprendizado (`src/curriculum/fichas/`), transferindo a orquestração 100% para o `Composer.ts`.
 - **Motor do Mascote T-Rex V2:** Estruturado em `src/engine/mascot-v2/` com SpriteSheets, Atlas JSON e motor de animações para garantir escalabilidade gráfica sem travamentos de UI.
+
+### Resolução Definitiva da Raiz do Bug de Áudio e Subitização (Flash / Olhos Tampados) (30 Julho 2026)
+- **Diagnóstico da Causa Raiz:**
+  1. **Deduplicação Nociva de Fala:** Em `GameLoop.tsx`, a referência `lastSpokenPromptRef` usava a chave `${q.kind}|${q.prompt}`. Como exercícios consecutivos de subitização possuem a mesma pergunta ("Quantos você viu?"), a partir da 2ª questão o sistema assumia erroneamente que o áudio já tinha sido reproduzido e não disparava o `speak()`.
+  2. **Bloqueio do Estado `promptDone`:** Como o áudio não era acionado, o evento `onEnd` nunca acontecia, deixando `promptDone` preso em `false`. Com `promptDone = false`, o Flash forçava `flashHidden = true` permanente. A criança só via os olhos tampados (`🙈`) e o exercício ficava totalmente travado sem mostrar os objetos!
+- **Correções Aplicadas:**
+  1. **Chave Única por Questão:** Alterada a chave de fala para incluir o índice e o ID da questão (`${idx}|${q.kind}|${q.prompt}|${q.n}|${q.id}`), garantindo a reprodução automática do áudio em 100% das novas questões.
+  2. **Fail-Safe de Tempo:** Adicionado um timer de segurança (2.2s) na reprodução de áudio, garantindo que `promptDone` seja liberado mesmo se a API Web Speech do navegador falhar ou demorar.
+  3. **Abertura Imediata do Relance:** A exibição visual do Flash (`q.kind === "flash"`) agora inicia os objetos imediatamente por `peekMs` (1.4s a 2s) assim que a questão carrega. Em seguida, aciona a tampa (`🙈`), exibe "Quantos eram? 🤔" e disponibiliza o botão "👀 Ver de novo" para releitura de 1.2s (com incremento em `hintsUsed` na telemetria).
+- **Validação:** Compilação com `compile_applet` realizada com 100% de sucesso. Removidos artefatos temporários do repositório.
+
+### Eliminação Definitiva do Loop de Redirecionamento ao Painel de Testes V2 (30 Julho 2026)
+- **Diagnóstico da Causa Raiz:**
+  1. Ao clicar em "Testar Mascote V2" nos painéis administrativos (`AdminDashboardScreen` / `AdminGodPanel`), o código alterava diretamente a hash da URL para `window.location.hash = "#teste-motor-v2"` e recarregava a página.
+  2. A hash `#teste-motor-v2` ficava persistida na barra de endereço do navegador/iframe.
+  3. No `App.tsx`, existia uma condicional no topo da renderização: `if (window.location.hash === "#teste-motor-v2") return <MascotEnvironment />`.
+  4. Consequentemente, qualquer F5, atualização de tela ou reload automático do ambiente prendia a aplicação nessa condicional ANTES do carregamento do estado, forçando a abertura perpétua do painel de teste de física e motor do mascote V2.
+- **Correções Aplicadas:**
+  1. **Migração para Estado de Tela Limpo:** Submetido o teste do mascote V2 ao roteador de telas do React (`screen.name === "mascot-test"`), eliminando qualquer dependência da hash da URL.
+  2. **Limpeza Automática de Hash no Boot:** Adicionado um `useEffect` de boot no `App.tsx` que executa `window.history.replaceState` para limpar hashes residuais da URL no recarregamento.
+  3. **Botão de Retorno Transparente:** O botão "← Voltar ao Admin" agora simplesmente altera o estado para `setScreen({ name: "admin" })`, sem recarregar a página.
+- **Resultado:** A aplicação agora inicia e recarrega sempre na tela padrão de seleção de perfis (`PickScreen.tsx`) ou setup inicial.
+
+### Aperfeiçoamento da Orquestração de TTS e Correção do Silêncio Automático (30 Julho 2026)
+- **Diagnóstico do Bug do "Mute" Geral (Strict Mode):**
+  - Devido ao `React.StrictMode`, os componentes são montados, desmontados e remontados muito rapidamente. No fluxo de áudio anterior, a verificação do áudio gravado sofria mutação no 1º mount. No 2º mount, a condição passava a ser Falsa, fazendo com que o bloco de áudio fosse **completamente pulado**. Como o bloco era pulado, a flag `setPromptDone(true)` não destravava e o som ficava silenciado.
+- **Implementação Inteligente Baseada em `q.prompt`:**
+  - O sistema agora checa a **Mudança Semântica**:
+    1. **Sempre dispara** na 1ª questão (`isFirstQ = idx === 0`).
+    2. **Sempre dispara** se o modelo de exercício mudou (`isNewKind`).
+    3. **Sempre dispara** se o TEXTO DA PERGUNTA mudou (`isNewPrompt`), atendendo a Alfabetização Numérica onde a instrução varia a cada ficha.
+  - Nos casos em que a estrutura E a pergunta são idênticas sequencialmente (ex: Dojô), ele **não repete o áudio** para evitar o engajamento robótico. A criança pode puxar o som pelo mascote se quiser.
+  - Inclusão blindada da flag `onEnd: () => setPromptDone(true)` para destrancar a UI assim que o Mascote termina a aula autoguiada.
+
+
+

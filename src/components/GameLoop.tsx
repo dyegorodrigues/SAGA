@@ -126,6 +126,7 @@ export function GameLoop({
   // Fluidez: guarda a transição pendente para a criança PULAR com um toque
   const advanceRef = useRef<null | (() => void)>(null);
   const lastSpokenPromptRef = useRef<string | null>(null);
+  const lastSpokenKindRef = useRef<string | null>(null);
 
   // Pula na hora: corta a voz e vai para a próxima (criança no comando do ritmo)
   
@@ -295,7 +296,20 @@ export function GameLoop({
       aulaEndRef.current = () => {
         // só fala o enunciado se ainda estamos na MESMA questão, sem resposta dada
         if (sound && qRef.current === q0 && !advanceRef.current) {
-          setTimeout(() => { speak(qSpeech(q0, true), q0.lang ? { lang: q0.lang } : {}); lastSpokenPromptRef.current = q0.kind + "|" + q0.prompt; }, 350);
+          setTimeout(() => {
+            let timer: any = setTimeout(() => setPromptDone(true), 2500);
+            speak(qSpeech(q0, true), {
+              ...(q0.lang ? { lang: q0.lang } : {}),
+              onEnd: () => {
+                if (timer) clearTimeout(timer);
+                setPromptDone(true);
+              }
+            });
+            lastSpokenPromptRef.current = q0.prompt;
+            lastSpokenKindRef.current = q0.kind;
+          }, 350);
+        } else {
+          setPromptDone(true);
         }
       };
       playAulinha(true);
@@ -316,15 +330,11 @@ export function GameLoop({
   const peekMs = (q.n ?? 0) <= 3 ? 2000 : (q.n ?? 0) <= 5 ? 1700 : 1400;
   useEffect(() => {
     if (q.kind !== "flash") return;
-    if (!promptDone) {
-      setFlashHidden(true);
-      return;
-    }
     setHintsUsed(0);
     setFlashHidden(false);
     const t = setTimeout(() => setFlashHidden(true), peekMs);
     return () => clearTimeout(t);
-  }, [q, promptDone]);
+  }, [q, idx, peekMs]);
 
   // "Ver de novo": re-mostra o grupo por um instante (gentil — a faixa é pequena
   // de propósito, então reolhar não vira contagem lenta).
@@ -360,14 +370,40 @@ export function GameLoop({
     // journey narra sozinho; na 1ª visita com aulinha automática, a AULA vem primeiro
     // e o enunciado é falado ao fim dela (ver efeito da aulinha)
     if (sound && !done && !status && q.kind !== "journey" && !autoAula) {
-      // "como fazer" só na 1ª questão da missão; depois vai direto ao enunciado
-      const speechId = q.kind + "|" + q.prompt;
-      if (lastSpokenPromptRef.current !== speechId) {
-        lastSpokenPromptRef.current = speechId;
-        speak(qSpeech(q, idx === 0), { ...(q.lang ? { lang: q.lang } : {}), onEnd: () => setPromptDone(true) });
+      const isFirstQ = idx === 0;
+      const isNewKind = lastSpokenKindRef.current !== q.kind;
+      const isNewPrompt = lastSpokenPromptRef.current !== q.prompt;
+
+      // Estratégia Inteligente de Áudio:
+      // Fala a pergunta em voz alta se for a 1ª questão da missão (isFirstQ)
+      // OU se mudou o tipo/formato de ficha (isNewKind)
+      // OU se a pergunta em si mudou (isNewPrompt)
+      if (isFirstQ || isNewKind || isNewPrompt) {
+        lastSpokenPromptRef.current = q.prompt;
+        lastSpokenKindRef.current = q.kind;
+
+        let timer: any = null;
+        timer = setTimeout(() => {
+          setPromptDone(true);
+        }, 2500);
+
+        speak(qSpeech(q, isFirstQ), {
+          ...(q.lang ? { lang: q.lang } : {}),
+          onEnd: () => {
+            if (timer) clearTimeout(timer);
+            setPromptDone(true);
+          }
+        });
+      } else {
+        // Para questões subsequentes do MESMO tipo E com a MESMA pergunta:
+        // Evita voz robótica repetitiva. A criança visualiza a questão diretamente e pode clicar no Mascote para ouvir se quiser.
+        lastSpokenKindRef.current = q.kind;
+        setPromptDone(true);
       }
+    } else if (!sound) {
+      setPromptDone(true);
     }
-  }, [q, done, autoAula]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [q, idx, sound, done, status, autoAula]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // journey: ao terminar a viagem, faz a pergunta de reconhecimento
   useEffect(() => {

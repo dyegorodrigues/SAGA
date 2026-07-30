@@ -257,27 +257,16 @@ export default function App() {
   });
   const [showAdmin, setShowAdmin] = useState(false);
 
-  // Verificacao de Rota Secreta Isolada (Mascote V2 Teste)
-  const isMascotV2Test = typeof window !== "undefined" && window.location.hash === "#teste-motor-v2";
-
-  if (isMascotV2Test) {
-    return (
-      <Shell>
-        <div className="pt-8">
-          <button 
-            onClick={() => {
-              window.location.hash = "";
-              window.location.reload();
-            }}
-            className="absolute top-4 left-4 bg-slate-800 text-white px-4 py-2 rounded-xl font-bold shadow z-50 hover:bg-slate-700"
-          >
-            ← Voltar para o App Normal
-          </button>
-          <MascotEnvironment />
-        </div>
-      </Shell>
-    );
-  }
+  // Reset URL hash on boot so page refreshes always load the normal App state
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.location.hash) {
+      try {
+        window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
 
   // Desafio Misto 👑: as 10 questões são montadas UMA vez ao entrar na missão
   // (o App re-renderiza a cada resposta; sem memo, a lista seria re-sorteada).
@@ -865,7 +854,23 @@ export default function App() {
                   setScreen({ name: "game", kid: devKidId, track: trackId, lvl });
                }
             }}
+            onTestMascotV2={() => setScreen({ name: "mascot-test" })}
           />
+        )}
+
+        {screen.name === "mascot-test" && (
+          <div className="min-h-screen bg-slate-900 text-white p-4 relative">
+            <button 
+              onClick={() => {
+                sfx.tick();
+                setScreen({ name: "admin" });
+              }}
+              className="mb-4 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl font-bold shadow cursor-pointer transition-colors z-50 relative"
+            >
+              ← Voltar ao Admin
+            </button>
+            <MascotEnvironment />
+          </div>
         )}
       </motion.div>
 
@@ -887,6 +892,10 @@ export default function App() {
                 state={state}
                 onUpdateState={(ns) => persist(ns)}
                 onClose={() => setShowAdmin(false)}
+                onTestMascotV2={() => {
+                  setShowAdmin(false);
+                  setScreen({ name: "mascot-test" });
+                }}
               />
             </div>
           </div>

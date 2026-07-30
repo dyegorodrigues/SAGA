@@ -164,16 +164,16 @@ export function GameLoopExerciseRenderer({
 
           {/* ----- SCENES ----- */}
           {q.kind === "grow" && q.n != null && (
-            <div className="flex justify-center my-4"><GrowthScene stage={q.n} size={180} /></div>
+            <div className="flex justify-center my-4"><GrowthScene stage={q.n as any} size={180} /></div>
           )}
           {q.kind === "weather" && q.big && (
             <div className="flex justify-center my-4"><WeatherScene type={q.big as any} size={180} /></div>
           )}
           {q.kind === "lifestage" && q.n != null && (
-            <div className="flex justify-center my-4"><PersonLifeScene stage={q.n} size={180} /></div>
+            <div className="flex justify-center my-4"><PersonLifeScene stage={q.n as any} size={180} /></div>
           )}
           {q.kind === "animal" && q.n != null && (
-            <div className="flex justify-center my-4"><AnimalLifeScene stage={q.n} size={180} /></div>
+            <div className="flex justify-center my-4"><AnimalLifeScene stage={q.n as any} size={180} /></div>
           )}
           {q.kind === "lugar" && q.big && (
             <div className="flex justify-center my-4"><NestScene kind={q.big as any} size={180} /></div>
@@ -185,10 +185,10 @@ export function GameLoopExerciseRenderer({
             <div className="flex justify-center my-4"><EmotionScene type={q.big as any} size={180} /></div>
           )}
           {q.kind === "place" && q.big && (
-            <div className="flex justify-center my-4"><PlaceScene type={q.big as any} size={180} /></div>
+            <div className="flex justify-center my-4"><PlaceScene slot={q.big as any} size={180} /></div>
           )}
           {q.kind === "journey" && (
-            <div className="flex justify-center my-4"><JourneyScene size={180} /></div>
+            <div className="flex justify-center my-4"><JourneyScene /></div>
           )}
 
           {q.kind === "clock" && q.hour != null && q.minute != null && (
@@ -302,8 +302,8 @@ export function GameLoopExerciseRenderer({
                 </div>
               ) : (
                 <>
-                  <div style={{ fontSize: 64, lineHeight: 1 }}>{!promptDone ? '👀' : '🙈'}</div>
-                  <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.sub }}>{!promptDone ? 'Prepare-se...' : 'Quantos eram? 🤔'}</div>
+                  <div style={{ fontSize: 64, lineHeight: 1 }}>{!promptDone ? '🙈' : '🙈'}</div>
+                  <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.sub }}>{!promptDone ? 'Olhos fechados... 👀' : 'Quantos eram? 🤔'}</div>
                   {promptDone && !status && (
                     <button
                       onClick={peekAgain}
