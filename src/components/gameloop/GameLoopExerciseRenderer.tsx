@@ -188,7 +188,9 @@ export function GameLoopExerciseRenderer({
             <div className="flex justify-center my-4"><PlaceScene slot={q.big as any} size={180} /></div>
           )}
           {q.kind === "journey" && (
-            <div className="flex justify-center my-4"><JourneyScene /></div>
+            <div className="flex justify-center my-4">
+              <JourneyScene journey={q.journey || []} sound={sound} onDone={() => {}} />
+            </div>
           )}
 
           {q.kind === "clock" && q.hour != null && q.minute != null && (

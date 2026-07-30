@@ -122,49 +122,52 @@ export function useMascotMotor(config?: MascotMotorConfig) {
     const autonomousMotor = setTimeout(() => {
       const timeSinceLastInteraction = Date.now() - lastInteraction.current;
 
-      if (hunger < 30) {
+      // Necessidades vitais (se estiver muito baixo, força comportamento)
+      if (hunger < 30 && Math.random() < 0.4) {
         setCurrentState('eating');
         setTimeout(() => setCurrentState('idle'), 3000);
         return;
       }
       
-      if (energy < 20) {
+      if (energy < 20 && Math.random() < 0.4) {
         setCurrentState('sleeping');
         setTimeout(() => setCurrentState('idle'), 5000);
         return;
       }
       
-      if (timeSinceLastInteraction > 20000) {
-        // Sem clique 20s -> walk aleatório de um lado pro outro
+      // Micro-ações frequentes para dar vida (a cada 3-5s)
+      const randomChance = Math.random();
+      
+      if (randomChance < 0.25) {
+        // 25% chance de Andar de um lado para o outro
         const dir = Math.random() > 0.5 ? 'left' : 'right';
         setDirection(dir);
         setCurrentState('walking');
         setPositionX(prev => dir === 'left' ? Math.max(-35, prev - 15) : Math.min(35, prev + 15));
         setTimeout(() => setCurrentState('idle'), 1200);
-        resetInteraction(); // reset so he doesn't just walk constantly
-        return;
+      } else if (randomChance < 0.40) {
+        // 15% chance de Deitar (Lying down)
+        setCurrentState('looking'); // maps to 'idle_lie'
+        setTimeout(() => setCurrentState('idle'), 3000);
+      } else if (randomChance < 0.55) {
+        // 15% chance de Piscar / Acordar
+        setCurrentState('blinking');
+        setTimeout(() => setCurrentState('idle'), 1500);
+      } else if (randomChance < 0.65) {
+        // 10% chance de Sentar
+        setCurrentState('sitting');
+        setTimeout(() => setCurrentState('idle'), 2500);
+      } else if (randomChance < 0.70) {
+        // 5% chance de Espirrar / Tonto
+        setCurrentState('sneezing');
+        setTimeout(() => setCurrentState('idle'), 1500);
       }
 
-      // Micro-ações a cada 5s no idle: 10% chance de piscar, 5% de olhar pro lado, 2% de espirrar. 
-      // Mapeando para as poses disponíveis:
-      const randomChance = Math.random();
-      if (randomChance < 0.1) {
-        // piscar (poderíamos usar idle_wake ou semelhante)
-        setCurrentState('blinking');
-        setTimeout(() => setCurrentState('idle'), 1000);
-      } else if (randomChance < 0.15) {
-        // olhar pro lado
-        setCurrentState('looking');
-        setTimeout(() => setCurrentState('idle'), 1000);
-      } else if (randomChance < 0.17) {
-        // espirrar
-        setCurrentState('sneezing');
-        setTimeout(() => setCurrentState('idle'), 1000);
-      }
-    }, 5000);
+      // 30% chance de não fazer nada e só continuar idle
+    }, 3000 + Math.random() * 2500); // Trigger every 3 to 5.5 seconds
 
     return () => clearTimeout(autonomousMotor);
-  }, [currentState, energy, hunger]);
+  }, [currentState, energy, hunger, config?.disableAutonomous]);
 
   return {
     currentState,
