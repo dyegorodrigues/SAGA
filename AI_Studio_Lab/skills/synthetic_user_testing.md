@@ -4,7 +4,8 @@
 Garantir que **nenhuma competência, currículo ou mecânica de adaptação do SAGA seja lançada sem prova matemática de que funciona**, bem como **auditar e revisar todos os sistemas e currículos já existentes**. 
 O Motor de Adaptação de um ITS (Intelligent Tutoring System) é complexo. Para evitar "loops infinitos", becos sem saída ou frustração prolongada, utilizamos **Agent-Based Modeling (ABM)** combinado com **Simulação de Monte Carlo**.
 
-## 🧠 A Base Científica (O que você precisa saber)
+## 🧠 A Base Científica (Ver BIBLIA_DO_SAGA.md §12.8)
+ (O que você precisa saber)
 1. **Agent-Based Modeling (ABM):** Não testamos componentes isolados. Instanciamos "Agentes" (Synthetic Users) com perfis cognitivos específicos (ex: precisão de 80%, mas com uma lacuna severa em X). 
 2. **Estocasticidade:** Crianças erram por acaso. O simulador não é determinístico; ele usa probabilidade (Roleta) para simular erros de atenção.
 3. **Orquestração Completa:** A simulação roda a máquina inteira: Motor de Geração, Radar de Lacunas, Oficina (Resgate) e Composer de Sessão em paralelo.

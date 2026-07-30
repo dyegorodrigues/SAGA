@@ -294,7 +294,7 @@ export default function App() {
       const kp = (state.progress[kid.id] || {})[tid];
       return kp ? { ...kp } : { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
     };
-    return buildAulaTrack(base, progOf).track;
+    return buildAulaTrack(base, progOf, kid.grade).track;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen.name, screen.kid, screen.track]);
 
@@ -706,7 +706,6 @@ export default function App() {
             albumCount={albumOf(screen.kid!).length}
             onBack={() => setScreen({ name: "pick" })}
             onAlbum={() => setScreen({ name: "album", kid: screen.kid })}
-            onTrack={(t) => setScreen({ name: "game", kid: screen.kid, track: t.id })}
             onTrackLvl={(t, lvl) => setScreen({ name: "game", kid: screen.kid, track: t.id, lvl })}
             onMixed={() => {
             setScreen({ name: "game", kid: screen.kid, track: "mista" });

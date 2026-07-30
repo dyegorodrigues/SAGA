@@ -35,15 +35,13 @@ Antes de cada assunto, três coisas são sempre definidas. É o gabarito que tod
 
 **1. A PRIMEIRA EXPLICAÇÃO (first-contact).** Como o conceito aparece pela *primeiríssima* vez, quando a criança ainda não sabe nada. Sempre: uma história concreta + uma ação física + o tutor nomeando o que ela acabou de ver (nunca o símbolo antes da vivência). Formalizada aqui para cada assunto no bloco "▶️ Primeira vez".
 
-**2. A RESPOSTA AO ERRO — DOIS NÍVEIS QUE NÃO SE MISTURAM.** Este é o ponto mais delicado do design, e a regra-mãe é: **o fluxo é sagrado.** Errar faz parte de aprender; a criança precisa continuar SE MOVENDO, não parar para uma aula a cada tropeço. Por isso a resposta ao erro trabalha em duas camadas separadas — uma leve e imediata (dentro da questão), outra profunda e adiada (disparada por PADRÃO, no momento certo).
+**2. A RESPOSTA AO ERRO — DOIS NÍVEIS QUE NÃO SE MISTURAM.** Este é o ponto mais delicado do design, e a regra-mãe é: **o fluxo é sagrado.** Errar faz parte de aprender; a criança precisa continuar SE MOVENDO, não parar para uma aula a cada tropeço. Por isso a resposta ao erro trabalha em duas camadas separadas — uma leve e imediata (dentro da própria questão), outra profunda e adiada (disparada por PADRÃO, no momento certo).
 
-> **A regra de uma frase:** *o erro num exercício recebe um toque leve e o fluxo continua; o PADRÃO de erros recebe trabalho focado, na hora certa.*
-
-**CAMADA 1 — Resposta imediata (leve, preserva o fluxo).** Dentro da própria questão, no máximo dois toques antes de seguir:
+**CAMADA 1 — Resposta imediata (leve, preserva o fluxo).**
 - **1ª tentativa errada → deixa a criança se auto-corrigir.** Nada de aula. Feedback gentil que convida a tentar de novo ("hmm, olha de novo!") + esconder 1 opção absurda. A maioria dos erros é deslize (pressa, dedo torto) e a própria criança conserta sozinha — interromper isso com explicação é chato e ensina dependência.
 - **2ª tentativa errada → UMA dica estratégica (a "E1").** Agora vale um empurrão: uma pergunta curta que aponta a estratégia do nível (*"quantos espaços vazios sobraram na moldura?"*). A criança continua no comando, ainda resolvendo.
 - **Ainda errou → mostra a resposta com uma frase de porquê e SEGUE.** Sem cerimônia, sem demonstração longa no meio do fluxo. A questão é "estacionada" (marcada como frágil no fato/competência) e a criança AVANÇA na hora. **Nunca trava.**
-- *Deslize vs. dificuldade:* o motor separa os dois pelo tempo de resposta e pelo tipo de distrator — erro rápido num distrator qualquer = provável deslize → toque mínimo. Erro lento OU num distrator com tag de misconception = dificuldade real → a dica do passo 2 já é a específica daquela confusão.
+- *Deslize vs. dificuldade:* o motor separa os dois pelo tempo de resposta e pelo tipo de distrator — erro rápido num distrator qualquer = provável deslize (toque mais leve ainda); erro lento ou num distrator de misconception = dificuldade real (a dica da 2ª tentativa já é a certeira daquela confusão).
 
 **CAMADA 2 — Remediação profunda (por padrão, no momento certo).** É AQUI que mora o ensino pesado — a demonstração narrada, a Mão Fantasma (fazer junto) e o microtutorial. Mas ele **NÃO dispara na questão isolada**; dispara quando o Radar de Lacunas (Bíblia §11.4) detecta um PADRÃO — a mesma tag de misconception 2× em poucas questões, ou um fato cronicamente fraco. E entrega a remediação no momento que respeita o fluxo: numa pausa natural, no fim da sessão, ou como Missão de Resgate na sessão seguinte — nunca engasgando a criança no meio de uma questão. É exatamente o "depois de alguns exercícios, verificar os erros e aí trabalhar pontualmente".
 - **Os três conteúdos de remediação** (o que cada nível CONTÉM, disparados pela Camada 2, não a cada erro): **Dica** aponta a estratégia · **Demonstração** = worked example, o tutor resolve um gêmeo narrando, a criança assiste · **Fazer Junto** = Mão Fantasma, a criança executa com o tutor sustentando. Quando um assunto abaixo diz "E1/E2/E3", está descrevendo o CONTEÚDO de cada nível — o QUANDO é governado por este modelo de duas camadas, sempre.
@@ -57,7 +55,7 @@ Antes de cada assunto, três coisas são sempre definidas. É o gabarito que tod
 
 # 🧒 A CRIANÇA REAL — as limitações que TODO gerador e TODA tela respeitam
 
-Antes de qualquer assunto: o SAGA não ensina para uma "criança ideal". Ele ensina para uma criança real, com um cérebro em construção. Estas são as restrictions de hardware que todos os geradores, tutores e telas obedecem — ignorar qualquer uma delas produz frustração que parece "falta de capacidade" mas é só design errado.
+Antes de qualquer assunto: o SAGA não ensina para uma "criança ideal". Ele ensina para uma criança real, com um cérebro em construção. Estas são as restrições de hardware que todos os geradores, tutores e telas obedecem — ignorar qualquer uma delas produz frustração que parece "falta de capacidade" mas é só design errado.
 
 **Memória de trabalho.** Aos 4-5 anos a criança segura ~2-3 informações ao mesmo tempo; aos 6-7, ~3-4; aos 8+, ~4-5. Consequência dura: **nenhuma instrução com mais de 2 passos para F0-F1**. "Pegue as maçãs vermelhas E conte E arraste pro cesto" = 3 comandos = travamento garantido. Uma ação por vez, o tutor guia a próxima.
 
@@ -168,7 +166,7 @@ Dois grupos de patinhos entram nadando (2 e 1). Tutor: *"Os patinhos querem nada
 ### Nível 2 — o poder do 10 (N1.11, N3.06)
 - **A moldura de 10** é a lente principal: o 8 na grade 2×5 mostra fisicamente **2 buracos vazios**. A criança não calcula "quanto falta pra 10" — ela VÊ.
 - **Dobros como estacas (N3.06):** 4+4, 5+5... memorizados por simetria visual (espelho). Quase-dobros derivam: 5+6 = (5+5)+1. 🧒 *Erro:* derivar pro lado errado (5+6 = 10−1=9). E1: *"6 é MAIS que 5 ou MENOS?"*
-- Params: molduras sempre preenchidas da esquerda pra direita, linha de cima primeiro (a structure canônica é o que vira imagem mental).
+- Params: molduras sempre preenchidas da esquerda pra direita, linha de cima primeiro (a estrutura canônica é o que vira imagem mental).
 
 ### Nível 3 — a Ponte do 10 (N3.07) — o segredo asiático
 Como somar 8+5 de cabeça: **(1)** olha pro 8: *"de quanto você precisa pra virar 10?"* → 2. **(2)** espatifa o 5 em 2+3 (efeito de divisão de célula na tela). **(3)** o 2 voa pro 8 → fecha a barra dourada de 10. **(4)** sobra 10+3 = 13.
@@ -355,7 +353,7 @@ Muita gente adulta não sabe que a divisão resolve **dois problemas diferentes*
 
 ### Micro (b) — Medida / Fazer Pacotes: "quantos grupos cabem?"
 - **A pergunta interna:** sei o tamanho de cada grupo; quero saber *quantos grupos* dá pra fazer.
-- **História + ação:** 12 ovos, cada caixa cabe 4. A criança **laça** (lasso) ou circunda ovos de 4 em 4, e cada laço vira uma caixa fechada. No fim, conta as caixas: 3.
+- **História + ação:** 12 ovos, cada caixa cabe 4. A criança **laça** (lasso) ou circunda ovos de 4 em 4, e cada laço vira uma caixa fechada. No fim, count as caixas: 3.
 - **Fala do tutor:** *"Agora é o contrário: você sabe QUANTO cabe em cada caixa. Quer descobrir QUANTAS caixas vai precisar."*
 - **Detalhe de interação que importa:** partição usa arrastar-um-a-um; medida usa laçar-grupos. A mecânica DIFERENTE ajuda o cérebro a sentir que são duas perguntas diferentes com a mesma conta.
 
@@ -572,45 +570,6 @@ Até aqui, "menor que zero" não existia — e a subtração "sempre diminui". O
 
 ## Microtutorial e regras
 **"O Termômetro da Montanha"** (N7.01) · **"O Boneco da Reta"** (N7.02 — I do: tutor resolve −2+6 andando; We do: 3−7; You do: −4+5). Regras: reta SEMPRE visível até nível 4 da competência; termômetro vertical e reta horizontal são o MESMO objeto (girado — e o app mostra o giro); "menos com menos" e afins banidos do vocabulário do tutor — fala-se o movimento.
-
----
-
-# 🌡️ INTEIROS — O MUNDO ABAIXO DO ZERO → N7.01, N7.02
-*Didática construída nesta versão. Fecha a última strand numérica (F4): a reta que a criança conhece desde N1.12 finalmente abre o lado esquerdo.*
-
-## Por que trava
-Os negativos chegam na escola como regras de sinal decoradas — e a regra da multiplicação VAZA para a adição (−2 + −3 = +5?). Sintoma-diagnóstico: *"−5 > −2, porque 5 é maior que 2"*. Causa: a reta numérica mental da criança termina no zero; ninguém abriu o lado de baixo com contextos que ela já vive.
-
-## A escada
-```
- Nível 2: Operar — movimento na reta, fichas, subtrair dívida → N7.02
- Nível 1: A reta completa — comparar, oposto, zero no centro  → N7.01b-d
- Nível 0: Contextos vividos — elevador, termômetro, saldo     → N7.01a
-```
-
-## ▶️ Primeira vez
-O elevador do prédio: térreo (0), andares 1, 2, 3... e a garagem embaixo. Tutor: *"O elevador DESCEU pra garagem. Que andar é esse? É o andar MENOS UM — um abaixo do térreo."* Depois o termômetro num dia de inverno: *"três graus ABAIXO de zero"*. O sinal − nasce como **endereço** (o lado de baixo/esquerda do zero), não como operação. Só então a velha reta de N1.12 volta — espelhada, com o zero virando o CENTRO do mundo.
-
-## Nível a nível
-
-### Nível 0-1 — morar na reta completa (N7.01)
-- Comparar: 🧒 **o erro-chefão dos inteiros:** −5 > −2 "porque 5 > 2" (a lógica dos naturais vazando — igualzinho ao 1/8 > 1/4 das frações). A cura nunca é a regra falada: é o termômetro (−5 é MAIS FRIO) e o elevador (−5 é MAIS FUNDO). Regra deduzida: **mais à esquerda = menor.** Distrator canônico: a comparação pelos módulos.
-- Oposto e distância ao zero (módulo informal): −3 e 3 são vizinhos do zero à MESMA distância, em lados opostos — o espelho da reta.
-
-### Nível 2 — operar com corpo (N7.02)
-- **Somar/subtrair como movimento:** ganhar/perder, subir/descer — saltos bidirecionais na reta. −3 + 5: começa no −3, anda 5 pra direita, chega no 2.
-- **O modelo de fichas:** ficha +1 e ficha −1 se ANULAM em par (poof!). −3 + 5 = três pares somem, sobram 2 positivas. 🧒 *Erros mapeados:* −3+5 tratado como −(3+5); "menos com menos dá menos" na SOMA (−2 + −3 = +5?) — as fichas desmontam: juntar dívida com dívida dá dívida maior.
-- **Subtrair negativo:** *"tirar uma dívida é GANHAR"* — o mascote deve 3 moedas; a dívida é perdoada (sai da tela) → ele ficou 3 moedas mais rico. A cena antes do símbolo, como sempre.
-- **Regras de sinal da × e ÷ por padrão observado, nunca por decreto:** a tabela viva 3×(−2)=−6, 2×(−2)=−4, 1×(−2)=−2, 0×(−2)=0, (−1)×(−2)=... — a sequência REVELA o +2. 🧒 *O vazamento clássico:* decorar a regra da × e aplicá-la na adição — atacado mostrando lado a lado a conta de + (fichas) e a de × (padrão): mundos diferentes, ferramentas diferentes.
-
-## Microtutoriais
-**"O Elevador"** (N7.01) · **"As Fichas que Somem"** (N7.02 — I do: tutor resolve −4+6 anulando pares; We do: −3+5; You do: −2+6) · **"A Dívida Perdoada"** (N7.02c).
-
-## Regras de implementação
-1. O − de endereço (negativo) e o − de operação (subtração) nascem separados — a fala do tutor SEMPRE distingue ("menos três" vs "tirar três").
-2. Termômetro/elevador disponíveis como apoio em toda comparação até nível 4 da competência.
-3. Regras de sinal só por padrão observado na tabela viva.
-4. Fichas com anulação animada em pares — o par que some é a alma do modelo.
 
 ---
 
@@ -887,3 +846,173 @@ Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada C
 *Changelog: v2.0 (jul/2026) — detalhamento completo de todos os assuntos no padrão da divisão; novas didáticas: Fundação N1/N2, Decimais/Porcentagem/Proporção, Inteiros (N7), Dados/Probabilidade, Método de Barras; seção A Criança Real (limites de desenvolvimento); mapa de confluências.*
 *v2.1 (jul/2026) — Contrato de Ensino: modelo de erro reformulado para duas camadas (resposta imediata leve que preserva o fluxo + remediação profunda por padrão, no momento certo). Regra-mãe "o fluxo é sagrado". Os E1/E2/E3 por assunto passam a descrever o CONTEÚDO de cada nível; o QUANDO é governado centralmente. Andaime de ensino distinguido de resposta a erro.*
 *v2.2 (jul/2026) — Fundação N1.02: exercício-âncora Canhão de Balões (contar = tiro + numeral + som, semente da correspondência 1-a-1 e da cardinalidade) e a ordem correta da contagem (o 1 antes do 0; zero nasce concreto como "vazio", depois da cardinalidade).*
+
+---
+
+# 🆕 AS 11 COMPETÊNCIAS NOVAS — DIDÁTICA
+
+*Acrescentadas na v1.1 do Grafo. Cada uma segue o mesmo formato: por que trava, a escada, a primeira vez, os erros típicos.*
+
+---
+
+## 🔢 PARES E ÍMPARES → N2.06
+
+**Por que trava:** a criança decora "termina em 0,2,4,6,8" sem entender o que significa. Aí não consegue dizer se 47 pares de meias dá número par.
+
+**A definição que funciona:** par é o que **dá para arrumar em duplas sem sobrar ninguém**. Ímpar é quando sobra um sozinho.
+
+**A escada:**
+- **Nível 0-1 (concreto):** objetos soltos, a criança tenta formar pares arrastando. Sobrou um? Ímpar.
+- **Nível 2 (pictórico):** duas fileiras alinhadas. Se as fileiras ficam iguais, é par.
+- **Nível 3-4 (abstrato):** só o número, mas o tutor lembra "tente formar duplas na cabeça".
+- **Nível 5:** reconhecer par/ímpar em números grandes pelo último algarismo — **agora sim** a regra, porque ela já entende de onde veio.
+
+**▶️ Primeira vez:** *"Vamos ver se todo mundo tem um par pra dançar."* Sete bichinhos, a criança forma duplas, sobra um. *"Esse ficou sem par! Sete é ímpar."*
+
+**Erros típicos:** achar que número grande é par e pequeno é ímpar · achar que zero é ímpar (zero é par: nenhum sobra) · confundir com "certo/errado"
+
+---
+
+## 🌳 FATORES → N2.07
+
+**Por que trava:** fator é ensinado como lista para decorar. A criança não vê **de onde vem**.
+
+**A definição que funciona:** os fatores de um número são **as formas de arrumá-lo em retângulo**. 12 pode virar 1×12, 2×6, 3×4 — cada retângulo entrega um par de fatores.
+
+**A escada:**
+- **Nível 0-1:** 12 quadradinhos soltos, a criança tenta montar retângulos. Cada um que dá certo vira um par.
+- **Nível 2:** a criança lista os retângulos que achou.
+- **Nível 3-4:** dado o número, listar os fatores sem montar.
+- **Nível 5:** achar o maior fator comum de dois números.
+
+**▶️ Primeira vez:** *"Você tem 12 azulejos. De quantas formas dá pra fazer um chão retangular?"* Ela descobre 3 formas — e cada uma é um par de fatores.
+
+**Erros típicos:** esquecer o 1 e o próprio número · parar antes de esgotar · confundir fator com múltiplo
+
+---
+
+## 🦘 MÚLTIPLOS → N2.08
+
+**Por que trava:** múltiplo e fator são confundidos porque a relação é a mesma vista ao contrário.
+
+**A definição que funciona:** múltiplos são **onde o pé cai quando você anda de N em N**. Os múltiplos de 3 são as casas em que você pisa pulando de 3 em 3.
+
+**A distinção que resolve a confusão:** *fator é o que cabe dentro; múltiplo é onde você chega*. 3 é fator de 12 (cabe 4 vezes). 12 é múltiplo de 3 (chega-se lá pulando).
+
+**A escada:** saltos na reta com os pontos marcados → quadro de 100 pintando os múltiplos (o padrão aparece) → listar sem apoio → menor múltiplo comum.
+
+**Erros típicos:** inverter a relação · achar que múltiplo é sempre maior (o próprio número é múltiplo dele mesmo)
+
+---
+
+## 🍕 FRAÇÕES EQUIVALENTES → N5.07
+
+**Por que trava:** a criança acha que 2/4 é maior que 1/2 porque tem números maiores.
+
+**A imagem que resolve:** duas barras **do mesmo comprimento**, uma cortada em 2 e outra em 4. Pinta 1 na primeira e 2 na segunda: **ocupam exatamente o mesmo espaço.**
+
+**A regra que emerge sozinha:** cortar cada pedaço ao meio dobra os dois números. Não se ensina a regra — a criança a descobre cortando.
+
+**A escada:** barras sobrepostas → cortar e ver dobrar → completar 1/2 = ☐/4 → simplificar.
+
+**▶️ Primeira vez:** *"Olha essas duas barras de chocolate iguais. Eu corto a minha em 2 e como 1 pedaço. Você corta a sua em 4 e come 2. Quem comeu mais?"* Sobrepõe: igual.
+
+**Erros típicos:** achar que mais pedaços = mais quantidade · multiplicar só o numerador
+
+---
+
+## ⚖️ COMPARAR FRAÇÕES → N5.08
+
+**Por que trava:** o erro clássico é 1/5 > 1/3 "porque 5 é maior que 3".
+
+**A imagem que resolve:** dividir a **mesma** barra em 3 e em 5. Quanto mais cortes, **menor** cada pedaço. É contraintuitivo e precisa ser visto.
+
+**A escada:**
+- **Nível 1:** mesmo denominador (3/5 vs 2/5) — só comparar numerador
+- **Nível 2:** mesmo numerador (1/3 vs 1/5) — **o degrau que inverte a intuição**
+- **Nível 3:** usar 1/2 como referência ("é mais ou menos que meio?")
+- **Nível 4-5:** denominadores diferentes, com equivalência
+
+**Erros típicos:** comparar só os denominadores · comparar só os numeradores · somar numerador com denominador
+
+---
+
+## ⛽ SOMAR E SUBTRAIR FRAÇÕES → N5.06
+
+**Por que trava:** a criança soma os denominadores (1/4 + 2/4 = 3/8).
+
+**A imagem que resolve:** um tanque dividido em 4 partes. Encher 1 parte, depois mais 2 — o tanque tem **3 partes cheias de 4**. **O tamanho da parte não muda ao juntar.**
+
+**A frase que ancora:** *"o de baixo diz o tamanho do pedaço. Juntar pedaços não muda o tamanho deles."*
+
+**Regra dura:** só mesmo denominador nesta competência. Denominador diferente exige equivalência (N5.07) antes.
+
+**Erros típicos:** somar denominadores · esquecer de simplificar · somar numerador com denominador
+
+---
+
+## 🍰 RAZÃO E PROPORÇÃO → N7.03
+
+**Por que trava:** a criança soma quando deveria multiplicar. "A receita usa 2 de farinha e 3 de leite. Se eu usar 4 de farinha, quanto de leite?" — ela responde 5 (somou 2), não 6.
+
+**A imagem que resolve:** barras lado a lado que **crescem juntas**. Dobrou uma, dobra a outra — visualmente é impossível somar.
+
+**A escada:** dobrar a receita → triplicar → escala qualquer → razão como fração.
+
+**▶️ Primeira vez:** *"Essa poção usa 2 gotas azuis pra cada 3 vermelhas. Se eu quiser fazer o dobro?"* Ela vê as duas barras dobrarem juntas.
+
+**Erros típicos:** somar em vez de multiplicar · escalar só um lado
+
+---
+
+## 💯 PORCENTAGEM → N7.04
+
+**Por que trava:** porcentagem é tratada como número comum. "50% de 20" vira 50-20 ou 50+20.
+
+**A imagem que resolve:** o **quadrado de 100** — o mesmo que a criança usou para centena e para decimais. Porcentagem é **quantos quadradinhos de 100 estão pintados**.
+
+**A tríade que se ensina junta:** 25% = 25/100 = 0,25 = 1/4. **As quatro representações no mesmo desenho.** É o que impede a criança de tratá-las como assuntos diferentes.
+
+**A escada:** pintar N de 100 → as âncoras (50%, 25%, 10%) → porcentagem de uma quantidade → desconto e aumento.
+
+**Erros típicos:** tratar % como inteiro · achar que 100% é sempre o número 100 · confundir "50% de" com "50 a menos"
+
+---
+
+## 📏 CONVERSÃO DE UNIDADES → GM.10
+
+**Por que trava:** decorar "multiplica por 100" sem saber quando multiplicar e quando dividir.
+
+**A imagem que resolve:** uma régua com **cm e m sobrepostos na mesma linha**. A criança vê 100 cm ocuparem exatamente o mesmo espaço que 1 m. **A quantidade não mudou — mudou o nome.**
+
+**A pergunta que orienta:** *"a unidade nova é maior ou menor? Se é menor, vou precisar de mais delas."* Isso decide multiplicar ou dividir sem decoreba.
+
+**Erros típicos:** inverter a operação · confundir as escalas (misturar peso e comprimento)
+
+---
+
+## 📦 VOLUME → GM.11
+
+**Por que trava:** a criança soma as três dimensões em vez de multiplicar.
+
+**A imagem que resolve:** encher a caixa de cubinhos **camada por camada**. Ela conta a primeira camada (isso é área), vê quantas camadas cabem, e descobre sozinha que basta multiplicar.
+
+**A escada:** contar cubinhos um por um → contar uma camada e multiplicar → a fórmula → volume com uma dimensão faltando.
+
+**Erros típicos:** somar as dimensões · confundir com área · esquecer a unidade cúbica
+
+---
+
+## 🎲 PROBABILIDADE → PE.05
+
+**Por que trava:** "deu cara 5 vezes, agora vai dar coroa" — a falácia do apostador. E ela aparece cedo.
+
+**A escada, com a linguagem antes do número:**
+- **Nível 0-1:** certo / possível / impossível ("vai chover pedra?")
+- **Nível 2:** mais provável / menos provável, com sacolas de bolinhas
+- **Nível 3:** chance como fração (3 azuis de 5 = 3/5)
+- **Nível 4-5:** frequência — girar a roleta 100 vezes e ver aproximar da previsão
+
+**A experiência que quebra a falácia:** girar a roleta muitas vezes e ver que **cada giro não lembra do anterior**. Sem essa experiência, a intuição errada persiste na vida adulta.
+
+**Erros típicos:** achar que resultado passado influencia · confundir "possível" com "provável" · achar que tudo é 50/50 (ou acontece ou não)

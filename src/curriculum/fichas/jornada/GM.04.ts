@@ -40,7 +40,8 @@ export const GM_04: FichaCompetencia = {
         interativo: true,
         minutos_step: 15,
         audio_prompt: "Ajuste o relógio para avançar 15 minutos." 
-      }
+      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 }
     }
   ],
   erros_tipicos: [

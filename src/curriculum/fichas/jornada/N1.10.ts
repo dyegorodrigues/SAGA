@@ -19,8 +19,8 @@ export const N1_10: FichaCompetencia = {
     1: { primitiva: "bond", andaime: "mao_fantasma" },
     2: { primitiva: "bond", andaime: "alto" },
     3: { primitiva: "bond", andaime: "medio" },
-    4: { primitiva: "plain", andaime: "minimo" },
-    5: { primitiva: "plain", rt_alvo: 4000 }
+    4: { primitiva: "bond", andaime: "minimo" },
+    5: { primitiva: "bond", rt_alvo: 4000 }
   },
 
   micros: [
@@ -45,7 +45,8 @@ export const N1_10: FichaCompetencia = {
         interactive: "part",
         audio_prompt: "Nós temos o total. Que parte está faltando?", 
         tutorial: [{fala: "Qual número junta com essa parte para dar o total lá de cima?"}] 
-      }
+      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 }
     }
   ],
   erros_tipicos: [

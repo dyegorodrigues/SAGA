@@ -22,7 +22,6 @@ interface KidHomeProps {
   coins: number;
   streak: number;
   albumCount: number;
-  onTrack: (t: Track) => void;
   /** iniciar a trilha num nível escolhido a dedo (seletor 🎯) */
   onTrackLvl: (t: Track, lvl: number) => void;
   onMixed: () => void;
@@ -45,7 +44,6 @@ export function KidHomeScreen({
   coins,
   streak,
   albumCount,
-  onTrack,
   onTrackLvl,
   onMixed,
   onDojo,
@@ -134,7 +132,7 @@ export function KidHomeScreen({
         key={t.id}
         onClick={() => {
           sfx.tick();
-          onTrack(t);
+          setPickerTrack(t);
         }}
         className="relative select-none transition-all cursor-pointer active:translate-y-1 text-center flex flex-col items-center justify-between"
         style={{
@@ -230,17 +228,17 @@ export function KidHomeScreen({
         {activeShellTab === "sensei" && (
           <SenseiTab 
             kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec} 
-            onMatricula={onMatricula} onAula={onAula} onTrack={onTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)} 
+            onMatricula={onMatricula} onAula={onAula} onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)} 
           />
         )}
         {activeShellTab === "jornada" && (
-          <JourneyTab kid={kid} prog={prog} onTrack={onTrack} />
+          <JourneyTab kid={kid} prog={prog} onTrack={setPickerTrack} />
         )}
         {activeShellTab === "dojo" && (
-          <DojoTab prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} onMixed={onMixed} renderTrackCard={renderTrackCard} onTrack={onTrack} onOpenPicker={setPickerTrack} />
+          <DojoTab prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} onMixed={onMixed} renderTrackCard={renderTrackCard} onTrack={setPickerTrack} onOpenPicker={setPickerTrack} />
         )}
         {activeShellTab === "oficina" && (
-          <OficinaTab aulaPlan={aulaPlan} onTrack={onTrack} />
+          <OficinaTab aulaPlan={aulaPlan} onTrack={setPickerTrack} />
         )}
         {activeShellTab === "perfil" && (
           <PerfilTab 
@@ -280,7 +278,6 @@ export function KidHomeScreen({
           prog={prog}
           onClose={() => setPickerTrack(null)}
           onTrackLvl={onTrackLvl}
-          onTrack={onTrack}
         />
       )}
 

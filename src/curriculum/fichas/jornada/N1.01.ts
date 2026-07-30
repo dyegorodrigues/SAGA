@@ -44,7 +44,8 @@ export const N1_01: FichaCompetencia = {
         audio_prompt: "Entregue uma comidinha para cada. Será que vai sobrar?", 
         tutorial: [{ fala: "Lembre-se de colocar só UMA comidinha em cada bichinho!" }],
         tem_sobra: true 
-      }
+      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 }
     }
   ],
   erros_tipicos: [

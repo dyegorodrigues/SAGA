@@ -21,8 +21,12 @@ export class Composer {
     let answer: any = null;
     let options: any[] | undefined = undefined;
 
+    let big: string | undefined = undefined;
+
+    const baseKind = micro.kinds[0];
+
     // A simple factory that delegates to specific kind builders based on params
-    switch (kind) {
+    switch (baseKind) {
       case "emojirow": {
         const min = params.n_min || 1;
         const max = params.n_max || 5;
@@ -71,6 +75,34 @@ export class Composer {
         };
         evaluate = (ans) => ans === next;
         answer = next;
+        big = String(current);
+        options = [
+          { label: String(answer), value: answer },
+          { label: String(answer + 1), value: answer + 1 },
+          { label: String(answer - 1 >= start ? answer - 1 : answer + 2), value: answer - 1 >= start ? answer - 1 : answer + 2 },
+        ].sort(() => Math.random() - 0.5);
+        break;
+      }
+      
+      case "tenframe": {
+        const min = params.n_min || 1;
+        const max = params.n_max || 10;
+        const target = Math.floor(Math.random() * (max - min + 1)) + min;
+        
+        uiProps = {
+          n: target,
+          flashDurationMs: params.flash_ms,
+          moldura: params.moldura || 10
+        };
+        
+        evaluate = (ans) => ans === target;
+        answer = target;
+        options = [
+          { label: String(target), value: target },
+          { label: String(target + 1), value: target + 1 },
+          { label: String(target - 1 >= 0 ? target - 1 : target + 2), value: target - 1 >= 0 ? target - 1 : target + 2 },
+          { label: String(target + 2), value: target + 2 }
+        ].sort(() => Math.random() - 0.5);
         break;
       }
         
@@ -180,7 +212,8 @@ export class Composer {
       uiProps,
       evaluate,
       answer,
-      options
+      options,
+      big
     };
   }
 }

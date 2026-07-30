@@ -18,7 +18,7 @@ export interface FichaMicro {
   alvo: string; // O que está sendo treinado especificamente
   kinds: KindType[]; // Array das mecânicas UI autorizadas
   params: FichaParams; // Parâmetros numéricos para o gerador
-  dominio?: FichaDominio; // Regras de domínio específicas desta micro
+  dominio: FichaDominio; // Regras de domínio específicas desta micro
 }
 
 export interface FichaErroTipico {
@@ -88,6 +88,7 @@ export class CurriculumValidator {
         if (!micro.alvo) errors.push(`Micro [${idx}] sem alvo`);
         if (!micro.kinds || micro.kinds.length === 0) errors.push(`Micro [${micro.id}] sem kinds (mecânica ausente = falsa interação)`);
         if (!micro.params) errors.push(`Micro [${micro.id}] sem params numéricos definidos`);
+        if (!micro.dominio) errors.push(`Micro [${micro.id}] sem critério de 'dominio' definido (falso domínio)`);
       });
     }
     return errors;

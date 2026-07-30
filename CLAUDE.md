@@ -1,7 +1,6 @@
 # 🤖 CLAUDE.md (Cloud Code Router)
 
 As regras, instruções e orquestração deste projeto foram consolidadas em uma tríade arquitetural para separar as responsabilidades e otimizar a cognição dos agentes.
-
 Este arquivo orienta você (Claude) no desenvolvimento externo.
 
 ## A Tríade de Orquestração
@@ -11,7 +10,7 @@ Este arquivo orienta você (Claude) no desenvolvimento externo.
 
 ## Protocolo de Sincronia para Claude
 1. **Leia os Diários:** Antes de iniciar qualquer codificação ou análise, leia `AI_Studio_Lab/DIARIO_DE_BORDO_COMPLETO_PARA_CLAUDE.md` e `AI_Studio_Lab/DIARIO_DE_BORDO.md` para entender as últimas decisões tomadas pelo Gemini ou pelo usuário.
-2. **Respeite o Cânone:** Todas as definições curriculares e pedagógicas estão em `/AI_Studio_Lab/pedagogia/`. Não as ignore ou reescreva sem evidências fortes.
+2. **Respeite o Cânone:** Todas as definições curriculares, regras arquiteturais e pedagógicas estão unificadas em um único lugar, que é a **fonte da verdade**: `/AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md`.
 3. **Mantenha a Limpeza:** O Gemini é cobrado por manter o workspace limpo. Siga o mesmo rigor, comitando código limpo e arquitetado em pequenos componentes (anti-monólito).
 
-*Para regras detalhadas de implementação, consulte o `AGENTS.md`.*
+*Para regras detalhadas de implementação, consulte a BIBLIA_DO_SAGA.md e o AGENTS.md.*

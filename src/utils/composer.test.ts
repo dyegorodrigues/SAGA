@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { planAula, composeAula, buildAulaTrack, AULA_TOTAL } from "../curriculum/motores/composer";
+import { planAula, composeAula, buildAulaTrack, getAulaTotal() } from "../curriculum/motores/composer";
 import { Track, Progress } from "../types";
 
 /** trilha-fantasma: toda questão assina o id da trilha no prompt (rastreável) */
@@ -38,7 +38,7 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
   it("criança NOVA: 10 questões válidas, abre pela 1ª trilha sem pré-requisito", () => {
     const tracks = [...TRACKS_BASE, trk("contar", "N1.04"), trk("soma", "N1.05"), trk("padroes", "AL.01")];
     const { qs, plan } = composeAula(tracks, progOfMap({ ...M_BASE }));
-    expect(qs.length).toBe(AULA_TOTAL);
+    expect(qs.length).toBe(getAulaTotal());
     for (const q of qs) {
       expect(q.options.length).toBeGreaterThanOrEqual(2);
       expect(q.options.some((o: any) => o.value === q.answer)).toBe(true);
@@ -107,11 +107,11 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     const tracks = [...TRACKS_BASE, trk("contar", "N1.04"), trk("padroes", "AL.01")];
     const { track } = buildAulaTrack(tracks, progOfMap({ ...M_BASE }));
     expect(track.id).toBe("aula");
-    expect(track.totalQ).toBe(AULA_TOTAL);
+    expect(track.totalQ).toBe(getAulaTotal());
     const seen: string[] = [];
-    for (let i = 0; i < AULA_TOTAL; i++) seen.push(track.gen(1).prompt);
+    for (let i = 0; i < getAulaTotal(); i++) seen.push(track.gen(1).prompt);
     expect(seen[0]).toBe("t1");
-    expect(seen.length).toBe(AULA_TOTAL);
+    expect(seen.length).toBe(getAulaTotal());
   });
 
   it("planAula é barato e nunca explode com listas vazias", () => {

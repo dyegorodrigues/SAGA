@@ -43,7 +43,8 @@ export const AL_05: FichaCompetencia = {
         peso_alvo_max: 12,
         tipo: "soma_simples",
         audio_prompt: "Falta um pedaço para ficar igual. Qual bloco nós devemos colocar?" 
-      }
+      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 }
     }
   ],
   erros_tipicos: [

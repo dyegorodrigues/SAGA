@@ -51,7 +51,8 @@ export const N1_04: FichaCompetencia = {
         escopo_teclado: "1-10",
         interactive_count: true,
         audio_prompt: "Quantos têm aqui? Toque para contar!" 
-      }
+      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 }
     },
     {
       id: "c",
@@ -64,7 +65,8 @@ export const N1_04: FichaCompetencia = {
         escopo_teclado: "1-10",
         interactive_count: true,
         audio_prompt: "Eles estão espalhados! Conte todos eles."
-      }
+      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 }
     }
   ],
   erros_tipicos: [

@@ -169,14 +169,18 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
                   
                   if (filterStatus !== "ALL") {
                     nodesInFaixa = nodesInFaixa.filter(n => {
-                      const isImp = !!getTrackById(n.id);
+                      const track = getTrackById(n.id);
+                      const isImp = track && !track.gen(1).isFallback;
                       return filterStatus === "IMPLEMENTED" ? isImp : !isImp;
                     });
                   }
                   
                   if (nodesInFaixa.length === 0) return null;
                   
-                  const implementedCount = nodesInFaixa.filter(n => !!getTrackById(n.id)).length;
+                  const implementedCount = nodesInFaixa.filter(n => {
+                    const t = getTrackById(n.id);
+                    return t && !t.gen(1).isFallback;
+                  }).length;
                   
                   return (
                     <div key={faixa} className="bg-slate-900 rounded-xl border border-slate-700 overflow-hidden">
@@ -190,7 +194,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
                       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {nodesInFaixa.map(node => {
                           const track = getTrackById(node.id);
-                          const isImplemented = !!track;
+                          const isImplemented = track && !track.gen(1).isFallback;
                           
                           return (
                             <div key={node.id} className={`rounded-xl p-4 border flex flex-col justify-between transition-colors ${isImplemented ? 'bg-slate-800 border-indigo-500 hover:border-indigo-400' : 'bg-slate-800/50 border-slate-700 opacity-60'} cursor-pointer`} onClick={() => setSelectedNode(node)}>

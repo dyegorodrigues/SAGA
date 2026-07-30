@@ -15,12 +15,13 @@ export const N1_08: FichaCompetencia = {
     { regra: "n-1", tag: "OFF_BY_ONE" },
     { regra: "n-5", tag: "IGNOROU_BASE_5" }
   ],
+  excecaoCPA: "perceptual", // Subitização é habilidade visual, não possui formato simbólico
   niveis: {
     1: { primitiva: "tenframe", andaime: "mao_fantasma" },
     2: { primitiva: "tenframe", andaime: "alto" },
     3: { primitiva: "tenframe", andaime: "medio" },
-    4: { primitiva: "plain", andaime: "minimo" },
-    5: { primitiva: "plain", rt_alvo: 2500 }
+    4: { primitiva: "tenframe", andaime: "minimo" },
+    5: { primitiva: "tenframe", rt_alvo: 2500 }
   },
 
   micros: [

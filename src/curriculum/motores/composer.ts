@@ -19,7 +19,21 @@ export const FLUENCY_IDS = ["N1.01", "N1.02", "N1.11", "N3.01", "N3.02", "N3.06"
 const FUN_IDS = ["padroes", "intruso", "olho", "formas", "logica", "graficos"];
 
 // Total de questões varia por faixa etária, mas vamos usar um total em torno de 10-12
-export const AULA_TOTAL = 12;
+export const AULA_TOTAL_F0 = 8;
+export const AULA_TOTAL_F1 = 12;
+export const AULA_TOTAL_F2 = 16;
+export const AULA_TOTAL_F3_F4 = 20;
+
+export function getAulaTotal(grade?: string): number {
+  switch (grade) {
+    case "pre": return AULA_TOTAL_F0;
+    case "ano1": return AULA_TOTAL_F1;
+    case "ano2": return AULA_TOTAL_F2;
+    case "ano3": return AULA_TOTAL_F3_F4;
+    case "ano4": return AULA_TOTAL_F3_F4;
+    default: return 12;
+  }
+}
 
 type ProgOf = (trackId: string) => Progress;
 const accOf = (p: Progress) => (p.tot ? p.ok / p.tot : -1);
@@ -105,7 +119,7 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
   return { aquecimento, fronteira, resgates, fluencia, fecho, resumo };
 }
 
-export function composeAula(tracks: Track[], progOf: ProgOf, total = AULA_TOTAL): { qs: Question[]; plan: AulaPlan } {
+export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTotal()): { qs: Question[]; plan: AulaPlan } {
   const plan = planAula(tracks, progOf);
   const lvlOf = (t: Track) => Math.min(5, Math.max(1, progOf(t.id).lvl || 1));
   
@@ -164,8 +178,14 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = AULA_TOTAL)
   return { qs: final, plan };
 }
 
-export function buildAulaTrack(tracks: Track[], progOf: ProgOf): { track: Track; plan: AulaPlan } {
-  const { qs, plan } = composeAula(tracks, progOf);
+export function buildAulaTrack(tracks: Track[], progOf: ProgOf, grade: string = "ano1"): { track: Track; plan: AulaPlan } {
+  let total = getAulaTotal();
+  if (grade === "pre") total = 8;
+  else if (grade === "ano1") total = 12;
+  else if (grade === "ano2") total = 16;
+  else total = 20;
+
+  const { qs, plan } = composeAula(tracks, progOf, total);
   let i = 0;
   return {
     plan,
@@ -176,7 +196,7 @@ export function buildAulaTrack(tracks: Track[], progOf: ProgOf): { track: Track;
       color: "#4F46E5",
       dark: "#3730A3",
       gen: () => qs[i++ % qs.length],
-      totalQ: qs.length || AULA_TOTAL,
+      totalQ: qs.length || total,
     } as Track,
   };
 }
