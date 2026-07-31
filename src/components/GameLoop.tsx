@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Kid, Track, Question, Progress } from "../types";
-import { commitProgress } from "../curriculum/motores/progressEngine";
+import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
 import { auth, logTelemetryToCloud } from "../lib/firebase";
 import {
   C, FONT, BODY, Mascote, StarChip, ProgressBar, SoundBtn, Burst, sfx, speak, stopSpeak, pickVoice, applyTheme, pickPraise, PRAISE, OOPS, THEMES,
@@ -157,6 +157,7 @@ export function GameLoop({
   // kind `flash` (subitização): o grupo aparece por ~2s e some — "quantos eram?"
   const [flashHidden, setFlashHidden] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
+  const helpUsedRef = useRef(false);
   // tutorial guiado 👉 generalizado: legenda do passo atual (null = parado)
   const [guidedNarr, setGuidedNarr] = useState<string | null>(null);
   // aula com IMAGENS: cena que o passo atual do tutorial manda mostrar (null = a da questão)
@@ -227,6 +228,7 @@ export function GameLoop({
     setGuidedIdx(null);
     setQErrors(0);
     setHiddenOpts([]);
+    helpUsedRef.current = false;
     answeredRef.current = false;
     setArmedOpt(null);
   }, [q]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -278,6 +280,7 @@ export function GameLoop({
 
   const playAulinha = (isAuto: boolean = false) => {
     if (status) return;
+    helpUsedRef.current = true;
     setAulaSuggest(false);
     markAulaSeen(kid.id, q.kind);
     if (q.kind === "count") startGuidedCount(isAuto);
@@ -340,6 +343,7 @@ export function GameLoop({
   // de propósito, então reolhar não vira contagem lenta).
   const peekAgain = () => {
     if (status) return;
+    helpUsedRef.current = true;
     if (sound) sfx.tick();
     setHintsUsed(h => h + 1);
     setFlashHidden(false);
@@ -464,9 +468,24 @@ export function GameLoop({
     }
 
     answeredRef.current = true;
-    const p = { ...prog, bank: [...(prog.bank || [])] };
-    p.tot++;
-    let currentToast = null;
+    const durationMs = Math.min(30000, Math.max(0, Date.now() - t0));
+    const targetRtSeconds = q.rt_max_s ?? track.rt_max_s;
+    const progressResult = applyJourneyAnswer(prog, right, idx < WARMUP_QUESTIONS, {
+      durationMs,
+      targetRtMs: targetRtSeconds !== undefined ? targetRtSeconds * 1000 : undefined,
+      helpUsed: helpUsedRef.current,
+      isReview: q.review === true,
+      practiceDay: new Date().toISOString().slice(0, 10),
+      previousPracticeDay: prog.lastDay,
+    });
+    const p = progressResult.progress;
+    let currentToast = progressResult.transition?.type === "level-up"
+      ? `Subiu para o nível ${progressResult.transition.level}! 🚀`
+      : progressResult.transition?.type === "level-down"
+        ? "Vamos voltar um passinho para treinar! 💪"
+        : progressResult.transition?.type === "multidimensional-crown"
+          ? "DOMÍNIO ABSOLUTO! 👑✨"
+          : null;
 
     // AULINHA 🎬: 2 erros seguidos na missão → o algoritmo re-oferece a mini-aula
     if (right) {
@@ -475,36 +494,6 @@ export function GameLoop({
     } else {
       wrongStreakRef.current++;
       if (wrongStreakRef.current >= 2 && hasAulinha(q)) setAulaSuggest(true);
-    }
-
-    if (right) {
-      p.ok++;
-      // bolinha conquistada só com ACERTO no nível (pular de nível pelo seletor 🎯 não pinta bolinha de graça)
-      p.maxLvl = Math.max(p.maxLvl || 1, p.lvl);
-      p.streak++;
-      p.bad = 0;
-      if (p.streak >= 3 && p.lvl < 5) {
-        p.lvl++;
-        p.streak = 0;
-        p.maxLvl = Math.max(p.maxLvl || 1, p.lvl);
-        currentToast = `Subiu para o nível ${p.lvl}! 🚀`;
-      } else if (p.streak >= 3 && p.lvl === 5 && !p.dom) {
-        // Domínio Absoluto 👑: coroou o nível máximo da trilha (nunca se perde)
-        p.dom = true;
-        currentToast = "DOMÍNIO ABSOLUTO! 👑✨";
-      }
-    } else {
-      p.streak = 0;
-      // Aquecimento: erro nas 2 primeiras questões só ajusta o ritmo — nunca rebaixa
-      if (idx >= WARMUP_QUESTIONS) {
-        p.bad++;
-        // Frustration Engine (Camada 3): Downgrade após 3 erros
-        if (p.bad >= 3 && p.lvl > 1) {
-          p.lvl--;
-          p.bad = 0;
-          currentToast = "Vamos voltar um passinho para treinar! 💪";
-        }
-      }
     }
 
     // AI smart review: mastering a missed question after 2 hits
@@ -531,8 +520,6 @@ export function GameLoop({
         if (p.bank.length > 10) p.bank.shift();
       }
     }
-
-    const durationMs = Math.min(30000, Math.max(0, Date.now() - t0));
 
     // ⭐ XP vitalício e Nivelamento por Velocidade (Dojo)
     let starGain = 0;

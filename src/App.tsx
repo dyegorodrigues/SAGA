@@ -21,6 +21,7 @@ import { ParentDashboard } from "./components/ParentDashboard";
 import { getKidLifetimeStars, getMascotStage } from "./components/MascotEvolution";
 import { tracksForGrade, SUBJECTS } from "./subjects";
 import { ALL_MATH_TRACKS } from "./curriculum/motores/curriculum";
+import { migrateLegacyCrown } from "./curriculum/motores/progressEngine";
 import { buildMixedTrack } from "./curriculum/motores/mixedChallenge";
 import { dojo_add } from "./curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "./curriculum/fichas/dojo/sensei/dojo_sub";
@@ -132,6 +133,11 @@ function migrate(s: any): State {
       // Bolinhas conquistadas: saves antigos herdam o nível atual como o máximo já alcançado
       if (prog[tid].maxLvl == null) {
         prog[tid] = { ...prog[tid], maxLvl: prog[tid].lvl || 1, dom: prog[tid].dom || false };
+      }
+      // Coroas já conquistadas nunca são revogadas. Elas recebem proveniência
+      // explícita para não serem confundidas com o novo domínio multidimensional.
+      if (prog[tid].dom && !prog[tid].masteryEvidence) {
+        prog[tid] = migrateLegacyCrown(prog[tid]);
       }
     }
     m.progress[k.id] = prog;

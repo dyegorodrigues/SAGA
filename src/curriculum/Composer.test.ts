@@ -40,6 +40,10 @@ describe("Composer de fichas", () => {
     );
   });
 
+  it("converts the level response-time target from milliseconds to seconds", () => {
+    expect(Composer.generate(N1_03, 5, "a").rt_max_s).toBe(1.5);
+  });
+
   it("generates valid answers across every registered Journey ficha and level", () => {
     for (const ficha of REGISTERED_JOURNEY_FICHAS) {
       for (let level = 1; level <= 5; level += 1) {

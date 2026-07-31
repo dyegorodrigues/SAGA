@@ -152,7 +152,7 @@ export interface Progress {
   mast: number;
   /** maior nível já alcançado (as bolinhas conquistadas — nunca regridem) */
   maxLvl?: number;
-  /** Domínio Absoluto 👑: 3 acertos seguidos no nível 5 (nunca se perde) */
+  /** Domínio Absoluto 👑: evidências maduras de compreensão, fluência, retenção e independência. */
   dom?: boolean;
   /** Telemetria: Cliques em botão de ajuda/dica nesta microcompetência */
   helpClicks?: number;
@@ -168,6 +168,18 @@ export interface Progress {
   errKind?: string[];
   /** Leitner: Força de revisão espaçada (1..5) mantida separadamente do nível CPA (lvl/mast) */
   reviewForce?: number;
+  /** Evidências independentes para a coroa; `legacy` preserva saves já coroados. */
+  masteryEvidence?: MasteryEvidence;
+}
+
+export interface MasteryEvidence {
+  schemaVersion: 1;
+  comprehensionStreak: number;
+  independenceStreak: number;
+  fluencyStreak: number;
+  retentionPasses: number;
+  candidateDay?: string;
+  crownedBy?: "legacy" | "multidimensional";
 }
 
 export interface FactStrength {

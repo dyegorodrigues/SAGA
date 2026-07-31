@@ -358,6 +358,9 @@ export class Composer {
     return {
       howto: ficha.howto,
       explain: ficha.explain,
+      rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
+        ? ficha.niveis[lvl].rt_alvo! / 1000
+        : undefined,
       kind: kind === "intruso_math" ? "plain" : kind,
       prompt: promptOverride || params.audio_prompt || "Responda:",
       audioPrompt: promptOverride || params.audio_prompt,

@@ -481,7 +481,7 @@ guarda somente continuidade, diagnóstico e plano.
 # 13. Verificações já executadas
 
 - `npm run lint` — TypeScript aprovado.
-- `npm test` — 27 arquivos e 844 testes aprovados após tipar a fronteira do Composer.
+- `npm test` — 28 arquivos e 853 testes aprovados após o domínio multidimensional.
 - `npm run build` — aprovado; warning de bundle acima de 500 KB.
 - `npm run auditar` — invariantes aprovados e lacunas listadas.
 - comparação byte a byte dos uploads contra documentos canônicos.
@@ -509,7 +509,8 @@ guarda somente continuidade, diagnóstico e plano.
    continua no item 4.
 6. Implementar coreografia universal.
 7. Completar misconceptions e distratores diagnósticos.
-8. Tornar domínio multidimensional.
+8. ✅ Tornar o motor de domínio multidimensional — concluído; painel das quatro
+   dimensões e cobertura de metas `rt_max_s` ainda pendentes.
 9. Completar Radar e Oficina.
 10. Consolidar Dojo FD/PD/Jardim.
 11. Corrigir regras e arquitetura de telemetria Firestore.

@@ -354,3 +354,27 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   proprietário. Até lá, o Codex pode criar versões provisórias fundamentadas nas
   fontes canônicas; na entrega, haverá comparação e fusão, nunca substituição cega.
 - Baseline desta etapa: 27 arquivos e 844 testes, typecheck, auditor e build aprovados.
+
+### 31 de Julho de 2026 — Motor único de progressão (preparação do domínio)
+
+- Removida a implementação divergente e não utilizada do `progressEngine`; a regra
+  efetivamente usada pelo `GameLoop` agora mora em `applyJourneyAnswer`.
+- Subida após três acertos, proteção do aquecimento, regressão após três erros e
+  imutabilidade do estado foram preservadas e cobertas por testes puros.
+- A coroa atual foi nomeada `legacy-crown` de propósito: não houve alteração
+  pedagógica escondida neste passo. Isso isola o próximo trabalho de domínio
+  multidimensional e migração de saves em um único ponto seguro.
+- Baseline: 28 arquivos e 849 testes, auditor, typecheck e build aprovados.
+
+### 31 de Julho de 2026 — Domínio multidimensional e migração de coroas
+
+- Novas coroas agora exigem compreensão, independência sem ajuda, fluência dentro
+  da meta e retenção comprovada por revisão após pelo menos dois dias.
+- Usar aulinha/repetição visual é registrado como ajuda; resposta lenta ou ajudada
+  não amadurece a dimensão correspondente, sem punir nem retirar progresso comum.
+- `rt_alvo` das fichas passou a alimentar `rt_max_s` em segundos no runtime.
+- Saves já coroados são preservados e recebem `crownedBy: legacy`; nenhuma conquista
+  antiga é apagada. Coroas novas recebem `crownedBy: multidimensional`.
+- Lacuna explícita: competências sem meta de tempo ainda não podem coroar, e o painel
+  dos pais ainda precisa exibir as quatro dimensões separadamente.
+- Baseline: 28 arquivos e 853 testes, auditor, typecheck e build aprovados.

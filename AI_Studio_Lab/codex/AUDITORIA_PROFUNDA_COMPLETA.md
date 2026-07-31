@@ -226,10 +226,17 @@ por vez.
 
 ## C-04 — Domínio simplificado
 
-- **Fato:** `dom` é concedido essencialmente por streak no nível 5.
+- **Fato original:** `dom` era concedido essencialmente por streak no nível 5.
 - **Cânone:** exige ajuda zero, tempo-meta, retenção e independência.
 - **Impacto:** falso domínio, desbloqueio precoce e relatório enganoso.
-- **Recomendação:** `MasteryEvidence`, migração de saves e política de coroas antigas.
+- **Correção executada no motor:** novas coroas exigem três evidências consecutivas
+  no nível 5 de compreensão, independência e fluência dentro da meta, seguidas por
+  uma revisão correta após o primeiro intervalo de dois dias. Ajuda e lentidão não
+  contam; erro ou evidência frágil reinicia a candidatura.
+- **Compatibilidade:** coroas antigas são preservadas e marcadas `crownedBy: legacy`;
+  não são revogadas nem apresentadas como evidência multidimensional nova.
+- **Risco residual:** competências sem `rt_max_s` não podem obter fluência/coroa até
+  receberem meta canônica; as quatro dimensões ainda precisam aparecer no painel.
 
 ## C-05 — Cobertura executável insuficiente
 
