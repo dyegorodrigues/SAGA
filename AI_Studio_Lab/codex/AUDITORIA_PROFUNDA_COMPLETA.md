@@ -194,13 +194,19 @@ por vez.
 - **Risco residual:** conteúdo rico de um strand ainda pode divergir semanticamente
   do Manual mesmo com ID/pré-requisito alinhado.
 
-## C-02 — DAG calculado sem garantia de aplicação visual
+## C-02 — DAG calculado sem garantia de aplicação visual (corrigido)
 
-- **Fato:** `getTracksForKid` calcula `computeUnlockStatus`, porém a lista observada
-  deduplica todos os tracks e a devolve como “unlockedTracks”.
-- **Impacto:** criança pode selecionar conteúdo cujos pré-requisitos não amadureceram.
-- **Recomendação:** extrair `selectVisibleTracks`, aplicar `status.opened`, testar
-  raízes, fronteira e conteúdo bloqueado e medir paridade antes/depois.
+- **Fato original:** `getTracksForKid` calculava `computeUnlockStatus`, mas devolvia
+  todos os tracks como “unlockedTracks”.
+- **Correção executada:** a Jornada matemática recebe os 95 nós, mantém bloqueados
+  visíveis como mapa e usa um único `UnlockStatus`, calculado com todo o progresso
+  salvo, para impedir seleção prematura. Sensei recomenda somente nós acessíveis.
+  Cartuchos externos ao grafo matemático continuam sujeitos às próprias regras e
+  não são bloqueados por ausência de ID no DAG.
+- **Proteção:** testes cobrem os 95 IDs únicos, raízes, múltiplos pré-requisitos,
+  aliases por `graphId` e cartuchos externos.
+- **Risco residual:** a Jornada completa precisa de validação infantil de navegação
+  e agrupamento visual; isso não altera a regra de acesso curricular.
 
 ## C-03 — Kind e dados incompatíveis no Composer de fichas
 
@@ -622,4 +628,3 @@ O objetivo amplo só estará concluído quando houver evidência de que:
 10. testes cobrem motores, fluxo, Firebase, acessibilidade e regressão visual;
 11. fallbacks publicados são claramente controlados ou substituídos;
 12. beta com crianças confirma compreensão e ausência de frustração sistêmica.
-

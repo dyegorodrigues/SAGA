@@ -3,14 +3,17 @@ import { Kid, Track } from "../../types";
 import { FONT, FRESH } from "../Mascot";
 import { LearningPath } from "../LearningPath";
 import { SUBJECTS } from "../../subjects";
+import { UnlockStatus } from "../../curriculum/motores/unlockEngine";
 
 interface Props {
   kid: Kid;
   prog: Record<string, any>;
+  tracks: Track[];
+  unlockStatus: UnlockStatus;
   onTrack: (t: Track) => void;
 }
 
-export function JourneyTab({ kid, prog, onTrack }: Props) {
+export function JourneyTab({ kid, prog, tracks: allMathTracks, unlockStatus, onTrack }: Props) {
   const [activeSubject, setActiveSubject] = useState("mat");
   const grade = kid.grade || "pre";
 
@@ -24,7 +27,9 @@ export function JourneyTab({ kid, prog, onTrack }: Props) {
   
   const tracks = (() => {
     if (!subject) return [];
-    const t = subject.tracks[grade as "pre"|"ano1"|"ano2"] || [];
+    const t = subject.id === "mat"
+      ? allMathTracks.filter(track => Boolean(track.graphId))
+      : subject.tracks[grade as "pre"|"ano1"|"ano2"] || [];
     return t.map(track => ({ ...track, island: track.island || subject.id }));
   })();
 
@@ -96,7 +101,7 @@ export function JourneyTab({ kid, prog, onTrack }: Props) {
                </div>
             </div>
             <div className="text-right text-[10px] font-bold text-slate-400">
-               {progressPct}% concluído para o nível {grade === "pre" ? "Pré-escola" : grade === "ano1" ? "1º Ano" : "2º Ano"}
+              {progressPct}% das competências desta Jornada
             </div>
          </div>
 
@@ -119,6 +124,7 @@ export function JourneyTab({ kid, prog, onTrack }: Props) {
            <LearningPath 
               tracks={tracks}
               progOf={(id) => prog[id] || FRESH()}
+              unlockStatus={unlockStatus}
               onSelectTrack={onTrack}
            />
          ) : (

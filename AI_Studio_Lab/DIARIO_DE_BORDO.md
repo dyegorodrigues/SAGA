@@ -309,3 +309,17 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   definição de pronto.
 - O README da pasta Codex e o dossiê agora possuem links relativos clicáveis para o
   relatório completo, evitando depender do histórico do chat no tablet.
+
+### 31 de Julho de 2026 — DAG aplicado à Jornada e ao Sensei (Fase 2)
+
+- A Jornada matemática passou a exibir o mapa canônico completo de 95 competências;
+  idade/série não remove nós, e pré-requisitos determinam quais podem ser iniciados.
+- Nós bloqueados permanecem visíveis para comunicar o caminho, mas não aceitam
+  seleção. O cálculo usa todo o progresso salvo, evitando que requisitos de faixas
+  anteriores desapareçam ao navegar em conteúdo posterior.
+- O Sensei agora recomenda apenas competências abertas. Cartuchos de Português,
+  Inglês, Ciências e Meu Mundo não são submetidos indevidamente ao DAG matemático.
+- O Dojo passou a enxergar competências matemáticas de F0 a F4 já praticadas, em vez
+  de limitar o catálogo às três primeiras faixas.
+- Testes de contrato cobrem 95 IDs únicos, raízes, múltiplos pré-requisitos, aliases
+  por `graphId` e compatibilidade de cartuchos externos.

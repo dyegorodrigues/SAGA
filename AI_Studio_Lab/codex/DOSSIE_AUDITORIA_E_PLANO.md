@@ -220,10 +220,13 @@ de IDs/pré-requisitos entre o agregado e os YAMLs por strand.
 Markdown, YAML agregado, YAMLs por strand, JSON e TypeScript podem divergir. É
 necessário definir formalmente fonte autoral e artefatos derivados.
 
-## C-02 — DAG calculado, mas possivelmente não aplicado à lista
+## C-02 — DAG calculado, mas não aplicado integralmente à lista (corrigido)
 
-O app calcula o `UnlockStatus`, porém o fluxo observado constrói e devolve todos os
-tracks deduplicados. Isso pode mostrar competências sem pré-requisitos maduros.
+O fluxo devolvia todos os tracks deduplicados sem usar o resultado para controlar a
+seleção. A correção preserva os 95 nós matemáticos visíveis no mapa, bloqueia a
+interação pelos pré-requisitos do DAG, usa o progresso global (inclusive de faixas
+anteriores) e impede recomendações do Sensei para nós fechados. Cartuchos externos
+não são confundidos com nós matemáticos.
 
 ## C-03 — Contrato inconsistente no Composer de fichas
 
@@ -376,6 +379,8 @@ Resolver YAMLs por strand, definir artefatos gerados e impedir deriva.
 
 Aplicar `status.opened` à experiência visível, com teste de integração e medição de
 paridade para não reduzir acidentalmente conteúdo alcançável.
+**Estado:** realizado; validação visual infantil e refinamento da navegação ficam
+como melhoria de UI, sem reabrir a regra curricular.
 
 ## PR 4 — Competência padrão-ouro
 

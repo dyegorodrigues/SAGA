@@ -19,9 +19,8 @@ import { SagaLogo } from "./components/SagaLogo";
 import { GameLoop } from "./components/GameLoop";
 import { ParentDashboard } from "./components/ParentDashboard";
 import { getKidLifetimeStars, getMascotStage } from "./components/MascotEvolution";
-import { computeUnlockStatus } from "./curriculum/motores/unlockEngine";
-
 import { tracksForGrade, SUBJECTS } from "./subjects";
+import { ALL_MATH_TRACKS } from "./curriculum/motores/curriculum";
 import { buildMixedTrack } from "./curriculum/motores/mixedChallenge";
 import { dojo_add } from "./curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "./curriculum/fichas/dojo/sensei/dojo_sub";
@@ -441,13 +440,9 @@ export default function App() {
   const kidById = (id: string) => state.kids.find((k) => k.id === id) || state.kids[0];
   
   const getTracksForKid = (k: Kid): Track[] => {
-    // Phase 1: No age/grade locks! All tracks unlock purely by mastery via the DAG.
-    const allTracks = ["pre", "ano1", "ano2"].flatMap(g => tracksForGrade(g as any));
-    const status = computeUnlockStatus(state.progress[k.id] || {});
-    
-    // We only show tracks that are OPENED according to the graph
-    // (i.e. all prerequisites are met).
-    const unlockedTracks = Array.from(new Map(allTracks.map(t => [t.id, t])).values()); // Deduplicate
+    // A Jornada mostra o mapa matemático completo. O DAG controla o acesso na UI;
+    // série/idade não apagam nós e tracks travadas continuam visíveis no caminho.
+    const mathTracks = Array.from(new Map(ALL_MATH_TRACKS.map(t => [t.id, t])).values());
 
     const custom = (state.customTracks || [])
       // removed filter by grade here too
@@ -472,7 +467,7 @@ export default function App() {
         },
         questions: t.questions,
       }));
-    return [...unlockedTracks, ...custom];
+    return [...mathTracks, ...custom];
   };
 
   const getProg = (kidId: string, trackId: string): Progress => {

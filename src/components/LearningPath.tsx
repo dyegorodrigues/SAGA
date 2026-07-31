@@ -1,24 +1,18 @@
 import React, { useState } from 'react';
 import { Track, Progress } from '../types';
-import { computeUnlockStatus } from "../curriculum/motores/unlockEngine";
+import { isTrackUnlocked, UnlockStatus } from "../curriculum/motores/unlockEngine";
 import { ISLAND_DEFS } from "../curriculum/motores/curriculum";
 import { C, FONT, sfx } from './Mascot';
 
 interface Props {
   tracks: Track[];
   progOf: (trackId: string) => Progress;
+  unlockStatus: UnlockStatus;
   onSelectTrack: (track: Track) => void;
 }
 
 
-export function LearningPath({ tracks, progOf, onSelectTrack }: Props) {
-  // Build a pMap for computeUnlockStatus
-  const pMap = tracks.reduce((acc, t) => {
-    acc[t.id] = progOf(t.id);
-    return acc;
-  }, {} as Record<string, Progress>);
-  const status = computeUnlockStatus(pMap);
-  
+export function LearningPath({ tracks, progOf, unlockStatus, onSelectTrack }: Props) {
   // Group tracks by island
   const islandGroups: Record<string, Track[]> = {};
   tracks.forEach(t => {
@@ -56,8 +50,9 @@ export function LearningPath({ tracks, progOf, onSelectTrack }: Props) {
 
               {islandTracks.map((track, i) => {
                 const p = progOf(track.id);
-                const isLocked = !status.opened.includes(track.id);
-                const isFrontier = status.frontier.includes(track.id);
+                const isLocked = !isTrackUnlocked(track.id, track.graphId, unlockStatus);
+                const nodeId = track.graphId || track.id;
+                const isFrontier = unlockStatus.frontier.includes(nodeId);
                 const lvl = p.lvl || 1;
                 const isDominated = p.dom;
                 const offset = offsets[i % offsets.length];
@@ -74,7 +69,9 @@ export function LearningPath({ tracks, progOf, onSelectTrack }: Props) {
                     {/* Botão circular da Trilha */}
                     <button
                       onClick={() => !isLocked && onSelectTrack(track)}
-                      className={`relative w-[76px] h-[76px] rounded-full border-b-[6px] flex items-center justify-center text-3xl shadow-sm transition-all active:translate-y-1.5 active:border-b-0 cursor-pointer ${isLocked ? 'opacity-50 grayscale hover:scale-100' : 'hover:scale-105'}`}
+                      disabled={isLocked}
+                      aria-label={`${track.name}: ${isLocked ? 'travada' : 'disponível'}`}
+                      className={`relative w-[76px] h-[76px] rounded-full border-b-[6px] flex items-center justify-center text-3xl shadow-sm transition-all active:translate-y-1.5 active:border-b-0 ${isLocked ? 'cursor-not-allowed opacity-50 grayscale hover:scale-100' : 'cursor-pointer hover:scale-105'}`}
                       style={{
                         backgroundColor: isLocked ? '#F1F5F9' : track.color,
                         borderColor: isLocked ? '#CBD5E1' : track.dark,

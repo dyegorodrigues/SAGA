@@ -139,6 +139,12 @@ export const TRACKS_PRE = CURRICULUM.find(m => m.id === 'F0')?.tracks || [];
 export const TRACKS_ANO1 = CURRICULUM.find(m => m.id === 'F1')?.tracks || [];
 export const TRACKS_ANO2 = CURRICULUM.find(m => m.id === 'F2')?.tracks || [];
 
+/**
+ * Jornada matemática completa. Idade/série orienta a apresentação, mas não remove
+ * nós do DAG: pré-requisitos e proficiência decidem o que pode ser iniciado.
+ */
+export const ALL_MATH_TRACKS = CURRICULUM.flatMap(module => module.tracks);
+
 export const ISLAND_DEFS: Record<string, { title: string, subtitle: string, color: string }> = {
   "N1": { title: "Senso Numérico e Contagem", subtitle: "A base de tudo", color: "from-green-400 to-emerald-600" },
   "N2": { title: "Sistema Decimal", subtitle: "Valor posicional", color: "from-blue-400 to-indigo-600" },
