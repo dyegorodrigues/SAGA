@@ -235,8 +235,11 @@ por vez.
   contam; erro ou evidência frágil reinicia a candidatura.
 - **Compatibilidade:** coroas antigas são preservadas e marcadas `crownedBy: legacy`;
   não são revogadas nem apresentadas como evidência multidimensional nova.
-- **Risco residual:** competências sem `rt_max_s` não podem obter fluência/coroa até
-  receberem meta canônica; as quatro dimensões ainda precisam aparecer no painel.
+- **Painel:** responsáveis agora podem expandir compreensão, fluência, retenção e
+  independência por competência; coroas legadas aparecem como “não medida”, sem
+  fabricar barras retrospectivas.
+- **Metas:** o auditor e a suíte exigem `rt_alvo` positivo no nível 5 das fichas
+  registradas (12/12 atuais). Competências sem ficha ainda aguardam meta canônica.
 
 ## C-05 — Cobertura executável insuficiente
 
@@ -277,7 +280,11 @@ por vez.
 
 - **Fato:** Radar existe, mas muitos distratores são apenas `alvo ± 1`.
 - **Impacto:** o erro informa que a resposta estava errada, não o raciocínio usado.
-- **Recomendação:** cada distrator principal ligado a uma tag e estratégia corretiva.
+- **Evolução executada:** distratores numéricos que correspondem exatamente a regras
+  `n±k` recebem a tag canônica; valores sem correspondência não são rotulados por
+  aproximação. O Radar registra no clone de progresso, sem mutar o estado React.
+- **Risco residual:** regras semânticas não numéricas ainda exigem builders próprios
+  e estratégias corretivas ligadas a cada tag.
 
 ---
 
@@ -377,6 +384,13 @@ de que `explain` não ensina a misconception.
 **Ação:** separar feedback imediato de agenda de resgate e validar explicações.
 
 ## 7.5 Oficina
+
+Implementado nesta etapa:
+
+- resgates tipados por padrão de misconception, banco de erro ou revisão espaçada;
+- tropeço isolado não abre Oficina;
+- questão gerada por Radar/revisão é marcada como revisão e atualiza Leitner;
+- texto positivo explica por que a missão apareceu sem linguagem punitiva.
 
 Pendente:
 

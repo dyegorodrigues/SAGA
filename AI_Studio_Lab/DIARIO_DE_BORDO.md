@@ -378,3 +378,17 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Lacuna explícita: competências sem meta de tempo ainda não podem coroar, e o painel
   dos pais ainda precisa exibir as quatro dimensões separadamente.
 - Baseline: 28 arquivos e 853 testes, auditor, typecheck e build aprovados.
+
+### 31 de Julho de 2026 — Painel de domínio, metas e Oficina tipada
+
+- O painel dos pais ganhou uma visualização expansível das quatro dimensões; coroas
+  legadas são preservadas como não medidas, sem inventar histórico retroativo.
+- O auditor e o Composer exigem meta `rt_alvo` positiva no nível 5 das fichas de
+  Jornada: cobertura atual 12/12. Fichas futuras entram no mesmo bloqueio.
+- O plano da aula distingue resgate por misconception, questão do banco e revisão
+  espaçada. Prática recente sem padrão/erro não abre uma Oficina artificial.
+- Questões de Radar/revisão são marcadas como revisão e alimentam a força Leitner;
+  a Oficina explica o motivo em linguagem positiva.
+- Distratores `n±k` recebem tag somente quando o valor corresponde exatamente à
+  regra; o Radar deixou de mutar diretamente o progresso recebido do React.
+- Baseline: 29 arquivos e 859 testes, auditor, typecheck e build aprovados.

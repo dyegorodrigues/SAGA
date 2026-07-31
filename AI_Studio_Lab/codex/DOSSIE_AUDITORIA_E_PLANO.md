@@ -509,9 +509,10 @@ guarda somente continuidade, diagnóstico e plano.
    continua no item 4.
 6. Implementar coreografia universal.
 7. Completar misconceptions e distratores diagnósticos.
-8. ✅ Tornar o motor de domínio multidimensional — concluído; painel das quatro
-   dimensões e cobertura de metas `rt_max_s` ainda pendentes.
-9. Completar Radar e Oficina.
+8. ✅ Tornar domínio multidimensional e exibir as quatro dimensões — concluído para
+   fichas atuais; novas fichas devem fornecer `rt_alvo` nível 5.
+9. Completar Radar e Oficina — resgates tipados, Leitner integrado e tags numéricas
+   concluídos; remediações semânticas e escalada de pré-requisitos ainda pendentes.
 10. Consolidar Dojo FD/PD/Jardim.
 11. Corrigir regras e arquitetura de telemetria Firestore.
 12. Versionar/migrar estado de crianças até F4.

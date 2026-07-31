@@ -1,4 +1,4 @@
-import { FichaCompetencia } from "./schema";
+import { FichaCompetencia, FichaDistrator } from "./schema";
 import { Option, Question } from "../types";
 import {
   FichaAnswer,
@@ -21,6 +21,25 @@ function numericOptions(answer: number, min: number, max: number) {
   return values
     .map(value => ({ label: String(value), value }))
     .sort(() => Math.random() - 0.5);
+}
+
+function tagNumericDistractors(
+  options: Option[] | undefined,
+  answer: FichaAnswer,
+  distractors: FichaDistrator[] | undefined,
+): Option[] | undefined {
+  if (!options || typeof answer !== "number" || !distractors?.length) return options;
+  const taggedValues = new Map<number, string>();
+  for (const distractor of distractors) {
+    const match = distractor.regra.trim().match(/^n\s*([+-])\s*(\d+)$/);
+    if (!match) continue;
+    const delta = Number(match[2]) * (match[1] === "+" ? 1 : -1);
+    taggedValues.set(answer + delta, distractor.tag);
+  }
+  return options.map(option => {
+    const tag = typeof option.value === "number" ? taggedValues.get(option.value) : undefined;
+    return tag ? { ...option, misconception: tag } : option;
+  });
 }
 
 export class Composer {
@@ -369,7 +388,7 @@ export class Composer {
       uiProps,
       evaluate,
       answer,
-      options,
+      options: tagNumericDistractors(options, answer, ficha.distratores),
       big,
       n,
       emoji,

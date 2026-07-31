@@ -1,22 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Composer } from "./Composer";
-import { AL_01 } from "./fichas/jornada/AL.01";
-import { AL_05 } from "./fichas/jornada/AL.05";
-import { GM_04 } from "./fichas/jornada/GM.04";
 import { N1_01 } from "./fichas/jornada/N1.01";
-import { N1_02 } from "./fichas/jornada/N1.02";
 import { N1_03 } from "./fichas/jornada/N1.03";
 import { N1_04 } from "./fichas/jornada/N1.04";
-import { N1_07 } from "./fichas/jornada/N1.07";
-import { N1_08 } from "./fichas/jornada/N1.08";
-import { N1_09 } from "./fichas/jornada/N1.09";
-import { N1_10 } from "./fichas/jornada/N1.10";
-import { N2_01 } from "./fichas/jornada/N2.01";
-
-const REGISTERED_JOURNEY_FICHAS = [
-  N1_01, N1_02, N1_03, N1_04, N1_07, N1_08, N1_09, N1_10,
-  N2_01, GM_04, AL_01, AL_05,
-];
+import { JOURNEY_FICHAS } from "./fichas";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
@@ -44,8 +31,21 @@ describe("Composer de fichas", () => {
     expect(Composer.generate(N1_03, 5, "a").rt_max_s).toBe(1.5);
   });
 
+  it("attaches canonical misconception tags only to matching numeric distractors", () => {
+    const question = Composer.generate(N1_03, 5, "a");
+    const wrongOptions = question.options?.filter(option => option.value !== question.answer) || [];
+    const mappedOffByOne = wrongOptions.filter(option =>
+      typeof option.value === "number" && Math.abs(option.value - question.answer) === 1
+    );
+
+    expect(wrongOptions.length).toBeGreaterThan(0);
+    expect(mappedOffByOne.length).toBeGreaterThan(0);
+    expect(mappedOffByOne.every(option => option.misconception === "OFF_BY_ONE")).toBe(true);
+    expect(question.options?.find(option => option.value === question.answer)?.misconception).toBeUndefined();
+  });
+
   it("generates valid answers across every registered Journey ficha and level", () => {
-    for (const ficha of REGISTERED_JOURNEY_FICHAS) {
+    for (const ficha of JOURNEY_FICHAS) {
       for (let level = 1; level <= 5; level += 1) {
         for (let sample = 0; sample < 10; sample += 1) {
           const question = Composer.generate(ficha, level);
@@ -62,6 +62,13 @@ describe("Composer de fichas", () => {
           }
         }
       }
+    }
+  });
+
+  it("requires a positive level-five response-time target in every registered ficha", () => {
+    for (const ficha of JOURNEY_FICHAS) {
+      expect(ficha.niveis?.[5]?.rt_alvo, ficha.id).toBeGreaterThan(0);
+      expect(Composer.generate(ficha, 5).rt_max_s, ficha.id).toBeGreaterThan(0);
     }
   });
 

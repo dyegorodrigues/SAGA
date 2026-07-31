@@ -92,7 +92,7 @@ const shuffle = (arr: any[]) => {
   return a;
 };
 
-import { trackMisconception } from "../curriculum/motores/radarEngine";
+import { evaluateSpacedRepetition, trackMisconception } from "../curriculum/motores/radarEngine";
 
 export function GameLoop({
   kid,
@@ -435,6 +435,7 @@ export function GameLoop({
     
     // forcedRight: usado por interações que decidem o acerto por conta própria (ex.: `order`)
     const right = forcedRight !== undefined ? forcedRight : val === q.answer;
+    let terminalMisconception: string | undefined;
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
@@ -463,7 +464,7 @@ export function GameLoop({
       // Registra a misconception no Radar se houver e estiver mapeada nas opções
       const pickedOpt = q.options.find((o: any) => o.value === val);
       if (pickedOpt && pickedOpt.misconception) {
-        trackMisconception(prog, pickedOpt.tag || pickedOpt.misconception);
+        terminalMisconception = pickedOpt.tag || pickedOpt.misconception;
       }
     }
 
@@ -479,6 +480,7 @@ export function GameLoop({
       previousPracticeDay: prog.lastDay,
     });
     const p = progressResult.progress;
+    if (terminalMisconception) trackMisconception(p, terminalMisconception);
     let currentToast = progressResult.transition?.type === "level-up"
       ? `Subiu para o nível ${progressResult.transition.level}! 🚀`
       : progressResult.transition?.type === "level-down"
@@ -519,6 +521,17 @@ export function GameLoop({
         p.bank.push({ sig, hits: 0, q: sanitizeQ(q) });
         if (p.bank.length > 10) p.bank.shift();
       }
+    }
+
+    if (q.review) {
+      evaluateSpacedRepetition(
+        kid.id,
+        track.id,
+        right,
+        durationMs,
+        { [track.id]: p },
+        targetRtSeconds !== undefined ? targetRtSeconds * 1000 : 10000,
+      );
     }
 
     // ⭐ XP vitalício e Nivelamento por Velocidade (Dojo)

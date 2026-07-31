@@ -89,9 +89,38 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     const { qs, plan } = composeAula(tracks, progOfMap(m));
     expect(plan.fronteira!.id).toBe("padroes");
     // a fria vira resgate (a fronteira nunca conta como resgate)
-    expect(plan.resgates.find((r) => !r.fromBank)?.track.id).toBe("vizinhos");
+    expect(plan.resgates.find((r) => r.reason === "spaced-review")?.track.id).toBe("vizinhos");
+    expect(plan.resgates.find((r) => r.reason === "error-bank")?.track.id).toBe("contar");
     // o erro do banco aparece na aula (o passado nunca se perde)
     expect(qs.some((q) => q.prompt === "erro-antigo")).toBe(true);
+    expect(qs.some((q) => q.prompt === "vizinhos" && q.review)).toBe(true);
+  });
+
+  it("não inventa resgate quando não há padrão, erro no banco ou revisão vencida", () => {
+    const today = new Date().toISOString().slice(0, 10);
+    const tracks = [...TRACKS_BASE, trk("contar", "N1.04")];
+    const plan = planAula(tracks, progOfMap({
+      t1: prog({ tot: 8, ok: 8, lastDay: today, reviewForce: 5, dom: true }),
+      t2: prog({ tot: 8, ok: 7, lastDay: today, reviewForce: 5, dom: true }),
+      contar: prog({ tot: 5, ok: 4, lastDay: today, reviewForce: 5 }),
+    }));
+
+    expect(plan.resgates).toEqual([]);
+  });
+
+  it("classifica padrões repetidos do Radar como resgate de misconception", () => {
+    const now = Date.now();
+    const tracks = [...TRACKS_BASE, trk("contar", "N1.04")];
+    const plan = planAula(tracks, progOfMap({
+      ...M_BASE,
+      contar: prog({
+        tot: 5,
+        ok: 2,
+        misconceptions: [{ tag: "contagem-dupla", ts: now - 1000 }, { tag: "contagem-dupla", ts: now }],
+      }),
+    }));
+
+    expect(plan.resgates.some(r => r.track.id === "contar" && r.reason === "misconception")).toBe(true);
   });
 
   it("FECHO lúdico fecha a aula quando existe trilha divertida", () => {

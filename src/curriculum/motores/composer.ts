@@ -58,10 +58,18 @@ const shuffleOpts = (q: Question): Question => {
 export interface AulaPlan {
   aquecimento: Track | null;
   fronteira: Track | null;
-  resgates: { track: Track; fromBank: boolean }[];
+  resgates: RescuePlanItem[];
   fluencia: Track | null;
   fecho: Track | null;
   resumo: string;
+}
+
+export type RescueReason = "misconception" | "error-bank" | "spaced-review";
+
+export interface RescuePlanItem {
+  track: Track;
+  fromBank: boolean;
+  reason: RescueReason;
 }
 
 export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
@@ -96,25 +104,27 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
   // 3. RESGATE
   const radarRescueIds = RadarEngine.getRescueItems("kid", pMap);
   const radarTracks = radarRescueIds.map(id => tracks.find(t => t.id === id || t.graphId === id)).filter(Boolean) as Track[];
-  
-  const cold = tracks
-    .filter((t) => practiced(progOf(t.id)) && t.id !== fronteira?.id && t.id !== aquecimento?.id && !radarRescueIds.includes(t.id))
+  const dueReviewIds = new Set(RadarEngine.getDueReviews(pMap));
+  const dueTracks = tracks
+    .filter(t => {
+      const nodeId = t.graphId || t.id;
+      return dueReviewIds.has(nodeId) && t.id !== fronteira?.id && t.id !== aquecimento?.id;
+    })
     .sort((a, b) => (progOf(a.id).lastDay || "0000").localeCompare(progOf(b.id).lastDay || "0000"));
-  
-  const hasBank = tracks.some((t) => (progOf(t.id).bank || []).length > 0);
-  const resgates: (AulaPlan["resgates"][0] & { isRadar?: boolean })[] = [];
+  const bankTrack = tracks.find(t => (progOf(t.id).bank || []).length > 0);
+  const resgates: RescuePlanItem[] = [];
   
   for (const rt of radarTracks) {
     if (!resgates.some(r => r.track.id === rt.id)) {
-       resgates.push({ track: rt, fromBank: false, isRadar: true });
+       resgates.push({ track: rt, fromBank: false, reason: "misconception" });
     }
   }
 
-  if (hasBank && !resgates.some(r => r.track.id === fronteira?.id)) {
-    resgates.push({ track: fronteira!, fromBank: true }); 
+  if (bankTrack && !resgates.some(r => r.track.id === bankTrack.id)) {
+    resgates.push({ track: bankTrack, fromBank: true, reason: "error-bank" });
   }
-  if (cold[0] && !resgates.some(r => r.track.id === cold[0].id)) {
-    resgates.push({ track: cold[0], fromBank: false });
+  if (dueTracks[0] && !resgates.some(r => r.track.id === dueTracks[0].id)) {
+    resgates.push({ track: dueTracks[0], fromBank: false, reason: "spaced-review" });
   }
 
   // 4. FLUÊNCIA (Bloco Dojo da Academia)
@@ -158,15 +168,12 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
     [bankQs[i], bankQs[j]] = [bankQs[j], bankQs[i]];
   }
 
-  const radarTrack = (plan.resgates as any[]).find((r) => r.isRadar)?.track || null;
-  const coldTrack = plan.resgates.find((r) => !r.fromBank && !(r as any).isRadar)?.track || null;
-  
-  const genResg = () => {
-    if (radarTrack) return gen(radarTrack);
-    const bq = bankQs.pop();
-    if (bq) return bq;
-    return gen(coldTrack);
-  };
+  const rescueQueue = plan.resgates.map(rescue => () => {
+    if (rescue.reason === "error-bank") return bankQs.pop() || null;
+    const question = gen(rescue.track);
+    return question ? { ...question, review: true } : null;
+  });
+  const genResg = () => rescueQueue.shift()?.() || null;
 
   const qs: Question[] = [];
   

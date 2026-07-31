@@ -157,6 +157,17 @@ for (const file of fichaFiles) {
   if (match) fichaIds.push(match[1]);
 }
 const journeyFichaIds = fichaIds.filter((id) => yamlIdSet.has(id));
+const journeyFichasWithRtTarget = [];
+for (const file of fichaFiles) {
+  const source = read(file);
+  const idMatch = source.match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2})["']/);
+  if (!idMatch || !yamlIdSet.has(idMatch[1])) continue;
+  const levelFive = source.match(/\b5:\s*\{([^}]*)\}/);
+  const rtTarget = levelFive?.[1].match(/\brt_alvo:\s*(\d+(?:\.\d+)?)/);
+  if (rtTarget && Number(rtTarget[1]) > 0) journeyFichasWithRtTarget.push(idMatch[1]);
+}
+const journeyFichasMissingRt = journeyFichaIds.filter((id) => !journeyFichasWithRtTarget.includes(id));
+check(journeyFichasMissingRt.length === 0, `fichas sem rt_alvo positivo no nível 5: ${journeyFichasMissingRt.join(", ")}`);
 
 const fichaIndex = read("src/curriculum/fichas/index.ts");
 const importedFichaFiles = new Map(
@@ -201,6 +212,7 @@ console.log(`- Nós com gerador explícito: ${generatorMap.size}/${yamlNodes.len
 console.log(`- Nós no fallback \"Em construção\": ${fallbackIds.length}/${yamlNodes.length}`);
 console.log(`- Fichas de Jornada no disco: ${journeyFichaIds.length}/${yamlNodes.length}`);
 console.log(`- Fichas de Jornada registradas em AllFichas: ${registeredJourneyFichaIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada com rt_alvo no nível 5: ${journeyFichasWithRtTarget.length}/${journeyFichaIds.length}`);
 console.log(`- Fichas de Dojo no disco/registradas: ${fichaIds.length - journeyFichaIds.length}/${registeredFichaIds.length - registeredJourneyFichaIds.length}`);
 console.log(`- Fichas no disco fora de AllFichas: ${unregisteredFichaIds.length}`);
 console.log(`- Geradores exportados sem uso no mapa: ${orphanGenerators.length}`);

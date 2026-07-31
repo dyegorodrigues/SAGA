@@ -20,3 +20,8 @@ export const AllFichas = [
   dojo_add, dojo_sub, dojo_mul, dojo_div,
   N1_01, N1_02, N1_03, N1_04, N1_07, N1_08, N1_09, N1_10, N2_01, GM_04, AL_01, AL_05
 ];
+
+export const JOURNEY_FICHAS = [
+  N1_01, N1_02, N1_03, N1_04, N1_07, N1_08, N1_09, N1_10,
+  N2_01, GM_04, AL_01, AL_05,
+];
