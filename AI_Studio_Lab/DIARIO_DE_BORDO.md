@@ -249,3 +249,35 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - **Atualização da SPEC de Construção dos Exercícios (`SPEC_CONSTRUCAO_EXERCICIOS.md`):**
   - O arquivo de especificações visuais e lógicas dos exercícios (`SPEC_CONSTRUCAO_EXERCICIOS.md`) enviado foi comparado, validado e sincronizado na pasta canônica `AI_Studio_Lab/pedagogia/`.
   - Contém as fichas F0-F2 (31 exercícios desenhados em texto) e as regras do Jardim do Dojô.
+
+### 31 de Julho de 2026 — Baseline canônico reproduzível
+
+- Conferidos por hash e comparação byte a byte os arquivos de `Upload_docs/`
+  contra Bíblia, Dojo, Grafo, Manual e YAML canônicos; nenhuma substituição cega
+  foi repetida porque os conteúdos já coincidiam.
+- Corrigidas referências residuais de 84 para 95 competências e o nome canônico
+  `BIBLIA_DO_SAGA.md`; os dois nomes da SPEC foram documentados como aliases que
+  devem permanecer idênticos.
+- `src/docsText.ts` deixou de embutir uma cópia integral da Bíblia e agora lê o
+  Markdown canônico como texto bruto, eliminando uma fonte silenciosa de deriva.
+- `npm run auditar` foi restaurado como ferramenta estritamente read-only. Ele
+  valida os 95 nós, pré-requisitos, ausência de ciclos, paridade YAML/JSON/TS,
+  aliases da SPEC e cobertura de geradores/fichas.
+- Baseline encontrado: 95 nós canônicos; 42 com gerador explícito; 53 no fallback
+  “Em construção”; 12 fichas de Jornada no disco, 11 registradas; 4 fichas Dojo;
+  `AL.01` existe no disco mas não está em `AllFichas`; YAMLs por strand ainda
+  somam 84 e não incluem as 11 competências da v2.7.
+- O eixo futuro do mascote foi preservado no Plano Mestre como motor independente,
+  com atlas/renderer substituível e vocabulário inicial de animações, sem colocá-lo
+  à frente da estabilização curricular.
+
+### 31 de Julho de 2026 — Continuidade e backup do trabalho Codex
+
+- Criado `AI_Studio_Lab/codex/README.md` como ponto único de continuidade, sem
+  duplicar o repositório dentro dele.
+- Configurado `origin` para `SAGA-Codex` e `ai-studio` para leitura do SAGA
+  original, com push do original desabilitado localmente.
+- Tentativas de leitura e push para o GitHub foram bloqueadas pelo proxy do
+  ambiente (`CONNECT tunnel failed, response 403`) antes da autenticação.
+- Gerados e verificados backups locais em formatos bundle, ZIP e patch. O push
+  pendente continua sendo `git push -u origin work` quando a rede for liberada.

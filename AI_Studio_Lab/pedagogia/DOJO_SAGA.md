@@ -1,5 +1,5 @@
 # 🥋 DOJO SAGA — A Academia de Fluência
-*v1.1 — §3-bis: vocabulário oficial FAIXA (Dojo, 1-10) × NÍVEL (Jornada, 1-5), sincronizado com BIBLIA_SAGA §12.2-bis.*
+*v1.1 — §3-bis: vocabulário oficial FAIXA (Dojo, 1-10) × NÍVEL (Jornada, 1-5), sincronizado com `BIBLIA_DO_SAGA.md` §12.2-bis.*
 
 **Este documento é a especificação completa do Dojo — a semente original do projeto.** A ideia nasceu assim: um "Kumon digital" para treinar aritmética até o domínio absoluto. O projeto cresceu ao redor (o Grafo ensina, o Manual explica), mas o Dojo continua sendo o coração do treino: **o lugar onde o que foi COMPREENDIDO nas aulas vira REFLEXO**. Compreensão sem fluência trava a criança nos problemas grandes (a memória de trabalho lota calculando o básico); fluência sem compreensão é a decoreba que quebra. O SAGA exige as duas — em lugares diferentes: a aula ensina, o Dojo automatiza.
 
@@ -107,7 +107,7 @@ ProcStrength {
 
 ## §3-bis. VOCABULÁRIO OFICIAL: FAIXA (Dojo) × NÍVEL (Jornada)
 
-Os "degraus" deste documento (FD3.1...FD3.10, PD-D.1...PD-D.10) são chamados oficialmente de **FAIXA** — 1 a 10, uma por família de trilha. Isso não é o mesmo que o **NÍVEL** de proficiência da Jornada (1 a 5, em `BIBLIA_SAGA.md` §12.2-bis). Ficam claras as diferenças, porque os dois nomes já foram confundidos:
+Os "degraus" deste documento (FD3.1...FD3.10, PD-D.1...PD-D.10) são chamados oficialmente de **FAIXA** — 1 a 10, uma por família de trilha. Isso não é o mesmo que o **NÍVEL** de proficiência da Jornada (1 a 5, em `BIBLIA_DO_SAGA.md` §12.2-bis). Ficam claras as diferenças, porque os dois nomes já foram confundidos:
 
 | | **NÍVEL** (Jornada, 1-5) | **FAIXA** (Dojo, 1-10) |
 |---|---|---|

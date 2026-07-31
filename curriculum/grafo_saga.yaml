@@ -1,5 +1,5 @@
 # GRAFO DE CONHECIMENTO — SAGA · Matemática 4-12 anos · v1.0 (jul/2026)
-# Versão executável do GRAFO_DE_CONHECIMENTO_SAGA.md (fonte humana). 84 nós.
+# Versão executável do GRAFO_DE_CONHECIMENTO_SAGA.md (fonte humana). 95 nós.
 # Regra de desbloqueio: nó aberto <=> todos os prereqs com maxLvl >= 3 ou dom=true.
 # Nós com prereqs [] são raízes (sempre abertos).
 # faixa: F0 4-5 · F1 5-7 · F2 7-9 · F3 9-11 · F4 11-12 (referência, não trava)
