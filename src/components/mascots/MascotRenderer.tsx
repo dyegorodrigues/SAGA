@@ -152,7 +152,7 @@ export function MascotRenderer({
       className={`select-none ${className}`} 
       width={size} 
       height={size} 
-      viewBox="0 0 100 100" 
+      viewBox="0 0 100 120" 
       style={{ display: "block", margin: "0 auto", overflow: "visible" }}
     >
       <defs>
@@ -191,7 +191,7 @@ export function MascotRenderer({
         <g>
         {activeBg === "castelo" && (
           <g>
-            <rect x="0" y="0" width="100" height="100" fill="#2E1065" />
+            <rect x="0" y="0" width="100" height="120" fill="#2E1065" />
             <circle cx="50" cy="35" r="28" fill="#4C1D95" opacity="0.5" />
             <circle cx="30" cy="20" r="1" fill="#FFF" />
             <circle cx="70" cy="22" r="1" fill="#FFF" />
@@ -215,14 +215,14 @@ export function MascotRenderer({
 
         {activeBg === "campo" && (
           <g>
-            <rect x="0" y="0" width="100" height="100" fill="#38BDF8" />
+            <rect x="0" y="0" width="100" height="120" fill="#38BDF8" />
             <circle cx="25" cy="24" r="10" fill="#FFFFFF" opacity="0.8" />
             <circle cx="35" cy="26" r="8" fill="#FFFFFF" opacity="0.8" />
             <circle cx="75" cy="20" r="12" fill="#FFFFFF" opacity="0.8" />
             {/* Grass fields */}
-            <ellipse cx="50" cy="110" rx="90" ry="62" fill="#15803D" />
-            <ellipse cx="50" cy="110" rx="80" ry="50" fill="#166534" />
-            <ellipse cx="50" cy="110" rx="70" ry="38" fill="#15803D" />
+            <ellipse cx="50" cy="130" rx="90" ry="62" fill="#15803D" />
+            <ellipse cx="50" cy="130" rx="80" ry="50" fill="#166534" />
+            <ellipse cx="50" cy="130" rx="70" ry="38" fill="#15803D" />
             {/* Soccer goal structure */}
             <path d="M 28 85 L 28 58 L 72 58 L 72 85" fill="none" stroke="#E2E8F0" strokeWidth="2.5" opacity="0.6" />
           </g>
@@ -230,7 +230,7 @@ export function MascotRenderer({
 
         {activeBg === "espaco" && (
           <g>
-            <rect x="0" y="0" width="100" height="100" fill="#0F172A" />
+            <rect x="0" y="0" width="100" height="120" fill="#0F172A" />
             <circle cx="20" cy="30" r="1" fill="#FFF" opacity="0.8" />
             <circle cx="80" cy="20" r="1.5" fill="#FFF" opacity="0.9" />
             <circle cx="40" cy="15" r="0.8" fill="#FFF" opacity="0.6" />
@@ -243,13 +243,13 @@ export function MascotRenderer({
             <circle cx="87" cy="17" r="1.5" fill="#64748B" opacity="0.5" />
             
             {/* Crater/Mountains */}
-            <ellipse cx="50" cy="110" rx="90" ry="40" fill="#1E293B" />
-            <ellipse cx="50" cy="110" rx="70" ry="30" fill="#334155" />
+            <ellipse cx="50" cy="130" rx="90" ry="40" fill="#1E293B" />
+            <ellipse cx="50" cy="130" rx="70" ry="30" fill="#334155" />
           </g>
         )}
         {activeBg === "parque" && (
           <g>
-            <rect x="0" y="0" width="100" height="100" fill="#BAE6FD" />
+            <rect x="0" y="0" width="100" height="120" fill="#BAE6FD" />
             <circle cx="20" cy="20" r="10" fill="#F59E0B" />
             <circle cx="20" cy="20" r="7" fill="#FDE047" />
             {/* Meadows and Trees */}

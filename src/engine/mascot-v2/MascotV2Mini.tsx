@@ -21,7 +21,7 @@ export function MascotV2Mini({ size = 96, animation = "idle", activeTheme = "tre
   // Em geral o tamanho do sprite original é ~150px.
   // Queremos que ele caiba dentro de "size".
   const numericSize = typeof size === 'number' ? size : parseInt(size.toString()) || 96;
-  const scale = activeTheme === "trex2" ? numericSize / 380 : numericSize / 350; // Ajustado para balancear o tamanho entre os dois temas
+  const scale = numericSize / 350; // Fixed scale per C2
 
   let currentPose = motor.currentPose;
   let animClass = "";

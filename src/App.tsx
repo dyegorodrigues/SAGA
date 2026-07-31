@@ -170,7 +170,8 @@ interface ShellProps {
   theme?: string;
 }
 
-export function Shell({ children, theme = "classico" }: ShellProps) {
+interface ShellExtProps extends ShellProps { screenName?: string; }
+export function Shell({ children, theme = "classico", screenName }: ShellExtProps) {
   const t = THEMES[theme] || THEMES.classico;
   const bg = t.bg || ["#E4F0FF", C.bg];
 
@@ -234,8 +235,8 @@ export function Shell({ children, theme = "classico" }: ShellProps) {
         @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
       `}</style>
 
-      <div className="relative mx-auto w-full max-w-md px-4 pt-5 pb-8">
-        <div className="relative z-10">{children}</div>
+      <div className={`relative mx-auto w-full px-4 pt-5 pb-8 flex flex-col ${screenName === "game" ? "h-[100dvh] max-w-3xl overflow-hidden" : "min-h-screen max-w-md"}`}>
+        <div className={`relative z-10 flex flex-col ${screenName === "game" ? "flex-1 h-full overflow-hidden" : ""}`}>{children}</div>
       </div>
     </div>
   );
@@ -647,7 +648,7 @@ export default function App() {
   };
 
   return (
-    <Shell theme={screen.kid ? kidById(screen.kid).theme : "classico"}>
+    <Shell theme={screen.kid ? kidById(screen.kid).theme : "classico"} screenName={screen.name}>
       {/* Visual Screen Router Transitions using framer-motion */}
       <motion.div
         key={screen.name + (screen.kid || "") + (screen.track || "") + (screen.lvl || "")}

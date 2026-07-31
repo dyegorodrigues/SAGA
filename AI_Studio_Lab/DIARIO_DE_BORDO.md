@@ -219,3 +219,29 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - **count / emojirow (modo contagem e flash):** Serve N1.01, N1.03, N1.04 e JD1.
 - **singapore-bars (comparação por barras / cubos):** Serve N3.04, N3.10, N5.*, N6.04 (e PE.01/PE.02 no modo vertical).
 - **linking-cubes / sequence / sum:** Serão integrados às progressões de adição concreta (N3.01-04) e sequenciamento (N1.07, N2.02).
+
+### 31 de Julho de 2026 - Auditoria do Grafo, Sincronização dos Documentos Canônicos e Melhorias no Palco do Mascote
+
+- **Sincronização Direta dos Documentos Canônicos (`AI_Studio_Lab/pedagogia/`):**
+  - Os documentos recebidos na pasta de upload (`BIBLIA_SAGA.md`, `DOJO_SAGA.md`, `GRAFO_DE_CONHECIMENTO_SAGA.md`, `MANUAL_DIDATICO_SAGA.md`, `PLANO_MESTRE_SAGA.md`) foram transportados diretamente para a pasta de autoridade `AI_Studio_Lab/pedagogia/`, substituindo os arquivos anteriores em seu local de origem.
+  - A pasta temporária de upload `Upload_docs/` e todos os scripts temporários (.cjs, .py) foram higienizados e removidos conforme a *The Clean Workspace Rule*.
+
+- **Validação e Reconstrução do Grafo SAGA (`grafo_saga.ts` e `grafoSaga.ts`):**
+  - O arquivo executável do Grafo (`src/curriculum/grafo_saga.ts`) foi compilado e validado a partir do arquivo YAML fonte.
+  - O utilitário `src/utils/grafoSaga.ts` foi atualizado para importar diretamente de `grafo_saga.ts` (fortemente tipado), mantendo compatibilidade total com o Grafo de 84 nós e com as famílias de fluência.
+  - Tipagem verificada com `npx tsc --noEmit` com 100% de aprovação.
+
+- **Arquitetura Visual do Mascote em 3 Camadas (§10.12 da Bíblia SAGA):**
+  - O componente `Mascote` (`src/components/Mascot.tsx`) foi padronizado no Palco em 3 camadas (Fundo/Cenário, Ator Central em repouso e Frente/Iluminação) em telas retangulares arredondadas (`rounded-2xl` / `rounded-[16px]`), mantendo o mascote solto e visualmente integrado.
+  - O motor de mascote V2 (MascotV2Mini) teve a escala do sprite padronizada.
+
+- **Ajustes de Layout sem Rolagem no GameLoop:**
+  - O contêiner de exercícios em `GameLoop.tsx` foi estruturado para caber inteiramente na viewport de 100dvh com `flex-1 min-h-0` e `flex-shrink-0` nos botões, garantindo uma interface limpa que nunca exige rolagem vertical para a criança.
+
+- **Registro e Visibilidade no Painel Admin God Dashboard:**
+  - O `AdminDashboardScreen.tsx` teve a aba **🎼 Composer & Inspetor** adicionada para inspeção do motor adaptativo, logs do Composer, simulação lado a lado dos 5 níveis no Sandbox e diagnóstico das 84 competências.
+  - O backdrop do modal Sandbox (`SandboxModal.tsx`) foi configurado para fechar a janela ao clicar fora.
+
+- **Sanitização do Repositório & Build:**
+  - Todos os scripts temporários foram removidos.
+  - O ambiente foi validado com compilação limpa e o dev server está ativo e pronto.

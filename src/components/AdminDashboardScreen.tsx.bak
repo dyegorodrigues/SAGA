@@ -19,7 +19,7 @@ interface AdminDashboardScreenProps {
 }
 
 export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack, onTestTrackLvl, onTestMascotV2 }: AdminDashboardScreenProps) {
-  const [activeTab, setActiveTab] = useState<"curriculum" | "profiles" | "composer" | "notes" | "docs">("curriculum");
+  const [activeTab, setActiveTab] = useState<"curriculum" | "profiles" | "notes" | "docs">("curriculum");
   const [generalNotes, setGeneralNotes] = useState(() => localStorage.getItem("matemagica_dev_notes") || "");
   const [nodeNotes, setNodeNotes] = useState<Record<string, string>>(() => {
     try {
@@ -101,12 +101,6 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
             className={`px-4 py-2 rounded-lg text-sm font-black transition-colors ${activeTab === 'docs' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
           >
             📖 Documentação & Arquitetura
-          </button>
-          <button 
-            onClick={() => setActiveTab("composer")}
-            className={`px-4 py-2 rounded-lg text-sm font-black transition-colors ${activeTab === "composer" ? "bg-indigo-600 text-white" : "text-slate-400 hover:text-white"}`}
-          >
-            🎼 Composer & Inspetor
           </button>
           <button 
             onClick={() => setActiveTab("notes")}
@@ -282,29 +276,6 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
         )}
 
         {/* TAB 4: Notes */}
-        
-        {activeTab === "composer" && (
-          <div className="flex-1 overflow-y-auto p-6 bg-slate-900">
-            <h2 className="text-white text-lg font-black mb-4">🎼 Inspetor de Progresso & Log do Composer</h2>
-            <div className="bg-slate-800 rounded-xl p-4 border border-slate-700">
-              <p className="text-slate-400 text-sm mb-4">
-                (Em construção) Aqui o Motor Adaptativo irá registrar suas decisões de:
-              </p>
-              <ul className="list-disc pl-5 text-slate-300 text-sm space-y-2">
-                <li>Bússola de Posicionamento (Onde a criança parou)</li>
-                <li>Radar de Lacunas (Quando uma Missão de Resgate é disparada)</li>
-                <li>Motor de Revisão (Quais competências estão enfraquecendo)</li>
-                <li>Composer (Log da geração da pergunta atual: Ficha → Micro → Nível → Primitiva)</li>
-              </ul>
-              <div className="mt-6 bg-slate-900 p-4 rounded border border-slate-700 font-mono text-xs text-indigo-300 h-64 overflow-y-auto">
-                {"// LOG STREAM..."}<br/>
-                {"[COMPOSER] Initializing curriculum..."}<br/>
-                {"[COMPOSER] Engine ready. Waiting for session start."}
-              </div>
-            </div>
-          </div>
-        )}
-
         {activeTab === "notes" && (
           <div className="max-w-4xl mx-auto pb-20">
             <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700 shadow-xl flex flex-col h-[500px]">

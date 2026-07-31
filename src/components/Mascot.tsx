@@ -59,6 +59,50 @@ export function Mascote({
   animation?: "idle" | "walk" | "happy";
   transparentBg?: boolean;
 }) {
+  
+  if (!transparentBg) {
+    // Stage 3-layer architecture for framed mascots!
+    const numericSize = typeof size === 'number' ? size : parseInt(size.toString()) || 96;
+    const activeBg = bgAccessory !== "default" ? bgAccessory : (kid?.bgAccessory || "default");
+    
+    // Convert named BGs to gradient colors roughly
+    let bgGradient = "linear-gradient(180deg, #BAE6FD 0%, #38BDF8 100%)";
+    if (activeBg === "castelo") bgGradient = "linear-gradient(180deg, #2E1065 0%, #4C1D95 100%)";
+    if (activeBg === "espaco") bgGradient = "linear-gradient(180deg, #0F172A 0%, #1E293B 100%)";
+    
+    return (
+      <div 
+        className={`relative rounded-[16px] overflow-hidden flex items-end justify-center shadow-inner ${className}`}
+        style={{ 
+          width: numericSize, 
+          height: numericSize * 1.2,
+          background: bgGradient
+        }}
+      >
+        <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+           {/* Abstract scenery layer */}
+           <svg width="100%" height="100%" viewBox="0 0 100 120" preserveAspectRatio="none">
+             <circle cx="20" cy="20" r="10" fill="#FFF" opacity="0.3" />
+             <ellipse cx="50" cy="120" rx="90" ry="40" fill="#FFF" opacity="0.1" />
+           </svg>
+        </div>
+        <div className="relative z-10 pointer-events-none mb-1">
+          <MascotRenderer
+            theme={theme}
+            size={numericSize * 0.9}
+            outfit={outfit}
+            bgAccessory="none"
+            kid={kid}
+            stage={stage}
+            animation={animation}
+            transparentBg={true}
+          />
+        </div>
+        <div className="absolute inset-0 z-20 shadow-[inset_0_4px_12px_rgba(255,255,255,0.4)] pointer-events-none rounded-[16px]"></div>
+      </div>
+    );
+  }
+
   return (
     <MascotRenderer
       theme={theme}

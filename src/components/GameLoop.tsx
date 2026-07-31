@@ -873,7 +873,7 @@ export function GameLoop({
   }
 
   return (
-    <div className="mk-pop text-left">
+    <div className="mk-pop text-left flex flex-col h-full">
       {toast && (
         <div
           className="fixed left-1/2 -translate-x-1/2 z-50 text-white font-bold text-sm px-5 py-2.5 rounded-md shadow-lg border-b-4"
@@ -889,7 +889,7 @@ export function GameLoop({
       )}
 
       {/* Game navigation header */}
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex-shrink-0 flex items-center justify-between gap-3">
         <button
           onClick={() => {
             sfx.tick();
@@ -911,7 +911,7 @@ export function GameLoop({
       </div>
 
       {/* Narrative Mascot Header Row */}
-      <div className="mb-4 flex items-start gap-3">
+      <div className="mb-4 flex-shrink-0 flex items-start gap-3">
         <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`}>
           <Mascote 
             theme={kid.theme} 
@@ -953,17 +953,19 @@ export function GameLoop({
         </div>
       )}
 
+      <div className="flex-1 flex flex-col min-h-0 justify-center">
       <GameLoopExerciseRenderer
         q={q} status={status} idx={idx} handlePick={handlePick}
         timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
         mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
         flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
       />
+      </div>
       {/* Botão AVANÇAR — surge ao responder; deixa a criança seguir no ritmo dela */}
       {status && (
         <button
           onClick={advanceNow}
-          className="mt-4 w-full py-3 text-lg font-black text-white select-none cursor-pointer border-none rounded-2xl transition-all active:translate-y-1 mk-optin flex items-center justify-center gap-2"
+          className="mt-4 flex-shrink-0 w-full py-3 text-lg font-black text-white select-none cursor-pointer border-none rounded-2xl transition-all active:translate-y-1 mk-optin flex items-center justify-center gap-2"
           style={{
             fontFamily: FONT,
             background: status === "right" ? C.mint : C.ocean,
