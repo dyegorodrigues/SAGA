@@ -208,12 +208,18 @@ por vez.
 - **Risco residual:** a Jornada completa precisa de validação infantil de navegação
   e agrupamento visual; isso não altera a regra de acesso curricular.
 
-## C-03 — Kind e dados incompatíveis no Composer de fichas
+## C-03 — Kind e dados incompatíveis no Composer de fichas (corrigido no catálogo atual)
 
-- **Fato:** o kind retornado pode vir do nível, enquanto o switch de construção usa
-  `micro.kinds[0]`.
-- **Impacto:** tenframe pode receber dados de emojirow, por exemplo.
-- **Recomendação:** builder selecionado pela primitiva efetiva e contratos por kind.
+- **Fato original:** o kind retornado vinha do nível, enquanto o switch de
+  construção usava `micro.kinds[0]`.
+- **Correção executada:** o builder agora é escolhido pela primitiva efetiva do
+  nível. Os builders atuais cobrem as 12 fichas de Jornada registradas e retornam
+  resposta avaliável; tutorial legado `fala` é normalizado para `say`; kind sem
+  builder falha explicitamente em vez de produzir questão silenciosamente inválida.
+- **Proteção:** teste percorre os cinco níveis das 12 fichas registradas, valida
+  `uiProps`, função de avaliação e unicidade da resposta nas opções.
+- **Risco residual:** `Question` e `FichaParams` ainda têm campos amplos (`any`) e a
+  migração para união discriminada por kind permanece pendente e deve ser gradual.
 
 ## C-04 — Domínio simplificado
 

@@ -195,9 +195,9 @@ O auditor read-only `npm run auditar` comprovou:
 | Nós com gerador explícito | 42/95 |
 | Nós no fallback “Em construção” | 53/95 |
 | Fichas de Jornada no disco | 12/95 |
-| Fichas de Jornada registradas | 11/95 |
+| Fichas de Jornada registradas | 12/95 |
 | Fichas de Dojo no disco/registradas | 4/4 |
-| Fichas fora de `AllFichas` | 1 (`AL.01`) |
+| Fichas fora de `AllFichas` | 0 |
 
 As 11 competências que estavam ausentes dos YAMLs individuais foram incorporadas:
 
@@ -228,10 +228,13 @@ interação pelos pré-requisitos do DAG, usa o progresso global (inclusive de f
 anteriores) e impede recomendações do Sensei para nós fechados. Cartuchos externos
 não são confundidos com nós matemáticos.
 
-## C-03 — Contrato inconsistente no Composer de fichas
+## C-03 — Contrato inconsistente no Composer de fichas (corrigido no catálogo atual)
 
-O `kind` pode ser escolhido por `niveis[lvl].primitiva`, mas os dados da questão são
-construídos pelo primeiro kind da micro. Uma primitiva pode receber props de outra.
+O `kind` era escolhido por `niveis[lvl].primitiva`, mas os dados eram construídos
+pelo primeiro kind da micro. Agora a mesma primitiva efetiva seleciona o builder;
+as 12 fichas registradas são exercitadas em seus cinco níveis por teste de contrato,
+e kind desconhecido falha explicitamente. A tipagem discriminada completa continua
+pendente porque `Question` e `FichaParams` ainda possuem campos amplos.
 
 ## C-04 — Falso domínio
 
@@ -390,6 +393,8 @@ cinco níveis, com áudio, tutorial, misconception e testes.
 ## PR 5 — Contratos do Composer
 
 Corrigir incompatibilidade de kind/props e começar migração tipada kind por kind.
+**Estado:** incompatibilidade corrigida e catálogo atual protegido; migração da
+união discriminada continua em PRs pequenos, kind por kind.
 
 ---
 
@@ -439,11 +444,11 @@ cansaço ou “desmaio” são estados ficcionais e jamais punição por erro ou
 - `SAGA-Codex` — repositório destinado ao trabalho Codex.
 - branch local `work` — linha de trabalho isolada.
 
-Configuração local:
+Estado local atual:
 
-- `origin` aponta para `SAGA-Codex`;
-- `ai-studio` aponta para o SAGA original apenas para fetch;
-- push em `ai-studio` está desabilitado localmente.
+- não há remotos configurados nesta cópia;
+- nenhum push ocorre automaticamente;
+- o SAGA original não é um destino alcançável de push a partir desta cópia.
 
 ## Bloqueio atual
 
@@ -454,18 +459,18 @@ CONNECT tunnel failed, response 403
 ```
 
 Assim, tornar o repositório público não resolveu: o bloqueio ocorre antes da
-autenticação. O comando pendente é:
+autenticação. Quando houver rede e autorização, os comandos pendentes são:
 
 ```bash
+git remote add origin https://github.com/dyegorodrigues/SAGA-Codex.git
 git push -u origin work
 ```
 
-## Backups locais produzidos
+## Persistência local atual
 
-- `/workspace/SAGA-Codex-work.bundle` — histórico Git completo;
-- `/workspace/SAGA-Codex-work.zip` — snapshot de arquivos;
-- `/workspace/SAGA-Codex-work.patch` — commits após o baseline;
-- `/workspace/SAGA-Codex-work.SHA256` — integridade.
+O histórico está commitado na branch local `work`. ZIPs, patches, bundles e cópias
+redundantes foram removidos para manter uma única árvore de trabalho. A cópia no
+GitHub só estará comprovada após um push confirmado.
 
 Não se deve duplicar todo o repositório dentro de uma pasta do próprio repositório,
 pois isso cria duas fontes editáveis e crescimento recursivo. Esta pasta `codex/`
@@ -476,7 +481,7 @@ guarda somente continuidade, diagnóstico e plano.
 # 13. Verificações já executadas
 
 - `npm run lint` — TypeScript aprovado.
-- `npm test` — 25 arquivos e 834 testes aprovados no baseline auditado.
+- `npm test` — 27 arquivos e 843 testes aprovados após o contrato do Composer.
 - `npm run build` — aprovado; warning de bundle acima de 500 KB.
 - `npm run auditar` — invariantes aprovados e lacunas listadas.
 - comparação byte a byte dos uploads contra documentos canônicos.
@@ -495,11 +500,12 @@ guarda somente continuidade, diagnóstico e plano.
 
 # 14. O que falta, em lista direta
 
-1. Registrar `AL.01` ou justificar sua exclusão.
-2. Corrigir o DAG visível na UI.
+1. ✅ Registrar `AL.01` ou justificar sua exclusão — concluído.
+2. ✅ Corrigir o DAG visível na UI — concluído.
 3. Unificar gradualmente fichas e geradores legados.
 4. Tipar contratos por kind.
-5. Corrigir o Composer de fichas.
+5. ✅ Corrigir a divergência de primitiva do Composer — concluído; tipagem ampla
+   continua no item 4.
 6. Implementar coreografia universal.
 7. Completar misconceptions e distratores diagnósticos.
 8. Tornar domínio multidimensional.

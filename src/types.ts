@@ -53,7 +53,7 @@ export interface Question {
   /** Array de falas em estágios, quando o jogo narra passo-a-passo (ex: I-do/We-do) */
   audioSteps?: string[];
   tutorial?: { say: string; show?: Record<string, any> | string | number; ms?: number }[];
-  excecaoCPA?: boolean | "perceptual";
+  excecaoCPA?: boolean | "perceptual" | "espacial";
   isFallback?: boolean;
   kind: string;
   prompt: string;

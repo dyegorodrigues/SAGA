@@ -323,3 +323,21 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   de limitar o catálogo às três primeiras faixas.
 - Testes de contrato cobrem 95 IDs únicos, raízes, múltiplos pré-requisitos, aliases
   por `graphId` e compatibilidade de cartuchos externos.
+
+### 31 de Julho de 2026 — Contrato efetivo do Composer (Fase 3)
+
+- Corrigida a divergência em que o `kind` retornado vinha do nível CPA, mas o builder
+  construía dados conforme `micro.kinds[0]`. Agora ambos usam a primitiva efetiva.
+- Normalizados tutoriais antigos de `{ fala }` para o contrato runtime `{ say }`.
+- Adicionados builders para material de dezenas, relógio e balança, além das
+  transições para `plain`; primitives desconhecidas agora falham com contexto.
+- A suíte percorre os cinco níveis das 12 fichas de Jornada, verificando renderer,
+  avaliação e resposta única. `AL.01` foi incluída em `AllFichas`, eliminando a ficha
+  órfã registrada pelo auditor.
+- Baseline verificado após a mudança: 27 arquivos e 843 testes aprovados, além de
+  typecheck, auditor curricular e build de produção.
+- Risco mantido explícito: a união discriminada completa de `Question`/`FichaParams`
+  ainda será migrada incrementalmente para não quebrar os geradores legados.
+- Estado de continuidade revisado: apenas a branch local `work` guarda os commits;
+  não há remoto configurado nem backups ZIP/patch/bundle concorrentes nesta cópia.
+  Publicação no `SAGA-Codex` continua pendente e nunca é automática.

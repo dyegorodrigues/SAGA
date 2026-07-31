@@ -7,13 +7,14 @@
 ## Estado preservado
 
 - Branch local: `work`
-- Baseline anterior: `9f8ab0f` (`docs: consolidate project documentation`)
-- Commit da sincronização/auditoria: `46235e6`
+- Baseline curricular/DAG: `24317be`
+- Marco atual: contrato efetivo do Composer registrado no Diário de Bordo.
 - Repositório de backup pretendido: <https://github.com/dyegorodrigues/SAGA-Codex>
 - Repositório do Google AI Studio: <https://github.com/dyegorodrigues/SAGA>
 
-O remoto `origin` aponta para `SAGA-Codex`. O remoto `ai-studio` serve para buscar
-o original e tem push desabilitado localmente, evitando publicação acidental.
+No estado atual deste ambiente não há remoto Git configurado. Portanto, nenhum push
+é feito automaticamente e o repositório do Google AI Studio não pode ser alterado
+por acidente a partir desta cópia.
 
 ## Bloqueio de publicação
 
@@ -24,35 +25,34 @@ autenticação com:
 CONNECT tunnel failed, response 403
 ```
 
-Tornar o repositório público não remove esse bloqueio de rede. Assim que o acesso
-for restabelecido, publicar com:
+Tornar o repositório público não remove esse bloqueio de rede. Quando houver rede e
+autorização, configurar exclusivamente o repositório de backup e publicar com:
 
 ```bash
+git remote add origin https://github.com/dyegorodrigues/SAGA-Codex.git
 git push -u origin work
 ```
 
-Nunca trocar `origin` pelo repositório do Google AI Studio e nunca habilitar push
-em `ai-studio` sem autorização explícita do proprietário.
+Nunca configurar o repositório do Google AI Studio como destino de push sem
+autorização explícita do proprietário.
 
-## Backups locais de emergência
+## Persistência local
 
-Foram produzidos fora da árvore Git, para não inflar nem macular o aplicativo:
+O trabalho está preservado no histórico Git local da branch `work`. Não há ZIP,
+patch, bundle ou cópia do repositório dentro dele; isso evita backups concorrentes,
+arquivos obsoletos e consumo desnecessário de espaço/contexto.
 
-- `/workspace/SAGA-Codex-work.bundle` — branch e histórico Git completos;
-- `/workspace/SAGA-Codex-work.zip` — snapshot dos arquivos;
-- `/workspace/SAGA-Codex-work.patch` — alterações após `9f8ab0f`;
-- `/workspace/SAGA-Codex-work.SHA256` — hashes de integridade.
-
-O bundle foi validado com `git bundle verify` e registra histórico completo.
+A cópia externa no GitHub só estará garantida depois de um `git push` confirmado;
+commit local e PR preparado não equivalem a publicação remota.
 
 ## Baseline técnico já descoberto
 
 - grafo canônico: 95 competências;
 - geradores explícitos: 42/95;
 - fallbacks “Em construção”: 53/95;
-- fichas de Jornada no disco/registradas: 12/11;
+- fichas de Jornada no disco/registradas: 12/12;
 - fichas Dojo no disco/registradas: 4/4;
-- ficha fora de `AllFichas`: `AL.01`;
+- fichas fora de `AllFichas`: nenhuma;
 - YAMLs individuais por strand: 95 nós, sincronizados por ID e pré-requisitos com
   o grafo agregado; JSON/TypeScript são artefatos gerados e verificáveis.
 
