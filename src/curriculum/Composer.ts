@@ -159,6 +159,39 @@ export class Composer {
         answer = target;
         break;
       }
+      
+      case "scattered": {
+        const min = params.n_min || 1;
+        const max = params.n_max || 10;
+        const target = Math.floor(Math.random() * (max - min + 1)) + min;
+        
+        uiProps = {
+          emoji: ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐵"][Math.floor(Math.random() * 10)],
+          n: target,
+          ordered: params.arranjo === "fila" || params.arranjo === "grade",
+          flashDurationMs: params.flash_ms,
+          interactiveCount: params.interactive_count
+        };
+        
+        if (params.interactive_count) {
+          evaluate = (count) => count === target;
+          answer = target;
+        } else if (params.flash_ms) {
+          uiProps.targetNumber = target;
+          evaluate = (ans) => ans === target;
+          answer = target;
+          options = [];
+          const wrong1 = target + 1 > max ? target - 1 : target + 1;
+          const wrong2 = target - 1 < min ? target + 2 : target - 1;
+          options.push({ label: String(target), value: target });
+          if(wrong1 >= min && wrong1 <= max && wrong1 !== target) options.push({ label: String(wrong1), value: wrong1 });
+          if(wrong2 >= min && wrong2 <= max && wrong2 !== target && wrong2 !== wrong1) options.push({ label: String(wrong2), value: wrong2 });
+          options.sort(() => Math.random() - 0.5);
+        } else {
+          evaluate = (ans) => true; answer = target; options = [{ label: "Continuar 👍", value: target }];
+        }
+        break;
+      }
         
       case "plain": {
         // We will just return the params for plain rendering

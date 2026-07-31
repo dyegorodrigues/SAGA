@@ -81,15 +81,20 @@ export function trackMisconception(
  * E dentro da janela temporal de sessão (≤ 10 min) = misconception ativa.
  * Erros distantes no tempo ou isolados NUNCA disparam resgate.
  */
+const TAG_TO_NODE: Record<string, string> = {
+  "LENTO_DEDOS": "N1.03", // Subitização
+  "OFF_BY_ONE": "N1.02", // Canto Numérico
+  "ERRO_POSICIONAL": "N2.01", // Sistema Decimal
+};
+
 export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): string[] {
   if (!pMap) return [];
-  const rescueNodes: string[] = [];
+  const rescueNodes: Set<string> = new Set();
 
   for (const [node, progress] of Object.entries(pMap)) {
     const events = progress?.misconceptions;
     if (!events || events.length < 2) continue;
 
-    let hasActiveMisconception = false;
     for (let i = 0; i < events.length; i++) {
       const current = events[i];
       const window = events.slice(Math.max(0, i - 4), i + 1);
@@ -99,17 +104,17 @@ export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): 
       );
 
       if (closeMatches.length >= 2) {
-        hasActiveMisconception = true;
-        break;
+        if (TAG_TO_NODE[current.tag]) {
+          rescueNodes.add(TAG_TO_NODE[current.tag]);
+        } else {
+          rescueNodes.add(node);
+        }
+        break; // Achou pelo menos uma misconception ativa, avança para o próximo nó
       }
-    }
-
-    if (hasActiveMisconception) {
-      rescueNodes.push(node);
     }
   }
 
-  return rescueNodes;
+  return Array.from(rescueNodes);
 }
 
 /**

@@ -185,3 +185,23 @@ Durante as refatorações da Home e do GameLoop, o agente perdeu contexto críti
 - **Reconstrução do Repositório Git:** A corrupção local (fatal: loose object is corrupt) foi limpa e extirpada do contêiner excluindo fisicamente o diretório `.git`, reinicializando e fazendo o commit completo do atual projeto (The Clean Workspace Rule).
 - **AdminDashboardScreen:** A exibição visual do currículo estava contando tracks de `gFallback` (arquitetura padrão) como 'Implementados'. Foi corrigido adicionando a checagem `!track.gen(1).isFallback` para exibir com rigor estatístico os itens reais concluídos.
 - **Testes de Regressão:** Caminhos de leitura (readFileSync) corrigidos em `anti_regression.test.ts`. Todos os testes agora rodam 100% (green pass).
+
+### Registro de Alinhamento Arquitetural, Fichas Pedagógicas e Treino Inteligente (30 Julho 2026 - Noite)
+- **O Significado das Fichas Pedagógicas (Cards / Dossiês de Competência):**
+  - As **Fichas Pedagógicas** (`FichaCompetencia` localizadas em `src/curriculum/fichas/`) são a **Unidade Atômica de Ensino** do SAGA.
+  - Cada Ficha define os metadados pedagógicos de uma micro-habilidade (BNCC, Vertente/Strand, Faixa Etária, Pré-requisitos, Como Ensinar/Howto, Explicação/Explain e Distratores Cognitivos com tags de misconceptions).
+  - Além dos metadados, cada Ficha especifica o contrato **CRA (Concreto-Pictórico-Abstrato)** através da propriedade `niveis: { 1..5 }`. A variação de nível define qual a **primitiva de interface** (ex: `draggroup`, `emojirow`, `tenframe`, `numberline`, `arraygrid`) e o **andaime visual** (ex: `mao_fantasma`, `alto`, `medio`, `minimo`).
+  - As Fichas não contêm código de renderização JSX; elas são traduzidas pelo motor `Composer.ts` para gerar os objetos `Question` executados pelo `GameLoopExerciseRenderer.tsx`.
+- **Ajustes de UI no Treino Inteligente e Radar (SenseiTab.tsx):**
+  - O cartão principal da Home foi atualizado para **"Treino Inteligente"** (A Lição do Dia), com o detalhamento dinâmico dos 3 blocos da sessão (Aquecimento, Foco Novo e Fluência).
+  - O cartão secundário da lista foi renomeado para **"Mistura Total"** (Revisão Geral com tudo que já foi desbloqueado).
+  - A **Oficina de Resgate** foi estilizada com destaque visual rosa/vermelho (`bg-rose-50`, borda rosa), apresentando a lista exata de conceitos mapeados ativamente pelo `RadarEngine` ou pelo banco de erros.
+- **Unificação do RadarEngine e Conceitos Ativos:**
+  - O `RadarEngine` rastreia misconceptions em tempo real na janela rolante do aluno. Foi adicionada a constante `TAG_TO_NODE` para redirecionar erros genéricos (ex: `LENTO_DEDOS`, `OFF_BY_ONE`, `ERRO_POSICIONAL`) para as Fichas de origem correspondentes (`N1.03`, `N1.02`, `N2.01`).
+  - No `Composer.ts`, as questões de resgate da Aula do Dia agora priorizam automaticamente as Fichas detectadas pelo `RadarEngine`.
+- **Subitização e Flash (Relance Visual):**
+  - Ajustada a verificação no `GameLoopExerciseRenderer.tsx` para garantir que questões com `q.uiProps?.flashDurationMs` acionem a interface de relance com aviso "👀 Olhe rápido...", sem revelar os números antecipadamente.
+  - Garantido que a medição de tempo no Dojô/Subitização (`q.kind === "rapid-fire"` ou `track.id.startsWith("dojo")`) registre a tag `LENTO_DEDOS` quando o tempo ultrapassar 10s no acerto.
+- **Verificação de Integridade:**
+  - `npm run build` e compilação do bundle `dist/server.cjs` validados com sucesso (0 erros de build/lint).
+  - Repositório sanitizado sem arquivos temporários residuais.

@@ -327,9 +327,9 @@ export function GameLoop({
 
   // flash (subitização): mostra o grupo por um relance, depois esconde.
   // Tempo curto (e menor em níveis altos) para treinar reconhecer SEM contar.
-  const peekMs = (q.n ?? 0) <= 3 ? 2000 : (q.n ?? 0) <= 5 ? 1700 : 1400;
+  const peekMs = q.uiProps?.flashDurationMs || ((q.n ?? 0) <= 3 ? 2000 : (q.n ?? 0) <= 5 ? 1700 : 1400);
   useEffect(() => {
-    if (q.kind !== "flash") return;
+    if (q.kind !== "flash" && !q.uiProps?.flashDurationMs) return;
     setHintsUsed(0);
     setFlashHidden(false);
     const t = setTimeout(() => setFlashHidden(true), peekMs);
@@ -459,7 +459,7 @@ export function GameLoop({
       // Registra a misconception no Radar se houver e estiver mapeada nas opções
       const pickedOpt = q.options.find((o: any) => o.value === val);
       if (pickedOpt && pickedOpt.misconception) {
-        trackMisconception(kid.id, track.graphId || track.id, pickedOpt.tag || pickedOpt.misconception);
+        trackMisconception(prog, pickedOpt.tag || pickedOpt.misconception);
       }
     }
 
@@ -537,10 +537,14 @@ export function GameLoop({
     // ⭐ XP vitalício e Nivelamento por Velocidade (Dojo)
     let starGain = 0;
     if (right) {
-      if (q.kind === "rapid-fire") {
+      if (q.kind === "rapid-fire" || track.id.startsWith("dojo")) {
         if (durationMs <= 3000) starGain = 15; // Genialidade (Subitização mental)
         else if (durationMs <= 10000) starGain = 5; // Mediano
-        else starGain = 2; // Contando nos dedos
+        else {
+          starGain = 2; // Contando nos dedos
+          // Se está muito lento na soma/subtração básica, loga misconception
+          trackMisconception(p, "LENTO_DEDOS");
+        }
       } else {
         starGain = 1;
       }

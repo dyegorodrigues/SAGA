@@ -84,9 +84,9 @@ export function GameLoopExerciseRenderer({
 
           ) : (
             <>
-              {q.kind === "count" && q.emoji && q.n != null && (
-            <div className="flex flex-col items-center gap-3">
-              <EmojiRow emoji={q.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />                                        
+              {(q.kind === "count" || q.kind === "emojirow") && (q.emoji || q.uiProps?.emoji) && q.n != null && (
+            <div className="flex flex-col items-center gap-3" style={{ opacity: (q.uiProps?.flashDurationMs && flashHidden && status !== "right") ? 0 : 1, transition: "opacity 0.2s" }}>
+              <EmojiRow emoji={q.emoji || q.uiProps?.emoji} n={mockTutorialN !== null ? mockTutorialN : q.n} highlightIndex={guidedIdx} />                                        
             </div>
           )}
           {q.kind === "subvis" && (
@@ -283,13 +283,19 @@ export function GameLoopExerciseRenderer({
           {q.kind === "numberline-interactive" && <InteractiveNumberLine q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "drag-group" && <DragGroup q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "visual-addition" && q.a != null && q.b != null && <VisualAddition a={q.a} b={q.b} emojiA={q.uiProps?.emojiA || q.emoji} emojiB={q.uiProps?.emojiB || q.emoji} showNumbers={q.uiProps?.showNumbers !== false} />}
-          {q.kind === "scattered" && q.n != null && <ScatteredItems n={q.n} emoji={q.emoji || "⭐"} ordered={q.uiProps?.ordered} />}
+          {q.kind === "scattered" && q.n != null && (
+            <div style={{ opacity: (q.uiProps?.flashDurationMs && flashHidden && status !== "right") ? 0 : 1, transition: "opacity 0.2s" }}>
+              <ScatteredItems n={q.n} emoji={q.emoji || q.uiProps?.emoji || "⭐"} ordered={q.uiProps?.ordered} />
+            </div>
+          )}
           {q.kind === "linking-cubes" && q.groups && <LinkingCubes groups={q.groups.map(g => ({ n: g.n, color: (g as any).color || "bg-blue-400" }))} showNumbers={q.uiProps?.showNumbers} />}
           {q.kind === "take-apart" && q.a != null && q.b != null && q.n != null && <TakeApart total={q.n} knownSplit={{a: q.a, b: q.b}} />}
 
           {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
           {q.kind === "tenframe" && q.n != null && (
-            <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} flashDurationMs={q.uiProps?.flashDurationMs} state={status === "right" ? "acerto" : status === "wrong" ? "erro-suave" : "ocioso"} />
+            <div style={{ opacity: (q.uiProps?.flashDurationMs && flashHidden && status !== "right") ? 0 : 1, transition: "opacity 0.2s" }}>
+              <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} flashDurationMs={q.uiProps?.flashDurationMs} state={status === "right" ? "acerto" : status === "wrong" ? "erro-suave" : "ocioso"} />
+            </div>
           )}
 
           {q.kind === "flash" && q.emoji && q.n != null && (
@@ -431,7 +437,7 @@ export function GameLoopExerciseRenderer({
 
       {/* Answer Button Grid Options */}
       <div className="mt-5">
-        {q.kind === "flash" && (!flashHidden && status !== "right") ? (
+        {(q.kind === "flash" || q.uiProps?.flashDurationMs) && (!flashHidden && status !== "right") ? (
           // durante o relance: sem números na tela, só o convite a OLHAR
           <div className="text-center py-4" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.grape }}>
             👀 Olhe rápido...

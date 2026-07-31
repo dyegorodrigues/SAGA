@@ -1,5 +1,6 @@
 import { Question, Track, Progress } from "../../types";
 import { computeUnlockStatus } from "./unlockEngine";
+import { RadarEngine } from "./radarEngine";
 
 /**
  * COMPOSER SAGA — O Orquestrador da Academia Diária
@@ -93,13 +94,28 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
   const fronteira = learning[0] || fresh || aquecimento;
 
   // 3. RESGATE
+  const radarRescueIds = RadarEngine.getRescueItems("kid", pMap);
+  const radarTracks = radarRescueIds.map(id => tracks.find(t => t.id === id || t.graphId === id)).filter(Boolean) as Track[];
+  
   const cold = tracks
-    .filter((t) => practiced(progOf(t.id)) && t.id !== fronteira?.id && t.id !== aquecimento?.id)
+    .filter((t) => practiced(progOf(t.id)) && t.id !== fronteira?.id && t.id !== aquecimento?.id && !radarRescueIds.includes(t.id))
     .sort((a, b) => (progOf(a.id).lastDay || "0000").localeCompare(progOf(b.id).lastDay || "0000"));
+  
   const hasBank = tracks.some((t) => (progOf(t.id).bank || []).length > 0);
-  const resgates: AulaPlan["resgates"] = [];
-  if (hasBank) resgates.push({ track: fronteira!, fromBank: true }); 
-  if (cold[0]) resgates.push({ track: cold[0], fromBank: false });
+  const resgates: (AulaPlan["resgates"][0] & { isRadar?: boolean })[] = [];
+  
+  for (const rt of radarTracks) {
+    if (!resgates.some(r => r.track.id === rt.id)) {
+       resgates.push({ track: rt, fromBank: false, isRadar: true });
+    }
+  }
+
+  if (hasBank && !resgates.some(r => r.track.id === fronteira?.id)) {
+    resgates.push({ track: fronteira!, fromBank: true }); 
+  }
+  if (cold[0] && !resgates.some(r => r.track.id === cold[0].id)) {
+    resgates.push({ track: cold[0], fromBank: false });
+  }
 
   // 4. FLUÊNCIA (Bloco Dojo da Academia)
   const fluPool = tracks.filter((t) => FLUENCY_IDS.includes(t.id) && t.id !== fronteira?.id);
@@ -142,8 +158,15 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
     [bankQs[i], bankQs[j]] = [bankQs[j], bankQs[i]];
   }
 
-  const coldTrack = plan.resgates.find((r) => !r.fromBank)?.track || null;
-  const genResg = () => bankQs.pop() || gen(coldTrack);
+  const radarTrack = (plan.resgates as any[]).find((r) => r.isRadar)?.track || null;
+  const coldTrack = plan.resgates.find((r) => !r.fromBank && !(r as any).isRadar)?.track || null;
+  
+  const genResg = () => {
+    if (radarTrack) return gen(radarTrack);
+    const bq = bankQs.pop();
+    if (bq) return bq;
+    return gen(coldTrack);
+  };
 
   const qs: Question[] = [];
   
