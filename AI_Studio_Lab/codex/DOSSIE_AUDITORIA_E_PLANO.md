@@ -10,6 +10,10 @@ continuidade. Este documento não substitui a Bíblia, o Grafo, o Manual ou o Do
 > exposição de raciocínio interno. Ele preserva os resultados, justificativas,
 > comandos e decisões necessários para continuar o trabalho sem depender do chat.
 
+> **Auditoria detalhada:** o registro problema por problema, com fatos, impactos,
+> riscos e recomendações, está em
+> [`AUDITORIA_PROFUNDA_COMPLETA.md`](./AUDITORIA_PROFUNDA_COMPLETA.md).
+
 ---
 
 # 1. Visão do produto entendida

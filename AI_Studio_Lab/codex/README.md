@@ -69,3 +69,12 @@ o Codex estão preservados em:
 
 O dossiê é a melhor porta de entrada para retomar o trabalho sem depender do
 histórico do chat. Ele não substitui as fontes pedagógicas canônicas.
+
+## Auditoria completa, problema por problema
+
+Para consultar a auditoria detalhada — fatos observados, impactos, riscos,
+recomendações, lacunas pedagógicas/técnicas e matriz de prioridade — abra:
+
+- **[`AUDITORIA_PROFUNDA_COMPLETA.md`](./AUDITORIA_PROFUNDA_COMPLETA.md)**
+
+Use este arquivo quando precisar do detalhe que não cabe no resumo do dossiê.

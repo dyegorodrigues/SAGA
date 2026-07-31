@@ -300,3 +300,12 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Criado `scripts/generate-graph-artifacts.cjs`: `npm run grafo:gerar` produz JSON
   e TypeScript; `npm run grafo:check` detecta artefato desatualizado sem escrever.
 - O build agora executa o check antes do Vite, e um teste Vitest protege o contrato.
+
+### 31 de Julho de 2026 — Registro integral da auditoria para consulta no GitHub
+
+- Criado `AI_Studio_Lab/codex/AUDITORIA_PROFUNDA_COMPLETA.md` com inventário,
+  arquitetura real, conflitos documentais, dez achados críticos, dez achados médios,
+  auditoria pedagógica, UI/UX, mascote, testes, plano por fases, prioridades e
+  definição de pronto.
+- O README da pasta Codex e o dossiê agora possuem links relativos clicáveis para o
+  relatório completo, evitando depender do histórico do chat no tablet.
