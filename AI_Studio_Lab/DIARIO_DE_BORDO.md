@@ -341,3 +341,15 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Estado de continuidade revisado: apenas a branch local `work` guarda os commits;
   não há remoto configurado nem backups ZIP/patch/bundle concorrentes nesta cópia.
   Publicação no `SAGA-Codex` continua pendente e nunca é automática.
+
+### 31 de Julho de 2026 — Fronteira tipada das fichas (Fase 3, parte 2)
+
+- `FichaParams` deixou de aceitar `any`; a entrada do Composer agora interpreta e
+  valida números, booleanos, textos, opções e respostas antes de gerar a questão.
+- Resposta, função avaliadora e `uiProps` das fichas receberam tipos incrementais,
+  mantendo o contrato global legado intacto para não quebrar saves ou geradores.
+- Parâmetro malformado falha com competência/micro no erro, e a suíte protege essa
+  fronteira. A união discriminada global de `Question` permanece uma migração futura.
+- Registrado que as fichas cinematográficas detalhadas serão entregues separadamente
+  pelo proprietário; não devem ser inventadas ou massificadas antes desse arquivo.
+- Baseline desta etapa: 27 arquivos e 844 testes, typecheck, auditor e build aprovados.

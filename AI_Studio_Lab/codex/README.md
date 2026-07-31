@@ -60,6 +60,14 @@ O comando reproduzível é `npm run auditar`. O plano de execução permanece em
 `AI_Studio_Lab/pedagogia/PLANO_MESTRE_SAGA.md` e os fatos de cada sessão em
 `AI_Studio_Lab/DIARIO_DE_BORDO.md`.
 
+## Dependência de conteúdo em elaboração
+
+As fichas cinematográficas detalhadas estão sendo produzidas separadamente pelo
+proprietário. Até o arquivo ser entregue, o trabalho técnico pode fortalecer
+contratos, motores e validações, mas não deve inventar, completar em massa ou
+reescrever essa autoria pedagógica. Na entrega, importar por uma etapa própria,
+validar contra Bíblia/Grafo/SPEC e preservar rastreabilidade da origem.
+
 ## Dossiê consolidado das conversas
 
 O relatório, os diagnósticos, as decisões e o plano produzidos nas conversas com

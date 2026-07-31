@@ -481,7 +481,7 @@ guarda somente continuidade, diagnóstico e plano.
 # 13. Verificações já executadas
 
 - `npm run lint` — TypeScript aprovado.
-- `npm test` — 27 arquivos e 843 testes aprovados após o contrato do Composer.
+- `npm test` — 27 arquivos e 844 testes aprovados após tipar a fronteira do Composer.
 - `npm run build` — aprovado; warning de bundle acima de 500 KB.
 - `npm run auditar` — invariantes aprovados e lacunas listadas.
 - comparação byte a byte dos uploads contra documentos canônicos.
@@ -503,7 +503,8 @@ guarda somente continuidade, diagnóstico e plano.
 1. ✅ Registrar `AL.01` ou justificar sua exclusão — concluído.
 2. ✅ Corrigir o DAG visível na UI — concluído.
 3. Unificar gradualmente fichas e geradores legados.
-4. Tipar contratos por kind.
+4. Tipar contratos por kind — fronteira das fichas iniciada; contrato global legado
+   ainda pendente.
 5. ✅ Corrigir a divergência de primitiva do Composer — concluído; tipagem ampla
    continua no item 4.
 6. Implementar coreografia universal.
@@ -520,6 +521,8 @@ guarda somente continuidade, diagnóstico e plano.
 17. Cobrir as 53 competências atualmente em fallback.
 18. Profissionalizar o mascote somente depois da base educacional.
 19. Publicar a branch `work` no `SAGA-Codex` quando a rede permitir.
+20. Importar e validar as fichas cinematográficas detalhadas quando o proprietário
+    concluir o arquivo externo; não inventar nem massificar esse conteúdo antes.
 
 ---
 

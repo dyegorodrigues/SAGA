@@ -1,5 +1,12 @@
-import { FichaCompetencia, FichaMicro } from "./schema";
-import { Question } from "../types";
+import { FichaCompetencia } from "./schema";
+import { Option, Question } from "../types";
+import {
+  FichaAnswer,
+  FichaEvaluate,
+  FichaUiProps,
+  normalizeFichaTutorial,
+  parseComposerParams,
+} from "./fichaQuestionContract";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -14,22 +21,6 @@ function numericOptions(answer: number, min: number, max: number) {
   return values
     .map(value => ({ label: String(value), value }))
     .sort(() => Math.random() - 0.5);
-}
-
-function normalizeTutorial(value: unknown): Question["tutorial"] {
-  if (!Array.isArray(value)) return undefined;
-
-  return value.flatMap(step => {
-    if (!step || typeof step !== "object") return [];
-    const raw = step as Record<string, unknown>;
-    const say = raw.say ?? raw.fala;
-    if (typeof say !== "string") return [];
-    return [{
-      say,
-      ...(raw.show !== undefined ? { show: raw.show as Record<string, any> | string | number } : {}),
-      ...(typeof raw.ms === "number" ? { ms: raw.ms } : {}),
-    }];
-  });
 }
 
 export class Composer {
@@ -50,12 +41,12 @@ export class Composer {
     // O nível é a fonte da representação CPA efetiva. O builder precisa usar a
     // mesma primitiva retornada, nunca o primeiro kind histórico da micro.
     const kind = ficha.niveis?.[lvl]?.primitiva ?? micro.kinds[0];
-    const params = micro.params;
+    const params = parseComposerParams(micro.params, `${ficha.id}/${micro.id}`);
 
-    let uiProps: any = {};
-    let evaluate = (ans: any) => false;
-    let answer: any = null;
-    let options: any[] | undefined = undefined;
+    let uiProps: FichaUiProps;
+    let evaluate: FichaEvaluate;
+    let answer: FichaAnswer;
+    let options: Option[] | undefined;
 
     let big: string | undefined = undefined;
     let n: number | undefined;
@@ -370,7 +361,7 @@ export class Composer {
       kind: kind === "intruso_math" ? "plain" : kind,
       prompt: promptOverride || params.audio_prompt || "Responda:",
       audioPrompt: promptOverride || params.audio_prompt,
-      tutorial: normalizeTutorial(params.tutorial),
+      tutorial: normalizeFichaTutorial(params.tutorial),
       excecaoCPA: ficha.excecaoCPA,
       uiProps,
       evaluate,

@@ -70,4 +70,18 @@ describe("Composer de fichas", () => {
       "Primitiva shapecanvas ainda não possui builder",
     );
   });
+
+  it("rejects malformed ficha parameters at the Composer boundary", () => {
+    const malformed = {
+      ...N1_03,
+      micros: [{
+        ...N1_03.micros[0],
+        params: { ...N1_03.micros[0].params, n_min: "um" },
+      }],
+    };
+
+    expect(() => Composer.generate(malformed, 1, "a")).toThrow(
+      "Parâmetro n_min inválido em N1.03/a",
+    );
+  });
 });

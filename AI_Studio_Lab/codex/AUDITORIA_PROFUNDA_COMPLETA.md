@@ -218,8 +218,11 @@ por vez.
   builder falha explicitamente em vez de produzir questão silenciosamente inválida.
 - **Proteção:** teste percorre os cinco níveis das 12 fichas registradas, valida
   `uiProps`, função de avaliação e unicidade da resposta nas opções.
-- **Risco residual:** `Question` e `FichaParams` ainda têm campos amplos (`any`) e a
-  migração para união discriminada por kind permanece pendente e deve ser gradual.
+- **Evolução posterior:** a fronteira do Composer passou a validar parâmetros
+  desconhecidos em runtime e a usar respostas, avaliação e `uiProps` tipados no
+  catálogo de fichas, sem alterar o contrato legado global.
+- **Risco residual:** `Question` global ainda possui campos amplos (`any`) e a união
+  discriminada completa por kind permanece pendente e deve ser gradual.
 
 ## C-04 — Domínio simplificado
 
