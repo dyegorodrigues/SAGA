@@ -63,10 +63,15 @@ O comando reproduzível é `npm run auditar`. O plano de execução permanece em
 ## Dependência de conteúdo em elaboração
 
 As fichas cinematográficas detalhadas estão sendo produzidas separadamente pelo
-proprietário. Até o arquivo ser entregue, o trabalho técnico pode fortalecer
-contratos, motores e validações, mas não deve inventar, completar em massa ou
-reescrever essa autoria pedagógica. Na entrega, importar por uma etapa própria,
-validar contra Bíblia/Grafo/SPEC e preservar rastreabilidade da origem.
+proprietário. O Codex pode criar ou completar fichas provisórias quando isso for
+necessário para fazer o produto funcionar, sempre fundamentado em Bíblia, Grafo,
+Manual e SPEC e com a origem registrada no commit/Diário.
+
+Quando o arquivo do proprietário chegar, ele entra primeiro como material de
+comparação, nunca como substituição cega. A fusão avalia lado a lado objetivo,
+escada CRA, parâmetros, misconceptions, roteiro/coreografia, acessibilidade e
+testes; aproveita o melhor de cada versão e publica apenas uma ficha runtime
+canônica. O original recebido fica preservado em staging para rastreabilidade.
 
 ## Dossiê consolidado das conversas
 

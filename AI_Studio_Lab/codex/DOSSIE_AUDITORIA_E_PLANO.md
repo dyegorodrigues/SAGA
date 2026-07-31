@@ -521,8 +521,9 @@ guarda somente continuidade, diagnóstico e plano.
 17. Cobrir as 53 competências atualmente em fallback.
 18. Profissionalizar o mascote somente depois da base educacional.
 19. Publicar a branch `work` no `SAGA-Codex` quando a rede permitir.
-20. Importar e validar as fichas cinematográficas detalhadas quando o proprietário
-    concluir o arquivo externo; não inventar nem massificar esse conteúdo antes.
+20. Continuar fichas provisórias quando necessário e, quando o proprietário entregar
+    as versões cinematográficas, comparar e fundir sem substituição cega, mantendo
+    uma única ficha runtime canônica e a origem recebida preservada em staging.
 
 ---
 

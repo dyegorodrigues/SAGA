@@ -350,6 +350,7 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   mantendo o contrato global legado intacto para não quebrar saves ou geradores.
 - Parâmetro malformado falha com competência/micro no erro, e a suíte protege essa
   fronteira. A união discriminada global de `Question` permanece uma migração futura.
-- Registrado que as fichas cinematográficas detalhadas serão entregues separadamente
-  pelo proprietário; não devem ser inventadas ou massificadas antes desse arquivo.
+- As fichas cinematográficas detalhadas serão entregues separadamente pelo
+  proprietário. Até lá, o Codex pode criar versões provisórias fundamentadas nas
+  fontes canônicas; na entrega, haverá comparação e fusão, nunca substituição cega.
 - Baseline desta etapa: 27 arquivos e 844 testes, typecheck, auditor e build aprovados.
