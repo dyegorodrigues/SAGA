@@ -245,3 +245,7 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - **Sanitização do Repositório & Build:**
   - Todos os scripts temporários foram removidos.
   - O ambiente foi validado com compilação limpa e o dev server está ativo e pronto.
+
+- **Atualização da SPEC de Construção dos Exercícios (`SPEC_CONSTRUCAO_EXERCICIOS.md`):**
+  - O arquivo de especificações visuais e lógicas dos exercícios (`SPEC_CONSTRUCAO_EXERCICIOS.md`) enviado foi comparado, validado e sincronizado na pasta canônica `AI_Studio_Lab/pedagogia/`.
+  - Contém as fichas F0-F2 (31 exercícios desenhados em texto) e as regras do Jardim do Dojô.
