@@ -128,6 +128,7 @@ export interface Track {
   lvlSkills?: string[];
   /** trilhas-alicerce (continuum vertical — Constituição regra 7) */
   prereqs?: string[];
+  dominio?: string;
   graphId?: string;
   island?: string;
 }

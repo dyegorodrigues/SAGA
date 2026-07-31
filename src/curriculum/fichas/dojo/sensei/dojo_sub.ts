@@ -102,5 +102,6 @@ export const dojo_sub: Track = {
     "2D - 2D (Sem Emprest.)",
     "2D - 2D (Com Emprest.)"
   ],
-  prereqs: []
+  prereqs: [],
+  dominio: "2 rounds seguidos ≥80% sobe de faixa, <60% desce"
 };

@@ -205,3 +205,17 @@ Durante as refatorações da Home e do GameLoop, o agente perdeu contexto críti
 - **Verificação de Integridade:**
   - `npm run build` e compilação do bundle `dist/server.cjs` validados com sucesso (0 erros de build/lint).
   - Repositório sanitizado sem arquivos temporários residuais.
+
+### 30/jul/2026 - Correção
+* Os resultados da simulação do `simulated-learner` foram identificados como falsos e não confiáveis (eram prints estáticos). O arquivo `AI_Studio_Lab/tools/simulated-learner.ts` foi apagado. A reconstrução real fica para depois.
+
+### TAREFA 2 CONCLUÍDA - Painel Admin
+* Atualizado o \`AdminDashboardScreen\` para exibir a **tabela das 95 competências** usando as propriedades das trilhas do Grafo (gerador, primitiva, áudio, etc.).
+* O \`SandboxModal\` foi reescrito (na aba Sandbox Lado-a-Lado) para renderizar os **5 níveis (1 a 5) simultaneamente**, gerando a questão real no \`GameLoopExerciseRenderer\` para cada um, permitindo visualizar a transição CPA de uma vez.
+* O \`AdminGodPanel\` recebeu a nova aba **Inspetor Avançado**, que lista para a criança selecionada: a tabela de progresso bruto por trilha (\`lvl, streak, mast, ok/tot\`), o log detalhado das decisões do Composer e os botões de simular erro e forçar avanço de nível.
+
+### Kinds Órfãos Mapeados (§12.6)
+De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a estas competências:
+- **count / emojirow (modo contagem e flash):** Serve N1.01, N1.03, N1.04 e JD1.
+- **singapore-bars (comparação por barras / cubos):** Serve N3.04, N3.10, N5.*, N6.04 (e PE.01/PE.02 no modo vertical).
+- **linking-cubes / sequence / sum:** Serão integrados às progressões de adição concreta (N3.01-04) e sequenciamento (N1.07, N2.02).

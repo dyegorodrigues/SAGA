@@ -16,7 +16,8 @@ export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded, onTes
   const [selectedStage, setSelectedStage] = useState<1 | 2 | 3 | 4 | 5>(5);
   const [selectedOutfit, setSelectedOutfit] = useState<string>("default");
   const [selectedBg, setSelectedBg] = useState<string>("default");
-  const [activeTab, setActiveTab] = useState<"tamagotchis" | "perfis">("tamagotchis");
+  const [activeTab, setActiveTab] = useState<"tamagotchis" | "perfis" | "inspetor">("tamagotchis");
+  const [selectedKidId, setSelectedKidId] = useState<string>("");
 
   const themesList = Object.entries(THEMES);
 
@@ -164,6 +165,20 @@ export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded, onTes
           >
             👥 Gestor de Perfis (Editar Stars & Unlocks)
           </button>
+          <button
+            onClick={() => {
+              sfx.tick();
+              setActiveTab("inspetor");
+              if (!selectedKidId && state.kids.length > 0) setSelectedKidId(state.kids[0].id);
+            }}
+            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
+              activeTab === "inspetor" ? "bg-indigo-600 text-white shadow-sm" : "text-indigo-800 hover:bg-indigo-100"
+            }`}
+            style={{ fontFamily: FONT }}
+          >
+            🕵️ Inspetor Avançado (Composer & Progress)
+          </button>
+
           <button
             onClick={() => {
               sfx.tick();
@@ -461,6 +476,111 @@ export function AdminGodPanel({ state, onUpdateState, onClose, isEmbedded, onTes
                   </div>
                 );
               })}
+            </div>
+          )}
+
+
+          {/* TAB 3: Inspetor */}
+          {activeTab === "inspetor" && (
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200">
+                <span className="text-sm font-black text-slate-600 uppercase tracking-widest">Inspecionar Criança:</span>
+                <select 
+                  className="bg-slate-100 border border-slate-300 rounded-lg px-4 py-2 text-sm font-bold focus:outline-none focus:border-indigo-500"
+                  value={selectedKidId}
+                  onChange={e => setSelectedKidId(e.target.value)}
+                >
+                  {state.kids.map(k => <option key={k.id} value={k.id}>{k.name} ({k.id})</option>)}
+                </select>
+              </div>
+
+              {selectedKidId && state.progress[selectedKidId] ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* PROGRESSO BRUTO */}
+                  <div className="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm flex flex-col max-h-[60vh] overflow-y-auto">
+                    <h3 className="text-base font-black text-slate-800 mb-4 border-b border-slate-100 pb-2">📈 Progresso Bruto por Trilha</h3>
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider">
+                        <tr>
+                          <th className="p-2 rounded-tl-lg">Trilha</th>
+                          <th className="p-2">Lvl</th>
+                          <th className="p-2">Streak</th>
+                          <th className="p-2">Mast</th>
+                          <th className="p-2 rounded-tr-lg">Acertos</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {Object.entries(state.progress[selectedKidId]).map(([tId, p]) => (
+                          <tr key={tId} className="hover:bg-slate-50">
+                            <td className="p-2 font-bold text-indigo-600">{tId}</td>
+                            <td className="p-2 font-bold">{p.lvl}</td>
+                            <td className="p-2">{p.streak}</td>
+                            <td className="p-2">{p.mast}</td>
+                            <td className="p-2 text-emerald-600">{p.ok}/{p.tot}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* COMPOSER LOG & BUTTONS */}
+                  <div className="flex flex-col gap-6 max-h-[60vh] overflow-y-auto">
+                    
+                    <div className="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm">
+                      <h3 className="text-base font-black text-slate-800 mb-4 border-b border-slate-100 pb-2">🛠️ Botões de Teste (Forçar / Simular)</h3>
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2">
+                          <input id="forceTrack" type="text" placeholder="ID (ex: N1.01)" className="border p-2 rounded text-xs w-24" />
+                          <button onClick={() => {
+                            const tId = (document.getElementById('forceTrack') as HTMLInputElement).value;
+                            if (!tId) return;
+                            const prog = {...state.progress};
+                            if(!prog[selectedKidId]) prog[selectedKidId] = {};
+                            if(!prog[selectedKidId][tId]) prog[selectedKidId][tId] = {lvl:1, streak:0, bad:0, stars:0, ok:0, tot:0, bank:[], mast:0};
+                            prog[selectedKidId][tId].lvl = Math.min(5, prog[selectedKidId][tId].lvl + 1);
+                            onUpdateState({...state, progress: prog});
+                            alert("Nível forçado para " + prog[selectedKidId][tId].lvl);
+                          }} className="bg-indigo-100 text-indigo-700 px-3 py-2 rounded font-bold text-xs">Avançar Lvl</button>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input id="forceErrTag" type="text" placeholder="Tag de erro" className="border p-2 rounded text-xs w-24" />
+                          <button onClick={() => {
+                            const tag = (document.getElementById('forceErrTag') as HTMLInputElement).value;
+                            const tId = (document.getElementById('forceTrack') as HTMLInputElement).value || "N1.01";
+                            if (!tag) return;
+                            const prog = {...state.progress};
+                            if(!prog[selectedKidId]) prog[selectedKidId] = {};
+                            if(!prog[selectedKidId][tId]) prog[selectedKidId][tId] = {lvl:1, streak:0, bad:0, stars:0, ok:0, tot:0, bank:[], mast:0};
+                            prog[selectedKidId][tId].bank.push({ sig: tag, hits: 1, q: { kind: 'mock', prompt: '', answer: 0 } as any });
+                            onUpdateState({...state, progress: prog});
+                            alert("Erro simulado com tag: " + tag);
+                          }} className="bg-rose-100 text-rose-700 px-3 py-2 rounded font-bold text-xs">Simular Erro</button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-3xl p-6 border-2 border-slate-200 shadow-sm flex-1 flex flex-col min-h-[300px]">
+                      <h3 className="text-base font-black text-slate-800 mb-4 border-b border-slate-100 pb-2">🧠 Log de Decisão do Composer</h3>
+                      <div className="flex-1 overflow-y-auto bg-slate-900 rounded-xl p-4 font-mono text-[10px] text-emerald-400 space-y-3">
+                        {state.log && state.log[selectedKidId] && state.log[selectedKidId].length > 0 ? (
+                          [...state.log[selectedKidId]].reverse().map((entry, idx) => (
+                            <div key={idx} className="border-b border-slate-700 pb-2">
+                              <span className="text-slate-500">[{new Date(entry.t).toLocaleTimeString()}]</span>
+                              <div className="text-emerald-300 mt-1 whitespace-pre-wrap">{entry.d}</div>
+                              {entry.stars !== undefined && <div className="text-amber-400 mt-1">⭐ +{entry.stars} stars</div>}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-slate-500 italic">Nenhum log registrado ainda. Jogue uma rodada!</div>
+                        )}
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center p-8 text-slate-400 font-bold">Nenhum dado encontrado para a criança selecionada.</div>
+              )}
             </div>
           )}
 

@@ -123,6 +123,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
       {/* CONTENT AREA */}
       <div className="flex-1 overflow-y-auto p-6 relative">
         
+        
         {/* TAB 1: Curriculum */}
         {activeTab === "curriculum" && (
           <div className="max-w-7xl mx-auto space-y-8 pb-20">
@@ -191,53 +192,56 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
                         </div>
                       </div>
                       
-                      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {nodesInFaixa.map(node => {
-                          const track = getTrackById(node.id);
-                          const isImplemented = track && !track.gen(1).isFallback;
-                          
-                          return (
-                            <div key={node.id} className={`rounded-xl p-4 border flex flex-col justify-between transition-colors ${isImplemented ? 'bg-slate-800 border-indigo-500 hover:border-indigo-400' : 'bg-slate-800/50 border-slate-700 opacity-60'} cursor-pointer`} onClick={() => setSelectedNode(node)}>
-                              <div>
-                                <div className="flex justify-between items-start mb-2">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-2xl">{track ? track.icon : '🚧'}</span>
-                                    <div>
-                                      <div className={`text-xs font-bold tracking-widest ${isImplemented ? 'text-indigo-400' : 'text-slate-500'}`}>{node.id} - {node.strand}</div>
-                                      <h4 className="text-white font-bold">{node.nome}</h4>
-                                    </div>
-                                  </div>
-                                </div>
-                                
-                                {node.prereqs && node.prereqs.length > 0 && (
-                                  <div className="mt-3 text-xs">
-                                    <span className="text-slate-500 font-bold">Reqs: </span>
-                                    <span className="text-amber-400 font-medium">{node.prereqs.join(', ')}</span>
-                                  </div>
-                                )}
-                              </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-slate-300 text-sm">
+                          <thead className="bg-slate-800 text-slate-400 font-bold text-xs uppercase tracking-wider border-b border-slate-700">
+                            <tr>
+                              <th className="px-4 py-3">ID</th>
+                              <th className="px-4 py-3">Competência</th>
+                              <th className="px-4 py-3">Gerador?</th>
+                              <th className="px-4 py-3">Nº Micros</th>
+                              <th className="px-4 py-3">Primitiva</th>
+                              <th className="px-4 py-3">Coreografia?</th>
+                              <th className="px-4 py-3">Áudio?</th>
+                              <th className="px-4 py-3">Testar</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-700">
+                            {nodesInFaixa.map(node => {
+                              const track = getTrackById(node.id);
+                              const isImplemented = track && !track.gen(1).isFallback;
+                              let qTest = null;
+                              try { if(isImplemented) qTest = track.gen(1); } catch(e){}
                               
-                              {isImplemented && (
-                                <div className="mt-5 grid grid-cols-5 gap-1">
-                                  {[1, 2, 3, 4, 5].map((lvl) => (
-                                    <button
-                                      key={lvl}
-                                      onClick={(e) => { e.stopPropagation(); onTestTrackLvl(node.id, lvl); }}
-                                      className="py-1 text-center bg-slate-700 hover:bg-indigo-500 text-slate-300 hover:text-white rounded text-xs font-bold transition-colors"
-                                    >
-                                      L{lvl}
-                                    </button>
-                                  ))}
-                                </div>
-                              )}
-                              {!isImplemented && (
-                                <div className="mt-5 text-center p-1 border border-dashed border-slate-600 rounded text-xs text-slate-500 font-bold uppercase tracking-widest">
-                                  Não Implementado
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                              return (
+                                <tr key={node.id} className={`hover:bg-slate-800/50 transition-colors cursor-pointer ${isImplemented ? '' : 'opacity-50'}`} onClick={() => setSelectedNode(node)}>
+                                  <td className="px-4 py-3 font-bold text-indigo-400">{node.id}</td>
+                                  <td className="px-4 py-3 text-white font-semibold">{node.nome}</td>
+                                  <td className="px-4 py-3">{isImplemented ? "✅ Sim" : "❌ Não"}</td>
+                                  <td className="px-4 py-3">{track?.lvlSkills?.length || 5}</td>
+                                  <td className="px-4 py-3"><span className="px-2 py-1 bg-slate-800 rounded-md text-xs font-bold text-slate-400">{qTest?.kind || "-"}</span></td>
+                                  <td className="px-4 py-3">{qTest?.tutorial ? "🎬 Sim" : "-"}</td>
+                                  <td className="px-4 py-3">{(qTest?.audioPrompt || qTest?.audioSteps) ? "🔊 Sim" : "-"}</td>
+                                  <td className="px-4 py-3">
+                                    {isImplemented && (
+                                      <div className="flex gap-1">
+                                        {[1, 2, 3, 4, 5].map((lvl) => (
+                                          <button
+                                            key={lvl}
+                                            onClick={(e) => { e.stopPropagation(); onTestTrackLvl(node.id, lvl); }}
+                                            className="w-6 h-6 flex items-center justify-center bg-slate-700 hover:bg-indigo-500 text-slate-300 hover:text-white rounded text-xs font-bold transition-colors"
+                                          >
+                                            {lvl}
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   );
@@ -247,7 +251,7 @@ export function AdminDashboardScreen({ state, onUpdateState, onBack, onTestTrack
           </div>
         )}
         
-        {/* TAB 2: Profiles */}
+{/* TAB 2: Profiles */}
         {activeTab === "profiles" && (
           <div className="max-w-4xl mx-auto pb-20">
             <AdminGodPanel 

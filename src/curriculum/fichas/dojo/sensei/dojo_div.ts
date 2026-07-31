@@ -92,5 +92,6 @@ export const dojo_div: Track = {
     "Dividir por 10",
     "Dezenas Exatas"
   ],
-  prereqs: []
+  prereqs: [],
+  dominio: "2 rounds seguidos ≥80% sobe de faixa, <60% desce"
 };
