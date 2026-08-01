@@ -120,7 +120,8 @@ Object.keys(FAIXAS_INFO).forEach(faixaId => {
       dark: info.dark,
       gen: generator,
       lvlSkills: info.lvlSkills,
-      prereqs: n.prereqs
+      prereqs: n.prereqs,
+      contentStatus: GENERATOR_MAP[n.id] ? "explicit" : "fallback",
     });
   });
   

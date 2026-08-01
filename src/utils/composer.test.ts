@@ -123,6 +123,23 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     expect(plan.resgates.some(r => r.track.id === "contar" && r.reason === "misconception")).toBe(true);
   });
 
+  it("redireciona um padrão para a base mais frágil sem inventar uma ficha", () => {
+    const now = Date.now();
+    const tracks = [...TRACKS_BASE, trk("contar", "N1.04")];
+    const plan = planAula(tracks, progOfMap({
+      t1: prog({ maxLvl: 1 }),
+      t2: prog({ maxLvl: 2 }),
+      contar: prog({
+        misconceptions: [{ tag: "contagem-dupla", ts: now - 1000 }, { tag: "contagem-dupla", ts: now }],
+      }),
+    }));
+
+    const rescue = plan.resgates.find(r => r.reason === "prerequisite-gap");
+    expect(rescue?.track.id).toBe("t1");
+    expect(rescue?.sourceNodeId).toBe("N1.04");
+    expect(rescue?.requiredLevel).toBe(3);
+  });
+
   it("FECHO lúdico fecha a aula quando existe trilha divertida", () => {
     const tracks = [...TRACKS_BASE, trk("contar", "N1.04"), trk("soma", "N1.05"), trk("padroes", "AL.01")];
     const m = { ...M_BASE, contar: prog({ tot: 10, ok: 9, maxLvl: 3, dom: true }), soma: prog({ tot: 6, ok: 3 }) };

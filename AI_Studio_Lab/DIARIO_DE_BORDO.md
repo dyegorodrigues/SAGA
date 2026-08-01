@@ -392,3 +392,15 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Distratores `n±k` recebem tag somente quando o valor corresponde exatamente à
   regra; o Radar deixou de mutar diretamente o progresso recebido do React.
 - Baseline: 29 arquivos e 859 testes, auditor, typecheck e build aprovados.
+## 2026-07-31 — Oficina executável até a fronteira das fichas
+
+- Criado `rescuePlanner.ts`: um padrão confirmado agora procura o pré-requisito
+  disponível mais frágil, prescreve dose curta (4) ou severa (8) e, após três
+  missões inconclusas no mesmo alvo, desce mais um degrau quando há ficha real.
+- A ausência de track/ficha retorna `null`; nenhum fallback pedagógico é inventado.
+- A Oficina inicia a missão diretamente, sem passar pelo seletor comum. O GameLoop
+  usa escada própria de dois acertos, encerra ao atingir nível 3 e persiste o
+  contador anti-loop quando a dose termina sem recuperar o alvo.
+- Limite consciente alcançado: ampliar tags semânticas, demonstrações e Mão
+  Fantasma por competência depende das fichas cinematográficas em elaboração.
+- Baseline: 30 arquivos e 865 testes, auditor, grafo, typecheck e build aprovados.

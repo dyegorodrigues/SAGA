@@ -21,6 +21,7 @@ interface GameProps {
   stage: number;
   /** missão de nível escolhido no seletor 🎯: sem aquecimento e sem revisão do banco */
   exactLvl?: boolean;
+  rescue?: { requiredLevel: number; questionBudget: number };
 }
 
 const TOTAL_Q = 8;
@@ -106,6 +107,7 @@ export function GameLoop({
   stage,
   firstMissionToday = false,
   exactLvl = false,
+  rescue,
 }: GameProps) {
   const [idx, setIdx] = useState(0);
   const [t0, setT0] = useState(() => Date.now());
@@ -478,7 +480,7 @@ export function GameLoop({
       isReview: q.review === true,
       practiceDay: new Date().toISOString().slice(0, 10),
       previousPracticeDay: prog.lastDay,
-    });
+    }, rescue ? { kind: "rescue", requiredLevel: rescue.requiredLevel } : undefined);
     const p = progressResult.progress;
     if (terminalMisconception) trackMisconception(p, terminalMisconception);
     let currentToast = progressResult.transition?.type === "level-up"
@@ -552,7 +554,11 @@ export function GameLoop({
     
     const nextStars = stars + starGain;
     const nextOk = ok + (right ? 1 : 0);
-    const isLast = idx === totalQFor(track) - 1;
+    const rescueRecovered = !!rescue && (
+      p.lvl >= rescue.requiredLevel ||
+      (rescue.requiredLevel === 5 && prog0.lvl === 5 && p.streak >= 2)
+    );
+    const isLast = idx === totalQFor(track) - 1 || rescueRecovered;
     let nextBonus = 0;
 
     p.stars = (p.stars || 0) + starGain;
@@ -601,6 +607,9 @@ export function GameLoop({
        console.warn("Failed to dispatch telemetry", e);
     }
 
+    if (isLast && rescue) {
+      p.rescueAttempts = rescueRecovered ? 0 : (p.rescueAttempts || 0) + 1;
+    }
     if (!q.isFallback) {
       onCommit(p, right, starGain + nextBonus, durationMs, isLast);
     }

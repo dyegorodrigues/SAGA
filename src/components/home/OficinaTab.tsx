@@ -1,11 +1,10 @@
 import React from "react";
-import { Track } from "../../types";
 import { FONT, sfx } from "../Mascot";
-import { AulaPlan, RescueReason } from "../../curriculum/motores/composer";
+import { AulaPlan, RescuePlanItem, RescueReason } from "../../curriculum/motores/composer";
 
 interface Props {
   aulaPlan: AulaPlan;
-  onTrack: (t: Track) => void;
+  onTrack: (rescue: RescuePlanItem) => void;
 }
 
 export function OficinaTab({ aulaPlan, onTrack }: Props) {
@@ -13,6 +12,10 @@ export function OficinaTab({ aulaPlan, onTrack }: Props) {
     misconception: {
       badge: "Padrão percebido",
       detail: "Vamos reconstruir esta ideia com outro caminho.",
+    },
+    "prerequisite-gap": {
+      badge: "Base para reconstruir",
+      detail: "Vamos fortalecer um degrau anterior e voltar ao caminho.",
     },
     "error-bank": {
       badge: "Questão para rever",
@@ -42,7 +45,7 @@ export function OficinaTab({ aulaPlan, onTrack }: Props) {
            {aulaPlan.resgates.map((rescue) => (
              <button 
                 key={`${rescue.reason}-${rescue.track.id}`}
-               onClick={() => { sfx.level(); onTrack(rescue.track); }}
+               onClick={() => { sfx.level(); onTrack(rescue); }}
                className="w-full bg-emerald-50 border-2 border-emerald-400 p-4 rounded-2xl flex items-center justify-between shadow-sm active:scale-95 transition-all text-left"
              >
                 <div>
@@ -53,6 +56,12 @@ export function OficinaTab({ aulaPlan, onTrack }: Props) {
                   <div className="text-xs text-emerald-700 font-bold mt-0.5">
                     {reasonCopy[rescue.reason].detail}
                   </div>
+                  {rescue.questionBudget && (
+                    <div className="text-[10px] text-emerald-700 mt-1">
+                      Missão curta · até {rescue.questionBudget} desafios
+                      {rescue.escalated ? " · investigando a base" : ""}
+                    </div>
+                  )}
                 </div>
                 <span className="text-2xl">🔧</span>
              </button>

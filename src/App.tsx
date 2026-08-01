@@ -250,7 +250,13 @@ export function Shell({ children, theme = "classico", screenName }: ShellExtProp
 /* ---------------- Main Component ---------------- */
 export default function App() {
   const [state, setState] = useState<State | null>(null);
-  const [screen, setScreen] = useState<{ name: string; kid?: string; track?: string; lvl?: number }>({ name: "loading" });
+  const [screen, setScreen] = useState<{
+    name: string;
+    kid?: string;
+    track?: string;
+    lvl?: number;
+    rescue?: { requiredLevel: number; questionBudget: number };
+  }>({ name: "loading" });
   const [userEmail, setUserEmail] = useState<string | null>(getCurrentUserEmail());
   // Gancho de teste E2E (só com ?e2e=1 na URL): entra como visitante e não deixa o
   // reset de auth do Firebase mandar de volta pro login. Inócuo em produção.
@@ -717,6 +723,15 @@ export default function App() {
           }}
 
             onAula={() => setScreen({ name: "game", kid: screen.kid, track: "aula" })}
+            onRescue={(rescue) => setScreen({
+              name: "game",
+              kid: screen.kid,
+              track: rescue.track.id,
+              rescue: rescue.requiredLevel ? {
+                requiredLevel: rescue.requiredLevel,
+                questionBudget: rescue.questionBudget || 4,
+              } : undefined,
+            })}
             onMatricula={() => setScreen({ name: "game", kid: screen.kid, track: "matricula" })}
             mixedDoneToday={kidById(screen.kid!).lastMixedDay === localDay()}
             tracks={getTracksForKid(kidById(screen.kid!))}
@@ -767,12 +782,20 @@ export default function App() {
     }
     return found;
   })()
+          const activeTrack = screen.rescue
+            ? { ...gameTrack, totalQ: screen.rescue.questionBudget }
+            : gameTrack;
           return (
             <GameLoop
               kid={kidObj}
-              track={gameTrack}
-              prog0={screen.lvl ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl } : getProg(screen.kid!, screen.track!)}
-              exactLvl={!!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // aula/matrícula: sequência pura (sem banco/aquecimento por cima)
+              track={activeTrack}
+              prog0={screen.rescue
+                ? { ...getProg(screen.kid!, screen.track!), streak: 0 }
+                : screen.lvl
+                  ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl }
+                  : getProg(screen.kid!, screen.track!)}
+              exactLvl={!!screen.rescue || !!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // sequências puras: sem banco/aquecimento por cima
+              rescue={screen.rescue}
               sound={sound}
               onToggleSound={toggleSound}
               onCommit={(p, right, gain, ms, missionDone) => commitProg(screen.kid!, screen.track!, p, right, gain, ms, missionDone)}

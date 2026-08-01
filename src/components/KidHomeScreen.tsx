@@ -14,7 +14,7 @@ import { LevelPickerModal } from "./home/LevelPickerModal";
 import { WardrobeModal } from "./home/WardrobeModal";
 
 import { SUBJECTS } from "../subjects";
-import { planAula } from "../curriculum/motores/composer";
+import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
 import { isTrackUnlocked } from "../curriculum/motores/unlockEngine";
 
 interface KidHomeProps {
@@ -29,6 +29,7 @@ interface KidHomeProps {
   onDojo: () => void;
   /** ▶️ MINHA AULA 📚 (E2): a missão composta pelo Professor Mágico */
   onAula: () => void;
+  onRescue: (rescue: RescuePlanItem) => void;
   /** 🎒 MATRÍCULA (E3): o placement disfarçado da primeira visita */
   onMatricula: () => void;
   mixedDoneToday: boolean;
@@ -49,6 +50,7 @@ export function KidHomeScreen({
   onMixed,
   onDojo,
   onAula,
+  onRescue,
   onMatricula,
   mixedDoneToday,
   onAlbum,
@@ -243,7 +245,7 @@ export function KidHomeScreen({
           <DojoTab prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} onMixed={onMixed} renderTrackCard={renderTrackCard} onTrack={setPickerTrack} onOpenPicker={setPickerTrack} />
         )}
         {activeShellTab === "oficina" && (
-          <OficinaTab aulaPlan={aulaPlan} onTrack={setPickerTrack} />
+          <OficinaTab aulaPlan={aulaPlan} onTrack={onRescue} />
         )}
         {activeShellTab === "perfil" && (
           <PerfilTab 

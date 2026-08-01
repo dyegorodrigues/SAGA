@@ -131,6 +131,8 @@ export interface Track {
   dominio?: string;
   graphId?: string;
   island?: string;
+  /** Proveniência executável; a Oficina nunca transforma um placeholder em remediação. */
+  contentStatus?: "explicit" | "fallback";
 }
 
 export interface BankItem {
@@ -168,6 +170,8 @@ export interface Progress {
   errKind?: string[];
   /** Leitner: Força de revisão espaçada (1..5) mantida separadamente do nível CPA (lvl/mast) */
   reviewForce?: number;
+  /** Oficina: missões concluídas no mesmo alvo; após 3, o Radar sonda um pré-requisito anterior. */
+  rescueAttempts?: number;
   /** Evidências independentes para a coroa; `legacy` preserva saves já coroados. */
   masteryEvidence?: MasteryEvidence;
 }

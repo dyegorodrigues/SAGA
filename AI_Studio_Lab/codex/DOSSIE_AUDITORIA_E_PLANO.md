@@ -511,8 +511,11 @@ guarda somente continuidade, diagnóstico e plano.
 7. Completar misconceptions e distratores diagnósticos.
 8. ✅ Tornar domínio multidimensional e exibir as quatro dimensões — concluído para
    fichas atuais; novas fichas devem fornecer `rt_alvo` nível 5.
-9. Completar Radar e Oficina — resgates tipados, Leitner integrado e tags numéricas
-   concluídos; remediações semânticas e escalada de pré-requisitos ainda pendentes.
+9. ✅ Completar a infraestrutura do Radar e da Oficina — resgates tipados, Leitner,
+   seleção do pré-requisito mais frágil, dose de 4/8 questões, escada acelerada de
+   2 acertos, término no nível necessário e escalada anti-loop após 3 missões estão
+   implementados. A cobertura semântica de cada misconception continua vinculada
+   às fichas pedagógicas reais: o motor retorna ausência em vez de inventar missão.
 10. Consolidar Dojo FD/PD/Jardim.
 11. Corrigir regras e arquitetura de telemetria Firestore.
 12. Versionar/migrar estado de crianças até F4.

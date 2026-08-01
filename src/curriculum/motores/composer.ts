@@ -1,6 +1,7 @@
 import { Question, Track, Progress } from "../../types";
 import { computeUnlockStatus } from "./unlockEngine";
 import { RadarEngine } from "./radarEngine";
+import { prescribeMisconceptionRescue } from "./rescuePlanner";
 
 /**
  * COMPOSER SAGA — O Orquestrador da Academia Diária
@@ -64,12 +65,16 @@ export interface AulaPlan {
   resumo: string;
 }
 
-export type RescueReason = "misconception" | "error-bank" | "spaced-review";
+export type RescueReason = "misconception" | "prerequisite-gap" | "error-bank" | "spaced-review";
 
 export interface RescuePlanItem {
   track: Track;
   fromBank: boolean;
   reason: RescueReason;
+  sourceNodeId?: string;
+  requiredLevel?: number;
+  questionBudget?: number;
+  escalated?: boolean;
 }
 
 export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
@@ -115,8 +120,18 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
   const resgates: RescuePlanItem[] = [];
   
   for (const rt of radarTracks) {
-    if (!resgates.some(r => r.track.id === rt.id)) {
-       resgates.push({ track: rt, fromBank: false, reason: "misconception" });
+    const nodeId = rt.graphId || rt.id;
+    const prescription = prescribeMisconceptionRescue(nodeId, tracks, pMap);
+    if (prescription && !resgates.some(r => r.track.id === prescription.track.id)) {
+      resgates.push({
+        track: prescription.track,
+        fromBank: false,
+        reason: prescription.targetNodeId === nodeId ? "misconception" : "prerequisite-gap",
+        sourceNodeId: prescription.sourceNodeId,
+        requiredLevel: prescription.requiredLevel,
+        questionBudget: prescription.questionBudget,
+        escalated: prescription.escalated,
+      });
     }
   }
 

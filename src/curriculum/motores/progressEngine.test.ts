@@ -117,4 +117,19 @@ describe("progressEngine", () => {
     expect(migrated.dom).toBe(true);
     expect(migrated.masteryEvidence?.crownedBy).toBe("legacy");
   });
+
+  it("uses the accelerated two-success staircase only inside a rescue", () => {
+    const first = applyJourneyAnswer(
+      progress({ lvl: 2, maxLvl: 2 }), true, false, undefined,
+      { kind: "rescue", requiredLevel: 3 },
+    );
+    const second = applyJourneyAnswer(
+      first.progress, true, false, undefined,
+      { kind: "rescue", requiredLevel: 3 },
+    );
+
+    expect(first.progress.lvl).toBe(2);
+    expect(second.progress.lvl).toBe(3);
+    expect(second.transition).toEqual({ type: "level-up", level: 3 });
+  });
 });

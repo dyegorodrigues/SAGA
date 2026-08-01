@@ -21,6 +21,11 @@ export interface AnswerProgressResult {
   transition: ProgressTransition;
 }
 
+export interface ProgressionMode {
+  kind: "journey" | "rescue";
+  requiredLevel?: number;
+}
+
 /**
  * Transição pura da escada de proficiência da Jornada.
  *
@@ -33,6 +38,7 @@ export function applyJourneyAnswer(
   right: boolean,
   isWarmup: boolean,
   masteryAttempt?: MasteryAttempt,
+  mode: ProgressionMode = { kind: "journey" },
 ): AnswerProgressResult {
   const progress: Progress = {
     ...current,
@@ -52,7 +58,9 @@ export function applyJourneyAnswer(
     progress.streak += 1;
     progress.bad = 0;
 
-    if (progress.streak >= 3 && progress.lvl < 5) {
+    const streakToLevel = mode.kind === "rescue" ? 2 : 3;
+    const levelCeiling = mode.kind === "rescue" ? mode.requiredLevel || 3 : 5;
+    if (progress.streak >= streakToLevel && progress.lvl < levelCeiling) {
       progress.lvl += 1;
       progress.streak = 0;
       progress.maxLvl = Math.max(progress.maxLvl || 1, progress.lvl);
