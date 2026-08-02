@@ -53,7 +53,7 @@ export interface Question {
   /** Array de falas em estágios, quando o jogo narra passo-a-passo (ex: I-do/We-do) */
   audioSteps?: string[];
   tutorial?: { say: string; show?: Record<string, any> | string | number; ms?: number }[];
-  excecaoCPA?: boolean | "perceptual";
+  excecaoCPA?: boolean | "perceptual" | "espacial";
   isFallback?: boolean;
   kind: string;
   prompt: string;
@@ -131,6 +131,8 @@ export interface Track {
   dominio?: string;
   graphId?: string;
   island?: string;
+  /** Proveniência executável; a Oficina nunca transforma um placeholder em remediação. */
+  contentStatus?: "explicit" | "fallback";
 }
 
 export interface BankItem {
@@ -152,7 +154,7 @@ export interface Progress {
   mast: number;
   /** maior nível já alcançado (as bolinhas conquistadas — nunca regridem) */
   maxLvl?: number;
-  /** Domínio Absoluto 👑: 3 acertos seguidos no nível 5 (nunca se perde) */
+  /** Domínio Absoluto 👑: evidências maduras de compreensão, fluência, retenção e independência. */
   dom?: boolean;
   /** Telemetria: Cliques em botão de ajuda/dica nesta microcompetência */
   helpClicks?: number;
@@ -168,6 +170,20 @@ export interface Progress {
   errKind?: string[];
   /** Leitner: Força de revisão espaçada (1..5) mantida separadamente do nível CPA (lvl/mast) */
   reviewForce?: number;
+  /** Oficina: missões concluídas no mesmo alvo; após 3, o Radar sonda um pré-requisito anterior. */
+  rescueAttempts?: number;
+  /** Evidências independentes para a coroa; `legacy` preserva saves já coroados. */
+  masteryEvidence?: MasteryEvidence;
+}
+
+export interface MasteryEvidence {
+  schemaVersion: 1;
+  comprehensionStreak: number;
+  independenceStreak: number;
+  fluencyStreak: number;
+  retentionPasses: number;
+  candidateDay?: string;
+  crownedBy?: "legacy" | "multidimensional";
 }
 
 export interface FactStrength {

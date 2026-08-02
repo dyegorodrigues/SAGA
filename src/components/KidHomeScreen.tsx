@@ -14,7 +14,8 @@ import { LevelPickerModal } from "./home/LevelPickerModal";
 import { WardrobeModal } from "./home/WardrobeModal";
 
 import { SUBJECTS } from "../subjects";
-import { planAula } from "../curriculum/motores/composer";
+import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
+import { isTrackUnlocked } from "../curriculum/motores/unlockEngine";
 
 interface KidHomeProps {
   state: State;
@@ -28,6 +29,7 @@ interface KidHomeProps {
   onDojo: () => void;
   /** ▶️ MINHA AULA 📚 (E2): a missão composta pelo Professor Mágico */
   onAula: () => void;
+  onRescue: (rescue: RescuePlanItem) => void;
   /** 🎒 MATRÍCULA (E3): o placement disfarçado da primeira visita */
   onMatricula: () => void;
   mixedDoneToday: boolean;
@@ -48,6 +50,7 @@ export function KidHomeScreen({
   onMixed,
   onDojo,
   onAula,
+  onRescue,
   onMatricula,
   mixedDoneToday,
   onAlbum,
@@ -57,7 +60,7 @@ export function KidHomeScreen({
   onSpendCoins,
 }: KidHomeProps) {
   const prog = state.progress[kid.id] || {};
-  const unlockStatus = computeUnlockStatus(prog);
+  const unlockStatus = useMemo(() => computeUnlockStatus(prog), [prog]);
   const themeObj = THEMES[kid.theme] || THEMES.classico;
 
   // ▶️ MINHA AULA 📚: o plano do dia pro card (barato — escolhe trilhas, não gera questão)
@@ -90,8 +93,12 @@ export function KidHomeScreen({
 
   // Adaptive recommendation engine based on child's exact progress history
   const rec = useMemo(() => {
+    const accessibleTracks = tracks.filter(t =>
+      isTrackUnlocked(t.id, t.graphId, unlockStatus)
+    );
+
     // 1. Spaced repetition: if a track has pending review items, recommend it
-    const needsReview = tracks.filter((t) => prog[t.id] && prog[t.id].bank && prog[t.id].bank.length > 0);
+    const needsReview = accessibleTracks.filter((t) => prog[t.id]?.bank?.length > 0);
     if (needsReview.length > 0) {
       // Pick one randomly based on the day to avoid being stuck forever if the kid hates it
       const daySeed = Math.floor(Date.now() / 86400000);
@@ -103,9 +110,9 @@ export function KidHomeScreen({
     }
 
     // 2. Balanced learning: recommend the track with the lowest star count to keep progress uniform
-    let bestTrack = tracks[0];
+    let bestTrack = accessibleTracks[0];
     let minStars = Infinity;
-    for (const t of tracks) {
+    for (const t of accessibleTracks) {
       const p = prog[t.id] || { stars: 0 };
       if ((p.stars || 0) < minStars) {
         minStars = p.stars || 0;
@@ -113,11 +120,11 @@ export function KidHomeScreen({
       }
     }
 
-    return {
+    return bestTrack ? {
       track: bestTrack,
       reason: "O Sensei separou este exercício para você treinar hoje! 🦊",
-    };
-  }, [tracks, prog]);
+    } : null;
+  }, [tracks, prog, unlockStatus]);
 
   // Amostra do que cada nível pergunta (gera 1 questão-exemplo por nível — memoizada
   // para os textos não trocarem a cada render enquanto o seletor está aberto)
@@ -232,13 +239,13 @@ export function KidHomeScreen({
           />
         )}
         {activeShellTab === "jornada" && (
-          <JourneyTab kid={kid} prog={prog} onTrack={setPickerTrack} />
+          <JourneyTab kid={kid} prog={prog} tracks={tracks} unlockStatus={unlockStatus} onTrack={setPickerTrack} />
         )}
         {activeShellTab === "dojo" && (
           <DojoTab prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} onMixed={onMixed} renderTrackCard={renderTrackCard} onTrack={setPickerTrack} onOpenPicker={setPickerTrack} />
         )}
         {activeShellTab === "oficina" && (
-          <OficinaTab aulaPlan={aulaPlan} onTrack={setPickerTrack} />
+          <OficinaTab aulaPlan={aulaPlan} onTrack={onRescue} />
         )}
         {activeShellTab === "perfil" && (
           <PerfilTab 

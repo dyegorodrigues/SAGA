@@ -25,11 +25,11 @@ por evidência de terminal**. Depois disso, os uploads foram incorporados: Bíbl
 v2.7, Grafo humano, Manual, Dojo v1.1 e o YAML agregado coincidem com os arquivos
 recebidos, e os artefatos JSON/TypeScript contêm 95 nós.
 
-**Consequência atual:** a substituição deixou resíduos de documentação e fontes
-auxiliares: os YAMLs separados por strand ainda somam 84 nós, comentários antigos
-citavam 84, e não havia uma auditoria reproduzível comparando todos os artefatos.
-Esses resíduos não autorizam uma nova substituição cega dos documentos; exigem
-auditoria de paridade e uma cadeia explícita de fonte → artefato derivado → runtime.
+**Consequência tratada:** a substituição deixou resíduos de documentação e fontes
+auxiliares. Os YAMLs separados por strand foram completados para 95 nós; o YAML
+agregado passou a gerar JSON/TypeScript por comando determinístico; e o auditor
+agora bloqueia divergências de IDs, pré-requisitos ou artefatos. O histórico de 84
+nós permanece somente como registro da falha encontrada.
 
 ## Verificação obrigatória — rode ANTES de tocar em qualquer coisa
 
@@ -88,10 +88,11 @@ foram atualizados. Não substituir novamente arquivos idênticos.
 
 **Prova de conclusão:** os 6 comandos da Parte 0 retornam os valores corretos.
 
-## 🔴 TAREFA 1B — Baseline curricular reproduzível (bloqueia mudanças de conteúdo)
+## ✅ TAREFA 1B — Baseline curricular reproduzível (concluída)
 
-**Problema residual:** a sincronização foi feita, mas o auditor estava quebrado e
-as representações auxiliares ainda podem divergir silenciosamente.
+**Resultado:** auditor read-only restaurado; YAMLs por strand com 95 nós; JSON e
+TypeScript derivados do YAML agregado por `npm run grafo:gerar`; build protegido
+por `npm run grafo:check`.
 
 **Ação:** `npm run auditar` deve, sem escrever em produção:
 1. validar os 95 IDs e todos os pré-requisitos do YAML agregado;

@@ -14,4 +14,3 @@ Em 31/jul/2026 foi verificado que:
 Para editar o projeto, use somente as fontes indicadas em `AGENTS.md` e na
 cláusula de supremacia da Bíblia. Um upload novo deve ser comparado primeiro; ele
 jamais substitui silenciosamente uma fonte canônica.
-

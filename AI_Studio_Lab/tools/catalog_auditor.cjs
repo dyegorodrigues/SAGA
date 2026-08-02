@@ -88,17 +88,27 @@ check(JSON.stringify(tsIds) === JSON.stringify(yamlIds), "ordem/IDs do grafo Typ
 
 const strandFiles = listFiles("curriculum", ".yaml").filter((file) => !file.endsWith("grafo_saga.yaml"));
 const strandIds = [];
+const strandNodes = new Map();
 for (const file of strandFiles) {
   const strand = parseYaml(file);
-  strandIds.push(...Object.keys(strand.nodes || {}));
+  for (const [id, node] of Object.entries(strand.nodes || {})) {
+    strandIds.push(id);
+    check(!strandNodes.has(id), `${id} aparece em mais de um YAML por strand`);
+    strandNodes.set(id, node);
+  }
 }
 const missingFromStrands = yamlIds.filter((id) => !strandIds.includes(id));
 const extraInStrands = strandIds.filter((id) => !yamlIdSet.has(id));
-if (missingFromStrands.length || extraInStrands.length) {
-  warnings.push(
-    `YAMLs por strand não são fonte completa: ${strandIds.length} nós; ` +
-    `faltam [${missingFromStrands.join(", ") || "nenhum"}]; ` +
-    `extras [${extraInStrands.join(", ") || "nenhum"}]`
+check(missingFromStrands.length === 0, `YAMLs por strand não declaram: ${missingFromStrands.join(", ")}`);
+check(extraInStrands.length === 0, `YAMLs por strand declaram IDs fora do agregado: ${extraInStrands.join(", ")}`);
+for (const node of yamlNodes) {
+  const strandNode = strandNodes.get(node.id);
+  if (!strandNode) continue;
+  const aggregatePrereqs = sorted(node.prereqs || []);
+  const strandPrereqs = sorted(strandNode.prereqs || []);
+  check(
+    JSON.stringify(strandPrereqs) === JSON.stringify(aggregatePrereqs),
+    `${node.id} tem pré-requisitos diferentes no YAML agregado e no YAML por strand`
   );
 }
 
@@ -147,6 +157,17 @@ for (const file of fichaFiles) {
   if (match) fichaIds.push(match[1]);
 }
 const journeyFichaIds = fichaIds.filter((id) => yamlIdSet.has(id));
+const journeyFichasWithRtTarget = [];
+for (const file of fichaFiles) {
+  const source = read(file);
+  const idMatch = source.match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2})["']/);
+  if (!idMatch || !yamlIdSet.has(idMatch[1])) continue;
+  const levelFive = source.match(/\b5:\s*\{([^}]*)\}/);
+  const rtTarget = levelFive?.[1].match(/\brt_alvo:\s*(\d+(?:\.\d+)?)/);
+  if (rtTarget && Number(rtTarget[1]) > 0) journeyFichasWithRtTarget.push(idMatch[1]);
+}
+const journeyFichasMissingRt = journeyFichaIds.filter((id) => !journeyFichasWithRtTarget.includes(id));
+check(journeyFichasMissingRt.length === 0, `fichas sem rt_alvo positivo no nível 5: ${journeyFichasMissingRt.join(", ")}`);
 
 const fichaIndex = read("src/curriculum/fichas/index.ts");
 const importedFichaFiles = new Map(
@@ -191,6 +212,7 @@ console.log(`- Nós com gerador explícito: ${generatorMap.size}/${yamlNodes.len
 console.log(`- Nós no fallback \"Em construção\": ${fallbackIds.length}/${yamlNodes.length}`);
 console.log(`- Fichas de Jornada no disco: ${journeyFichaIds.length}/${yamlNodes.length}`);
 console.log(`- Fichas de Jornada registradas em AllFichas: ${registeredJourneyFichaIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada com rt_alvo no nível 5: ${journeyFichasWithRtTarget.length}/${journeyFichaIds.length}`);
 console.log(`- Fichas de Dojo no disco/registradas: ${fichaIds.length - journeyFichaIds.length}/${registeredFichaIds.length - registeredJourneyFichaIds.length}`);
 console.log(`- Fichas no disco fora de AllFichas: ${unregisteredFichaIds.length}`);
 console.log(`- Geradores exportados sem uso no mapa: ${orphanGenerators.length}`);
