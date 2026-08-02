@@ -111,8 +111,8 @@ Gerar 92 arquivos TypeScript automaticamente sem revisão; transformar prosa em 
 
 ## Próximo bloco
 
-Estruturar **F35/N3.09** como primeira ficha vertical padrão-ouro sobre o builder
-tipado já ligado ao `InteractiveVertical`. Preservar o runtime legado enquanto se
-valida CRA sem reagrupamento, áudio-first, ajuda progressiva, resposta única e
-viewport infantil. Somente depois usar o mesmo contrato em F39/N3.11 (a dezena que
-sobe) e repetir o padrão de integração em `array` e `singapore-bars`.
+**F35/N3.09 está estruturada e protegida por contrato**, mantendo o gerador legado
+na Jornada até a validação visual infantil. O próximo bloco é validar o padrão-ouro
+no Sandbox e implementar **F39/N3.11** com reagrupamento explícito, sem antecipar a
+migração de produção. Depois, repetir o padrão de integração em `array` e
+`singapore-bars`.

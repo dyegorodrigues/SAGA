@@ -14,13 +14,20 @@ function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function randomStep(min: number, max: number, step: number): number {
+  const first = Math.ceil(min / step) * step;
+  const last = Math.floor(max / step) * step;
+  if (first > last) throw new Error("Intervalo sem valor compatível com operand_step.");
+  return first + randomInt(0, Math.floor((last - first) / step)) * step;
+}
+
 function hasVerticalRegroup(top: number, bottom: number, operation: "+" | "-"): boolean {
   if (operation === "+") return (top % 10) + (bottom % 10) >= 10;
   return top % 10 < bottom % 10;
 }
 
 function verticalOperands(params: ReturnType<typeof parseComposerParams>, context: string) {
-  const operation = params.operation ?? "+";
+  const requestedOperation = params.operation ?? "+";
   const topMin = params.top_min ?? 10;
   const topMax = params.top_max ?? 99;
   const bottomMin = params.bottom_min ?? 1;
@@ -28,12 +35,25 @@ function verticalOperands(params: ReturnType<typeof parseComposerParams>, contex
   if (topMin > topMax || bottomMin > bottomMax) {
     throw new Error(`Intervalo vertical inválido em ${context}.`);
   }
+  if (params.require_regroup && params.forbid_regroup) {
+    throw new Error(`Conta vertical não pode exigir e proibir reagrupamento em ${context}.`);
+  }
+  const step = params.operand_step ?? 1;
+  if (!Number.isInteger(step) || step <= 0) {
+    throw new Error(`operand_step inválido em ${context}.`);
+  }
 
   for (let attempt = 0; attempt < 200; attempt += 1) {
-    const top = randomInt(topMin, topMax);
-    const bottom = randomInt(bottomMin, bottomMax);
+    const operation = requestedOperation === "mixed"
+      ? (Math.random() < 0.5 ? "+" : "-")
+      : requestedOperation;
+    const top = randomStep(topMin, topMax, step);
+    const bottom = randomStep(bottomMin, bottomMax, step);
     if (operation === "-" && bottom > top) continue;
     if (params.require_regroup && !hasVerticalRegroup(top, bottom, operation)) continue;
+    if (params.forbid_regroup && hasVerticalRegroup(top, bottom, operation)) continue;
+    const result = operation === "+" ? top + bottom : top - bottom;
+    if (params.result_max !== undefined && result > params.result_max) continue;
     return { top, bottom, operation };
   }
   throw new Error(`Não foi possível gerar conta vertical com os parâmetros de ${context}.`);
@@ -72,9 +92,10 @@ export class Composer {
    * Generates a concrete question instance from a Ficha's micro-competence.
    */
   static generate(ficha: FichaCompetencia, lvl: number, microId?: string): Question {
-    let micro = microId ? ficha.micros.find(m => m.id === microId) : null;
+    const selectedMicroId = microId ?? ficha.niveis?.[lvl]?.micro;
+    let micro = selectedMicroId ? ficha.micros.find(m => m.id === selectedMicroId) : null;
     if (!micro) {
-      if (microId) console.warn(`Micro ${microId} not found in Ficha ${ficha.id}, falling back to first micro.`);
+      if (selectedMicroId) console.warn(`Micro ${selectedMicroId} not found in Ficha ${ficha.id}, falling back to first micro.`);
       micro = ficha.micros[0];
     }
 
@@ -317,7 +338,7 @@ export class Composer {
         vBot = operands.bottom;
         vOp = operands.operation;
         answer = vOp === "+" ? vTop + vBot : vTop - vBot;
-        uiProps = { vTop, vBot, vOp };
+        uiProps = { vTop, vBot, vOp, showPlaceValue: params.show_place_value };
         evaluate = (ans) => ans === answer;
         promptOverride = params.audio_prompt ?? `${vTop} ${vOp === "+" ? "mais" : "menos"} ${vBot}.`;
         break;

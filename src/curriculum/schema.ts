@@ -28,6 +28,7 @@ export interface FichaErroTipico {
 
 export interface FichaNivel {
   primitiva: KindType;
+  micro?: string;
   andaime?: "mao_fantasma" | "alto" | "medio" | "minimo" | "nenhum";
   rt_alvo?: number;
 }
@@ -76,6 +77,12 @@ export class CurriculumValidator {
           if (!ficha.niveis[i]) {
             errors.push(`Contrato Universal: Nível ${i} não declarado em ${ficha.id}`);
           }
+        }
+      }
+      const microIds = new Set(ficha.micros?.map(micro => micro.id) ?? []);
+      for (const [level, config] of Object.entries(ficha.niveis)) {
+        if (config.micro && !microIds.has(config.micro)) {
+          errors.push(`Nível ${level} referencia micro inexistente '${config.micro}' em ${ficha.id}`);
         }
       }
     }

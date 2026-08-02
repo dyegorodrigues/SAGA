@@ -480,3 +480,19 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Testes cobrem uma soma fixa com reagrupamento, resposta única e operação inválida.
 - O mapa passou de 12 para 13 primitivas executáveis; `vertical` deixou de ser
   renderer sem builder. Próximo alvo padrão-ouro: F35/N3.09, antes de F39/N3.11.
+
+## 2 de agosto de 2026 — F35/N3.09 vertical padrão-ouro
+
+- A ficha executável N3.09 foi registrada no catálogo da Jornada sem substituir o
+  gerador legado usado pela criança; a migração de produção continua deliberadamente
+  separada desta validação.
+- Os cinco níveis agora selecionam microcompetências próprias: dezenas exatas, soma
+  com unidades, soma de duas ordens, subtração e operações mistas, sempre sem
+  reagrupamento e com resultados entre 0 e 100.
+- O Composer passou a validar passo dos operandos, teto do resultado, operação mista
+  e proibição explícita de reagrupamento. Níveis 1–3 fazem a ponte CRA exibindo o
+  material dourado ao lado da conta vertical; níveis 4–5 retiram esse apoio.
+- Testes amostram 500 contas, verificam unidades sem vai-um/empréstimo, dezenas
+  exatas no nível 1, material nos níveis concretos e tempo-alvo apenas no nível 5.
+- Próximo bloco: validar visualmente a ficha no Sandbox infantil e, mantendo o
+  legado até essa evidência, preparar F39/N3.11 com reagrupamento explícito.
