@@ -154,13 +154,17 @@ describe("Composer de fichas", () => {
         expect((question.vTop! % 10) + (question.vBot! % 10)).toBeGreaterThanOrEqual(10);
         expect(question.answer).toBe(question.vTop! + question.vBot!);
         expect(question.answer).toBeLessThanOrEqual(level === 5 ? 999 : 99);
-        if (level <= 3) {
+        if (level <= 2) {
           expect(question.uiProps).toMatchObject({ showPlaceValue: true, showRegroup: true });
-        } else {
+        } else if (level >= 4) {
           expect(question.uiProps).toMatchObject({ showPlaceValue: undefined, showRegroup: undefined });
         }
         if (level <= 2) expect(question.uiProps.showAlgorithm).toBe(false);
-        if (level === 3) expect(question.uiProps.showAlgorithm).toBeUndefined();
+        if (level === 3) expect(question.uiProps).toMatchObject({
+          showPlaceValue: true,
+          showRegroup: undefined,
+          showAlgorithm: undefined,
+        });
         if (level === 5) {
           const unitCarry = 1;
           const tens = Math.floor(question.vTop! / 10) % 10;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Question } from '../types';
+import { AnswerMeta, Question } from '../types';
 
 // Import primitives
 import { EmojiRow } from './primitives/EmojiRow';
@@ -21,7 +21,7 @@ import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
 
 interface FichaRendererProps {
   question: Question;
-  onAnswer: (answer: any, isCorrect: boolean) => void;
+  onAnswer: (answer: any, isCorrect: boolean, meta?: AnswerMeta) => void;
   disabled?: boolean;
   promptDone?: boolean;
 }
@@ -29,10 +29,10 @@ interface FichaRendererProps {
 export function FichaRenderer({ question, onAnswer, disabled, promptDone = true }: FichaRendererProps) {
   const { kind, uiProps, evaluate } = question;
 
-  const handleInteract = (val: any) => {
+  const handleInteract = (val: any, meta?: AnswerMeta) => {
     if (disabled) return;
     const isCorrect = evaluate(val);
-    onAnswer(val, isCorrect);
+    onAnswer(val, isCorrect, meta);
   };
 
   switch (kind) {

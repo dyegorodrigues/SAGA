@@ -38,6 +38,7 @@ import { AdminGodPanel } from "./components/AdminGodPanel";
 import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
 import { MascotEnvironment } from "./engine/mascot-v2/MascotEnvironment";
+import { shellRootClass } from "./components/layout/shellLayout";
 
 /* ============================================================
    MATEMÁGICA IA — Matemática Adaptativa & Tutoria Inteligente (PT-BR)
@@ -182,7 +183,7 @@ export function Shell({ children, theme = "classico", screenName }: ShellExtProp
 
   return (
     <div
-      className="relative min-h-screen w-full overflow-hidden transition-colors duration-500 pb-16"
+      className={shellRootClass(screenName)}
       style={{
         background: `linear-gradient(180deg, ${bg[0]} 0%, ${bg[1]} 40%)`,
         fontFamily: BODY,

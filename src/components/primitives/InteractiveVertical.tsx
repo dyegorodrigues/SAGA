@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Question } from '../../types';
+import { AnswerMeta, Question } from '../../types';
 import { tokens, UIState } from '../../styles/tokens';
-import { getVerticalColumnStep, verticalDigitChoices } from './verticalProcedure';
+import { getVerticalColumnStep, inferVerticalMisconception, verticalAnswerFromColumns, verticalDigitChoices } from './verticalProcedure';
 
 interface InteractiveVerticalProps {
   q: Question;
   onAnswer: (val: number) => void;
-  onMistake?: (digit: number) => void;
+  onMistake?: (digit: number, meta: AnswerMeta) => void;
   onRegroup?: (remainingUnits: number) => void;
   showAlgorithm?: boolean;
   disabled: boolean;
@@ -37,17 +37,17 @@ export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlg
     
     if (parseInt(input, 10) === step.expectedDigit) {
       const newAnswers = [...answers];
-      newAnswers[totalCols - 1 - colIdx] = input;
+      newAnswers[colIdx] = input;
       setAnswers(newAnswers);
       
       if (step.carry && op === "+") {
         const newCarries = [...carries];
-        newCarries[totalCols - 1 - colIdx - 1] = '1';
+        newCarries[colIdx + 1] = '1';
         setCarries(newCarries);
         if (colIdx === 0) onRegroup?.(step.expectedDigit);
       } else if (step.borrow && op === "-") {
         const newCarries = [...carries];
-        newCarries[totalCols - 1 - colIdx - 1] = '-1';
+        newCarries[colIdx + 1] = '-1';
         setCarries(newCarries);
       }
 
@@ -57,16 +57,21 @@ export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlg
         if (step.carry && op === "+") {
           setColIdx(colIdx + 1);
         } else {
-          onAnswer(parseInt(newAnswers.join(''), 10));
+          onAnswer(verticalAnswerFromColumns(newAnswers));
         }
       } else if (colIdx === totalCols) {
-        onAnswer(parseInt(newAnswers.join(''), 10));
+        onAnswer(verticalAnswerFromColumns(newAnswers));
       } else {
         setColIdx(colIdx + 1);
       }
     } else {
       setCurrentInput('');
-      onMistake?.(parseInt(input, 10));
+      const selectedDigit = parseInt(input, 10);
+      onMistake?.(selectedDigit, {
+        source: "vertical-column",
+        columnIndex: colIdx,
+        misconception: inferVerticalMisconception(top, bot, op, colIdx, selectedDigit),
+      });
     }
   };
 
@@ -84,11 +89,13 @@ export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlg
         }}
       >
         <div className="flex absolute -top-4 left-0 right-0 justify-end pr-6">
-          {carries.map((c, i) => (
-            <span key={`c${i}`} className="w-12 text-center text-xl" style={{ color: tokens.cor.elementos.base_B }}>
+          {Array.from({ length: totalCols + 1 }).map((_, i) => {
+            const power = totalCols - i;
+            const c = carries[power];
+            return <span key={`c${i}`} className="w-12 text-center text-xl" style={{ color: tokens.cor.elementos.base_B }}>
               {c === '-1' ? '−1' : c === '1' ? '+1' : ''}
-            </span>
-          ))}
+            </span>;
+          })}
         </div>
 
         <div className="flex justify-end pr-6">
@@ -117,8 +124,10 @@ export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlg
         </div>
         
         <div className="flex h-14 justify-end pr-6 relative">
-          {answers.map((c, i) => {
-            const isActiveCol = (totalCols - 1 - colIdx === i) || (colIdx === totalCols && i === 0);
+          {Array.from({ length: totalCols + 1 }).map((_, i) => {
+            const power = totalCols - i;
+            const c = answers[power];
+            const isActiveCol = colIdx === power;
             return (
               <span key={`a${i}`} className="w-12 text-center relative">
                 {isActiveCol ? (

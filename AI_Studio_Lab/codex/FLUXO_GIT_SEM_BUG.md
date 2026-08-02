@@ -17,9 +17,14 @@ caixa, depois guardamos na estante `main`, e só então abrimos uma caixa nova.
 Apagar a branch depois do merge é seguro: o conteúdo já está guardado na `main`.
 Não use **Update branch** e não resolva conflitos no editor web.
 
-## Como começar a conversa seguinte
+## Como continuar — na mesma conversa ou em outra
 
-Cole esta mensagem:
+Não é obrigatório abrir conversa nova. O que é obrigatório é o **estado Git novo**:
+o PR anterior já mesclado, `origin/main` atualizada e uma branch inédita criada
+diretamente dela. Se o Codex conseguir provar essas três coisas, pode continuar na
+mesma conversa sem risco de carregar a branch anterior.
+
+Se preferir abrir outra conversa, ou se o ambiente parecer confuso, cole:
 
 ```text
 O PR anterior já foi mesclado em main e a branch foi apagada.
@@ -47,12 +52,13 @@ outro lote em cima de história antiga.
 1. Não clique em Update branch.
 2. Não edite o conflito no GitHub.
 3. Não faça merge “só para ver”.
-4. Abra uma conversa nova dizendo que houve conflito e peça reconstrução direta
-   da `origin/main` atual.
+4. Na mesma conversa, informe que houve conflito e peça a reconstrução direta da
+   `origin/main` atual. Abrir outra conversa é opcional, não é uma correção Git.
 
 ## Regra de ouro
 
-**Merge → apagar branch → conversa nova → fetch → branch nova.**
+**Merge → apagar branch → fetch → branch nova.** A conversa nova é opcional; a
+branch nova é obrigatória.
 
 Seguindo sempre esta ordem, nenhum lote velho entra escondido no lote novo.
 
