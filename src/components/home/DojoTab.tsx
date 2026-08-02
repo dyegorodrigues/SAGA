@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Track, Progress } from "../../types";
 import { UnlockStatus } from "../../curriculum/motores/unlockEngine";
 import { C, FONT, sfx } from "../Mascot";
-import { SUBJECTS } from "../../subjects";
+import { ALL_MATH_TRACKS } from "../../curriculum/motores/curriculum";
 import { dojo_add } from "../../curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "../../curriculum/fichas/dojo/sensei/dojo_sub";
 import { dojo_mul } from "../../curriculum/fichas/dojo/sensei/dojo_mul";
@@ -21,12 +21,7 @@ interface Props {
 export function DojoTab({ prog, unlockStatus, mixedDoneToday, onMixed, renderTrackCard, onTrack, onOpenPicker }: Props) {
   const [mode, setMode] = useState<'garden' | 'sensei'>('garden');
 
-  const tracks = (() => {
-    const mat = SUBJECTS.find(s => s.id === 'mat');
-    if (!mat) return [];
-    const allMat = ["pre", "ano1", "ano2"].flatMap(g => mat.tracks[g as "pre" | "ano1" | "ano2"] || []);
-    return Array.from(new Map(allMat.map(t => [t.id, t])).values());
-  })();
+  const tracks = ALL_MATH_TRACKS;
 
   const dojoStats = useMemo(() => {
     let ok = 0;
