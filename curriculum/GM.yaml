@@ -35,7 +35,6 @@ nodes:
     objective: "horas exatas e meia hora nos dois relógios."
     prereqs:
       - "N1.06"
-      - "GM.06"
     kinds:
       - "clock (existente)"
       - "clock-set (arrastar ponteiro). Nota: ler minutos exige contagem de 5 em 5 — por isso fica para GM.06."
@@ -95,4 +94,30 @@ nodes:
       - "measure"
       - "plain"
       - "story."
+    micros:
+  GM.10:
+    title: "Conversão de unidades"
+    objective: "converter cm/m, g/kg e ml/l reconhecendo que a quantidade permanece a mesma."
+    prereqs:
+      - "GM.05"
+      - "N2.04"
+    kinds:
+      - "numberline"
+      - "plain."
+    misconceptions:
+      - "multiplicar quando deveria dividir"
+      - "misturar grandezas diferentes"
+    micros:
+  GM.11:
+    title: "Volume de prismas"
+    objective: "obter o volume contando uma camada de cubos e multiplicando pela altura."
+    prereqs:
+      - "GM.09"
+      - "N4.02"
+    kinds:
+      - "array"
+      - "plain."
+    misconceptions:
+      - "somar as dimensões em vez de multiplicar"
+      - "confundir volume com área"
     micros:

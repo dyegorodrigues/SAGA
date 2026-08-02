@@ -54,3 +54,24 @@ export function canUnlockNode(nodeId: string, pMap: Record<string, Progress>): b
   const status = computeUnlockStatus(pMap);
   return status.opened.includes(nodeId);
 }
+
+const GRAPH_NODE_IDS = new Set(GrafoSaga.nodes.map(node => node.id));
+
+/**
+ * Resolve a identidade curricular sem transformar cartuchos externos em nós
+ * matemáticos. Tracks sem graphId e sem ID no Grafo não pertencem a este DAG e,
+ * portanto, continuam acessíveis pelas regras do próprio cartucho.
+ */
+export function resolveGraphNodeId(trackId: string, graphId?: string): string | null {
+  const candidate = graphId || trackId;
+  return GRAPH_NODE_IDS.has(candidate) ? candidate : null;
+}
+
+export function isTrackUnlocked(
+  trackId: string,
+  graphId: string | undefined,
+  status: UnlockStatus,
+): boolean {
+  const nodeId = resolveGraphNodeId(trackId, graphId);
+  return nodeId === null || status.opened.includes(nodeId);
+}

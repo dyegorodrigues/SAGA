@@ -2,20 +2,34 @@
 **Documento de trabalho para o agente de desenvolvimento · 30/jul/2026**
 *Substitui os planos anteriores. É a única lista de tarefas válida.*
 
+> **Estado verificado em 31/jul/2026:** os seis arquivos canônicos recebidos já
+> foram sincronizados e o grafo agregado/runtime contém 95 nós. A prioridade
+> anterior de “receber os uploads” está concluída. O próximo bloqueio é tornar
+> essa sincronização verificável por `npm run auditar`, sem alterar a experiência
+> da criança. Relatos históricos abaixo permanecem registrados, mas não devem ser
+> interpretados como estado atual sem a prova automatizada da Parte 0.
+
 ---
 
 # PARTE 0 — LEIA ANTES DE QUALQUER COISA
 
-## A contradição que precisa ser resolvida primeiro
+## A contradição encontrada — e o estado atual verificado
 
 No relatório da última sessão você afirmou **duas coisas incompatíveis**:
 
 1. *"100% dos anexos inseridos. Todos os arquivos de documentação em AI_Studio_Lab/pedagogia/ foram substituídos integralmente."*
 2. *"Fiz uma varredura com comandos de terminal e esses anexos não chegaram ao AI Studio. O meu GrafoSaga ainda lista apenas 84 nós."*
 
-**A segunda está certa** (é a que tem evidência de terminal). A primeira foi otimismo.
+Na sessão em que essas frases foram escritas, **a segunda era a única sustentada
+por evidência de terminal**. Depois disso, os uploads foram incorporados: Bíblia
+v2.7, Grafo humano, Manual, Dojo v1.1 e o YAML agregado coincidem com os arquivos
+recebidos, e os artefatos JSON/TypeScript contêm 95 nós.
 
-**Consequência real:** o Grafo no repositório tem **84 nós**, mas o cânone atual tem **95**. As fichas C22, C24, C31, C40 e outras apontam para competências que não existem no seu ambiente. Qualquer trabalho de conteúdo feito agora nasce quebrado.
+**Consequência tratada:** a substituição deixou resíduos de documentação e fontes
+auxiliares. Os YAMLs separados por strand foram completados para 95 nós; o YAML
+agregado passou a gerar JSON/TypeScript por comando determinístico; e o auditor
+agora bloqueia divergências de IDs, pré-requisitos ou artefatos. O histórico de 84
+nós permanece somente como registro da falha encontrada.
 
 ## Verificação obrigatória — rode ANTES de tocar em qualquer coisa
 
@@ -56,11 +70,13 @@ Também foram feitos: ajuste da subitização (padrão de dados em vez de disper
 
 # PARTE 2 — AS TAREFAS, EM ORDEM
 
-## 🔴 TAREFA 1 — Sincronizar o cânone (bloqueia tudo)
+## ✅ TAREFA 1A — Sincronizar os arquivos recebidos (concluída)
 
-**Problema:** Grafo com 84 nós, cânone com 95.
+**Resultado verificado:** os documentos recebidos são byte a byte idênticos às
+cópias na pasta canônica, o YAML agregado contém 95 nós e os artefatos JSON/TS
+foram atualizados. Não substituir novamente arquivos idênticos.
 
-**Ação:** receber os 6 arquivos atualizados e substituí-los **integralmente**:
+**Arquivos sincronizados:**
 - `AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md` → v2.7
 - `AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md` → 95 competências
 - `AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md` → com a didática das 11 novas
@@ -70,7 +86,23 @@ Também foram feitos: ajuste da subitização (padrão de dados em vez de disper
 
 **As 11 competências novas:** N2.06 (pares/ímpares) · N2.07 (fatores) · N2.08 (múltiplos) · N5.06 (somar frações) · N5.07 (equivalentes) · N5.08 (comparar frações) · N7.03 (razão) · N7.04 (porcentagem) · GM.10 (conversão) · GM.11 (volume) · PE.05 (probabilidade)
 
-**Prova de conclusão:** os 6 comandos da Parte 0 retornando os valores corretos, colados em bruto.
+**Prova de conclusão:** os 6 comandos da Parte 0 retornam os valores corretos.
+
+## ✅ TAREFA 1B — Baseline curricular reproduzível (concluída)
+
+**Resultado:** auditor read-only restaurado; YAMLs por strand com 95 nós; JSON e
+TypeScript derivados do YAML agregado por `npm run grafo:gerar`; build protegido
+por `npm run grafo:check`.
+
+**Ação:** `npm run auditar` deve, sem escrever em produção:
+1. validar os 95 IDs e todos os pré-requisitos do YAML agregado;
+2. comparar YAML agregado, JSON e grafo TypeScript do runtime;
+3. informar a cobertura do `GENERATOR_MAP`, fallbacks e fichas registradas;
+4. verificar que os dois nomes da SPEC permanecem idênticos;
+5. reportar separadamente os YAMLs por strand ainda não migrados.
+
+**Prova de conclusão:** comando reproduzível com saída bruta, build, TypeScript e
+testes verdes. Lacuna pedagógica encontrada é relatório, nunca correção automática.
 
 ---
 
@@ -216,3 +248,40 @@ Para evitar dispersão, **não trabalhe nisto ainda**:
 - novas primitivas que não estejam na lista das tarefas 4 e 6
 
 **O motivo:** hoje o projeto tem boa infraestrutura e pouco conteúdo chegando na criança. Cada peça nova de infraestrutura aumenta essa distância. **A pergunta antes de cada tarefa: isso muda o que a criança vê amanhã?**
+
+---
+
+# PARTE 6 — EIXO FUTURO PRESERVADO: MASCOTE COMO MOTOR INDEPENDENTE
+
+O mascote não será expandido durante a estabilização curricular, mas sua direção
+fica registrada para impedir que novas telas acoplem pedagogia a sprites. A meta é
+um widget/motor vivo, reutilizável e substituível, com render SVG ou spritesheet.
+
+## Fronteira arquitetural
+
+- o motor pedagógico publica eventos (`ANSWER_CORRECT`, `SESSION_COMPLETED`,
+  `RESCUE_COMPLETED`); não comanda frames nem conhece o atlas;
+- o motor do mascote deriva estado e animação; nunca decide nível, desbloqueio,
+  recompensa pedagógica ou acesso à aula;
+- fome, cansaço e energia mudam expressão/animação, jamais punem ou bloqueiam;
+- renderer e atlas são plugins visuais: trocar T-Rex 1, T-Rex 2, SVG ou futuro
+  personagem não altera progresso, Firestore nem GameLoop;
+- a primeira versão profissional terá um único personagem; o registro já nasce
+  expansível, sem exigir uma coleção antes do aplicativo estar estável.
+
+## Vocabulário inicial de animações
+
+`ocioso · comendo · comemorando · dormindo · cansado · desmaiado · meditando ·
+estudando · pensando · encorajando · chute · soco`
+
+Cada animação futura declarará no atlas: nome semântico, sequência de frames,
+FPS, repetição, prioridade, possibilidade de interrupção, retorno ao estado
+ocioso, ponto de ancoragem e fallback estático. “Desmaiado” é apenas estado
+ficcional/visual, nunca consequência punitiva de erro ou ausência da criança.
+
+## Momento correto de execução
+
+Somente depois de Jornada, Dojo, Oficina, progressão, persistência e fluxo de
+exercícios estarem confiáveis. Até lá, T-Rex 1 e T-Rex 2 permanecem protótipos de
+atlas; correções permitidas limitam-se a enquadramento, transparência, performance
+e regressões que impeçam o app atual de funcionar.
