@@ -47,16 +47,3 @@ nodes:
       - "story"
       - "picto."
     micros:
-  PE.05:
-    title: "Probabilidade e chance"
-    objective: "classificar eventos e representar chance como fração sem atribuir memória ao acaso."
-    prereqs:
-      - "PE.04"
-      - "N5.02"
-    kinds:
-      - "plain"
-      - "singapore."
-    misconceptions:
-      - "achar que um resultado passado influencia o próximo"
-      - "achar que todo evento tem chance de 50 por cento"
-    micros:

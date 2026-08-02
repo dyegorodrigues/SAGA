@@ -419,3 +419,22 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   `main` foi apagado no resultado.
 - O manifesto de hashes, a inspeção das PRs e os critérios de preservação estão em
   `AI_Studio_Lab/codex/RECONCILIACAO_MAIN_CODEX.md`.
+
+## 2 de agosto de 2026 — Cânone v3.2 e catálogo das 92 fichas
+
+- Os 16 arquivos recebidos foram lidos como pacote único. A decisão nova substitui
+  o baseline de 95: o grafo canônico fecha em 88 competências e 13 trilhas; sete
+  IDs sem gerador/ficha foram rejeitados por duplicarem competências existentes.
+- Bíblia v3.2, Grafo v1.2, Manual v2.3 e Dojo v1.4 foram promovidos aos caminhos
+  canônicos. Método, Arquitetura Cognitiva, Primitivas, Trilhas do Dojo e os cinco
+  blocos de fichas foram organizados sob `AI_Studio_Lab/pedagogia/`.
+- As SPECs antigas de 95 nós foram movidas para `arquivo_morto`; o pacote e seu
+  Diário de Alterações permanecem como evidência em `reconciliacao/2026-08-01/`.
+- Foram removidos do YAML agregado e dos strands: N2.08, N5.06, N5.07, N5.08,
+  N7.03, N7.04 e PE.05. JSON e TypeScript foram regenerados.
+- O auditor agora exige 88 competências, 13 trilhas, 92 fichas autorais, rejeita o
+  retorno dos sete IDs e verifica sinais de duplicação semântica.
+- `npm run fichas:auditar` prova 92 IDs únicos, nove seções por ficha, cobertura
+  88/88 e lista três primitivas sem componente homônimo: TouchCount, Moedas e Regua.
+- Próximo bloco: mapa estruturado ficha → primitiva → componente/builder/renderer e
+  ligação incremental das primitivas existentes, sem migração automática em massa.

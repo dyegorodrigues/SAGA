@@ -1,16 +1,18 @@
 # Uploads recebidos — área de conferência, não fonte canônica
 
-Esta pasta preserva os arquivos recebidos do fluxo externo do Google AI Studio.
-Ela existe para comparação, auditoria e rastreabilidade; **nenhum motor do SAGA
-deve importar conteúdo daqui**.
+`Upload_docs/` é somente uma caixa de entrada. Ela **não é fonte canônica** e
+nenhum motor do SAGA deve importar conteúdo daqui.
 
-Em 31/jul/2026 foi verificado que:
+O pacote de 1º de agosto de 2026 foi reconciliado em 2 de agosto:
 
-- `BIBLIA_SAGA.md` coincide com `AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md`;
-- `DOJO_SAGA.md`, o Grafo e o Manual coincidem com suas cópias canônicas;
-- `grafo_saga.txt` coincide com `curriculum/grafo_saga.yaml`;
-- os dois arquivos `GRAFO_DE_CONHECIMENTO_SAGA*.md` desta pasta são duplicatas.
+- Bíblia, Grafo, Manual e Dojo foram promovidos para `AI_Studio_Lab/pedagogia/`;
+- Método, Arquitetura Cognitiva, Primitivas e Trilhas do Dojo ficaram ao lado das
+  fontes pedagógicas;
+- os cinco blocos de 92 fichas estão em `AI_Studio_Lab/pedagogia/fichas/`;
+- a evidência original da decisão está em `AI_Studio_Lab/reconciliacao/2026-08-01/`;
+- as duas SPECs antigas de 95 nós foram aposentadas em
+  `AI_Studio_Lab/arquivo_morto/spec-95/`.
 
-Para editar o projeto, use somente as fontes indicadas em `AGENTS.md` e na
-cláusula de supremacia da Bíblia. Um upload novo deve ser comparado primeiro; ele
-jamais substitui silenciosamente uma fonte canônica.
+Um novo upload deve ser comparado primeiro e jamais substitui silenciosamente uma
+fonte canônica. Depois da promoção, esta pasta deve voltar a conter apenas este
+README.

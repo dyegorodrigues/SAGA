@@ -1,5 +1,11 @@
 # Auditoria profunda completa do SAGA
 
+> **Nota de atualização (2/ago/2026):** este relatório preserva a fotografia da
+> auditoria anterior. O pacote autoral v3.2 posterior fixou o grafo em **88
+> competências**, rejeitou sete duplicatas e entregou **92 fichas**. Para decisões
+> atuais, use `AI_Studio_Lab/pedagogia/PLANO_MESTRE_SAGA.md` e confirme os números
+> com `npm run auditar` e `npm run fichas:auditar`.
+
 **Data-base:** 31 de julho de 2026  
 **Escopo:** repositório inteiro, documentação, currículo, motores, React/TypeScript,
 Firebase, testes, UI infantil e mascote.  
