@@ -844,63 +844,6 @@
       ]
     },
     {
-      "id": "N2.08",
-      "nome": "Múltiplos",
-      "strand": "N2",
-      "faixa": "F3",
-      "prereqs": [
-        "AL.03",
-        "N4.03"
-      ]
-    },
-    {
-      "id": "N5.06",
-      "nome": "Somar frações (mesmo denom.)",
-      "strand": "N5",
-      "faixa": "F4",
-      "prereqs": [
-        "N5.03"
-      ]
-    },
-    {
-      "id": "N5.07",
-      "nome": "Frações equivalentes",
-      "strand": "N5",
-      "faixa": "F3",
-      "prereqs": [
-        "N5.02"
-      ]
-    },
-    {
-      "id": "N5.08",
-      "nome": "Comparar frações",
-      "strand": "N5",
-      "faixa": "F4",
-      "prereqs": [
-        "N5.07"
-      ]
-    },
-    {
-      "id": "N7.03",
-      "nome": "Razão e proporção",
-      "strand": "N7",
-      "faixa": "F4",
-      "prereqs": [
-        "N4.12",
-        "N5.08"
-      ]
-    },
-    {
-      "id": "N7.04",
-      "nome": "Porcentagem",
-      "strand": "N7",
-      "faixa": "F4",
-      "prereqs": [
-        "N6.03",
-        "N7.03"
-      ]
-    },
-    {
       "id": "GM.10",
       "nome": "Conversão de unidades",
       "strand": "GM",
@@ -918,16 +861,6 @@
       "prereqs": [
         "GM.09",
         "N4.02"
-      ]
-    },
-    {
-      "id": "PE.05",
-      "nome": "Probabilidade e chance",
-      "strand": "PE",
-      "faixa": "F4",
-      "prereqs": [
-        "PE.04",
-        "N5.02"
       ]
     }
   ],

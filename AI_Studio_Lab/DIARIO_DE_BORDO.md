@@ -249,3 +249,234 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - **Atualização da SPEC de Construção dos Exercícios (`SPEC_CONSTRUCAO_EXERCICIOS.md`):**
   - O arquivo de especificações visuais e lógicas dos exercícios (`SPEC_CONSTRUCAO_EXERCICIOS.md`) enviado foi comparado, validado e sincronizado na pasta canônica `AI_Studio_Lab/pedagogia/`.
   - Contém as fichas F0-F2 (31 exercícios desenhados em texto) e as regras do Jardim do Dojô.
+
+### 31 de Julho de 2026 — Baseline canônico reproduzível
+
+- Conferidos por hash e comparação byte a byte os arquivos de `Upload_docs/`
+  contra Bíblia, Dojo, Grafo, Manual e YAML canônicos; nenhuma substituição cega
+  foi repetida porque os conteúdos já coincidiam.
+- Corrigidas referências residuais de 84 para 95 competências e o nome canônico
+  `BIBLIA_DO_SAGA.md`; os dois nomes da SPEC foram documentados como aliases que
+  devem permanecer idênticos.
+- `src/docsText.ts` deixou de embutir uma cópia integral da Bíblia e agora lê o
+  Markdown canônico como texto bruto, eliminando uma fonte silenciosa de deriva.
+- `npm run auditar` foi restaurado como ferramenta estritamente read-only. Ele
+  valida os 95 nós, pré-requisitos, ausência de ciclos, paridade YAML/JSON/TS,
+  aliases da SPEC e cobertura de geradores/fichas.
+- Baseline encontrado: 95 nós canônicos; 42 com gerador explícito; 53 no fallback
+  “Em construção”; 12 fichas de Jornada no disco, 11 registradas; 4 fichas Dojo;
+  `AL.01` existe no disco mas não está em `AllFichas`; YAMLs por strand ainda
+  somam 84 e não incluem as 11 competências da v2.7.
+- O eixo futuro do mascote foi preservado no Plano Mestre como motor independente,
+  com atlas/renderer substituível e vocabulário inicial de animações, sem colocá-lo
+  à frente da estabilização curricular.
+
+### 31 de Julho de 2026 — Continuidade e backup do trabalho Codex
+
+- Criado `AI_Studio_Lab/codex/README.md` como ponto único de continuidade, sem
+  duplicar o repositório dentro dele.
+- Configurado `origin` para `SAGA-Codex` e `ai-studio` para leitura do SAGA
+  original, com push do original desabilitado localmente.
+- Tentativas de leitura e push para o GitHub foram bloqueadas pelo proxy do
+  ambiente (`CONNECT tunnel failed, response 403`) antes da autenticação.
+- Gerados e verificados backups locais em formatos bundle, ZIP e patch. O push
+  pendente continua sendo `git push -u origin work` quando a rede for liberada.
+
+### 31 de Julho de 2026 — Dossiê consolidado da auditoria e das conversas
+
+- Criado `AI_Studio_Lab/codex/DOSSIE_AUDITORIA_E_PLANO.md` para preservar em um
+  único Markdown os resultados da auditoria, arquitetura observada, baseline dos
+  95 nós, inconsistências, lacunas pedagógicas/técnicas, plano em fases, direção do
+  mascote, situação Git/GitHub, backups, verificações e ordem de continuidade.
+- O dossiê é uma consolidação operacional do conteúdo útil do chat, não uma nova
+  fonte pedagógica e não uma transcrição de raciocínio interno.
+
+### 31 de Julho de 2026 — Fechamento da cadeia do Grafo (Fase 0)
+
+- Adicionadas aos YAMLs de N2, N5, N7, GM e PE as 11 competências da v2.7, com
+  objetivo, pré-requisitos, kinds e misconceptions fundamentados no Grafo e Manual.
+- Os 11 YAMLs por strand agora totalizam 95 nós e o auditor exige paridade de IDs e
+  pré-requisitos com `curriculum/grafo_saga.yaml`.
+- Criado `scripts/generate-graph-artifacts.cjs`: `npm run grafo:gerar` produz JSON
+  e TypeScript; `npm run grafo:check` detecta artefato desatualizado sem escrever.
+- O build agora executa o check antes do Vite, e um teste Vitest protege o contrato.
+
+### 31 de Julho de 2026 — Registro integral da auditoria para consulta no GitHub
+
+- Criado `AI_Studio_Lab/codex/AUDITORIA_PROFUNDA_COMPLETA.md` com inventário,
+  arquitetura real, conflitos documentais, dez achados críticos, dez achados médios,
+  auditoria pedagógica, UI/UX, mascote, testes, plano por fases, prioridades e
+  definição de pronto.
+- O README da pasta Codex e o dossiê agora possuem links relativos clicáveis para o
+  relatório completo, evitando depender do histórico do chat no tablet.
+
+### 31 de Julho de 2026 — DAG aplicado à Jornada e ao Sensei (Fase 2)
+
+- A Jornada matemática passou a exibir o mapa canônico completo de 95 competências;
+  idade/série não remove nós, e pré-requisitos determinam quais podem ser iniciados.
+- Nós bloqueados permanecem visíveis para comunicar o caminho, mas não aceitam
+  seleção. O cálculo usa todo o progresso salvo, evitando que requisitos de faixas
+  anteriores desapareçam ao navegar em conteúdo posterior.
+- O Sensei agora recomenda apenas competências abertas. Cartuchos de Português,
+  Inglês, Ciências e Meu Mundo não são submetidos indevidamente ao DAG matemático.
+- O Dojo passou a enxergar competências matemáticas de F0 a F4 já praticadas, em vez
+  de limitar o catálogo às três primeiras faixas.
+- Testes de contrato cobrem 95 IDs únicos, raízes, múltiplos pré-requisitos, aliases
+  por `graphId` e compatibilidade de cartuchos externos.
+
+### 31 de Julho de 2026 — Contrato efetivo do Composer (Fase 3)
+
+- Corrigida a divergência em que o `kind` retornado vinha do nível CPA, mas o builder
+  construía dados conforme `micro.kinds[0]`. Agora ambos usam a primitiva efetiva.
+- Normalizados tutoriais antigos de `{ fala }` para o contrato runtime `{ say }`.
+- Adicionados builders para material de dezenas, relógio e balança, além das
+  transições para `plain`; primitives desconhecidas agora falham com contexto.
+- A suíte percorre os cinco níveis das 12 fichas de Jornada, verificando renderer,
+  avaliação e resposta única. `AL.01` foi incluída em `AllFichas`, eliminando a ficha
+  órfã registrada pelo auditor.
+- Baseline verificado após a mudança: 27 arquivos e 843 testes aprovados, além de
+  typecheck, auditor curricular e build de produção.
+- Risco mantido explícito: a união discriminada completa de `Question`/`FichaParams`
+  ainda será migrada incrementalmente para não quebrar os geradores legados.
+- Estado de continuidade revisado: apenas a branch local `work` guarda os commits;
+  não há remoto configurado nem backups ZIP/patch/bundle concorrentes nesta cópia.
+  Publicação no `SAGA-Codex` continua pendente e nunca é automática.
+
+### 31 de Julho de 2026 — Fronteira tipada das fichas (Fase 3, parte 2)
+
+- `FichaParams` deixou de aceitar `any`; a entrada do Composer agora interpreta e
+  valida números, booleanos, textos, opções e respostas antes de gerar a questão.
+- Resposta, função avaliadora e `uiProps` das fichas receberam tipos incrementais,
+  mantendo o contrato global legado intacto para não quebrar saves ou geradores.
+- Parâmetro malformado falha com competência/micro no erro, e a suíte protege essa
+  fronteira. A união discriminada global de `Question` permanece uma migração futura.
+- As fichas cinematográficas detalhadas serão entregues separadamente pelo
+  proprietário. Até lá, o Codex pode criar versões provisórias fundamentadas nas
+  fontes canônicas; na entrega, haverá comparação e fusão, nunca substituição cega.
+- Baseline desta etapa: 27 arquivos e 844 testes, typecheck, auditor e build aprovados.
+
+### 31 de Julho de 2026 — Motor único de progressão (preparação do domínio)
+
+- Removida a implementação divergente e não utilizada do `progressEngine`; a regra
+  efetivamente usada pelo `GameLoop` agora mora em `applyJourneyAnswer`.
+- Subida após três acertos, proteção do aquecimento, regressão após três erros e
+  imutabilidade do estado foram preservadas e cobertas por testes puros.
+- A coroa atual foi nomeada `legacy-crown` de propósito: não houve alteração
+  pedagógica escondida neste passo. Isso isola o próximo trabalho de domínio
+  multidimensional e migração de saves em um único ponto seguro.
+- Baseline: 28 arquivos e 849 testes, auditor, typecheck e build aprovados.
+
+### 31 de Julho de 2026 — Domínio multidimensional e migração de coroas
+
+- Novas coroas agora exigem compreensão, independência sem ajuda, fluência dentro
+  da meta e retenção comprovada por revisão após pelo menos dois dias.
+- Usar aulinha/repetição visual é registrado como ajuda; resposta lenta ou ajudada
+  não amadurece a dimensão correspondente, sem punir nem retirar progresso comum.
+- `rt_alvo` das fichas passou a alimentar `rt_max_s` em segundos no runtime.
+- Saves já coroados são preservados e recebem `crownedBy: legacy`; nenhuma conquista
+  antiga é apagada. Coroas novas recebem `crownedBy: multidimensional`.
+- Lacuna explícita: competências sem meta de tempo ainda não podem coroar, e o painel
+  dos pais ainda precisa exibir as quatro dimensões separadamente.
+- Baseline: 28 arquivos e 853 testes, auditor, typecheck e build aprovados.
+
+### 31 de Julho de 2026 — Painel de domínio, metas e Oficina tipada
+
+- O painel dos pais ganhou uma visualização expansível das quatro dimensões; coroas
+  legadas são preservadas como não medidas, sem inventar histórico retroativo.
+- O auditor e o Composer exigem meta `rt_alvo` positiva no nível 5 das fichas de
+  Jornada: cobertura atual 12/12. Fichas futuras entram no mesmo bloqueio.
+- O plano da aula distingue resgate por misconception, questão do banco e revisão
+  espaçada. Prática recente sem padrão/erro não abre uma Oficina artificial.
+- Questões de Radar/revisão são marcadas como revisão e alimentam a força Leitner;
+  a Oficina explica o motivo em linguagem positiva.
+- Distratores `n±k` recebem tag somente quando o valor corresponde exatamente à
+  regra; o Radar deixou de mutar diretamente o progresso recebido do React.
+- Baseline: 29 arquivos e 859 testes, auditor, typecheck e build aprovados.
+## 2026-07-31 — Oficina executável até a fronteira das fichas
+
+- Criado `rescuePlanner.ts`: um padrão confirmado agora procura o pré-requisito
+  disponível mais frágil, prescreve dose curta (4) ou severa (8) e, após três
+  missões inconclusas no mesmo alvo, desce mais um degrau quando há ficha real.
+- A ausência de track/ficha retorna `null`; nenhum fallback pedagógico é inventado.
+- A Oficina inicia a missão diretamente, sem passar pelo seletor comum. O GameLoop
+  usa escada própria de dois acertos, encerra ao atingir nível 3 e persiste o
+  contador anti-loop quando a dose termina sem recuperar o alvo.
+- Limite consciente alcançado: ampliar tags semânticas, demonstrações e Mão
+  Fantasma por competência depende das fichas cinematográficas em elaboração.
+- Baseline: 30 arquivos e 865 testes, auditor, grafo, typecheck e build aprovados.
+
+## 2 de agosto de 2026 — Reconciliação segura de `main` e Codex
+
+- Inspecionadas as duas branches publicadas e as PRs #1, #2 e #3 do repositório
+  `dyegorodrigues/SAGA`.
+- Confirmado por blob Git que os 16 arquivos do upload mais recente chegaram de
+  forma idêntica a `main` e à branch Codex; nenhum deles precisou ser escolhido
+  contra outra versão.
+- `main` foi incorporada por merge na branch `reconcile/main-codex`, preservando
+  os dois históricos. Nos quatro conflitos documentais/técnicos foi mantida a
+  evolução mais recente do lado Codex, sem tornar o lado `main` irrecuperável.
+- `Upload_docs/README.md`, exclusivo de `main`, foi restaurado e nenhum caminho de
+  `main` foi apagado no resultado.
+- O manifesto de hashes, a inspeção das PRs e os critérios de preservação estão em
+  `AI_Studio_Lab/codex/RECONCILIACAO_MAIN_CODEX.md`.
+
+## 2 de agosto de 2026 — Cânone v3.2 e catálogo das 92 fichas
+
+- Os 16 arquivos recebidos foram lidos como pacote único. A decisão nova substitui
+  o baseline de 95: o grafo canônico fecha em 88 competências e 13 trilhas; sete
+  IDs sem gerador/ficha foram rejeitados por duplicarem competências existentes.
+- Bíblia v3.2, Grafo v1.2, Manual v2.3 e Dojo v1.4 foram promovidos aos caminhos
+  canônicos. Método, Arquitetura Cognitiva, Primitivas, Trilhas do Dojo e os cinco
+  blocos de fichas foram organizados sob `AI_Studio_Lab/pedagogia/`.
+- As SPECs antigas de 95 nós foram movidas para `arquivo_morto`; o pacote e seu
+  Diário de Alterações permanecem como evidência em `reconciliacao/2026-08-01/`.
+- Foram removidos do YAML agregado e dos strands: N2.08, N5.06, N5.07, N5.08,
+  N7.03, N7.04 e PE.05. JSON e TypeScript foram regenerados.
+- O auditor agora exige 88 competências, 13 trilhas, 92 fichas autorais, rejeita o
+  retorno dos sete IDs e verifica sinais de duplicação semântica.
+- `npm run fichas:auditar` prova 92 IDs únicos, nove seções por ficha, cobertura
+  88/88 e lista três primitivas sem componente homônimo: TouchCount, Moedas e Regua.
+- Próximo bloco: mapa estruturado ficha → primitiva → componente/builder/renderer e
+  ligação incremental das primitivas existentes, sem migração automática em massa.
+
+## 2 de agosto de 2026 — Publicação recuperada e auditoria final da `main`
+
+- A árvore final do PR #8 foi recuperada sobre a `main` vigente, sem reutilizar o
+  histórico conflitante, e publicada pelo PR #9.
+- O PR #9 foi mesclado em `main` no commit `2e0f9a2`; a árvore publicada
+  `4f07bcb4a56a77fe761ffc3691831a12f8e51662` coincide exatamente com a árvore
+  reconciliada. O PR #8 tornou-se redundante e deve permanecer fechado sem merge.
+- O ambiente local foi realinhado byte a byte com `origin/main`; não há diferenças
+  de árvore nem marcadores de conflito.
+- Auditoria reproduzida após a publicação: 88 competências, 13 trilhas, 92 fichas,
+  cobertura autoral 88/88, 42 geradores explícitos, 46 fallbacks, 12 fichas de
+  Jornada e quatro de Dojo registradas, sem geradores órfãos ou deriva nominal.
+- `npm run auditar`, `npm run fichas:auditar`, `npm run grafo:check`, `npm run lint`,
+  `npm test -- --run` (30 arquivos/865 testes) e `npm run build` passaram. Permanece
+  somente o aviso não bloqueante de bundle principal acima de 500 kB.
+- Próximo bloco confirmado: completar o mapa executável das primitivas e selecionar
+  uma competência vertical padrão-ouro antes de qualquer migração autoral em massa.
+
+## 2 de agosto de 2026 — Mapa executável das primitivas autorais
+
+- Criado `ficha_runtime_map.cjs`, cobrindo explicitamente as 25 primitivas declaradas
+  nas 92 fichas e ligando nomenclatura autoral a kind, componente, builder e renderer.
+- O auditor agora falha se uma primitiva usada não estiver mapeada, se um componente
+  declarado desaparecer ou se o mapa alegar builder/renderer que não existe no código.
+- Resultado medido: 12 primitivas executáveis, seis com renderer sem builder, seis
+  componentes isolados e uma lacuna real.
+- `TouchCount` foi resolvido como alias semântico de `EmojiRow`; `Moedas` já tem
+  renderer inline com `MoneyCoin`/`MoneyNote`, mas não builder; apenas `Regua` ainda
+  não possui componente, builder ou renderer.
+- Um teste de contrato executa o auditor e protege os 25 mapeamentos. Próximo passo:
+  fechar o builder tipado de `vertical` sem remover o caminho legado.
+
+## 2 de agosto de 2026 — Primeiro desbloqueio: builder `vertical`
+
+- O contrato tipado de parâmetros recebeu intervalos das parcelas, operação e opção
+  de exigir reagrupamento, com rejeição explícita de operação ou faixa inválida.
+- O Composer agora produz `vTop`, `vBot`, `vOp`, resposta e avaliador coerentes para
+  `InteractiveVertical`; a geração de subtração nunca cria resultado negativo.
+- Testes cobrem uma soma fixa com reagrupamento, resposta única e operação inválida.
+- O mapa passou de 12 para 13 primitivas executáveis; `vertical` deixou de ser
+  renderer sem builder. Próximo alvo padrão-ouro: F35/N3.09, antes de F39/N3.11.

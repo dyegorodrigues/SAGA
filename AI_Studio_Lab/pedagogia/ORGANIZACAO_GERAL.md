@@ -1,6 +1,11 @@
 # 🗂️ ORGANIZAÇÃO GERAL — O QUE FALTA E EM QUE ORDEM
 **Consolidação de tudo que foi levantado + achados novos + próximos passos**
 
+> **Documento de diagnóstico histórico.** Algumas correções descritas abaixo já
+> foram implementadas depois de sua escrita. A ordem executiva vigente está em
+> `PLANO_MESTRE_SAGA.md`, e o estado factual deve ser confirmado pelos comandos
+> do `package.json`. Não reaplique uma correção daqui sem verificar o código atual.
+
 ---
 
 # 1. O BUG DO "50+7 NO NÍVEL 1" — encontrei a causa

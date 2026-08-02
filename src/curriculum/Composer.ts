@@ -1,5 +1,71 @@
-import { FichaCompetencia, FichaMicro } from "./schema";
-import { Question } from "../types";
+import { FichaCompetencia, FichaDistrator } from "./schema";
+import { Option, Question } from "../types";
+import {
+  FichaAnswer,
+  FichaEvaluate,
+  FichaUiProps,
+  normalizeFichaTutorial,
+  parseComposerParams,
+} from "./fichaQuestionContract";
+
+const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
+
+function randomInt(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function hasVerticalRegroup(top: number, bottom: number, operation: "+" | "-"): boolean {
+  if (operation === "+") return (top % 10) + (bottom % 10) >= 10;
+  return top % 10 < bottom % 10;
+}
+
+function verticalOperands(params: ReturnType<typeof parseComposerParams>, context: string) {
+  const operation = params.operation ?? "+";
+  const topMin = params.top_min ?? 10;
+  const topMax = params.top_max ?? 99;
+  const bottomMin = params.bottom_min ?? 1;
+  const bottomMax = params.bottom_max ?? 9;
+  if (topMin > topMax || bottomMin > bottomMax) {
+    throw new Error(`Intervalo vertical inválido em ${context}.`);
+  }
+
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    const top = randomInt(topMin, topMax);
+    const bottom = randomInt(bottomMin, bottomMax);
+    if (operation === "-" && bottom > top) continue;
+    if (params.require_regroup && !hasVerticalRegroup(top, bottom, operation)) continue;
+    return { top, bottom, operation };
+  }
+  throw new Error(`Não foi possível gerar conta vertical com os parâmetros de ${context}.`);
+}
+
+function numericOptions(answer: number, min: number, max: number) {
+  const candidates = [answer, answer - 1, answer + 1, answer - 2, answer + 2]
+    .filter(value => value >= min && value <= max);
+  const values = [...new Set(candidates)].slice(0, Math.min(3, max - min + 1));
+  return values
+    .map(value => ({ label: String(value), value }))
+    .sort(() => Math.random() - 0.5);
+}
+
+function tagNumericDistractors(
+  options: Option[] | undefined,
+  answer: FichaAnswer,
+  distractors: FichaDistrator[] | undefined,
+): Option[] | undefined {
+  if (!options || typeof answer !== "number" || !distractors?.length) return options;
+  const taggedValues = new Map<number, string>();
+  for (const distractor of distractors) {
+    const match = distractor.regra.trim().match(/^n\s*([+-])\s*(\d+)$/);
+    if (!match) continue;
+    const delta = Number(match[2]) * (match[1] === "+" ? 1 : -1);
+    taggedValues.set(answer + delta, distractor.tag);
+  }
+  return options.map(option => {
+    const tag = typeof option.value === "number" ? taggedValues.get(option.value) : undefined;
+    return tag ? { ...option, misconception: tag } : option;
+  });
+}
 
 export class Composer {
   /**
@@ -12,28 +78,39 @@ export class Composer {
       micro = ficha.micros[0];
     }
 
-    // Use level to pick primitive from niveis block (CPA progression), fallback to micro.kinds[0]
-    const kind = ficha.niveis && ficha.niveis[lvl] ? ficha.niveis[lvl].primitiva : micro.kinds[0];
-    const params = micro.params;
+    if (!micro) {
+      throw new Error(`Ficha ${ficha.id} não possui microcompetências.`);
+    }
 
-    let uiProps: any = {};
-    let evaluate = (ans: any) => false;
-    let answer: any = null;
-    let options: any[] | undefined = undefined;
+    // O nível é a fonte da representação CPA efetiva. O builder precisa usar a
+    // mesma primitiva retornada, nunca o primeiro kind histórico da micro.
+    const kind = ficha.niveis?.[lvl]?.primitiva ?? micro.kinds[0];
+    const params = parseComposerParams(micro.params, `${ficha.id}/${micro.id}`);
+
+    let uiProps: FichaUiProps;
+    let evaluate: FichaEvaluate;
+    let answer: FichaAnswer;
+    let options: Option[] | undefined;
 
     let big: string | undefined = undefined;
-
-    const baseKind = micro.kinds[0];
+    let n: number | undefined;
+    let emoji: string | undefined;
+    let promptOverride: string | undefined;
+    let vTop: number | undefined;
+    let vBot: number | undefined;
+    let vOp: "+" | "-" | undefined;
 
     // A simple factory that delegates to specific kind builders based on params
-    switch (baseKind) {
+    switch (kind) {
       case "emojirow": {
         const min = params.n_min || 1;
         const max = params.n_max || 5;
-        const target = Math.floor(Math.random() * (max - min + 1)) + min;
+        const target = randomInt(min, max);
+        emoji = EMOJIS[randomInt(0, EMOJIS.length - 1)];
+        n = target;
         
         uiProps = {
-          emoji: ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"][Math.floor(Math.random() * 10)],
+          emoji,
           n: target,
           flashDurationMs: params.flash_ms,
           interactiveCount: params.interactive_count
@@ -64,7 +141,7 @@ export class Composer {
         const start = params.start || 0;
         const end = params.end || 10;
         const jump = params.jump_size || 1;
-        const current = Math.floor(Math.random() * (end - start - jump)) + start;
+        const current = randomInt(start, end - jump);
         const next = current + jump;
         
         uiProps = {
@@ -76,18 +153,15 @@ export class Composer {
         evaluate = (ans) => ans === next;
         answer = next;
         big = String(current);
-        options = [
-          { label: String(answer), value: answer },
-          { label: String(answer + 1), value: answer + 1 },
-          { label: String(answer - 1 >= start ? answer - 1 : answer + 2), value: answer - 1 >= start ? answer - 1 : answer + 2 },
-        ].sort(() => Math.random() - 0.5);
+        options = numericOptions(answer, start, end);
         break;
       }
       
       case "tenframe": {
         const min = params.n_min || 1;
         const max = params.n_max || 10;
-        const target = Math.floor(Math.random() * (max - min + 1)) + min;
+        const target = randomInt(min, max);
+        n = target;
         
         uiProps = {
           n: target,
@@ -163,12 +237,14 @@ export class Composer {
       case "scattered": {
         const min = params.n_min || 1;
         const max = params.n_max || 10;
-        const target = Math.floor(Math.random() * (max - min + 1)) + min;
+        const target = randomInt(min, max);
+        emoji = EMOJIS[randomInt(0, EMOJIS.length - 1)];
+        n = target;
         
         uiProps = {
-          emoji: ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐵"][Math.floor(Math.random() * 10)],
+          emoji,
           n: target,
-          ordered: params.arranjo === "fila" || params.arranjo === "grade",
+          ordered: false,
           flashDurationMs: params.flash_ms,
           interactiveCount: params.interactive_count
         };
@@ -192,11 +268,116 @@ export class Composer {
         }
         break;
       }
+
+      case "tens": {
+        const dezenas = randomInt(1, params.dezenas_max || 5);
+        const unidades = randomInt(0, params.unidades_max || 9);
+        answer = dezenas * 10 + unidades;
+        uiProps = { dezenas, unidades };
+        options = numericOptions(answer, Math.max(10, answer - 2), answer + 2);
+        evaluate = (ans) => ans === answer;
+        break;
+      }
+
+      case "relogio": {
+        const initialHours = randomInt(1, 12);
+        const initialMinutes = params.apenas_horas_exatas
+          ? 0
+          : [0, 15, 30, 45][randomInt(0, 3)];
+        const advance = params.interativo ? (params.minutos_step || 15) : 0;
+        const totalMinutes = (initialHours % 12) * 60 + initialMinutes + advance;
+        const targetHours = Math.floor(totalMinutes / 60) % 12 || 12;
+        const targetMinutes = totalMinutes % 60;
+        answer = `${targetHours}:${String(targetMinutes).padStart(2, "0")}`;
+        uiProps = { initialHours, initialMinutes, interactive: false };
+        options = [answer, `${initialHours}:${String(initialMinutes).padStart(2, "0")}`, `${targetHours}:${String((targetMinutes + 15) % 60).padStart(2, "0")}`]
+          .filter((value, index, values) => values.indexOf(value) === index)
+          .map(value => ({ label: value, value }))
+          .sort(() => Math.random() - 0.5);
+        evaluate = (ans) => ans === answer;
+        break;
+      }
+
+      case "balanca": {
+        const target = randomInt(params.peso_alvo_min || 2, params.peso_alvo_max || 8);
+        const visible = randomInt(1, Math.max(1, target - 1));
+        answer = target - visible;
+        uiProps = {
+          leftItems: [{ id: "alvo", weight: target, label: target }],
+          rightItems: [{ id: "visivel", weight: visible, label: visible }],
+        };
+        options = numericOptions(answer, 1, Math.max(target, answer + 2));
+        evaluate = (ans) => ans === answer;
+        break;
+      }
+
+      case "vertical": {
+        const operands = verticalOperands(params, `${ficha.id}/${micro.id}`);
+        vTop = operands.top;
+        vBot = operands.bottom;
+        vOp = operands.operation;
+        answer = vOp === "+" ? vTop + vBot : vTop - vBot;
+        uiProps = { vTop, vBot, vOp };
+        evaluate = (ans) => ans === answer;
+        promptOverride = params.audio_prompt ?? `${vTop} ${vOp === "+" ? "mais" : "menos"} ${vBot}.`;
+        break;
+      }
         
       case "plain": {
-        // We will just return the params for plain rendering
-        uiProps = { text: params.big || "" };
-        evaluate = (ans) => true; // Default
+        if (typeof params.dezenas_max === "number") {
+          const dezenas = randomInt(1, params.dezenas_max);
+          const unidades = randomInt(0, params.unidades_max || 9);
+          answer = dezenas * 10 + unidades;
+          uiProps = { text: `${dezenas} dezenas + ${unidades} unidades = ?` };
+          options = numericOptions(answer, Math.max(10, answer - 2), answer + 2);
+          evaluate = (ans) => ans === answer;
+          promptOverride = "Qual número foi formado?";
+        } else if (params.apenas_horas_exatas || params.interativo) {
+          const hours = randomInt(1, 12);
+          const minutes = params.interativo ? (params.minutos_step || 15) : 0;
+          answer = `${hours}:${String(minutes).padStart(2, "0")}`;
+          uiProps = {
+            text: params.interativo
+              ? `${hours}:00 + ${minutes} minutos = ?`
+              : `Ponteiro pequeno no ${hours}; grande no 12`,
+          };
+          options = [answer, `${hours}:00`, `${hours === 12 ? 1 : hours + 1}:00`]
+            .filter((value, index, values) => values.indexOf(value) === index)
+            .map(value => ({ label: value, value }));
+          evaluate = (ans) => ans === answer;
+          promptOverride = "Que horas são?";
+        } else if (typeof params.peso_alvo_min === "number") {
+          const target = randomInt(params.peso_alvo_min, params.peso_alvo_max || 8);
+          const visible = randomInt(1, Math.max(1, target - 1));
+          answer = target - visible;
+          uiProps = { text: `${target} = ${visible} + ?` };
+          options = numericOptions(answer, 1, Math.max(target, answer + 2));
+          evaluate = (ans) => ans === answer;
+          promptOverride = "Quanto falta para ficar igual?";
+        } else if (typeof params.start === "number" && typeof params.end === "number") {
+          const jump = params.jump_size || 1;
+          const current = randomInt(params.start, params.end - jump);
+          answer = current + jump;
+          big = String(current);
+          uiProps = { text: String(current) };
+          options = numericOptions(answer, params.start, params.end);
+          evaluate = (ans) => ans === answer;
+          promptOverride = "Qual número vem depois?";
+        } else if (typeof params.n_min === "number" && typeof params.n_max === "number") {
+          answer = randomInt(params.n_min, params.n_max);
+          const shown = Array.from({ length: Math.max(1, answer - 1) }, (_, index) => index + 1);
+          uiProps = { text: `${shown.join(" · ")} · ?` };
+          options = numericOptions(answer, params.n_min, params.n_max);
+          evaluate = (ans) => ans === answer;
+          promptOverride = "Continue a contagem. Qual número vem agora?";
+        } else if (typeof params.big === "string") {
+          uiProps = { text: params.big };
+          answer = params.answer;
+          options = params.options;
+          evaluate = (ans) => ans === answer;
+        } else {
+          throw new Error(`Primitiva plain sem parâmetros compatíveis em ${ficha.id}/${micro.id}.`);
+        }
         break;
       }
       
@@ -230,23 +411,30 @@ export class Composer {
       }
       
       default:
-        uiProps = undefined;
-        evaluate = (ans) => true;
-        answer = null;
+        throw new Error(`Primitiva ${kind} ainda não possui builder no Composer (${ficha.id}/${micro.id}).`);
     }
 
     return {
       howto: ficha.howto,
       explain: ficha.explain,
+      rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
+        ? ficha.niveis[lvl].rt_alvo! / 1000
+        : undefined,
       kind: kind === "intruso_math" ? "plain" : kind,
-      prompt: params.audio_prompt || "Responda:",
-      audioPrompt: params.audio_prompt,
-      tutorial: params.tutorial,
+      prompt: promptOverride || params.audio_prompt || "Responda:",
+      audioPrompt: promptOverride || params.audio_prompt,
+      tutorial: normalizeFichaTutorial(params.tutorial),
+      excecaoCPA: ficha.excecaoCPA,
       uiProps,
       evaluate,
       answer,
-      options,
-      big
+      options: tagNumericDistractors(options, answer, ficha.distratores),
+      big,
+      n,
+      emoji,
+      vTop,
+      vBot,
+      vOp,
     };
   }
 }
