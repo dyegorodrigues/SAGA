@@ -28,7 +28,7 @@ export const N3_09: FichaCompetencia = {
     5: { primitiva: "vertical", micro: "misto", andaime: "nenhum", rt_alvo: 8000 },
   },
   micros: [
-    { id: "dezenas_exatas", alvo: "somar dezenas exatas sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 70, bottom_min: 10, bottom_max: 70, operand_step: 10, result_max: 100, operation: "+", forbid_regroup: true, show_place_value: true, tutorial }, dominio },
+    { id: "dezenas_exatas", alvo: "somar dezenas exatas sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 70, bottom_min: 10, bottom_max: 70, operand_step: 10, result_max: 100, operation: "+", forbid_regroup: true, show_place_value: true, show_algorithm: false, tutorial }, dominio },
     { id: "soma_unidades", alvo: "somar um número de dois algarismos e unidades sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 99, bottom_min: 1, bottom_max: 9, result_max: 100, operation: "+", forbid_regroup: true, show_place_value: true, tutorial }, dominio },
     { id: "soma_duas_ordens", alvo: "somar dezenas e unidades por coluna sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 99, bottom_min: 10, bottom_max: 89, result_max: 100, operation: "+", forbid_regroup: true, show_place_value: true, tutorial }, dominio },
     { id: "subtracao", alvo: "subtrair dezenas e unidades por coluna sem empréstimo", kinds: ["vertical"], params: { top_min: 20, top_max: 99, bottom_min: 10, bottom_max: 89, operation: "-", forbid_regroup: true }, dominio },

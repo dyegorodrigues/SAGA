@@ -1,5 +1,5 @@
 import React from "react";
-import { Question } from "../../types";
+import { AnswerMeta, Question } from "../../types";
 import { RapidFire } from "../exercises/RapidFire";
 import { SingaporeBars } from "../primitives/SingaporeBars";
 import { NumberBond } from "../primitives/NumberBond";
@@ -12,7 +12,7 @@ import { NumberLine } from "../primitives/NumberLine";
 import { InteractiveNumberLine } from "../primitives/InteractiveNumberLine";
 import { DragGroup } from "../primitives/DragGroup";
 import { ArrayGrid } from "../primitives/ArrayGrid";
-import { InteractiveVertical } from "../primitives/InteractiveVertical";
+import { VerticalPlaceValueStage } from "../primitives/VerticalPlaceValueStage";
 import { VisualAddition } from "../primitives/VisualAddition";
 import { ScatteredItems } from "../primitives/ScatteredItems";
 import { LinkingCubes } from "../primitives/LinkingCubes";
@@ -29,12 +29,13 @@ import NestScene from "../scenes/NestScene";
 import JourneyScene from "../scenes/JourneyScene";
 import PlaceScene, { Place } from "../scenes/PlaceScene";
 import { hasAulinha, hasTutorial } from "../../utils/tutorials";
+import { shouldRenderQuestionOptions } from "./answerPolicy";
 
 interface Props {
   q: Question;
   status: "right" | "wrong" | null;
   idx: number;
-  handlePick: (val: any) => void;
+  handlePick: (val: any, forcedRight?: boolean, meta?: AnswerMeta) => void;
   timeLeft: number;
   promptDone: boolean;
   guidedIdx: number | null;
@@ -291,7 +292,14 @@ export function GameLoopExerciseRenderer({
           {q.kind === "linking-cubes" && q.groups && <LinkingCubes groups={q.groups.map(g => ({ n: g.n, color: (g as any).color || "bg-blue-400" }))} showNumbers={q.uiProps?.showNumbers} />}
           {q.kind === "take-apart" && q.a != null && q.b != null && q.n != null && <TakeApart total={q.n} knownSplit={{a: q.a, b: q.b}} />}
 
-          {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
+          {q.kind === "vertical" && (
+            <VerticalPlaceValueStage
+              question={q}
+              onAnswer={handlePick}
+              onMistake={(digit, meta) => handlePick(digit, false, meta)}
+              disabled={status !== null}
+            />
+          )}
           {q.kind === "tenframe" && q.n != null && (
             <div style={{ opacity: (q.uiProps?.flashDurationMs && flashHidden && status !== "right") ? 0 : 1, transition: "opacity 0.2s" }}>
               <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} flashDurationMs={q.uiProps?.flashDurationMs} state={status === "right" ? "acerto" : status === "wrong" ? "erro-suave" : "ocioso"} />
@@ -414,7 +422,7 @@ export function GameLoopExerciseRenderer({
       )}
 
       {/* Tutorial guiado 👉 (generalizado): a mãozinha do Contar, para as cenas novas */}
-      {hasTutorial(q) && !status && (
+      {hasTutorial(q) && q.kind !== "vertical" && !status && (
         guidedNarr !== null ? (
           <div
             className="mt-3 mx-auto p-3 rounded-2xl text-center mk-optin"
@@ -423,10 +431,10 @@ export function GameLoopExerciseRenderer({
             💡 {guidedNarr}
           </div>
         ) : (
-          <div className="flex justify-center mt-3">
+          <div className="flex justify-center mt-2">
             <button
               onClick={() => playAulinha(false)}
-              className="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-xs px-4 py-2 rounded-md flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
+              className="min-h-20 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-sm px-5 py-3 rounded-xl flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
               style={{ fontFamily: FONT }}
             >
               <span>👉 Como faz? 🫵</span>
@@ -527,7 +535,7 @@ export function GameLoopExerciseRenderer({
           </div>
         ) : (
           <>
-          {q.options && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && (<div className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid grid-cols-2"}`}>
+          {shouldRenderQuestionOptions(q) && q.options && (<div className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid grid-cols-2"}`}>
             {q.options.map((o, i) => {
               const isAnswer = o.value === q.answer;
               const picked = sel === o.value;

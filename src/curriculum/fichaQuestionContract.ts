@@ -22,7 +22,7 @@ export type FichaUiProps =
   | { dezenas: number; unidades: number }
   | { initialHours: number; initialMinutes: number; interactive: false }
   | { leftItems: BalanceItem[]; rightItems: BalanceItem[] }
-  | { vTop: number; vBot: number; vOp: "+" | "-"; showPlaceValue?: boolean }
+  | { vTop: number; vBot: number; vOp: "+" | "-"; showPlaceValue?: boolean; showRegroup?: boolean; showAlgorithm?: boolean }
   | { text: string };
 
 interface BalanceItem {
@@ -56,10 +56,13 @@ export interface ComposerParams {
   bottom_max?: number;
   operation?: "+" | "-" | "mixed";
   require_regroup?: boolean;
+  require_double_regroup?: boolean;
   forbid_regroup?: boolean;
   operand_step?: number;
   result_max?: number;
   show_place_value?: boolean;
+  show_regroup?: boolean;
+  show_algorithm?: boolean;
   big?: string;
   answer?: FichaAnswer;
   options?: Option[];
@@ -77,7 +80,7 @@ const NUMBER_KEYS = [
 ] as const;
 const BOOLEAN_KEYS = [
   "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo",
-  "require_regroup", "forbid_regroup", "show_place_value",
+  "require_regroup", "require_double_regroup", "forbid_regroup", "show_place_value", "show_regroup", "show_algorithm",
 ] as const;
 const STRING_KEYS = ["interactive", "big", "audio_prompt"] as const;
 

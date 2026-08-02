@@ -46,6 +46,13 @@ export interface Option {
   misconception?: string;
 }
 
+/** Context from production interactions that do not select a Question option. */
+export interface AnswerMeta {
+  misconception?: string;
+  source?: "vertical-column";
+  columnIndex?: number;
+}
+
 export interface Question {
   rt_max_s?: number;
   /** A fala que introduz o exercício (narração principal) */
