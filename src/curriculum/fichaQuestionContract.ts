@@ -22,6 +22,7 @@ export type FichaUiProps =
   | { dezenas: number; unidades: number }
   | { initialHours: number; initialMinutes: number; interactive: false }
   | { leftItems: BalanceItem[]; rightItems: BalanceItem[] }
+  | { vTop: number; vBot: number; vOp: "+" | "-" }
   | { text: string };
 
 interface BalanceItem {
@@ -49,6 +50,12 @@ export interface ComposerParams {
   minutos_step?: number;
   peso_alvo_min?: number;
   peso_alvo_max?: number;
+  top_min?: number;
+  top_max?: number;
+  bottom_min?: number;
+  bottom_max?: number;
+  operation?: "+" | "-";
+  require_regroup?: boolean;
   big?: string;
   answer?: FichaAnswer;
   options?: Option[];
@@ -61,10 +68,12 @@ type Tutorial = Question["tutorial"];
 const NUMBER_KEYS = [
   "n_min", "n_max", "flash_ms", "start", "end", "jump_size", "moldura",
   "soma_max", "dezenas_max", "unidades_max", "minutos_step",
-  "peso_alvo_min", "peso_alvo_max",
+  "peso_alvo_min", "peso_alvo_max", "top_min", "top_max", "bottom_min",
+  "bottom_max",
 ] as const;
 const BOOLEAN_KEYS = [
   "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo",
+  "require_regroup",
 ] as const;
 const STRING_KEYS = ["interactive", "big", "audio_prompt"] as const;
 
@@ -94,6 +103,12 @@ export function parseComposerParams(input: FichaParams, context: string): Compos
       throw new Error(`Parâmetro ${key} inválido em ${context}: esperado texto.`);
     }
     parsed[key] = value;
+  }
+  if (input.operation !== undefined) {
+    if (input.operation !== "+" && input.operation !== "-") {
+      throw new Error(`Parâmetro operation inválido em ${context}: esperado + ou -.`);
+    }
+    parsed.operation = input.operation;
   }
 
   const answer = input.answer;

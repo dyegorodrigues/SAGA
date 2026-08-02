@@ -1,11 +1,17 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const YAML = require("yaml");
+const { FICHA_RUNTIME_MAP } = require("./ficha_runtime_map.cjs");
 
 const ROOT = path.resolve(__dirname, "../..");
 const FICHAS_DIR = path.join(ROOT, "AI_Studio_Lab/pedagogia/fichas");
 const GRAPH_PATH = path.join(ROOT, "curriculum/grafo_saga.yaml");
 const COMPONENTS_DIR = path.join(ROOT, "src/components");
+const COMPOSER_PATH = path.join(ROOT, "src/curriculum/Composer.ts");
+const RENDERER_PATHS = [
+  path.join(ROOT, "src/components/FichaRenderer.tsx"),
+  path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
+];
 const EXPECTED_FICHAS = 92;
 const EXPECTED_COMPETENCIES = 88;
 const REJECTED_IDS = new Set(["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"]);
@@ -23,6 +29,8 @@ const componentNames = new Set(
     .map((file) => path.basename(file, ".tsx"))
 );
 const builtInPrimitives = new Set(["plain"]);
+const composerSource = fs.readFileSync(COMPOSER_PATH, "utf8");
+const rendererSource = RENDERER_PATHS.map((file) => fs.readFileSync(file, "utf8")).join("\n");
 
 function parseFichaFile(file) {
   const source = fs.readFileSync(path.join(FICHAS_DIR, file), "utf8");
@@ -80,6 +88,47 @@ const unavailablePrimitives = [...primitiveUsage]
   .filter(([primitive]) => !componentNames.has(primitive) && !builtInPrimitives.has(primitive))
   .map(([primitive, usedBy]) => ({ primitive, usedBy }));
 
+const runtimeMapByPrimitive = new Map(FICHA_RUNTIME_MAP.map((entry) => [entry.primitive, entry]));
+check(runtimeMapByPrimitive.size === FICHA_RUNTIME_MAP.length, "o mapa runtime possui primitivas duplicadas");
+for (const primitive of primitiveUsage.keys()) {
+  check(runtimeMapByPrimitive.has(primitive), `primitiva autoral ${primitive} não está no mapa runtime`);
+}
+for (const entry of FICHA_RUNTIME_MAP) {
+  check(primitiveUsage.has(entry.primitive), `mapa runtime contém primitiva não usada ${entry.primitive}`);
+  check(entry.kinds.length > 0, `${entry.primitive} não declara kind semântico`);
+  check(entry.builtin || entry.componentFiles.length > 0 || entry.note, `${entry.primitive} não documenta componente nem lacuna`);
+  for (const file of entry.componentFiles) {
+    const absoluteFile = path.join(ROOT, file);
+    check(fs.existsSync(absoluteFile), `${entry.primitive} aponta para componente inexistente ${file}`);
+    if (fs.existsSync(absoluteFile)) {
+      const source = fs.readFileSync(absoluteFile, "utf8");
+      for (const exportedName of entry.componentExports || []) {
+        check(source.includes(`function ${exportedName}`), `${entry.primitive} não encontrou export ${exportedName} em ${file}`);
+      }
+    }
+  }
+  for (const kind of entry.builderKinds) {
+    check(composerSource.includes(`case "${kind}"`) || composerSource.includes(`case '${kind}'`), `${entry.primitive} declara builder ausente para ${kind}`);
+  }
+  for (const kind of entry.rendererKinds) {
+    const doubleQuoted = `kind === "${kind}"`;
+    const singleQuoted = `case '${kind}'`;
+    check(rendererSource.includes(doubleQuoted) || rendererSource.includes(singleQuoted), `${entry.primitive} declara renderer ausente para ${kind}`);
+  }
+}
+
+function runtimeStatus(entry) {
+  const hasComponent = entry.builtin || entry.componentFiles.length > 0;
+  const hasBuilder = entry.builderKinds.length > 0;
+  const hasRenderer = entry.rendererKinds.length > 0;
+  if (hasBuilder && hasRenderer) return "executável";
+  if (hasComponent && hasRenderer) return "renderer-sem-builder";
+  if (hasComponent) return "componente-isolado";
+  return "ausente";
+}
+
+const runtimeStatuses = new Map(FICHA_RUNTIME_MAP.map((entry) => [entry.primitive, runtimeStatus(entry)]));
+
 console.log("SAGA — CATÁLOGO AUTORAL DE FICHAS (READ-ONLY)");
 console.log(`Blocos: ${files.length}`);
 console.log(`Fichas: ${fichas.length}`);
@@ -100,6 +149,21 @@ for (const { primitive, usedBy } of unavailablePrimitives) {
   console.log(`- ${primitive}: ${usedBy.length} ficha(s) — ${usedBy.join(", ")}`);
 }
 if (!unavailablePrimitives.length) console.log("Nenhuma");
+
+console.log("\n[MAPA FICHA → RUNTIME]");
+for (const entry of FICHA_RUNTIME_MAP) {
+  const usage = primitiveUsage.get(entry.primitive) || [];
+  console.log(
+    `- ${entry.primitive}: ${runtimeStatuses.get(entry.primitive)} | ` +
+    `kinds=${entry.kinds.join("+")} | builder=${entry.builderKinds.join("+") || "—"} | ` +
+    `renderer=${entry.rendererKinds.join("+") || "—"} | fichas=${usage.length}`
+  );
+}
+
+console.log("\n[COBERTURA DO MAPA RUNTIME]");
+for (const status of ["executável", "renderer-sem-builder", "componente-isolado", "ausente"]) {
+  console.log(`- ${status}: ${[...runtimeStatuses.values()].filter((value) => value === status).length}`);
+}
 
 if (failures.length) {
   console.error("\n[FALHAS DE CONTRATO AUTORAL]");

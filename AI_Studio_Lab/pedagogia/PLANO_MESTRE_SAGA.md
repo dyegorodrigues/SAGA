@@ -111,4 +111,8 @@ Gerar 92 arquivos TypeScript automaticamente sem revisão; transformar prosa em 
 
 ## Próximo bloco
 
-Criar o catálogo estruturado read-only das 92 fichas e o mapa de primitivas, sem alterar ainda a experiência infantil. Esse catálogo determina a primeira competência padrão-ouro e impede migração em massa baseada em suposição.
+Estruturar **F35/N3.09** como primeira ficha vertical padrão-ouro sobre o builder
+tipado já ligado ao `InteractiveVertical`. Preservar o runtime legado enquanto se
+valida CRA sem reagrupamento, áudio-first, ajuda progressiva, resposta única e
+viewport infantil. Somente depois usar o mesmo contrato em F39/N3.11 (a dezena que
+sobe) e repetir o padrão de integração em `array` e `singapore-bars`.
