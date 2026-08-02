@@ -7,9 +7,10 @@ interface MaterialDouradoProps {
   dezenas: number;
   centenas?: number;
   state?: UIState;
+  compact?: boolean;
 }
 
-export function MaterialDourado({ unidades, dezenas, centenas = 0, state = 'ocioso' }: MaterialDouradoProps) {
+export function MaterialDourado({ unidades, dezenas, centenas = 0, state = 'ocioso', compact = false }: MaterialDouradoProps) {
   
   const BlockCube = () => (
     <div className="w-5 h-5 bg-amber-400 border border-amber-600 shadow-sm rounded-sm" />
@@ -32,7 +33,7 @@ export function MaterialDourado({ unidades, dezenas, centenas = 0, state = 'ocio
   );
 
   return (
-    <div className={`flex flex-wrap justify-center items-end gap-8 p-6 select-none bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-200 ${tokens.estado[state]}`}>
+    <div className={`flex flex-wrap justify-center items-end select-none bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-200 ${compact ? 'gap-3 p-3' : 'gap-8 p-6'} ${tokens.estado[state]}`}>
       
       {/* Centenas */}
       {centenas > 0 && (

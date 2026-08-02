@@ -4,6 +4,7 @@ import { N1_01 } from "./fichas/jornada/N1.01";
 import { N1_03 } from "./fichas/jornada/N1.03";
 import { N1_04 } from "./fichas/jornada/N1.04";
 import { JOURNEY_FICHAS } from "./fichas";
+import { N3_09 } from "./fichas/jornada/N3.09";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
@@ -141,5 +142,37 @@ describe("Composer de fichas", () => {
     expect(() => Composer.generate(invalid, 1, invalid.micros[0].id)).toThrow(
       "Parâmetro operation inválido",
     );
+  });
+
+  it("follows the five authored N3.09 progressions without regrouping", () => {
+    const operations = new Set<string>();
+
+    for (let level = 1; level <= 5; level += 1) {
+      for (let sample = 0; sample < 100; sample += 1) {
+        const question = Composer.generate(N3_09, level);
+        const top = question.vTop!;
+        const bottom = question.vBot!;
+        const operation = question.vOp!;
+        operations.add(operation);
+
+        expect(question.kind).toBe("vertical");
+        expect(question.evaluate?.(question.answer)).toBe(true);
+        const unitsResult = operation === "+" ? top % 10 + bottom % 10 : top % 10 - bottom % 10;
+        if (operation === "+") expect(unitsResult).toBeLessThan(10);
+        else expect(unitsResult).toBeGreaterThanOrEqual(0);
+        expect(question.answer as number).toBeLessThanOrEqual(100);
+        expect(question.answer as number).toBeGreaterThanOrEqual(0);
+
+        if (level === 1) {
+          expect(top % 10).toBe(0);
+          expect(bottom % 10).toBe(0);
+        }
+        if (level <= 3) expect(question.uiProps.showPlaceValue).toBe(true);
+        if (level === 4) expect(operation).toBe("-");
+      }
+    }
+
+    expect(operations).toEqual(new Set(["+", "-"]));
+    expect(Composer.generate(N3_09, 5).rt_max_s).toBe(8);
   });
 });
