@@ -111,8 +111,57 @@ Gerar 92 arquivos TypeScript automaticamente sem revisão; transformar prosa em 
 
 ## Próximo bloco
 
-**F35/N3.09 está estruturada e protegida por contrato**, mantendo o gerador legado
-na Jornada até a validação visual infantil. O próximo bloco é validar o padrão-ouro
-no Sandbox e implementar **F39/N3.11** com reagrupamento explícito, sem antecipar a
-migração de produção. Depois, repetir o padrão de integração em `array` e
-`singapore-bars`.
+**F35/N3.09 e F39/N3.11 estão estruturadas e validadas no Sandbox e na Jornada de
+teste**, mantendo os dois geradores legados na produção. O próximo bloco é o
+**Lote B — migração controlada do vertical**: fechar persistência diagnóstica por
+tentativa, executar canário e decidir um único nó por PR. `array` e
+`singapore-bars` continuam bloqueados até essa decisão.
+
+## Orquestração dos próximos lotes após F39
+
+Cada lote abaixo só começa quando o anterior estiver mesclado em `main` e a nova
+branch provar que nasceu da `origin/main` atual. Nenhum lote mistura mudança
+pedagógica, troca de gerador em produção e expansão de outra primitiva.
+
+### Lote A — fechar F39 como padrão-ouro
+
+**Estado: concluído em 2/ago/2026.** Os cinco níveis ficaram sem rolagem em
+390×844; a Jornada legada foi exercitada sem crash e com uma única ação dominante;
+erro gentil, áudio, troca simples/dupla e paridade foram cobertos por logs e testes.
+
+1. Validar os cinco níveis de N3.11 no Sandbox e em 390×844.
+2. Verificar a troca como ação observável: unidades → barra → dezena registrada.
+3. Confirmar erro gentil por coluna, áudio, alvos de 80 px e ausência de rolagem.
+4. Medir paridade entre `gN3_11` e a ficha; **não** trocar produção ainda.
+5. Só depois decidir, em PR próprio, se a ficha substitui o legado.
+
+### Lote B — migração controlada do vertical
+
+1. Criar teste de paridade de alcance e contrato para N3.09/N3.11.
+2. Preservar saves e telemetria; validar Radar e misconceptions por coluna.
+3. Fazer canário no Sandbox/Jornada de teste antes de alterar `GENERATOR_MAP`.
+4. Trocar um único nó por PR e manter rollback explícito.
+
+### Lote C — array, somente depois de F39 verde
+
+1. Ligar `ArrayGrid` ao builder `array` com união discriminada.
+2. Implementar N4.02 nos cinco níveis seguindo grupos → arranjo → símbolo.
+3. Validar rotação/comutatividade, toque alternativo e diagnóstico.
+4. Preservar qualquer caminho legado até a paridade.
+
+### Lote D — barras de Singapura
+
+1. Ligar `SingaporeBars` ao builder tipado.
+2. Começar por N3.10; não expandir de uma vez para frações/razão.
+3. Testar áudio da história, uma pergunta por tela e quatro estruturas aditivas.
+
+### Lote E — confiabilidade antes de massificação
+
+1. E2E da missão diária e das fichas migradas.
+2. Radar por coluna, filtro motor e Oficina com evidência real.
+3. Firestore Emulator, saves versionados, acessibilidade e orçamento de bundle.
+4. Só então repetir o pipeline em pequenos lotes de F2.
+
+**Regra de revisão adaptativa:** descoberta nova pode reordenar itens dentro do
+lote atual, mas não autoriza pular a trava entre lotes. Toda mudança de rota entra
+no Diário com evidência, impacto, decisão e comando de verificação.
