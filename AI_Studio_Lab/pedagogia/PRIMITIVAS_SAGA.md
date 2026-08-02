@@ -1,5 +1,5 @@
 # 🧱 INVENTÁRIO DE PRIMITIVAS SAGA
-**Versão 1.0 · Agosto 2026 · o que existe, o que está ligado, o que falta construir**
+**Versão 1.1 · Agosto 2026 · o que existe, o que está ligado, o que falta construir**
 
 > **Para que serve.** A pergunta "as primitivas já foram criadas ou faltam?" precisava de uma
 > resposta medida, não de impressão. Este documento é o mapa: cada `kind` do catálogo §9 da Bíblia,
@@ -90,6 +90,33 @@ testado ou não, esperando um `case` no Composer.
 | `fact-family` | triângulo de fatos | 🟡 | é modo do `NumberBond` |
 | `count`, `groups`, `sum`, `subvis`, `part-whole` | — | 🟡 | cobertos pelos componentes de §2.2 |
 
+## 2.4 Mapa medido das 25 primitivas autorais
+
+O catálogo F0–F4 usa nomes autorais de componente, enquanto o runtime despacha por
+`kind`. O mapa executável e auditado mora em
+`AI_Studio_Lab/tools/ficha_runtime_map.cjs`; ele impede considerar igualdade de nome
+como prova de integração.
+
+| Estado comprovado | Total | Significado |
+|---|---:|---|
+| Executável | **13** | há builder e renderer comprovados |
+| Renderer sem builder | **5** | a tela sabe desenhar, mas o Composer ainda não gera os dados |
+| Componente isolado | **6** | componente existe, mas não está na cadeia builder/renderer |
+| Ausente | **1** | não existe componente, builder nem renderer |
+
+As três divergências de nome foram resolvidas semanticamente:
+
+- `TouchCount` não é uma primitiva ausente: usa `EmojiRow`/`emojirow`, que já oferece
+  contagem por toque e áudio;
+- `Moedas` já possui `MoneyCoin`/`MoneyNote` e renderer inline de `money`, mas ainda
+  precisa de contrato extraído e builder;
+- `Regua`/`measure` é a única lacuna realmente ausente entre as 25 primitivas usadas
+  pelas fichas recebidas.
+
+O primeiro desbloqueio após o inventário foi concluído: `vertical` agora possui
+builder tipado, geração opcional com reagrupamento e contrato de resposta única para
+o `InteractiveVertical`.
+
 **Primitiva nova declarada na Bíblia v3.2 e ainda não construída:**
 
 | Primitiva | Kind | Estado |
@@ -139,7 +166,8 @@ construídos e sendo listados como "faltando".
 
 ---
 
-*Changelog: v1.0 (ago/2026) — inventário inaugural, medido diretamente do repositório no branch
+*Changelog: v1.1 (ago/2026) — adiciona mapa autoral→runtime auditável e resolve semanticamente
+`TouchCount`, `Moedas` e `Regua`. v1.0 — inventário inaugural, medido diretamente do repositório no branch
 `codex/realizar-auditoria-completa-do-repositorio-saga-fovec6`. Corrige a percepção de que faltavam
 primitivas críticas: `InteractiveVertical` (conta armada), `TraceCanvas` (traçado) e `RapidFire`
 (Dojo) já existem — não estão ligados ao Composer.*

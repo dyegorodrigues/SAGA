@@ -6,44 +6,29 @@
 
 ## Estado preservado
 
-- Branch local: `work`
-- Baseline curricular/DAG: `24317be`
-- Marco atual: contrato efetivo do Composer registrado no Diário de Bordo.
-- Repositório de backup pretendido: <https://github.com/dyegorodrigues/SAGA-Codex>
-- Repositório do Google AI Studio: <https://github.com/dyegorodrigues/SAGA>
+- Branch canônica remota: `main` em <https://github.com/dyegorodrigues/SAGA>.
+- Publicação validada: PR #9, incorporada em `main` pelo commit `2e0f9a2`.
+- Árvore canônica publicada: `4f07bcb4a56a77fe761ffc3691831a12f8e51662`.
+- Marco atual: cânone v3.2 reconciliado, catálogo autoral auditável e suíte com 865
+  testes aprovada.
+- O PR #8 é somente registro histórico da tentativa com base antiga; não deve ser
+  mesclado, pois sua árvore já foi publicada integralmente pelo PR #9.
 
-No estado atual deste ambiente não há remoto Git configurado. Portanto, nenhum push
-é feito automaticamente e o repositório do Google AI Studio não pode ser alterado
-por acidente a partir desta cópia.
+## Estado de publicação
 
-## Bloqueio de publicação
+O bloqueio de rede observado em 31/jul/2026 não está ativo neste ambiente: leitura
+e `fetch` do remoto `origin` funcionam. A publicação continua seguindo o protocolo
+de PR; nunca se escreve diretamente em `main` durante uma tarefa.
 
-Em 31/jul/2026, leitura e escrita HTTPS para o GitHub falharam antes da
-autenticação com:
+Cada novo bloco nasce de `origin/main`, recebe um commit atômico em branch nova e
+um PR explícito para `main`. Antes do merge, devem ser comprovados pai/base, árvore
+esperada, ausência de marcadores de conflito e checks verdes.
 
-```text
-CONNECT tunnel failed, response 403
-```
+## Persistência
 
-Tornar o repositório público não remove esse bloqueio de rede. Quando houver rede e
-autorização, configurar exclusivamente o repositório de backup e publicar com:
-
-```bash
-git remote add origin https://github.com/dyegorodrigues/SAGA-Codex.git
-git push -u origin work
-```
-
-Nunca configurar o repositório do Google AI Studio como destino de push sem
-autorização explícita do proprietário.
-
-## Persistência local
-
-O trabalho está preservado no histórico Git local da branch `work`. Não há ZIP,
-patch, bundle ou cópia do repositório dentro dele; isso evita backups concorrentes,
-arquivos obsoletos e consumo desnecessário de espaço/contexto.
-
-A cópia externa no GitHub só estará garantida depois de um `git push` confirmado;
-commit local e PR preparado não equivalem a publicação remota.
+O trabalho canônico está preservado na `main` remota. Não há ZIP, patch, bundle ou
+cópia concorrente do repositório dentro dele. Commit local e PR preparado continuam
+sem equivaler a publicação: a evidência final é o commit presente em `origin/main`.
 
 ## Baseline técnico vigente
 
@@ -56,6 +41,8 @@ commit local e PR preparado não equivalem a publicação remota.
 - fichas fora de `AllFichas`: nenhuma;
 - YAMLs individuais por strand: 88 nós, sincronizados por ID e pré-requisitos com
   o grafo agregado; JSON/TypeScript são artefatos gerados e verificáveis.
+- mapa autoral→runtime: 25 primitivas mapeadas; 13 executáveis, cinco com renderer
+  sem builder, seis componentes isolados e uma lacuna real (`Regua`/`measure`).
 
 Os comandos reproduzíveis são `npm run auditar` e `npm run fichas:auditar`. O plano de execução permanece em
 `AI_Studio_Lab/pedagogia/PLANO_MESTRE_SAGA.md` e os fatos de cada sessão em

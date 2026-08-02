@@ -14,6 +14,31 @@ function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function hasVerticalRegroup(top: number, bottom: number, operation: "+" | "-"): boolean {
+  if (operation === "+") return (top % 10) + (bottom % 10) >= 10;
+  return top % 10 < bottom % 10;
+}
+
+function verticalOperands(params: ReturnType<typeof parseComposerParams>, context: string) {
+  const operation = params.operation ?? "+";
+  const topMin = params.top_min ?? 10;
+  const topMax = params.top_max ?? 99;
+  const bottomMin = params.bottom_min ?? 1;
+  const bottomMax = params.bottom_max ?? 9;
+  if (topMin > topMax || bottomMin > bottomMax) {
+    throw new Error(`Intervalo vertical inválido em ${context}.`);
+  }
+
+  for (let attempt = 0; attempt < 200; attempt += 1) {
+    const top = randomInt(topMin, topMax);
+    const bottom = randomInt(bottomMin, bottomMax);
+    if (operation === "-" && bottom > top) continue;
+    if (params.require_regroup && !hasVerticalRegroup(top, bottom, operation)) continue;
+    return { top, bottom, operation };
+  }
+  throw new Error(`Não foi possível gerar conta vertical com os parâmetros de ${context}.`);
+}
+
 function numericOptions(answer: number, min: number, max: number) {
   const candidates = [answer, answer - 1, answer + 1, answer - 2, answer + 2]
     .filter(value => value >= min && value <= max);
@@ -71,6 +96,9 @@ export class Composer {
     let n: number | undefined;
     let emoji: string | undefined;
     let promptOverride: string | undefined;
+    let vTop: number | undefined;
+    let vBot: number | undefined;
+    let vOp: "+" | "-" | undefined;
 
     // A simple factory that delegates to specific kind builders based on params
     switch (kind) {
@@ -282,6 +310,18 @@ export class Composer {
         evaluate = (ans) => ans === answer;
         break;
       }
+
+      case "vertical": {
+        const operands = verticalOperands(params, `${ficha.id}/${micro.id}`);
+        vTop = operands.top;
+        vBot = operands.bottom;
+        vOp = operands.operation;
+        answer = vOp === "+" ? vTop + vBot : vTop - vBot;
+        uiProps = { vTop, vBot, vOp };
+        evaluate = (ans) => ans === answer;
+        promptOverride = params.audio_prompt ?? `${vTop} ${vOp === "+" ? "mais" : "menos"} ${vBot}.`;
+        break;
+      }
         
       case "plain": {
         if (typeof params.dezenas_max === "number") {
@@ -392,6 +432,9 @@ export class Composer {
       big,
       n,
       emoji,
+      vTop,
+      vBot,
+      vOp,
     };
   }
 }

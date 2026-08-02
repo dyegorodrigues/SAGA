@@ -438,3 +438,45 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   88/88 e lista três primitivas sem componente homônimo: TouchCount, Moedas e Regua.
 - Próximo bloco: mapa estruturado ficha → primitiva → componente/builder/renderer e
   ligação incremental das primitivas existentes, sem migração automática em massa.
+
+## 2 de agosto de 2026 — Publicação recuperada e auditoria final da `main`
+
+- A árvore final do PR #8 foi recuperada sobre a `main` vigente, sem reutilizar o
+  histórico conflitante, e publicada pelo PR #9.
+- O PR #9 foi mesclado em `main` no commit `2e0f9a2`; a árvore publicada
+  `4f07bcb4a56a77fe761ffc3691831a12f8e51662` coincide exatamente com a árvore
+  reconciliada. O PR #8 tornou-se redundante e deve permanecer fechado sem merge.
+- O ambiente local foi realinhado byte a byte com `origin/main`; não há diferenças
+  de árvore nem marcadores de conflito.
+- Auditoria reproduzida após a publicação: 88 competências, 13 trilhas, 92 fichas,
+  cobertura autoral 88/88, 42 geradores explícitos, 46 fallbacks, 12 fichas de
+  Jornada e quatro de Dojo registradas, sem geradores órfãos ou deriva nominal.
+- `npm run auditar`, `npm run fichas:auditar`, `npm run grafo:check`, `npm run lint`,
+  `npm test -- --run` (30 arquivos/865 testes) e `npm run build` passaram. Permanece
+  somente o aviso não bloqueante de bundle principal acima de 500 kB.
+- Próximo bloco confirmado: completar o mapa executável das primitivas e selecionar
+  uma competência vertical padrão-ouro antes de qualquer migração autoral em massa.
+
+## 2 de agosto de 2026 — Mapa executável das primitivas autorais
+
+- Criado `ficha_runtime_map.cjs`, cobrindo explicitamente as 25 primitivas declaradas
+  nas 92 fichas e ligando nomenclatura autoral a kind, componente, builder e renderer.
+- O auditor agora falha se uma primitiva usada não estiver mapeada, se um componente
+  declarado desaparecer ou se o mapa alegar builder/renderer que não existe no código.
+- Resultado medido: 12 primitivas executáveis, seis com renderer sem builder, seis
+  componentes isolados e uma lacuna real.
+- `TouchCount` foi resolvido como alias semântico de `EmojiRow`; `Moedas` já tem
+  renderer inline com `MoneyCoin`/`MoneyNote`, mas não builder; apenas `Regua` ainda
+  não possui componente, builder ou renderer.
+- Um teste de contrato executa o auditor e protege os 25 mapeamentos. Próximo passo:
+  fechar o builder tipado de `vertical` sem remover o caminho legado.
+
+## 2 de agosto de 2026 — Primeiro desbloqueio: builder `vertical`
+
+- O contrato tipado de parâmetros recebeu intervalos das parcelas, operação e opção
+  de exigir reagrupamento, com rejeição explícita de operação ou faixa inválida.
+- O Composer agora produz `vTop`, `vBot`, `vOp`, resposta e avaliador coerentes para
+  `InteractiveVertical`; a geração de subtração nunca cria resultado negativo.
+- Testes cobrem uma soma fixa com reagrupamento, resposta única e operação inválida.
+- O mapa passou de 12 para 13 primitivas executáveis; `vertical` deixou de ser
+  renderer sem builder. Próximo alvo padrão-ouro: F35/N3.09, antes de F39/N3.11.

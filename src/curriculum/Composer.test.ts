@@ -95,4 +95,51 @@ describe("Composer de fichas", () => {
       "Parâmetro n_min inválido em N1.03/a",
     );
   });
+
+  it("builds a typed vertical question with a single valid answer", () => {
+    const vertical = {
+      ...N1_01,
+      niveis: { 1: { primitiva: "vertical" as const } },
+      micros: [{
+        ...N1_01.micros[0],
+        kinds: ["vertical" as const],
+        params: {
+          top_min: 27,
+          top_max: 27,
+          bottom_min: 5,
+          bottom_max: 5,
+          operation: "+",
+          require_regroup: true,
+          audio_prompt: "Vinte e sete mais cinco.",
+        },
+      }],
+    };
+
+    const question = Composer.generate(vertical, 1, vertical.micros[0].id);
+    expect(question).toMatchObject({
+      kind: "vertical",
+      vTop: 27,
+      vBot: 5,
+      vOp: "+",
+      answer: 32,
+      audioPrompt: "Vinte e sete mais cinco.",
+    });
+    expect(question.evaluate?.(32)).toBe(true);
+    expect(question.evaluate?.(31)).toBe(false);
+  });
+
+  it("rejects an invalid vertical operation at the typed boundary", () => {
+    const invalid = {
+      ...N1_01,
+      niveis: { 1: { primitiva: "vertical" as const } },
+      micros: [{
+        ...N1_01.micros[0],
+        kinds: ["vertical" as const],
+        params: { operation: "×" },
+      }],
+    };
+    expect(() => Composer.generate(invalid, 1, invalid.micros[0].id)).toThrow(
+      "Parâmetro operation inválido",
+    );
+  });
 });
