@@ -83,15 +83,3 @@ nodes:
       - "esquecer o 1 e o próprio número"
       - "parar antes de esgotar os retângulos possíveis"
     micros:
-  N2.08:
-    title: "Múltiplos"
-    objective: "compreender múltiplos como os pontos alcançados ao saltar de N em N."
-    prereqs:
-      - "AL.03"
-      - "N4.03"
-    kinds:
-      - "numberline"
-      - "plain."
-    misconceptions:
-      - "inverter a relação entre fator e múltiplo"
-    micros:

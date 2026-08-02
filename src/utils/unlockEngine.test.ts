@@ -9,8 +9,8 @@ import { ALL_MATH_TRACKS } from "../curriculum/motores/curriculum";
 describe("unlockEngine", () => {
   it("exposes every canonical math node exactly once in the Journey", () => {
     const ids = ALL_MATH_TRACKS.map((track) => track.graphId);
-    expect(ids).toHaveLength(95);
-    expect(new Set(ids).size).toBe(95);
+    expect(ids).toHaveLength(88);
+    expect(new Set(ids).size).toBe(88);
   });
 
   it("opens root nodes (no prereqs) when no progress exists", () => {

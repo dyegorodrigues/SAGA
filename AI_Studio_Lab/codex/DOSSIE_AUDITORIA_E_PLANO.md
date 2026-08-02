@@ -1,5 +1,11 @@
 # Dossiê consolidado — Auditoria, decisões e plano do SAGA
 
+> **Nota de atualização (2/ago/2026):** este dossiê continua válido como histórico
+> das decisões e implementações, mas os números 95/53 foram superados pelo cânone
+> v3.2 recebido depois. O baseline vigente é **88 competências, 13 trilhas e 92
+> fichas autorais**; a ordem executiva está em
+> `AI_Studio_Lab/pedagogia/PLANO_MESTRE_SAGA.md`.
+
 **Data de consolidação:** 31 de julho de 2026  
 **Branch de trabalho:** `work`  
 **Finalidade:** preservar, em um único arquivo Markdown, o conteúdo útil produzido

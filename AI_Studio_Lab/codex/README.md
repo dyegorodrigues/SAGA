@@ -45,18 +45,19 @@ arquivos obsoletos e consumo desnecessário de espaço/contexto.
 A cópia externa no GitHub só estará garantida depois de um `git push` confirmado;
 commit local e PR preparado não equivalem a publicação remota.
 
-## Baseline técnico já descoberto
+## Baseline técnico vigente
 
-- grafo canônico: 95 competências;
-- geradores explícitos: 42/95;
-- fallbacks “Em construção”: 53/95;
-- fichas de Jornada no disco/registradas: 12/12;
+- grafo canônico: 88 competências e 13 trilhas de fluência;
+- geradores explícitos: 42/88;
+- fallbacks “Em construção”: 46/88;
+- fichas autorais recebidas: 92, cobrindo 88/88 competências;
+- fichas TypeScript de Jornada no disco/registradas: 12/12;
 - fichas Dojo no disco/registradas: 4/4;
 - fichas fora de `AllFichas`: nenhuma;
-- YAMLs individuais por strand: 95 nós, sincronizados por ID e pré-requisitos com
+- YAMLs individuais por strand: 88 nós, sincronizados por ID e pré-requisitos com
   o grafo agregado; JSON/TypeScript são artefatos gerados e verificáveis.
 
-O comando reproduzível é `npm run auditar`. O plano de execução permanece em
+Os comandos reproduzíveis são `npm run auditar` e `npm run fichas:auditar`. O plano de execução permanece em
 `AI_Studio_Lab/pedagogia/PLANO_MESTRE_SAGA.md` e os fatos de cada sessão em
 `AI_Studio_Lab/DIARIO_DE_BORDO.md`.
 
