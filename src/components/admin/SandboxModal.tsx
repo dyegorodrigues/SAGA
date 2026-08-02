@@ -4,7 +4,9 @@ import { getTrackById } from '../../curriculum/motores/curriculum';
 import { Question, Track } from '../../types';
 import { GameLoopExerciseRenderer } from '../gameloop/GameLoopExerciseRenderer';
 import { ErrorBoundary } from '../ErrorBoundary';
-import { AllFichas } from '../../curriculum/fichas';
+import { AllFichas, JOURNEY_FICHAS } from '../../curriculum/fichas';
+import { Composer } from '../../curriculum/Composer';
+import { FichaCompetencia } from '../../curriculum/schema';
 import { sfx, speak, stopSpeak } from '../Mascot';
 
 interface SandboxModalProps {
@@ -14,7 +16,7 @@ interface SandboxModalProps {
   onNoteChange: (nodeId: string, text: string) => void;
 }
 
-function LevelSimulator({ lvl, track, node }: { lvl: number, track: Track, node: SagaNode }) {
+function LevelSimulator({ lvl, track, ficha }: { lvl: number, track: Track, ficha?: FichaCompetencia }) {
   const [q, setQ] = useState<Question | null>(null);
   const [status, setStatus] = useState<"right" | "wrong" | null>(null);
   const [showJson, setShowJson] = useState(false);
@@ -28,7 +30,9 @@ function LevelSimulator({ lvl, track, node }: { lvl: number, track: Track, node:
   const generateQ = () => {
     if (track && track.gen) {
       try {
-        const newQ = track.gen(lvl);
+        // O Sandbox inspeciona a ficha autoral quando ela existe. A Jornada
+        // continua usando track.gen até a validação e a decisão de migração.
+        const newQ = ficha ? Composer.generate(ficha, lvl) : track.gen(lvl);
         setQ(newQ);
         setStatus(null);
         setFlashHidden(false);
@@ -45,7 +49,7 @@ function LevelSimulator({ lvl, track, node }: { lvl: number, track: Track, node:
 
   useEffect(() => {
     generateQ();
-  }, [lvl, track]);
+  }, [lvl, track, ficha]);
 
   useEffect(() => {
     if (!q || q.kind !== "flash") return;
@@ -109,14 +113,14 @@ function LevelSimulator({ lvl, track, node }: { lvl: number, track: Track, node:
         </div>
       </div>
       
-      <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-4 touch-none flex flex-col">
+      <div className="flex-1 relative overflow-y-auto overflow-x-hidden p-1 sm:p-4 touch-none flex flex-col">
         {showJson && q ? (
           <pre className="text-[10px] font-mono text-slate-800 whitespace-pre-wrap break-all bg-slate-100 p-2 rounded">
             {JSON.stringify(q, null, 2)}
           </pre>
         ) : q ? (
           <ErrorBoundary onReset={generateQ}>
-            <div className="transform origin-top scale-90 w-[111%] h-[111%]">
+            <div className="w-full h-full">
               <GameLoopExerciseRenderer
                 q={q}
                 status={status}
@@ -164,15 +168,16 @@ function LevelSimulator({ lvl, track, node }: { lvl: number, track: Track, node:
 export function SandboxModal({ node, onClose, nodeNote, onNoteChange }: SandboxModalProps) {
   const [tab, setTab] = useState<"auditoria" | "sandbox">("sandbox");
   const track = getTrackById(node.id);
-  const ficha = AllFichas.find(f => f.id === node.id);
+  const ficha = JOURNEY_FICHAS.find(f => f.id === node.id);
+  const catalogEntry = AllFichas.find(f => f.id === node.id);
 
   return (
     <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-md z-[70] flex flex-col">
-      <div className="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0">
+      <div className="p-2 sm:p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900 shrink-0">
         <div className="flex items-center gap-4">
           <div>
             <div className="text-xs font-bold text-indigo-400 tracking-widest">{node.id} - Faixa {node.faixa}</div>
-            <h2 className="text-xl font-black text-white">{node.nome}</h2>
+            <h2 className="hidden sm:block text-xl font-black text-white">{node.nome}</h2>
           </div>
           {track && (
             <div className="bg-slate-800 px-3 py-1 rounded-lg border border-slate-700 flex items-center gap-2">
@@ -183,7 +188,7 @@ export function SandboxModal({ node, onClose, nodeNote, onNoteChange }: SandboxM
         </div>
         
         <div className="flex items-center gap-4">
-          <div className="flex bg-slate-800 p-1 rounded-xl">
+          <div className="hidden sm:flex bg-slate-800 p-1 rounded-xl">
             <button 
               onClick={() => setTab("sandbox")}
               className={`px-4 py-1.5 rounded-lg text-sm font-black transition-colors ${tab === 'sandbox' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'}`}
@@ -222,12 +227,12 @@ export function SandboxModal({ node, onClose, nodeNote, onNoteChange }: SandboxM
                 </div>
               </div>
             </div>
-            {ficha && (
+            {catalogEntry && (
               <div>
                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Especificação (Ficha Competência)</h3>
                 <div className="bg-slate-900 border border-slate-700 rounded-xl p-4 overflow-x-auto">
                   <pre className="text-xs font-mono text-emerald-400 whitespace-pre-wrap break-all">
-                    {JSON.stringify(ficha, null, 2)}
+                    {JSON.stringify(catalogEntry, null, 2)}
                   </pre>
                 </div>
               </div>
@@ -244,10 +249,10 @@ export function SandboxModal({ node, onClose, nodeNote, onNoteChange }: SandboxM
           </div>
         )}
         {tab === "sandbox" && (
-          <div className="flex-1 flex overflow-x-auto overflow-y-hidden bg-slate-950 p-6 gap-6 snap-x snap-mandatory">
+          <div className="flex-1 flex overflow-x-auto overflow-y-hidden bg-slate-950 p-2 sm:p-6 gap-3 sm:gap-6 snap-x snap-mandatory">
             {track ? (
               [1, 2, 3, 4, 5].map(lvl => (
-                <LevelSimulator key={lvl} lvl={lvl} track={track} node={node} />
+                <LevelSimulator key={lvl} lvl={lvl} track={track} ficha={ficha} />
               ))
             ) : (
               <div className="m-auto text-rose-500 text-center">

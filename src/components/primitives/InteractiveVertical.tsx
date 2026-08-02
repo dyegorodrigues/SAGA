@@ -2,8 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Question } from '../../types';
 import { tokens, UIState } from '../../styles/tokens';
+import { getVerticalColumnStep, verticalDigitChoices } from './verticalProcedure';
 
-export function InteractiveVertical({ q, onAnswer, disabled, state = 'ocioso' }: { q: Question; onAnswer: (val: any) => void; disabled: boolean; state?: UIState }) {
+interface InteractiveVerticalProps {
+  q: Question;
+  onAnswer: (val: number) => void;
+  onMistake?: (digit: number) => void;
+  onRegroup?: (remainingUnits: number) => void;
+  showAlgorithm?: boolean;
+  disabled: boolean;
+  state?: UIState;
+}
+
+export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlgorithm = true, disabled, state = 'ocioso' }: InteractiveVerticalProps) {
   const top = q.vTop ?? 0;
   const bot = q.vBot ?? 0;
   const op = q.vOp ?? "+";
@@ -19,60 +30,22 @@ export function InteractiveVertical({ q, onAnswer, disabled, state = 'ocioso' }:
   const [carries, setCarries] = useState<string[]>(Array(totalCols + 1).fill(''));
   const [currentInput, setCurrentInput] = useState('');
 
-  const getExpectedCol = (cIdx: number) => {
-    let tCarry = 0;
-    for (let i = 0; i <= cIdx; i++) {
-      const pTop = parseInt(topStr[topStr.length - 1 - i] || '0', 10);
-      const pBot = parseInt(botStr[botStr.length - 1 - i] || '0', 10);
-      let sum = pTop + tCarry;
-      if (op === "+") sum += pBot;
-      else sum -= pBot;
-      
-      if (i === cIdx) return sum;
-      
-      if (op === "+") {
-        tCarry = sum >= 10 ? 1 : 0;
-      } else {
-        tCarry = sum < 0 ? -1 : 0;
-      }
-    }
-    return 0;
-  };
+  const step = getVerticalColumnStep(top, bot, op, colIdx);
 
-  const expected = getExpectedCol(colIdx);
-  const expectCarry = expected >= 10;
-  const expectBorrow = expected < 0;
-
-  const handleNum = (n: number) => {
-    if (disabled) return;
-    setCurrentInput(prev => (prev.length < 2 ? prev + n : prev));
-  };
-
-  const handleBackspace = () => {
-    if (disabled) return;
-    setCurrentInput(prev => prev.slice(0, -1));
-  };
-
-  const handleConfirm = () => {
-    if (disabled || !currentInput) return;
+  const handleConfirm = (input = currentInput) => {
+    if (disabled || input === '') return;
     
-    let expectedVal = expected;
-    if (op === "+") {
-      expectedVal = expected % 10;
-    } else {
-      if (expectBorrow) expectedVal = expected + 10;
-    }
-
-    if (parseInt(currentInput, 10) === expectedVal) {
+    if (parseInt(input, 10) === step.expectedDigit) {
       const newAnswers = [...answers];
-      newAnswers[totalCols - 1 - colIdx] = currentInput;
+      newAnswers[totalCols - 1 - colIdx] = input;
       setAnswers(newAnswers);
       
-      if (expectCarry && op === "+") {
+      if (step.carry && op === "+") {
         const newCarries = [...carries];
         newCarries[totalCols - 1 - colIdx - 1] = '1';
         setCarries(newCarries);
-      } else if (expectBorrow && op === "-") {
+        if (colIdx === 0) onRegroup?.(step.expectedDigit);
+      } else if (step.borrow && op === "-") {
         const newCarries = [...carries];
         newCarries[totalCols - 1 - colIdx - 1] = '-1';
         setCarries(newCarries);
@@ -81,7 +54,7 @@ export function InteractiveVertical({ q, onAnswer, disabled, state = 'ocioso' }:
       setCurrentInput('');
       
       if (colIdx === totalCols - 1) {
-        if (expectCarry && op === "+") {
+        if (step.carry && op === "+") {
           setColIdx(colIdx + 1);
         } else {
           onAnswer(parseInt(newAnswers.join(''), 10));
@@ -92,15 +65,17 @@ export function InteractiveVertical({ q, onAnswer, disabled, state = 'ocioso' }:
         setColIdx(colIdx + 1);
       }
     } else {
-      // Wrong
       setCurrentInput('');
+      onMistake?.(parseInt(input, 10));
     }
   };
 
+  const digitChoices = verticalDigitChoices(step.expectedDigit, top + bot + colIdx);
+
   return (
     <div className={`flex flex-col items-center select-none ${tokens.estado[state]}`}>
-      <div 
-        className="font-mono text-5xl font-black tracking-[0.3em] p-6 rounded-2xl shadow-inner relative"
+      {showAlgorithm && <div
+        className="font-mono text-4xl sm:text-5xl font-black tracking-[0.2em] p-3 sm:p-5 rounded-2xl shadow-inner relative"
         style={{ 
           backgroundColor: tokens.cor.superficie.cartao,
           color: tokens.cor.texto.principal,
@@ -157,15 +132,15 @@ export function InteractiveVertical({ q, onAnswer, disabled, state = 'ocioso' }:
             );
           })}
         </div>
-      </div>
+      </div>}
 
       {!disabled && (
-        <div className="mt-8 grid grid-cols-3 gap-3">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => (
+        <div className="mt-3 grid grid-cols-3 gap-2 sm:gap-3" aria-label="Escolha o algarismo desta coluna">
+          {digitChoices.map(n => (
             <button
               key={n}
-              onClick={() => handleNum(n)}
-              className="w-16 h-16 rounded-2xl text-2xl font-bold shadow-sm active:scale-95 transition-transform"
+              onClick={() => handleConfirm(String(n))}
+              className="w-20 h-20 rounded-2xl text-2xl font-bold shadow-sm active:scale-95 transition-transform"
               style={{ 
                 backgroundColor: tokens.cor.superficie.fundo,
                 color: tokens.cor.texto.principal,
@@ -176,40 +151,6 @@ export function InteractiveVertical({ q, onAnswer, disabled, state = 'ocioso' }:
               {n}
             </button>
           ))}
-          <button
-            onClick={handleBackspace}
-            className="w-16 h-16 rounded-2xl text-xl font-bold shadow-sm active:scale-95 transition-transform flex items-center justify-center"
-            style={{ 
-              backgroundColor: tokens.cor.superficie.fundo,
-              color: tokens.cor.elementos.base_B,
-              borderColor: tokens.cor.elementos.borda,
-              borderWidth: 2
-            }}
-          >
-            ⌫
-          </button>
-          <button
-            onClick={() => handleNum(0)}
-            className="w-16 h-16 rounded-2xl text-2xl font-bold shadow-sm active:scale-95 transition-transform"
-            style={{ 
-              backgroundColor: tokens.cor.superficie.fundo,
-              color: tokens.cor.texto.principal,
-              borderColor: tokens.cor.elementos.borda,
-              borderWidth: 2
-            }}
-          >
-            0
-          </button>
-          <button
-            onClick={handleConfirm}
-            className="w-16 h-16 rounded-2xl text-2xl font-bold shadow-sm active:scale-95 transition-transform"
-            style={{ 
-              backgroundColor: tokens.cor.feedback.acerto.split(' ')[0],
-              color: 'white'
-            }}
-          >
-            ✓
-          </button>
         </div>
       )}
     </div>

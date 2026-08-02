@@ -12,7 +12,7 @@ import { NumberLine } from "../primitives/NumberLine";
 import { InteractiveNumberLine } from "../primitives/InteractiveNumberLine";
 import { DragGroup } from "../primitives/DragGroup";
 import { ArrayGrid } from "../primitives/ArrayGrid";
-import { InteractiveVertical } from "../primitives/InteractiveVertical";
+import { VerticalPlaceValueStage } from "../primitives/VerticalPlaceValueStage";
 import { VisualAddition } from "../primitives/VisualAddition";
 import { ScatteredItems } from "../primitives/ScatteredItems";
 import { LinkingCubes } from "../primitives/LinkingCubes";
@@ -291,7 +291,14 @@ export function GameLoopExerciseRenderer({
           {q.kind === "linking-cubes" && q.groups && <LinkingCubes groups={q.groups.map(g => ({ n: g.n, color: (g as any).color || "bg-blue-400" }))} showNumbers={q.uiProps?.showNumbers} />}
           {q.kind === "take-apart" && q.a != null && q.b != null && q.n != null && <TakeApart total={q.n} knownSplit={{a: q.a, b: q.b}} />}
 
-          {q.kind === "vertical" && <InteractiveVertical q={q} onAnswer={handlePick} disabled={status !== null} />}
+          {q.kind === "vertical" && (
+            <VerticalPlaceValueStage
+              question={q}
+              onAnswer={handlePick}
+              onMistake={handlePick}
+              disabled={status !== null}
+            />
+          )}
           {q.kind === "tenframe" && q.n != null && (
             <div style={{ opacity: (q.uiProps?.flashDurationMs && flashHidden && status !== "right") ? 0 : 1, transition: "opacity 0.2s" }}>
               <TenFrame filled={q.n} filled2={q.big === "add" ? q.u ?? null : null} destacarFileira={typeof tutShow === "object" && tutShow?.destacarFileira ? tutShow.destacarFileira : null} flashDurationMs={q.uiProps?.flashDurationMs} state={status === "right" ? "acerto" : status === "wrong" ? "erro-suave" : "ocioso"} />
@@ -414,7 +421,7 @@ export function GameLoopExerciseRenderer({
       )}
 
       {/* Tutorial guiado 👉 (generalizado): a mãozinha do Contar, para as cenas novas */}
-      {hasTutorial(q) && !status && (
+      {hasTutorial(q) && q.kind !== "vertical" && !status && (
         guidedNarr !== null ? (
           <div
             className="mt-3 mx-auto p-3 rounded-2xl text-center mk-optin"
@@ -423,10 +430,10 @@ export function GameLoopExerciseRenderer({
             💡 {guidedNarr}
           </div>
         ) : (
-          <div className="flex justify-center mt-3">
+          <div className="flex justify-center mt-2">
             <button
               onClick={() => playAulinha(false)}
-              className="bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-xs px-4 py-2 rounded-md flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
+              className="min-h-20 bg-indigo-50 hover:bg-indigo-100 border-2 border-indigo-200 text-indigo-700 font-extrabold text-sm px-5 py-3 rounded-xl flex items-center gap-1.5 active:scale-95 transition-all shadow-sm cursor-pointer"
               style={{ fontFamily: FONT }}
             >
               <span>👉 Como faz? 🫵</span>
