@@ -6,6 +6,11 @@
 
 ## Estado preservado
 
+> **Marco de continuidade (2/ago/2026):** o Lote C liga F98/N4.02 ao ArrayGrid
+> autoral sem trocar `gN4_02` em produção. O handoff operacional e a arquitetura
+> aprovada, ainda não implementada, do Lote D estão em
+> [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md).
+
 - Branch canônica remota: `main` em <https://github.com/dyegorodrigues/SAGA>.
 - Publicação validada: PR #9, incorporada em `main` pelo commit `2e0f9a2`.
 - Árvore canônica publicada: `4f07bcb4a56a77fe761ffc3691831a12f8e51662`.
@@ -36,7 +41,7 @@ sem equivaler a publicação: a evidência final é o commit presente em `origin
 - geradores explícitos: 42/88;
 - fallbacks “Em construção”: 46/88;
 - fichas autorais recebidas: 92, cobrindo 88/88 competências;
-- fichas TypeScript de Jornada no disco/registradas: 12/12;
+- fichas TypeScript de Jornada no disco/registradas: 15/15;
 - fichas Dojo no disco/registradas: 4/4;
 - fichas fora de `AllFichas`: nenhuma;
 - YAMLs individuais por strand: 88 nós, sincronizados por ID e pré-requisitos com

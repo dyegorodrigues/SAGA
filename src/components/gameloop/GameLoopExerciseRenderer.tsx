@@ -11,7 +11,6 @@ import {
 import { NumberLine } from "../primitives/NumberLine";
 import { InteractiveNumberLine } from "../primitives/InteractiveNumberLine";
 import { DragGroup } from "../primitives/DragGroup";
-import { ArrayGrid } from "../primitives/ArrayGrid";
 import { VerticalPlaceValueStage } from "../primitives/VerticalPlaceValueStage";
 import { VisualAddition } from "../primitives/VisualAddition";
 import { ScatteredItems } from "../primitives/ScatteredItems";
@@ -270,7 +269,6 @@ export function GameLoopExerciseRenderer({
 
 
 
-          {q.kind === "array" && <ArrayGrid q={q} />}
           {q.kind === "bond" && q.a != null && q.b != null && (
             <NumberBond 
               whole={q.big === "topo" ? '?' : q.a} 

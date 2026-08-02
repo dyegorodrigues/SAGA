@@ -23,6 +23,7 @@ export type FichaUiProps =
   | { initialHours: number; initialMinutes: number; interactive: false }
   | { leftItems: BalanceItem[]; rightItems: BalanceItem[] }
   | { vTop: number; vBot: number; vOp: "+" | "-"; showPlaceValue?: boolean; showRegroup?: boolean; showAlgorithm?: boolean }
+  | { rows: number; cols: number; allowRotate: boolean; requireRotate: boolean; areaMode: boolean; showEquation: boolean; answerMode: "total" | "equation" }
   | { text: string };
 
 interface BalanceItem {
@@ -63,6 +64,15 @@ export interface ComposerParams {
   show_place_value?: boolean;
   show_regroup?: boolean;
   show_algorithm?: boolean;
+  rows_min?: number;
+  rows_max?: number;
+  cols_min?: number;
+  cols_max?: number;
+  allow_rotate?: boolean;
+  require_rotate?: boolean;
+  area_mode?: boolean;
+  show_equation?: boolean;
+  answer_mode?: "total" | "equation";
   big?: string;
   answer?: FichaAnswer;
   options?: Option[];
@@ -76,11 +86,12 @@ const NUMBER_KEYS = [
   "n_min", "n_max", "flash_ms", "start", "end", "jump_size", "moldura",
   "soma_max", "dezenas_max", "unidades_max", "minutos_step",
   "peso_alvo_min", "peso_alvo_max", "top_min", "top_max", "bottom_min",
-  "bottom_max", "operand_step", "result_max",
+  "bottom_max", "operand_step", "result_max", "rows_min", "rows_max", "cols_min", "cols_max",
 ] as const;
 const BOOLEAN_KEYS = [
   "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo",
   "require_regroup", "require_double_regroup", "forbid_regroup", "show_place_value", "show_regroup", "show_algorithm",
+  "allow_rotate", "require_rotate", "area_mode", "show_equation",
 ] as const;
 const STRING_KEYS = ["interactive", "big", "audio_prompt"] as const;
 
@@ -116,6 +127,12 @@ export function parseComposerParams(input: FichaParams, context: string): Compos
       throw new Error(`Parâmetro operation inválido em ${context}: esperado +, - ou mixed.`);
     }
     parsed.operation = input.operation;
+  }
+  if (input.answer_mode !== undefined) {
+    if (input.answer_mode !== "total" && input.answer_mode !== "equation") {
+      throw new Error(`Parâmetro answer_mode inválido em ${context}: esperado total ou equation.`);
+    }
+    parsed.answer_mode = input.answer_mode;
   }
 
   const answer = input.answer;

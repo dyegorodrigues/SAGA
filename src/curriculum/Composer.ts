@@ -7,6 +7,7 @@ import {
   normalizeFichaTutorial,
   parseComposerParams,
 } from "./fichaQuestionContract";
+import { arrayAnswer, arrayOptions, fitsArrayDimension } from "../components/primitives/arrayProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -360,6 +361,36 @@ export class Composer {
         promptOverride = params.audio_prompt ?? `${vTop} ${vOp === "+" ? "mais" : "menos"} ${vBot}.`;
         break;
       }
+
+      case "arraygrid": {
+        const rowsMin = params.rows_min ?? 1;
+        const rowsMax = params.rows_max ?? 10;
+        const colsMin = params.cols_min ?? 1;
+        const colsMax = params.cols_max ?? 10;
+        if (![rowsMin, rowsMax, colsMin, colsMax].every(fitsArrayDimension) || rowsMin > rowsMax || colsMin > colsMax) {
+          throw new Error(`Dimensões de arraygrid inválidas em ${ficha.id}/${micro.id}; use inteiros entre 1 e 10.`);
+        }
+        if (params.require_rotate && !params.allow_rotate) {
+          throw new Error(`arraygrid não pode exigir giro sem permiti-lo em ${ficha.id}/${micro.id}.`);
+        }
+        const rows = randomInt(rowsMin, rowsMax);
+        const cols = randomInt(colsMin, colsMax);
+        const answerMode = params.answer_mode ?? "total";
+        answer = arrayAnswer({ rows, cols, answerMode });
+        options = arrayOptions({ rows, cols, answerMode }).sort(() => Math.random() - 0.5);
+        uiProps = {
+          rows, cols, answerMode,
+          allowRotate: params.allow_rotate ?? false,
+          requireRotate: params.require_rotate ?? false,
+          areaMode: params.area_mode ?? false,
+          showEquation: params.show_equation ?? false,
+        };
+        evaluate = candidate => candidate === answer;
+        promptOverride = answerMode === "equation"
+          ? "Qual expressão representa este arranjo?"
+          : "Quantos quadradinhos há no arranjo?";
+        break;
+      }
         
       case "plain": {
         if (typeof params.dezenas_max === "number") {
@@ -458,7 +489,7 @@ export class Composer {
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
         ? ficha.niveis[lvl].rt_alvo! / 1000
         : undefined,
-      kind: kind === "intruso_math" ? "plain" : kind,
+      kind: kind === "intruso_math" ? "plain" : kind === "arraygrid" ? "array" : kind,
       prompt: promptOverride || params.audio_prompt || "Responda:",
       audioPrompt: promptOverride || params.audio_prompt,
       tutorial: normalizeFichaTutorial(params.tutorial),

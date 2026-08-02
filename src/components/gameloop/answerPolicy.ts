@@ -15,5 +15,6 @@ export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)
     && q.kind !== "vertical"
     && q.kind !== "numberline-interactive"
-    && q.kind !== "drag-group";
+    && q.kind !== "drag-group"
+    && q.kind !== "array";
 }
