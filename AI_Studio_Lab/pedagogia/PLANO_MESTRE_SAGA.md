@@ -137,6 +137,11 @@ erro gentil, áudio, troca simples/dupla e paridade foram cobertos por logs e te
 
 ### Lote B — migração controlada do vertical
 
+**Estado: concluído em 2/ago/2026.** N3.09 tornou-se o único canário do Composer,
+com proveniência observável e rollback pela retirada do conjunto de canários.
+N3.11 continua no gerador legado `gN3_11`. O diagnóstico é agregado em memória e
+publicado apenas no evento terminal da questão, deduplicado para o Radar.
+
 1. Criar teste de paridade de alcance e contrato para N3.09/N3.11.
 2. Preservar saves e telemetria; validar Radar e misconceptions por coluna.
 3. Fazer canário no Sandbox/Jornada de teste antes de alterar `GENERATOR_MAP`.
