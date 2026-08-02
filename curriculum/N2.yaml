@@ -57,3 +57,29 @@ nodes:
       - "build-number"
       - "numberline."
     micros:
+  N2.06:
+    title: "Pares e ímpares"
+    objective: "reconhecer se uma quantidade forma duplas exatas ou deixa um elemento sem par."
+    prereqs:
+      - "N2.03"
+    kinds:
+      - "array"
+      - "groups"
+      - "plain."
+    misconceptions:
+      - "confundir paridade com número grande ou pequeno"
+      - "achar que zero é ímpar"
+    micros:
+  N2.07:
+    title: "Fatores de um número"
+    objective: "descobrir fatores pelas diferentes formas de organizar uma quantidade em retângulos."
+    prereqs:
+      - "N4.02"
+      - "N2.06"
+    kinds:
+      - "array"
+      - "plain."
+    misconceptions:
+      - "esquecer o 1 e o próprio número"
+      - "parar antes de esgotar os retângulos possíveis"
+    micros:

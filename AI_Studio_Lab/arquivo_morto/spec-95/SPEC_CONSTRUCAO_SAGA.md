@@ -1,6 +1,10 @@
 # 🏗️ SPEC DE CONSTRUÇÃO DOS EXERCÍCIOS — SAGA
 **Documento autossuficiente. Não precisa de imagem: cada exercício está desenhado em texto.**
 
+> **Nome canônico para edição:** `SPEC_CONSTRUCAO_EXERCICIOS.md`. O arquivo
+> `SPEC_CONSTRUCAO_SAGA.md` é um alias de compatibilidade, preservado para não
+> quebrar referências antigas, e deve permanecer byte a byte idêntico a este.
+
 Este documento substitui as 130 capturas de tela. Cada ficha abaixo tem: o desenho da tela, a lista de elementos, o fluxo de interação passo a passo, e a competência que atende.
 
 **Como usar:** entregue este arquivo ao agente de desenvolvimento junto com a Bíblia e o Grafo. Ele tem tudo o que precisa para construir sem ver nenhuma imagem.
