@@ -404,3 +404,18 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Limite consciente alcançado: ampliar tags semânticas, demonstrações e Mão
   Fantasma por competência depende das fichas cinematográficas em elaboração.
 - Baseline: 30 arquivos e 865 testes, auditor, grafo, typecheck e build aprovados.
+
+## 2 de agosto de 2026 — Reconciliação segura de `main` e Codex
+
+- Inspecionadas as duas branches publicadas e as PRs #1, #2 e #3 do repositório
+  `dyegorodrigues/SAGA`.
+- Confirmado por blob Git que os 16 arquivos do upload mais recente chegaram de
+  forma idêntica a `main` e à branch Codex; nenhum deles precisou ser escolhido
+  contra outra versão.
+- `main` foi incorporada por merge na branch `reconcile/main-codex`, preservando
+  os dois históricos. Nos quatro conflitos documentais/técnicos foi mantida a
+  evolução mais recente do lado Codex, sem tornar o lado `main` irrecuperável.
+- `Upload_docs/README.md`, exclusivo de `main`, foi restaurado e nenhum caminho de
+  `main` foi apagado no resultado.
+- O manifesto de hashes, a inspeção das PRs e os critérios de preservação estão em
+  `AI_Studio_Lab/codex/RECONCILIACAO_MAIN_CODEX.md`.
