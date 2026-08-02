@@ -149,12 +149,23 @@ publicado apenas no evento terminal da questão, deduplicado para o Radar.
 
 ### Lote C — array, somente depois de F39 verde
 
+**Estado: concluído neste salvamento.** F98/N4.02 possui cinco níveis autorais,
+builder tipado e ArrayGrid com alternativas internas, giro obrigatório no nível
+3 e ponte visual para área no nível 5. `gN4_02` permanece em produção e não
+foi criado canário.
+
 1. Ligar `ArrayGrid` ao builder `array` com união discriminada.
 2. Implementar N4.02 nos cinco níveis seguindo grupos → arranjo → símbolo.
 3. Validar rotação/comutatividade, toque alternativo e diagnóstico.
 4. Preservar qualquer caminho legado até a paridade.
 
 ### Lote D — barras de Singapura
+
+**Estado: arquitetura aprovada, ainda não implementada.** StoryPanel cuidará da
+narrativa e SingaporeBars da representação de N3.10, cobrindo `join`, `separate`,
+`compare` e `complete`; o nível 5 terá incógnita variável. Começar no Sandbox,
+manter `gN3_10` em produção, não criar canário neste lote e não expandir para
+frações ou razão.
 
 1. Ligar `SingaporeBars` ao builder tipado.
 2. Começar por N3.10; não expandir de uma vez para frações/razão.

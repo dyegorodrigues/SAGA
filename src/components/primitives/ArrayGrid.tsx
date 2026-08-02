@@ -1,55 +1,50 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Question } from '../../types';
-import { tokens, UIState } from '../../styles/tokens';
+import React, { useState } from "react";
+import { motion } from "motion/react";
+import { AnswerMeta, Question } from "../../types";
 
-export function ArrayGrid({ q, state = 'ocioso' }: { q: Question; state?: UIState }) {
-  const rows = q.a ?? 3;
-  const cols = q.b ?? 4;
-  const rotate = q.nlEnd === 1;
+interface Props {
+  question: Question;
+  onAnswer: (value: unknown, meta?: AnswerMeta) => void;
+  disabled?: boolean;
+}
 
+export function ArrayGrid({ question, onAnswer, disabled = false }: Props) {
+  const { rows, cols, allowRotate, requireRotate, areaMode, showEquation } = question.uiProps;
   const [rotated, setRotated] = useState(false);
+  const [unavailable, setUnavailable] = useState<Set<unknown>>(new Set());
   const actualRows = rotated ? cols : rows;
   const actualCols = rotated ? rows : cols;
+  const cell = Math.min(44, Math.floor(300 / Math.max(actualRows, actualCols)));
 
-  return (
-    <div className={`flex flex-col items-center justify-center p-4 ${tokens.estado[state]}`}>
-      {rotate && (
-        <button 
-          onClick={() => setRotated(!rotated)}
-          className="mb-4 px-4 py-2 rounded-full font-bold shadow-sm active:scale-95"
-          style={{ 
-            backgroundColor: tokens.cor.superficie.destaque,
-            color: tokens.cor.texto.principal,
-            borderColor: tokens.cor.elementos.borda,
-            borderWidth: 1
-          }}
-        >
-          🔄 Girar
-        </button>
-      )}
-      <motion.div 
-        layout
-        className="grid gap-2"
-        style={{
-          gridTemplateColumns: `repeat(${actualCols}, minmax(0, 1fr))`
-        }}
-      >
-        {Array.from({ length: actualRows * actualCols }).map((_, i) => (
-          <motion.div
-            layout
-            key={i}
-            className="rounded-lg shadow-sm flex items-center justify-center text-2xl"
-            style={{ 
-              width: tokens.tamanho.base, 
-              height: tokens.tamanho.base,
-              backgroundColor: q.emoji ? 'transparent' : tokens.cor.elementos.base_A 
-            }}
-          >
-            {q.emoji || ''}
-          </motion.div>
-        ))}
-      </motion.div>
+  const choose = (value: unknown) => {
+    if (disabled || unavailable.has(value) || (requireRotate && !rotated)) return;
+    if (!question.evaluate?.(value)) setUnavailable(current => new Set(current).add(value));
+    onAnswer(value, { source: "array-grid" });
+  };
+
+  return <div className="flex flex-col items-center gap-3">
+    {allowRotate && <button type="button" onClick={() => setRotated(value => !value)} disabled={disabled}
+      className="min-h-12 rounded-full border-2 border-indigo-300 bg-indigo-50 px-6 font-black text-indigo-800">
+      🔄 Girar o arranjo
+    </button>}
+    <motion.div layout aria-label={`${actualRows} linhas e ${actualCols} colunas`}
+      className={`grid overflow-hidden ${areaMode ? "gap-0 border-2 border-indigo-700" : "gap-1.5"}`}
+      style={{ gridTemplateColumns: `repeat(${actualCols}, ${cell}px)` }}>
+      {Array.from({ length: actualRows * actualCols }, (_, index) =>
+        <motion.div layout key={index} aria-hidden="true" className={areaMode ? "border border-indigo-500 bg-indigo-200" : "rounded-md bg-indigo-400"}
+          style={{ width: cell, height: cell }} />)}
+    </motion.div>
+    {showEquation && <p className="text-2xl font-black text-slate-800">{actualRows} linhas × {actualCols} colunas = ?</p>}
+    {requireRotate && !rotated && <p className="font-bold text-indigo-700">Gire primeiro para descobrir outro jeito.</p>}
+    <div className="grid grid-cols-2 gap-3" aria-label="Alternativas do arranjo">
+      {question.options?.map(option => {
+        const blocked = unavailable.has(option.value);
+        return <button key={String(option.value)} type="button" onClick={() => choose(option.value)}
+          disabled={disabled || blocked || (requireRotate && !rotated)}
+          className="min-h-20 min-w-20 rounded-2xl border-2 border-indigo-300 bg-white px-4 text-xl font-black disabled:cursor-not-allowed disabled:opacity-35">
+          {option.label ?? String(option.value)}
+        </button>;
+      })}
     </div>
-  );
+  </div>;
 }

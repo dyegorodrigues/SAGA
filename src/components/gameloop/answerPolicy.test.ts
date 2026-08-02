@@ -29,4 +29,10 @@ describe("política de resposta de interações produtivas", () => {
     expect(shouldRenderQuestionOptions({ ...vertical, options: [{ value: 62 }] })).toBe(false);
     expect(shouldRenderQuestionOptions({ ...vertical, kind: "plain", options: [{ value: 62 }] })).toBe(true);
   });
+
+  it("deixa alternativas autorais do array dentro da primitiva", () => {
+    const array = { ...vertical, kind: "array", options: [{ value: 12 }] };
+    expect(shouldRenderQuestionOptions(array)).toBe(false);
+    expect(isRetryableAnswer(array, 11, { source: "array-grid" })).toBe(true);
+  });
 });

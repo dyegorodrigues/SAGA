@@ -10,7 +10,7 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
  * Arrays vazios são lacunas deliberadamente visíveis, nunca inferências silenciosas.
  */
 const FICHA_RUNTIME_MAP = [
-  { primitive: "ArrayGrid", kinds: ["array", "area-model"], componentFiles: [component("ArrayGrid")], builderKinds: [], rendererKinds: ["array"] },
+  { primitive: "ArrayGrid", kinds: ["array", "area-model"], componentFiles: [component("ArrayGrid")], builderKinds: ["arraygrid"], rendererKinds: ["array"] },
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice")], builderKinds: [], rendererKinds: [] },
   { primitive: "Balanca", kinds: ["balanca"], componentFiles: [component("Balanca")], builderKinds: ["balanca"], rendererKinds: ["balanca"] },
   { primitive: "DragGroup", kinds: ["draggroup"], componentFiles: [component("DragGroup")], builderKinds: ["draggroup"], rendererKinds: ["draggroup"] },

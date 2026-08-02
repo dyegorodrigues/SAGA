@@ -49,7 +49,7 @@ export interface Option {
 /** Context from production interactions that do not select a Question option. */
 export interface AnswerMeta {
   misconception?: string;
-  source?: "vertical-column";
+  source?: "vertical-column" | "array-grid";
   columnIndex?: number;
 }
 

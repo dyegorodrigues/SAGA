@@ -606,3 +606,27 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   e a origem `legacy/composer/fallback` fica observável no Track.
 - O rollback é explícito: retirar N3.09 de `VERTICAL_COMPOSER_CANARIES`. ArrayGrid
   e Singapore Bars seguem bloqueados para os lotes posteriores.
+
+## 2 de agosto de 2026 — Salvamento final do Lote C / F98-N4.02
+
+- Uma branch inédita nasceu diretamente da base `c9e4757`; o Lote C foi
+  reconstruído cirurgicamente sem publicar o commit antigo `e03f187`.
+- O Composer recebeu builder tipado de `arraygrid`, normalizado para o kind runtime
+  `array`, com dimensões de 1 a 10 e validação da dependência entre permitir e
+  exigir giro. N4.02 passou a ser a 15ª ficha de Jornada registrada.
+- Os cinco níveis fecham contagem, ligação com multiplicação, giro/comutatividade,
+  escolha da expressão e ponte para área. As alternativas vivem na primitiva,
+  erros ficam indisponíveis, os alvos têm 80 px e o modo área encosta as células.
+- `gN4_02` permaneceu em produção e nenhum canário de N4.02 foi criado.
+- Não foram adicionados binários. A limitação visual permanece: a inspeção
+  programática cobre dimensões e contratos, mas este salvamento não versiona
+  capturas; a validação visual completa continua no Sandbox em viewport infantil.
+- Ponto exato de parada: Lote C pronto para revisão, antes de qualquer alteração
+  em N3.10, StoryPanel ou SingaporeBars.
+- A arquitetura planejada do Lote D separa StoryPanel (narrativa) e SingaporeBars
+  (representação) para `join`, `separate`, `compare` e `complete`, com incógnita
+  variável no nível 5. O Lote D ainda não foi implementado e deve iniciar no
+  Sandbox, sem frações/razão, canário ou troca de `gN3_10` no mesmo lote.
+- Testes reais deste fechamento: auditorias de catálogo e fichas, grafo, TypeScript,
+  Vitest, build, guarda textual do PR e checks Git foram executados pelo ritual
+  final; os resultados observados ficam no log do terminal e no PR.

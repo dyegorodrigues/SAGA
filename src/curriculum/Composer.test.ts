@@ -6,6 +6,7 @@ import { N1_04 } from "./fichas/jornada/N1.04";
 import { JOURNEY_FICHAS } from "./fichas";
 import { N3_09 } from "./fichas/jornada/N3.09";
 import { N3_11 } from "./fichas/jornada/N3.11";
+import { N4_02 } from "./fichas/jornada/N4.02";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
@@ -52,7 +53,9 @@ describe("Composer de fichas", () => {
         for (let sample = 0; sample < 10; sample += 1) {
           const question = Composer.generate(ficha, level);
           const declaredKind = ficha.niveis?.[level]?.primitiva ?? ficha.micros[0].kinds[0];
-          const renderedKind = declaredKind === "intruso_math" ? "plain" : declaredKind;
+          const renderedKind = declaredKind === "intruso_math"
+            ? "plain"
+            : declaredKind === "arraygrid" ? "array" : declaredKind;
           expect(question.kind, `${ficha.id} L${level}`).toBe(renderedKind);
           expect(question.uiProps, `${ficha.id} L${level}`).toBeDefined();
           expect(question.evaluate, `${ficha.id} L${level}`).toBeTypeOf("function");
@@ -207,5 +210,30 @@ describe("Composer de fichas", () => {
 
     expect(operations).toEqual(new Set(["+", "-"]));
     expect(Composer.generate(N3_09, 5).rt_max_s).toBe(8);
+  });
+
+  it("normaliza arraygrid para array e respeita os cinco degraus autorais", () => {
+    for (let level = 1; level <= 5; level += 1) {
+      const question = Composer.generate(N4_02, level);
+      expect(question.kind).toBe("array");
+      expect(question.uiProps.rows).toBeGreaterThanOrEqual(1);
+      expect(question.uiProps.rows).toBeLessThanOrEqual(10);
+      expect(question.uiProps.cols).toBeGreaterThanOrEqual(1);
+      expect(question.uiProps.cols).toBeLessThanOrEqual(10);
+      expect(question.options?.filter(option => option.value === question.answer)).toHaveLength(1);
+    }
+    expect(Composer.generate(N4_02, 3).uiProps).toMatchObject({ allowRotate: true, requireRotate: true });
+    expect(Composer.generate(N4_02, 4).uiProps.answerMode).toBe("equation");
+    expect(Composer.generate(N4_02, 5).uiProps.areaMode).toBe(true);
+  });
+
+  it("rejeita dimensão fora de 1..10 e giro obrigatório sem permissão", () => {
+    const withParams = (params: Record<string, unknown>) => ({
+      ...N4_02,
+      micros: [{ ...N4_02.micros[0], params }],
+      niveis: { 1: { primitiva: "arraygrid" as const, micro: "contagem" } },
+    });
+    expect(() => Composer.generate(withParams({ rows_min: 0 }), 1)).toThrow("entre 1 e 10");
+    expect(() => Composer.generate(withParams({ require_rotate: true, allow_rotate: false }), 1)).toThrow("exigir giro");
   });
 });
