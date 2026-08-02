@@ -129,6 +129,8 @@ export interface Track {
   color: string;
   dark: string;
   gen: (lvl: number) => Question;
+  /** Origem do gerador em produção; permite observar e reverter canários. */
+  generatorSource?: "legacy" | "composer" | "fallback";
   /** questões por missão (padrão 8; Desafio Misto usa 10) */
   totalQ?: number;
   /** habilidade treinada em cada um dos 5 níveis (mostrada no seletor 🎯) */
@@ -255,6 +257,8 @@ export interface TelemetryLog {
   givenAnswer: string;
   reactionTimeMs: number;
   isCorrect: boolean;
+  attemptCount?: number;
+  recoveredAfterError?: boolean;
   misconceptionTags?: string[];
   tutState?: string;
   hintsUsed?: number;

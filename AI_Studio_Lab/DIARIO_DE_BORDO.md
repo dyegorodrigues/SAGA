@@ -594,3 +594,15 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - O conflito do PR 15 foi reproduzido e sua causa foi comprovada pelo grafo Git: o commit da correção partia de `b56f5a6`, enquanto a `origin/main` já estava em `80a5abe` após o merge do PR 14. Assim, o PR reapresentava arquivos que já haviam sido mesclados.
 - Nenhum conflito foi resolvido pelo editor web, por `Update branch`, merge ou rebase da branch antiga. A árvore final da correção foi calculada contra `origin/main`, aplicada em uma branch inédita criada diretamente de `80a5abe` e validada antes do commit.
 - Regra operacional reforçada: a conversa pode continuar; cada lote Git, porém, nasce sempre de uma nova leitura de `origin/main`. Se um PR for criado sobre uma base velha, ele deve ser substituído pela reconstrução limpa, nunca remendado pela interface web.
+
+## 2 de agosto de 2026 — Lote B: diagnóstico terminal e canário N3.09
+
+- O resumo de cada questão passa a consolidar em memória tentativas, ocorrência de
+  erro e tags únicas. Somente a resposta terminal publica telemetria; não existe
+  escrita Firestore intermediária por toque.
+- O Radar recebe no máximo uma ocorrência de cada tag por questão, inclusive
+  quando a criança erra gentilmente e depois se recupera.
+- N3.09 é o único canário do Composer. N3.11 permanece exatamente em `gN3_11`,
+  e a origem `legacy/composer/fallback` fica observável no Track.
+- O rollback é explícito: retirar N3.09 de `VERTICAL_COMPOSER_CANARIES`. ArrayGrid
+  e Singapore Bars seguem bloqueados para os lotes posteriores.

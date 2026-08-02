@@ -62,6 +62,14 @@ branch nova é obrigatória.
 
 Seguindo sempre esta ordem, nenhum lote velho entra escondido no lote novo.
 
+## Canário curricular e rollback
+
+- Troque somente um nó por PR e registre `generatorSource` no Track.
+- Um toque durante a questão nunca cria uma escrita Firestore; apenas o evento
+  terminal leva o resumo agregado das tentativas.
+- Para reverter o canário vertical atual, retire `N3.09` de
+  `VERTICAL_COMPOSER_CANARIES`; não mova N3.11 de `gN3_11` e não use Update branch.
+
 ## Regra para imagens e outros binários
 
 O criador de PR deste ambiente não aceita arquivos binários no diff. Portanto:

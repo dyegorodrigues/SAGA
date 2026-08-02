@@ -8,6 +8,11 @@ import {
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
 import { isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
+import {
+  createQuestionDiagnostics,
+  recordQuestionAttempt,
+  summarizeQuestionDiagnostics,
+} from "./gameloop/questionDiagnostics";
 
 interface GameProps {
   kid: Kid;
@@ -176,6 +181,7 @@ export function GameLoop({
   const wrongStreakRef = useRef(0);
   const aulaEndRef = useRef<null | (() => void)>(null);
   const qRef = useRef<Question>(q);
+  const questionDiagnosticsRef = useRef(createQuestionDiagnostics());
 
   useEffect(() => {
     if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
@@ -233,6 +239,7 @@ export function GameLoop({
     setHiddenOpts([]);
     helpUsedRef.current = false;
     answeredRef.current = false;
+    questionDiagnosticsRef.current = createQuestionDiagnostics();
     setArmedOpt(null);
   }, [q]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -438,7 +445,8 @@ export function GameLoop({
     
     // forcedRight: usado por interações que decidem o acerto por conta própria (ex.: `order`)
     const right = forcedRight !== undefined ? forcedRight : val === q.answer;
-    let terminalMisconception: string | undefined;
+    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
+    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
@@ -464,8 +472,7 @@ export function GameLoop({
       }
       // Se errou a 3ª vez, segue pro erro terminal e avança
       
-      // Registra a misconception no Radar se houver e estiver mapeada nas opções
-      terminalMisconception = misconceptionForAnswer(q, val, answerMeta);
+      // O resumo terminal abaixo publica as hipóteses deduplicadas no Radar.
     }
 
     answeredRef.current = true;
@@ -480,7 +487,8 @@ export function GameLoop({
       previousPracticeDay: prog.lastDay,
     }, rescue ? { kind: "rescue", requiredLevel: rescue.requiredLevel } : undefined);
     const p = progressResult.progress;
-    if (terminalMisconception) trackMisconception(p, terminalMisconception);
+    const diagnostics = summarizeQuestionDiagnostics(questionDiagnosticsRef.current, right);
+    diagnostics.misconceptionTags.forEach(tag => trackMisconception(p, tag));
     let currentToast = progressResult.transition?.type === "level-up"
       ? `Subiu para o nível ${progressResult.transition.level}! 🚀`
       : progressResult.transition?.type === "level-down"
@@ -581,8 +589,6 @@ export function GameLoop({
     // FIREBASE ATOMIC TELEMETRY
     try {
       const qPromptText = q.kind === "story" ? String(q.story) : String(q.prompt || "") + (q.kind === "math" ? " " + String(q.expr) : "");
-      const misconceptionTag = misconceptionForAnswer(q, val, answerMeta);
-
       logTelemetryToCloud({
         kidId: kid.id,
         timestamp: Date.now(),
@@ -593,7 +599,9 @@ export function GameLoop({
         givenAnswer: String(val),
         reactionTimeMs: durationMs,
         isCorrect: right,
-        misconceptionTags: misconceptionTag ? [misconceptionTag] : [],
+        attemptCount: diagnostics.attemptCount,
+        recoveredAfterError: diagnostics.recoveredAfterError,
+        misconceptionTags: diagnostics.misconceptionTags,
         tutState: tutShow !== null ? "guided" : "hide",
         hintsUsed
       });
