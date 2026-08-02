@@ -16,13 +16,14 @@ import { GM_04 } from './jornada/GM.04';
 import { AL_05 } from './jornada/AL.05';
 import { AL_01 } from './jornada/AL.01';
 import { N3_09 } from './jornada/N3.09';
+import { N3_11 } from './jornada/N3.11';
 
 export const AllFichas = [
   dojo_add, dojo_sub, dojo_mul, dojo_div,
-  N1_01, N1_02, N1_03, N1_04, N1_07, N1_08, N1_09, N1_10, N2_01, N3_09, GM_04, AL_01, AL_05
+  N1_01, N1_02, N1_03, N1_04, N1_07, N1_08, N1_09, N1_10, N2_01, N3_09, N3_11, GM_04, AL_01, AL_05
 ];
 
 export const JOURNEY_FICHAS = [
   N1_01, N1_02, N1_03, N1_04, N1_07, N1_08, N1_09, N1_10,
-  N2_01, N3_09, GM_04, AL_01, AL_05,
+  N2_01, N3_09, N3_11, GM_04, AL_01, AL_05,
 ];

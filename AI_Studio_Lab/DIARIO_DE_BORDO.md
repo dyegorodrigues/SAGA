@@ -496,3 +496,67 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   exatas no nível 1, material nos níveis concretos e tempo-alvo apenas no nível 5.
 - Próximo bloco: validar visualmente a ficha no Sandbox infantil e, mantendo o
   legado até essa evidência, preparar F39/N3.11 com reagrupamento explícito.
+
+## 2 de agosto de 2026 — Validação infantil F35 e F39/N3.11 estruturada
+
+- A inspeção Playwright do Sandbox revelou que ele ainda chamava `track.gen` e,
+  portanto, mostrava o gerador legado de N3.09 em vez da ficha que precisava ser
+  validada. O Sandbox agora prefere o Composer autoral quando há ficha registrada;
+  a Jornada continua deliberadamente no `gN3_09` legado.
+- F35 foi inspecionada em 1280×800 e na viewport infantil 390×844. A ficha oferece
+  uma única decisão por coluna, áudio reproduzível, material dourado nos níveis
+  1–3 e retirada do apoio nos níveis 4–5. As três alternativas por coluna medem
+  80×80 px; o cartão infantil fecha sem rolagem vertical após a compactação
+  responsiva do Sandbox. A evidência persistida é o log métrico; capturas locais
+  não entram no Git porque o criador de PR deste ambiente rejeita binários.
+- F39/N3.11 entrou no catálogo executável sem substituir `gN3_11` em produção.
+  Os níveis 1–3 mostram explicitamente a troca de dez cubinhos por uma barra; o
+  nível 4 retira o material e o nível 5 exige reagrupamento simultâneo de unidades
+  e dezenas em três algarismos.
+- O vertical deixou o teclado de 12 teclas e passou a oferecer três alternativas
+  diagnósticas por coluna, coerentes com a entrada posicional da Bíblia. Isso
+  tornou a ação dominante, garantiu alvos de 80 px e retirou carga motora sem
+  alterar a ordem direita→esquerda.
+- Baseline anterior à mudança: auditorias e grafo aprovados; 31 arquivos/869 testes,
+  typecheck e build aprovados. A validação final deste bloco é registrada pelo
+  commit e pelo PR, somente após repetir a suíte completa.
+
+## 2 de agosto de 2026 — Revisão crítica do vertical e plano dos próximos lotes
+
+- A revisão do primeiro F39 encontrou duas falhas que o verde anterior não via:
+  a troca era uma legenda estática mostrada antes da ação, e um algarismo errado
+  era apagado dentro da primitiva sem chegar ao feedback do GameLoop.
+- A matemática coluna a coluna foi extraída para `verticalProcedure.ts`, com testes
+  de troca simples, troca dupla e resposta presente uma vez. A primitiva agora
+  envia o erro ao fluxo externo e só revela a barra depois que a criança resolve
+  corretamente a coluna das unidades.
+- O `GameLoopExerciseRenderer` passou a usar `VerticalPlaceValueStage`, eliminando
+  a divergência em que o Sandbox/Jornada desenhava apenas a conta enquanto o
+  `FichaRenderer` conhecia a ponte CRA.
+- A divulgação progressiva foi corrigida: N3.09 nível 1 e N3.11 níveis 1–2 não
+  empilham material, transformação e algoritmo ao mesmo tempo. A conta aparece
+  depois, quando a ficha chega ao degrau representacional apropriado.
+- Playwright em 390×844 comprovou `clientHeight=723`, `scrollHeight=723`, três
+  alvos de 80×80 px e a mudança observável de “Escolha as unidades” para “10
+  cubinhos viraram 1 barra”. As capturas foram inspecionadas localmente; o Git
+  guarda somente o log textual para manter o PR compatível.
+- O Plano Mestre ganhou cinco lotes com travas explícitas: fechar F39, migração
+  controlada do vertical, array, barras de Singapura e confiabilidade. Array e
+  barras continuam proibidos antes do fechamento e da revisão de F39.
+- Foi criado `codex/FLUXO_GIT_SEM_BUG.md`: merge → apagar branch → conversa nova
+  → fetch → branch nova, sem Update branch e sem editor web para conflitos.
+- Fechamento reproduzido: auditor curricular, fichas, grafo, typecheck e build
+  aprovados; Vitest executou 33 arquivos e 874 testes. O build manteve apenas o
+  aviso conhecido de chunk principal acima de 500 kB.
+
+## 2 de agosto de 2026 — Reconstrução do PR sem arquivos binários
+
+- O criador de PR exibiu o erro vermelho “arquivos binários não são compatíveis”
+  por causa das capturas PNG adicionadas como evidência visual.
+- A correção não reutilizou a branch problemática: uma branch inédita nasceu
+  diretamente de `origin/main`, e o diff de código/documentação foi reaplicado
+  excluindo todos os PNGs.
+- A política deste fluxo passa a ser: inspeção visual continua obrigatória, mas a
+  evidência versionada é textual (viewport, scroll, alvos e transição observada).
+  Binários só entram por um canal de assets que suporte revisão, nunca pelo
+  criador de PR textual.

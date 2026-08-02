@@ -5,6 +5,7 @@ import { N1_03 } from "./fichas/jornada/N1.03";
 import { N1_04 } from "./fichas/jornada/N1.04";
 import { JOURNEY_FICHAS } from "./fichas";
 import { N3_09 } from "./fichas/jornada/N3.09";
+import { N3_11 } from "./fichas/jornada/N3.11";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
@@ -144,6 +145,33 @@ describe("Composer de fichas", () => {
     );
   });
 
+  it("builds F39 with an explicit regrouping bridge and double regrouping at level 5", () => {
+    for (let level = 1; level <= 5; level += 1) {
+      for (let sample = 0; sample < 200; sample += 1) {
+        const question = Composer.generate(N3_11, level);
+        expect(question.kind).toBe("vertical");
+        expect(question.vOp).toBe("+");
+        expect((question.vTop! % 10) + (question.vBot! % 10)).toBeGreaterThanOrEqual(10);
+        expect(question.answer).toBe(question.vTop! + question.vBot!);
+        expect(question.answer).toBeLessThanOrEqual(level === 5 ? 999 : 99);
+        if (level <= 3) {
+          expect(question.uiProps).toMatchObject({ showPlaceValue: true, showRegroup: true });
+        } else {
+          expect(question.uiProps).toMatchObject({ showPlaceValue: undefined, showRegroup: undefined });
+        }
+        if (level <= 2) expect(question.uiProps.showAlgorithm).toBe(false);
+        if (level === 3) expect(question.uiProps.showAlgorithm).toBeUndefined();
+        if (level === 5) {
+          const unitCarry = 1;
+          const tens = Math.floor(question.vTop! / 10) % 10;
+          const otherTens = Math.floor(question.vBot! / 10) % 10;
+          expect(tens + otherTens + unitCarry).toBeGreaterThanOrEqual(10);
+        }
+      }
+    }
+    expect(Composer.generate(N3_11, 5).rt_max_s).toBe(12);
+  });
+
   it("follows the five authored N3.09 progressions without regrouping", () => {
     const operations = new Set<string>();
 
@@ -168,6 +196,7 @@ describe("Composer de fichas", () => {
           expect(bottom % 10).toBe(0);
         }
         if (level <= 3) expect(question.uiProps.showPlaceValue).toBe(true);
+        if (level === 1) expect(question.uiProps.showAlgorithm).toBe(false);
         if (level === 4) expect(operation).toBe("-");
       }
     }

@@ -57,7 +57,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
     case 'draggroup':
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
     case 'vertical':
-      return <VerticalPlaceValueStage question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
+      return <VerticalPlaceValueStage question={question} onAnswer={handleInteract} onMistake={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':
       return <div className="flex justify-center"><TenFrame filled={question.n!} {...uiProps} /></div>;
     case 'visual-addition':

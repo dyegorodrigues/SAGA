@@ -26,6 +26,12 @@ function hasVerticalRegroup(top: number, bottom: number, operation: "+" | "-"): 
   return top % 10 < bottom % 10;
 }
 
+function hasDoubleAdditionRegroup(top: number, bottom: number): boolean {
+  const unitCarry = (top % 10) + (bottom % 10) >= 10 ? 1 : 0;
+  return unitCarry === 1
+    && (Math.floor(top / 10) % 10) + (Math.floor(bottom / 10) % 10) + unitCarry >= 10;
+}
+
 function verticalOperands(params: ReturnType<typeof parseComposerParams>, context: string) {
   const requestedOperation = params.operation ?? "+";
   const topMin = params.top_min ?? 10;
@@ -37,6 +43,9 @@ function verticalOperands(params: ReturnType<typeof parseComposerParams>, contex
   }
   if (params.require_regroup && params.forbid_regroup) {
     throw new Error(`Conta vertical não pode exigir e proibir reagrupamento em ${context}.`);
+  }
+  if (params.require_double_regroup && requestedOperation !== "+") {
+    throw new Error(`Reagrupamento duplo exige adição em ${context}.`);
   }
   const step = params.operand_step ?? 1;
   if (!Number.isInteger(step) || step <= 0) {
@@ -51,6 +60,7 @@ function verticalOperands(params: ReturnType<typeof parseComposerParams>, contex
     const bottom = randomStep(bottomMin, bottomMax, step);
     if (operation === "-" && bottom > top) continue;
     if (params.require_regroup && !hasVerticalRegroup(top, bottom, operation)) continue;
+    if (params.require_double_regroup && !hasDoubleAdditionRegroup(top, bottom)) continue;
     if (params.forbid_regroup && hasVerticalRegroup(top, bottom, operation)) continue;
     const result = operation === "+" ? top + bottom : top - bottom;
     if (params.result_max !== undefined && result > params.result_max) continue;
@@ -338,7 +348,14 @@ export class Composer {
         vBot = operands.bottom;
         vOp = operands.operation;
         answer = vOp === "+" ? vTop + vBot : vTop - vBot;
-        uiProps = { vTop, vBot, vOp, showPlaceValue: params.show_place_value };
+        uiProps = {
+          vTop,
+          vBot,
+          vOp,
+          showPlaceValue: params.show_place_value,
+          showRegroup: params.show_regroup,
+          showAlgorithm: params.show_algorithm,
+        };
         evaluate = (ans) => ans === answer;
         promptOverride = params.audio_prompt ?? `${vTop} ${vOp === "+" ? "mais" : "menos"} ${vBot}.`;
         break;
