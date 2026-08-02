@@ -46,40 +46,40 @@ export const gN3_11 = (lvl: number): Question => {
   const b = d2 * 10 + u2;
   const sum = a + b;
   
-  const opts = new Set<string>();
+  const opts = new Set<number>();
   const options: Option[] = [];
   
   // Resposta certa
-  options.push({ label: sum.toString(), value: sum.toString() });
-  opts.add(sum.toString());
+  options.push({ label: sum.toString(), value: sum });
+  opts.add(sum);
   
   // Misconception 1: Esqueceu o vai um (ex: 27+15 = 32 em vez de 42)
   const esqueceuVaiUm = (d1 + d2) * 10 + (u1 + u2 - 10);
-  if (!opts.has(esqueceuVaiUm.toString())) {
-    options.push({ label: esqueceuVaiUm.toString(), value: esqueceuVaiUm.toString(), misconception: MisconceptionTag.ESQUECEU_VAI_UM });
-    opts.add(esqueceuVaiUm.toString());
+  if (!opts.has(esqueceuVaiUm)) {
+    options.push({ label: esqueceuVaiUm.toString(), value: esqueceuVaiUm, misconception: MisconceptionTag.ESQUECEU_VAI_UM });
+    opts.add(esqueceuVaiUm);
   }
   
   // Misconception 2: Concatenou tudo em vez de reagrupar (ex: 27+15 = 312)
   const concatenou = parseInt(`${d1+d2}${u1+u2}`);
-  if (!opts.has(concatenou.toString())) {
-    options.push({ label: concatenou.toString(), value: concatenou.toString(), misconception: MisconceptionTag.CONCATENOU_DIGITOS });
-    opts.add(concatenou.toString());
+  if (!opts.has(concatenou)) {
+    options.push({ label: concatenou.toString(), value: concatenou, misconception: MisconceptionTag.CONCATENOU_DIGITOS });
+    opts.add(concatenou);
   }
   
   // Misconception 3: Off-by-one (um a mais ou a menos no cálculo mental das unidades)
   const offByOne = sum + pick([-1, 1]);
-  if (!opts.has(offByOne.toString())) {
-    options.push({ label: offByOne.toString(), value: offByOne.toString(), misconception: MisconceptionTag.OFF_BY_ONE });
-    opts.add(offByOne.toString());
+  if (!opts.has(offByOne)) {
+    options.push({ label: offByOne.toString(), value: offByOne, misconception: MisconceptionTag.OFF_BY_ONE });
+    opts.add(offByOne);
   }
   
   // Preencher até ter 4 opções
   while (options.length < 4) {
     const v = sum + pick([-10, 10, -2, 2, -3, 3]);
-    if (v > 0 && !opts.has(v.toString())) {
-      options.push({ label: v.toString(), value: v.toString() });
-      opts.add(v.toString());
+    if (v > 0 && !opts.has(v)) {
+      options.push({ label: v.toString(), value: v });
+      opts.add(v);
     }
   }
 

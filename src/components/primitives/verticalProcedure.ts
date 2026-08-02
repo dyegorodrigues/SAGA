@@ -1,3 +1,5 @@
+import { MisconceptionTag, MisconceptionTagType } from "../../constants/misconceptions";
+
 export interface VerticalColumnStep {
   expectedDigit: number;
   carry: boolean;
@@ -38,4 +40,23 @@ export function verticalDigitChoices(expectedDigit: number, seed: number): numbe
     (expectedDigit + 1) % 10,
     (expectedDigit + 9) % 10,
   ])].sort((a, b) => ((a * 7 + seed) % 11) - ((b * 7 + seed) % 11));
+}
+
+export function verticalAnswerFromColumns(columns: string[]): number {
+  return Number([...columns].reverse().join(""));
+}
+
+export function inferVerticalMisconception(
+  top: number,
+  bottom: number,
+  operation: "+" | "-",
+  columnIndex: number,
+  selectedDigit: number,
+): MisconceptionTagType {
+  const step = getVerticalColumnStep(top, bottom, operation, columnIndex);
+  if (operation === "+" && columnIndex > 0 && selectedDigit === (step.expectedDigit + 9) % 10) {
+    return MisconceptionTag.ESQUECEU_VAI_UM;
+  }
+  if (operation === "-" && step.borrow) return MisconceptionTag.INVERTE_COLUNA;
+  return MisconceptionTag.OFF_BY_ONE;
 }

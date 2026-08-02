@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Kid, Track, Question, Progress } from "../types";
+import { AnswerMeta, Kid, Track, Question, Progress } from "../types";
 import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
 import { auth, logTelemetryToCloud } from "../lib/firebase";
 import {
@@ -7,6 +7,7 @@ import {
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
+import { isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
 
 interface GameProps {
   kid: Kid;
@@ -431,7 +432,7 @@ export function GameLoop({
   // pelo `status` ainda nulo e gravavam progresso em dobro / pulavam questões)
   const answeredRef = useRef(false);
 
-  const handlePick = (val: any, forcedRight?: boolean) => {
+  const handlePick = (val: any, forcedRight?: boolean, answerMeta?: AnswerMeta) => {
     if (val === "__timeout__") setIsTimeout(true);
     if (status || answeredRef.current) return;
     
@@ -441,7 +442,7 @@ export function GameLoop({
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
-    if (!right && val !== '__timeout__' && (q.options || q.groups)) {
+    if (!right && isRetryableAnswer(q, val, answerMeta)) {
       if (qErrors === 0) {
         setQErrors(1);
         setHiddenOpts((prev) => [...prev, val]);
@@ -464,10 +465,7 @@ export function GameLoop({
       // Se errou a 3ª vez, segue pro erro terminal e avança
       
       // Registra a misconception no Radar se houver e estiver mapeada nas opções
-      const pickedOpt = q.options.find((o: any) => o.value === val);
-      if (pickedOpt && pickedOpt.misconception) {
-        terminalMisconception = pickedOpt.tag || pickedOpt.misconception;
-      }
+      terminalMisconception = misconceptionForAnswer(q, val, answerMeta);
     }
 
     answeredRef.current = true;
@@ -583,11 +581,7 @@ export function GameLoop({
     // FIREBASE ATOMIC TELEMETRY
     try {
       const qPromptText = q.kind === "story" ? String(q.story) : String(q.prompt || "") + (q.kind === "math" ? " " + String(q.expr) : "");
-      let misconceptionTag = undefined;
-      if (q.options) {
-         const pickedOpt = q.options.find((o: any) => o.value === val);
-         if (pickedOpt && pickedOpt.misconception) misconceptionTag = pickedOpt.tag || pickedOpt.misconception;
-      }
+      const misconceptionTag = misconceptionForAnswer(q, val, answerMeta);
 
       logTelemetryToCloud({
         kidId: kid.id,

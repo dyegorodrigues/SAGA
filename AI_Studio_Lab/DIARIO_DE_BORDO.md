@@ -560,3 +560,37 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   evidência versionada é textual (viewport, scroll, alvos e transição observada).
   Binários só entram por um canal de assets que suporte revisão, nunca pelo
   criador de PR textual.
+
+## 2 de agosto de 2026 — Fechamento real do Lote A / F39
+
+- Após o merge do PR #14, uma branch inédita nasceu do merge `80a5abe` em
+  `origin/main`. A Jornada de teste, e não só o Sandbox, foi aberta com Playwright.
+- A revisão encontrou quatro regressões anteriores: a Jornada legada quebrava por
+  `uiProps` ausente; mostrava alternativas inteiras e por coluna ao mesmo tempo; o
+  padding global criava 64px de rolagem; e um vai-um final podia perder a nova
+  centena ao montar a resposta. Todas receberam correção e teste de regressão.
+- O gerador legado N3.11 também misturava `answer` numérico com `Option.value`
+  textual. Os valores foram normalizados para número, restaurando a regra de
+  resposta presente exatamente uma vez sem trocar o gerador em produção.
+- Interações verticais agora transportam `AnswerMeta` com fonte, coluna e hipótese
+  canônica (`off-by-one`, `esqueceu-vai-um` ou `inverte-coluna`). O GameLoop aplica
+  as duas tentativas gentis também a kinds de produção e mantém a hipótese pronta
+  para Radar/telemetria no erro terminal.
+- Paridade amostrada: 500 questões de N3.09 e 500 de N3.11 por caminho autoral,
+  comparadas com o legado nos cinco níveis; N3.09 não perde alcance, N3.11 mantém
+  dois dígitos nos níveis 1–4 e expande apenas o nível 5 para três dígitos.
+- Playwright 390×844: os cinco níveis do Sandbox fecharam em 723×723 sem rolagem,
+  três alvos por coluna; Jornada legada fechou em 844×844, sem crash, sem opções
+  duplicadas, com primeira resposta errada em “Olha de novo” e segunda em “Dica”.
+- Limite consciente: a hipótese diagnóstica ainda é persistida no progresso apenas
+  no erro terminal. Persistência probabilística por tentativa pertence ao Lote B,
+  junto do canário e da decisão de migração; não foi improvisada dentro da UI.
+- O ritual operacional foi simplificado com a evidência deste merge: conversa nova
+  é opcional. A trava real é Git — merge confirmado, fetch e branch inédita em
+  `origin/main`. O agente executa isso automaticamente antes do lote seguinte.
+
+### 2026-08-02 — Reconstrução cirúrgica do PR 15 sobre a `origin/main`
+
+- O conflito do PR 15 foi reproduzido e sua causa foi comprovada pelo grafo Git: o commit da correção partia de `b56f5a6`, enquanto a `origin/main` já estava em `80a5abe` após o merge do PR 14. Assim, o PR reapresentava arquivos que já haviam sido mesclados.
+- Nenhum conflito foi resolvido pelo editor web, por `Update branch`, merge ou rebase da branch antiga. A árvore final da correção foi calculada contra `origin/main`, aplicada em uma branch inédita criada diretamente de `80a5abe` e validada antes do commit.
+- Regra operacional reforçada: a conversa pode continuar; cada lote Git, porém, nasce sempre de uma nova leitura de `origin/main`. Se um PR for criado sobre uma base velha, ele deve ser substituído pela reconstrução limpa, nunca remendado pela interface web.

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Question } from '../../types';
+import { AnswerMeta, Question } from '../../types';
 import { InteractiveVertical } from './InteractiveVertical';
 import { MaterialDourado } from './MaterialDourado';
+import { verticalStageProps } from './verticalStageContract';
 
 interface VerticalPlaceValueStageProps {
   question: Question;
   onAnswer: (answer: number) => void;
-  onMistake?: (digit: number) => void;
+  onMistake?: (digit: number, meta: AnswerMeta) => void;
   disabled: boolean;
 }
 
@@ -21,7 +22,7 @@ function PlaceValueOperand({ value, label }: { value: number; label: string }) {
 
 /** Keeps concrete place value beside the vertical algorithm during the CRA bridge. */
 export function VerticalPlaceValueStage({ question, onAnswer, onMistake, disabled }: VerticalPlaceValueStageProps) {
-  const props = question.uiProps as { vTop: number; vBot: number; showPlaceValue?: boolean; showRegroup?: boolean; showAlgorithm?: boolean };
+  const props = verticalStageProps(question);
   const unitSum = (props.vTop % 10) + (props.vBot % 10);
   const regroupUnits = unitSum % 10;
   const [regrouped, setRegrouped] = useState(false);

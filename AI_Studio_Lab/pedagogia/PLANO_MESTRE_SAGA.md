@@ -111,11 +111,11 @@ Gerar 92 arquivos TypeScript automaticamente sem revisão; transformar prosa em 
 
 ## Próximo bloco
 
-**F35/N3.09 está estruturada e protegida por contrato**, mantendo o gerador legado
-na Jornada até a validação visual infantil. O próximo bloco é validar o padrão-ouro
-no Sandbox e implementar **F39/N3.11** com reagrupamento explícito, sem antecipar a
-migração de produção. Depois, repetir o padrão de integração em `array` e
-`singapore-bars`.
+**F35/N3.09 e F39/N3.11 estão estruturadas e validadas no Sandbox e na Jornada de
+teste**, mantendo os dois geradores legados na produção. O próximo bloco é o
+**Lote B — migração controlada do vertical**: fechar persistência diagnóstica por
+tentativa, executar canário e decidir um único nó por PR. `array` e
+`singapore-bars` continuam bloqueados até essa decisão.
 
 ## Orquestração dos próximos lotes após F39
 
@@ -124,6 +124,10 @@ branch provar que nasceu da `origin/main` atual. Nenhum lote mistura mudança
 pedagógica, troca de gerador em produção e expansão de outra primitiva.
 
 ### Lote A — fechar F39 como padrão-ouro
+
+**Estado: concluído em 2/ago/2026.** Os cinco níveis ficaram sem rolagem em
+390×844; a Jornada legada foi exercitada sem crash e com uma única ação dominante;
+erro gentil, áudio, troca simples/dupla e paridade foram cobertos por logs e testes.
 
 1. Validar os cinco níveis de N3.11 no Sandbox e em 390×844.
 2. Verificar a troca como ação observável: unidades → barra → dezena registrada.

@@ -1,5 +1,5 @@
 import React from "react";
-import { Question } from "../../types";
+import { AnswerMeta, Question } from "../../types";
 import { RapidFire } from "../exercises/RapidFire";
 import { SingaporeBars } from "../primitives/SingaporeBars";
 import { NumberBond } from "../primitives/NumberBond";
@@ -29,12 +29,13 @@ import NestScene from "../scenes/NestScene";
 import JourneyScene from "../scenes/JourneyScene";
 import PlaceScene, { Place } from "../scenes/PlaceScene";
 import { hasAulinha, hasTutorial } from "../../utils/tutorials";
+import { shouldRenderQuestionOptions } from "./answerPolicy";
 
 interface Props {
   q: Question;
   status: "right" | "wrong" | null;
   idx: number;
-  handlePick: (val: any) => void;
+  handlePick: (val: any, forcedRight?: boolean, meta?: AnswerMeta) => void;
   timeLeft: number;
   promptDone: boolean;
   guidedIdx: number | null;
@@ -295,7 +296,7 @@ export function GameLoopExerciseRenderer({
             <VerticalPlaceValueStage
               question={q}
               onAnswer={handlePick}
-              onMistake={handlePick}
+              onMistake={(digit, meta) => handlePick(digit, false, meta)}
               disabled={status !== null}
             />
           )}
@@ -534,7 +535,7 @@ export function GameLoopExerciseRenderer({
           </div>
         ) : (
           <>
-          {q.options && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && (<div className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid grid-cols-2"}`}>
+          {shouldRenderQuestionOptions(q) && q.options && (<div className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid grid-cols-2"}`}>
             {q.options.map((o, i) => {
               const isAnswer = o.value === q.answer;
               const picked = sel === o.value;
