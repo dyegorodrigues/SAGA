@@ -4,6 +4,7 @@ import { CURRICULUM } from "../curriculum/motores/curriculum";
 import { auth, linkAnonymousWithGoogle } from "../lib/firebase";
 import { C, FONT, StarChip, LevelDots, SoundBtn, MiniBars, StatChip, calcStreak, sumWindow, accWindow, TOTAL_STICKERS, sfx, THEME_EMOJIS, THEMES, Mascote } from "./Mascot";
 import { PedagogicalEditor } from "./PedagogicalEditor";
+import { MasteryDimensions } from "./parent/MasteryDimensions";
 
 interface ParentProps {
   state: State;
@@ -548,18 +549,21 @@ export function ParentDashboard({
                 const p = prog[t.id] || { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
                 const acc = p.tot ? Math.round((p.ok / p.tot) * 100) + "%" : "—";
                 return (
-                  <div key={t.id} className="flex items-center gap-2" style={{ background: C.soft, borderRadius: 14, padding: "8px 10px" }}>
-                    <span className="text-xl">{t.icon}</span>
-                    <span className="flex-1 font-semibold text-sm text-slate-800" style={{ fontFamily: FONT }}>
-                      {t.name}
-                    </span>
-                    <LevelDots lvl={p.lvl} conquered={p.maxLvl} dom={p.dom} color={t.color} />
-                    <span className="font-bold text-xs text-slate-500 w-10 text-right">
-                      {acc}
-                    </span>
-                    <span className="font-bold text-xs text-amber-600 w-11 text-right">
-                      ⭐ {p.stars || 0}
-                    </span>
+                  <div key={t.id} style={{ background: C.soft, borderRadius: 14, padding: "8px 10px" }}>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{t.icon}</span>
+                      <span className="flex-1 font-semibold text-sm text-slate-800" style={{ fontFamily: FONT }}>
+                        {t.name}
+                      </span>
+                      <LevelDots lvl={p.lvl} conquered={p.maxLvl} dom={p.dom} color={t.color} />
+                      <span className="font-bold text-xs text-slate-500 w-10 text-right">
+                        {acc}
+                      </span>
+                      <span className="font-bold text-xs text-amber-600 w-11 text-right">
+                        ⭐ {p.stars || 0}
+                      </span>
+                    </div>
+                    <MasteryDimensions progress={p} />
                   </div>
                 );
               })}

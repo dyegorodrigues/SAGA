@@ -4,7 +4,7 @@
 export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis" | "visual-addition" | "scattered" | "linking-cubes" | "missing-addend-frame" | "take-apart" | "sequence" | "multiple_choice" | "sentencebuilder" | "storypanel" | "audiochoice" | "intruso_math";
 
 export interface FichaParams {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface FichaDominio {
@@ -28,6 +28,7 @@ export interface FichaErroTipico {
 
 export interface FichaNivel {
   primitiva: KindType;
+  micro?: string;
   andaime?: "mao_fantasma" | "alto" | "medio" | "minimo" | "nenhum";
   rt_alvo?: number;
 }
@@ -76,6 +77,12 @@ export class CurriculumValidator {
           if (!ficha.niveis[i]) {
             errors.push(`Contrato Universal: Nível ${i} não declarado em ${ficha.id}`);
           }
+        }
+      }
+      const microIds = new Set(ficha.micros?.map(micro => micro.id) ?? []);
+      for (const [level, config] of Object.entries(ficha.niveis)) {
+        if (config.micro && !microIds.has(config.micro)) {
+          errors.push(`Nível ${level} referencia micro inexistente '${config.micro}' em ${ficha.id}`);
         }
       }
     }

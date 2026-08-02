@@ -1,92 +1,316 @@
-const fs = require('fs');
+const fs = require("node:fs");
+const path = require("node:path");
+const YAML = require("yaml");
 
-// 1. Read the Graph from Markdown
-const md = fs.readFileSync('AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md', 'utf8');
-const graphIds = new Set();
-const regexId = /([A-Z]{2}|N[0-9])\.[0-9]{2}[a-z]?/g;
-let match;
-while ((match = regexId.exec(md)) !== null) {
-  graphIds.add(match[0]);
-}
-// Clean up
-graphIds.delete('N1.02d');
-graphIds.delete('N1.02e');
-graphIds.delete('N1.04c');
-graphIds.delete('N1.05c');
-graphIds.delete('N1.06c');
-graphIds.delete('N3.03d');
-graphIds.delete('N3.04b');
-graphIds.delete('N3.04c');
-graphIds.delete('N3.07b');
-graphIds.delete('N3.11c');
-graphIds.delete('N3.12c');
-graphIds.delete('N4.03b');
-graphIds.delete('N6.02c');
+const ROOT = path.resolve(__dirname, "../..");
+const read = (relativePath) => fs.readFileSync(path.join(ROOT, relativePath), "utf8");
+const parseYaml = (relativePath) => YAML.parse(read(relativePath));
+const unique = (items) => [...new Set(items)];
+const sorted = (items) => [...items].sort((a, b) => a.localeCompare(b));
 
-// 2. Read Curriculum
-const curr = fs.readFileSync('src/utils/curriculum.ts', 'utf8');
-const curriculumMap = new Map();
-const regexMap = /"([A-Z0-9.]+)":\s*([a-zA-Z0-9_]+)/g;
-let matchMap;
-while ((matchMap = regexMap.exec(curr)) !== null) {
-  curriculumMap.set(matchMap[1], matchMap[2]);
+const failures = [];
+const warnings = [];
+const EXPECTED_COMPETENCIES = 88;
+const EXPECTED_FLUENCY_TRACKS = 13;
+const EXPECTED_AUTHORED_FICHAS = 92;
+const REJECTED_DUPLICATE_IDS = ["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"];
+// Progressões legítimas cujos nomes necessariamente contêm o conceito do pré-requisito.
+// Toda nova exceção exige decisão pedagógica explícita, não ajuste silencioso do teste.
+const SEMANTIC_CONTAINMENT_ALLOWLIST = new Set(["N2.04:N2.02", "GE.09:GM.08"]);
+
+function check(condition, message) {
+  if (!condition) failures.push(message);
 }
 
-// 3. Read Generators
-const gen1 = fs.readFileSync('src/utils/generators.ts', 'utf8');
-let gen2 = '';
-try { gen2 = fs.readFileSync('src/utils/generatorsF2.ts', 'utf8'); } catch(e){}
-const allGens = gen1 + '\n' + gen2;
+function sameNodes(left, right) {
+  const normalize = (nodes) => nodes.map(({ id, nome, strand, faixa, prereqs }) => ({
+    id,
+    nome,
+    strand,
+    faixa,
+    prereqs: [...(prereqs || [])],
+  }));
+  return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
+}
 
-const exportedGens = new Set();
-const regexExport = /export\s+(?:function|const)\s+([a-zA-Z0-9_]+)/g;
-let matchExport;
-while ((matchExport = regexExport.exec(allGens)) !== null) {
-  if (matchExport[1].startsWith('g') && matchExport[1] !== 'g') {
-    exportedGens.add(matchExport[1]);
+function listFiles(directory, suffix) {
+  return fs.readdirSync(path.join(ROOT, directory))
+    .filter((name) => name.endsWith(suffix))
+    .map((name) => path.join(directory, name));
+}
+
+const graphYaml = parseYaml("curriculum/grafo_saga.yaml");
+const yamlNodes = graphYaml.nodes || [];
+const yamlIds = yamlNodes.map((node) => node.id);
+const yamlIdSet = new Set(yamlIds);
+
+check(
+  yamlNodes.length === EXPECTED_COMPETENCIES,
+  `grafo YAML deveria ter ${EXPECTED_COMPETENCIES} nós; encontrou ${yamlNodes.length}`
+);
+check(yamlIdSet.size === yamlIds.length, "grafo YAML contém IDs duplicados");
+check(
+  (graphYaml.fluency || []).length === EXPECTED_FLUENCY_TRACKS,
+  `grafo YAML deveria ter ${EXPECTED_FLUENCY_TRACKS} trilhas de fluência; encontrou ${(graphYaml.fluency || []).length}`
+);
+for (const rejectedId of REJECTED_DUPLICATE_IDS) {
+  check(!yamlIdSet.has(rejectedId), `${rejectedId} foi rejeitado por duplicação e reapareceu no grafo`);
+}
+
+for (const node of yamlNodes) {
+  for (const prereq of node.prereqs || []) {
+    check(yamlIdSet.has(prereq), `${node.id} referencia pré-requisito inexistente ${prereq}`);
+    check(prereq !== node.id, `${node.id} referencia a si próprio como pré-requisito`);
   }
 }
 
-// Analysis
-const missing = [];
-for (const id of graphIds) {
-  if (!curriculumMap.has(id)) {
-    missing.push(id);
+const normalizedName = (name) => name
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, " ")
+  .trim();
+for (let leftIndex = 0; leftIndex < yamlNodes.length; leftIndex += 1) {
+  const left = yamlNodes[leftIndex];
+  for (let rightIndex = leftIndex + 1; rightIndex < yamlNodes.length; rightIndex += 1) {
+    const right = yamlNodes[rightIndex];
+    const samePrereqs = JSON.stringify(sorted(left.prereqs || [])) === JSON.stringify(sorted(right.prereqs || []));
+    const leftName = normalizedName(left.nome);
+    const rightName = normalizedName(right.nome);
+    const overlappingName = leftName === rightName || leftName.includes(rightName) || rightName.includes(leftName);
+    check(!(samePrereqs && overlappingName), `${left.id} e ${right.id} parecem duplicar nome e pré-requisitos`);
+  }
+}
+for (const node of yamlNodes) {
+  const nodeName = normalizedName(node.nome);
+  for (const prereqId of node.prereqs || []) {
+    const prereq = yamlNodes.find((candidate) => candidate.id === prereqId);
+    if (!prereq) continue;
+    const prereqName = normalizedName(prereq.nome);
+    const containment = nodeName === prereqName || nodeName.includes(prereqName) || prereqName.includes(nodeName);
+    check(
+      !containment || SEMANTIC_CONTAINMENT_ALLOWLIST.has(`${node.id}:${prereq.id}`),
+      `${node.id} tem nome semanticamente contido no pré-requisito ${prereq.id}`
+    );
   }
 }
 
-const usedGens = new Set(curriculumMap.values());
-const orphans = [];
-for (const gen of exportedGens) {
-  if (!usedGens.has(gen)) {
-    orphans.push(gen);
+const prereqsById = new Map(yamlNodes.map((node) => [node.id, node.prereqs || []]));
+const visiting = new Set();
+const visited = new Set();
+function visit(nodeId, trail = []) {
+  if (visiting.has(nodeId)) {
+    failures.push(`ciclo no DAG: ${[...trail, nodeId].join(" -> ")}`);
+    return;
+  }
+  if (visited.has(nodeId)) return;
+  visiting.add(nodeId);
+  for (const prereq of prereqsById.get(nodeId) || []) visit(prereq, [...trail, nodeId]);
+  visiting.delete(nodeId);
+  visited.add(nodeId);
+}
+for (const nodeId of yamlIds) visit(nodeId);
+
+const markdown = read("AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md");
+const markdownIds = unique(
+  [...markdown.matchAll(/^###\s+((?:N[1-7]|AL|GE|GM|PE)\.\d{2})\b/gm)].map((match) => match[1])
+);
+const markdownMissing = yamlIds.filter((id) => !markdownIds.includes(id));
+const markdownExtra = markdownIds.filter((id) => !yamlIdSet.has(id));
+check(
+  markdownIds.length === EXPECTED_COMPETENCIES,
+  `grafo Markdown deveria declarar ${EXPECTED_COMPETENCIES} competências; encontrou ${markdownIds.length}`
+);
+check(markdownMissing.length === 0, `Markdown não declara: ${markdownMissing.join(", ")}`);
+check(markdownExtra.length === 0, `Markdown declara IDs fora do YAML: ${markdownExtra.join(", ")}`);
+
+const graphJson = JSON.parse(read("src/data/grafo_saga.json"));
+check(sameNodes(yamlNodes, graphJson.nodes || []), "src/data/grafo_saga.json diverge do YAML agregado");
+
+const graphTs = read("src/curriculum/grafo_saga.ts");
+const tsNodeBlock = graphTs.match(/export const grafoSaga:[\s\S]*?=\s*\[([\s\S]*?)\n\];/);
+const tsIds = tsNodeBlock
+  ? [...tsNodeBlock[1].matchAll(/\bid:\s*"((?:N[1-7]|AL|GE|GM|PE)\.\d{2})"/g)].map((match) => match[1])
+  : [];
+check(
+  tsIds.length === EXPECTED_COMPETENCIES,
+  `grafo TypeScript deveria declarar ${EXPECTED_COMPETENCIES} nós; encontrou ${tsIds.length}`
+);
+check(JSON.stringify(tsIds) === JSON.stringify(yamlIds), "ordem/IDs do grafo TypeScript divergem do YAML agregado");
+
+const strandFiles = listFiles("curriculum", ".yaml").filter((file) => !file.endsWith("grafo_saga.yaml"));
+const strandIds = [];
+const strandNodes = new Map();
+for (const file of strandFiles) {
+  const strand = parseYaml(file);
+  for (const [id, node] of Object.entries(strand.nodes || {})) {
+    strandIds.push(id);
+    check(!strandNodes.has(id), `${id} aparece em mais de um YAML por strand`);
+    strandNodes.set(id, node);
   }
 }
-
-const duplicates = []; 
-const currLines = curr.split('\n');
-const seenNodes = new Set();
-for (const line of currLines) {
-  const m = /"([A-Z0-9.]+)":\s*([a-zA-Z0-9_]+)/.exec(line);
-  if (m) {
-    if (seenNodes.has(m[1])) {
-      duplicates.push(m[1]);
-    }
-    seenNodes.add(m[1]);
-  }
+const missingFromStrands = yamlIds.filter((id) => !strandIds.includes(id));
+const extraInStrands = strandIds.filter((id) => !yamlIdSet.has(id));
+check(missingFromStrands.length === 0, `YAMLs por strand não declaram: ${missingFromStrands.join(", ")}`);
+check(extraInStrands.length === 0, `YAMLs por strand declaram IDs fora do agregado: ${extraInStrands.join(", ")}`);
+for (const node of yamlNodes) {
+  const strandNode = strandNodes.get(node.id);
+  if (!strandNode) continue;
+  const aggregatePrereqs = sorted(node.prereqs || []);
+  const strandPrereqs = sorted(strandNode.prereqs || []);
+  check(
+    JSON.stringify(strandPrereqs) === JSON.stringify(aggregatePrereqs),
+    `${node.id} tem pré-requisitos diferentes no YAML agregado e no YAML por strand`
+  );
 }
 
-const nomenclatureDrift = [];
-for (const [node, gen] of curriculumMap.entries()) {
-  const expectedGen = 'g' + node.replace('.', '_');
-  if (gen !== expectedGen && gen !== 'gFallback') {
-    nomenclatureDrift.push(`${node} is served by ${gen} (expected ${expectedGen})`);
+const curriculum = read("src/curriculum/motores/curriculum.ts");
+const generatorMapBlock = curriculum.match(/const GENERATOR_MAP[\s\S]*?=\s*\{([\s\S]*?)\n\};/);
+const generatorEntries = generatorMapBlock
+  ? [...generatorMapBlock[1].matchAll(/"((?:N[1-7]|AL|GE|GM|PE)\.\d{2})"\s*:\s*([A-Za-z0-9_]+)/g)]
+      .map((match) => [match[1], match[2]])
+  : [];
+const generatorMap = new Map(generatorEntries);
+const duplicateMappings = generatorEntries
+  .map(([id]) => id)
+  .filter((id, index, ids) => ids.indexOf(id) !== index);
+check(duplicateMappings.length === 0, `GENERATOR_MAP contém duplicatas: ${unique(duplicateMappings).join(", ")}`);
+
+const generatorFiles = [
+  "src/utils/generators.ts",
+  "src/utils/generatorsF1.ts",
+  "src/utils/generatorsF2.ts",
+];
+const exportedGenerators = new Set();
+for (const file of generatorFiles) {
+  for (const match of read(file).matchAll(/export\s+(?:function|const)\s+(g[A-Za-z0-9_]+)/g)) {
+    exportedGenerators.add(match[1]);
   }
 }
+const mappedGenerators = new Set(generatorMap.values());
+const missingGeneratorExports = generatorEntries
+  .filter(([, generator]) => !exportedGenerators.has(generator))
+  .map(([id, generator]) => `${id}:${generator}`);
+check(missingGeneratorExports.length === 0, `mapa usa geradores não exportados: ${missingGeneratorExports.join(", ")}`);
 
-console.log(">> DETECTOR DE ENTULHO (V2) <<\n");
-console.log("[BURACOS - Faltam no GENERATOR_MAP]:\n" + missing.join(', ') + "\n");
-console.log("[DUPLICATAS - Mais de um gerador para o mesmo nó]:\n" + (duplicates.length ? duplicates.join(', ') : 'Nenhuma') + "\n");
-console.log("[ÓRFÃOS - Geradores exportados mas não usados no mapa]:\n" + orphans.join(', ') + "\n");
-console.log("[DERIVA DE NOMENCLATURA - Gerador não reflete o ID do nó]:\n" + nomenclatureDrift.join('\n') + "\n");
+const fichaFiles = [];
+function walk(directory) {
+  for (const entry of fs.readdirSync(path.join(ROOT, directory), { withFileTypes: true })) {
+    const relative = path.join(directory, entry.name);
+    if (entry.isDirectory()) walk(relative);
+    else if (entry.name.endsWith(".ts") && entry.name !== "index.ts") fichaFiles.push(relative);
+  }
+}
+walk("src/curriculum/fichas");
 
+const fichaIds = [];
+for (const file of fichaFiles) {
+  const match = read(file).match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2}|dojo_[a-z]+)["']/);
+  if (match) fichaIds.push(match[1]);
+}
+const journeyFichaIds = fichaIds.filter((id) => yamlIdSet.has(id));
+const journeyFichasWithRtTarget = [];
+for (const file of fichaFiles) {
+  const source = read(file);
+  const idMatch = source.match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2})["']/);
+  if (!idMatch || !yamlIdSet.has(idMatch[1])) continue;
+  const levelFive = source.match(/\b5:\s*\{([^}]*)\}/);
+  const rtTarget = levelFive?.[1].match(/\brt_alvo:\s*(\d+(?:\.\d+)?)/);
+  if (rtTarget && Number(rtTarget[1]) > 0) journeyFichasWithRtTarget.push(idMatch[1]);
+}
+const journeyFichasMissingRt = journeyFichaIds.filter((id) => !journeyFichasWithRtTarget.includes(id));
+check(journeyFichasMissingRt.length === 0, `fichas sem rt_alvo positivo no nível 5: ${journeyFichasMissingRt.join(", ")}`);
+
+const fichaIndex = read("src/curriculum/fichas/index.ts");
+const importedFichaFiles = new Map(
+  [...fichaIndex.matchAll(/import\s+\{\s*([A-Za-z0-9_]+)\s*\}\s+from\s+["'](.+?)["']/g)]
+    .map((match) => [match[1], path.join("src/curriculum/fichas", `${match[2]}.ts`)])
+);
+const allFichasBlock = fichaIndex.match(/export const AllFichas\s*=\s*\[([\s\S]*?)\]/);
+const registeredSymbols = allFichasBlock
+  ? allFichasBlock[1].match(/[A-Za-z_][A-Za-z0-9_]*/g) || []
+  : [];
+const registeredFichaIds = [];
+for (const symbol of registeredSymbols) {
+  const file = importedFichaFiles.get(symbol);
+  if (!file) continue;
+  const match = read(file).match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2}|dojo_[a-z]+)["']/);
+  if (match) registeredFichaIds.push(match[1]);
+}
+const registeredJourneyFichaIds = registeredFichaIds.filter((id) => yamlIdSet.has(id));
+const unregisteredFichaIds = fichaIds.filter((id) => !registeredFichaIds.includes(id));
+
+const declaredCountSources = [
+  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 88 competências:/],
+  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 88 competências\.\*\*/],
+  ["Manual", "AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md", /88 de 88 competências/],
+  ["Método", "AI_Studio_Lab/pedagogia/METODO_SAGA.md", /grafo de 88 competências/],
+];
+for (const [label, file, pattern] of declaredCountSources) {
+  check(pattern.test(read(file)), `${label} não declara o invariante canônico de 88 competências`);
+}
+
+const authoredFichaFiles = listFiles("AI_Studio_Lab/pedagogia/fichas", ".md");
+const authoredFichaSources = authoredFichaFiles.map(read);
+const authoredFichaCount = authoredFichaSources.reduce(
+  (total, source) => total + (source.match(/^# FICHA\s+/gm) || []).length,
+  0
+);
+check(
+  authoredFichaCount === EXPECTED_AUTHORED_FICHAS,
+  `catálogo autoral deveria ter ${EXPECTED_AUTHORED_FICHAS} fichas; encontrou ${authoredFichaCount}`
+);
+const authoredCompetenceIds = unique(
+  authoredFichaSources.flatMap((source) =>
+    [...source.matchAll(/^\*\*Competência:\*\*\s+((?:N[1-7]|AL|GE|GM|PE)\.\d{2})\b/gm)].map((match) => match[1])
+  )
+);
+const authoredUnknownIds = authoredCompetenceIds.filter((id) => !yamlIdSet.has(id));
+check(authoredUnknownIds.length === 0, `fichas autorais referenciam IDs fora do grafo: ${authoredUnknownIds.join(", ")}`);
+
+const fallbackIds = yamlIds.filter((id) => !generatorMap.has(id));
+const orphanGenerators = sorted([...exportedGenerators].filter((name) => !mappedGenerators.has(name)));
+const nomenclatureDrift = generatorEntries
+  .filter(([id, generator]) => generator !== `g${id.replace(".", "_")}`)
+  .map(([id, generator]) => `${id}:${generator}`);
+
+console.log("SAGA — AUDITORIA CURRICULAR READ-ONLY");
+console.log(`Executado em: ${new Date().toISOString()}`);
+console.log("Fonte agregada: curriculum/grafo_saga.yaml\n");
+console.log("[FONTES]");
+console.log(`- YAML agregado: ${yamlNodes.length} nós`);
+console.log(`- Markdown humano: ${markdownIds.length} competências`);
+console.log(`- JSON derivado: ${(graphJson.nodes || []).length} nós`);
+console.log(`- TypeScript runtime: ${tsIds.length} nós`);
+console.log(`- YAMLs por strand: ${strandIds.length} nós (${strandFiles.length} arquivos)\n`);
+console.log(`- Trilhas de fluência: ${(graphYaml.fluency || []).length}`);
+console.log(`- Fichas autorais documentadas: ${authoredFichaCount} (${authoredFichaFiles.length} blocos)\n`);
+console.log("[COBERTURA EXECUTÁVEL]");
+console.log(`- Nós com gerador explícito: ${generatorMap.size}/${yamlNodes.length}`);
+console.log(`- Nós no fallback \"Em construção\": ${fallbackIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada no disco: ${journeyFichaIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada registradas em AllFichas: ${registeredJourneyFichaIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada com rt_alvo no nível 5: ${journeyFichasWithRtTarget.length}/${journeyFichaIds.length}`);
+console.log(`- Fichas de Dojo no disco/registradas: ${fichaIds.length - journeyFichaIds.length}/${registeredFichaIds.length - registeredJourneyFichaIds.length}`);
+console.log(`- Fichas no disco fora de AllFichas: ${unregisteredFichaIds.length}`);
+console.log(`- Geradores exportados sem uso no mapa: ${orphanGenerators.length}`);
+console.log(`- Mapeamentos com deriva de nome: ${nomenclatureDrift.length}\n`);
+console.log(`[FALLBACKS]\n${fallbackIds.join(", ") || "Nenhum"}\n`);
+console.log(`[FICHAS DE JORNADA]\n${sorted(journeyFichaIds).join(", ") || "Nenhuma"}\n`);
+console.log(`[FICHAS FORA DE AllFichas]\n${sorted(unregisteredFichaIds).join(", ") || "Nenhuma"}\n`);
+console.log(`[GERADORES ÓRFÃOS]\n${orphanGenerators.join(", ") || "Nenhum"}\n`);
+console.log(`[DERIVA DE NOMENCLATURA]\n${nomenclatureDrift.join(", ") || "Nenhuma"}\n`);
+
+if (warnings.length) {
+  console.log("[AVISOS NÃO BLOQUEANTES]");
+  warnings.forEach((warning) => console.log(`- ${warning}`));
+  console.log();
+}
+
+if (failures.length) {
+  console.error("[FALHAS DE INVARIANTE]");
+  failures.forEach((failure) => console.error(`- ${failure}`));
+  process.exitCode = 1;
+} else {
+  console.log("[RESULTADO] Invariantes canônicos aprovados; lacunas de cobertura permanecem explicitadas acima.");
+}

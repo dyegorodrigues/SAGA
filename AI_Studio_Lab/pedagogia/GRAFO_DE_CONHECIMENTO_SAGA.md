@@ -1,5 +1,7 @@
 # 🕸️ GRAFO DE CONHECIMENTO — SAGA (Matemática 4–12 anos)
-**Versão 1.0 · Julho 2026 · Documento-irmão da BÍBLIA DO SAGA (ler junto)**
+**Versão 1.2 · Agosto 2026 · Documento-irmão da BÍBLIA DO SAGA (ler junto)**
+
+> **v1.2 (ago/2026) — retificação de contagem.** O grafo tem **88 competências** e **13 trilhas de fluência**. A v1.1 anunciou a ampliação de 84 para 95; das 11 candidatas, 4 foram absorvidas e 7 rejeitadas por duplicarem nós existentes. O registro completo, com o nó que já cobria cada rejeitada, está na **§15.8 da Bíblia v3.1**. 84 + 4 = 88. Qualquer artefato (`.yaml`, `.json`, `.ts`) que declare outro número está desatualizado.
 
 Este documento substitui: `grafo_competencias.md` (legado), as listas de ilhas da `BIBLE_PEDAGOGICA_UNIFICADA.md`, o `curriculo-mestre.md` e qualquer outra lista de trilhas/competências. A partir daqui, **toda competência de Matemática existe se, e somente se, estiver neste grafo.**
 
@@ -53,7 +55,7 @@ Este documento substitui: `grafo_competencias.md` (legado), as listas de ilhas d
 | **GM** | Grandezas e Medidas | esmeralda | ●● | ●● | ●●● | ●● | |
 | **PE** | Probabilidade e Estatística | índigo | | ● | ● | ● | ● |
 
-**Total: 84 competências.** Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
+**Total: 88 competências.** Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
 
 ---
 
@@ -297,7 +299,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 
 ### N3.03 — Contar a partir do maior (counting on)
 **Objetivo:** abandonar o "contar tudo": 2+7 → "sete… oito, nove!".
-**Pré-req:** N3.01, N1.09(c), N2.03(a). **Kinds:** sum, numberline*, plain.
+**Pré-req:** N3.01, N1.09, N1.05
 **Micros:** a) +1/+2 a partir do maior, com apoio visual (o grupo maior vira um NÚMERO fechado, só o menor mostra objetos) · b) +3 · c) comutar primeiro (2+7 → pensa 7+2) · d) simbólico até 10 (o antigo C0105) · e) na reta: saltar do maior
 **Erros típicos:** começar a contagem NO número (7+2 → "sete, oito" = 8 — o erro off-by-one central; a animação da reta corrige); voltar a contar tudo sob pressão (sinal de fluência frágil, não de erro conceitual).
 
@@ -345,7 +347,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 
 ### AL.03 — Contagem por saltos (2, 5, 10)
 **Objetivo:** contar de 2 em 2, 5 em 5, 10 em 10 — a ponte rítmica para a multiplicação.
-**Pré-req:** N1.09, N2.01(c). **Kinds:** order, numberline*, plain (pular — existente).
+**Pré-req:** N1.09, N2.01, AL.02
 **Micros:** a) de 2 em 2 até 20 (+ pares e ímpares como identidade visual: "tem par ou sobra um?") · b) de 5 em 5 até 50 (mãos!) · c) de 10 em 10 até 100 · d) começando de qualquer número (23, 33, 43…)
 **Erros típicos:** decorar a sequência mas não conseguir continuar do meio (mesmo teste de sempre); pular de 5 começando do 2.
 
@@ -357,7 +359,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 
 ### GM.04 — Horas (relógio de ponteiros e digital)
 **Objetivo:** horas exatas e meia hora nos dois relógios.
-**Pré-req:** N1.06. **Kinds:** clock (existente), clock-set* (arrastar ponteiro). *Nota: ler minutos exige contagem de 5 em 5 — por isso fica para GM.06.*
+**Pré-req:** N1.06, GM.02
 **Micros:** a) o ponteiro pequeno (só horas exatas, ponteiro grande fixo no 12) · b) horas exatas analógico · c) horas exatas digital e o pareamento entre os dois · d) meia hora ("o grande no 6, o pequeno no MEIO do caminho") · e) montar a hora pedida arrastando o ponteiro
 **Erros típicos:** ler o ponteiro grande como hora; na meia hora, ler o pequeno "já no próximo número" (7:30 lido como 8:30 — distrator obrigatório).
 
@@ -394,7 +396,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 
 ### N3.13 — Cálculo mental e estimativa aditiva
 **Objetivo:** escolher estratégia (compensar, arredondar, decompor) em vez de armar sempre.
-**Pré-req:** N3.11(c), N3.12(c). **Kinds:** math, plain, rapid-fire.
+**Pré-req:** N3.11, N3.12, N3.06
 **Micros:** a) +9/+11 via +10∓1 · b) decompor (46+37 = 46+30+7) · c) compensação (99+47 = 100+47−1) · d) estimativa por arredondamento ("398+205 dá mais ou menos…?")
 **Erros típicos:** compensar para o lado errado (+1 quando é −1).
 
@@ -424,7 +426,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 
 ### N4.05 — Divisão: repartir e medir
 **Objetivo:** os dois sentidos: repartir igualmente (12 balas ÷ 3 amigos) e medir quantos grupos cabem (12 balas, saquinhos de 3).
-**Pré-req:** N4.01, N3.02. **Kinds:** drag-group* (repartir arrastando — PRIORIDADE 2), groups, story.
+**Pré-req:** N4.01, N3.02, N3.10
 **Micros:** a) repartir concreto, um a um, divisões exatas (params: total ≤ 20, divisor ∈ [2,4]) · b) medir/agrupar concreto · c) escrever a divisão da cena · d) e quando SOBRA? (resto concreto, sem símbolo ainda)
 **Erros típicos:** distribuir desigualmente e não conferir; confundir divisor com quociente na fala ("12 dividido em 3" vs "por 3" — a voz sempre encena a história).
 **Didática:** os dois rostos (partição arrasta-um-a-um; medida laça-grupos) — Manual §Divisão, Nível 0-1. Primeira explicação ("piratas e baús") está lá.
@@ -529,7 +531,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Didática:** o resto como coisa física + a "Chave Viva" (algoritmo sincronizado com blocos dourados, passo a passo) — Manual §Divisão, Nível 4-5. Sincronia papel↔bloco no mesmo frame é inegociável.
 
 ### N4.11 — Múltiplos, divisores e primos
-**Pré-req:** N4.07, N4.10. **Kinds:** array*, hundred-chart* (crivo pintado), plain.
+**Pré-req:** N4.07, N4.10
 **Micros:** a) múltiplos como "a tabuada continua" · b) divisores via arranjos possíveis (12 = 1×12, 2×6, 3×4) · c) par/ímpar, critérios de 2, 5, 10 (e 3 como curiosidade) · d) primos: o número que só forma UMA fileira (crivo na tabela de 100).
 **Erros:** confundir múltiplo com divisor (a fala ancora: múltiplo é MAIOR ou igual, divisor CABE dentro); 1 como primo.
 
@@ -544,12 +546,12 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Erros:** partes desiguais aceitas; contar as partes pintadas como denominador; achar que fração "mora só dentro da pizza" (c e d existem para isso).
 
 ### N5.03 — Equivalência e comparação de frações
-**Pré-req:** N5.02. **Kinds:** frac-shade* (sobreposição), numberline*, math.
+**Pré-req:** N5.02
 **Micros:** a) equivalência visual (1/2 = 2/4 sobrepondo) · b) gerar equivalentes (×2, ×3 em cima e embaixo — com o porquê visual) · c) comparar mesmo denominador · d) comparar mesmo NUMERADOR (1/3 vs 1/8 — quanto maior o de baixo, MENOR o pedaço) · e) comparar com âncoras (maior ou menor que 1/2?).
 **Erros:** **1/8 > 1/3 "porque 8 > 3"** — o erro-chefão de frações; distrator obrigatório, e a barra visual responde.
 
 ### N5.04 — Adição e subtração de frações
-**Pré-req:** N5.03. **Kinds:** frac-shade*, numberline*, math.
+**Pré-req:** N5.03
 **Micros:** a) mesmo denominador, visual · b) mesmo denominador, simbólico · c) denominadores "amigos" (um múltiplo do outro: 1/2+1/4) · d) resultado como número misto informal (5/4 = 1 e 1/4).
 **Erros:** **somar em cima e embaixo (1/4+2/4 = 3/8)** — distrator obrigatório em toda instância; o visual (as partes são do MESMO tamanho, só conta em cima) é a cura.
 
@@ -589,7 +591,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Erros:** confundir com perímetro (d é o antídoto); multiplicar TODOS os lados.
 
 ### GM.09 — Conversões e problemas de medida
-**Pré-req:** GM.05, N4.08(d), N6.01. **Kinds:** measure*, plain, story.
+**Pré-req:** GM.05, N4.08, N6.01, GM.06
 **Micros:** a) m↔cm, kg↔g, L↔mL (×1000/÷1000 pelo deslocamento — coerente com N6.02c) · b) km para distâncias · c) problemas com unidades misturadas (2 m − 40 cm) · d) tempo: h↔min (cuidado: base 60, NÃO desloca vírgula!).
 **Erros:** converter tempo como decimal (1h30 = 1,3h — distrator obrigatório em d); direção da conversão invertida.
 
@@ -604,12 +606,12 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 *BNCC: 6º–7º ano (início). Fecha o escopo do SAGA. Formato compacto.*
 
 ### N6.03 — Porcentagem
-**Pré-req:** N6.01, N5.03. **Kinds:** frac-shade* (quadrado 100), plain, money, story.
+**Pré-req:** N6.01, N5.03
 **Micros:** a) % como "de cada 100" no quadrado (50% = 1/2 = 0,5 — a trinca sempre junta) · b) 10%, 25%, 50% de quantias por raciocínio (10% = ÷10) · c) compor (30% = 3×10%) · d) desconto e aumento em contexto de compra.
 **Erros:** 50% de 80 = 40… mas 25% respondido como "−25"; % tratada como valor absoluto.
 
 ### N6.04 — Razão e proporcionalidade
-**Pré-req:** N6.03, N4.06. **Kinds:** ratio-table* (tabela de proporção — PRIORIDADE 3), plain, story.
+**Pré-req:** N6.03, N4.06
 **Micros:** a) razão como comparação (3 azuis para 2 vermelhas) · b) tabela de proporção (receita: dobra tudo) · c) valor unitário ("se 3 custam 12, 1 custa…") · d) escala em mapas simples · e) reconhecer o que NÃO é proporcional (idade×altura).
 **Erros:** resolver proporção por ADIÇÃO (+4 em vez de ×2 — o erro estrutural; a tabela visual denuncia); aplicar regra de três onde não há proporcionalidade (e existe para isso).
 
@@ -619,12 +621,12 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Erros:** "multiplicar sempre aumenta / dividir sempre diminui" — quebrado visualmente em b–c (é o luto conceitual central da faixa).
 
 ### N7.01 — Números negativos e a reta completa
-**Pré-req:** N1.12 (a reta volta!), N3.04. **Kinds:** numberline* (agora com lado esquerdo), plain, story.
+**Pré-req:** N1.12, N3.04
 **Micros:** a) contextos: temperatura, saldo, elevador (andar −1) · b) a reta espelhada e o zero como centro · c) comparar (−5 < −2 — quanto mais à esquerda, menor) · d) oposto e distância até o zero (módulo informal).
 **Erros:** **−5 > −2 "porque 5 > 2"** — o erro-chefão dos inteiros; o termômetro/elevador responde.
 
 ### N7.02 — Operações com inteiros
-**Pré-req:** N7.01, N3.13. **Kinds:** numberline* (saltos bidirecionais), chip-model* (fichas + e − que se anulam), math.
+**Pré-req:** N7.01, N3.13
 **Micros:** a) somar/subtrair como movimento na reta (ganhar/perder, subir/descer) · b) o modelo de fichas (par +1/−1 se anula) · c) subtrair negativo ("tirar uma dívida é ganhar") · d) regras de sinal na × e ÷ — por padrão observado, não decreto.
 **Erros:** −3 + 5 tratado como −(3+5); "menos com menos dá menos" na soma (−2 + −3 = +5?); decorar a regra da multiplicação e aplicá-la na ADIÇÃO (o vazamento clássico).
 
@@ -649,7 +651,7 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Erros:** contar só os cubos VISÍVEIS (o erro de a — o kind gira a pilha para revelar); confundir volume com área da frente.
 
 ### PE.04 — Estatística e probabilidade com contagem
-**Pré-req:** PE.03, N6.03. **Kinds:** bar-build*, plain, story, picto.
+**Pré-req:** PE.03, N6.03
 **Micros:** a) gráfico de linhas (variação no tempo) · b) gráfico de setores lido com % (a ponte N6.03) · c) moda e mediana informais · d) probabilidade por contagem de possibilidades (2 moedas: por que "1 cara" é mais provável que "2 caras") · e) amostra: "perguntar só pros amigos vale?"
 **Erros:** ler setores por "tamanho psicológico"; achar que resultados equiprováveis onde não são (d desmonta com a árvore de possibilidades).
 
@@ -691,7 +693,23 @@ A versão executável é o `grafo_saga.yaml` (mesmo conteúdo, machine-readable)
 
 ## 🆕 COMPETÊNCIAS ACRESCENTADAS (v1.1) — 11 nós
 
-*Adicionadas após a análise de lacunas cruzando IXL (Pre-K a Grade 5), Common Core e BNCC. O grafo passa de 84 para 95 nós.*
+*Adicionadas após a análise de lacunas cruzando IXL (Pre-K a Grade 5), Common Core e BNCC. O grafo passa de 84 para 88 nós.*
+
+> **[Retificado em ago/2026 · Bíblia v3.1]** Das 11 candidatas analisadas, **4 foram absorvidas** — `N2.06` pares e ímpares, `N2.07` fatores, `GM.10` conversão de unidades, `GM.11` volume de prismas — e **7 foram rejeitadas** por duplicarem nós já existentes. **84 + 4 = 88.** O registro completo, com o teste de duplicação, está na **§15.8 da Bíblia**.
+
+<!-- IDS_REJEITADOS_INICIO · NÃO SÃO NÓS DESTE GRAFO · excluir da contagem automática (§15.8) -->
+
+| ~~Candidata rejeitada~~ | Já era coberta por |
+|---|---|
+| ~~N2.08~~ Múltiplos | `N4.11` múltiplos, divisores e primos |
+| ~~N5.06~~ Somar frações (mesmo denom.) | `N5.04` adição e subtração de frações |
+| ~~N5.07~~ Frações equivalentes | `N5.03` equivalência e comparação de frações |
+| ~~N5.08~~ Comparar frações | `N5.03` (o nome já inclui comparação) |
+| ~~N7.03~~ Razão e proporção | `N6.04` razão e proporcionalidade |
+| ~~N7.04~~ Porcentagem | `N6.03` porcentagem |
+| ~~PE.05~~ Probabilidade e chance | `PE.03` + `PE.04` |
+
+<!-- IDS_REJEITADOS_FIM -->
 
 ### N2.06 — Pares e ímpares
 **Strand:** N2 · **Faixa:** F2 · **Pré-req:** N2.03
@@ -703,38 +721,8 @@ Reconhecer se uma quantidade forma pares exatos ou sobra um. Definição visual:
 De quantas formas diferentes um número pode ser arrumado em retângulo. Cada retângulo revela um par de fatores.
 **Kinds:** array, plain · **Erros típicos:** esquecer o 1 e o próprio número; parar antes de esgotar
 
-### N2.08 — Múltiplos
-**Strand:** N2 · **Faixa:** F3 · **Pré-req:** AL.03, N4.03
-Os "saltos" de um número na reta. Múltiplo é onde o pé cai quando se anda de N em N.
-**Kinds:** numberline, plain · **Erros típicos:** confundir fator com múltiplo (inverter a relação)
-
-### N5.06 — Somar e subtrair frações (mesmo denominador)
-**Strand:** N5 · **Faixa:** F4 · **Pré-req:** N5.03
-Juntar partes do mesmo tamanho. O denominador diz o tamanho da peça e não muda ao somar.
-**Kinds:** singapore, plain · **Erros típicos:** somar os denominadores (1/4+2/4=3/8)
-
-### N5.07 — Frações equivalentes
-**Strand:** N5 · **Faixa:** F3 · **Pré-req:** N5.02
-A mesma quantidade escrita de formas diferentes. Cortar cada pedaço ao meio dobra os dois números.
-**Kinds:** singapore, shapes, plain · **Erros típicos:** achar que mais pedaços = mais quantidade
-
-### N5.08 — Comparar frações
-**Strand:** N5 · **Faixa:** F4 · **Pré-req:** N5.07
-Qual é maior, com denominadores iguais e diferentes. Usar 1/2 como referência.
-**Kinds:** singapore, balanca, plain · **Erros típicos:** achar que 1/5 > 1/3 porque 5 > 3
-
-### N7.03 — Razão e proporção
-**Strand:** N7 · **Faixa:** F4 · **Pré-req:** N4.12, N5.08
-Relação entre quantidades que crescem juntas. A receita que dobra.
-**Kinds:** singapore, plain · **Erros típicos:** somar em vez de multiplicar ao escalar
-
-### N7.04 — Porcentagem
-**Strand:** N7 · **Faixa:** F4 · **Pré-req:** N6.03, N7.03
-Parte de 100. O mesmo quadrado de 100 mostra 25% = 25/100 = 0,25 = 1/4.
-**Kinds:** quadrado100, singapore, plain · **Erros típicos:** tratar % como número inteiro comum
-
 ### GM.10 — Conversão de unidades
-**Strand:** GM · **Faixa:** F4 · **Pré-req:** GM.05, N2.04
+**Strand:** GM · **Faixa:** F4 · **Pré-req:** GM.05, N2.04, N2.05
 Trocar entre cm/m, g/kg, ml/l. A mesma quantidade com números diferentes.
 **Kinds:** numberline, plain · **Erros típicos:** multiplicar quando deveria dividir
 
@@ -742,8 +730,3 @@ Trocar entre cm/m, g/kg, ml/l. A mesma quantidade com números diferentes.
 **Strand:** GM · **Faixa:** F4 · **Pré-req:** GM.09, N4.02
 Encher a caixa de cubinhos. Contar uma camada e multiplicar pela altura.
 **Kinds:** array, plain · **Erros típicos:** somar as três dimensões em vez de multiplicar
-
-### PE.05 — Probabilidade e chance
-**Strand:** PE · **Faixa:** F4 · **Pré-req:** PE.04, N5.02
-Certo, provável, improvável, impossível. Depois a chance como fração.
-**Kinds:** plain, singapore · **Erros típicos:** achar que resultado passado influencia o próximo

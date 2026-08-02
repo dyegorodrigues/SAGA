@@ -17,6 +17,7 @@ import { Relogio } from './primitives/Relogio';
 import { Balanca } from './primitives/Balanca';
 import { MaterialDourado } from './primitives/MaterialDourado';
 import { DragGroup } from './primitives/DragGroup';
+import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
 
 interface FichaRendererProps {
   question: Question;
@@ -55,6 +56,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       
     case 'draggroup':
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
+    case 'vertical':
+      return <VerticalPlaceValueStage question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':
       return <div className="flex justify-center"><TenFrame filled={question.n!} {...uiProps} /></div>;
     case 'visual-addition':

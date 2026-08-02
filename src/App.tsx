@@ -19,9 +19,9 @@ import { SagaLogo } from "./components/SagaLogo";
 import { GameLoop } from "./components/GameLoop";
 import { ParentDashboard } from "./components/ParentDashboard";
 import { getKidLifetimeStars, getMascotStage } from "./components/MascotEvolution";
-import { computeUnlockStatus } from "./curriculum/motores/unlockEngine";
-
 import { tracksForGrade, SUBJECTS } from "./subjects";
+import { ALL_MATH_TRACKS } from "./curriculum/motores/curriculum";
+import { migrateLegacyCrown } from "./curriculum/motores/progressEngine";
 import { buildMixedTrack } from "./curriculum/motores/mixedChallenge";
 import { dojo_add } from "./curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "./curriculum/fichas/dojo/sensei/dojo_sub";
@@ -134,6 +134,11 @@ function migrate(s: any): State {
       if (prog[tid].maxLvl == null) {
         prog[tid] = { ...prog[tid], maxLvl: prog[tid].lvl || 1, dom: prog[tid].dom || false };
       }
+      // Coroas já conquistadas nunca são revogadas. Elas recebem proveniência
+      // explícita para não serem confundidas com o novo domínio multidimensional.
+      if (prog[tid].dom && !prog[tid].masteryEvidence) {
+        prog[tid] = migrateLegacyCrown(prog[tid]);
+      }
     }
     m.progress[k.id] = prog;
   }
@@ -245,7 +250,13 @@ export function Shell({ children, theme = "classico", screenName }: ShellExtProp
 /* ---------------- Main Component ---------------- */
 export default function App() {
   const [state, setState] = useState<State | null>(null);
-  const [screen, setScreen] = useState<{ name: string; kid?: string; track?: string; lvl?: number }>({ name: "loading" });
+  const [screen, setScreen] = useState<{
+    name: string;
+    kid?: string;
+    track?: string;
+    lvl?: number;
+    rescue?: { requiredLevel: number; questionBudget: number };
+  }>({ name: "loading" });
   const [userEmail, setUserEmail] = useState<string | null>(getCurrentUserEmail());
   // Gancho de teste E2E (só com ?e2e=1 na URL): entra como visitante e não deixa o
   // reset de auth do Firebase mandar de volta pro login. Inócuo em produção.
@@ -441,13 +452,9 @@ export default function App() {
   const kidById = (id: string) => state.kids.find((k) => k.id === id) || state.kids[0];
   
   const getTracksForKid = (k: Kid): Track[] => {
-    // Phase 1: No age/grade locks! All tracks unlock purely by mastery via the DAG.
-    const allTracks = ["pre", "ano1", "ano2"].flatMap(g => tracksForGrade(g as any));
-    const status = computeUnlockStatus(state.progress[k.id] || {});
-    
-    // We only show tracks that are OPENED according to the graph
-    // (i.e. all prerequisites are met).
-    const unlockedTracks = Array.from(new Map(allTracks.map(t => [t.id, t])).values()); // Deduplicate
+    // A Jornada mostra o mapa matemático completo. O DAG controla o acesso na UI;
+    // série/idade não apagam nós e tracks travadas continuam visíveis no caminho.
+    const mathTracks = Array.from(new Map(ALL_MATH_TRACKS.map(t => [t.id, t])).values());
 
     const custom = (state.customTracks || [])
       // removed filter by grade here too
@@ -472,7 +479,7 @@ export default function App() {
         },
         questions: t.questions,
       }));
-    return [...unlockedTracks, ...custom];
+    return [...mathTracks, ...custom];
   };
 
   const getProg = (kidId: string, trackId: string): Progress => {
@@ -716,6 +723,15 @@ export default function App() {
           }}
 
             onAula={() => setScreen({ name: "game", kid: screen.kid, track: "aula" })}
+            onRescue={(rescue) => setScreen({
+              name: "game",
+              kid: screen.kid,
+              track: rescue.track.id,
+              rescue: rescue.requiredLevel ? {
+                requiredLevel: rescue.requiredLevel,
+                questionBudget: rescue.questionBudget || 4,
+              } : undefined,
+            })}
             onMatricula={() => setScreen({ name: "game", kid: screen.kid, track: "matricula" })}
             mixedDoneToday={kidById(screen.kid!).lastMixedDay === localDay()}
             tracks={getTracksForKid(kidById(screen.kid!))}
@@ -766,12 +782,20 @@ export default function App() {
     }
     return found;
   })()
+          const activeTrack = screen.rescue
+            ? { ...gameTrack, totalQ: screen.rescue.questionBudget }
+            : gameTrack;
           return (
             <GameLoop
               kid={kidObj}
-              track={gameTrack}
-              prog0={screen.lvl ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl } : getProg(screen.kid!, screen.track!)}
-              exactLvl={!!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // aula/matrícula: sequência pura (sem banco/aquecimento por cima)
+              track={activeTrack}
+              prog0={screen.rescue
+                ? { ...getProg(screen.kid!, screen.track!), streak: 0 }
+                : screen.lvl
+                  ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl }
+                  : getProg(screen.kid!, screen.track!)}
+              exactLvl={!!screen.rescue || !!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // sequências puras: sem banco/aquecimento por cima
+              rescue={screen.rescue}
               sound={sound}
               onToggleSound={toggleSound}
               onCommit={(p, right, gain, ms, missionDone) => commitProg(screen.kid!, screen.track!, p, right, gain, ms, missionDone)}
