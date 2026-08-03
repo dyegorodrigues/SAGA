@@ -67,8 +67,18 @@ Seguindo sempre esta ordem, nenhum lote velho entra escondido no lote novo.
 - Troque somente um nó por PR e registre `generatorSource` no Track.
 - Um toque durante a questão nunca cria uma escrita Firestore; apenas o evento
   terminal leva o resumo agregado das tentativas.
-- Para reverter o canário vertical atual, retire `N3.09` de
-  `VERTICAL_COMPOSER_CANARIES`; não mova N3.11 de `gN3_11` e não use Update branch.
+- Para reverter o canário atual, retire `N3.09` de `COMPOSER_CANARIES` — ou chame
+  `rollbackComposerCanary("N3.09")` — em `src/curriculum/motores/composerCanary.ts`;
+  não mova N3.11 de `gN3_11` e não use Update branch.
+- Para promover um nó novo a canário, registre a ficha em `COMPOSER_FICHAS` e chame
+  `enableComposerCanary`. Não existe lista de ids em `curriculum.ts`: ativar um
+  canário não exige editar o currículo.
+
+> Correção de 3/ago/2026: até esta data o rollback não surtia efeito em produção.
+> `CURRICULUM` congelava a decisão na carga do módulo e o currículo só consultava a
+> ponte para `N3.09` e `N3.11`, de modo que qualquer outro id no conjunto era
+> ignorado em silêncio. A origem do gerador passou a ser resolvida a cada questão
+> gerada, e há testes que provam rollback e ativação por `getTrackById`.
 
 ## Regra para imagens e outros binários
 
