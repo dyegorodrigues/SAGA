@@ -782,3 +782,22 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   local como única evidência. Isso é dívida conhecida e pertence ao Lote E.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 637 testes e 40 arquivos.
+
+## 3 de agosto de 2026 — Andar 5 começa: integração contínua
+
+- O PR #20 foi mesclado com `total_count: 0` de check runs, porque o repositório
+  não possuía workflow algum. O protocolo manda "merge somente após checks
+  verdes" e, na prática, os checks eram o log local de quem publicava. A lacuna
+  já constava do dossiê do Codex e agora está fechada.
+- `.github/workflows/ci.yml` roda em PR e em push na `main` exatamente os gates
+  que o protocolo já exigia: auditar, fichas:auditar, grafo:check, lint, testes e
+  build. Nada de novo foi inventado; o que mudou é que deixou de depender de
+  alguém lembrar.
+- A guarda de binários virou job próprio, e dois detalhes precisaram de cuidado:
+  o Actions confere por padrão um merge commit sintético do PR, o que distorceria
+  o diff, então o checkout aponta para o head real; e `pr_text_guard.cjs` aceita
+  `PR_BASE`, que passa a ser preenchido com a base declarada do PR em vez de
+  presumir `origin/main`.
+- `npm ci` foi verificado contra o lockfile atual antes de entrar no workflow.
+- Gates locais: auditar, fichas:auditar, grafo:check, lint e testes aprovados;
+  suíte em 637 testes e 40 arquivos.
