@@ -685,3 +685,33 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   `defineConfig` de `vitest/config`; o `tsc` recusou a versão anterior.
 - Gates após a retirada: auditar, fichas:auditar, grafo:check, lint e build
   aprovados; suíte em 599 testes e 35 arquivos, todos verdes.
+
+## 3 de agosto de 2026 — Lote D: parte não visual concluída
+
+- A cadeia de N3.10 foi construída de baixo para cima, sem tocar em componente
+  visual: procedimento puro das quatro estruturas, contratos separados de
+  StoryPanel e SingaporeBars, camada narrativa e builder do Composer.
+- As quatro estruturas foram unificadas na relação parte–parte–todo, que é o que
+  a barra de Singapura desenha. A incógnita variável do nível 5 virou um
+  deslocamento de posição em vez de quatro procedimentos distintos.
+- A ficha autoral N3.10 seguiu a ficha canônica F20: `StoryPanel` como primitiva
+  principal em todos os níveis, escada por estrutura e não por tamanho de número,
+  domínio de quatro acertos cobrindo estruturas diferentes e os quatro erros
+  típicos como distratores com tag.
+- Três defeitos foram encontrados por teste, nenhum deles visível em revisão:
+  1. a tag de diagnóstico genérica vencia a específica quando a incógnita se
+     deslocava, escondendo `SO_RESOLVE_CANONICO`, que é o sinal do nível 5;
+  2. a narrativa montava as falas por posição fixa e enunciava o próprio número
+     perguntado sempre que a incógnita saía da posição direta, o que faria todo o
+     nível 5 nascer entregando a resposta;
+  3. quando as duas partes são iguais, a resposta coincide com um número visível;
+     nesses casos repetir um dado acertaria por acaso e o distrator `REPETE_DADO`
+     deixaria de diagnosticar. O builder passou a descartar essas triplas.
+- `gN3_10` permanece em produção e nenhum canário foi criado. O kind autoral é
+  `storypanel`, como o cânone exige; o runtime recebe `story-bars`, distinto do
+  `story` legado.
+- Ponto exato de parada: faltam o `StoryPanel`, a extensão do `SingaporeBars`
+  para separar, comparar e completar, a integração nos renderers e a validação no
+  Sandbox em viewport infantil.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 607 testes e 36 arquivos; 16/16 fichas de Jornada registradas.

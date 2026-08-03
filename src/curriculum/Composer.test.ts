@@ -55,7 +55,9 @@ describe("Composer de fichas", () => {
           const declaredKind = ficha.niveis?.[level]?.primitiva ?? ficha.micros[0].kinds[0];
           const renderedKind = declaredKind === "intruso_math"
             ? "plain"
-            : declaredKind === "arraygrid" ? "array" : declaredKind;
+            : declaredKind === "arraygrid" ? "array"
+            : declaredKind === "storypanel" ? "story-bars"
+            : declaredKind;
           expect(question.kind, `${ficha.id} L${level}`).toBe(renderedKind);
           expect(question.uiProps, `${ficha.id} L${level}`).toBeDefined();
           expect(question.evaluate, `${ficha.id} L${level}`).toBeTypeOf("function");
