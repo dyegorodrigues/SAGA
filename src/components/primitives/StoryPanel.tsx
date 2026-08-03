@@ -42,9 +42,14 @@ export function StoryPanel({ step, p1Illustration, p1Text, p2Illustration, p2Tex
             className="w-full flex flex-col rounded-2xl overflow-hidden shadow-sm"
             style={{ border: `2px solid ${tokens.cor.elementos.borda}` }}
           >
-            <div className="px-3 py-2 min-h-[64px] flex items-center justify-center" style={{ backgroundColor: tokens.cor.superficie.cartao }}>
-              {p2Illustration}
-            </div>
+            {/* Moldura vazia é lida como imagem que falhou. Quando não há
+                ilustração — nível 4 em diante — o painel vira só a fala, e a
+                ausência passa a parecer intenção em vez de defeito. */}
+            {p2Illustration && (
+              <div className="px-3 py-2 min-h-[64px] flex items-center justify-center" style={{ backgroundColor: tokens.cor.superficie.cartao }}>
+                {p2Illustration}
+              </div>
+            )}
             <div className="px-3 py-2 text-center font-bold text-base" style={{ backgroundColor: tokens.cor.superficie.fundo, color: tokens.cor.texto.principal }}>
               {p2Text}
             </div>

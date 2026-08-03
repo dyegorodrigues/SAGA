@@ -740,3 +740,28 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   versionada, conforme a regra de binários.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 628 testes e 39 arquivos.
+
+## 3 de agosto de 2026 — Moldura vazia e preparação do Andar 4
+
+- **Moldura vazia corrigida.** No nível 4 o painel da mudança ficava com a caixa
+  de ilustração vazia, e o proprietário leu isso como imagem que não carregou
+  antes de saber que era proposital. Se quem conhece o projeto lê como defeito, a
+  criança lê igual. O painel passa a não renderizar a moldura quando não há
+  ilustração: vira apenas a fala, e a ausência parece intenção. A altura dos
+  níveis 4 e 5 caiu de 551 para 487 px.
+- **Leitura pedagógica registrada:** a ficha F20 nomeia o nível 4 como "as quatro,
+  sem ilustração da mudança" e descreve o apoio como "só narração". Foi adotada a
+  leitura literal do nome — sai a cena da mudança, permanece a situação inicial —,
+  por ser a mais específica das duas. Se a intenção for retirar toda ilustração,
+  a mudança é de uma linha em `StoryPanelStage`.
+- **Andar 4 preparado, não ativado.** N3.10 foi registrada em `COMPOSER_FICHAS`,
+  o que a torna apta, mas permanece fora de `COMPOSER_CANARIES`. O roteiro exige
+  branch nova e PR separado depois do Lote D mesclado, e a main ainda está 16
+  commits atrás; ativar agora violaria o protocolo em dois pontos.
+- **Paridade medida** entre o Composer e `gN3_10`: ambos produzem questão
+  utilizável nos cinco níveis, o alcance autoral não excede o legado, e o caminho
+  autoral cobre as quatro estruturas, varia a incógnita no nível 5 e emite
+  diagnóstico por alternativa — três coisas que o legado não faz. A ativação e o
+  rollback de N3.10 foram exercitados pelo caminho de produção e funcionam.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 636 testes e 40 arquivos.

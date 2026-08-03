@@ -102,3 +102,16 @@ describe("StoryPanelStage", () => {
     expect(violacoes.map(v => `${v.id}: ${v.help}`)).toEqual([]);
   });
 });
+
+describe("StoryPanelStage — ausência de ilustração", () => {
+  it("não deixa moldura vazia quando a mudança não é ilustrada", () => {
+    const semIlustracao = story({ showChangeIllustration: false });
+    render(<StoryPanelStage story={semIlustracao} />);
+
+    // A fala da mudança continua; a caixa de imagem vazia não existe.
+    expect(screen.getByText("Então chegaram mais 4.")).toBeTruthy();
+    expect(screen.queryByLabelText("4 objetos")).toBeNull();
+    // A cena inicial permanece ilustrada: só a mudança sai.
+    expect(screen.getByLabelText("3 objetos")).toBeTruthy();
+  });
+});

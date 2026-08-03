@@ -1,6 +1,7 @@
 import { Composer } from "../Composer";
 import { FichaCompetencia } from "../schema";
 import { N3_09 } from "../fichas/jornada/N3.09";
+import { N3_10 } from "../fichas/jornada/N3.10";
 import { Question, Track } from "../../types";
 
 type Generator = (level: number) => Question;
@@ -15,6 +16,10 @@ export type GeneratorSource = NonNullable<Track["generatorSource"]>;
  */
 const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
+  // N3.10 está registrada e apta, mas deliberadamente fora do conjunto de
+  // canários: implementar e ativar são passos distintos, e a ativação pertence a
+  // um PR próprio, depois que o Lote D estiver mesclado.
+  "N3.10": N3_10,
 };
 
 /**
