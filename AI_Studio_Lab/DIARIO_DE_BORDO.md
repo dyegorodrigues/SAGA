@@ -826,3 +826,27 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   Mestre confirma ao exigir "trocar um único nó por PR".
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 651 testes e 41 arquivos.
+
+## 3 de agosto de 2026 — Contrato do canário: o padrão vira executável
+
+- **Causa da falha anterior identificada.** O Andar 4 foi declarado concluído a
+  partir da memória do que fora feito, e não da releitura da lista no momento de
+  fechar. Nenhum mecanismo cobrava a diferença, então a omissão de quatro itens
+  passou despercebida até a revisão do proprietário.
+- **A correção não é lembrar melhor, é não depender de lembrar.** Duas travas
+  passam a existir:
+  1. cada Andar do roteiro recebe uma tabela item-a-item com a evidência ao lado;
+     tabela não se preenche de memória;
+  2. o padrão do canário virou suíte executável que **enumera
+     `COMPOSER_CANARIES`** em vez de listar nós à mão.
+- **Inconsistência encontrada e fechada.** N3.10 foi promovido com nove
+  verificações; N3.09, promovido no Lote B, tinha apenas paridade. Dois canários
+  em produção com padrões diferentes é dívida silenciosa — o mais fraco só
+  aparece quando quebra. O contrato aplica as onze verificações a ambos, e N3.09
+  passa em todas: estava correto, apenas não estava verificado.
+- **A trava foi provada, não afirmada.** Simulando a promoção de N4.02 sem
+  declaração no contrato, oito testes falham imediatamente, começando por "todo
+  canário ativo está registrado neste contrato". O estado foi restaurado em
+  seguida.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 674 testes e 42 arquivos.
