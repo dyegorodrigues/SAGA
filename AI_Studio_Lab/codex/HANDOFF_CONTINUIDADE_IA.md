@@ -1,35 +1,65 @@
-# Handoff de continuidade — estado após o Lote C
+# Handoff de continuidade — estado após a correção do canário
 
 ## Base e publicação
 
-- A base obrigatória deste salvamento é `origin/main = c9e4757` (`c9e4757275d7d12ef06b7a781966459dd03918a6`).
-- Os Lotes A e B já estão na `main`; o Lote C (F98/N4.02 e ArrayGrid autoral) está sendo salvo por este PR.
-- O Lote D **não foi implementado**. Não publicar `e03f187` diretamente: esse commit local antigo partia de `b56f5a6` e reapresentaria uma base superada.
-- `gN4_02` permanece em produção. N4.02 não ganhou canário neste lote.
+- Base desta atualização: `origin/main = 3c9acbd` (`Revise AGENTS.md with new SAGA guidelines`).
+- Os Lotes A, B e C estão na `main`. O PR #19 foi mesclado; o Lote C
+  (F98/N4.02 e ArrayGrid autoral) está incorporado, não mais "sendo salvo".
+- O Lote D **não foi implementado**. Não publicar `e03f187` diretamente: aquele
+  commit local antigo partia de `b56f5a6` e reapresentaria uma base superada.
+- `gN4_02` e `gN3_10` permanecem em produção. N3.09 segue como único canário.
 
 ## Ponto exato de parada
 
-O ArrayGrid autoral está ligado ao Composer, N4.02 está registrada e exercitável
-no Sandbox/caminho de ficha, e o legado continua sendo o caminho de produção.
-Pare aqui: não iniciar barras, narrativa ou migração de N3.10 neste PR.
+O mecanismo de canário do Composer foi corrigido e comprovado pelo caminho de
+produção. O Lote D continua **não iniciado**: nenhum `StoryPanel`, nenhum
+`SingaporeBars` estendido e nenhuma ficha N3.10 autoral foram criados.
 
-## Lote D aprovado, ainda não implementado
+## Correções recentes que mudam o plano
 
-- `StoryPanel` será responsável pela narrativa de N3.10.
-- `SingaporeBars` será responsável pela representação matemática.
-- As quatro estruturas são `join`, `separate`, `compare` e `complete`.
-- O nível 5 terá incógnita variável.
-- `gN3_10` permanece em produção.
-- O Lote D deve começar no Sandbox, sem expansão para frações ou razão e sem criar canário no mesmo lote.
+### Canário do Composer — corrigido
+
+O rollback documentado no Lote B não funcionava em produção, apesar de o teste
+passar. `CURRICULUM` congelava a decisão na carga do módulo, e o curriculum só
+consultava a ponte para `N3.09` e `N3.11`; qualquer outro id no conjunto de
+canários era ignorado em silêncio.
+
+`verticalMigration.ts` foi substituído por `composerCanary.ts`:
+
+- a origem do gerador é resolvida a cada questão, não na carga do módulo;
+- `generatorSource` é getter e acompanha o rollback;
+- não existe lista de ids privilegiados no curriculum;
+- `enableComposerCanary` recusa nó sem ficha registrada;
+- há testes de regressão que provam rollback e ativação via `getTrackById`.
+
+Consequência para o Andar 4: promover N3.10 a canário agora exige apenas registrar
+a ficha em `COMPOSER_FICHAS` e ativar o id — sem editar `curriculum.ts`.
+
+### Lote D — arquitetura corrigida
+
+A ficha canônica **F20** define `StoryPanel` como primitiva **principal** de N3.10.
+O `SingaporeBars` existente representa apenas `A + B = total` e precisa ser
+estendido para separar, comparar, completar e incógnita variável. O passo antigo
+"ligar SingaporeBars ao builder" produziria uma ficha pedagogicamente incorreta e
+foi substituído no `PLANO_MESTRE_SAGA.md`.
 
 ## Ordem segura de retomada
 
-1. Confirmar que este PR foi incorporado e criar branch inédita da nova `origin/main`.
-2. Revalidar o contrato e a ficha autoral de N3.10 sem tocar no legado.
-3. Tipar o builder e separar StoryPanel de SingaporeBars.
-4. Exercitar `join`, `separate`, `compare` e `complete` no Sandbox, incluindo incógnita variável no nível 5.
-5. Validar acessibilidade, áudio, viewport e paridade.
-6. Encerrar o lote ainda com `gN3_10` em produção; qualquer canário pertence a outro PR.
+1. Criar branch inédita da `origin/main` atualizada.
+2. Tipar `StorySpec` e `SingaporeBarSpec` e escrever o procedimento puro das quatro
+   estruturas, com testes, antes de qualquer componente visual.
+3. Implementar `StoryPanel` como primitiva principal e estender `SingaporeBars`.
+4. Compor as duas em uma única tela: uma pergunta, uma ação dominante.
+5. Exercitar `join`, `separate`, `compare` e `complete` no Sandbox, com incógnita
+   variável no nível 5.
+6. Validar acessibilidade, áudio, viewport infantil e paridade.
+7. Encerrar o lote com `gN3_10` ainda em produção; o canário pertence a outro PR.
+
+## Roteiro completo
+
+O roteiro por andares, o sistema de design, o motor de mascotes, as regras de
+animação e o pipeline de áudio/TTS estão em
+[`ROTEIRO_DE_CONSTRUCAO_ANDARES.md`](./ROTEIRO_DE_CONSTRUCAO_ANDARES.md).
 
 ## Validação reproduzível completa
 
@@ -42,12 +72,8 @@ npm test -- --run
 npm run build
 npm run pr:check
 git diff --check
-git diff --numstat origin/main..HEAD
-git rev-list --count origin/main..HEAD
-git diff --name-only origin/main..HEAD
-git diff --name-only origin/main..HEAD | wc -l
 git status --short --branch
-git diff origin/main..HEAD | rg '^<<<<<<< |^=======|^>>>>>>> '
-git rev-parse HEAD^
+git rev-parse HEAD
 git rev-parse origin/main
+git merge-base HEAD origin/main
 ```

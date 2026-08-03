@@ -167,9 +167,24 @@ narrativa e SingaporeBars da representação de N3.10, cobrindo `join`, `separat
 manter `gN3_10` em produção, não criar canário neste lote e não expandir para
 frações ou razão.
 
-1. Ligar `SingaporeBars` ao builder tipado.
-2. Começar por N3.10; não expandir de uma vez para frações/razão.
-3. Testar áudio da história, uma pergunta por tela e quatro estruturas aditivas.
+**Correção pedagógica registrada em 3/ago/2026.** A auditoria da ficha canônica
+**F20** mostrou que a primitiva principal de N3.10 é o `StoryPanel`, porque o alvo
+é compreender a transformação entre dois momentos da história; `SingaporeBars` é a
+representação da relação, não o exercício. Além disso, o `SingaporeBars` existente
+só representa composição `A + B = total`: ele **não** cobre separar, comparar,
+completar nem incógnita variável. Executar o passo antigo — "ligar SingaporeBars ao
+builder" — reduziria as quatro estruturas a uma barra de soma arrastável e
+produziria uma ficha pedagogicamente incorreta.
+
+1. Tipar `StorySpec` e `SingaporeBarSpec` como contratos discriminados e criar o
+   procedimento puro das quatro estruturas antes de qualquer componente.
+2. Implementar o `StoryPanel` como primitiva principal da narrativa e estender o
+   `SingaporeBars` para separar, comparar, completar e incógnita.
+3. Compor as duas primitivas em uma única tela, sem empilhar duas atividades
+   independentes nem apresentar duas perguntas.
+4. Começar por N3.10; não expandir de uma vez para frações/razão.
+5. Testar áudio da história, uma pergunta por tela e quatro estruturas aditivas,
+   com diagnóstico específico por estrutura.
 
 ### Lote E — confiabilidade antes de massificação
 

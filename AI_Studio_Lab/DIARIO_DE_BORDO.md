@@ -630,3 +630,36 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Testes reais deste fechamento: auditorias de catálogo e fichas, grafo, TypeScript,
   Vitest, build, guarda textual do PR e checks Git foram executados pelo ritual
   final; os resultados observados ficam no log do terminal e no PR.
+
+## 3 de agosto de 2026 — Auditoria de retomada e correção do canário do Composer
+
+- Base provada antes de qualquer edição: a branch de trabalho havia nascido de
+  `05fc693`, enquanto a `origin/main` já estava em `3c9acbd`. A branch foi
+  reconstruída sobre a main atual; nenhum conflito foi resolvido por editor web.
+- As duas branches `codex/estabelecer-fluxo-de-trabalho-para-nova-tarefa*` foram
+  comparadas árvore a árvore com a `main`: nenhum arquivo exclusivo, nove arquivos
+  presentes apenas na `main` e toda divergência de conteúdo representando estado
+  anterior já superado. São seguras para remoção.
+- **Defeito comprovado por execução:** o rollback do canário não funcionava em
+  produção. Com o conjunto de canários vazio, `getTrackById("N3.09").generatorSource`
+  continuava `composer`, porque `CURRICULUM` congelava a decisão na carga do módulo.
+  Além disso, `curriculum.ts` só consultava a ponte para `N3.09` e `N3.11`: incluir
+  qualquer outro nó no conjunto era ignorado silenciosamente. O teste anterior
+  passava por exercitar a função isolada, nunca o caminho de produção.
+- **Correção:** `verticalMigration.ts` deu lugar a `composerCanary.ts`. A origem do
+  gerador passou a ser resolvida a cada questão, `generatorSource` virou getter,
+  a lista de ids privilegiados saiu do curriculum e `enableComposerCanary` recusa
+  nó sem ficha registrada. Foram acrescentados testes de regressão que provam
+  rollback e ativação por `getTrackById`, e a delegação de N3.11 ao gerador legado
+  passou a ser verificada de forma determinística com `Math.random` fixado.
+- **Contradição pedagógica registrada:** a ficha canônica F20 define `StoryPanel`
+  como primitiva principal de N3.10, e o `SingaporeBars` existente cobre apenas
+  `A + B = total`. O passo "ligar SingaporeBars ao builder" foi substituído no
+  Plano Mestre por uma sequência que tipa os contratos, implementa o StoryPanel e
+  estende as barras para separar, comparar, completar e incógnita variável.
+- O roteiro por andares, o sistema de design, o motor de mascotes, as regras de
+  animação e o pipeline de áudio/TTS foram preservados em
+  `AI_Studio_Lab/codex/ROTEIRO_DE_CONSTRUCAO_ANDARES.md`, com a dívida ainda aberta
+  listada ao final.
+- Gates executados nesta sessão: `auditar`, `fichas:auditar`, `grafo:check`,
+  `pr:check`, `lint`, `build` aprovados; suíte em 905 testes e 41 arquivos.
