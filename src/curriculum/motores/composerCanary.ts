@@ -16,9 +16,6 @@ export type GeneratorSource = NonNullable<Track["generatorSource"]>;
  */
 const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
-  // N3.10 está registrada e apta, mas deliberadamente fora do conjunto de
-  // canários: implementar e ativar são passos distintos, e a ativação pertence a
-  // um PR próprio, depois que o Lote D estiver mesclado.
   "N3.10": N3_10,
 };
 
@@ -29,7 +26,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  * gerada, sem exigir rebuild: a decisão é resolvida a cada chamada, não na carga
  * do módulo.
  */
-export const COMPOSER_CANARIES = new Set<string>(["N3.09"]);
+export const COMPOSER_CANARIES = new Set<string>(["N3.09", "N3.10"]);
 
 export interface GeneratorBinding {
   /** Resolve a origem a cada questão, refletindo o estado atual dos canários. */

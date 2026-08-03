@@ -15,10 +15,11 @@ describe("ponte de canário do Composer", () => {
   afterEach(() => {
     COMPOSER_CANARIES.clear();
     COMPOSER_CANARIES.add("N3.09");
+    COMPOSER_CANARIES.add("N3.10");
   });
 
-  it("usa N3.09 como único canário e mantém N3.11 no legado", () => {
-    expect([...COMPOSER_CANARIES]).toEqual(["N3.09"]);
+  it("serve N3.09 e N3.10 pelo Composer e mantém N3.11 no legado", () => {
+    expect([...COMPOSER_CANARIES].sort()).toEqual(["N3.09", "N3.10"]);
     expect(selectGenerator("N3.09", gN3_09, fallback).source()).toBe("composer");
     expect(selectGenerator("N3.11", gN3_11, fallback).source()).toBe("legacy");
   });

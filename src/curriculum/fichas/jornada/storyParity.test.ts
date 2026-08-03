@@ -27,11 +27,22 @@ describe("paridade de N3.10 entre Composer e gerador legado", () => {
   afterEach(() => {
     COMPOSER_CANARIES.clear();
     COMPOSER_CANARIES.add("N3.09");
+    COMPOSER_CANARIES.add("N3.10");
   });
 
-  it("N3.10 continua no gerador legado, sem canário ativo", () => {
-    expect(COMPOSER_CANARIES.has("N3.10")).toBe(false);
+  it("N3.10 é servida pelo Composer como canário ativo", () => {
+    expect(COMPOSER_CANARIES.has("N3.10")).toBe(true);
+    expect(getTrackById("N3.10")?.generatorSource).toBe("composer");
+    expect(getTrackById("N3.10")?.gen(3).kind).toBe("story-bars");
+  });
+
+  it("o rollback devolve N3.10 ao gerador legado na questão seguinte", () => {
+    rollbackComposerCanary("N3.10");
     expect(getTrackById("N3.10")?.generatorSource).toBe("legacy");
+    expect(getTrackById("N3.10")?.gen(3).kind).toBe("story");
+
+    enableComposerCanary("N3.10");
+    expect(getTrackById("N3.10")?.generatorSource).toBe("composer");
   });
 
   it("ambos os caminhos produzem questão utilizável nos cinco níveis", () => {
@@ -87,14 +98,8 @@ describe("paridade de N3.10 entre Composer e gerador legado", () => {
     expect(comTag.length, "questões autorais com misconception").toBeGreaterThan(0);
   });
 
-  it("a ativação e o rollback de N3.10 funcionam pelo caminho de produção", () => {
-    expect(getTrackById("N3.10")?.generatorSource).toBe("legacy");
-
-    enableComposerCanary("N3.10");
-    expect(getTrackById("N3.10")?.generatorSource).toBe("composer");
-    expect(getTrackById("N3.10")?.gen(1).kind).toBe("story-bars");
-
-    rollbackComposerCanary("N3.10");
-    expect(getTrackById("N3.10")?.generatorSource).toBe("legacy");
+  it("N3.09 e N3.11 não foram afetados pela promoção de N3.10", () => {
+    expect(getTrackById("N3.09")?.generatorSource).toBe("composer");
+    expect(getTrackById("N3.11")?.generatorSource).toBe("legacy");
   });
 });

@@ -765,3 +765,20 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   rollback de N3.10 foram exercitados pelo caminho de produção e funcionam.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 636 testes e 40 arquivos.
+
+## 3 de agosto de 2026 — Andar 4: promoção de N3.10 a canário do Composer
+
+- O PR #20 foi mesclado em `origin/main = ea191c2` e a branch renasceu da main
+  atualizada, o que satisfez as duas condições que bloqueavam o Andar 4: base
+  mesclada e mudança separada da implementação.
+- N3.10 entrou em `COMPOSER_CANARIES`. A ativação quebrou exatamente **dois**
+  testes, ambos afirmando o estado anterior — raio de impacto mínimo, que é o
+  sinal de que o mecanismo está bem isolado.
+- O rollback foi exercitado pelo caminho de produção e devolve `kind: "story"`,
+  do gerador legado, na questão seguinte; a reativação devolve `story-bars`. É a
+  prova de que a correção de hoje cedo funciona no caso real para que foi feita.
+- N3.09 permanece canário e N3.11 permanece legado, sem alteração.
+- O repositório **não possui CI**: o PR #20 foi mesclado sem check runs, com o log
+  local como única evidência. Isso é dívida conhecida e pertence ao Lote E.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 637 testes e 40 arquivos.
