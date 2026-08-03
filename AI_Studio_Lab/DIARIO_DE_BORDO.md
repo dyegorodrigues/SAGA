@@ -663,3 +663,25 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   listada ao final.
 - Gates executados nesta sessão: `auditar`, `fichas:auditar`, `grafo:check`,
   `pr:check`, `lint`, `build` aprovados; suíte em 905 testes e 41 arquivos.
+
+## 3 de agosto de 2026 — Retirada do acervo histórico da árvore de trabalho
+
+- Medição do impacto real de `AI_Studio_Lab/arquivo_morto` (198 arquivos, 3,1 MB):
+  - **runtime limpo**: `tsconfig.json` já excluía `AI_Studio_Lab/**/*`, nenhum
+    arquivo de `src/` importava do acervo e o bundle não continha código dele —
+    as únicas menções no bundle são prosa da Bíblia, que cita esses caminhos ao
+    descrever o próprio incidente;
+  - **suíte contaminada**: o Vitest não tinha `exclude` e varria o acervo. Nove
+    arquivos de teste de `backup_repo/` contribuíam **337 dos 936 testes**. A
+    contagem real do código vivo é **599**. O relatório de saúde vinha inflado em
+    36% havia meses, exatamente o sintoma que a Bíblia já descrevia;
+  - **navegação contaminada**: 551 dos 1778 nós do grafo de código (30%) vinham
+    do acervo, duplicando `App.tsx`, `Mascot.tsx`, `generators.ts` e `types.ts`.
+- O acervo saiu da árvore de trabalho e permanece íntegro no histórico Git. Para
+  consultar ou restaurar qualquer arquivo:
+  `git checkout 9d9412b -- AI_Studio_Lab/arquivo_morto`.
+- `vite.config.ts` passou a declarar `test.exclude` com `AI_Studio_Lab/**`, para
+  que nenhum acervo futuro volte a inflar a suíte. A chave exigiu importar
+  `defineConfig` de `vitest/config`; o `tsc` recusou a versão anterior.
+- Gates após a retirada: auditar, fichas:auditar, grafo:check, lint e build
+  aprovados; suíte em 599 testes e 35 arquivos, todos verdes.
