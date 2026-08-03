@@ -1,5 +1,6 @@
 import { Option, Question } from "../types";
 import { FichaParams } from "./schema";
+import { StoryBarsSpec } from "./procedimentos/storyBarsContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -24,6 +25,7 @@ export type FichaUiProps =
   | { leftItems: BalanceItem[]; rightItems: BalanceItem[] }
   | { vTop: number; vBot: number; vOp: "+" | "-"; showPlaceValue?: boolean; showRegroup?: boolean; showAlgorithm?: boolean }
   | { rows: number; cols: number; allowRotate: boolean; requireRotate: boolean; areaMode: boolean; showEquation: boolean; answerMode: "total" | "equation" }
+  | StoryBarsSpec
   | { text: string };
 
 interface BalanceItem {

@@ -9,7 +9,7 @@ import { gN1_10, gN1_11, gN2_02, gN3_05, gN3_06, gN3_07, gN3_08, gN3_09 } from "
 import { gN2_04, gN2_05, gN3_11, gN3_12, gN3_13, gN4_01, gN4_02, gN4_05 } from "../../utils/generatorsF2";
 import { C } from "../../components/Mascot";
 import { GrafoSaga } from "../../utils/grafoSaga";
-import { selectVerticalGenerator } from "./verticalMigration";
+import { hasComposerFicha, selectGenerator } from "./composerCanary";
 
 export interface CurriculumModule {
   id: string;
@@ -109,13 +109,9 @@ Object.keys(FAIXAS_INFO).forEach(faixaId => {
   nodes.forEach(n => {
     const strandPrefix = n.id.substring(0, 2);
     const info = ISLAND_INFO[strandPrefix] || ISLAND_INFO["N1"];
-    const selectedGenerator = n.id === "N3.09" || n.id === "N3.11"
-      ? selectVerticalGenerator(n.id, GENERATOR_MAP[n.id], gFallback)
-      : {
-          gen: GENERATOR_MAP[n.id] || gFallback,
-          generatorSource: GENERATOR_MAP[n.id] ? "legacy" as const : "fallback" as const,
-        };
-    
+    // Todo nó passa pela mesma ponte: promover um canário não exige tocar aqui.
+    const binding = selectGenerator(n.id, GENERATOR_MAP[n.id], gFallback);
+
     mod.tracks.push({
       id: n.id,
       name: n.nome,
@@ -124,10 +120,14 @@ Object.keys(FAIXAS_INFO).forEach(faixaId => {
       icon: info.icon,
       color: info.color,
       dark: info.dark,
-      ...selectedGenerator,
+      gen: binding.gen,
+      // Getter: a proveniência acompanha rollback em vez de congelar na carga.
+      get generatorSource() {
+        return binding.source();
+      },
       lvlSkills: info.lvlSkills,
       prereqs: n.prereqs,
-      contentStatus: GENERATOR_MAP[n.id] ? "explicit" : "fallback",
+      contentStatus: GENERATOR_MAP[n.id] || hasComposerFicha(n.id) ? "explicit" : "fallback",
     });
   });
   

@@ -630,3 +630,138 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - Testes reais deste fechamento: auditorias de catálogo e fichas, grafo, TypeScript,
   Vitest, build, guarda textual do PR e checks Git foram executados pelo ritual
   final; os resultados observados ficam no log do terminal e no PR.
+
+## 3 de agosto de 2026 — Auditoria de retomada e correção do canário do Composer
+
+- Base provada antes de qualquer edição: a branch de trabalho havia nascido de
+  `05fc693`, enquanto a `origin/main` já estava em `3c9acbd`. A branch foi
+  reconstruída sobre a main atual; nenhum conflito foi resolvido por editor web.
+- As duas branches `codex/estabelecer-fluxo-de-trabalho-para-nova-tarefa*` foram
+  comparadas árvore a árvore com a `main`: nenhum arquivo exclusivo, nove arquivos
+  presentes apenas na `main` e toda divergência de conteúdo representando estado
+  anterior já superado. São seguras para remoção.
+- **Defeito comprovado por execução:** o rollback do canário não funcionava em
+  produção. Com o conjunto de canários vazio, `getTrackById("N3.09").generatorSource`
+  continuava `composer`, porque `CURRICULUM` congelava a decisão na carga do módulo.
+  Além disso, `curriculum.ts` só consultava a ponte para `N3.09` e `N3.11`: incluir
+  qualquer outro nó no conjunto era ignorado silenciosamente. O teste anterior
+  passava por exercitar a função isolada, nunca o caminho de produção.
+- **Correção:** `verticalMigration.ts` deu lugar a `composerCanary.ts`. A origem do
+  gerador passou a ser resolvida a cada questão, `generatorSource` virou getter,
+  a lista de ids privilegiados saiu do curriculum e `enableComposerCanary` recusa
+  nó sem ficha registrada. Foram acrescentados testes de regressão que provam
+  rollback e ativação por `getTrackById`, e a delegação de N3.11 ao gerador legado
+  passou a ser verificada de forma determinística com `Math.random` fixado.
+- **Contradição pedagógica registrada:** a ficha canônica F20 define `StoryPanel`
+  como primitiva principal de N3.10, e o `SingaporeBars` existente cobre apenas
+  `A + B = total`. O passo "ligar SingaporeBars ao builder" foi substituído no
+  Plano Mestre por uma sequência que tipa os contratos, implementa o StoryPanel e
+  estende as barras para separar, comparar, completar e incógnita variável.
+- O roteiro por andares, o sistema de design, o motor de mascotes, as regras de
+  animação e o pipeline de áudio/TTS foram preservados em
+  `AI_Studio_Lab/codex/ROTEIRO_DE_CONSTRUCAO_ANDARES.md`, com a dívida ainda aberta
+  listada ao final.
+- Gates executados nesta sessão: `auditar`, `fichas:auditar`, `grafo:check`,
+  `pr:check`, `lint`, `build` aprovados; suíte em 905 testes e 41 arquivos.
+
+## 3 de agosto de 2026 — Retirada do acervo histórico da árvore de trabalho
+
+- Medição do impacto real de `AI_Studio_Lab/arquivo_morto` (198 arquivos, 3,1 MB):
+  - **runtime limpo**: `tsconfig.json` já excluía `AI_Studio_Lab/**/*`, nenhum
+    arquivo de `src/` importava do acervo e o bundle não continha código dele —
+    as únicas menções no bundle são prosa da Bíblia, que cita esses caminhos ao
+    descrever o próprio incidente;
+  - **suíte contaminada**: o Vitest não tinha `exclude` e varria o acervo. Nove
+    arquivos de teste de `backup_repo/` contribuíam **337 dos 936 testes**. A
+    contagem real do código vivo é **599**. O relatório de saúde vinha inflado em
+    36% havia meses, exatamente o sintoma que a Bíblia já descrevia;
+  - **navegação contaminada**: 551 dos 1778 nós do grafo de código (30%) vinham
+    do acervo, duplicando `App.tsx`, `Mascot.tsx`, `generators.ts` e `types.ts`.
+- O acervo saiu da árvore de trabalho e permanece íntegro no histórico Git. Para
+  consultar ou restaurar qualquer arquivo:
+  `git checkout 9d9412b -- AI_Studio_Lab/arquivo_morto`.
+- `vite.config.ts` passou a declarar `test.exclude` com `AI_Studio_Lab/**`, para
+  que nenhum acervo futuro volte a inflar a suíte. A chave exigiu importar
+  `defineConfig` de `vitest/config`; o `tsc` recusou a versão anterior.
+- Gates após a retirada: auditar, fichas:auditar, grafo:check, lint e build
+  aprovados; suíte em 599 testes e 35 arquivos, todos verdes.
+
+## 3 de agosto de 2026 — Lote D: parte não visual concluída
+
+- A cadeia de N3.10 foi construída de baixo para cima, sem tocar em componente
+  visual: procedimento puro das quatro estruturas, contratos separados de
+  StoryPanel e SingaporeBars, camada narrativa e builder do Composer.
+- As quatro estruturas foram unificadas na relação parte–parte–todo, que é o que
+  a barra de Singapura desenha. A incógnita variável do nível 5 virou um
+  deslocamento de posição em vez de quatro procedimentos distintos.
+- A ficha autoral N3.10 seguiu a ficha canônica F20: `StoryPanel` como primitiva
+  principal em todos os níveis, escada por estrutura e não por tamanho de número,
+  domínio de quatro acertos cobrindo estruturas diferentes e os quatro erros
+  típicos como distratores com tag.
+- Três defeitos foram encontrados por teste, nenhum deles visível em revisão:
+  1. a tag de diagnóstico genérica vencia a específica quando a incógnita se
+     deslocava, escondendo `SO_RESOLVE_CANONICO`, que é o sinal do nível 5;
+  2. a narrativa montava as falas por posição fixa e enunciava o próprio número
+     perguntado sempre que a incógnita saía da posição direta, o que faria todo o
+     nível 5 nascer entregando a resposta;
+  3. quando as duas partes são iguais, a resposta coincide com um número visível;
+     nesses casos repetir um dado acertaria por acaso e o distrator `REPETE_DADO`
+     deixaria de diagnosticar. O builder passou a descartar essas triplas.
+- `gN3_10` permanece em produção e nenhum canário foi criado. O kind autoral é
+  `storypanel`, como o cânone exige; o runtime recebe `story-bars`, distinto do
+  `story` legado.
+- Ponto exato de parada: faltam o `StoryPanel`, a extensão do `SingaporeBars`
+  para separar, comparar e completar, a integração nos renderers e a validação no
+  Sandbox em viewport infantil.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 607 testes e 36 arquivos; 16/16 fichas de Jornada registradas.
+
+## 3 de agosto de 2026 — Lote D: composição, renderers e validação visual
+
+- `StoryBarsStage` coloca narrativa e barra na mesma tela sem que uma passe a
+  conhecer a outra; a barra é leitura e a resposta vem das alternativas,
+  preservando uma única ação dominante. O kind `story-bars` entrou no
+  `FichaRenderer` e no `GameLoopExerciseRenderer` ao lado do `singapore-bars`
+  legado, que segue atendendo seus três consumidores.
+- A inspeção visual em 390×844, com Chromium e medição real, reprovou a primeira
+  versão e revelou três defeitos que nenhum teste automatizado apontaria:
+  1. **concordância**: "Quantas peixes" e "1 estrelas". O pool de objetos já
+     trazia o gênero e nunca era usado, e não havia forma singular;
+  2. **violação da escada**: o nível 4 é "as quatro, sem ilustração da mudança",
+     mas `showChangeIllustration` só desligava a animação. A cena da mudança
+     continuava desenhada, e o nível 4 não era mais difícil que o 3;
+  3. **rolagem**: os cinco níveis mediam 887, 899, 887, 859 e 803 px, acima da
+     viewport-alvo de 844.
+- Uma quarta falha apareceu na segunda captura: a história abria com "Então 2
+  foram embora", conectivo que pressupõe cena anterior. O conectivo passa a ser
+  retirado quando a fala de transformação cai na primeira batida.
+- Depois das correções: 611, 611, 639, 551 e 551 px — todos sem rolagem.
+- Medição reproduzível com Playwright e Chromium em 390×844; nenhuma captura foi
+  versionada, conforme a regra de binários.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 628 testes e 39 arquivos.
+
+## 3 de agosto de 2026 — Moldura vazia e preparação do Andar 4
+
+- **Moldura vazia corrigida.** No nível 4 o painel da mudança ficava com a caixa
+  de ilustração vazia, e o proprietário leu isso como imagem que não carregou
+  antes de saber que era proposital. Se quem conhece o projeto lê como defeito, a
+  criança lê igual. O painel passa a não renderizar a moldura quando não há
+  ilustração: vira apenas a fala, e a ausência parece intenção. A altura dos
+  níveis 4 e 5 caiu de 551 para 487 px.
+- **Leitura pedagógica registrada:** a ficha F20 nomeia o nível 4 como "as quatro,
+  sem ilustração da mudança" e descreve o apoio como "só narração". Foi adotada a
+  leitura literal do nome — sai a cena da mudança, permanece a situação inicial —,
+  por ser a mais específica das duas. Se a intenção for retirar toda ilustração,
+  a mudança é de uma linha em `StoryPanelStage`.
+- **Andar 4 preparado, não ativado.** N3.10 foi registrada em `COMPOSER_FICHAS`,
+  o que a torna apta, mas permanece fora de `COMPOSER_CANARIES`. O roteiro exige
+  branch nova e PR separado depois do Lote D mesclado, e a main ainda está 16
+  commits atrás; ativar agora violaria o protocolo em dois pontos.
+- **Paridade medida** entre o Composer e `gN3_10`: ambos produzem questão
+  utilizável nos cinco níveis, o alcance autoral não excede o legado, e o caminho
+  autoral cobre as quatro estruturas, varia a incógnita no nível 5 e emite
+  diagnóstico por alternativa — três coisas que o legado não faz. A ativação e o
+  rollback de N3.10 foram exercitados pelo caminho de produção e funcionam.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 636 testes e 40 arquivos.

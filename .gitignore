@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Saída local do graphify (grafo de código; não versionar)
+graphify-out/
+*.bak

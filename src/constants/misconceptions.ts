@@ -22,7 +22,19 @@ export const MisconceptionTag = {
   CONFUSAO_SINAL: "confusao-sinal",
 
   /** Erro ao contar elementos iniciais */
-  CONTAGEM_INICIAL_ERRADA: "contagem-inicial-errada"
+  CONTAGEM_INICIAL_ERRADA: "contagem-inicial-errada",
+
+  /** Problemas aditivos: escolheu a operação pela palavra do enunciado, não pela estrutura */
+  PALAVRA_CHAVE: "palavra-chave",
+
+  /** Problemas aditivos: devolveu um dos números da história sem operar */
+  REPETE_DADO: "repete-dado",
+
+  /** Problemas aditivos: somou numa comparação, sem entendê-la como diferença */
+  COMPARA_SOMANDO: "compara-somando",
+
+  /** Problemas aditivos: só resolve com a incógnita no fim; erra quando ela muda de posição */
+  SO_RESOLVE_CANONICO: "so-resolve-canonico"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

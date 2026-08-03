@@ -8,6 +8,15 @@ import {
   parseComposerParams,
 } from "./fichaQuestionContract";
 import { arrayAnswer, arrayOptions, fitsArrayDimension } from "../components/primitives/arrayProcedure";
+import {
+  additiveOptions,
+  knownTerms,
+  solveAdditive,
+  structuresForLevel,
+  unknownSlotsForLevel,
+} from "./procedimentos/additiveProcedure";
+import { buildNarrative } from "./procedimentos/additiveNarrative";
+import { buildStoryBarsSpec } from "./procedimentos/storyBarsContract";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -392,6 +401,44 @@ export class Composer {
         break;
       }
         
+      case "storypanel": {
+        const wholeMax = params.result_max ?? 10;
+        if (!Number.isInteger(wholeMax) || wholeMax < 2 || wholeMax > 20) {
+          throw new Error(`result_max inválido para storypanel em ${ficha.id}/${micro.id}; use inteiro entre 2 e 20.`);
+        }
+        const estruturas = structuresForLevel(lvl);
+        const structure = estruturas[randomInt(0, estruturas.length - 1)];
+        const posicoes = unknownSlotsForLevel(lvl, structure);
+        const unknown = posicoes[randomInt(0, posicoes.length - 1)];
+
+        // A tripla nasce do todo para baixo, garantindo partes positivas e soma
+        // coerente. Triplas em que a resposta coincide com um número visível são
+        // descartadas: nelas, repetir um dado da história acertaria por acaso e o
+        // distrator REPETE_DADO deixaria de diagnosticar qualquer coisa.
+        let situation = { structure, part1: 1, part2: 1, whole: 2, unknown };
+        for (let tentativa = 0; tentativa < 60; tentativa += 1) {
+          const whole = randomInt(2, wholeMax);
+          const part1 = randomInt(1, whole - 1);
+          situation = { structure, part1, part2: whole - part1, whole, unknown };
+          const [visivelA, visivelB] = knownTerms(situation);
+          const resposta = solveAdditive(situation);
+          if (resposta !== visivelA && resposta !== visivelB) break;
+        }
+
+        const narrative = buildNarrative(situation, {
+          subjectIndex: randomInt(0, 7),
+          partnerIndex: randomInt(0, 7),
+          objectIndex: randomInt(0, 5),
+        });
+
+        answer = solveAdditive(situation);
+        options = additiveOptions(situation).sort(() => Math.random() - 0.5);
+        uiProps = buildStoryBarsSpec(situation, narrative, lvl);
+        evaluate = candidate => candidate === answer;
+        promptOverride = narrative.question;
+        break;
+      }
+
       case "plain": {
         if (typeof params.dezenas_max === "number") {
           const dezenas = randomInt(1, params.dezenas_max);
@@ -489,7 +536,7 @@ export class Composer {
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
         ? ficha.niveis[lvl].rt_alvo! / 1000
         : undefined,
-      kind: kind === "intruso_math" ? "plain" : kind === "arraygrid" ? "array" : kind,
+      kind: kind === "intruso_math" ? "plain" : kind === "arraygrid" ? "array" : kind === "storypanel" ? "story-bars" : kind,
       prompt: promptOverride || params.audio_prompt || "Responda:",
       audioPrompt: promptOverride || params.audio_prompt,
       tutorial: normalizeFichaTutorial(params.tutorial),

@@ -1,6 +1,0 @@
-{
-  "name": "Matemágica IA",
-  "description": "Matemática adaptativa e divertida para crianças, com tutoria inteligente por IA, gamificação e relatório pedagógico para os pais.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
