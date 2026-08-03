@@ -14,6 +14,7 @@
     "fichas:auditar": "node AI_Studio_Lab/tools/ficha_catalog_auditor.cjs",
     "grafo:gerar": "node scripts/generate-graph-artifacts.cjs",
     "grafo:check": "node scripts/generate-graph-artifacts.cjs --check",
+    "grafo:codigo": "graphify update . && graphify cluster-only .",
     "pr:check": "node AI_Studio_Lab/tools/pr_text_guard.cjs",
     "simular": "tsx simulated-learner-real.ts",
     "contrato": "vitest run"
