@@ -98,11 +98,31 @@ compreende a ação; sem rolagem; alvos de toque adequados; `reduced-motion`
 funcionando; testes passando; build passando; legado intacto.
 
 ### Andar 4 — Canário de N3.10, em PR separado
+
+**Estado: concluído em 3/ago/2026.**
+
 Nova branch; N3.10 como canário único; proveniência marcada; rollback explícito;
 comparação Composer × legado; testes de saves, telemetria e Jornada; observação de
 erros; então promover ou retirar.
 
 > **Implementação e ativação nunca devem ser o mesmo passo.**
+
+| Item | Evidência |
+|---|---|
+| Nova branch da main mesclada | `origin/main = ea191c2` após o PR #20 |
+| N3.10 promovida | `COMPOSER_CANARIES` |
+| Proveniência marcada | `generatorSource === "composer"` |
+| Rollback explícito | devolve `kind: "story"` na questão seguinte |
+| Composer × legado | `storyParity.test.ts` |
+| Saves | id, `graphId` e pré-requisitos preservados; save anterior segue válido |
+| Telemetria | tag de misconception emitida, aceita pelo Radar; legado não emite |
+| Jornada | `contentStatus: "explicit"`, questão completa nos cinco níveis |
+| Observação de erro | erro não avança nível; resposta única; sem negativos; 500 amostras sem laço |
+
+**Leitura de "canário único":** foi entendida como *um nó promovido por PR*, e não
+como *um único canário no sistema*. N3.09 já havia sido promovida e validada no
+Lote B; retirá-la seria regressão. O Plano Mestre confirma a leitura ao exigir
+"trocar um único nó por PR".
 
 ### Andar 5 — Lote E: confiabilidade antes de expansão
 E2E da missão diária (criar criança → perfil → missão → ouvir → responder → errar →

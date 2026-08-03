@@ -801,3 +801,28 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
 - `npm ci` foi verificado contra o lockfile atual antes de entrar no workflow.
 - Gates locais: auditar, fichas:auditar, grafo:check, lint e testes aprovados;
   suíte em 637 testes e 40 arquivos.
+
+## 3 de agosto de 2026 — Andar 4 fechado: observabilidade do canário
+
+- Correção de rota: o Andar 5 havia começado com o Andar 4 pela metade. Dos nove
+  itens da lista, cinco estavam feitos — branch, promoção, proveniência, rollback
+  e paridade — e quatro não: saves, telemetria, Jornada e observação de erro.
+- **Saves**: o progresso é indexado pelo id do nó, que a promoção não altera;
+  `graphId` e pré-requisitos permanecem idênticos antes e depois. Um progresso
+  salvo continua válido, e `applyJourneyAnswer` não conhece a origem do gerador —
+  promover um canário não exige migração de save.
+- **Telemetria**: a alternativa errada carrega tag de misconception, a certa não
+  gera diagnóstico e a tag é aceita por `trackMisconception` sem erro. O legado
+  `gN3_10` não oferece tag alguma, o que é exatamente o ganho da promoção.
+- **Jornada**: N3.10 aparece com `contentStatus: "explicit"` e a questão traz
+  kind, uiProps, prompt, alternativas e `evaluate` nos cinco níveis. As
+  alternativas são exibidas, porque aqui a barra é leitura e não a interação —
+  diferente de `vertical` e `array`.
+- **Observação de erro**: errar não avança o nível, a resposta correta aparece
+  exatamente uma vez, nenhuma alternativa é negativa e 500 amostras não produzem
+  laço nem exceção.
+- **"Canário único"** foi lido como *um nó por PR*, não como *um só canário no
+  sistema*: N3.09 já fora validada no Lote B e retirá-la seria regressão. O Plano
+  Mestre confirma ao exigir "trocar um único nó por PR".
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 651 testes e 41 arquivos.
