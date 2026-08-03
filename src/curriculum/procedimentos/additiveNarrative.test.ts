@@ -76,3 +76,31 @@ describe("narrativa dos problemas aditivos", () => {
     expect(direta).not.toBe(deslocada);
   });
 });
+
+describe("conectivos da narrativa", () => {
+  it("não abre a história com 'Então', que pressupõe cena anterior", () => {
+    for (const structure of ADDITIVE_STRUCTURES) {
+      for (const unknown of ["part1", "part2", "whole"] as const) {
+        const n = buildNarrative(situacao({ structure, unknown }), seed);
+        expect(n.beats[0].text.startsWith("Então"), `${structure}/${unknown}`).toBe(false);
+        expect(n.beats[0].text[0], `${structure}/${unknown}`).toBe(n.beats[0].text[0].toUpperCase());
+      }
+    }
+  });
+
+  it("concorda em gênero e número com o objeto sorteado", () => {
+    // objectIndex 3 é "peixes", masculino; quantidade 1 exige singular.
+    const masculino = buildNarrative(
+      situacao({ part1: 1, part2: 2, whole: 3, unknown: "whole" }),
+      { subjectIndex: 0, partnerIndex: 1, objectIndex: 3 },
+    );
+    expect(masculino.question.startsWith("Quantos")).toBe(true);
+    expect(masculino.beats[0].text).toContain("1 peixe.");
+
+    const feminino = buildNarrative(
+      situacao({ part1: 2, part2: 2, whole: 4, unknown: "whole" }),
+      { subjectIndex: 0, partnerIndex: 1, objectIndex: 4 },
+    );
+    expect(feminino.question.startsWith("Quantas")).toBe(true);
+  });
+});

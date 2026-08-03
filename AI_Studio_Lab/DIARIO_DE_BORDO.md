@@ -715,3 +715,28 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   Sandbox em viewport infantil.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 607 testes e 36 arquivos; 16/16 fichas de Jornada registradas.
+
+## 3 de agosto de 2026 — Lote D: composição, renderers e validação visual
+
+- `StoryBarsStage` coloca narrativa e barra na mesma tela sem que uma passe a
+  conhecer a outra; a barra é leitura e a resposta vem das alternativas,
+  preservando uma única ação dominante. O kind `story-bars` entrou no
+  `FichaRenderer` e no `GameLoopExerciseRenderer` ao lado do `singapore-bars`
+  legado, que segue atendendo seus três consumidores.
+- A inspeção visual em 390×844, com Chromium e medição real, reprovou a primeira
+  versão e revelou três defeitos que nenhum teste automatizado apontaria:
+  1. **concordância**: "Quantas peixes" e "1 estrelas". O pool de objetos já
+     trazia o gênero e nunca era usado, e não havia forma singular;
+  2. **violação da escada**: o nível 4 é "as quatro, sem ilustração da mudança",
+     mas `showChangeIllustration` só desligava a animação. A cena da mudança
+     continuava desenhada, e o nível 4 não era mais difícil que o 3;
+  3. **rolagem**: os cinco níveis mediam 887, 899, 887, 859 e 803 px, acima da
+     viewport-alvo de 844.
+- Uma quarta falha apareceu na segunda captura: a história abria com "Então 2
+  foram embora", conectivo que pressupõe cena anterior. O conectivo passa a ser
+  retirado quando a fala de transformação cai na primeira batida.
+- Depois das correções: 611, 611, 639, 551 e 551 px — todos sem rolagem.
+- Medição reproduzível com Playwright e Chromium em 390×844; nenhuma captura foi
+  versionada, conforme a regra de binários.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 628 testes e 39 arquivos.

@@ -23,13 +23,19 @@ export function StoryPanelStage({ story, step = 3, onReplay }: Props) {
   const reduzirMovimento = useReducedMotion();
   const [inicial, mudanca] = story.beats;
 
-  const ilustracao = (quantidade: number, animar: boolean) => (
-    <Ilustracao
-      quantidade={quantidade}
-      emoji={story.emoji}
-      animar={animar && story.showChangeIllustration && !reduzirMovimento}
-    />
-  );
+  // A ficha F20 define o nível 4 como "as quatro, sem ilustração da mudança".
+  // Retirar apenas a animação não cumpre a escada: a cena da mudança precisa
+  // sair, para que só a narração sustente o reconhecimento da estrutura.
+  const ilustracao = (quantidade: number, ehMudanca: boolean) => {
+    if (ehMudanca && !story.showChangeIllustration) return null;
+    return (
+      <Ilustracao
+        quantidade={quantidade}
+        emoji={story.emoji}
+        animar={ehMudanca && story.showChangeIllustration && !reduzirMovimento}
+      />
+    );
+  };
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -49,7 +55,7 @@ export function StoryPanelStage({ story, step = 3, onReplay }: Props) {
           type="button"
           onClick={onReplay}
           aria-label="Ver de novo o que aconteceu"
-          className="mt-4 rounded-full font-bold shadow-sm active:scale-95"
+          className="mt-2 rounded-full font-bold shadow-sm active:scale-95"
           style={{
             minWidth: tokens.tamanho.alvo,
             minHeight: tokens.tamanho.alvo,
@@ -90,7 +96,7 @@ function Ilustracao({
       {Array.from({ length: quantidade }).map((_, i) => (
         <motion.span
           key={i}
-          className="text-4xl"
+          className="text-3xl"
           aria-hidden="true"
           initial={animar ? { opacity: 0, x: 32 } : false}
           animate={{ opacity: 1, x: 0 }}

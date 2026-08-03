@@ -21,13 +21,25 @@ export interface NarrativeContent {
 const NOMES = ["Lia", "Caio", "Nina", "Téo", "Bia", "Davi", "Mel", "Rui"] as const;
 
 const OBJETOS = [
-  { label: "estrelas", emoji: "⭐", feminino: true },
-  { label: "dinos", emoji: "🦕", feminino: false },
-  { label: "maçãs", emoji: "🍎", feminino: true },
-  { label: "peixes", emoji: "🐟", feminino: false },
-  { label: "flores", emoji: "🌸", feminino: true },
-  { label: "bolinhas", emoji: "🔵", feminino: true },
+  { plural: "estrelas", singular: "estrela", emoji: "⭐", feminino: true },
+  { plural: "dinos", singular: "dino", emoji: "🦕", feminino: false },
+  { plural: "maçãs", singular: "maçã", emoji: "🍎", feminino: true },
+  { plural: "peixes", singular: "peixe", emoji: "🐟", feminino: false },
+  { plural: "flores", singular: "flor", emoji: "🌸", feminino: true },
+  { plural: "bolinhas", singular: "bolinha", emoji: "🔵", feminino: true },
 ] as const;
+
+type Objeto = (typeof OBJETOS)[number];
+
+/** "1 estrela" e não "1 estrelas": concordância de número. */
+function nomear(objeto: Objeto, quantidade: number): string {
+  return quantidade === 1 ? objeto.singular : objeto.plural;
+}
+
+/** "Quantos peixes" e "Quantas flores": concordância de gênero. */
+function quantos(objeto: Objeto): string {
+  return objeto.feminino ? "Quantas" : "Quantos";
+}
 
 export interface NarrativeSeed {
   subjectIndex: number;
@@ -49,13 +61,14 @@ function phrasesFor(
   structure: AdditiveStructure,
   subject: string,
   partner: string,
-  objectLabel: string,
+  objeto: Objeto,
 ): { fala: Record<Slot, Phrase>; ordem: [Slot, Slot, Slot] } {
+  const obj = (n: number) => nomear(objeto, n);
   switch (structure) {
     case "join":
       return {
         fala: {
-          part1: n => `${subject} tinha ${n} ${objectLabel}.`,
+          part1: n => `${subject} tinha ${n} ${obj(n)}.`,
           part2: n => `Então chegaram mais ${n}.`,
           whole: n => `Agora ${subject} tem ${n}.`,
         },
@@ -64,7 +77,7 @@ function phrasesFor(
     case "separate":
       return {
         fala: {
-          whole: n => `${subject} tinha ${n} ${objectLabel}.`,
+          whole: n => `${subject} tinha ${n} ${obj(n)}.`,
           part1: n => `Então ${n} foram embora.`,
           part2: n => `Sobraram ${n}.`,
         },
@@ -73,7 +86,7 @@ function phrasesFor(
     case "compare":
       return {
         fala: {
-          whole: n => `${subject} tem ${n} ${objectLabel}.`,
+          whole: n => `${subject} tem ${n} ${obj(n)}.`,
           part1: n => `${partner} tem ${n}.`,
           part2: n => `${subject} tem ${n} a mais que ${partner}.`,
         },
@@ -82,13 +95,23 @@ function phrasesFor(
     default:
       return {
         fala: {
-          part1: n => `${subject} tem ${n} ${objectLabel}.`,
+          part1: n => `${subject} tem ${n} ${obj(n)}.`,
           part2: n => `Faltam ${n} para a meta.`,
           whole: n => `A meta é ${n}.`,
         },
         ordem: ["part1", "part2", "whole"],
       };
   }
+}
+
+/**
+ * Um conectivo de sequência não pode abrir a história: "Então 2 foram embora"
+ * pressupõe uma cena anterior que a criança não viu. Quando a fala de
+ * transformação cai na primeira batida, o conectivo sai.
+ */
+function semConectivo(texto: string): string {
+  const semEntao = texto.replace(/^Então\s+/, "");
+  return semEntao === texto ? texto : semEntao.charAt(0).toUpperCase() + semEntao.slice(1);
 }
 
 /**
@@ -102,39 +125,41 @@ function beatsFor(
   situation: AdditiveSituation,
   subject: string,
   partner: string,
-  objectLabel: string,
+  objeto: Objeto,
 ): [StoryBeat, StoryBeat] {
-  const { fala, ordem } = phrasesFor(structure, subject, partner, objectLabel);
+  const { fala, ordem } = phrasesFor(structure, subject, partner, objeto);
   const conhecidos = ordem.filter(slot => slot !== situation.unknown);
   const [primeiro, segundo] = conhecidos;
   return [
-    { role: "initial", text: fala[primeiro](situation[primeiro]), count: situation[primeiro] },
+    { role: "initial", text: semConectivo(fala[primeiro](situation[primeiro])), count: situation[primeiro] },
     { role: "change", text: fala[segundo](situation[segundo]), count: situation[segundo] },
   ];
 }
 
 /** A pergunta muda com a estrutura e com a posição da incógnita. */
-function questionFor(situation: AdditiveSituation, subject: string, objectLabel: string): string {
+function questionFor(situation: AdditiveSituation, subject: string, objeto: Objeto): string {
   const { structure, unknown } = situation;
+  const q = quantos(objeto);
+  const nome = objeto.plural;
   if (unknown === "part1") {
     return structure === "join"
-      ? `Com quantas ${objectLabel} ${subject} começou?`
-      : `Quantas ${objectLabel} havia no começo?`;
+      ? `Com ${q.toLowerCase()} ${nome} ${subject} começou?`
+      : `${q} ${nome} havia no começo?`;
   }
   if (unknown === "whole") {
     return structure === "separate"
-      ? `Quantas ${objectLabel} ${subject} tinha antes?`
-      : `Quantas ${objectLabel} há ao todo?`;
+      ? `${q} ${nome} ${subject} tinha antes?`
+      : `${q} ${nome} há ao todo?`;
   }
   switch (structure) {
     case "join":
-      return `Quantas ${objectLabel} chegaram?`;
+      return `${q} ${nome} chegaram?`;
     case "separate":
-      return `Quantas ${objectLabel} sobraram?`;
+      return `${q} ${nome} sobraram?`;
     case "compare":
-      return `Quantas ${objectLabel} a mais?`;
+      return `${q} ${nome} a mais?`;
     default:
-      return `Quantas ${objectLabel} faltam?`;
+      return `${q} ${nome} faltam?`;
   }
 }
 
@@ -150,10 +175,10 @@ export function buildNarrative(
   return {
     subject,
     partner: situation.structure === "compare" ? partner : undefined,
-    objectLabel: objeto.label,
+    objectLabel: objeto.plural,
     emoji: objeto.emoji,
-    beats: beatsFor(situation.structure, situation, subject, partner, objeto.label),
-    question: questionFor(situation, subject, objeto.label),
+    beats: beatsFor(situation.structure, situation, subject, partner, objeto),
+    question: questionFor(situation, subject, objeto),
   };
 }
 
