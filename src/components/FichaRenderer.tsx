@@ -18,6 +18,7 @@ import { Balanca } from './primitives/Balanca';
 import { MaterialDourado } from './primitives/MaterialDourado';
 import { DragGroup } from './primitives/DragGroup';
 import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
+import { StoryBarsStage } from "./primitives/StoryBarsStage";
 import { ArrayGrid } from './primitives/ArrayGrid';
 
 interface FichaRendererProps {
@@ -59,6 +60,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
     case 'vertical':
       return <VerticalPlaceValueStage question={question} onAnswer={handleInteract} onMistake={handleInteract} disabled={Boolean(disabled)} />;
+    case 'story-bars':
+      return <StoryBarsStage spec={uiProps as never} />;
     case 'array':
       return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':
