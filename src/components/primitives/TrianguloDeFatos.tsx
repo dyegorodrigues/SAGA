@@ -1,4 +1,5 @@
 import React from "react";
+import { INVERSA, OPERACAO, Operacao } from "../../styles/coresDeOperacao";
 
 /**
  * O triângulo da família de fatos — usado pela família ADITIVA (F16, N3.05) e
@@ -25,9 +26,15 @@ import React from "react";
 
 export type TipoDeFamilia = "aditiva" | "multiplicativa";
 
-const SINAL: Record<TipoDeFamilia, { combina: string; desce: string; cor: string; nome: string }> = {
-  aditiva: { combina: "+", desce: "−", cor: "#0ea5e9", nome: "somados" },
-  multiplicativa: { combina: "×", desce: "÷", cor: "#9333ea", nome: "multiplicados" },
+/**
+ * A operação que combina as bases, por família. A que desce pelas pernas é a
+ * inversa dela — e as cores vêm do padrão do aplicativo, não de escolha local:
+ * a criança encontra o mesmo verde de somar e o mesmo roxo de multiplicar em
+ * toda tela do SAGA.
+ */
+const COMBINA: Record<TipoDeFamilia, Operacao> = {
+  aditiva: "adicao",
+  multiplicativa: "multiplicacao",
 };
 
 interface Props {
@@ -58,7 +65,9 @@ function Circulo({ valor, cor, tamanho }: { valor: number | "?"; cor: string; ta
 }
 
 export function TrianguloDeFatos({ topo, esquerda, direita, tipo }: Props) {
-  const { combina, desce, cor, nome } = SINAL[tipo];
+  const operacao = COMBINA[tipo];
+  const { simbolo: combina, cor, verbo: nome } = OPERACAO[operacao];
+  const { simbolo: desce } = OPERACAO[INVERSA[operacao]];
   return (
     <div
       role="img"
