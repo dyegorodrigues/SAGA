@@ -160,16 +160,27 @@ npm run grafo:codigo    # fechar o bloco com o grafo em dia
 | Família | Nós | Por que nesta ordem |
 |---|---|---|
 | **N4** (9) | N4.03-04, N4.06-12 | grupos iguais e arranjos são pré-requisito de tabuada e divisão; a primitiva `array` **já existe** |
-| **N2** (2) | N2.06-07 | só dois nós, e `tens` já existe — vitória rápida que valida o trilho |
+| **N2** (2) | N2.06-07 | **exige primitiva nova** — ver nota abaixo |
 | **AL** (5) | AL.04-08 | `pattern` já existe |
 | **N5** (5) | N5.01-05 | depende de N4 pronto |
 | **GM** (8) | GM.01, GM.05-11 | exige primitivas novas (`measure`, `money`) — Andar 7 |
 | **GE** (8) | GE.03-10 | idem |
 | **N6** (4), **N7** (2), **PE** (3) | | dependem das camadas acima |
 
-**Começar por N2 (2 nós) antes de N4.** Contradiz a tabela de propósito: dois nós
-pequenos com primitiva pronta são o teste barato de que este documento funciona.
-Se o trilho tiver defeito, é melhor descobrir gastando dois nós, não nove.
+**Correção de rota, registrada em vez de apagada.** Eu havia escolhido N2 como
+validação barata do trilho, supondo que `DragGroup` e `ArrayGrid` já serviam.
+**Não serviam:** F38 quer formar duplas por arrasto (o `DragGroup` distribui em
+caixas, modelo de divisão) e F66 quer *montar* retângulos (o `ArrayGrid` apenas
+*exibe* um). N2.06 e N2.07 exigem primitiva nova e pertencem ao Andar 7. N2
+tampouco está na lista do Andar 6.
+
+**O nó certo era N4.03** (tabuadas ×2, ×5, ×10 — ficha F42): está na lista do
+Andar 6 ("tabuadas"), e as primitivas que a ficha pede — `Quadrado100` e a reta
+numérica — existem e servem sem alteração.
+
+**Lição para as próximas 45:** antes de estimar o custo de um nó, abra a
+primitiva que a ficha nomeia e confira se ela faz o que a ficha descreve. O
+nome bater não significa que o comportamento bata.
 
 ---
 
@@ -239,7 +250,35 @@ vencia, escondendo a específica.
 → Guarda por assinatura + comparar contra a questão realmente anterior. **Meça
 antes de declarar resolvido:** esta levou três rodadas de medição para chegar a 0%.
 
-### 6.10 O Vitest não checa tipos
+### 6.10 Registrar a ficha anunciava conteúdo que ainda não era servido
+`contentStatus` era derivado de **ter ficha no catálogo**, não do que é
+**servido**. No intervalo entre o PR que implementa e o que ativa — o estado que
+esta própria regra cria — o nó se dizia `"explicit"` enquanto caía no fallback
+genérico. Como a Oficina só prescreve resgate em trilha `!== "fallback"`, ela
+mandaria a criança treinar numa competência sem conteúdo autoral.
+→ Derive `contentStatus` da resolução (`binding.source()`), com getter, igual a
+`generatorSource`. Mesma família da 6.7.
+→ **Só apareceu porque a regra dos dois PRs foi seguida de fato.** Os dois
+canários anteriores foram registrados e ativados no mesmo commit, e por isso o
+intervalo nunca havia existido.
+
+### 6.11 Parafrasear a tabela da ficha em vez de segui-la
+A ficha F42 distribui os apoios assim: nível 1 = arranjo + **saltos**; 2 e 3 =
+arranjo + **quadro**; 4 e 5 = só símbolo. Eu li "o apoio sai em degraus" e
+implementei uma distribuição própria — arranjo em 1-2, quadro em 1-3. Os testes
+passaram, porque testavam a minha versão.
+→ Transcreva a tabela da ficha para o teste **antes** de escrever o
+procedimento. A ficha é a especificação; o resumo dela não é.
+
+### 6.12 Medir a tela sem carregar o estilo mede nada
+A primeira medição de altura deu **40.735px** e teria virado uma "correção" de
+um defeito inexistente. Os níveis sem apoio visual davam 48px, o que denunciou:
+a página de teste não importava o CSS, e sem as classes utilitárias os cem
+quadradinhos empilhavam em coluna.
+→ Antes de acreditar numa medição de layout, confira um valor que você já
+conhece. Se ele estiver errado, o instrumento está errado.
+
+### 6.13 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.

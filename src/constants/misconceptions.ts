@@ -34,7 +34,13 @@ export const MisconceptionTag = {
   COMPARA_SOMANDO: "compara-somando",
 
   /** Problemas aditivos: só resolve com a incógnita no fim; erra quando ela muda de posição */
-  SO_RESOLVE_CANONICO: "so-resolve-canonico"
+  SO_RESOLVE_CANONICO: "so-resolve-canonico",
+
+  /** Tabuada: somou os dois fatores em vez de multiplicar (5×4 → 9) */
+  SOMA_OS_FATORES: "soma-os-fatores",
+
+  /** Tabuada: devolveu um múltiplo vizinho — memorizou a lista sem o padrão que a gera (5×4 → 15 ou 25) */
+  TABUADA_TROCADA: "tabuada-trocada"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

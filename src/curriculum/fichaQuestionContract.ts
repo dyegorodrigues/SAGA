@@ -1,6 +1,7 @@
 import { Option, Question } from "../types";
 import { FichaParams } from "./schema";
 import { StoryBarsSpec } from "./procedimentos/storyBarsContract";
+import { TabuadaSpec } from "./procedimentos/tabuadaContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -26,6 +27,7 @@ export type FichaUiProps =
   | { vTop: number; vBot: number; vOp: "+" | "-"; showPlaceValue?: boolean; showRegroup?: boolean; showAlgorithm?: boolean }
   | { rows: number; cols: number; allowRotate: boolean; requireRotate: boolean; areaMode: boolean; showEquation: boolean; answerMode: "total" | "equation" }
   | StoryBarsSpec
+  | TabuadaSpec
   | { text: string };
 
 interface BalanceItem {

@@ -127,7 +127,15 @@ Object.keys(FAIXAS_INFO).forEach(faixaId => {
       },
       lvlSkills: info.lvlSkills,
       prereqs: n.prereqs,
-      contentStatus: GENERATOR_MAP[n.id] || hasComposerFicha(n.id) ? "explicit" : "fallback",
+      // Reflete o que é SERVIDO, não o que está registrado. Uma ficha existir no
+      // catálogo sem estar ativa é o estado normal entre o PR que implementa e o
+      // que ativa — e nesse intervalo o nó continua caindo no fallback genérico.
+      // Marcá-lo "explicit" faria a Oficina prescrever resgate sobre conteúdo que
+      // não existe, exatamente o que o rescuePlanner promete nunca fazer.
+      // Getter pelo mesmo motivo de `generatorSource`: acompanha o rollback.
+      get contentStatus() {
+        return binding.source() === "fallback" ? "fallback" as const : "explicit" as const;
+      },
     });
   });
   

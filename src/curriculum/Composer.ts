@@ -17,6 +17,13 @@ import {
 } from "./procedimentos/additiveProcedure";
 import { buildNarrative } from "./procedimentos/additiveNarrative";
 import { buildStoryBarsSpec } from "./procedimentos/storyBarsContract";
+import { construirTabuadaSpec } from "./procedimentos/tabuadaContract";
+import {
+  OUTRO_FATOR_MAX,
+  PADRAO_DA_TABUADA,
+  ehPergunavelComDiagnostico,
+  tabuadasDoNivel,
+} from "./procedimentos/tabuadaProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -436,6 +443,37 @@ export class Composer {
         uiProps = buildStoryBarsSpec(situation, narrative, lvl);
         evaluate = candidate => candidate === answer;
         promptOverride = narrative.question;
+        break;
+      }
+
+      case "tabuada": {
+        // Sorteia entre as multiplicações que o nível autoriza E que ainda
+        // diagnosticam: ×1 traz a resposta escrita no enunciado, e nas tabuadas
+        // pequenas somar pode coincidir com multiplicar. Filtrar antes de
+        // sortear é mais honesto que sortear e repetir até dar certo — a lista
+        // é pequena e conhecida.
+        const tabuadas = tabuadasDoNivel(lvl);
+        const candidatas = tabuadas.flatMap(tabuada =>
+          Array.from({ length: OUTRO_FATOR_MAX }, (_, i) => ({ tabuada, vezes: i + 1 })))
+          .filter(ehPergunavelComDiagnostico);
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem multiplicação com valor diagnóstico.`);
+        }
+
+        const situacao = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirTabuadaSpec(situacao, lvl, PADRAO_DA_TABUADA[situacao.tabuada]);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
         break;
       }
 

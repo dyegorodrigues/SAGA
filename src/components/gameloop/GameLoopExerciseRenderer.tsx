@@ -3,6 +3,7 @@ import { AnswerMeta, Question } from "../../types";
 import { RapidFire } from "../exercises/RapidFire";
 import { SingaporeBars } from "../primitives/SingaporeBars";
 import { StoryBarsStage } from "../primitives/StoryBarsStage";
+import { TabuadaStage } from "../primitives/TabuadaStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -77,6 +78,7 @@ export function GameLoopExerciseRenderer({
         {q.kind === "rapid-fire" && <RapidFire q={q} onAnswer={handlePick} disabled={status !== null} timeLeft={timeLeft} />}
         {q.kind === "singapore-bars" && <SingaporeBars q={q} onAnswer={handlePick} disabled={status !== null} />}
         {q.kind === "story-bars" && q.uiProps && <StoryBarsStage spec={q.uiProps as never} />}
+        {q.kind === "tabuada" && q.uiProps && <TabuadaStage spec={q.uiProps as never} />}
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}
