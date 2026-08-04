@@ -19,9 +19,18 @@ interface Props {
   descricao: string;
   /** Largura máxima disponível, em px. */
   larguraMax?: number;
+  /**
+   * Colunas marcadas como "a que sai", contadas a partir do fim.
+   *
+   * Serve o ×9 da ficha F44: mostra-se o arranjo do fato fácil (7×10) com a
+   * última coluna destacada — é ela que será removida para virar 7×9. Sem o
+   * destaque, exibir um arranjo de 70 quadradinhos numa pergunta de 7×9 confunde
+   * em vez de ajudar.
+   */
+  colunasQueSaem?: number;
 }
 
-export function Arranjo({ linhas, colunas, descricao, larguraMax = 280 }: Props) {
+export function Arranjo({ linhas, colunas, descricao, larguraMax = 280, colunasQueSaem = 0 }: Props) {
   const lado = Math.min(28, Math.floor(larguraMax / Math.max(linhas, colunas)));
   return (
     <div
@@ -30,14 +39,17 @@ export function Arranjo({ linhas, colunas, descricao, larguraMax = 280 }: Props)
       aria-label={descricao}
       style={{ gridTemplateColumns: `repeat(${colunas}, ${lado}px)` }}
     >
-      {Array.from({ length: linhas * colunas }, (_, i) => (
-        <div
-          key={i}
-          aria-hidden="true"
-          className="rounded bg-indigo-400"
-          style={{ width: lado, height: lado }}
-        />
-      ))}
+      {Array.from({ length: linhas * colunas }, (_, i) => {
+        const sai = colunasQueSaem > 0 && (i % colunas) >= colunas - colunasQueSaem;
+        return (
+          <div
+            key={i}
+            aria-hidden="true"
+            className={sai ? "rounded bg-rose-300 opacity-60" : "rounded bg-indigo-400"}
+            style={{ width: lado, height: lado }}
+          />
+        );
+      })}
     </div>
   );
 }

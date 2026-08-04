@@ -20,12 +20,13 @@ Este documento é o investimento que torna as restantes baratas.
 menos código — foi **barrar armadilhas antes de existirem** em vez de descobri-las
 apanhando:
 
-| | N4.03 (a primeira) | N4.04 (a segunda) |
-|---|---|---|
-| Armadilhas descobertas **apanhando** | 4 | 1 (acessibilidade) |
-| Armadilhas **barradas aplicando o §6** | 0 | 2 (×1 e o andaime que escreve a conta inteira) |
-| Componentes reusados | 2 (`Quadrado100`, `NumberLine`) | 3 (+ `Arranjo`, extraído aqui) |
-| Procedimento reusado | — | os distratores de N4.03, no nível 5 |
+| | N4.03 | N4.04 | N4.07 |
+|---|---|---|---|
+| Armadilhas descobertas **apanhando** | 4 | 1 | 1 (teto de alternativas) |
+| Armadilhas **barradas aplicando o §6** | 0 | 2 | 3 |
+| Componentes reusados | 2 | 3 | 4 |
+
+*(A tabela acima substitui a de duas colunas.)*
 
 
 
@@ -380,7 +381,17 @@ era o objetivo.
 > prova que o dado está certo; captura de tela prova que a criança consegue usar.
 > Um não substitui o outro.
 
-### 6.18 O Vitest não checa tipos
+### 6.18 Distratores demais estouram o teto do cânone
+Quatro estratégias com dois vizinhos numéricos davam **cinco alternativas** na
+tela. O cânone §9.1 manda 3 a 4 — e a razão não é estética: excesso de escolha
+vira ruído para quem tem 8 anos, não dificuldade. Nenhum teste da ficha pegou;
+a captura de tela mostrou de cara.
+→ Corte pelo fim, mantendo os erros ESPECÍFICOS e sacrificando o genérico. Um
+vizinho basta para representar a hipótese.
+→ A guarda ficou no **contrato do canário**, valendo para todo nó presente e
+futuro, em vez de ficar só na ficha que errou.
+
+### 6.19 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.

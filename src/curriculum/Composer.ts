@@ -32,6 +32,14 @@ import {
   ehPorDecomposicao,
   tabuadasDoNivel as tabuadasDecompostasDoNivel,
 } from "./procedimentos/decomposicaoProcedure";
+import { construirAncoraSpec } from "./procedimentos/ancoraContract";
+import {
+  OUTRO_FATOR_MAX as ANCORA_FATOR_MAX,
+  OUTRO_FATOR_MIN as ANCORA_FATOR_MIN,
+  ehPergunavelComDiagnostico as ancoraDiagnostica,
+  ehTabuadaDificil,
+  tabuadasDoNivel as tabuadasDificeisDoNivel,
+} from "./procedimentos/ancoraProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -502,6 +510,36 @@ export class Composer {
 
         const escolha = candidatas[randomInt(0, candidatas.length - 1)];
         const spec = construirDecomposicaoSpec(escolha.tabuada, escolha.vezes, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "ancora": {
+        const candidatas = tabuadasDificeisDoNivel(lvl).flatMap(tabuada =>
+          Array.from({ length: ANCORA_FATOR_MAX - ANCORA_FATOR_MIN + 1 },
+            (_, i) => ({ tabuada, vezes: i + ANCORA_FATOR_MIN }))
+            // Difícil passa pelo critério da âncora; já dominada só precisa não
+            // trazer a resposta escrita no enunciado.
+            .filter(c => ehTabuadaDificil(c.tabuada)
+              ? ancoraDiagnostica({ tabuada: c.tabuada, vezes: c.vezes })
+              : c.vezes > 1 && c.tabuada * c.vezes !== c.tabuada + c.vezes));
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem multiplicação com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirAncoraSpec(escolha.tabuada, escolha.vezes, lvl);
 
         answer = spec.resposta;
         options = spec.alternativas

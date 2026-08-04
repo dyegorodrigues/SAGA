@@ -4,6 +4,7 @@ import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
 import { N4_04 } from "../fichas/jornada/N4.04";
+import { N4_07 } from "../fichas/jornada/N4.07";
 import { Question, Track } from "../../types";
 
 type Generator = (level: number) => Question;
@@ -21,6 +22,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N3.10": N3_10,
   "N4.03": N4_03,
   "N4.04": N4_04,
+  "N4.07": N4_07,
 };
 
 /**
@@ -30,7 +32,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  * gerada, sem exigir rebuild: a decisão é resolvida a cada chamada, não na carga
  * do módulo.
  */
-export const COMPOSER_CANARIES = new Set<string>(["N3.09", "N3.10", "N4.03", "N4.04"]);
+export const COMPOSER_CANARIES = new Set<string>(["N3.09", "N3.10", "N4.03", "N4.04", "N4.07"]);
 
 export interface GeneratorBinding {
   /** Resolve a origem a cada questão, refletindo o estado atual dos canários. */

@@ -8,6 +8,7 @@ import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
 import { N4_04 } from "../fichas/jornada/N4.04";
+import { N4_07 } from "../fichas/jornada/N4.07";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
@@ -44,6 +45,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.10": N3_10,
   "N4.03": N4_03,
   "N4.04": N4_04,
+  "N4.07": N4_07,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];
@@ -169,6 +171,22 @@ describe("contrato do canário do Composer", () => {
           if (!q.options?.length) continue;
           const certas = q.options.filter(o => o.value === q.answer);
           expect(certas, `${id} L${lvl}`).toHaveLength(1);
+        }
+      }
+    });
+
+    it("a tela nunca oferece mais de quatro alternativas", () => {
+      // §9.1 do cânone: 3 a 4 opções tocáveis. Cinco apareceram de verdade em
+      // N4.07 e só a captura de tela mostrou — excesso de escolha vira ruído
+      // para quem tem 8 anos, não dificuldade. A guarda vale para TODO canário,
+      // presente e futuro, em vez de ficar só na ficha que errou.
+      for (let lvl = 1; lvl <= 5; lvl += 1) {
+        for (let i = 0; i < 40; i += 1) {
+          const q = Composer.generate(ficha, lvl);
+          if (!q.options) continue;
+          expect(q.options.length, `${id} L${lvl}: ${q.options.length} opções`)
+            .toBeLessThanOrEqual(4);
+          expect(q.options.length, `${id} L${lvl}`).toBeGreaterThanOrEqual(2);
         }
       }
     });

@@ -46,7 +46,13 @@ export const MisconceptionTag = {
   PAROU_NO_DOBRO: "parou-no-dobro",
 
   /** Decomposição: aplicou a OUTRA estratégia — dobrou o dobro onde cabia dobro mais um grupo, ou o contrário (7×3 → 28) */
-  TROCOU_ESTRATEGIA: "trocou-estrategia"
+  TROCOU_ESTRATEGIA: "trocou-estrategia",
+
+  /** Âncora: devolveu o fato fácil sem fazer o ajuste (7×9 → 70, que é 7×10) */
+  PAROU_NA_ANCORA: "parou-na-ancora",
+
+  /** Âncora: ajustou para o lado errado — somou onde era tirar, ou o contrário (7×9 → 77) */
+  DIRECAO_ERRADA: "direcao-errada"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];
