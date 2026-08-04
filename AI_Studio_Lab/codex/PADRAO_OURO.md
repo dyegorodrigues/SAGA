@@ -399,7 +399,27 @@ enquanto obedecia à regra do formato.
 → Filtre o apoio por **conter o número da resposta**, não por terminar em "?".
 A regra é sobre o valor, não sobre a aparência.
 
-### 6.21 O Vitest não checa tipos
+### 6.22 Reusar a figura sem reusar o significado
+O triângulo da família ×÷ é **a mesma figura** do "amigos do dez" — e isso é
+intencional no cânone: "a mesma figura gera as quatro contas", um nível acima.
+Mas eu reusei a forma sem nenhuma marca de operação. Uma criança que passou um
+ano somando as duas bolinhas de baixo olha e **soma**, porque é isso que a forma
+significou para ela até ontem.
+
+> **Transferência sem sinal vira interferência.**
+
+→ A figura precisa **declarar a própria operação**: o sinal grande entre as
+bases diz como elas se combinam (`+` ou `×`), e o sinal nas pernas diz o que
+acontece ao descer do topo (`−` ou `÷`). Aí a criança reconhece a forma E vê o
+que mudou — *"é igual ao dos amigos do dez, mas aqui é vezes"* — que é o
+pensamento que se queria provocar.
+→ Cores distintas por família reforçam sem depender de leitura.
+→ Um teste garante que **nenhum sinal aparece nas duas famílias**.
+→ **Apontado por um adulto olhando a tela**, com 1001 testes verdes. Nenhuma
+verificação automática pega interferência entre representações: ela mora na
+cabeça de quem aprendeu antes, não nos dados.
+
+### 6.23 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.

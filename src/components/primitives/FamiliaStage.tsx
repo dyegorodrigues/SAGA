@@ -1,5 +1,5 @@
 import React from "react";
-import { NumberBond } from "./NumberBond";
+import { TrianguloDeFatos } from "./TrianguloDeFatos";
 import { FamiliaSpec } from "../../curriculum/procedimentos/familiaContract";
 
 /**
@@ -33,13 +33,16 @@ export function FamiliaStage({ spec, onReplay }: Props) {
         )}
       </div>
 
-      <div role="group" aria-label="Triângulo da família: os dois de baixo multiplicados dão o de cima">
-        <NumberBond
-          whole={spec.triangulo.topo}
-          part1={spec.triangulo.esquerda}
-          part2={spec.triangulo.direita}
-        />
-      </div>
+      {/* O "×" grande entre as bases é o que impede a criança de somar por
+          hábito: a figura é a mesma do "amigos do dez" de propósito, e o sinal
+          é o que transforma o reconhecimento em analogia em vez de confusão.
+          Ver Padrão Ouro §6.22. */}
+      <TrianguloDeFatos
+        topo={spec.triangulo.topo}
+        esquerda={spec.triangulo.esquerda}
+        direita={spec.triangulo.direita}
+        tipo="multiplicativa"
+      />
 
       {spec.apoio.length > 0 && (
         <div
