@@ -881,3 +881,33 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   `shift`, e tentar de novo descartaria um resgate legítimo.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 681 testes e 43 arquivos.
+
+## 3 de agosto de 2026 — Andar 5: telemetria negada em produção (C-06 confirmado)
+
+- **Defeito real em produção, confirmado por leitura cruzada.** O cliente grava
+  telemetria em `userStates/{userId}/Kids/{kidId}/TelemetryLogs`, mas
+  `firestore.rules` declarava apenas `match /userStates/{userId}`. No Firestore
+  uma regra de documento **não alcança as subcoleções dele**, então toda a
+  telemetria caía na negação padrão `allow read, write: if false`.
+- A falha era **silenciosa por construção**: `logTelemetryToCloud` engole a
+  exceção num `console.warn` para não interromper a aula da criança. O resultado
+  é que o Radar nunca recebeu dado algum da nuvem, e nada indicava isso.
+- Este é exatamente o **C-06** que o dossiê do Codex já registrava como suspeita;
+  a leitura cruzada entre o caminho gravado e o caminho declarado confirmou.
+- Correção: a subcoleção ganhou regra própria, restrita ao mesmo dono, e a
+  telemetria passou a ser **append-only** — `read` e `create` permitidos,
+  `update` e `delete` negados, porque histórico diagnóstico reescrito deixa de
+  ser evidência. A condição de posse foi extraída para a função `ehDono`.
+- **Guarda automática** em `firestoreRules.test.ts`: compara os caminhos que o
+  cliente monta com os caminhos que as regras declaram e falha quando aparece
+  caminho novo sem regra. Não substitui o emulador — não valida a lógica de
+  `allow` —, mas cobre a classe de defeito que o emulador sozinho não pega:
+  regra que simplesmente não existe.
+- A guarda foi **provada contra as regras antigas**: restaurando o arquivo de
+  produção, três testes falham e o relatório aponta
+  `userStates/*/Kids/*/TelemetryLogs` como caminho descoberto.
+- Dois tropeços no extrator, ambos corrigidos: a pilha de `match` não
+  acompanhava a profundidade real de chaves, e o regex parava no primeiro `{`,
+  que faz parte do próprio caminho em `{userId}`.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 687 testes e 44 arquivos.
