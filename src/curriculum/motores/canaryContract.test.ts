@@ -7,6 +7,7 @@ import { COMPOSER_CANARIES, rollbackComposerCanary, enableComposerCanary } from 
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
+import { N4_04 } from "../fichas/jornada/N4.04";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
@@ -42,6 +43,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
   "N3.10": N3_10,
   "N4.03": N4_03,
+  "N4.04": N4_04,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];

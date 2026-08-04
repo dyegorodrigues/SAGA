@@ -11,7 +11,21 @@ as 46 descobrindo o caminho de novo a cada uma é o jeito caro. As armadilhas do
 §6 foram encontradas construindo N3.10 — cada uma custou uma rodada de medição, e
 cada uma voltaria de graça na competência seguinte se não estivesse escrita.
 
-Este documento é o investimento que torna as 46 restantes baratas.
+Este documento é o investimento que torna as restantes baratas.
+
+**Medido depois de duas competências (N4.03 e N4.04).** O ganho não foi escrever
+menos código — foi **barrar armadilhas antes de existirem** em vez de descobri-las
+apanhando:
+
+| | N4.03 (a primeira) | N4.04 (a segunda) |
+|---|---|---|
+| Armadilhas descobertas **apanhando** | 4 | 1 (acessibilidade) |
+| Armadilhas **barradas aplicando o §6** | 0 | 2 (×1 e o andaime que escreve a conta inteira) |
+| Componentes reusados | 2 (`Quadrado100`, `NumberLine`) | 3 (+ `Arranjo`, extraído aqui) |
+| Procedimento reusado | — | os distratores de N4.03, no nível 5 |
+
+O contador de nós vive em `ALL_MATH_TRACKS`: leia `contentStatus` em vez de
+confiar no número escrito aqui, que envelhece.
 
 ---
 
