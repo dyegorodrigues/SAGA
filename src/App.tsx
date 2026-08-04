@@ -32,6 +32,7 @@ import { buildDojoTrack } from "./utils/dojoMode";
 import { buildAulaTrack } from "./curriculum/motores/composer";
 import { buildMatriculaTrack, seedFromResults } from "./utils/matricula";
 import { saveStateToCloud, loadStateFromCloud, getCurrentUserEmail, logoutUser, auth } from "./lib/firebase";
+import { carimbar, escolherSaveMaisRecente } from "./lib/reconciliacaoDeSaves";
 import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
 import { AdminGodPanel } from "./components/AdminGodPanel";
@@ -370,31 +371,35 @@ export default function App() {
 
     let active = true;
     (async () => {
-      let loadedState: State | null = null;
-      
-      // 1. Attempt to load state from Cloud Firestore if they are logged in
+      // Os dois lados são lidos SEMPRE, e só depois comparados. A nuvem não
+      // vence por ser nuvem: vence o carimbo mais recente. Sem isto, uma sessão
+      // gravada apenas no aparelho (Firestore sem cache persistente, cache
+      // despejado, escrita que nunca subiu) era substituída pelo save antigo da
+      // nuvem na abertura seguinte, em silêncio.
+      let cloudState: State | null = null;
       if (userEmail) {
         try {
-          const cloudState = await loadStateFromCloud();
-          if (cloudState) {
-            loadedState = cloudState;
-          }
+          cloudState = await loadStateFromCloud();
         } catch (err) {
           console.warn("Could not load state from Cloud Firestore, trying local storage fallback", err);
         }
       }
 
-      // 2. If Firestore state isn't found/loaded, fallback to local storage
-      if (!loadedState) {
-        try {
-          const raw = await getStorage("mk-state-v1");
-          if (raw) {
-            loadedState = JSON.parse(raw);
-          }
-        } catch (e) {
-          console.error("Erro ao carregar dados salvos locais:", e);
+      let localState: State | null = null;
+      try {
+        const raw = await getStorage("mk-state-v1");
+        if (raw) {
+          localState = JSON.parse(raw);
         }
+      } catch (e) {
+        console.error("Erro ao carregar dados salvos locais:", e);
       }
+
+      const escolha = escolherSaveMaisRecente(cloudState, localState);
+      if (escolha.houveConflito) {
+        console.log(`[Saves] Nuvem e aparelho divergiam; venceu o mais recente: ${escolha.origem}.`);
+      }
+      const loadedState: State | null = escolha.estado;
 
       if (!active) return;
 
@@ -419,18 +424,21 @@ export default function App() {
   }, [state]);
 
   const persist = (s: State) => {
-    setState(s);
+    // O MESMO carimbo vai para os dois destinos, senão a comparação da abertura
+    // acusaria conflito a cada gravação bem-sucedida.
+    const carimbado = carimbar(s);
+    setState(carimbado);
     (async () => {
       // 1. Persist locally first for instant offline availability
       try {
-        await setStorage("mk-state-v1", JSON.stringify(s));
+        await setStorage("mk-state-v1", JSON.stringify(carimbado));
       } catch (e) {
         console.error("Não consegui gravar o progresso local:", e);
       }
-      
+
       // 2. Synchronize to Firestore Cloud in the background so progress is never lost
       try {
-        await saveStateToCloud(s);
+        await saveStateToCloud(carimbado);
       } catch (e) {
         console.error("Não consegui sincronizar com a nuvem:", e);
       }

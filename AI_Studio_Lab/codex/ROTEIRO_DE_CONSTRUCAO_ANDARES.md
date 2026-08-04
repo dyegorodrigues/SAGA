@@ -125,6 +125,10 @@ Lote B; retirá-la seria regressão. O Plano Mestre confirma a leitura ao exigir
 "trocar um único nó por PR".
 
 ### Andar 5 — Lote E: confiabilidade antes de expansão
+
+**Estado: blocos 1–4 concluídos em 4/ago/2026. Um item depende de ação fora do
+repositório (publicação das regras) e três seguem abertos — listados abaixo.**
+
 E2E da missão diária (criar criança → perfil → missão → ouvir → responder → errar →
 dica → recuperar → concluir → salvar → fechar → reabrir → retomar). Firestore:
 regras, gravações por sessão, custo de writes, offline, reconciliação entre
@@ -132,6 +136,27 @@ dispositivos, migração de saves, retenção, ausência de dados pessoais
 desnecessários. Radar: toque errado isolado não gera diagnóstico, erro motor é
 filtrado, misconception exige padrão, tags deduplicadas, recuperação observável.
 Oficina: ajuda concreta, fluxo não punitivo, limite de resgates, retorno coerente.
+
+| Item | Evidência |
+|---|---|
+| E2E da missão diária | `missaoDiaria.e2e.test.ts` — ciclo completo com ida e volta real pelo JSON do save |
+| Firestore: regras | `firestore.rules` autoriza a subcoleção de telemetria; `firestoreRules.test.ts` compara caminho gravado × caminho declarado |
+| Firestore: **publicação** das regras | ⏳ pendente de ação no Console — `PUBLICAR_REGRAS_FIRESTORE.md`. Até lá valem as regras antigas e a telemetria segue negada em silêncio |
+| Offline | escrita local primeiro, nuvem depois; erro de rede não vira alerta; cache persistente do Firestore com fallback declarado |
+| Reconciliação entre dispositivos | `reconciliacaoDeSaves.ts` — vence o carimbo mais recente, não o lado. Antes a nuvem vencia incondicionalmente e uma sessão só local sumia em silêncio |
+| Migração de saves | `migrate()` com `schemaVersion`; `updatedAt` ausente é tratado como save anterior ao carimbo |
+| Radar: toque errado isolado não gera diagnóstico | `radarOficina.e2e.test.ts` — três toques na mesma questão chegam ao Radar como um evento só |
+| Radar: erro motor é filtrado | `filtroMotor.ts` (§8.3-bis) + sonda de mutação: desligar o filtro derruba 6 testes |
+| Radar: misconception exige padrão | `getRescueItems` exige 2 ocorrências da mesma tag em ≤ 5 erros e ≤ 10 min |
+| Radar: tags deduplicadas | `Set` em `QuestionDiagnostics`; coberto por `questionDiagnostics.test.ts` |
+| Radar: recuperação observável | `recoveredAfterError`, preservado do envenenamento pelo filtro motor |
+| Oficina: ajuda concreta e não punitiva | escada acelerada de 2 acertos dentro do resgate (`progressEngine.test.ts`) |
+| Oficina: limite de resgates | `RESCUE_ESCALATION_LIMIT = 3`, com sondagem do pré-requisito anterior |
+| Oficina: retorno coerente | alvo é destravar (`RESCUE_UNLOCK_LEVEL`), nunca coroar; sem ficha real, retorna `null` em vez de fallback |
+
+**Ainda abertos neste andar:** custo de writes por sessão (hoje uma escrita de
+telemetria por questão, sem lote nem amortecimento), retenção de telemetria
+(nenhuma política declarada) e auditoria de dados pessoais desnecessários.
 
 ### Andar 6 — Migração gradual de F2
 Famílias pequenas: reagrupamento, grupos iguais, arranjos, problemas aditivos,

@@ -242,6 +242,12 @@ export interface LogEntry {
 
 export interface State {
   schemaVersion?: number;
+  /**
+   * Instante ISO da última gravação. Existe para reconciliar nuvem × local na
+   * abertura: sem ele, a nuvem vence sempre e uma sessão gravada só localmente
+   * some em silêncio. Ver `lib/reconciliacaoDeSaves.ts`.
+   */
+  updatedAt?: string;
   kids: Kid[];
   progress: Record<string, Record<string, Progress>>;
   dojoTracks?: Record<string, Record<string, DojoTrackState>>;
