@@ -850,3 +850,34 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   seguida.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 674 testes e 42 arquivos.
+
+## 3 de agosto de 2026 — Andar 5: E2E da missão diária e a repetição imediata
+
+- O E2E percorre o ciclo que a criança vive: criar criança, perfil, missão,
+  ouvir, responder, errar, recuperar, concluir, salvar, fechar, reabrir e
+  retomar. O ponto crítico é o meio: `State` é persistido com `JSON.stringify`,
+  e o dossiê já alertava que estado e questões podem conter funções que não
+  sobrevivem à serialização. O teste passa o estado por **round-trip JSON real**
+  em vez de reaproveitar o objeto em memória — e o progresso sobrevive inteiro.
+- **Defeito grave encontrado logo no primeiro teste.** A missão repetia a mesma
+  questão em sequência imediata. Medido antes de concluir qualquer coisa:
+  **95,3% das missões** traziam ao menos uma repetição e **32,4% dos pares
+  consecutivos eram idênticos** — mesmo kind, mesmo enunciado, mesma resposta.
+- Causa: cada fase chama o mesmo gerador em sequência — duas vezes o aquecimento,
+  cinco a fronteira, três a fluência, mais o laço de preenchimento. Geradores de
+  alcance pequeno colidem com frequência alta.
+- Correção em três camadas, cada uma revelada pela medição seguinte:
+  1. guarda de distinção com até oito tentativas nas fases geradas — caiu para
+     33,7% das missões e 4,8% dos pares;
+  2. o fecho era montado fora da guarda e depois do corte, sobrando exatamente
+     uma repetição por missão afetada; passou a comparar com a questão que de
+     fato ficou por último;
+  3. o fallback "Em construção" é **constante**, então repetir a geração devolve
+     sempre a mesma carta. Duas seguidas passaram a ser recusadas: missão mais
+     curta é melhor que missão preenchida com a mesma carta vazia.
+- Resultado medido em 300 missões por faixa: **0,0% em F0, F1, F2 e F3**, com os
+  tamanhos preservados em 8, 12, 16 e 20.
+- O resgate ficou de fora da guarda de propósito: sua fila é consumida por
+  `shift`, e tentar de novo descartaria um resgate legítimo.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 681 testes e 43 arquivos.

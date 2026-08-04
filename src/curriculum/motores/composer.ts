@@ -191,34 +191,88 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
   const genResg = () => rescueQueue.shift()?.() || null;
 
   const qs: Question[] = [];
-  
+
   const addQ = (q: Question | null) => { if (q) qs.push(q); };
 
+  /**
+   * O que a criança percebe como "a mesma questão de novo".
+   * Não é identidade de objeto: dois sorteios distintos podem produzir
+   * exatamente o mesmo enunciado e a mesma resposta.
+   */
+  const assinatura = (q: Question) => JSON.stringify([
+    q.kind, q.prompt, q.answer, q.big, q.n, q.emoji, q.a, q.b, q.story, q.expr,
+  ]);
+
+  /**
+   * Cada fase chama o mesmo gerador em sequência, e geradores de alcance
+   * pequeno repetem com frequência alta. Sem esta guarda, 95% das missões
+   * traziam ao menos uma repetição imediata e um terço dos pares consecutivos
+   * era idêntico — a criança via a mesma pergunta duas vezes seguidas.
+   */
+  const fabricarDistinta = (
+    fabricar: () => Question | null,
+    anterior: string | null,
+    tentativas = 8,
+  ): Question | null => {
+    let q = fabricar();
+    if (!q) return null;
+    for (let i = 0; anterior && i < tentativas && assinatura(q) === anterior; i += 1) {
+      const outra = fabricar();
+      if (!outra) break;
+      q = outra;
+    }
+    return q;
+  };
+
+  const addDistinta = (fabricar: () => Question | null): boolean => {
+    const anterior = qs.length ? qs[qs.length - 1] : null;
+    const q = fabricarDistinta(fabricar, anterior ? assinatura(anterior) : null);
+    if (!q) return false;
+    // O fallback "Em construção" é constante: repetir a geração devolve sempre a
+    // mesma carta. Empilhar duas seguidas não ensina nada e parece defeito, então
+    // a segunda é recusada — missão mais curta é melhor que missão preenchida
+    // com a mesma carta vazia.
+    if (q.isFallback && anterior?.isFallback) return false;
+    qs.push(q);
+    return true;
+  };
+
   // 1. AQUECIMENTO (15% = ~2 questões) -> Nível - 1 (Fácil)
-  addQ(gen(plan.aquecimento, Math.max(1, lvlOf(plan.aquecimento!) - 1)));
-  addQ(gen(plan.aquecimento, Math.max(1, lvlOf(plan.aquecimento!) - 1)));
+  const nivelAquecimento = () => Math.max(1, lvlOf(plan.aquecimento!) - 1);
+  addDistinta(() => gen(plan.aquecimento, nivelAquecimento()));
+  addDistinta(() => gen(plan.aquecimento, nivelAquecimento()));
 
   // 2. FRONTEIRA (~40-50% = ~5-6 questões) -> Nível de Partida Atual (LevelToApply)
   for (let i = 0; i < 5; i++) {
-    addQ(gen(plan.fronteira));
+    addDistinta(() => gen(plan.fronteira));
   }
 
   // 3. RESGATE (1-2 questões)
+  // Sem repetição aqui: a fila de resgate é consumida por `shift`, e tentar de
+  // novo descartaria um resgate legítimo.
   addQ(genResg());
   addQ(genResg());
 
   // 4. FLUÊNCIA (25% = ~3 questões) -> Rápido
-  addQ(gen(plan.fluencia));
-  addQ(gen(plan.fluencia));
-  addQ(gen(plan.fluencia));
+  addDistinta(() => gen(plan.fluencia));
+  addDistinta(() => gen(plan.fluencia));
+  addDistinta(() => gen(plan.fluencia));
+
+  // Trunca/ajusta se passou do limite (sem remover o fecho)
+  while (qs.length < total - 1) {
+    if (!addDistinta(() => gen(plan.fronteira) || gen(plan.aquecimento, 1))) break;
+  }
+  const final = qs.slice(0, total - 1);
 
   // 5. FECHO (1 questão lúdica)
-  const fechoQ = gen(plan.fecho, Math.max(1, plan.fecho ? lvlOf(plan.fecho) - 1 : 1)) || gen(plan.aquecimento, 1);
-  
-  // Trunca/ajusta se passou do limite (sem remover o fecho)
-  while (qs.length < total - 1) { const q = gen(plan.fronteira) || gen(plan.aquecimento, 1); if (q) qs.push(q); else break; }
-  const final = qs.slice(0, total - 1);
-  if (fechoQ) final.push(fechoQ);
+  // O fecho é montado depois do corte, para que a comparação seja com a questão
+  // que realmente ficou por último — era aqui que sobrava a última repetição.
+  const fechoQ = fabricarDistinta(
+    () => gen(plan.fecho, Math.max(1, plan.fecho ? lvlOf(plan.fecho) - 1 : 1)) || gen(plan.aquecimento, 1),
+    final.length ? assinatura(final[final.length - 1]) : null,
+  );
+  const ultimaDaMissao = final.length ? final[final.length - 1] : null;
+  if (fechoQ && !(fechoQ.isFallback && ultimaDaMissao?.isFallback)) final.push(fechoQ);
 
   return { qs: final, plan };
 }
