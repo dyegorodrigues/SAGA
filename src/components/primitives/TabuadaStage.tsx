@@ -16,6 +16,33 @@ import { QuadroSpec, SaltosSpec, TabuadaSpec } from "../../curriculum/procedimen
  * O componente só apresenta.
  */
 
+/**
+ * Largura útil para a reta, em px.
+ *
+ * Não é simplesmente 390 menos margens: os rótulos dos números são posicionados
+ * de forma absoluta sobre traços de 4px e **transbordam para os lados**. O
+ * primeiro e o último rótulo avançam meia largura para fora da reta, cerca de
+ * 26px no total. Medido no navegador, não estimado.
+ */
+export const LARGURA_UTIL = 300;
+
+/** Cores dos saltos, alternadas para que a criança conte HOPS, não um trecho. */
+export const COR_DO_SALTO_PAR = "#f59e0b";
+export const COR_DO_SALTO_IMPAR = "#6366f1";
+
+/**
+ * Quanto cada ponto da reta pode ocupar para a reta inteira caber.
+ *
+ * Exportada para ser testável: jsdom não calcula layout, então a única forma de
+ * travar "não rola na horizontal" num teste unitário é verificar a conta que
+ * decide a largura.
+ */
+export function larguraPorPontoDaReta(quantidadeDeSaltos: number): number {
+  // O piso é 24: abaixo disso nem o rótulo encolhido cabe. A reta desta ficha
+  // nunca chega lá — o pior caso são 11 pontos, que dão 27px.
+  return Math.max(24, Math.floor(LARGURA_UTIL / (quantidadeDeSaltos + 1)));
+}
+
 interface Props {
   spec: TabuadaSpec;
   onReplay?: () => void;
@@ -48,13 +75,25 @@ function Quadro({ quadro }: { quadro: QuadroSpec }) {
  * sair no nível 2.
  */
 function Saltos({ saltos }: { saltos: SaltosSpec }) {
+  // A reta precisa CABER: rolando na horizontal, ela esconde o fim da contagem,
+  // que é exatamente a estratégia do nível 1. Ver Padrão Ouro §6.16.
+  const larguraPorPonto = larguraPorPontoDaReta(saltos.saltos.length);
   return (
     <div role="group" className="w-full" aria-label={saltos.descricao}>
       <NumberLine
         min={0}
         max={saltos.ate}
         step={saltos.passo}
-        highlightedRanges={saltos.saltos.map(s => ({ start: s.de, end: s.para }))}
+        larguraPorPonto={larguraPorPonto}
+        // Cores alternadas porque os saltos são adjacentes: pintados de uma cor
+        // só, os cinco saltos de dez viram UMA barra contínua de 0 a 50 — e a
+        // estratégia que o nível existe para ensinar fica invisível. Ver Padrão
+        // Ouro §6.17.
+        highlightedRanges={saltos.saltos.map((s, i) => ({
+          start: s.de,
+          end: s.para,
+          color: i % 2 === 0 ? COR_DO_SALTO_PAR : COR_DO_SALTO_IMPAR,
+        }))}
       />
     </div>
   );

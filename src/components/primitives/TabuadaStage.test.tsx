@@ -3,7 +3,7 @@ import React from "react";
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import axe from "axe-core";
-import { TabuadaStage } from "./TabuadaStage";
+import { LARGURA_UTIL, TabuadaStage, larguraPorPontoDaReta } from "./TabuadaStage";
 import { Composer } from "../../curriculum/Composer";
 import { N4_03 } from "../../curriculum/fichas/jornada/N4.03";
 import { TabuadaSpec } from "../../curriculum/procedimentos/tabuadaContract";
@@ -49,6 +49,29 @@ describe("TabuadaStage — a tela de N4.03", () => {
     expect(quatro.container.querySelector('[aria-label^="Quadro de cem"]')).toBeNull();
     expect(quatro.container.textContent?.replace(/\s/g, "")).toMatch(/^\d+×\d+$/);
     quatro.unmount();
+  });
+
+  it("a reta de saltos cabe na tela, em vez de rolar e esconder o fim", () => {
+    // O defeito que isto trava: com 10 saltos a 60px cada, a reta media 600px
+    // numa tela de 390 e ROLAVA na horizontal — escondendo justamente onde a
+    // contagem chega, que é a estratégia do nível 1. A medição de altura não
+    // pegava, e a captura de tela mostrou na hora.
+    for (let saltos = 2; saltos <= 10; saltos += 1) {
+      const largura = larguraPorPontoDaReta(saltos) * (saltos + 1);
+      expect(largura, `${saltos} saltos ocupariam ${largura}px`).toBeLessThanOrEqual(LARGURA_UTIL);
+    }
+  });
+
+  it("mesmo no pior caso da ficha, a reta não estoura nem some com o número", () => {
+    // Pior caso: tabuada do 10 tomada 10 vezes, 11 pontos. A tensão é real —
+    // 11 rótulos de dois dígitos não cabem em 300px no tamanho confortável.
+    // A saída não foi apertar o espaço (os números colidiriam) e sim ENCOLHER o
+    // rótulo quando a reta fica densa, o que NumberLine decide sozinha.
+    const s = spec(1);
+    const pontos = s.saltos!.saltos.length;
+    const largura = larguraPorPontoDaReta(pontos);
+    expect(largura * (pontos + 1)).toBeLessThanOrEqual(LARGURA_UTIL);
+    expect(largura, "abaixo de 24px nem o rótulo encolhido cabe").toBeGreaterThanOrEqual(24);
   });
 
   it("o botão de ouvir de novo existe e se identifica", () => {

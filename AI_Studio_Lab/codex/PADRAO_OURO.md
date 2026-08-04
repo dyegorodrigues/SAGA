@@ -6,10 +6,13 @@ cumprido, não para um exemplo inventado.
 
 ## Por que este documento existe
 
-Restam **46 competências em fallback** (contra 42 com conteúdo próprio). Fazer
-as 46 descobrindo o caminho de novo a cada uma é o jeito caro. As armadilhas do
+Descobrir o caminho de novo a cada competência é o jeito caro. As armadilhas do
 §6 foram encontradas construindo N3.10 — cada uma custou uma rodada de medição, e
 cada uma voltaria de graça na competência seguinte se não estivesse escrita.
+
+Quantas faltam? **Não confie em número escrito aqui** — envelhece a cada
+promoção. Conte pelo código: `ALL_MATH_TRACKS.filter(t => t.contentStatus ===
+"fallback")`.
 
 Este documento é o investimento que torna as restantes baratas.
 
@@ -24,8 +27,7 @@ apanhando:
 | Componentes reusados | 2 (`Quadrado100`, `NumberLine`) | 3 (+ `Arranjo`, extraído aqui) |
 | Procedimento reusado | — | os distratores de N4.03, no nível 5 |
 
-O contador de nós vive em `ALL_MATH_TRACKS`: leia `contentStatus` em vez de
-confiar no número escrito aqui, que envelhece.
+
 
 ---
 
@@ -133,7 +135,7 @@ visível na cena. Ver armadilha 6.2.
 | O nó antes | tinha gerador próprio | caía no placeholder "Em construção!" |
 | O que verificar | **paridade** — a ficha nova cobre o que o legado cobria | **deixou de ser placeholder** |
 | Rollback devolve | o gerador legado | o placeholder |
-| Quantos são | os já feitos | **os 46 restantes** |
+| Quantos são | os já feitos | **todos os que faltam** |
 
 O contrato original só previa substituição, porque os dois primeiros canários
 por acaso eram desse tipo. Todas as promoções que faltam são estreias.
@@ -170,7 +172,39 @@ E, para nós com tela nova, mais três:
 
 - [ ] `axe-core` sem violação nos cinco níveis
 - [ ] a tela renderizada **não fala** o número que a pergunta pede
-- [ ] cabe em 390×844 sem rolagem
+- [ ] cabe em 390×844 **sem rolagem em nenhuma das duas direções** (§6.16)
+- [ ] **capturado e olhado** nos cinco níveis — teste verde não prova legibilidade (§6.17)
+
+---
+
+## 2-bis. Lista fixa no teste: quando vale, quando envenena
+
+Varri a suíte inteira atrás deste padrão. A distinção é sutil e vale escrita,
+porque errar para qualquer um dos lados custa caro.
+
+**Fixe a lista quando ela É a especificação.** O teste deve quebrar se alguém
+mudar aquilo — é esse o serviço dele.
+
+- `[...doNivel(1)]` é `["join"]` → é a tabela da ficha, transcrita. Mudou? A
+  pedagogia mudou, e isso precisa de decisão humana.
+- 88 competências, 92 fichas → invariante do cânone (Bíblia §15.8). Um 89º nó
+  aparecendo sem passar pelo cânone é exatamente o que se quer barrar.
+- "a resposta certa aparece uma vez" → regra, expressa como número.
+
+**Derive a lista quando ela é um INVENTÁRIO** — algo que cresce com trabalho
+legítimo. Fixá-la faz o teste quebrar a cada avanço correto, e isso é pior do
+que inútil: **treina quem lê a "consertar o teste" sem pensar.** No dia em que o
+teste quebrar por um motivo real, a mão já vai estar automatizada para silenciá-lo.
+
+- ❌ `expect([...COMPOSER_CANARIES]).toEqual(["N3.09", "N3.10"])` — quebrava a
+  cada promoção legítima. Corrigido: hoje o teste percorre o conjunto e verifica
+  a **regra** (todo canário é servido pelo Composer; todo canário está
+  registrado no contrato).
+- ❌ Depender de existir, por acaso, um nó implementado e não ativado. O guarda
+  agora **produz** esse estado com rollback.
+
+**O teste de bolso:** *"este teste quebra quando eu faço o trabalho certo?"* Se
+sim, ele está medindo inventário e precisa virar regra.
 
 ---
 
@@ -326,7 +360,27 @@ recebe o resultado. Mesma família da regra do `BarSlot` sem valor.
 → **Encontrada aplicando o §3, não apanhando.** Foi a primeira armadilha barrada
 antes de existir.
 
-### 6.15 O Vitest não checa tipos
+### 6.16 Medir altura não detecta conteúdo cortado na horizontal
+A reta de saltos do nível 1 media 600px (10 pontos × 60px) dentro de 390px e
+**rolava na horizontal**, escondendo justamente onde a contagem chega — a
+estratégia que o nível existe para ensinar. Todos os testes passavam; a medição
+de altura dava 316px e aprovava.
+→ Meça **as duas dimensões**, e no navegador procure
+`el.scrollWidth > el.clientWidth`. Nenhum elemento pode rolar na horizontal.
+→ Quando não couber, **não aperte o espaço** — os rótulos colidem. Encolha o
+rótulo: `NumberLine` escolhe o tamanho da fonte pela própria densidade.
+
+### 6.17 Apoio pintado de uma cor só vira um bloco sem informação
+Os cinco saltos de dez, adjacentes e da mesma cor, formavam **uma barra contínua
+de 0 a 50**. A criança via "um trecho", não "cinco saltos" — e contar os saltos
+era o objetivo.
+→ Elementos adjacentes que precisam ser contados alternam cor.
+
+> **As duas foram achadas OLHANDO A TELA**, com a suíte inteira verde. Teste
+> prova que o dado está certo; captura de tela prova que a criança consegue usar.
+> Um não substitui o outro.
+
+### 6.18 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.
