@@ -40,11 +40,12 @@ import {
   ehTabuadaDificil,
   tabuadasDoNivel as tabuadasDificeisDoNivel,
 } from "./procedimentos/ancoraProcedure";
-import { construirFamiliaSpec } from "./procedimentos/familiaContract";
+import { apoioDisponivel, construirFamiliaSpec } from "./procedimentos/familiaContract";
 import {
   FATOR_MAX,
   FATOR_MIN,
   VerticeOculto,
+  contasDeApoio,
   ehPergunavelComDiagnostico as familiaDiagnostica,
   produto as produtoDaFamilia,
   produtoMaximoDoNivel,
@@ -572,7 +573,12 @@ export class Composer {
           for (let b = FATOR_MIN; b <= FATOR_MAX; b += 1) {
             if (produtoDaFamilia({ a, b }) > teto) continue;
             for (const vertice of verticesDoNivel(lvl)) {
-              if (familiaDiagnostica({ a, b }, vertice)) candidatas.push({ a, b, vertice });
+              if (!familiaDiagnostica({ a, b }, vertice)) continue;
+              // Nível que promete apoio precisa TER apoio: famílias de fatores
+              // iguais não sobram frase nenhuma depois do filtro, e cairiam com
+              // andaime alto numa tela idêntica à do nível 4.
+              if (contasDeApoio(lvl) > 0 && apoioDisponivel({ a, b }, vertice) === 0) continue;
+              candidatas.push({ a, b, vertice });
             }
           }
         }

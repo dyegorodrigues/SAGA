@@ -24,7 +24,6 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N4.03": N4_03,
   "N4.04": N4_04,
   "N4.07": N4_07,
-  // Implementada e verificada, NÃO ativada: a estreia é outro PR.
   "N4.06": N4_06,
 };
 
@@ -35,7 +34,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  * gerada, sem exigir rebuild: a decisão é resolvida a cada chamada, não na carga
  * do módulo.
  */
-export const COMPOSER_CANARIES = new Set<string>(["N3.09", "N3.10", "N4.03", "N4.04", "N4.07"]);
+export const COMPOSER_CANARIES = new Set<string>(["N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06"]);
 
 export interface GeneratorBinding {
   /** Resolve a origem a cada questão, refletindo o estado atual dos canários. */

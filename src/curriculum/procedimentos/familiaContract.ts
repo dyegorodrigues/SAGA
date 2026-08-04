@@ -83,6 +83,23 @@ export function construirFamiliaSpec(
   };
 }
 
+/**
+ * Quantas contas de apoio esta família consegue oferecer de fato.
+ *
+ * Nem toda família tem quatro frases distintas: em 3-3-9 os dois produtos são a
+ * mesma frase, e as duas divisões contêm o 9 — que é a resposta quando se
+ * pergunta o produto. Sobra ZERO apoio, e um nível de andaime alto sem apoio
+ * nenhum não é andaime alto: é a mesma tela do nível 4 com outro nome.
+ */
+export function apoioDisponivel(f: Familia, vertice: VerticeOculto): number {
+  const pergunta = contaEmAberto(f, vertice);
+  const resposta = resolver(f, vertice);
+  return quatroContas(f).map(mascarar)
+    .filter(c => c !== pergunta)
+    .filter(c => !(c.match(/\d+/g) ?? []).map(Number).includes(resposta))
+    .length;
+}
+
 /** O que a tela mostra na hora da pergunta contém a resposta? */
 export function enunciadoNaoRevela(spec: FamiliaSpec): boolean {
   const visivel = [spec.pergunta, spec.falado, ...spec.apoio,
