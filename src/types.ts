@@ -1,3 +1,5 @@
+import type { EventoManipulacao } from "./curriculum/procedimentos/filtroMotor";
+
 export interface Kid {
   id: string;
   rt_max_s?: number;
@@ -51,6 +53,12 @@ export interface AnswerMeta {
   misconception?: string;
   source?: "vertical-column" | "array-grid";
   columnIndex?: number;
+  /**
+   * Assinatura do gesto, quando a resposta veio de manipulação (arrasto, corte,
+   * alinhamento, giro, posicionamento). Alimenta o filtro motor do §8.3-bis:
+   * sem isto, escorregão de dedo vira tag de misconception.
+   */
+  manipulacao?: EventoManipulacao;
 }
 
 export interface Question {
