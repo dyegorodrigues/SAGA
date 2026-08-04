@@ -97,6 +97,21 @@ incógnita variando; resposta não revelada; áudio funcionando; criança não l
 compreende a ação; sem rolagem; alvos de toque adequados; `reduced-motion`
 funcionando; testes passando; build passando; legado intacto.
 
+**Estado dos Andares 1–3: concluídos em 3/ago/2026** — conferido item a item
+contra o código em 4/ago, não de memória.
+
+| Item do gate | Evidência |
+|---|---|
+| Quatro estruturas executáveis | `ADDITIVE_STRUCTURES` em `additiveProcedure.ts`; `coversDistinctStructures` |
+| Cinco níveis + incógnita variando | `structuresForLevel`, `unknownSlotsForLevel`; contrato do canário cobre os cinco |
+| Resposta não revelada | `BarSlot` da incógnita não tem campo de valor; teste lê a tela renderizada e os rótulos de acessibilidade |
+| Áudio | `onReplay` em `StoryPanelStage`; `audioPrompt` na ficha |
+| Não leitora compreende | cada parte interrogada anuncia seu papel no texto e no `aria-label` |
+| Sem rolagem | 611/611/639/487/487 px contra alvo de 844 |
+| Alvos de toque | `minHeight: 80px` nas primitivas de toque (`EmojiRow`, `DragGroup`) |
+| `reduced-motion` | `useReducedMotion` em `StoryPanelStage` + regra global em `App.tsx`; teste dedicado |
+| Testes / build / legado | 739 testes, build verde, `gN3_10` intacto e exercido pelo teste de paridade |
+
 ### Andar 4 — Canário de N3.10, em PR separado
 
 **Estado: concluído em 3/ago/2026.**
