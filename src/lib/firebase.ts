@@ -9,6 +9,7 @@ import {
   getDoc,
   setDoc,
   setLogLevel,
+  Timestamp,
 } from "firebase/firestore";
 import {
   getAuth,
@@ -295,6 +296,15 @@ export async function loadStateFromCloud(): Promise<State | null> {
 }
 
 /**
+ * Por quanto tempo um registro de telemetria vive na nuvem.
+ *
+ * 18 meses cobre a única análise que justifica guardar isto — comparar a criança
+ * com ela mesma ao longo de mais de um ano letivo — e nada além. Dado de criança
+ * que não serve a nenhuma pergunta é só risco parado.
+ */
+export const RETENCAO_TELEMETRIA_DIAS = 550;
+
+/**
  * Logs an atomic telemetry event to Cloud Firestore asynchronously.
  * This does not block the UI and provides deep analytical insight.
  */
@@ -306,8 +316,13 @@ export async function logTelemetryToCloud(log: TelemetryLog): Promise<void> {
     const colRef = collection(db, `userStates/${userId}/Kids/${log.kidId}/TelemetryLogs`);
     await setDoc(doc(colRef), {
       ...log,
-      parentUserId: userId,
-      serverTimestamp: new Date().toISOString()
+      serverTimestamp: new Date().toISOString(),
+      // Retenção (§ política em AI_Studio_Lab/DADOS_E_RETENCAO.md): o campo é o
+      // gatilho da política de TTL do Firestore. Precisa ser Timestamp de
+      // verdade — o TTL ignora string. Sem a política ligada no Console, o campo
+      // fica inerte e não custa nada; com ela ligada, o registro se apaga
+      // sozinho e ninguém precisa lembrar de faxinar.
+      expiraEm: Timestamp.fromMillis(Date.now() + RETENCAO_TELEMETRIA_DIAS * 86400000),
     });
   } catch (err: any) {
     console.warn("[Firestore] Falha ao enviar telemetria (background):", err.message);

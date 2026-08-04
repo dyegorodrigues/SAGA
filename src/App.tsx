@@ -33,6 +33,7 @@ import { buildAulaTrack } from "./curriculum/motores/composer";
 import { buildMatriculaTrack, seedFromResults } from "./utils/matricula";
 import { saveStateToCloud, loadStateFromCloud, getCurrentUserEmail, logoutUser, auth } from "./lib/firebase";
 import { carimbar, escolherSaveMaisRecente } from "./lib/reconciliacaoDeSaves";
+import { criarSincronizador } from "./lib/sincronizadorDeNuvem";
 import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
 import { AdminGodPanel } from "./components/AdminGodPanel";
@@ -44,6 +45,12 @@ import { shellRootClass } from "./components/layout/shellLayout";
 /* ============================================================
    MATEMÁGICA IA — Matemática Adaptativa & Tutoria Inteligente (PT-BR)
    ============================================================ */
+
+/**
+ * Único para o app inteiro, e fora do componente de propósito: um sincronizador
+ * criado a cada render não coalesceria nada.
+ */
+const nuvem = criarSincronizador({ gravar: saveStateToCloud });
 
 const getDefaultPetName = (theme: string) => {
   const names: Record<string, string> = {
@@ -340,6 +347,20 @@ export default function App() {
   // acertos da matrícula na ordem da escada (reiniciado no 1º commit da missão)
   const matResultsRef = useRef<boolean[]>([]);
 
+  // Fechar a aba, trocar de app ou bloquear a tela descarrega o que estiver
+  // esperando. `pagehide` e `visibilitychange` porque no iOS o `beforeunload`
+  // frequentemente não dispara — e tablet é onde este app roda.
+  useEffect(() => {
+    const descarregar = () => { void nuvem.descarregar(); };
+    const aoEsconder = () => { if (document.visibilityState === "hidden") descarregar(); };
+    window.addEventListener("pagehide", descarregar);
+    document.addEventListener("visibilitychange", aoEsconder);
+    return () => {
+      window.removeEventListener("pagehide", descarregar);
+      document.removeEventListener("visibilitychange", aoEsconder);
+    };
+  }, []);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -423,26 +444,32 @@ export default function App() {
     }
   }, [state]);
 
-  const persist = (s: State) => {
+  /**
+   * @param imediato sobe para a nuvem agora, sem esperar a janela do
+   * amortecedor. Use quando o estado é estrutural (perfil criado ou apagado,
+   * reset) ou quando a missão terminou — momentos em que o usuário espera que
+   * o outro aparelho já enxergue a mudança.
+   */
+  const persist = (s: State, imediato = false) => {
     // O MESMO carimbo vai para os dois destinos, senão a comparação da abertura
     // acusaria conflito a cada gravação bem-sucedida.
     const carimbado = carimbar(s);
     setState(carimbado);
+
+    // O aparelho grava SEMPRE, a cada questão: é o save que a criança usa, e é
+    // ele que vence na reconciliação por ser o mais recente.
     (async () => {
-      // 1. Persist locally first for instant offline availability
       try {
         await setStorage("mk-state-v1", JSON.stringify(carimbado));
       } catch (e) {
         console.error("Não consegui gravar o progresso local:", e);
       }
-
-      // 2. Synchronize to Firestore Cloud in the background so progress is never lost
-      try {
-        await saveStateToCloud(carimbado);
-      } catch (e) {
-        console.error("Não consegui sincronizar com a nuvem:", e);
-      }
     })();
+
+    // A nuvem é cópia de segurança e pode esperar. Reescrever o save inteiro a
+    // cada questão subia ~1,2 MB por missão para mudar meia dúzia de números.
+    nuvem.agendar(carimbado);
+    if (imediato) void nuvem.descarregar();
   };
 
   if (!state || screen.name === "loading") {
@@ -581,12 +608,16 @@ export default function App() {
       },
       coins: { ...state.coins, [kidId]: coinsOf(kidId) + coinGain },
       log: { ...state.log, [kidId]: lg.slice(-366) },
-    });
+    },
+    // Fim de missão sobe na hora: é o marco que o pai vê no painel e o ponto em
+    // que o outro aparelho precisa estar em dia. Durante a missão, o estado
+    // intermediário não interessa a ninguém e fica no amortecedor.
+    missionDone);
   };
 
   const handleFactoryReset = () => {
     const freshState = defaultState();
-    persist(freshState);
+    persist(freshState, true);
     setScreen({ name: "setup" });
   };
 
@@ -617,7 +648,7 @@ export default function App() {
     if (updatedKids.length === 0) {
       handleFactoryReset();
     } else {
-      persist(newState);
+      persist(newState, true);
     }
   };
 
@@ -630,17 +661,17 @@ export default function App() {
       album: { ...state.album, [newKid.id]: [] },
       log: { ...state.log, [newKid.id]: [] },
     };
-    persist(newState);
+    persist(newState, true);
   };
 
   const handleLoginSuccess = (email: string, cloudState: State | null) => {
     setUserEmail(email);
     if (cloudState) {
-      persist(migrate(cloudState));
+      persist(migrate(cloudState), true);
     } else {
       // If there's no cloud state for this new user, start completely fresh with a clean slate!
       const fresh = defaultState();
-      persist(fresh);
+      persist(fresh, true);
       setScreen({ name: "setup" });
     }
   };

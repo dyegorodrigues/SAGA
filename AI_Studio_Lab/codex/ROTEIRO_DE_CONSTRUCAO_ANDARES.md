@@ -126,8 +126,9 @@ Lote B; retirá-la seria regressão. O Plano Mestre confirma a leitura ao exigir
 
 ### Andar 5 — Lote E: confiabilidade antes de expansão
 
-**Estado: blocos 1–4 concluídos em 4/ago/2026. Um item depende de ação fora do
-repositório (publicação das regras) e três seguem abertos — listados abaixo.**
+**Estado: concluído em 4/ago/2026. Um único item depende de ação fora do
+repositório — publicar as regras e ligar o TTL no Console, dois cliques na mesma
+tela — e nada no app depende disso para funcionar hoje.**
 
 E2E da missão diária (criar criança → perfil → missão → ouvir → responder → errar →
 dica → recuperar → concluir → salvar → fechar → reabrir → retomar). Firestore:
@@ -153,10 +154,14 @@ Oficina: ajuda concreta, fluxo não punitivo, limite de resgates, retorno coeren
 | Oficina: ajuda concreta e não punitiva | escada acelerada de 2 acertos dentro do resgate (`progressEngine.test.ts`) |
 | Oficina: limite de resgates | `RESCUE_ESCALATION_LIMIT = 3`, com sondagem do pré-requisito anterior |
 | Oficina: retorno coerente | alvo é destravar (`RESCUE_UNLOCK_LEVEL`), nunca coroar; sem ficha real, retorna `null` em vez de fallback |
+| Custo de writes por sessão | `sincronizadorDeNuvem.ts` — 10 gravações do save por missão viram 1; upload anual cai de ~1,3 GB para ~136 MB. Medido, não estimado: `DADOS_E_RETENCAO.md` §3 |
+| Retenção | log diário 366 dias, hipóteses do Radar 15 por nó, telemetria 550 dias via campo `expiraEm` (TTL do Firestore). `DADOS_E_RETENCAO.md` §2 |
+| Ausência de dados pessoais desnecessários | inventário campo a campo em `DADOS_E_RETENCAO.md` §1. Um campo redundante removido (`parentUserId`); nenhum outro dado sem justificativa |
 
-**Ainda abertos neste andar:** custo de writes por sessão (hoje uma escrita de
-telemetria por questão, sem lote nem amortecimento), retenção de telemetria
-(nenhuma política declarada) e auditoria de dados pessoais desnecessários.
+**Dependência de ordem que vale registrar:** o amortecedor de gravações só é
+seguro porque a reconciliação por carimbo veio antes. Na ordem inversa, coalescer
+gravações teria aberto uma janela real de perda de progresso — o app fecharia com
+gravação pendente e a nuvem antiga venceria na abertura seguinte.
 
 ### Andar 6 — Migração gradual de F2
 Famílias pequenas: reagrupamento, grupos iguais, arranjos, problemas aditivos,

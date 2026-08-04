@@ -82,14 +82,29 @@ describe("carimbo", () => {
 
   it("o mesmo carimbo vai para os dois destinos", () => {
     const app = readFileSync(resolve(__dirname, "../App.tsx"), "utf8");
-    const persist = app.slice(app.indexOf("const persist = (s: State)"));
+    const persist = app.slice(app.indexOf("const persist = (s: State"));
     const corpo = persist.slice(0, persist.indexOf("\n  };"));
 
-    // Carimbar duas vezes produziria instantes diferentes no local e na nuvem,
-    // e a abertura seguinte acusaria conflito a cada gravação bem-sucedida.
+    // Carimbar duas vezes produziria instantes diferentes no aparelho e na
+    // nuvem, e a abertura seguinte acusaria conflito a cada gravação
+    // bem-sucedida.
     expect(corpo.match(/carimbar\(/g) ?? []).toHaveLength(1);
     expect(corpo).toContain('setStorage("mk-state-v1", JSON.stringify(carimbado))');
-    expect(corpo).toContain("saveStateToCloud(carimbado)");
+    expect(corpo, "a nuvem recebe o MESMO estado carimbado").toContain("nuvem.agendar(carimbado)");
+  });
+
+  it("o aparelho grava sempre; só a nuvem passa pelo amortecedor", () => {
+    const app = readFileSync(resolve(__dirname, "../App.tsx"), "utf8");
+    const persist = app.slice(app.indexOf("const persist = (s: State"));
+    const corpo = persist.slice(0, persist.indexOf("\n  };"));
+
+    // Se a gravação local entrar no amortecedor, uma queda do app perde o
+    // progresso da questão — e a reconciliação não tem mais nada a reconciliar.
+    const posLocal = corpo.indexOf("setStorage(");
+    const posAmortecedor = corpo.indexOf("nuvem.agendar(");
+    expect(posLocal).toBeGreaterThan(-1);
+    expect(posAmortecedor).toBeGreaterThan(posLocal);
+    expect(corpo).not.toMatch(/nuvem\.agendar\([^)]*\)[\s\S]*setStorage\(/);
   });
 });
 
