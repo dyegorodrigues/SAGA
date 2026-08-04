@@ -4,11 +4,31 @@ O arquivo `firestore.rules` na raiz do repositório é a **fonte da verdade**, m
 ele não entra em vigor sozinho: o Firebase só passa a usá-lo depois que as regras
 são publicadas no projeto. Enquanto isso não acontece, valem as regras antigas.
 
-**Por que isso importa agora.** As regras que estão no Firebase hoje negam toda a
-escrita de telemetria, porque autorizam apenas o documento do usuário e não a
-subcoleção `Kids/{kidId}/TelemetryLogs`. O aplicativo engole o erro para não
-interromper a aula, então nada aparece quebrado — mas o Radar não recebe dado
-algum da nuvem.
+## Primeiro: isto NÃO é urgente. Nada está quebrado para a criança.
+
+Vale a pena dizer com todas as letras, porque a descrição do defeito soa pior do
+que ele é:
+
+- **O progresso está salvo.** Estrelas, níveis, coroas, mascote e — o que mais
+  importa — as hipóteses do Radar moram dentro do save do usuário, no caminho
+  `userStates/{id}`, que as regras antigas **já autorizam**. Nada disso depende
+  do que está bloqueado.
+- **O Radar funciona.** Ele lê os erros do próprio save, não da nuvem. Missão de
+  Resgate, Oficina invisível e painel dos pais continuam funcionando hoje.
+- **O que está bloqueado** é só a subcoleção `Kids/{kidId}/TelemetryLogs`: o
+  registro detalhado, questão a questão, para análise profunda depois. E hoje
+  **nenhuma tela do app lê esse registro** — ele é gravado e mais nada.
+
+Ou seja: publicar as regras liga uma gravação que ainda não tem leitor. É
+trabalho de fundação, para quando as análises existirem. **Pode ser feito
+quando for confortável para você** — no computador novo, se preferir. Enquanto
+não for, o aplicativo funciona por inteiro e nenhum aprendizado se perde.
+
+O que já está pronto do meu lado: o arquivo `firestore.rules` está corrigido e
+tem teste que trava a correção, e o workflow do caminho B está escrito e
+esperando. O único passo que eu não consigo dar sozinho é o de dentro do
+Console do seu projeto Firebase, porque não tenho acesso a ele — não é uma
+tarefa que estou te passando, é o limite de onde eu alcanço.
 
 ---
 
@@ -29,8 +49,7 @@ republicar o aplicativo.
 
 **Como conferir que funcionou.** Depois de publicar, abra o app, responda uma
 questão e volte ao Console em **Firestore Database → Dados**. Deve aparecer, sob
-`userStates/{seu-id}`, uma subcoleção `Kids` com os registros de telemetria. Se
-aparecer, o Radar voltou a receber dados.
+`userStates/{seu-id}`, uma subcoleção `Kids` com os registros de telemetria.
 
 > Se o editor de regras reclamar de erro de sintaxe, não publique: copie a
 > mensagem e traga para a conversa. Regra inválida derruba o acesso do
