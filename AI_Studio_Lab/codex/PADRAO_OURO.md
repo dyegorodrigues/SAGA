@@ -391,7 +391,15 @@ vizinho basta para representar a hipótese.
 → A guarda ficou no **contrato do canário**, valendo para todo nó presente e
 futuro, em vez de ficar só na ficha que errou.
 
-### 6.19 O Vitest não checa tipos
+### 6.20 Mascarar o formato não basta — filtre pelo NÚMERO
+As contas de apoio da família ×÷ eram mostradas com o resultado mascarado
+(`14 ÷ 7 = ?`). Parecia seguro. Mas numa pergunta pelo PRODUTO, esse mesmo 14
+está do lado esquerdo — e é justamente a resposta. O apoio soletrava o gabarito
+enquanto obedecia à regra do formato.
+→ Filtre o apoio por **conter o número da resposta**, não por terminar em "?".
+A regra é sobre o valor, não sobre a aparência.
+
+### 6.21 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.

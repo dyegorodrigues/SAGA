@@ -5,6 +5,7 @@ import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
 import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
+import { N4_06 } from "../fichas/jornada/N4.06";
 import { Question, Track } from "../../types";
 
 type Generator = (level: number) => Question;
@@ -23,6 +24,8 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N4.03": N4_03,
   "N4.04": N4_04,
   "N4.07": N4_07,
+  // Implementada e verificada, NÃO ativada: a estreia é outro PR.
+  "N4.06": N4_06,
 };
 
 /**

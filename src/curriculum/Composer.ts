@@ -40,6 +40,16 @@ import {
   ehTabuadaDificil,
   tabuadasDoNivel as tabuadasDificeisDoNivel,
 } from "./procedimentos/ancoraProcedure";
+import { construirFamiliaSpec } from "./procedimentos/familiaContract";
+import {
+  FATOR_MAX,
+  FATOR_MIN,
+  VerticeOculto,
+  ehPergunavelComDiagnostico as familiaDiagnostica,
+  produto as produtoDaFamilia,
+  produtoMaximoDoNivel,
+  verticesDoNivel,
+} from "./procedimentos/familiaProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -540,6 +550,38 @@ export class Composer {
 
         const escolha = candidatas[randomInt(0, candidatas.length - 1)];
         const spec = construirAncoraSpec(escolha.tabuada, escolha.vezes, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "familia": {
+        const teto = produtoMaximoDoNivel(lvl);
+        const candidatas: { a: number; b: number; vertice: VerticeOculto }[] = [];
+        for (let a = FATOR_MIN; a <= FATOR_MAX; a += 1) {
+          for (let b = FATOR_MIN; b <= FATOR_MAX; b += 1) {
+            if (produtoDaFamilia({ a, b }) > teto) continue;
+            for (const vertice of verticesDoNivel(lvl)) {
+              if (familiaDiagnostica({ a, b }, vertice)) candidatas.push({ a, b, vertice });
+            }
+          }
+        }
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem família com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirFamiliaSpec({ a: escolha.a, b: escolha.b }, escolha.vertice, lvl);
 
         answer = spec.resposta;
         options = spec.alternativas

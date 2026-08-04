@@ -6,6 +6,7 @@ import { StoryBarsStage } from "../primitives/StoryBarsStage";
 import { TabuadaStage } from "../primitives/TabuadaStage";
 import { DecomposicaoStage } from "../primitives/DecomposicaoStage";
 import { AncoraStage } from "../primitives/AncoraStage";
+import { FamiliaStage } from "../primitives/FamiliaStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -83,6 +84,7 @@ export function GameLoopExerciseRenderer({
         {q.kind === "tabuada" && q.uiProps && <TabuadaStage spec={q.uiProps as never} />}
         {q.kind === "decomposicao" && q.uiProps && <DecomposicaoStage spec={q.uiProps as never} />}
         {q.kind === "ancora" && q.uiProps && <AncoraStage spec={q.uiProps as never} />}
+        {q.kind === "familia" && q.uiProps && <FamiliaStage spec={q.uiProps as never} />}
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}

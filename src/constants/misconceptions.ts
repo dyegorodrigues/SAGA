@@ -52,7 +52,13 @@ export const MisconceptionTag = {
   PAROU_NA_ANCORA: "parou-na-ancora",
 
   /** Âncora: ajustou para o lado errado — somou onde era tirar, ou o contrário (7×9 → 77) */
-  DIRECAO_ERRADA: "direcao-errada"
+  DIRECAO_ERRADA: "direcao-errada",
+
+  /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
+  INVERTE_DIVISAO: "inverte-divisao",
+
+  /** Família ×÷: tratou a divisão como subtração (12÷3 → 9) */
+  DIVIDE_SUBTRAINDO: "divide-subtraindo"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];
