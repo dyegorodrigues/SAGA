@@ -40,7 +40,13 @@ export const MisconceptionTag = {
   SOMA_OS_FATORES: "soma-os-fatores",
 
   /** Tabuada: devolveu um múltiplo vizinho — memorizou a lista sem o padrão que a gera (5×4 → 15 ou 25) */
-  TABUADA_TROCADA: "tabuada-trocada"
+  TABUADA_TROCADA: "tabuada-trocada",
+
+  /** Decomposição: dobrou uma vez e parou, sem completar a estratégia (7×4 → 14) */
+  PAROU_NO_DOBRO: "parou-no-dobro",
+
+  /** Decomposição: aplicou a OUTRA estratégia — dobrou o dobro onde cabia dobro mais um grupo, ou o contrário (7×3 → 28) */
+  TROCOU_ESTRATEGIA: "trocou-estrategia"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

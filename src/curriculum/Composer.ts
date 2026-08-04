@@ -24,6 +24,14 @@ import {
   ehPergunavelComDiagnostico,
   tabuadasDoNivel,
 } from "./procedimentos/tabuadaProcedure";
+import { construirDecomposicaoSpec } from "./procedimentos/decomposicaoContract";
+import {
+  OUTRO_FATOR_MAX as DECOMP_FATOR_MAX,
+  OUTRO_FATOR_MIN as DECOMP_FATOR_MIN,
+  ehPergunavelComDiagnostico as decomposicaoDiagnostica,
+  ehPorDecomposicao,
+  tabuadasDoNivel as tabuadasDecompostasDoNivel,
+} from "./procedimentos/decomposicaoProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -462,6 +470,38 @@ export class Composer {
 
         const situacao = candidatas[randomInt(0, candidatas.length - 1)];
         const spec = construirTabuadaSpec(situacao, lvl, PADRAO_DA_TABUADA[situacao.tabuada]);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "decomposicao": {
+        // Mesma disciplina de N4.03: filtrar antes de sortear. No nível 5 entram
+        // tabuadas que não se decompõem (×2, ×5, ×10) — para essas vale o
+        // critério de N4.03, e reusá-lo evita dois conjuntos de regras que
+        // envelheceriam em separado.
+        const candidatas = tabuadasDecompostasDoNivel(lvl).flatMap(tabuada =>
+          Array.from({ length: DECOMP_FATOR_MAX - DECOMP_FATOR_MIN + 1 },
+            (_, i) => ({ tabuada, vezes: i + DECOMP_FATOR_MIN }))
+            .filter(c => ehPorDecomposicao(c.tabuada)
+              ? decomposicaoDiagnostica({ tabuada: c.tabuada, vezes: c.vezes })
+              : ehPergunavelComDiagnostico({ tabuada: c.tabuada as never, vezes: c.vezes })));
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem multiplicação com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirDecomposicaoSpec(escolha.tabuada, escolha.vezes, lvl);
 
         answer = spec.resposta;
         options = spec.alternativas

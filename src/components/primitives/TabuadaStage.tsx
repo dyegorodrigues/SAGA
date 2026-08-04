@@ -1,7 +1,8 @@
 import React from "react";
 import { Quadrado100 } from "./Quadrado100";
+import { Arranjo } from "./Arranjo";
 import { NumberLine } from "./NumberLine";
-import { ArranjoSpec, QuadroSpec, SaltosSpec, TabuadaSpec } from "../../curriculum/procedimentos/tabuadaContract";
+import { QuadroSpec, SaltosSpec, TabuadaSpec } from "../../curriculum/procedimentos/tabuadaContract";
 
 /**
  * A tela de N4.03 — ficha F42.
@@ -20,28 +21,6 @@ interface Props {
   onReplay?: () => void;
 }
 
-/** O arranjo retangular. Contar os quadradinhos é estratégia legítima no nível 1. */
-function Arranjo({ arranjo }: { arranjo: ArranjoSpec }) {
-  const lado = Math.min(28, Math.floor(280 / Math.max(arranjo.linhas, arranjo.colunas)));
-  return (
-    <div
-      className="grid gap-1"
-      role="img"
-      aria-label={arranjo.descricao}
-      style={{ gridTemplateColumns: `repeat(${arranjo.colunas}, ${lado}px)` }}
-    >
-      {Array.from({ length: arranjo.linhas * arranjo.colunas }, (_, i) => (
-        <div
-          key={i}
-          aria-hidden="true"
-          className="rounded bg-indigo-400"
-          style={{ width: lado, height: lado }}
-        />
-      ))}
-    </div>
-  );
-}
-
 /**
  * O quadro com o padrão pintado.
  *
@@ -52,7 +31,10 @@ function Arranjo({ arranjo }: { arranjo: ArranjoSpec }) {
  */
 function Quadro({ quadro }: { quadro: QuadroSpec }) {
   return (
-    <div aria-label={`Quadro de cem com os múltiplos de ${quadro.tabuada} pintados`}>
+    // `role="group"`: `aria-label` em div sem papel é atributo ARIA proibido. Aqui
+    // o axe não acusa porque há conteúdo acessível dentro, mas a construção é a
+    // mesma que falhou em DecomposicaoStage — não vale depender desse detalhe.
+    <div role="group" aria-label={`Quadro de cem com os múltiplos de ${quadro.tabuada} pintados`}>
       <Quadrado100 highlightedNumbers={quadro.multiplosPintados} />
     </div>
   );
@@ -67,7 +49,7 @@ function Quadro({ quadro }: { quadro: QuadroSpec }) {
  */
 function Saltos({ saltos }: { saltos: SaltosSpec }) {
   return (
-    <div className="w-full" aria-label={saltos.descricao}>
+    <div role="group" className="w-full" aria-label={saltos.descricao}>
       <NumberLine
         min={0}
         max={saltos.ate}
@@ -97,7 +79,7 @@ export function TabuadaStage({ spec, onReplay }: Props) {
         )}
       </div>
 
-      {spec.arranjo && <Arranjo arranjo={spec.arranjo} />}
+      {spec.arranjo && <Arranjo {...spec.arranjo} />}
       {spec.saltos && <Saltos saltos={spec.saltos} />}
       {spec.quadro && <Quadro quadro={spec.quadro} />}
     </div>

@@ -20,6 +20,7 @@ import { DragGroup } from './primitives/DragGroup';
 import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
 import { StoryBarsStage } from "./primitives/StoryBarsStage";
 import { TabuadaStage } from './primitives/TabuadaStage';
+import { DecomposicaoStage } from './primitives/DecomposicaoStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
 interface FichaRendererProps {
@@ -65,6 +66,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <StoryBarsStage spec={uiProps as never} />;
     case 'tabuada':
       return <TabuadaStage spec={uiProps as never} />;
+    case 'decomposicao':
+      return <DecomposicaoStage spec={uiProps as never} />;
     case 'array':
       return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':

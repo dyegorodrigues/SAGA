@@ -2,6 +2,7 @@ import { Option, Question } from "../types";
 import { FichaParams } from "./schema";
 import { StoryBarsSpec } from "./procedimentos/storyBarsContract";
 import { TabuadaSpec } from "./procedimentos/tabuadaContract";
+import { DecomposicaoSpec } from "./procedimentos/decomposicaoContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -28,6 +29,7 @@ export type FichaUiProps =
   | { rows: number; cols: number; allowRotate: boolean; requireRotate: boolean; areaMode: boolean; showEquation: boolean; answerMode: "total" | "equation" }
   | StoryBarsSpec
   | TabuadaSpec
+  | DecomposicaoSpec
   | { text: string };
 
 interface BalanceItem {

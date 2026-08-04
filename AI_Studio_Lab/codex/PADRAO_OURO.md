@@ -294,7 +294,25 @@ quadradinhos empilhavam em coluna.
 → Antes de acreditar numa medição de layout, confira um valor que você já
 conhece. Se ele estiver errado, o instrumento está errado.
 
-### 6.13 O Vitest não checa tipos
+### 6.13 `aria-label` em `div` sem papel é atributo proibido
+O axe reprova `aria-prohibited-attr` quando uma `div` sem `role` carrega
+`aria-label` **e seus filhos são `aria-hidden`** — a div fica rotulada e vazia.
+A mesma construção existia em `TabuadaStage` e NÃO acusava, porque lá havia
+conteúdo acessível dentro. Depender desse detalhe é frágil.
+→ Toda `div` com `aria-label` declara papel: `role="math"` para expressão,
+`role="group"` para agrupamento, `role="img"` para figura.
+
+### 6.14 O apoio que escreve a conta inteira entrega o gabarito
+A ficha F43 pede "decomposição escrita" no nível 2, e a decomposição completa é
+`7 × 2 = 14` **e** `14 × 2 = 28` — que contém a resposta. Escrever as duas
+linhas seria dar o gabarito com aparência de andaime.
+→ O andaime correto é o passo conhecido **completo** e o seguinte **em aberto**
+(`14 × 2 = ?`). O contrato corta a conta no "=", de modo que o componente nunca
+recebe o resultado. Mesma família da regra do `BarSlot` sem valor.
+→ **Encontrada aplicando o §3, não apanhando.** Foi a primeira armadilha barrada
+antes de existir.
+
+### 6.15 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.
