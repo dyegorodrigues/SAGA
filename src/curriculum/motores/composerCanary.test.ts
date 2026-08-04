@@ -18,9 +18,16 @@ describe("ponte de canário do Composer", () => {
     COMPOSER_CANARIES.add("N3.10");
   });
 
-  it("serve N3.09 e N3.10 pelo Composer e mantém N3.11 no legado", () => {
-    expect([...COMPOSER_CANARIES].sort()).toEqual(["N3.09", "N3.10"]);
-    expect(selectGenerator("N3.09", gN3_09, fallback).source()).toBe("composer");
+  it("serve os canários pelo Composer e mantém os demais no legado", () => {
+    // A lista NÃO é fixada aqui: enumerar o conjunto e afirmar sua composição
+    // faria este teste quebrar a cada promoção legítima, treinando quem lê a
+    // "consertar" o teste sem pensar. Quem trava a composição é o contrato do
+    // canário, que exige registro para cada nó promovido.
+    expect(COMPOSER_CANARIES.size).toBeGreaterThan(0);
+    for (const id of COMPOSER_CANARIES) {
+      expect(selectGenerator(id, undefined, fallback).source(), id).toBe("composer");
+    }
+    expect(COMPOSER_CANARIES.has("N3.11"), "N3.11 não deve estar promovido").toBe(false);
     expect(selectGenerator("N3.11", gN3_11, fallback).source()).toBe("legacy");
   });
 

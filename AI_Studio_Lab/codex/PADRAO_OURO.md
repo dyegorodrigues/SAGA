@@ -108,10 +108,25 @@ visível na cena. Ver armadilha 6.2.
 
 ### Passo 7 — Canário: estrear sem apostar tudo
 
-**Produz:** o id em `COMPOSER_CANARIES` **e** o registro em
-`canaryContract.test.ts`.
+**Produz:** o id em `COMPOSER_CANARIES` **e** a ficha em `canaryContract.test.ts`.
 
 > **Implementação e ativação NUNCA são o mesmo passo.** São dois PRs.
+
+**Dois tipos de promoção, e eles não se verificam igual:**
+
+| | Substituição | Estreia |
+|---|---|---|
+| O nó antes | tinha gerador próprio | caía no placeholder "Em construção!" |
+| O que verificar | **paridade** — a ficha nova cobre o que o legado cobria | **deixou de ser placeholder** |
+| Rollback devolve | o gerador legado | o placeholder |
+| Quantos são | os já feitos | **os 46 restantes** |
+
+O contrato original só previa substituição, porque os dois primeiros canários
+por acaso eram desse tipo. Todas as promoções que faltam são estreias.
+
+O legado **não é declarado**: é descoberto por `geradorLegadoDe(id)`. Declarar à
+mão é uma chance de declarar errado — e um legado errado faria a paridade
+comparar a ficha nova com a coisa errada, passando sem verificar nada.
 
 **Verificado por:** `canaryContract.test.ts`, que **enumera** `COMPOSER_CANARIES`
 em vez de listar nós à mão — promover um nó sem registrá-lo derruba a suíte na
@@ -123,10 +138,11 @@ hora. O padrão não depende de ninguém lembrar dele.
 
 Um nó só está pronto quando as doze do contrato do canário passam:
 
-- [ ] registrado no contrato, com ficha e gerador legado declarados
+- [ ] registrado no contrato (só a ficha — o legado é descoberto)
 - [ ] servido pelo Composer, com `generatorSource === "composer"` e `contentStatus === "explicit"`
 - [ ] rollback devolve ao legado; reativação traz de volta
-- [ ] paridade: autoral e legado geram questão utilizável nos cinco níveis
+- [ ] a ficha autoral gera questão utilizável nos cinco níveis, sem placeholder
+- [ ] paridade (substituição) **ou** deixou de ser placeholder (estreia)
 - [ ] promoção não altera `id`, `graphId` nem pré-requisitos
 - [ ] progresso salvo antes da promoção continua válido
 - [ ] resposta certa não gera diagnóstico

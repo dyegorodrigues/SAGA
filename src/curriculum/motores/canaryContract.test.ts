@@ -1,13 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { Composer } from "../Composer";
-import { getTrackById } from "./curriculum";
+import { geradorLegadoDe, getTrackById } from "./curriculum";
 import { applyJourneyAnswer } from "./progressEngine";
 import { trackMisconception } from "./radarEngine";
 import { COMPOSER_CANARIES, rollbackComposerCanary, enableComposerCanary } from "./composerCanary";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
-import { gN3_09 } from "../../utils/generatorsF1";
-import { gN3_10 } from "../../utils/generators";
+import { N4_03 } from "../fichas/jornada/N4.03";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
@@ -24,15 +23,25 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  * modo que o padrão não depende de alguém lembrar de aplicá-lo.
  */
 
-interface CanarioRegistrado {
-  ficha: FichaCompetencia;
-  legado: (lvl: number) => Question;
-}
-
-/** Cada canário precisa declarar sua ficha e o gerador legado que substitui. */
-const REGISTRO: Record<string, CanarioRegistrado> = {
-  "N3.09": { ficha: N3_09, legado: gN3_09 },
-  "N3.10": { ficha: N3_10, legado: gN3_10 },
+/**
+ * Cada canário declara APENAS sua ficha.
+ *
+ * O gerador legado não é declarado: é descoberto em `geradorLegadoDe`. Declarar
+ * seria uma chance de declarar errado, e um legado errado faria a paridade
+ * comparar a ficha nova com a coisa errada — passando sem verificar nada.
+ *
+ * A distinção que isso revela: nem toda promoção substitui algo.
+ * - **Substituição** — o nó tinha gerador próprio. Paridade faz sentido.
+ * - **Estreia** — o nó caía no placeholder "Em construção!". Paridade não quer
+ *   dizer nada; o que importa é que ele deixou de ser um placeholder.
+ *
+ * Os 46 nós ainda em fallback são todos estreias. O contrato original só previa
+ * substituição porque os dois primeiros canários por acaso eram desse tipo.
+ */
+const REGISTRO: Record<string, FichaCompetencia> = {
+  "N3.09": N3_09,
+  "N3.10": N3_10,
+  "N4.03": N4_03,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];
@@ -53,31 +62,53 @@ describe("contrato do canário do Composer", () => {
   });
 
   describe.each(CANARIOS)("%s", id => {
-    const { ficha, legado } = REGISTRO[id] ?? {};
+    const ficha = REGISTRO[id];
+    const legado = geradorLegadoDe(id);
+    const ehEstreia = legado === undefined;
 
     it("é servido pelo Composer com proveniência observável", () => {
       expect(getTrackById(id)?.generatorSource).toBe("composer");
       expect(getTrackById(id)?.contentStatus).toBe("explicit");
     });
 
-    it("o rollback devolve o nó ao gerador legado, e a reativação o traz de volta", () => {
+    it("o rollback devolve o nó ao que havia antes, e a reativação o traz de volta", () => {
       rollbackComposerCanary(id);
-      expect(getTrackById(id)?.generatorSource).toBe("legacy");
+      // Numa substituição volta o gerador legado; numa estreia volta o
+      // placeholder. Nos dois casos o que importa é que SAI do Composer.
+      expect(getTrackById(id)?.generatorSource).toBe(ehEstreia ? "fallback" : "legacy");
 
       enableComposerCanary(id);
       expect(getTrackById(id)?.generatorSource).toBe("composer");
     });
 
-    it("paridade: autoral e legado produzem questão utilizável nos cinco níveis", () => {
+    it("a ficha autoral produz questão utilizável nos cinco níveis", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 20; i += 1) {
           const autoral = Composer.generate(ficha, lvl);
           expect(autoral.evaluate?.(autoral.answer), `${id} autoral L${lvl}`).toBe(true);
           expect(Number(autoral.answer), `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
-
-          const antigo = legado(lvl);
-          expect(antigo.answer, `${id} legado L${lvl}`).toBeDefined();
+          expect(autoral.isFallback, `${id} L${lvl} devolveu placeholder`).toBeFalsy();
         }
+      }
+    });
+
+    it(ehEstreia
+      ? "estreia: o nó deixou de ser placeholder"
+      : "paridade: o gerador legado continua produzindo questão válida", () => {
+      if (ehEstreia) {
+        // Não há com o que comparar. O que se verifica é que o rollback devolve
+        // ao placeholder — e portanto que a promoção trocou algo de verdade.
+        rollbackComposerCanary(id);
+        expect(getTrackById(id)?.gen(1).isFallback,
+          `${id} não era placeholder antes: isto deveria ser substituição, não estreia`).toBe(true);
+        enableComposerCanary(id);
+        expect(getTrackById(id)?.gen(1).isFallback).toBeFalsy();
+        return;
+      }
+      for (let lvl = 1; lvl <= 5; lvl += 1) {
+        const antigo = legado!(lvl);
+        expect(antigo.answer, `${id} legado L${lvl}`).toBeDefined();
+        expect(antigo.isFallback, `${id} legado L${lvl} é placeholder`).toBeFalsy();
       }
     });
 
