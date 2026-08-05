@@ -35,23 +35,17 @@ export function PerfilTab({
 }: Props) {
   const stats = useMemo(() => {
     const logs = state.log[kid.id] || [];
-    const activeDays = logs.length;
-    let totQuestions = 0;
-    let totStars = 0;
+    const activeDays = new Set(logs.map((entry) => entry.d)).size;
     const kidProg = state.progress[kid.id] || {};
-    for (const trackId of Object.keys(kidProg)) {
-      if (kidProg[trackId].ok) totQuestions += kidProg[trackId].ok;
+    let questions = 0;
+    let correct = 0;
+    let stars = 0;
+    for (const progress of Object.values(kidProg)) {
+      questions += progress.tot || 0;
+      correct += progress.ok || 0;
+      stars += progress.stars || 0;
     }
-    let logQuestions = 0;
-    logs.forEach((entry) => {
-      logQuestions += entry.tot || 0;
-      totStars += entry.stars || 0;
-    });
-    return {
-      days: activeDays,
-      questions: logQuestions > totQuestions ? logQuestions : totQuestions,
-      stars: totStars,
-    };
+    return { days: activeDays, questions, correct, stars };
   }, [kid.id, state.log, state.progress]);
 
   return (
@@ -65,21 +59,26 @@ export function PerfilTab({
         <CreatureProfileCard kid={kid} state={state} onUpdateKid={onUpdateKid} />
       </div>
 
-      <div className="mb-4 grid grid-cols-3 gap-2" aria-label="Resumo do progresso">
-        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-3 text-center">
-          <div className="text-xl">📅</div>
+      <div className="mb-4 grid grid-cols-4 gap-2" aria-label="Resumo do progresso">
+        <div className="rounded-2xl border border-blue-100 bg-blue-50 p-2.5 text-center">
+          <div className="text-lg">📅</div>
           <div className="text-base font-black text-blue-900">{stats.days}</div>
-          <div className="text-[9px] font-black uppercase text-blue-600">dias ativos</div>
+          <div className="text-[8px] font-black uppercase text-blue-600">dias</div>
         </div>
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-3 text-center">
-          <div className="text-xl">🧠</div>
-          <div className="text-base font-black text-emerald-900">{stats.questions}</div>
-          <div className="text-[9px] font-black uppercase text-emerald-600">acertos</div>
+        <div className="rounded-2xl border border-violet-100 bg-violet-50 p-2.5 text-center">
+          <div className="text-lg">🧩</div>
+          <div className="text-base font-black text-violet-900">{stats.questions}</div>
+          <div className="text-[8px] font-black uppercase text-violet-600">questões</div>
         </div>
-        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-3 text-center">
-          <div className="text-xl">⭐</div>
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-2.5 text-center">
+          <div className="text-lg">🧠</div>
+          <div className="text-base font-black text-emerald-900">{stats.correct}</div>
+          <div className="text-[8px] font-black uppercase text-emerald-600">acertos</div>
+        </div>
+        <div className="rounded-2xl border border-amber-100 bg-amber-50 p-2.5 text-center">
+          <div className="text-lg">⭐</div>
           <div className="text-base font-black text-amber-900">{stats.stars}</div>
-          <div className="text-[9px] font-black uppercase text-amber-600">estrelas</div>
+          <div className="text-[8px] font-black uppercase text-amber-600">estrelas</div>
         </div>
       </div>
 
