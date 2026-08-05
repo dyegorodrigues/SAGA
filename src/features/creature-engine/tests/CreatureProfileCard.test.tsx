@@ -2,7 +2,7 @@
 
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Kid, State } from "../../../types";
 import { CreatureProfileCard } from "../CreatureProfileCard";
@@ -72,7 +72,6 @@ const kid: Kid = {
 
 describe("CreatureProfileCard", () => {
   beforeEach(() => {
-    vi.restoreAllMocks();
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: RequestInfo | URL) => {
@@ -88,15 +87,20 @@ describe("CreatureProfileCard", () => {
     );
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
   it("renders a touch-first Tamagotchi and persists its initial learning sync", async () => {
     const onUpdateKid = vi.fn();
     render(<CreatureProfileCard kid={kid} state={baseState()} onUpdateKid={onUpdateKid} />);
 
-    expect(screen.getByRole("button", { name: "Alimentar" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Brincar" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Dormir" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Carinho" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Treinar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Comer/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Brincar/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Dormir/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Carinho/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Treinar/ })).toBeInTheDocument();
 
     await waitFor(() => expect(screen.getByTestId("pmd-sprite")).toBeInTheDocument());
     await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
@@ -110,7 +114,7 @@ describe("CreatureProfileCard", () => {
     await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
     onUpdateKid.mockClear();
 
-    fireEvent.click(screen.getByRole("button", { name: "Alimentar" }));
+    fireEvent.click(screen.getByRole("button", { name: /Comer/ }));
 
     await waitFor(() => expect(onUpdateKid).toHaveBeenCalledTimes(1));
     const persisted = onUpdateKid.mock.calls[0][0] as Kid & {
