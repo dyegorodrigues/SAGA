@@ -147,7 +147,7 @@ describe("CreatureProfileCard", () => {
     await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
     onUpdateKid.mockClear();
 
-    fireEvent.click(screen.getByRole("button", { name: /Trocar parceiro/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Trocarparceiro/ }));
     fireEvent.click(screen.getByRole("button", { name: /Eevee/ }));
 
     const persisted = onUpdateKid.mock.calls.at(-1)?.[0] as Kid & {
