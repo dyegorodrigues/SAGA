@@ -21,6 +21,9 @@
  *   npm run sonda            # falha o processo se houver achado
  *   npm run sonda -- --fotos # salva também um .png por cena
  *
+ * **Não edite arquivos com a sonda rodando.** O vite recarrega a página, a cena
+ * troca no meio da medição e a corrida morre — ou, pior, mede o código velho.
+ *
  * A sonda NÃO substitui olhar a tela. Ela pega a classe de defeito que já
  * escapou três vezes; julgamento pedagógico continua sendo trabalho humano.
  */

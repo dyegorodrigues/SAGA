@@ -585,6 +585,41 @@ o vite como filho; matar só o pai deixa a porta ocupada e a execução seguinte
 reporta o resultado ANTIGO. Passei minutos "consertando" o componente errado por
 causa disso.
 
+### 6.31-bis A ficha diz "modo X" de uma primitiva — respeite o "de"
+F68 pede `ArrayGrid` **em modo área**. Era tentador desenhar um retângulo novo,
+mais fácil de controlar. A razão de não fazer é pedagógica, não técnica: a
+criança que chega em N4.09 já leu `7 × 2` como sete fileiras de dois em N4.03.
+Ver **o mesmo quadriculado**, partido em duas, mantém a continuidade. Um desenho
+novo faria a área parecer outro assunto.
+
+→ Quando a ficha nomeia uma primitiva existente, **componha a partir dela**.
+`ModeloDeArea` é feito de `Arranjo`, um por região.
+→ O corte é o **vão** entre as regiões, com um traço dentro dele. Uma linha
+desenhada por cima de um bloco contínuo mostraria um retângulo riscado, não um
+retângulo partido.
+→ A conferência de conformidade (`npm run fichas:conferir`) cobra isto: uma
+competência que entrega primitiva diferente da que a ficha nomeia aparece na
+lista de divergentes, com nome e sobrenome.
+
+### 6.33 Quatro grades vizinhas não formam um retângulo sozinhas
+O nível 4 de N4.09 põe quatro regiões lado a lado para formar **um** retângulo
+partido. Cada `Arranjo` calculava o próprio lado de quadradinho a partir da
+largura que recebia — e a região de 5 colunas saía com células menores que a de
+10. As bordas não encostavam, as fileiras não se alinhavam, e o desenho deixava
+de ser um retângulo para virar quatro grades soltas com números embaixo.
+
+A criança não tinha como ver a coisa que a ficha existe para mostrar.
+
+→ Quando N peças compõem UMA figura, o tamanho da célula é decidido pela figura
+inteira e **imposto** a cada peça (`lado`), nunca derivado peça a peça.
+→ O teste mede: todos os quadradinhos da tela têm a mesma `width`. Isso o jsdom
+consegue, porque o lado vai em `style` inline — não é layout, é aritmética.
+→ Sonda de mutação: devolver o cálculo para dentro de cada peça derruba o teste
+(12px contra 7px no nível 1).
+
+**Irmão de §6.25:** correto e ilegível é o mesmo que errado. Aqui cada região
+estava matematicamente certa, e o conjunto não comunicava nada.
+
 ### 6.32 A tela inteira saía duas vezes
 `GameLoopExerciseRenderer` desenha o palco das competências do Padrão Ouro no
 topo — é lá que chega o `tutShow`, o fio da micro-aula. Logo abaixo, quem tem

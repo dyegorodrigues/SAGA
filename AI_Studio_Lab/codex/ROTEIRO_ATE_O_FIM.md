@@ -90,9 +90,10 @@ Isso é manutenção barata, feita em lote. Não é reconstrução.
 
 ## 3. A ordem, e o porquê de cada passo
 
-### Bloco 1 — Fechar o N4 (4 nós) · *o que estava em andamento*
+### Bloco 1 — Fechar o N4 (4 nós) · *em andamento*
 
-`N4.09` `N4.10` `N4.11` `N4.12`
+`N4.09` ✅ implementado (F68, modelo de área) — **não ativado**, aguardando o PR
+de canário · `N4.10` `N4.11` `N4.12`
 
 Fecham a multiplicação e a divisão, onde a máquina do Padrão Ouro já está
 afiada. Reaproveitam `Arranjo`, `TrianguloDeFatos`, `PromocaoDeOrdem` e o

@@ -7,6 +7,7 @@ import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
+import { N4_09 } from "../fichas/jornada/N4.09";
 import { Question, Track } from "../../types";
 
 type Generator = (level: number) => Question;
@@ -27,6 +28,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N4.07": N4_07,
   "N4.06": N4_06,
   "N4.08": N4_08,
+  "N4.09": N4_09,
 };
 
 /**

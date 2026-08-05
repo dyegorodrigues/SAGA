@@ -28,6 +28,8 @@ import { GameLoopExerciseRenderer } from "../src/components/gameloop/GameLoopExe
 import { Composer } from "../src/curriculum/Composer";
 import { N4_08 } from "../src/curriculum/fichas/jornada/N4.08";
 import { DeslocamentoStage } from "../src/components/primitives/DeslocamentoStage";
+import { AreaStage } from "../src/components/primitives/AreaStage";
+import { N4_09 } from "../src/curriculum/fichas/jornada/N4.09";
 
 /** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
 export const LARGURA_DO_APARELHO = 390;
@@ -111,6 +113,24 @@ export const CENAS: Cena[] = [
     nome: "N4.08 micro-aula ×10",
     render: () => <DeslocamentoStage spec={Composer.generate(N4_08, 1).uiProps as never} mostrar={{ promoverOrdens: true }} />,
   },
+  // N4.09 ainda não é canário: a cena renderiza o palco direto, com a ficha,
+  // porque `track.gen` devolveria o legado. Assim a sonda mede a tela nova
+  // ANTES de ela chegar à criança.
+  ...[1, 3, 4, 5].map(lvl => ({
+    nome: `N4.09 modelo de área (nível ${lvl})`,
+    render: (s: number) => (
+      <AreaStage spec={comSemente(s, () => Composer.generate(N4_09, lvl)).uiProps as never} />
+    ),
+  })),
+  {
+    nome: "N4.09 micro-aula: o corte",
+    render: (s: number) => (
+      <AreaStage
+        spec={comSemente(s, () => Composer.generate(N4_09, 1)).uiProps as never}
+        mostrar={{ cortarRetangulo: true, destacarRegiao: 0 }}
+      />
+    ),
+  },
   {
     nome: "N4.08 micro-aula ×100",
     render: () => <DeslocamentoStage spec={Composer.generate(N4_08, 2).uiProps as never} mostrar={{ promoverOrdens: true }} />,
@@ -137,7 +157,10 @@ function App() {
   React.useEffect(() => {
     (window as any).sonda = {
       total: TOMADAS.length,
-      nome: () => TOMADAS[i].nome,
+      // O índice pode ficar para trás por um instante se o vite recarregar a
+      // página no meio da corrida — foi o que aconteceu quando editei um
+      // componente com a sonda rodando, e a corrida inteira morreu na tomada 45.
+      nome: () => TOMADAS[Math.min(i, TOMADAS.length - 1)]?.nome ?? "(cena perdida no recarregamento)",
       ir: (n: number) => setI(n),
     };
   }, [i]);

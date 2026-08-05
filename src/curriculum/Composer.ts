@@ -51,6 +51,8 @@ import {
   produtoMaximoDoNivel,
   verticesDoNivel,
 } from "./procedimentos/familiaProcedure";
+import { construirAreaSpec } from "./procedimentos/areaContract";
+import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
   ehPergunavelComDiagnostico as deslocamentoDiagnostica,
@@ -622,6 +624,32 @@ export class Composer {
 
         const escolha = candidatas[randomInt(0, candidatas.length - 1)];
         const spec = construirDeslocamentoSpec(escolha, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "area": {
+        // As contas do nível já vêm filtradas pelo valor diagnóstico: o
+        // procedimento é dono da regra, o Composer só sorteia. Sortear aqui e
+        // filtrar depois deixaria a decisão pedagógica espalhada em dois lugares.
+        const candidatas = areaContasDoNivel(lvl);
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem conta com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirAreaSpec(escolha, lvl);
 
         answer = spec.resposta;
         options = spec.alternativas

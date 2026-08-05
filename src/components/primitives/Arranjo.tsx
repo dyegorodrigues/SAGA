@@ -28,10 +28,22 @@ interface Props {
    * em vez de ajudar.
    */
   colunasQueSaem?: number;
+  /**
+   * Lado do quadradinho, imposto de fora.
+   *
+   * Existe por causa do modelo de área (N4.09): lá, quatro arranjos vizinhos
+   * formam **um** retângulo partido. Cada um calculando o próprio lado a partir
+   * da largura disponível fazia as regiões saírem com células de tamanhos
+   * diferentes — as bordas não encostavam, e o desenho deixava de ser um
+   * retângulo para virar quatro grades soltas. Ver Padrão Ouro §6.33.
+   *
+   * Quem usa um arranjo sozinho continua sem passar nada.
+   */
+  lado?: number;
 }
 
-export function Arranjo({ linhas, colunas, descricao, larguraMax = 280, colunasQueSaem = 0 }: Props) {
-  const lado = Math.min(28, Math.floor(larguraMax / Math.max(linhas, colunas)));
+export function Arranjo({ linhas, colunas, descricao, larguraMax = 280, colunasQueSaem = 0, lado: ladoImposto }: Props) {
+  const lado = ladoImposto ?? Math.min(28, Math.floor(larguraMax / Math.max(linhas, colunas)));
   return (
     <div
       className="grid gap-1"

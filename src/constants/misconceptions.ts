@@ -67,7 +67,16 @@ export const MisconceptionTag = {
   ORDEM_ERRADA: "ordem-errada",
 
   /** Multiplicação armada: esqueceu de somar o "vai um" da ordem anterior (27×3 → 61) */
-  ESQUECE_REAGRUPAMENTO: "esquece-reagrupamento"
+  ESQUECE_REAGRUPAMENTO: "esquece-reagrupamento",
+
+  /** Modelo de área: multiplicou só uma região e parou, sem somar as partes (13×4 → 40) */
+  PARCELA_UNICA: "parcela-unica",
+
+  /** Modelo de área: partiu pelo ALGARISMO, não pelo valor — leu o 1 de 13 como um, não como dez (13×4 → 16) */
+  CORTE_ERRADO: "corte-errado",
+
+  /** Multiplicação armada por 2 dígitos: esqueceu o zero da segunda linha (13×14 → 65) */
+  ZERO_ESQUECIDO: "zero-esquecido"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];
