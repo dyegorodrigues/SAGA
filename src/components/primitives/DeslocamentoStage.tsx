@@ -1,5 +1,6 @@
 import React from "react";
 import { MaterialDourado } from "./MaterialDourado";
+import { PromocaoDeOrdem } from "./PromocaoDeOrdem";
 import { OPERACAO } from "../../styles/coresDeOperacao";
 import { DeslocamentoSpec, MaterialSpec } from "../../curriculum/procedimentos/deslocamentoContract";
 
@@ -14,6 +15,14 @@ import { DeslocamentoSpec, MaterialSpec } from "../../curriculum/procedimentos/d
 interface Props {
   spec: DeslocamentoSpec;
   onReplay?: () => void;
+  /**
+   * O que o passo atual da micro-aula manda mostrar.
+   *
+   * Vem do `tutShow` do GameLoop, que é alimentado pela coreografia declarada
+   * na ficha. Sem este fio ligado, declarar coreografia não produz nada — foi
+   * exatamente o que aconteceu nas seis primeiras competências que construí.
+   */
+  mostrar?: { promoverOrdens?: boolean } | null;
 }
 
 function Material({ material }: { material: MaterialSpec }) {
@@ -29,7 +38,7 @@ function Material({ material }: { material: MaterialSpec }) {
   );
 }
 
-export function DeslocamentoStage({ spec, onReplay }: Props) {
+export function DeslocamentoStage({ spec, onReplay, mostrar }: Props) {
   const { cor } = OPERACAO.multiplicacao;
   return (
     <div className="flex flex-col items-center gap-3">
@@ -49,7 +58,12 @@ export function DeslocamentoStage({ spec, onReplay }: Props) {
         )}
       </div>
 
-      {spec.material && <Material material={spec.material} />}
+      {/* Durante a micro-aula, a demonstração da promoção SUBSTITUI o material:
+          duas coisas ao mesmo tempo dividiriam a atenção justamente no momento
+          em que a criança precisa olhar para uma. */}
+      {mostrar?.promoverOrdens
+        ? <PromocaoDeOrdem ordens={spec.ordensDeslocadas} />
+        : spec.material && <Material material={spec.material} />}
 
       {spec.promocao && (
         <p className="max-w-[320px] text-center text-sm font-bold text-slate-500">

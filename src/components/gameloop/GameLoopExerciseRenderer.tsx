@@ -86,7 +86,9 @@ export function GameLoopExerciseRenderer({
         {q.kind === "decomposicao" && q.uiProps && <DecomposicaoStage spec={q.uiProps as never} />}
         {q.kind === "ancora" && q.uiProps && <AncoraStage spec={q.uiProps as never} />}
         {q.kind === "familia" && q.uiProps && <FamiliaStage spec={q.uiProps as never} />}
-        {q.kind === "deslocamento" && q.uiProps && <DeslocamentoStage spec={q.uiProps as never} />}
+        {/* `tutShow` é o fio que faltava: sem ele, declarar coreografia na ficha
+            não produz nada na tela. */}
+        {q.kind === "deslocamento" && q.uiProps && <DeslocamentoStage spec={q.uiProps as never} mostrar={typeof tutShow === "object" ? tutShow : null} />}
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}

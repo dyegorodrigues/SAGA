@@ -14,6 +14,22 @@ import { FichaCompetencia } from "../../schema";
 
 const dominio = { acertos: 3, de: 3, sessoes: 2 };
 
+/**
+ * A micro-aula, vinda da Coreografia da ficha F67.
+ *
+ * Sem ela a criança lê "cada peça sobe uma casa" e precisa IMAGINAR a promoção.
+ * Quem está aprendendo multiplicação agora não tem essa imagem — e a frase passa
+ * por cima do material, que vira decoração.
+ *
+ * A demonstração acontece em UMA peça de propósito: promover as vinte e nove na
+ * tela mostraria o resultado, ou seja, entregaria a resposta com cara de aula.
+ */
+const tutorial = [
+  { fala: "Olhe as peças que você tem.", show: { destacarMaterial: true } },
+  { fala: "Vezes dez, cada peça sobe uma casa.", show: { promoverOrdens: true } },
+  { fala: "O cubinho vira barra. A barra vira placa. Nada foi acrescentado: tudo subiu.", show: { promoverOrdens: true } },
+];
+
 export const N4_08: FichaCompetencia = {
   id: "N4.08",
   nome: "Multiplicação por 1 dígito e por 10 e 100",
@@ -35,8 +51,8 @@ export const N4_08: FichaCompetencia = {
     5: { primitiva: "deslocamento", micro: "combinado", andaime: "nenhum", rt_alvo: 10000 },
   },
   micros: [
-    { id: "dez_com_material", alvo: "ver a promoção das peças ao multiplicar por dez", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda." }, dominio },
-    { id: "cem", alvo: "entender que cem sobe duas ordens, não uma", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda." }, dominio },
+    { id: "dez_com_material", alvo: "ver a promoção das peças ao multiplicar por dez", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda.", tutorial }, dominio },
+    { id: "cem", alvo: "entender que cem sobe duas ordens, não uma", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda.", tutorial }, dominio },
     { id: "dez_sem_material", alvo: "deslocar sem o apoio do material", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda." }, dominio },
     { id: "por_digito", alvo: "multiplicar por um dígito, com reagrupamento", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda." }, dominio },
     { id: "combinado", alvo: "combinar tabuada e deslocamento: vinte, trinta, quatrocentos", kinds: ["deslocamento"], params: { audio_prompt: "Escute e responda." }, dominio },

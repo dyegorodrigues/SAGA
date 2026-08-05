@@ -1,5 +1,6 @@
 import {
-  Conta, alternativas, falaDaPromocao, materialDe, mostraMaterial, resolver,
+  Conta, alternativas, falaDaPromocao, materialDe, mostraMaterial,
+  ordensDeslocadas, resolver,
 } from "./deslocamentoProcedure";
 
 /**
@@ -26,6 +27,8 @@ export interface DeslocamentoSpec {
   material: MaterialSpec | null;
   /** A dica da promoção, em palavras, sem números. */
   promocao: string | null;
+  /** Quantas ordens o número sobe — a micro-aula precisa saber. */
+  ordensDeslocadas: number;
   alternativas: { valor: number; tag: string }[];
   resposta: number;
   /** A conta fechada — só depois de responder. */
@@ -50,6 +53,7 @@ export function construirDeslocamentoSpec(c: Conta, nivel: number): Deslocamento
       ? { ...material, descricao: descrever(material) }
       : null,
     promocao: mostraMaterial(nivel) && promocao ? promocao : null,
+    ordensDeslocadas: ordensDeslocadas(c.multiplicador),
     alternativas: alternativas(c).map(a => ({ valor: a.valor, tag: a.tag })),
     resposta: resolver(c),
     recapitulacao: `${c.numero} × ${c.multiplicador} = ${resolver(c)}`,

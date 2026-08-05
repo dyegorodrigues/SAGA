@@ -87,7 +87,7 @@ Repare também que `StorySpec` e `SingaporeBarSpec` são **independentes de
 propósito**: a história descreve o mundo, a barra descreve a matemática. Um não
 deriva do outro.
 
-### Passo 4 — Conteúdo: as palavras que a criança ouve
+### Passo 4 — Conteúdo: as palavras que a criança ouve E a coreografia que ensina
 
 **Produz:** narrativa, objetos, falas.
 **Exemplar:** `src/curriculum/procedimentos/additiveNarrative.ts`
@@ -174,6 +174,7 @@ E, para nós com tela nova, mais três:
 - [ ] `axe-core` sem violação nos cinco níveis
 - [ ] a tela renderizada **não fala** o número que a pergunta pede
 - [ ] cabe em 390×844 **sem rolagem em nenhuma das duas direções** (§6.16)
+- [ ] **declara `tutorial` na micro** e a tela aceita `tutShow` — a ficha ensina, não só pergunta (§6.23)
 - [ ] **capturado e olhado** nos cinco níveis — teste verde não prova legibilidade (§6.17)
 
 ---
@@ -419,7 +420,32 @@ pensamento que se queria provocar.
 verificação automática pega interferência entre representações: ela mora na
 cabeça de quem aprendeu antes, não nos dados.
 
-### 6.23 O Vitest não checa tipos
+### 6.23 Construir a PERGUNTA e esquecer a AULA
+As seis primeiras competências que construí — N3.10, N4.03, N4.04, N4.06, N4.07,
+N4.08 — nasceram sem **nenhum** momento de ensino. Elas perguntam e diagnosticam
+muito bem, e não ensinam nada.
+
+Toda ficha do cânone tem **Roteiro cinematográfico** e **Coreografia**, e o
+código já tinha a máquina inteira: `params.tutorial` → `normalizeFichaTutorial`
+→ `tutorialSteps(q)` → o GameLoop fala cada passo e publica `tutShow`. As fichas
+antigas (N1.x, N2.01, N3.09) usam. **Eu li a seção dos níveis e pulei a
+coreografia**, seis vezes seguidas.
+
+Faltavam dois fios, e os dois são meus:
+1. a ficha não declarava `tutorial` nos `params` da micro;
+2. a tela não aceitava `tutShow`, então mesmo declarando não apareceria nada.
+
+→ **Passo 4 do trilho não é só "as palavras da pergunta": é a coreografia.**
+→ Levantado por um adulto olhando a tela: *"ele olha o desenho, conta, e aí?"*.
+O material parado pede que a criança IMAGINE a transformação — e quem está
+aprendendo agora não tem essa imagem ainda. Material sem animação vira decoração.
+
+**A regra da demonstração:** demonstre em **UM** elemento, nunca no conjunto.
+Promover as vinte e nove peças da tela mostraria o resultado — seria entregar a
+resposta com aparência de aula. Uma peça ensina a regra e deixa a aplicação para
+a criança, que é o que se quer treinar.
+
+### 6.24 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.
