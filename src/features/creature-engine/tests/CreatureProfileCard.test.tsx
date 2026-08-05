@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import React from "react";
+import React, { useState } from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -70,6 +70,23 @@ const kid: Kid = {
   petName: "Faísca",
 };
 
+function renderProfile(onPersist = vi.fn()) {
+  function Harness() {
+    const [currentKid, setCurrentKid] = useState(kid);
+    return (
+      <CreatureProfileCard
+        kid={currentKid}
+        state={baseState()}
+        onUpdateKid={(nextKid) => {
+          setCurrentKid(nextKid);
+          onPersist(nextKid);
+        }}
+      />
+    );
+  }
+  return { onPersist, ...render(<Harness />) };
+}
+
 describe("CreatureProfileCard", () => {
   beforeEach(() => {
     vi.stubGlobal(
@@ -93,8 +110,7 @@ describe("CreatureProfileCard", () => {
   });
 
   it("renders a touch-first Tamagotchi and persists its initial learning sync", async () => {
-    const onUpdateKid = vi.fn();
-    render(<CreatureProfileCard kid={kid} state={baseState()} onUpdateKid={onUpdateKid} />);
+    const { onPersist } = renderProfile();
 
     expect(screen.getByRole("button", { name: /Comer/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: /Brincar/ })).toBeTruthy();
@@ -103,21 +119,20 @@ describe("CreatureProfileCard", () => {
     expect(screen.getByRole("button", { name: /Treinar/ })).toBeTruthy();
 
     await waitFor(() => expect(screen.getByTestId("pmd-sprite")).toBeTruthy());
-    await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
-    const persisted = onUpdateKid.mock.calls.at(-1)?.[0] as Kid & { creature?: { learning?: { stars?: number } } };
+    await waitFor(() => expect(onPersist).toHaveBeenCalled());
+    const persisted = onPersist.mock.calls.at(-1)?.[0] as Kid & { creature?: { learning?: { stars?: number } } };
     expect(persisted.creature?.learning?.stars).toBe(20);
   });
 
   it("feeds the creature and persists a higher satiety value", async () => {
-    const onUpdateKid = vi.fn();
-    render(<CreatureProfileCard kid={kid} state={baseState()} onUpdateKid={onUpdateKid} />);
-    await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
-    onUpdateKid.mockClear();
+    const { onPersist } = renderProfile();
+    await waitFor(() => expect(onPersist).toHaveBeenCalled());
+    onPersist.mockClear();
 
     fireEvent.click(screen.getByRole("button", { name: /Comer/ }));
 
-    await waitFor(() => expect(onUpdateKid).toHaveBeenCalledTimes(1));
-    const persisted = onUpdateKid.mock.calls[0][0] as Kid & {
+    await waitFor(() => expect(onPersist).toHaveBeenCalledTimes(1));
+    const persisted = onPersist.mock.calls[0][0] as Kid & {
       creature?: { needs?: { satiety?: number }; lastReaction?: string };
     };
     expect(persisted.creature?.needs?.satiety).toBe(100);
@@ -126,10 +141,9 @@ describe("CreatureProfileCard", () => {
   });
 
   it("renames the partner through an accessible input", async () => {
-    const onUpdateKid = vi.fn();
-    render(<CreatureProfileCard kid={kid} state={baseState()} onUpdateKid={onUpdateKid} />);
-    await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
-    onUpdateKid.mockClear();
+    const { onPersist } = renderProfile();
+    await waitFor(() => expect(onPersist).toHaveBeenCalled());
+    onPersist.mockClear();
 
     fireEvent.click(screen.getByRole("button", { name: "Trocar nome do mascote" }));
     const input = screen.getByRole("textbox", { name: "Nome do mascote" });
@@ -137,20 +151,20 @@ describe("CreatureProfileCard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Salvar nome" }));
 
     expect(screen.getByText(/Raio/)).toBeTruthy();
-    const persisted = onUpdateKid.mock.calls.at(-1)?.[0] as Kid & { creature?: { nickname?: string } };
+    const persisted = onPersist.mock.calls.at(-1)?.[0] as Kid & { creature?: { nickname?: string } };
     expect(persisted.creature?.nickname).toBe("Raio");
   });
 
   it("opens the starter selector and changes species without resetting progression", async () => {
-    const onUpdateKid = vi.fn();
-    render(<CreatureProfileCard kid={kid} state={baseState()} onUpdateKid={onUpdateKid} />);
-    await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
-    onUpdateKid.mockClear();
+    const { onPersist } = renderProfile();
+    await waitFor(() => expect(onPersist).toHaveBeenCalled());
+    onPersist.mockClear();
 
     fireEvent.click(screen.getByRole("button", { name: /Trocarparceiro/ }));
     fireEvent.click(screen.getByRole("button", { name: /Eevee/ }));
 
-    const persisted = onUpdateKid.mock.calls.at(-1)?.[0] as Kid & {
+    await waitFor(() => expect(onPersist).toHaveBeenCalled());
+    const persisted = onPersist.mock.calls.at(-1)?.[0] as Kid & {
       creature?: { speciesId?: string; learning?: { stars?: number }; evolutionStage?: number };
     };
     expect(persisted.creature?.speciesId).toBe("0133");
