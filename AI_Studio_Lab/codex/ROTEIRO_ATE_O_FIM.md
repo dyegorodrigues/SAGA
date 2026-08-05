@@ -75,6 +75,40 @@ Aplicando a regra aos 40 legados:
 
 **16 sobem. 24 ficam.** É esse o tamanho real da migração — não 40.
 
+> ### ⚠️ DECISÃO REVOGADA PELO AUTOR (5/ago, fim do dia)
+>
+> A tabela acima decidiu que **N1 fica legado** por baixo valor diagnóstico.
+> **O autor revogou:** os módulos iniciais — a *alfabetização matemática* — têm
+> de ser construídos desde o começo, conforme as fichas.
+>
+> *"Montar desde o começo, que tu foi direto pra multiplicação. Construir tudo
+> desde o começo com as fichas, lógico verificando o que já existe, mas se estão
+> em padrão com as fichas, e ajustar no modelo Padrão Ouro."*
+>
+> **O critério não é mais "onde o diagnóstico paga".** É: *este nó foi
+> desenvolvido, revisado e elaborado por nós, contra a ficha dele?* Os 40 legados
+> não foram — nasceram antes de as fichas virarem runtime, e ninguém comparou
+> depois.
+>
+> **O que "conforme a ficha" quer dizer, item por item.** Não basta a primitiva
+> certa. A ficha declara, e a competência tem de honrar:
+>
+> | Elemento da ficha | Onde vive no runtime |
+> |---|---|
+> | Competência e primitiva (§1) | o `kind` que o Composer serve |
+> | Fundamento pedagógico (§2) | o procedimento puro |
+> | Estrutura da tela (§3) — **incluindo o diagrama** | a primitiva (§6.34: o desenho da ficha é especificação, não ilustração) |
+> | **Roteiro cinematográfico (§4)** | a coreografia, ligada ao `tutShow` |
+> | Os 5 níveis (§5) | a escada, **transcrita** e não parafraseada (§6.11) |
+> | Diagnóstico (§6) | os distratores, um erro nomeado por alternativa |
+> | **Falas** — audioPrompt, howto, explain (§7) | o áudio, porque a criança de 4 anos não lê |
+> | Coreografia (§8) | os passos com `fala` + `mostra` |
+> | Domínio (§9) | o critério de conclusão |
+>
+> **E a ficha não é absoluta.** Se durante a construção aparecer lacuna, erro ou
+> método melhor, o cânone se corrige — com estudo, registro e o autor sabendo.
+> Foi assim que a F68 ganhou o nível de alfabetização visual.
+
 ### O que os 24 legados ainda precisam
 
 Ficar legado não é ficar largado. Todo nó, legado ou não, precisa passar em:
@@ -237,7 +271,8 @@ competências sobre um idioma não ensinado só aumenta a dívida**.
 
 | # | Bloco | Por que nesta posição |
 |---|---|---|
-| **1** | **Alfabetização visual — 12 trocas de modo** | Cada uma é uma tela que a criança acha que sabe ler e não sabe. N4.09 já ganhou o degrau; faltam 11. Sem isto, todo nó novo herda o problema |
+| **1** | **A alfabetização matemática — F0/N1, 12 nós** | Decisão do autor: os módulos iniciais são construídos desde o começo, conforme as fichas (F07, F27, JD1, F01, F06, F05, F02, F04, F03…). É onde a criança entra no app, e é a única faixa que nunca foi revisada contra o cânone |
+| **1b** | **Alfabetização visual — 11 trocas de modo restantes** | Feito em paralelo, porque atinge todas as faixas. N4.09 já ganhou o degrau |
 | **2** | **Dívida de coreografia — 6 nós** | N3.10, N4.03, N4.04, N4.06, N4.07 e níveis 3–5 de N4.08 ensinam sem momento de ensino. São os "roteiros cinematográficos" da §4 das fichas, declarados e nunca ligados |
 | **3** | **Fechar o N4** | N4.10 (F69, divisão longa), N4.11 (F70, primos), N4.12 (F71, divisor de 2 dígitos). N4.09 fica implementado à espera do canário |
 | **4** | **Ativar os canários pendentes** | N4.09 e o que sair do bloco 3, um PR por ativação |

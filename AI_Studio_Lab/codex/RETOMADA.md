@@ -62,9 +62,22 @@ npx vitest run       # o resto
 
 ## 4. Onde continuar
 
-`ROTEIRO_ATE_O_FIM.md §3-bis` tem os nove blocos em ordem. O **bloco 1** é
-terminar a alfabetização visual das trocas de modo restantes — porque construir
-mais competências sobre um idioma não ensinado só aumenta a dívida.
+`ROTEIRO_ATE_O_FIM.md §3-bis` tem os blocos em ordem. O **bloco 1** é a
+**alfabetização matemática**: construir os módulos iniciais (F0/N1) desde o
+começo, conforme as fichas.
+
+**Cuidado para não confundir dois nomes parecidos:**
+
+- **Alfabetização MATEMÁTICA** = os módulos iniciais, N1, onde a criança entra no
+  app. Decisão do autor: construir desde o começo conforme as fichas, mesmo que
+  já exista alguma coisa rodando. É o bloco 1.
+- **Alfabetização VISUAL** = ensinar a LER um desenho novo antes de cobrar
+  matemática nova (§6.36). É transversal, atinge todas as faixas, e vale como
+  regra em qualquer competência.
+
+Honrar a ficha não é só usar a primitiva certa: é o roteiro cinematográfico, as
+falas, os cinco níveis transcritos, o diagnóstico e a coreografia. A tabela
+completa está no `ROTEIRO_ATE_O_FIM.md §2`, no aviso de decisão revogada.
 
 `ROTEIRO_ATE_O_FIM.md §4-bis` lista as pendências pontuais, inclusive uma falha
 intermitente de teste **não resolvida** que não deve virar "passou" por
