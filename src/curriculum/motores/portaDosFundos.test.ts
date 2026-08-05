@@ -115,6 +115,8 @@ describe("nenhuma ficha chega à criança por fora do canário", () => {
 /** Os sete nós do F0 que estavam do lado de fora do mecanismo. */
 const REGULARIZADOS = ["N1.01", "N1.03", "N1.04", "N1.07", "N1.08", "N1.10", "AL.01"];
 
+/** O N1.02 entra na varredura estática, mas nunca teve porta dos fundos. */
+
 const CANARIOS_ORIGINAIS = [...COMPOSER_CANARIES];
 
 const trilhaDe = (id: string) =>
@@ -178,14 +180,22 @@ describe("o rollback devolve a tela anterior — e é observável", () => {
     }
   });
 
-  it("o N1.01 NÃO está ativo: implementação e ativação são PRs distintos", () => {
-    // A tela nova de pareamento existe e está registrada; ela não vai à criança
-    // no mesmo commit que a escreveu. Os outros seis JÁ eram servidos por ficha
-    // em produção antes desta mudança — ativá-los aqui regularizou um estado
-    // que já existia, sem mudar uma tela sequer.
-    expect(COMPOSER_CANARIES.has("N1.01")).toBe(false);
-    expect(trilhaDe("N1.01").generatorSource).toBe("legacy");
-    for (const id of REGULARIZADOS.filter(i => i !== "N1.01")) {
+  it("tela nova nasce DESLIGADA: implementação e ativação são PRs distintos", () => {
+    // A regra, e o motivo dela: uma tela que a criança nunca viu não vai a ela
+    // no mesmo commit que a escreveu. Quem entra aqui é todo nó cuja FICHA foi
+    // reescrita — N1.01 (pareamento, F07), N1.04 (contar tocando, F01) e N1.02
+    // (canhão, F27), que nasce agora.
+    //
+    // Os demais continuam ativos porque suas fichas não mudaram: para eles, a
+    // ativação só regularizou um estado que já existia em produção, sem trocar
+    // uma tela sequer.
+    const DESLIGADOS = ["N1.01", "N1.02", "N1.04"];
+    for (const id of DESLIGADOS) {
+      expect(COMPOSER_CANARIES.has(id), `${id} não deveria estar ativo`).toBe(false);
+      expect(hasComposerFicha(id), `${id} deveria estar registrado`).toBe(true);
+      expect(trilhaDe(id).generatorSource, id).toBe("legacy");
+    }
+    for (const id of REGULARIZADOS.filter(i => !DESLIGADOS.includes(i))) {
       expect(COMPOSER_CANARIES.has(id), `${id} deveria seguir ativo`).toBe(true);
     }
   });

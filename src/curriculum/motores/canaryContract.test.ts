@@ -12,7 +12,6 @@ import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
 import { N1_03 } from "../fichas/jornada/N1.03";
-import { N1_04 } from "../fichas/jornada/N1.04";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_10 } from "../fichas/jornada/N1.10";
@@ -61,7 +60,6 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   // do mecanismo — chamavam `Composer.generate` de dentro do gerador legado.
   // Regularizá-los os traz, pela primeira vez, para debaixo deste contrato.
   "N1.03": N1_03,
-  "N1.04": N1_04,
   "N1.07": N1_07,
   "N1.08": N1_08,
   "N1.10": N1_10,
@@ -226,6 +224,25 @@ describe("contrato do canário do Composer", () => {
         for (let i = 0; i < 40; i += 1) {
           const q = Composer.generate(ficha, lvl);
           if (!q.options) continue;
+
+          // Teclado não é leque de alternativas. O cânone §9.1 fixa "3 a 4
+          // opções tocáveis" para o kind `plain` — escolher entre distratores —
+          // e lista `count` ("tocar objetos 1 a 1") como mecânica distinta. A
+          // F01 §5 manda um teclado 1-3, 1-5 ou 1-10, escalado ao escopo: com
+          // quatro teclas, chutar acertaria em 25% e a cardinalidade deixaria de
+          // ser observável.
+          //
+          // Isto NÃO é isenção: o teclado troca uma guarda por outra igualmente
+          // estrita — ele tem de bater exatamente com o escopo que a ficha
+          // declarou, e conter a resposta.
+          const teclado = (q.uiProps as { tecladoAte?: number } | undefined)?.tecladoAte;
+          if (typeof teclado === "number" && teclado > 0) {
+            expect(q.options.length, `${id} L${lvl}: teclado fora do escopo`).toBe(teclado);
+            expect(q.options.map(o => o.value), `${id} L${lvl}: teclado sem a resposta`)
+              .toContain(q.answer);
+            continue;
+          }
+
           expect(q.options.length, `${id} L${lvl}: ${q.options.length} opções`)
             .toBeLessThanOrEqual(4);
           expect(q.options.length, `${id} L${lvl}`).toBeGreaterThanOrEqual(2);

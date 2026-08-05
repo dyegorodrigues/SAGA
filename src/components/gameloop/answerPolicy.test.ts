@@ -89,3 +89,31 @@ describe("filtro motor na porta do Radar (§8.3-bis)", () => {
     expect(isMotorSlip({ manipulacao: { repetiuMesmoDestino: true } })).toBe(false);
   });
 });
+
+describe("quem tem a resposta DENTRO da cena não recebe a barra genérica", () => {
+  // O defeito: `pareamento` e `touchcount` desenhavam a resposta duas vezes —
+  // o teclado do palco e, embaixo, a barra do app com as mesmas alternativas.
+  // Pior que feio: a barra deixava responder sem contar e sem distribuir, que é
+  // a única coisa que estas duas fichas medem.
+  it("pareamento e touchcount não desenham alternativas por fora", () => {
+    for (const kind of ["pareamento", "touchcount"]) {
+      const q = {
+        kind, prompt: "…", answer: 3,
+        options: [{ label: "1", value: 1 }, { label: "2", value: 2 }],
+      } as unknown as Question;
+      expect(shouldRenderQuestionOptions(q), kind).toBe(false);
+    }
+  });
+
+  it("mas quem só ILUSTRA continua recebendo — o palco não responde por ela", () => {
+    // `area`, `tabuada`, `deslocamento`: a criança olha o material e escolhe o
+    // número. Suprimir a barra aqui deixaria a questão sem resposta possível.
+    for (const kind of ["area", "tabuada", "deslocamento", "ancora", "familia"]) {
+      const q = {
+        kind, prompt: "…", answer: 12,
+        options: [{ label: "12", value: 12 }, { label: "13", value: 13 }],
+      } as unknown as Question;
+      expect(shouldRenderQuestionOptions(q), kind).toBe(true);
+    }
+  });
+});

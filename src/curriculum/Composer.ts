@@ -54,6 +54,8 @@ import {
 import { construirAreaSpec } from "./procedimentos/areaContract";
 import { TEMAS, construirPareamentoSpec } from "./procedimentos/pareamentoContract";
 import { cenasDoNivel as pareamentoCenasDoNivel, desfechoDe } from "./procedimentos/pareamentoProcedure";
+import { construirTouchCountSpec } from "./procedimentos/touchCountContract";
+import { ModoDeContagem } from "./procedimentos/touchCountProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -655,6 +657,30 @@ export class Composer {
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = spec.enunciado;
+        break;
+      }
+
+      case "touchcount": {
+        // Fichas F01 (N1.04, cardinalidade) e F27 (N1.02, sequência oral).
+        //
+        // A ficha diz o MODO; o Composer não adivinha pelo id da competência.
+        // Adivinhar funcionaria hoje, com dois nós, e apagaria em silêncio o
+        // dia em que uma terceira competência usar a primitiva.
+        const modo: ModoDeContagem = params.modo === "ritmico" ? "ritmico" : "toque";
+        const spec = construirTouchCountSpec(modo, lvl, Math.random);
+
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+
+        // O modo rítmico não tem alternativas: a criança dispara e a voz
+        // conta junto. Fabricar um teclado aqui trocaria uma competência ORAL
+        // por uma de leitura de numeral — que é outra ficha (N1.06).
+        options = modo === "ritmico"
+          ? []
+          : Array.from({ length: spec.tecladoAte }, (_, k) => k + 1)
+            .map(n => ({ value: n, label: String(n) }));
         break;
       }
 

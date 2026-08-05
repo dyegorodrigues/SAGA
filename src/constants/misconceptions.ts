@@ -85,7 +85,34 @@ export const MisconceptionTag = {
   PAREAMENTO_INCOMPLETO: "pareamento-incompleto",
 
   /** Pareamento: disse que sobrou quando não sobrou — julgou pela aparência, não pelo pareamento */
-  COMPARACAO_VISUAL: "comparacao-visual"
+  COMPARACAO_VISUAL: "comparacao-visual",
+
+  /* --- contagem (fichas F01 e F27) ---------------------------------- */
+
+  /** Contar tocando: contou o mesmo objeto duas vezes — o dedo não marcou o que já passou */
+  RECONTOU: "recontou",
+
+  /** Contar tocando: perdeu um objeto pelo caminho — o fio se rompeu no arranjo difícil */
+  PULOU: "pulou",
+
+  /**
+   * Contar tocando: **o marco cognitivo**. Ela contou tudo, ouviu o último número,
+   * e ainda assim recontou para responder "quantos são?". Não sabe que o último
+   * número dito É a quantidade — ele soou como o nome do último objeto.
+   */
+  NAO_TEM_CARDINALIDADE: "nao-tem-cardinalidade",
+
+  /** Contar tocando: acerta em fila e erra no disperso — conta só com apoio espacial */
+  DEPENDE_DE_ORDEM: "depende-de-ordem",
+
+  /** Contagem rítmica: disparou mais vezes que havia alvos — não monitora o que resta */
+  EXCESSO_ACAO: "excesso-acao",
+
+  /** Contagem rítmica: parou antes de acabar — perdeu o fio ou o engajamento */
+  CONTAGEM_INCOMPLETA: "contagem-incompleta",
+
+  /** Contagem rítmica: mandada continuar do 4, começou do 1 — não desacoplou a sequência do início */
+  NAO_CONTA_A_PARTIR_DE: "nao-conta-a-partir-de"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

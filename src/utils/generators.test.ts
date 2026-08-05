@@ -33,7 +33,15 @@ describe.each(ALL_TRACKS.map((t) => [`${t.grade}/${t.id}`, t] as const))(
           expect(typeof q.kind, ctx).toBe("string");
           expect(q.kind.length, ctx).toBeGreaterThan(0);
           expect(typeof q.prompt === "string" || q.kind === "picto", ctx).toBe(true);
-          if (q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "numberline" && q.isFallback !== true && q.kind !== "drag-group" && q.kind !== "draggroup" && q.kind !== "tenframe" && q.kind !== "plain" && q.kind !== "emojirow") {
+          // Estes kinds têm PALCO PRÓPRIO: a criança age na cena em vez de
+          // escolher entre alternativas, e o que houver em `options` serve ao
+          // motor, não à tela. `touchcount` entra aqui porque a F01 §5 manda um
+          // TECLADO escalado ao escopo (1-3, 1-5, 1-10) — com quatro teclas,
+          // chutar acertaria em 25% e a cardinalidade deixaria de ser observável.
+          // O escopo do teclado tem guarda própria no contrato do canário.
+          const PALCO_PROPRIO = ["vertical", "numberline-interactive", "numberline",
+            "drag-group", "draggroup", "tenframe", "plain", "emojirow", "touchcount"];
+          if (!PALCO_PROPRIO.includes(q.kind) && q.isFallback !== true) {
             expect(Array.isArray(q.options), ctx).toBe(true);
             expect(q.options.length, ctx).toBeGreaterThanOrEqual(2);
             expect(q.options.length, ctx).toBeLessThanOrEqual(6);

@@ -24,6 +24,9 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import "../src/index.css";
 import { ALL_MATH_TRACKS } from "../src/curriculum/motores/curriculum";
+import { FichaCompetencia } from "../src/curriculum/schema";
+import { N1_02 } from "../src/curriculum/fichas/jornada/N1.02";
+import { N1_04 } from "../src/curriculum/fichas/jornada/N1.04";
 import { GameLoopExerciseRenderer } from "../src/components/gameloop/GameLoopExerciseRenderer";
 import { Composer } from "../src/curriculum/Composer";
 import { N4_08 } from "../src/curriculum/fichas/jornada/N4.08";
@@ -31,7 +34,6 @@ import { DeslocamentoStage } from "../src/components/primitives/DeslocamentoStag
 import { AreaStage } from "../src/components/primitives/AreaStage";
 import { N4_09 } from "../src/curriculum/fichas/jornada/N4.09";
 import { N1_01 } from "../src/curriculum/fichas/jornada/N1.01";
-import { PareamentoStage } from "../src/components/primitives/PareamentoStage";
 
 /** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
 export const LARGURA_DO_APARELHO = 390;
@@ -95,6 +97,35 @@ function Exercicio({ id, lvl, semente }: { id: string; lvl: number; semente: num
 }
 
 /**
+ * O mesmo exercício do app, mas montado a partir da FICHA.
+ *
+ * `Exercicio` usa `track.gen`, que respeita o canário — então uma ficha
+ * implementada e ainda não ativada apareceria como o legado. Este monta a
+ * questão direto da ficha e a entrega ao **renderizador real do app**, com o
+ * cartão, a margem e a tipografia que a criança vê.
+ *
+ * Renderizar só o palco, como eu vinha fazendo, mede o layout do palco e esconde
+ * o enquadramento: dá para aprovar uma tela que, dentro do cartão, não cabe.
+ */
+function ExercicioDaFicha({ ficha, lvl, semente, mostrar }: {
+  ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown;
+}) {
+  const q = comSemente(semente, () => Composer.generate(ficha, lvl));
+  return (
+    <GameLoopExerciseRenderer
+      q={q} status={null} idx={0} handlePick={nada} timeLeft={30} promptDone
+      guidedIdx={null} mockTutorialN={null} tutShow={(mostrar ?? null) as never}
+      journeyDone={false}
+      flashHidden={false} sel={null} totalQFor={() => 10} track={{ id: ficha.id } as never}
+      aulaSuggest={false} guidedNarr={null} playAulinha={nada}
+      setShowClockTutorial={nada} sound={false} peekAgain={nada} setJourneyDone={nada}
+      orderTaps={[]} handleOrderTap={nada} orderShake={null} hiddenOpts={[]}
+      armedOpt={null} setArmedOpt={nada}
+    />
+  );
+}
+
+/**
  * O catálogo. Cresce a cada competência construída — uma cena por estado que
  * vale olhar, não uma por competência.
  */
@@ -105,21 +136,34 @@ export const CENAS: Cena[] = [
   { nome: "N1.01 rollback: draggroup congelado (nível 1)", render: (s) => <Exercicio id="N1.01" lvl={1} semente={s} /> },
 
   // N1.01 pela ficha, nos cinco níveis. Implementada e NÃO ativada: `track.gen`
-  // devolveria o congelado, então o palco é renderizado direto — a tela nova é
-  // medida ANTES de chegar à criança, que é o motivo de a sonda existir.
+  // devolveria o congelado. Passa pelo renderizador REAL do app — foi o palco
+  // solto que escondeu a barra de alternativas duplicada por baixo da cena.
   ...[1, 2, 3, 4, 5].map(lvl => ({
     nome: `N1.01 pareamento (nível ${lvl})`,
-    render: (s: number) => (
-      <PareamentoStage spec={comSemente(s, () => Composer.generate(N1_01, lvl)).uiProps as never} />
-    ),
+    render: (s: number) => <ExercicioDaFicha ficha={N1_01} lvl={lvl} semente={s} />,
   })),
+  // N1.02 e N1.04 — `TouchCount`, implementada e NÃO ativada. Montadas pela
+  // ficha e desenhadas pelo renderizador REAL do app.
+  ...[1, 3, 4, 5].map(lvl => ({
+    nome: `N1.04 contar tocando (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={N1_04} lvl={lvl} semente={s} />,
+  })),
+  ...[1, 5].map(lvl => ({
+    nome: `N1.02 canhão de balões (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={N1_02} lvl={lvl} semente={s} />,
+  })),
+  {
+    nome: "N1.04 micro-aula: contar juntos",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_04} lvl={1} semente={s}
+        mostrar={{ destacarGrupo: true, maoFantasma: 0, numeral: 1 }} />
+    ),
+  },
   {
     nome: "N1.01 micro-aula: a Mão Fantasma",
     render: (s: number) => (
-      <PareamentoStage
-        spec={comSemente(s, () => Composer.generate(N1_01, 1)).uiProps as never}
-        mostrar={{ destacarFileira: "receptores", maoFantasma: true }}
-      />
+      <ExercicioDaFicha ficha={N1_01} lvl={1} semente={s}
+        mostrar={{ destacarFileira: "receptores", maoFantasma: true }} />
     ),
   },
   { nome: "N1.03 comparar (nível 2)", render: (s) => <Exercicio id="N1.03" lvl={2} semente={s} /> },

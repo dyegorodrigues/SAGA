@@ -101,7 +101,7 @@ function primitivasExistentes(): Set<string> {
  * sem o arquivo aparecer em `src/components/primitives/` significa que alguém
  * apagou a dívida em vez de pagá-la.
  */
-export const PRIMITIVAS_PENDENTES = ["Moedas", "Regua", "TouchCount"];
+export const PRIMITIVAS_PENDENTES = ["Moedas", "Regua"];
 
 /**
  * De que primitiva é feito cada `kind` que o runtime produz.
@@ -158,6 +158,8 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   ancora: ["ArrayGrid"],
   familia: ["NumberBond"],
   deslocamento: ["MaterialDourado"],
+  pareamento: ["DragGroup"],
+  touchcount: ["TouchCount"],
 };
 
 /** Como cada competência é servida hoje. */
@@ -214,14 +216,9 @@ describe("conformidade entre as fichas e o que o app serve", () => {
    * repositório depois de resolvida.
    */
   const DIVIDA_DECLARADA: Record<string, string> = {
-    "N1.04":
-      "A ficha F01 manda `TouchCount` — a criança toca cada objeto uma vez e o " +
-      "ÚLTIMO número dito é o total. O runtime serve `emojirow`/`tenframe`/" +
-      "`plain`: ela olha uma fileira e escolhe um número, que é justamente a " +
-      "conduta que a F01 existe para superar. O defeito é anterior a este " +
-      "commit; ele só ficou visível agora porque o nó saiu de fora do " +
-      "mecanismo e entrou debaixo deste portão. Correção agendada: " +
-      "PLANO_DO_BLOCO_F0.md §5/§6, passo 1 (construir `TouchCount`).",
+    // Vazio. A entrada do N1.04 saiu daqui quando `TouchCount` passou a existir
+    // — foi o teste logo abaixo que exigiu a remoção, e é para isso que ele é
+    // escrito ao contrário.
   };
 
   it("nenhuma competência JÁ no Padrão Ouro exige primitiva que não existe", () => {

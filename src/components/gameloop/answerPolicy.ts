@@ -43,10 +43,32 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     : meta?.misconception;
 }
 
+/**
+ * Palcos que **coletam a resposta** — e por isso dispensam a barra genérica.
+ *
+ * Não confundir com `PALCOS_JA_DESENHADOS`: aquele conjunto diz quem desenha a
+ * própria CENA. Um palco pode desenhar a cena e ainda depender da barra para a
+ * resposta (`area`, `tabuada`, `deslocamento`: a criança olha o material e
+ * escolhe o número). Estes aqui têm a resposta DENTRO da cena.
+ *
+ * ### O defeito que isto corrige
+ *
+ * `pareamento` e `touchcount` desenhavam a resposta duas vezes: o teclado do
+ * palco e, embaixo, a barra do app com as mesmas alternativas. Pior que feio —
+ * a barra deixava responder **sem contar** e **sem distribuir**, que é a única
+ * coisa que estas duas fichas medem.
+ *
+ * Nenhum teste viu, e a sonda também não: as cenas renderizavam o palco solto e
+ * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
+ * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
+ */
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount"]);
+
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)
     && q.kind !== "vertical"
     && q.kind !== "numberline-interactive"
     && q.kind !== "drag-group"
-    && q.kind !== "array";
+    && q.kind !== "array"
+    && !PALCOS_QUE_RESPONDEM.has(q.kind as string);
 }

@@ -8,6 +8,7 @@ import { FamiliaSpec } from "./procedimentos/familiaContract";
 import { DeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import { AreaSpec } from "./procedimentos/areaContract";
 import { PareamentoSpec } from "./procedimentos/pareamentoContract";
+import { TouchCountSpec } from "./procedimentos/touchCountContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -40,6 +41,7 @@ export type FichaUiProps =
   | DeslocamentoSpec
   | AreaSpec
   | PareamentoSpec
+  | TouchCountSpec
   | { text: string };
 
 interface BalanceItem {
@@ -49,6 +51,14 @@ interface BalanceItem {
 }
 
 export interface ComposerParams {
+  /**
+   * O modo da primitiva, quando ela tem mais de um.
+   *
+   * `TouchCount` aceita `"toque"` (F01) e `"ritmico"` (F27). Quem manda é a
+   * FICHA: deduzir o modo pelo id da competência funcionaria com duas e falharia
+   * em silêncio na terceira.
+   */
+  modo?: string;
   n_min?: number;
   n_max?: number;
   flash_ms?: number;

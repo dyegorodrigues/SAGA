@@ -10,6 +10,7 @@ import { FamiliaStage } from "../primitives/FamiliaStage";
 import { DeslocamentoStage } from "../primitives/DeslocamentoStage";
 import { AreaStage } from "../primitives/AreaStage";
 import { PareamentoStage } from "../primitives/PareamentoStage";
+import { TouchCount } from "../primitives/TouchCount";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -58,6 +59,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "deslocamento",
   "area",
   "pareamento",
+  "touchcount",
 ]);
 
 interface Props {
@@ -118,6 +120,14 @@ export function GameLoopExerciseRenderer({
           <PareamentoStage
             spec={q.uiProps as never}
             onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "pareamento", pareamento: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "touchcount" && q.uiProps && (
+          <TouchCount
+            spec={q.uiProps as never}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "touchcount", touchcount: acao } as never)}
             disabled={status !== null}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />

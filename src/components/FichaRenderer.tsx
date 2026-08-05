@@ -26,6 +26,7 @@ import { FamiliaStage } from './primitives/FamiliaStage';
 import { DeslocamentoStage } from './primitives/DeslocamentoStage';
 import { AreaStage } from './primitives/AreaStage';
 import { PareamentoStage } from './primitives/PareamentoStage';
+import { TouchCount } from './primitives/TouchCount';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
 interface FichaRendererProps {
@@ -83,6 +84,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <AreaStage spec={uiProps as never} />;
     case 'pareamento':
       return <PareamentoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'touchcount':
+      return <TouchCount spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'array':
       return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':

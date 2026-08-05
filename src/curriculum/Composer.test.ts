@@ -10,17 +10,28 @@ import { N4_02 } from "./fichas/jornada/N4.02";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
+    // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. A N1.03
+    // demonstra sozinha — o micro "a" declara `emojirow`, e o nível 5 manda
+    // `scattered`. Se o Composer olhasse o micro, viria emojirow aqui.
     const scattered = Composer.generate(N1_03, 5, "a");
-    const tenframe = Composer.generate(N1_04, 3, "b");
-    const symbolic = Composer.generate(N1_04, 4, "b");
-
     expect(scattered.kind).toBe("scattered");
     expect(scattered.n).toBeTypeOf("number");
     expect(scattered.uiProps.ordered).toBe(false);
-    expect(tenframe.kind).toBe("tenframe");
-    expect(tenframe.n).toBeTypeOf("number");
-    expect(symbolic.kind).toBe("plain");
-    expect(symbolic.uiProps.text).toContain("?");
+
+    const flash = Composer.generate(N1_03, 1, "a");
+    expect(flash.kind).toBe("emojirow");
+  });
+
+  it("N1.04 é `touchcount` nos CINCO níveis — a ficha F01 não tem outra primitiva", () => {
+    // Este teste checava `tenframe` no nível 3 e `plain` no 4, porque era isso
+    // que o runtime servia: a criança olhava uma fileira e escolhia um número.
+    // A ficha F01 manda `TouchCount` do começo ao fim — contar é TOCAR. O que
+    // muda de nível para nível é o arranjo e o andaime, nunca a primitiva.
+    for (let lvl = 1; lvl <= 5; lvl += 1) {
+      const q = Composer.generate(N1_04, lvl);
+      expect(q.kind, `nível ${lvl}`).toBe("touchcount");
+      expect((q.uiProps as { modo?: string }).modo, `nível ${lvl}`).toBe("toque");
+    }
   });
 
   it("normalizes legacy tutorial speech into the runtime contract", () => {
