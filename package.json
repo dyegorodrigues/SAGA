@@ -16,7 +16,10 @@
     "grafo:check": "node scripts/generate-graph-artifacts.cjs --check",
     "pr:check": "node AI_Studio_Lab/tools/pr_text_guard.cjs",
     "simular": "tsx simulated-learner-real.ts",
-    "contrato": "vitest run"
+    "contrato": "vitest run",
+    "assets:pokemon-pmd": "node scripts/pokemon-pmd-assets.cjs generate",
+    "assets:pokemon-pmd:clean": "node scripts/pokemon-pmd-assets.cjs clean",
+    "pr:prepare": "npm run assets:pokemon-pmd:clean && npm run pr:check"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
