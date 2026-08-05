@@ -19,7 +19,8 @@
     "contrato": "vitest run",
     "assets:pokemon-pmd": "node scripts/pokemon-pmd-assets.cjs generate",
     "assets:pokemon-pmd:clean": "node scripts/pokemon-pmd-assets.cjs clean",
-    "pr:prepare": "npm run assets:pokemon-pmd:clean && npm run pr:check"
+    "pr:prepare": "npm run assets:pokemon-pmd:clean && npm run pr:check && npm run assets:pokemon-pmd:verify",
+    "assets:pokemon-pmd:verify": "node scripts/guard-pr-binaries.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

@@ -10,3 +10,11 @@ coverage/
 # Saída local do graphify (grafo de código; não versionar)
 graphify-out/
 *.bak
+# PMD creature sprites are generated locally; never commit binary outputs.
+public/assets/creatures/pokemon-pmd/*.png
+public/assets/creatures/pokemon-pmd/*.jpg
+public/assets/creatures/pokemon-pmd/*.jpeg
+public/assets/creatures/pokemon-pmd/*.gif
+public/assets/creatures/pokemon-pmd/*.webp
+public/assets/creatures/pokemon-pmd/*.zip
+public/assets/creatures/pokemon-pmd/*.pdf
