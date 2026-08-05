@@ -199,6 +199,36 @@ Registrado aqui porque a memória da conversa não sobrevive e o repositório si
 recalculam tudo: `npm run fichas:conferir` (conformidade) e `npm run sonda`
 (layout).
 
+## 3-bis. A ORDEM NOVA, depois da descoberta da progressão (5/ago)
+
+A auditoria de progressão mudou a fila. Antes eu ia fechar o N4 e depois pagar
+dívidas; agora a alfabetização visual vem primeiro, porque **construir mais
+competências sobre um idioma não ensinado só aumenta a dívida**.
+
+| # | Bloco | Por que nesta posição |
+|---|---|---|
+| **1** | **Alfabetização visual — 12 trocas de modo** | Cada uma é uma tela que a criança acha que sabe ler e não sabe. N4.09 já ganhou o degrau; faltam 11. Sem isto, todo nó novo herda o problema |
+| **2** | **Dívida de coreografia — 6 nós** | N3.10, N4.03, N4.04, N4.06, N4.07 e níveis 3–5 de N4.08 ensinam sem momento de ensino. São os "roteiros cinematográficos" da §4 das fichas, declarados e nunca ligados |
+| **3** | **Fechar o N4** | N4.10 (F69, divisão longa), N4.11 (F70, primos), N4.12 (F71, divisor de 2 dígitos). N4.09 fica implementado à espera do canário |
+| **4** | **Ativar os canários pendentes** | N4.09 e o que sair do bloco 3, um PR por ativação |
+| **5** | **Reagrupamento — N3.01 a N3.08** | O coração do F1, onde a criança trava de verdade |
+| **6** | **Valor posicional — N2.01 a N2.05** | Depende do 5: reagrupar é valor posicional em movimento |
+| **7** | **Primitivas que não existem** | `TouchCount` (bloqueia N1.02 e N1.04), `Moedas` (GM.03), `Regua` (GM.05) |
+| **8** | **As 41 estreias** | Com a máquina inteira pronta, é o trecho mais rápido |
+| **9** | **Dojo completo** | Fluência separada de conceito |
+
+**Faixa paralela, sem ocupar a fila:** as 27 divergentes (tela ≠ ficha) e a
+manutenção dos 24 legados (sonda + áudio), em lote.
+
+**Pendências pontuais que não são bloco:**
+
+- **Falha intermitente de teste** — vista uma vez, não reproduzida em 7
+  execuções, nome não capturado. Não resolvida.
+- **`GameLoop.tsx` com 1060 linhas**, bundle de 1,97 MB, `npm run simular`
+  apontando para arquivo inexistente, 10 telas grandes sem tokens.
+- **Fora do repositório:** publicar `firestore.rules` e ligar a política de TTL
+  no Console do Firebase.
+
 ## 4-ter. A revisão que passou a bloquear N4.09
 
 Levantado em 5/ago pela pergunta *"esse recurso pedagógico é ensinado antes de
