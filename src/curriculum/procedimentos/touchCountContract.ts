@@ -5,7 +5,7 @@ import {
   alvosDaMaoFantasma,
   arranjoDoToque,
   baloesDoNivel,
-  comecaDe,
+  jaFeitosNoNivel,
   marcaComCor,
   mostraNumeral,
   tetoDoTeclado,
@@ -68,8 +68,14 @@ export interface TouchCountSpec {
   aoMarcar: "colorir" | "estourar" | "nada";
   /** O numeral aparece escrito? Falso do nível 4 rítmico em diante. */
   mostraNumeral: boolean;
-  /** De que número a contagem começa. 1, exceto no nível 5 rítmico. */
-  comecaDe: number;
+  /**
+   * Quantos alvos a cena já traz FEITOS quando abre.
+   *
+   * Zero em quase toda parte. No nível 5 do rítmico é a **âncora do
+   * counting-on**: os balões já estourados mostram à criança de onde continuar,
+   * sem depender de ela ler número — e mantêm a sequência dentro de 1 a 10.
+   */
+  jaFeitos: number;
   /** Quantos alvos a Mão Fantasma faz antes de passar a vez. 0 = nenhum. */
   maoFantasma: number;
   /** O maior numeral do teclado. Só no modo toque. */
@@ -301,11 +307,15 @@ export function construirTouchCountSpec(
     : totalDoToque(nivel, sorteio);
 
   const arranjo: ArranjoDeContagem = ritmico ? "fila" : arranjoDoToque(nivel);
-  const inicio = ritmico ? comecaDe(nivel, Math.floor(sorteio() * 4)) : 1;
+  const jaFeitos = ritmico ? jaFeitosNoNivel(nivel, Math.floor(sorteio() * 4)) : 0;
 
   const enunciado = ritmico
-    ? (inicio > 1
-      ? `Estoure os balões continuando de ${inicio}!`
+    ? (jaFeitos > 0
+      // A fala da ficha, letra por letra: "continue de 4: cinco, seis…". O
+      // número aqui é o ponto de partida, não a resposta — e os balões já
+      // estourados na tela mostram de onde ele saiu.
+      // A fala da ficha, sem repetir o número: "continue de 4: cinco, seis…".
+      ? `Continue de ${jaFeitos}: estoure o resto!`
       : "Estoure os balões contando junto!")
     : enunciadoDoToque(t, total);
 
@@ -321,7 +331,7 @@ export function construirTouchCountSpec(
     falado: enunciado,
     aoMarcar: ritmico ? "estourar" : (marcaComCor(nivel) ? "colorir" : "nada"),
     mostraNumeral: ritmico ? mostraNumeral(nivel) : true,
-    comecaDe: inicio,
+    jaFeitos,
     // A F01 §5 manda a Mão Fantasma tocar os DOIS primeiros, e o nível 1
     // sorteia de 1 a 3 alvos: numa cena de um alvo só, ela tocaria dois de um.
     // O teto pelo total é o que impede a coreografia de prometer um gesto que
@@ -350,6 +360,6 @@ export function construirTouchCountSpec(
 export function enunciadoNaoEntregaResposta(spec: TouchCountSpec): boolean {
   const numerais = (spec.enunciado.match(/\d+/g) ?? []).map(Number);
   if (numerais.length === 0) return true;
-  if (spec.comecaDe > 1 && numerais.every(n => n === spec.comecaDe)) return true;
+  if (spec.jaFeitos > 0 && numerais.every(n => n === spec.jaFeitos)) return true;
   return false;
 }

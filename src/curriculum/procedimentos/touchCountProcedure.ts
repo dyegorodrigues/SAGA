@@ -122,16 +122,37 @@ export function mostraNumeral(nivel: number): boolean {
 }
 
 /**
- * De que número a contagem começa.
+ * Quantos alvos a cena já traz FEITOS quando abre.
  *
- * **O nível 5 é a ponte para somar.** Continuar de um número dado, em vez de
- * recomeçar do 1, é a estratégia `counting-on` — pré-requisito da adição. Nos
- * outros níveis começa do 1, como toda contagem.
+ * ### O que estava errado
+ *
+ * O nível 5 é a ponte para somar: continuar de um número dado, em vez de
+ * recomeçar do 1, é a estratégia `counting-on`. A primeira versão implementou
+ * isso deslocando a numeração — a criança estourava dez balões e os números
+ * saíam 2, 3, … 11.
+ *
+ * Duas coisas quebravam:
+ *
+ * 1. **Não havia âncora.** Dez balões idênticos e intactos, e o enunciado
+ *    dizendo *"continuando de 2"*. De onde? A criança não tinha como saber, e o
+ *    deslocamento da numeração é invisível para quem não lê número.
+ * 2. **A conta saía do escopo.** Dez balões a partir do 2 terminam em 11, e a
+ *    ficha inteira trabalha até dez.
+ *
+ * ### O que a ficha pede
+ *
+ * A F27 §5 escreve o apoio assim: *"continue de 4: cinco, seis…"*. Ou seja,
+ * **alguém já contou até quatro** — e é isso que a tela tem de mostrar. Os
+ * balões já estourados são a âncora, e ela é física, não numérica: funciona no
+ * nível 4 e 5, onde o numeral escrito nem aparece.
+ *
+ * Assim a sequência continua sendo 1 a 10, a criança faz de `jaFeitos + 1` até
+ * o fim, e ela vê exatamente de onde continuar.
  */
-export function comecaDe(nivel: number, sorteio = 0): number {
-  if (nivel < 5) return 1;
-  // 2 a 5: alto o bastante para recomeçar do 1 ser visivelmente diferente, e
-  // baixo o bastante para a sequência caber no escopo de dez.
+export function jaFeitosNoNivel(nivel: number, sorteio = 0): number {
+  if (nivel < 5) return 0;
+  // 2 a 5 já feitos: o bastante para "continue de N" ser visivelmente diferente
+  // de recomeçar, e pouco o bastante para sobrar contagem de verdade.
   return 2 + (sorteio % 4);
 }
 

@@ -2,12 +2,12 @@
 // clica pelo fluxo e salva screenshots. Requer: npm i -D playwright-core. Uso: node scripts/e2e-screenshots.mjs
 import { chromium } from "playwright-core";
 import fs from "node:fs";
-const OUT = "/tmp/claude-0/-home-user-Matem-gica/196f98a9-c43a-5306-b369-ed5074adef5e/scratchpad/shots";
+const OUT = process.env.SHOTS_OUT ?? "/tmp/shots";
 fs.mkdirSync(OUT, { recursive: true });
 const seed = { kids: [{ id: "k1", name: "Heitor", avatar: "🦸", grade: "ano1", theme: "classico" }],
   progress: {}, coins: { k1: 20 }, album: {}, log: {}, sound: false, customTracks: [] };
 const log = [];
-const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium", args: ["--no-sandbox"] });
+const browser = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium-1194/chrome-linux/chrome", args: ["--no-sandbox"] });
 const ctx = await browser.newContext({ viewport: { width: 420, height: 820 }, deviceScaleFactor: 2 });
 await ctx.addInitScript((s) => localStorage.setItem("mk-state-v1", JSON.stringify(s)), seed);
 const page = await ctx.newPage();
