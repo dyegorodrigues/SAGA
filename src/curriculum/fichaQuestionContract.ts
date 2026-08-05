@@ -5,6 +5,7 @@ import { TabuadaSpec } from "./procedimentos/tabuadaContract";
 import { DecomposicaoSpec } from "./procedimentos/decomposicaoContract";
 import { AncoraSpec } from "./procedimentos/ancoraContract";
 import { FamiliaSpec } from "./procedimentos/familiaContract";
+import { DeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -34,6 +35,7 @@ export type FichaUiProps =
   | DecomposicaoSpec
   | AncoraSpec
   | FamiliaSpec
+  | DeslocamentoSpec
   | { text: string };
 
 interface BalanceItem {

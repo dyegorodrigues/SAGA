@@ -58,7 +58,16 @@ export const MisconceptionTag = {
   INVERTE_DIVISAO: "inverte-divisao",
 
   /** Família ×÷: tratou a divisão como subtração (12÷3 → 9) */
-  DIVIDE_SUBTRAINDO: "divide-subtraindo"
+  DIVIDE_SUBTRAINDO: "divide-subtraindo",
+
+  /** Valor posicional: aplicou "acrescenta zero" sem entender — um zero no ×100 (23×100 → 230) */
+  ACRESCENTA_ZERO_SEM_ENTENDER: "acrescenta-zero-sem-entender",
+
+  /** Valor posicional: deslocou o número errado de ordens (12×30 → 36, esqueceu a dezena) */
+  ORDEM_ERRADA: "ordem-errada",
+
+  /** Multiplicação armada: esqueceu de somar o "vai um" da ordem anterior (27×3 → 61) */
+  ESQUECE_REAGRUPAMENTO: "esquece-reagrupamento"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

@@ -23,6 +23,7 @@ import { TabuadaStage } from './primitives/TabuadaStage';
 import { DecomposicaoStage } from './primitives/DecomposicaoStage';
 import { AncoraStage } from './primitives/AncoraStage';
 import { FamiliaStage } from './primitives/FamiliaStage';
+import { DeslocamentoStage } from './primitives/DeslocamentoStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
 interface FichaRendererProps {
@@ -74,6 +75,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <AncoraStage spec={uiProps as never} />;
     case 'familia':
       return <FamiliaStage spec={uiProps as never} />;
+    case 'deslocamento':
+      return <DeslocamentoStage spec={uiProps as never} />;
     case 'array':
       return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':

@@ -51,6 +51,11 @@ import {
   produtoMaximoDoNivel,
   verticesDoNivel,
 } from "./procedimentos/familiaProcedure";
+import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
+import {
+  ehPergunavelComDiagnostico as deslocamentoDiagnostica,
+  multiplicadoresDoNivel,
+} from "./procedimentos/deslocamentoProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -588,6 +593,31 @@ export class Composer {
 
         const escolha = candidatas[randomInt(0, candidatas.length - 1)];
         const spec = construirFamiliaSpec({ a: escolha.a, b: escolha.b }, escolha.vertice, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "deslocamento": {
+        const candidatas = multiplicadoresDoNivel(lvl).flatMap(multiplicador =>
+          Array.from({ length: 89 }, (_, i) => ({ numero: i + 11, multiplicador })))
+          .filter(deslocamentoDiagnostica);
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem conta com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirDeslocamentoSpec(escolha, lvl);
 
         answer = spec.resposta;
         options = spec.alternativas
