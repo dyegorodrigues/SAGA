@@ -9,6 +9,7 @@ import { AncoraStage } from "../primitives/AncoraStage";
 import { FamiliaStage } from "../primitives/FamiliaStage";
 import { DeslocamentoStage } from "../primitives/DeslocamentoStage";
 import { AreaStage } from "../primitives/AreaStage";
+import { PareamentoStage } from "../primitives/PareamentoStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -56,6 +57,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "familia",
   "deslocamento",
   "area",
+  "pareamento",
 ]);
 
 interface Props {
@@ -112,6 +114,14 @@ export function GameLoopExerciseRenderer({
             não produz nada na tela. */}
         {q.kind === "deslocamento" && q.uiProps && <DeslocamentoStage spec={q.uiProps as never} mostrar={typeof tutShow === "object" ? tutShow : null} />}
         {q.kind === "area" && q.uiProps && <AreaStage spec={q.uiProps as never} mostrar={typeof tutShow === "object" ? tutShow : null} />}
+        {q.kind === "pareamento" && q.uiProps && (
+          <PareamentoStage
+            spec={q.uiProps as never}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "pareamento", pareamento: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
         {/* A partir daqui, quem tem `uiProps` cai no FichaRenderer — que também
             sabe desenhar os palcos acima. Sem esta exclusão a tela saía DUAS
             vezes: a conta, o material e a dica repetidos, um embaixo do outro.

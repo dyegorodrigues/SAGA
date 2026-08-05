@@ -50,6 +50,19 @@ export interface Option {
 
 /** Context from production interactions that do not select a Question option. */
 export interface AnswerMeta {
+  /**
+   * O que a criança fez com as peças no pareamento (N1.01).
+   *
+   * Ficha de PRODUÇÃO: o diagnóstico vem da ação, não da alternativa escolhida.
+   * Sem este campo, o Radar não teria como distinguir "pôs dois no mesmo" de
+   * "deixou um sem" — que pedem aulas diferentes.
+   */
+  pareamento?: {
+    porReceptor: number[];
+    naBandeja: number;
+    respostaDaPergunta?: "exato" | "sobra" | "falta";
+  };
+
   misconception?: string;
   source?: "vertical-column" | "array-grid";
   columnIndex?: number;

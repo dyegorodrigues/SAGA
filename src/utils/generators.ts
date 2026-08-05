@@ -701,8 +701,10 @@ export function gGM_02(lvl: number): Question {
 
 // --- FUNDAÇÃO SAGA: N1.01 a N1.09 ---
 export function gN1_01(lvl: number): Question {
-  const microId = lvl <= 2 ? "a" : "b";
-  return Composer.generate(N1_01, lvl, microId);
+  // Sem microId à mão: a ficha F07 tem UM micro por nível, e o Composer resolve
+  // pelo `niveis[lvl].micro`. Passar "a"/"b" aqui — como a versão anterior
+  // fazia — colapsava os cinco níveis da ficha em dois.
+  return Composer.generate(N1_01, lvl);
 }
 
 export function gN1_02(lvl: number): Question {

@@ -52,6 +52,8 @@ import {
   verticesDoNivel,
 } from "./procedimentos/familiaProcedure";
 import { construirAreaSpec } from "./procedimentos/areaContract";
+import { TEMAS, construirPareamentoSpec } from "./procedimentos/pareamentoContract";
+import { cenasDoNivel as pareamentoCenasDoNivel, desfechoDe } from "./procedimentos/pareamentoProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -636,6 +638,23 @@ export class Composer {
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "pareamento": {
+        // Ficha de PRODUÇÃO (F07): a criança distribui, não escolhe. A única
+        // escolha é a pergunta do "sobrou?", cujas opções vêm do procedimento —
+        // e nenhuma delas é um número, que é a regra dura desta ficha.
+        const cenas = pareamentoCenasDoNivel(lvl);
+        const cena = cenas[randomInt(0, cenas.length - 1)];
+        const tema = TEMAS[randomInt(0, TEMAS.length - 1)];
+        const spec = construirPareamentoSpec(cena, lvl, tema);
+
+        answer = desfechoDe(cena);
+        options = spec.respostas.map(r => ({ value: r.desfecho, label: r.rotulo }));
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
         break;
       }
 

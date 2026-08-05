@@ -7,6 +7,7 @@ import { AncoraSpec } from "./procedimentos/ancoraContract";
 import { FamiliaSpec } from "./procedimentos/familiaContract";
 import { DeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import { AreaSpec } from "./procedimentos/areaContract";
+import { PareamentoSpec } from "./procedimentos/pareamentoContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -38,6 +39,7 @@ export type FichaUiProps =
   | FamiliaSpec
   | DeslocamentoSpec
   | AreaSpec
+  | PareamentoSpec
   | { text: string };
 
 interface BalanceItem {

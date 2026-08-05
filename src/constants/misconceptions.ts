@@ -76,7 +76,16 @@ export const MisconceptionTag = {
   CORTE_ERRADO: "corte-errado",
 
   /** Multiplicação armada por 2 dígitos: esqueceu o zero da segunda linha (13×14 → 65) */
-  ZERO_ESQUECIDO: "zero-esquecido"
+  ZERO_ESQUECIDO: "zero-esquecido",
+
+  /** Pareamento: pôs dois ou mais itens no mesmo receptor — não tem a regra "um e só um" */
+  DISTRIBUICAO_DESIGUAL: "distribuicao-desigual",
+
+  /** Pareamento: deixou receptor vazio com item sobrando — perdeu o fio, não varreu todos */
+  PAREAMENTO_INCOMPLETO: "pareamento-incompleto",
+
+  /** Pareamento: disse que sobrou quando não sobrou — julgou pela aparência, não pelo pareamento */
+  COMPARACAO_VISUAL: "comparacao-visual"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];
