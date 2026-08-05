@@ -9,6 +9,7 @@ import {
   getDoc,
   setDoc,
   setLogLevel,
+  Timestamp,
 } from "firebase/firestore";
 import {
   getAuth,
@@ -295,6 +296,28 @@ export async function loadStateFromCloud(): Promise<State | null> {
 }
 
 /**
+ * Por quanto tempo um registro de telemetria vive na nuvem.
+ *
+ * 18 meses cobre a única análise que justifica guardar isto — comparar a criança
+ * com ela mesma ao longo de mais de um ano letivo — e nada além. Dado de criança
+ * que não serve a nenhuma pergunta é só risco parado.
+ */
+export const RETENCAO_TELEMETRIA_DIAS = 550;
+
+/**
+ * Versão do formato do evento de telemetria.
+ *
+ * Um evento arquivado é lido anos depois do dia em que foi escrito, quando o
+ * código que o produziu já não existe. Sem esta marca, interpretar um arquivo
+ * antigo vira adivinhação — e como o arquivo é imutável, não há como consertar
+ * depois. Ver `AI_Studio_Lab/arquitetura/DADOS_EM_ESCALA.md` §4.
+ *
+ * Suba o número ao mudar o SIGNIFICADO de um campo existente ou ao remover um.
+ * Acrescentar campo opcional não exige versão nova: o leitor antigo o ignora.
+ */
+export const VERSAO_EVENTO_TELEMETRIA = 1;
+
+/**
  * Logs an atomic telemetry event to Cloud Firestore asynchronously.
  * This does not block the UI and provides deep analytical insight.
  */
@@ -306,8 +329,14 @@ export async function logTelemetryToCloud(log: TelemetryLog): Promise<void> {
     const colRef = collection(db, `userStates/${userId}/Kids/${log.kidId}/TelemetryLogs`);
     await setDoc(doc(colRef), {
       ...log,
-      parentUserId: userId,
-      serverTimestamp: new Date().toISOString()
+      schemaVersion: VERSAO_EVENTO_TELEMETRIA,
+      serverTimestamp: new Date().toISOString(),
+      // Retenção (§ política em AI_Studio_Lab/DADOS_E_RETENCAO.md): o campo é o
+      // gatilho da política de TTL do Firestore. Precisa ser Timestamp de
+      // verdade — o TTL ignora string. Sem a política ligada no Console, o campo
+      // fica inerte e não custa nada; com ela ligada, o registro se apaga
+      // sozinho e ninguém precisa lembrar de faxinar.
+      expiraEm: Timestamp.fromMillis(Date.now() + RETENCAO_TELEMETRIA_DIAS * 86400000),
     });
   } catch (err: any) {
     console.warn("[Firestore] Falha ao enviar telemetria (background):", err.message);

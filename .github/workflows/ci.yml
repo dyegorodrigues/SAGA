@@ -1,0 +1,83 @@
+name: CI
+
+# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
+# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
+# tudo localmente e passe a ser condição verificável no PR.
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: Gates do SAGA
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
+      # órfãos e deriva de nomenclatura.
+      - name: Auditoria do catálogo
+        run: npm run auditar
+
+      - name: Auditoria das fichas
+        run: npm run fichas:auditar
+
+      # O grafo é artefato derivado; o modo --check falha se alguém editar o
+      # gerado sem regerar a partir do YAML canônico.
+      - name: Sincronia do grafo
+        run: npm run grafo:check
+
+      - name: TypeScript
+        run: npm run lint
+
+      - name: Testes
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+  guarda-textual:
+    name: Guarda de binários
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Por padrão o Actions confere um merge commit sintético do PR, o que
+          # distorceria o diff. Aqui o alvo é o head real da branch.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # A guarda compara com a base do PR; precisa do histórico.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Buscar a base do PR
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      # O criador de PR deste ambiente não aceita binários no diff textual.
+      # Falhar aqui é mais barato que descobrir na hora de publicar.
+      - name: Verificar ausência de binários no diff
+        env:
+          PR_BASE: origin/${{ github.base_ref }}
+        run: node AI_Studio_Lab/tools/pr_text_guard.cjs

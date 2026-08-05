@@ -7,7 +7,7 @@ import {
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
-import { isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
+import { isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
@@ -445,6 +445,17 @@ export function GameLoop({
     
     // forcedRight: usado por interações que decidem o acerto por conta própria (ex.: `order`)
     const right = forcedRight !== undefined ? forcedRight : val === q.answer;
+
+    // FILTRO MOTOR (§8.3-bis): erro de dedo não é erro de cabeça. Não pontua,
+    // não gasta tentativa, não vira tag, não alimenta o Radar, não aparece no
+    // painel dos pais. Nem som de erro — a criança não errou nada.
+    if (!right && isMotorSlip(answerMeta)) {
+      speak("Quase! Põe de novo com calma.");
+      setToast("Quase! Tenta de novo 🖐️");
+      setTimeout(() => setToast(null), 2000);
+      return;
+    }
+
     const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
     recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
 

@@ -113,3 +113,31 @@ Fonte verificada em 2/ago/2026:
 O plugin melhora o ritual de planejamento, TDD, revisão e verificação, mas não
 substitui `AGENTS.md`, a Bíblia, o Plano Mestre nem as travas Git do SAGA. Em caso
 de conflito, as regras do repositório continuam mandando.
+
+## Fechamento de bloco — a lista que não depende de memória
+
+Três falhas desta natureza já ocorreram: um lote declarado concluído sem reler a
+própria lista, um canário promovido com padrão mais fraco que o seguinte e o
+grafo de código deixado quatro commits para trás. Nenhuma foi por desconhecimento
+— todas por confiar num passo de rotina à memória de quem executava.
+
+Antes de dizer que um bloco terminou:
+
+1. **Reabrir a lista do bloco** no roteiro e conferir item a item, preenchendo a
+   coluna de evidência. Tabela não se preenche de memória.
+2. **Rodar os gates**: `auditar`, `fichas:auditar`, `grafo:check`, `lint`,
+   `pr:check`, `test`, `build`.
+3. **Atualizar o grafo de código**: `npm run grafo:codigo`, e comparar
+   `Built from commit` com `git rev-parse HEAD`.
+4. **Provar a base**: `git status --short --branch` e `git rev-list --count
+   origin/main..HEAD`.
+5. **Verificar publicação**: local e remoto no mesmo commit.
+
+Onde a verificação puder virar código, ela deve virar. O contrato do canário é o
+exemplo: em vez de confiar que cada promoção repita as onze checagens, a suíte
+enumera `COMPOSER_CANARIES` e aplica o padrão a quem estiver lá. Promover sem
+declarar falha na hora.
+
+**Regra geral:** se um passo precisa ser lembrado, ele precisa de mecanismo. Se
+não couber num teste, cabe numa tabela de evidência; se não couber na tabela,
+cabe num script com nome descobrível.

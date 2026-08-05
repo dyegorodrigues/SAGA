@@ -186,6 +186,17 @@ produziria uma ficha pedagogicamente incorreta.
 5. Testar áudio da história, uma pergunta por tela e quatro estruturas aditivas,
    com diagnóstico específico por estrutura.
 
+### Lote D-canário — promoção controlada de N3.10
+
+**Estado: ativado em 3/ago/2026, em PR próprio.** N3.10 passou a ser servida pelo
+Composer depois que a paridade foi medida: o caminho autoral não regride em
+alcance nem em usabilidade e acrescenta as quatro estruturas, a incógnita
+variável no nível 5 e o diagnóstico por alternativa — três coisas que `gN3_10`
+não faz. N3.09 permanece canário e N3.11 permanece legado, sem serem afetados.
+
+O rollback é a retirada de `N3.10` de `COMPOSER_CANARIES` e vale na questão
+seguinte, sem rebuild. Há teste que exercita ida e volta por `getTrackById`.
+
 ### Lote E — confiabilidade antes de massificação
 
 1. E2E da missão diária e das fichas migradas.

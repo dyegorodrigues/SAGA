@@ -11,6 +11,16 @@ interface NumberLineProps {
   highlightedRanges?: { start: number; end: number; color?: string }[];
   onValueClick?: (val: number) => void;
   state?: UIState;
+  /**
+   * Largura mínima por ponto, em px.
+   *
+   * O padrão de 60 é confortável para retas curtas. Retas longas (contar de dez
+   * em dez até 90 são 10 pontos = 600px) estouram os 390px do aparelho e a reta
+   * passa a ROLAR na horizontal — escondendo justamente o fim da contagem, que é
+   * o que a criança precisa ver. Quem sabe quantos pontos vêm passa um valor
+   * menor. Ver Padrão Ouro §6.16.
+   */
+  larguraPorPonto?: number;
 }
 
 export function NumberLine({
@@ -21,14 +31,19 @@ export function NumberLine({
   targetValue = null,
   highlightedRanges = [],
   onValueClick,
-  state = 'ocioso'
+  state = 'ocioso',
+  larguraPorPonto = 60
 }: NumberLineProps) {
   const points = [];
   for (let i = min; i <= max; i += step) {
     points.push(i);
   }
 
-  const minWidthPerPoint = 60;
+  const minWidthPerPoint = larguraPorPonto;
+  // O rótulo acompanha a densidade da reta. Onze pontos com números de dois
+  // dígitos não cabem em 300px no tamanho confortável — e apertar o espaço só
+  // faria os números colidirem. Encolher a fonte resolve sem esconder nada.
+  const classeDoRotulo = minWidthPerPoint < 40 ? "text-sm" : "text-xl";
   const totalMinWidth = points.length * minWidthPerPoint;
 
   return (
@@ -104,7 +119,7 @@ export function NumberLine({
               />
               {/* Number Label */}
               <div 
-                className="absolute top-8 font-black text-xl transition-all"
+                className={`absolute top-8 font-black transition-all ${classeDoRotulo}`}
                 style={{ 
                   color: isCurrent || isTarget ? tokens.cor.texto.principal : tokens.cor.texto.secundario,
                   transform: isCurrent || isTarget ? 'scale(1.2)' : 'scale(1)'

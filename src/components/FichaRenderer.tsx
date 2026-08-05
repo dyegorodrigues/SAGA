@@ -19,6 +19,14 @@ import { MaterialDourado } from './primitives/MaterialDourado';
 import { DragGroup } from './primitives/DragGroup';
 import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
 import { StoryBarsStage } from "./primitives/StoryBarsStage";
+import { TabuadaStage } from './primitives/TabuadaStage';
+import { DecomposicaoStage } from './primitives/DecomposicaoStage';
+import { AncoraStage } from './primitives/AncoraStage';
+import { FamiliaStage } from './primitives/FamiliaStage';
+import { DeslocamentoStage } from './primitives/DeslocamentoStage';
+import { AreaStage } from './primitives/AreaStage';
+import { PareamentoStage } from './primitives/PareamentoStage';
+import { TouchCount } from './primitives/TouchCount';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
 interface FichaRendererProps {
@@ -62,6 +70,22 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <VerticalPlaceValueStage question={question} onAnswer={handleInteract} onMistake={handleInteract} disabled={Boolean(disabled)} />;
     case 'story-bars':
       return <StoryBarsStage spec={uiProps as never} />;
+    case 'tabuada':
+      return <TabuadaStage spec={uiProps as never} />;
+    case 'decomposicao':
+      return <DecomposicaoStage spec={uiProps as never} />;
+    case 'ancora':
+      return <AncoraStage spec={uiProps as never} />;
+    case 'familia':
+      return <FamiliaStage spec={uiProps as never} />;
+    case 'deslocamento':
+      return <DeslocamentoStage spec={uiProps as never} />;
+    case 'area':
+      return <AreaStage spec={uiProps as never} />;
+    case 'pareamento':
+      return <PareamentoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'touchcount':
+      return <TouchCount spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'array':
       return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':

@@ -17,6 +17,52 @@ import {
 } from "./procedimentos/additiveProcedure";
 import { buildNarrative } from "./procedimentos/additiveNarrative";
 import { buildStoryBarsSpec } from "./procedimentos/storyBarsContract";
+import { construirTabuadaSpec } from "./procedimentos/tabuadaContract";
+import {
+  OUTRO_FATOR_MAX,
+  PADRAO_DA_TABUADA,
+  ehPergunavelComDiagnostico,
+  tabuadasDoNivel,
+} from "./procedimentos/tabuadaProcedure";
+import { construirDecomposicaoSpec } from "./procedimentos/decomposicaoContract";
+import {
+  OUTRO_FATOR_MAX as DECOMP_FATOR_MAX,
+  OUTRO_FATOR_MIN as DECOMP_FATOR_MIN,
+  ehPergunavelComDiagnostico as decomposicaoDiagnostica,
+  ehPorDecomposicao,
+  tabuadasDoNivel as tabuadasDecompostasDoNivel,
+} from "./procedimentos/decomposicaoProcedure";
+import { construirAncoraSpec } from "./procedimentos/ancoraContract";
+import {
+  OUTRO_FATOR_MAX as ANCORA_FATOR_MAX,
+  OUTRO_FATOR_MIN as ANCORA_FATOR_MIN,
+  ehPergunavelComDiagnostico as ancoraDiagnostica,
+  ehTabuadaDificil,
+  tabuadasDoNivel as tabuadasDificeisDoNivel,
+} from "./procedimentos/ancoraProcedure";
+import { apoioDisponivel, construirFamiliaSpec } from "./procedimentos/familiaContract";
+import {
+  FATOR_MAX,
+  FATOR_MIN,
+  VerticeOculto,
+  contasDeApoio,
+  ehPergunavelComDiagnostico as familiaDiagnostica,
+  produto as produtoDaFamilia,
+  produtoMaximoDoNivel,
+  verticesDoNivel,
+} from "./procedimentos/familiaProcedure";
+import { construirAreaSpec } from "./procedimentos/areaContract";
+import { TEMAS, construirPareamentoSpec } from "./procedimentos/pareamentoContract";
+import { cenasDoNivel as pareamentoCenasDoNivel, desfechoDe } from "./procedimentos/pareamentoProcedure";
+import { construirTouchCountSpec } from "./procedimentos/touchCountContract";
+import { ModoDeContagem } from "./procedimentos/touchCountProcedure";
+import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
+import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
+import {
+  ehPergunavelComDiagnostico as deslocamentoDiagnostica,
+  multiplicadoresDoNivel,
+  numeroMaximoDoNivel,
+} from "./procedimentos/deslocamentoProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -436,6 +482,246 @@ export class Composer {
         uiProps = buildStoryBarsSpec(situation, narrative, lvl);
         evaluate = candidate => candidate === answer;
         promptOverride = narrative.question;
+        break;
+      }
+
+      case "tabuada": {
+        // Sorteia entre as multiplicações que o nível autoriza E que ainda
+        // diagnosticam: ×1 traz a resposta escrita no enunciado, e nas tabuadas
+        // pequenas somar pode coincidir com multiplicar. Filtrar antes de
+        // sortear é mais honesto que sortear e repetir até dar certo — a lista
+        // é pequena e conhecida.
+        const tabuadas = tabuadasDoNivel(lvl);
+        const candidatas = tabuadas.flatMap(tabuada =>
+          Array.from({ length: OUTRO_FATOR_MAX }, (_, i) => ({ tabuada, vezes: i + 1 })))
+          .filter(ehPergunavelComDiagnostico);
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem multiplicação com valor diagnóstico.`);
+        }
+
+        const situacao = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirTabuadaSpec(situacao, lvl, PADRAO_DA_TABUADA[situacao.tabuada]);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "decomposicao": {
+        // Mesma disciplina de N4.03: filtrar antes de sortear. No nível 5 entram
+        // tabuadas que não se decompõem (×2, ×5, ×10) — para essas vale o
+        // critério de N4.03, e reusá-lo evita dois conjuntos de regras que
+        // envelheceriam em separado.
+        const candidatas = tabuadasDecompostasDoNivel(lvl).flatMap(tabuada =>
+          Array.from({ length: DECOMP_FATOR_MAX - DECOMP_FATOR_MIN + 1 },
+            (_, i) => ({ tabuada, vezes: i + DECOMP_FATOR_MIN }))
+            .filter(c => ehPorDecomposicao(c.tabuada)
+              ? decomposicaoDiagnostica({ tabuada: c.tabuada, vezes: c.vezes })
+              : ehPergunavelComDiagnostico({ tabuada: c.tabuada as never, vezes: c.vezes })));
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem multiplicação com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirDecomposicaoSpec(escolha.tabuada, escolha.vezes, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "ancora": {
+        const candidatas = tabuadasDificeisDoNivel(lvl).flatMap(tabuada =>
+          Array.from({ length: ANCORA_FATOR_MAX - ANCORA_FATOR_MIN + 1 },
+            (_, i) => ({ tabuada, vezes: i + ANCORA_FATOR_MIN }))
+            // Difícil passa pelo critério da âncora; já dominada só precisa não
+            // trazer a resposta escrita no enunciado.
+            .filter(c => ehTabuadaDificil(c.tabuada)
+              ? ancoraDiagnostica({ tabuada: c.tabuada, vezes: c.vezes })
+              : c.vezes > 1 && c.tabuada * c.vezes !== c.tabuada + c.vezes));
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem multiplicação com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirAncoraSpec(escolha.tabuada, escolha.vezes, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "familia": {
+        const teto = produtoMaximoDoNivel(lvl);
+        const candidatas: { a: number; b: number; vertice: VerticeOculto }[] = [];
+        for (let a = FATOR_MIN; a <= FATOR_MAX; a += 1) {
+          for (let b = FATOR_MIN; b <= FATOR_MAX; b += 1) {
+            if (produtoDaFamilia({ a, b }) > teto) continue;
+            for (const vertice of verticesDoNivel(lvl)) {
+              if (!familiaDiagnostica({ a, b }, vertice)) continue;
+              // Nível que promete apoio precisa TER apoio: famílias de fatores
+              // iguais não sobram frase nenhuma depois do filtro, e cairiam com
+              // andaime alto numa tela idêntica à do nível 4.
+              if (contasDeApoio(lvl) > 0 && apoioDisponivel({ a, b }, vertice) === 0) continue;
+              candidatas.push({ a, b, vertice });
+            }
+          }
+        }
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem família com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirFamiliaSpec({ a: escolha.a, b: escolha.b }, escolha.vertice, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "deslocamento": {
+        // O teto do número por nível existe para o MATERIAL caber: onde ele
+        // aparece, treze peças na tela viram ruído em vez de apoio.
+        const tetoDoNumero = numeroMaximoDoNivel(lvl);
+        const candidatas = multiplicadoresDoNivel(lvl).flatMap(multiplicador =>
+          Array.from({ length: tetoDoNumero - 10 }, (_, i) => ({ numero: i + 11, multiplicador })))
+          .filter(deslocamentoDiagnostica);
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem conta com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirDeslocamentoSpec(escolha, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
+        break;
+      }
+
+      case "pareamento": {
+        // Ficha de PRODUÇÃO (F07): a criança distribui, não escolhe. A única
+        // escolha é a pergunta do "sobrou?", cujas opções vêm do procedimento —
+        // e nenhuma delas é um número, que é a regra dura desta ficha.
+        const cenas = pareamentoCenasDoNivel(lvl);
+        const cena = cenas[randomInt(0, cenas.length - 1)];
+        const tema = TEMAS[randomInt(0, TEMAS.length - 1)];
+        const spec = construirPareamentoSpec(cena, lvl, tema);
+
+        answer = desfechoDe(cena);
+        options = spec.respostas.map(r => ({ value: r.desfecho, label: r.rotulo }));
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
+        break;
+      }
+
+      case "touchcount": {
+        // Fichas F01 (N1.04, cardinalidade) e F27 (N1.02, sequência oral).
+        //
+        // A ficha diz o MODO; o Composer não adivinha pelo id da competência.
+        // Adivinhar funcionaria hoje, com dois nós, e apagaria em silêncio o
+        // dia em que uma terceira competência usar a primitiva.
+        // Sem padrão silencioso. A ficha F27 declara `modo: "ritmico"` e a
+        // chave foi descartada por `parseComposerParams`: o canhão de balões
+        // desenhou peixinhos, e um `?? "toque"` fez o defeito parecer normal.
+        // Faltando o modo, isto QUEBRA — barulho na hora certa vale mais que
+        // uma tela plausível e errada.
+        if (params.modo !== "toque" && params.modo !== "ritmico") {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva touchcount exige params.modo `
+            + `"toque" ou "ritmico" — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+        const modo: ModoDeContagem = params.modo;
+        const spec = construirTouchCountSpec(modo, lvl, Math.random);
+
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+
+        // O modo rítmico não tem alternativas: a criança dispara e a voz
+        // conta junto. Fabricar um teclado aqui trocaria uma competência ORAL
+        // por uma de leitura de numeral — que é outra ficha (N1.06).
+        // `undefined`, não `[]`: o rítmico não tem alternativa nenhuma. Um array
+        // vazio é truthy — passa pelos `if (q.options)` do app e do contrato
+        // como se houvesse alternativas, e some com a resposta em vez de dizer
+        // que ela não se escolhe.
+        options = modo === "ritmico"
+          ? undefined
+          : Array.from({ length: spec.tecladoAte }, (_, k) => k + 1)
+            .map(n => ({ value: n, label: String(n) }));
+        break;
+      }
+
+      case "area": {
+        // As contas do nível já vêm filtradas pelo valor diagnóstico: o
+        // procedimento é dono da regra, o Composer só sorteia. Sortear aqui e
+        // filtrar depois deixaria a decisão pedagógica espalhada em dois lugares.
+        const candidatas = areaContasDoNivel(lvl);
+        if (!candidatas.length) {
+          throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem conta com valor diagnóstico.`);
+        }
+
+        const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        const spec = construirAreaSpec(escolha, lvl);
+
+        answer = spec.resposta;
+        options = spec.alternativas
+          .map(a => ({
+            value: a.valor,
+            label: String(a.valor),
+            ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
+          }))
+          .sort(() => Math.random() - 0.5);
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = `Quanto é ${spec.falado}?`;
         break;
       }
 
