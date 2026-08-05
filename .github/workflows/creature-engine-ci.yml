@@ -4,6 +4,9 @@ on:
   pull_request:
     paths:
       - "src/features/creature-engine/**"
+      - "src/creature-lab-main.tsx"
+      - "creature-lab.html"
+      - "vite.config.ts"
       - "src/components/home/PerfilTab.tsx"
       - "server.ts"
       - "server/services/creatureSpriteService*"
@@ -60,6 +63,9 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Verify Creature Lab build entry
+        run: test -f dist/creature-lab.html
 
       - name: Text-only pull request guard
         env:
