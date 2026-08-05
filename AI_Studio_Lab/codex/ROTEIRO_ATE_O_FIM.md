@@ -182,6 +182,23 @@ sai por menos de metade do primeiro.
 
 ---
 
+## 4-bis. Aberto neste momento (5/ago/2026, fim da sessão)
+
+Registrado aqui porque a memória da conversa não sobrevive e o repositório sim.
+
+| Aberto | Estado |
+|---|---|
+| **N4.09** | implementado, testado, sonda verde — **não ativado**. A entrada em `COMPOSER_CANARIES` é o próximo PR |
+| **Nível 4 de N4.09** | quatro regiões + conta armada na mesma tela é o ponto mais carregado da ficha. Pergunta em aberto com o autor: aliviar movendo o algoritmo para o nível 5 mudaria a escada da F68, então não se mexe sem decisão dele |
+| **Falha intermitente** | uma execução da suíte falhou uma vez; não reproduzida em 7 seguidas e o nome do teste não foi capturado. **Não resolvida** — anotada para não virar "passou" por esquecimento |
+| **Dívida de coreografia** | N3.10, N4.03, N4.04, N4.06, N4.07 e os níveis 3–5 de N4.08 ensinam sem momento de ensino |
+| **Primitivas inexistentes** | `TouchCount` (bloqueia N1.02 e N1.04), `Moedas` (GM.03), `Regua` (GM.05) |
+| **27 divergentes** | competências cuja tela não é a que a ficha descreve. Lista sempre atual em `npm run fichas:conferir` |
+
+**Nenhum número deste documento deve ser confiado de memória.** Os comandos que
+recalculam tudo: `npm run fichas:conferir` (conformidade) e `npm run sonda`
+(layout).
+
 ## 5. As três coisas que este roteiro assume — e que podem estar erradas
 
 1. **Que o legado do N1 é bom o bastante.** Assumido depois de ver as telas, não

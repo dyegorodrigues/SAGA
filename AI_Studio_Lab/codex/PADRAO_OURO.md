@@ -601,6 +601,41 @@ retângulo partido.
 competência que entrega primitiva diferente da que a ficha nomeia aparece na
 lista de divergentes, com nome e sobrenome.
 
+### 6.34 Ter a regra escrita não impede repetir o erro
+O modelo de área de N4.09 nasceu com **três** defeitos. Dois deles já estavam
+neste documento, escritos por mim depois de apanhar antes:
+
+| O defeito | A regra que já existia |
+|---|---|
+| duas regiões da mesma cor lendo como um bloco só | **§6.17** — apoio de uma cor só vira bloco sem informação |
+| grade de 195 quadradinhos onde ninguém conta | **§6.22** — reusar a figura sem reusar o significado |
+
+O terceiro era novo: os números apareciam **sem origem**. Sob as regiões saíam
+"20" e "10" soltos, e um adulto perguntou o que aquilo tinha a ver com `15 × 2`.
+Tinha tudo — eram `10 × 2` e `5 × 2` — mas a tela não dizia.
+
+E o mais constrangedor: **a ficha F68 §3 já desenhava a forma certa**, com a
+conta escrita dentro de cada região. Eu li a ficha, escrevi o procedimento a
+partir dela, e ignorei o desenho.
+
+**As três regras que saem daqui:**
+
+→ **Leia o desenho da ficha, não só o texto dela.** Quando a ficha traz um
+diagrama, ele é especificação, não ilustração. Um `<pre>` de arte ASCII no meio
+do canônico é fácil de pular com os olhos e caro de ignorar.
+→ **Todo número na tela precisa de origem visível.** Um valor solto embaixo de
+uma figura é um número órfão: a criança não tem como saber de onde veio, e o
+apoio vira decoração numérica. A conta que gera o número mora junto dele.
+→ **Antes de declarar uma tela pronta, releia §6.17 e §6.22 contra ela.** Não
+como boa intenção: como item da lista de verificação, ao lado do `axe` e da
+sonda. Documentar uma armadilha não vacina contra ela — só relê-la no momento
+certo vacina.
+
+**A lição maior:** eu tinha as duas regras escritas e errei mesmo assim. Isso é
+evidência de que **documento não é mecanismo**. O que pegou os três defeitos foi
+um adulto olhando a tela — e é por isso que "capturado e olhado" continua na
+lista de verificação, acima de qualquer teste verde.
+
 ### 6.33 Quatro grades vizinhas não formam um retângulo sozinhas
 O nível 4 de N4.09 põe quatro regiões lado a lado para formar **um** retângulo
 partido. Cada `Arranjo` calculava o próprio lado de quadradinho a partir da
