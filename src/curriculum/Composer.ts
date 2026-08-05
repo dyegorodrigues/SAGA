@@ -666,7 +666,18 @@ export class Composer {
         // A ficha diz o MODO; o Composer não adivinha pelo id da competência.
         // Adivinhar funcionaria hoje, com dois nós, e apagaria em silêncio o
         // dia em que uma terceira competência usar a primitiva.
-        const modo: ModoDeContagem = params.modo === "ritmico" ? "ritmico" : "toque";
+        // Sem padrão silencioso. A ficha F27 declara `modo: "ritmico"` e a
+        // chave foi descartada por `parseComposerParams`: o canhão de balões
+        // desenhou peixinhos, e um `?? "toque"` fez o defeito parecer normal.
+        // Faltando o modo, isto QUEBRA — barulho na hora certa vale mais que
+        // uma tela plausível e errada.
+        if (params.modo !== "toque" && params.modo !== "ritmico") {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva touchcount exige params.modo `
+            + `"toque" ou "ritmico" — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+        const modo: ModoDeContagem = params.modo;
         const spec = construirTouchCountSpec(modo, lvl, Math.random);
 
         answer = spec.resposta;
@@ -677,8 +688,12 @@ export class Composer {
         // O modo rítmico não tem alternativas: a criança dispara e a voz
         // conta junto. Fabricar um teclado aqui trocaria uma competência ORAL
         // por uma de leitura de numeral — que é outra ficha (N1.06).
+        // `undefined`, não `[]`: o rítmico não tem alternativa nenhuma. Um array
+        // vazio é truthy — passa pelos `if (q.options)` do app e do contrato
+        // como se houvesse alternativas, e some com a resposta em vez de dizer
+        // que ela não se escolhe.
         options = modo === "ritmico"
-          ? []
+          ? undefined
           : Array.from({ length: spec.tecladoAte }, (_, k) => k + 1)
             .map(n => ({ value: n, label: String(n) }));
         break;

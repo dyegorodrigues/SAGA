@@ -5,7 +5,7 @@ import {
   alvosDaMaoFantasma,
   arranjoDoToque,
   baloesDoNivel,
-  comecaDe,
+  jaFeitosNoNivel,
   contagemPerfeita,
   diagnosticar,
   marcaComCor,
@@ -54,24 +54,29 @@ describe("modo `ritmico` — a escada da ficha F27 §5", () => {
     expect(NIVEIS.map(mostraNumeral)).toEqual([true, true, true, false, false]);
   });
 
-  it("só o nível 5 começa de outro número — é a ponte para somar", () => {
-    for (const n of [1, 2, 3, 4]) expect(comecaDe(n), `nível ${n}`).toBe(1);
-    const inicios = new Set([0, 1, 2, 3, 4, 5, 6, 7].map(s => comecaDe(5, s)));
-    expect(inicios.has(1), "o nível 5 nunca recomeça do 1").toBe(false);
+  it("só o nível 5 abre com balões JÁ estourados — é a âncora do counting-on", () => {
+    // Deslocar a numeração era invisível: dez balões idênticos e intactos, e o
+    // enunciado dizendo "continuando de 2". Os balões já estourados são a
+    // âncora, e ela é física — funciona sem a criança ler número nenhum.
+    for (const n of [1, 2, 3, 4]) expect(jaFeitosNoNivel(n), `nível ${n}`).toBe(0);
+    const inicios = new Set([0, 1, 2, 3, 4, 5, 6, 7].map(s => jaFeitosNoNivel(5, s)));
+    expect(inicios.has(0), "o nível 5 nunca começa do zero").toBe(false);
     expect(inicios.size, "o sorteio precisa variar o ponto de partida").toBeGreaterThan(1);
   });
 
-  it("o começo do nível 5 cabe no escopo de dez", () => {
+  it("a sequência do nível 5 continua cabendo em dez, e sobra contagem", () => {
+    // Dez balões a partir do 2 terminariam em 11, fora do escopo da ficha.
+    // Com a âncora, a sequência é 1 a 10 e a criança faz o que restou.
     for (let s = 0; s < 40; s += 1) {
-      const inicio = comecaDe(5, s);
-      expect(inicio).toBeGreaterThanOrEqual(2);
-      expect(inicio + baloesDoNivel(5) - 1).toBeLessThanOrEqual(14);
+      const jaFeitos = jaFeitosNoNivel(5, s);
+      expect(jaFeitos, "não pode já estar tudo feito").toBeLessThan(baloesDoNivel(5));
+      expect(baloesDoNivel(5) - jaFeitos, "sobrou pouca contagem").toBeGreaterThanOrEqual(5);
     }
   });
 
   it("cada nível difere observavelmente do anterior", () => {
     const assinatura = (n: number) =>
-      `${baloesDoNivel(n)}|${mostraNumeral(n)}|${comecaDe(n)}|${temMaoFantasma(n)}`;
+      `${baloesDoNivel(n)}|${mostraNumeral(n)}|${jaFeitosNoNivel(n)}|${temMaoFantasma(n)}`;
     expect(new Set(NIVEIS.map(assinatura)).size).toBe(5);
   });
 });

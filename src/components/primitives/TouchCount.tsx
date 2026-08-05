@@ -77,8 +77,12 @@ const ALVO = 52;
 export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: Props) {
   const semMovimento = useReducedMotion();
   /** A ordem em que cada alvo foi contado. `0` = ainda não contado. */
+  // `jaFeitos` da ficha é a âncora do counting-on: os alvos já feitos nascem
+  // feitos, e é olhando para eles que a criança sabe de onde continuar.
+  // `preenchidos` é só para a sonda, e nunca reduz o que a ficha já mandou.
   const [ordem, setOrdem] = React.useState<number[]>(
-    () => spec.alvos.map((_, i) => (i < (preenchidos ?? 0) ? i + 1 : 0)));
+    () => spec.alvos.map((_, i) =>
+      (i < Math.max(spec.jaFeitos, preenchidos ?? 0) ? i + 1 : 0)));
   const [repetidos, setRepetidos] = React.useState(0);
   const [aviso, setAviso] = React.useState<string | null>(null);
   /** Ela voltou a tocar depois de a pergunta subir? É o marco da F01. */
@@ -125,7 +129,7 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
   }
 
   /** O numeral que o alvo mostra: a posição dele na contagem, deslocada. */
-  const numeralDe = (i: number) => spec.comecaDe + ordem[i] - 1;
+  const numeralDe = (i: number) => ordem[i];
 
   const acesoPelaAula = mostrar?.destacarGrupo === true;
 
@@ -155,7 +159,7 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
               key={o}
               className="rounded-md bg-indigo-100 px-1.5 text-base font-black text-indigo-700"
             >
-              {spec.comecaDe + o - 1}
+              {o}
             </span>
           ))}
         </div>
@@ -176,6 +180,11 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
           // no lugar, invisível, porque remover do fluxo faria os balões
           // restantes escorregarem para debaixo do dedo da criança.
           const estourado = contado && spec.aoMarcar === "estourar";
+          // Os que a cena JÁ trouxe feitos deixam rastro. A criança viu os
+          // dela explodirem; estes não — sumir sem deixar marca faria a âncora
+          // do counting-on virar um buraco, e um buraco não conta nada. Com o
+          // rastro ela vê "dois já foram" e sabe de onde continuar.
+          const jaVeioFeito = estourado && i < spec.jaFeitos;
           const maoAqui = mostrar?.maoFantasma === i;
           // Regra 1: nada pulsa sugerindo por onde começar. O pulsar só existe
           // quando a micro-aula devolve a vez — "agora você conta!".
@@ -187,10 +196,15 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
               type="button"
               onClick={() => tocar(i)}
               disabled={disabled || estourado}
-              aria-hidden={estourado || undefined}
-              aria-label={contado
-                ? `${spec.nome}, já contei: ${numeralDe(i)}`
-                : `${spec.nome}, ainda não contei`}
+              // Sem `aria-hidden`: o alvo já feito CARREGA sentido — é a
+              // âncora de onde continuar. Escondê-lo do leitor de tela tiraria
+              // de quem não enxerga justamente a informação que a cena dá de
+              // graça a quem enxerga.
+              aria-label={jaVeioFeito
+                ? `${spec.nome}, este já estourei: ${numeralDe(i)}`
+                : contado
+                  ? `${spec.nome}, já contei: ${numeralDe(i)}`
+                  : `${spec.nome}, ainda não contei`}
               aria-pressed={contado}
               className="absolute flex items-center justify-center rounded-full"
               style={{
@@ -217,8 +231,9 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
                   filter: spec.aoMarcar === "colorir" && !contado && !acesoPelaAula
                     ? "grayscale(1)" : "none",
                   opacity: estourado
-                    ? 0
+                    ? (jaVeioFeito ? 0.22 : 0)
                     : (spec.aoMarcar === "colorir" && !contado && !acesoPelaAula ? 0.35 : 1),
+                  ...(jaVeioFeito ? { filter: "grayscale(1)" } : {}),
                   transition: "opacity 180ms, filter 200ms",
                 }}
               >

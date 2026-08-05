@@ -119,7 +119,11 @@ const BOOLEAN_KEYS = [
   "require_regroup", "require_double_regroup", "forbid_regroup", "show_place_value", "show_regroup", "show_algorithm",
   "allow_rotate", "require_rotate", "area_mode", "show_equation",
 ] as const;
-const STRING_KEYS = ["interactive", "big", "audio_prompt"] as const;
+// `modo` entrou aqui depois de ser descartado em silêncio: a ficha F27 declara
+// `modo: "ritmico"`, a chave não estava nesta lista, e o canhão de balões saiu
+// como peixinhos na tela. Quem acrescentar um parâmetro à interface e esquecer
+// desta lista repete o mesmo — por isso existe o teste que compara as duas.
+const STRING_KEYS = ["interactive", "big", "audio_prompt", "modo"] as const;
 
 export function parseComposerParams(input: FichaParams, context: string): ComposerParams {
   const parsed: ComposerParams = {};

@@ -43,7 +43,7 @@ describe("o enunciado nunca entrega a resposta", () => {
       const numerais = (spec.enunciado.match(/\d+/g) ?? []).map(Number);
       if (numerais.length === 0) continue;
       expect(`${modo}${n}`).toBe("ritmico5");
-      expect(numerais).toEqual([spec.comecaDe]);
+      expect(numerais).toEqual([spec.jaFeitos]);
     }
   });
 
@@ -157,7 +157,7 @@ describe("a escada chega ao spec", () => {
     for (const modo of MODOS) {
       const assinatura = (n: number) => {
         const s = construirTouchCountSpec(modo, n, semente(42));
-        return `${s.arranjo}|${s.aoMarcar}|${s.mostraNumeral}|${s.comecaDe}|${s.maoFantasma}`;
+        return `${s.arranjo}|${s.aoMarcar}|${s.mostraNumeral}|${s.jaFeitos}|${s.maoFantasma}`;
       };
       expect(new Set(NIVEIS.map(assinatura)).size, modo).toBeGreaterThanOrEqual(4);
     }

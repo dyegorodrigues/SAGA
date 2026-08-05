@@ -173,7 +173,7 @@ describe("o desmame do nível 5", () => {
     }
   });
 
-  it("no rítmico, o balão estourado SAI da cena", () => {
+  it("o balão que a CRIANÇA estoura some de vez — ela viu explodir", () => {
     // A F27 diz "o balão explode em partículas". Um balão que continua ali,
     // só que colorido, desfaz a metáfora e esconde da criança quantos faltam —
     // que é exatamente o que o diagnóstico EXCESSO_ACAO observa.
@@ -232,15 +232,34 @@ describe("o modo rítmico — ficha F27", () => {
     expect(container.querySelector('[aria-label="Números que já saíram"]')).toBeNull();
   });
 
-  it("no nível 5 a contagem começa de outro número, e o enunciado avisa", () => {
-    // A ponte para somar: continuar de um número dado é `counting-on`.
+  it("no nível 5 a cena ABRE com balões já estourados — é a âncora", () => {
+    // A ponte para somar: continuar de um número dado é `counting-on`. Sem a
+    // âncora visível, "continue de 2" não quer dizer nada para quem tem 4 anos
+    // e não lê número.
+    const s = ritmico(5);
+    expect(s.jaFeitos).toBeGreaterThan(0);
+    const { container } = render(<TouchCount spec={s} />);
+    const estourados = [...container.querySelectorAll("button")]
+      .filter(b => b.hasAttribute("disabled"));
+    expect(estourados).toHaveLength(s.jaFeitos);
+    expect(container.textContent).toContain(`Continue de ${s.jaFeitos}`);
+
+    // O já-estourado deixa RASTRO: sumir sem marca transformaria a âncora num
+    // buraco, e um buraco não conta nada.
+    const rastro = estourados[0].querySelector("span")!.getAttribute("style") ?? "";
+    expect(rastro, "o balão já estourado sumiu sem deixar rastro")
+      .toMatch(/opacity: 0\.2/);
+    expect(estourados[0].getAttribute("aria-label")).toContain("este já estourei");
+  });
+
+  it("e o que ela estoura continua a sequência, sem passar de dez", () => {
     const s = ritmico(5);
     const { container } = render(<TouchCount spec={s} />);
-    expect(s.comecaDe).toBeGreaterThan(1);
-    expect(container.textContent).toContain(`continuando de ${s.comecaDe}`);
-    fireEvent.click(container.querySelectorAll("button")[0]);
-    expect(container.querySelectorAll("button")[0].getAttribute("aria-label"))
-      .toContain(`já contei: ${s.comecaDe}`);
+    const livre = [...container.querySelectorAll("button")]
+      .find(b => !b.hasAttribute("disabled"))!;
+    fireEvent.click(livre);
+    expect(livre.getAttribute("aria-label")).toContain(`já contei: ${s.jaFeitos + 1}`);
+    expect(s.total).toBeLessThanOrEqual(10);
   });
 });
 
