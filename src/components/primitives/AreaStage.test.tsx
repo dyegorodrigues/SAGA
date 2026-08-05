@@ -41,12 +41,15 @@ describe("AreaStage — a tela de N4.09", () => {
 
   it("a conta armada aparece no nível 3, e sempre em aberto", () => {
     // Uma conta já somada seria o gabarito com cara de andaime (§6.14).
+    // Selecionado pelo rótulo, não pelo papel: a linha da abertura ("15 = 10 + 5")
+    // também é `role="math"`, e um seletor por papel pegaria a errada.
+    const armada = '[aria-label^="Conta armada"]';
     const dois = render(<AreaStage spec={spec(2)} />);
-    expect(dois.container.querySelector('[role="math"]')).toBeNull();
+    expect(dois.container.querySelector(armada)).toBeNull();
     dois.unmount();
 
     const tres = render(<AreaStage spec={spec(3)} />);
-    const conta = tres.container.querySelector('[role="math"]')!;
+    const conta = tres.container.querySelector(armada)!;
     expect(conta).not.toBeNull();
     expect(conta.textContent).toContain("?");
     tres.unmount();

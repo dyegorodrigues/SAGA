@@ -52,6 +52,42 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
         )}
       </div>
 
+      {/* O número se ABRINDO, antes do retângulo.
+          A tela mostrava o resultado da partição sem mostrar a partição
+          acontecendo: a criança via dois quadrados prontos e não via de onde
+          eles saíram. Esta linha é o começo do caminho — 15 vira 10 e 5, cada
+          parte já na cor da coluna que vai ocupar. Ver §6.35. */}
+      {spec.abertura && (
+        <p
+          role="math"
+          aria-label={spec.abertura.falado}
+          className="flex items-center gap-1 text-xl font-black text-slate-500"
+        >
+          <span aria-hidden="true">{spec.abertura.inteiro}</span>
+          <span aria-hidden="true" className="text-slate-400">=</span>
+          <span aria-hidden="true" style={{ color: "#3730A3" }}>{spec.abertura.dezenas}</span>
+          <span aria-hidden="true" className="text-slate-400">+</span>
+          <span aria-hidden="true" style={{ color: "#92400E" }}>{spec.abertura.unidades}</span>
+        </p>
+      )}
+
+      {/* A abertura do MULTIPLICADOR, quando ele também se parte.
+          Sem ela o `3` das fileiras aparece do nada, e `10 × 3 = 30` vira um
+          número sem origem no meio da tela. Ver §6.35. */}
+      {spec.aberturaDoMultiplicador && (
+        <p
+          role="math"
+          aria-label={spec.aberturaDoMultiplicador.falado}
+          className="-mt-2 flex items-center gap-1 text-xl font-black text-slate-500"
+        >
+          <span aria-hidden="true">{spec.aberturaDoMultiplicador.inteiro}</span>
+          <span aria-hidden="true" className="text-slate-400">=</span>
+          <span aria-hidden="true">{spec.aberturaDoMultiplicador.dezenas}</span>
+          <span aria-hidden="true" className="text-slate-400">+</span>
+          <span aria-hidden="true">{spec.aberturaDoMultiplicador.unidades}</span>
+        </p>
+      )}
+
       {spec.regioes.length > 0 && (
         <ModeloDeArea
           regioes={spec.regioes}

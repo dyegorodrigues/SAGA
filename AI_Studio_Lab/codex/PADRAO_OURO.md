@@ -601,6 +601,37 @@ retângulo partido.
 competência que entrega primitiva diferente da que a ficha nomeia aparece na
 lista de divergentes, com nome e sobrenome.
 
+### 6.35 Cor sem legenda é enigma; e o resultado não é o caminho
+O modelo de área já estava correto e bonito. Um adulto olhou e disse: *"demorei
+para entender que o azul é a dezena"*, *"o vinte embaixo podia estar da mesma
+cor do quadrado dele"*, e *"faltou ver como cada elemento vai se abrindo, se
+distribuindo"*.
+
+Três problemas distintos, e nenhum é de correção matemática:
+
+1. **A cor codificava sem legendar.** Azul era a dezena e âmbar a unidade, mas
+   isso estava escrito só na cabeça de quem programou. Quem lê a tela tinha de
+   deduzir. → Cada coluna passou a trazer o NOME da ordem embaixo da medida:
+   `10 / DEZENAS`, `5 / UNIDADES`, na cor da coluna. A cor deixa de ser enigma e
+   vira legenda.
+2. **O fio se cortava no meio.** As regiões eram coloridas e a linha da soma
+   embaixo era toda cinza: `20 + 10 = ?`. Os números estavam certos e não se
+   ligavam a nada. → Cada parcela passou a ser pintada na cor da região que a
+   produziu. A cor é o que leva o olho do quadrado até a parcela.
+3. **A tela mostrava o RESULTADO da partição, não a partição.** A criança via
+   dois quadrados prontos e não via de onde saíram. → Entrou uma linha antes do
+   retângulo: `15 = 10 + 5`, com cada parte já na cor da coluna que vai ocupar.
+
+**A regra geral:** um apoio visual precisa mostrar o **caminho**, não só o
+estado final. Pergunte da tela: *"dá para seguir com o dedo, do número da
+pergunta até a resposta, sem ninguém explicar?"* Se em algum ponto o fio se
+corta — uma cor sem nome, um número sem origem, um passo que já veio pronto —
+é ali que a criança para.
+
+**E o corolário sobre cor:** cor que carrega significado precisa de legenda
+visível. Sem ela, ela funciona para quem já sabe o que ela significa — que é
+exatamente quem não precisa dela.
+
 ### 6.34 Ter a regra escrita não impede repetir o erro
 O modelo de área de N4.09 nasceu com **três** defeitos. Dois deles já estavam
 neste documento, escritos por mim depois de apanhar antes:

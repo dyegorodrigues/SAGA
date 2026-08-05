@@ -36,9 +36,35 @@ export interface LinhaDoAlgoritmo {
   parcela: number;
 }
 
+/**
+ * O número se abrindo: `15 = 10 + 5`.
+ *
+ * Existe porque a tela mostrava o RESULTADO da partição sem mostrar a partição:
+ * dois quadrados prontos, e a criança sem ver de onde saíram. Esta linha é o
+ * primeiro elo do caminho, e cada parte já vem na cor da coluna que vai ocupar.
+ */
+export interface AberturaSpec {
+  inteiro: number;
+  dezenas: number;
+  unidades: number;
+  /** Como se fala, para quem não lê. */
+  falado: string;
+}
+
 export interface AreaSpec {
   pergunta: string;
   falado: string;
+  /** O número se abrindo. Some junto com a área, no nível 5. */
+  abertura: AberturaSpec | null;
+  /**
+   * O MULTIPLICADOR se abrindo, quando ele também tem dois dígitos.
+   *
+   * No nível 4 os dois fatores se partem: as colunas vêm de `15 = 10 + 5` e as
+   * fileiras de `13 = 10 + 3`. A tela mostrava só a primeira abertura, e o `3`
+   * das fileiras aparecia do nada — um adulto leu `10 × 3 = 30` e perguntou o
+   * que o três tinha a ver com a conta. Tinha tudo, e a tela não dizia.
+   */
+  aberturaDoMultiplicador: AberturaSpec | null;
   /** As regiões do retângulo. Vazio no nível 5, onde a área já saiu. */
   regioes: RegiaoSpec[];
   /** O corte já vem desenhado (nível 1) ou a criança o imagina? */
@@ -93,6 +119,22 @@ export function construirAreaSpec(c: Conta, nivel: number): AreaSpec {
   return {
     pergunta: `${c.a} × ${c.b}`,
     falado: `${c.a} vezes ${c.b}`,
+    abertura: comArea
+      ? {
+          inteiro: c.a,
+          dezenas: partir(c.a)[0],
+          unidades: partir(c.a)[1],
+          falado: `${c.a} é ${partir(c.a)[0]} mais ${partir(c.a)[1]}`,
+        }
+      : null,
+    aberturaDoMultiplicador: comArea && c.b >= 10
+      ? {
+          inteiro: c.b,
+          dezenas: partir(c.b)[0],
+          unidades: partir(c.b)[1],
+          falado: `${c.b} é ${partir(c.b)[0]} mais ${partir(c.b)[1]}`,
+        }
+      : null,
     regioes: comArea
       ? regioes(c).map(r => ({ linhas: r.linhas, colunas: r.colunas, valor: r.valor, descricao: descrever(r) }))
       : [],
@@ -114,8 +156,11 @@ export function construirAreaSpec(c: Conta, nivel: number): AreaSpec {
  * gabarito escondido dentro de uma equação mascarada (§6.20).
  */
 export function enunciadoNaoRevela(spec: AreaSpec): boolean {
-  const texto = [spec.pergunta, spec.falado, spec.corte, ...spec.regioes.map(r => r.descricao)]
-    .filter(Boolean).join(" ");
+  const texto = [
+    spec.pergunta, spec.falado, spec.corte,
+    spec.abertura?.falado, spec.aberturaDoMultiplicador?.falado,
+    ...spec.regioes.map(r => r.descricao),
+  ].filter(Boolean).join(" ");
   const numeros = (texto.match(/\d+/g) ?? []).map(Number);
   const valores = [
     ...spec.regioes.map(r => r.valor),

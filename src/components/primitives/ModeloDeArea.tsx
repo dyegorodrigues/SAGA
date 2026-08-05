@@ -97,6 +97,18 @@ export function repartir(partes: number[], total: number, minimo: number): numbe
   return bruto.map((v, i) => Math.max(minimo, v - (folga[i] / folgaTotal) * faltando));
 }
 
+/**
+ * Em que coluna do retângulo mora a região `i`.
+ *
+ * A soma de baixo precisa saber disso para pintar cada parcela na cor do
+ * quadrado que a produziu. Com quatro regiões, a 3ª volta para a coluna 0 —
+ * ela é a de baixo, na mesma coluna da 1ª.
+ */
+function indiceDaColuna(regioes: RegiaoSpec[], i: number): number {
+  const daFileira = regioes.filter(r => r.linhas === regioes[i].linhas);
+  return daFileira.indexOf(regioes[i]);
+}
+
 export function ModeloDeArea({
   regioes, corteMarcado, regioesSeparadas = false, destacada = null, juntando = false,
 }: Props) {
@@ -120,15 +132,22 @@ export function ModeloDeArea({
         <div className="flex" style={{ gap: 6 }}>
           {/* Espaçador da coluna das medidas da esquerda. */}
           <div aria-hidden="true" style={{ width: 18 }} />
-          {/* As medidas de cima: de onde sai um dos fatores de cada região. */}
+          {/* As medidas de cima, com o NOME da ordem embaixo de cada uma.
+              A cor sozinha não diz nada: um adulto precisou raciocinar para
+              descobrir que o azul era a dezena, e a criança não vai raciocinar.
+              O nome escrito transforma a cor em legenda. Ver §6.35. */}
           <div className="flex" style={{ gap: vao }} aria-hidden="true">
             {colunas.map((c, i) => (
-              <div
-                key={c}
-                className="pb-1 text-center text-sm font-black"
-                style={{ width: larguras[i], color: COR_DA_COLUNA[i % 2].tinta }}
-              >
-                {c}
+              <div key={c} className="pb-1 text-center" style={{ width: larguras[i] }}>
+                <div className="text-sm font-black" style={{ color: COR_DA_COLUNA[i % 2].tinta }}>
+                  {c}
+                </div>
+                <div
+                  className="text-[9px] font-bold uppercase tracking-wide"
+                  style={{ color: COR_DA_COLUNA[i % 2].tinta }}
+                >
+                  {i === 0 ? "dezenas" : "unidades"}
+                </div>
               </div>
             ))}
           </div>
@@ -201,9 +220,21 @@ export function ModeloDeArea({
           </div>
         </div>
 
-        {/* A soma em aberto: é ela que a criança responde. */}
+        {/* A soma em aberto — cada parcela na COR da região que a produziu.
+            Cinza uniforme deixava a linha de baixo solta do desenho de cima:
+            os números estavam certos e não se ligavam a nada. A cor é o fio que
+            leva o olho do quadrado até a parcela. Ver §6.35. */}
         <p aria-hidden="true" className="mt-2 text-center text-lg font-black text-slate-700">
-          {regioes.map(r => r.valor).join(" + ")} = ?
+          {regioes.map((r, i) => {
+            const cor = COR_DA_COLUNA[indiceDaColuna(regioes, i) % 2];
+            return (
+              <React.Fragment key={i}>
+                {i > 0 && <span className="text-slate-400"> + </span>}
+                <span style={{ color: cor.tinta }}>{r.valor}</span>
+              </React.Fragment>
+            );
+          })}
+          <span className="text-slate-400"> = </span>?
         </p>
       </div>
     </div>
