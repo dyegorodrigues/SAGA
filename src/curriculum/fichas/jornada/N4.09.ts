@@ -32,10 +32,12 @@ const dominio = { acertos: 3, de: 3, sessoes: 2 };
  * "cinquenta e dois" transformaria a aula na resposta.
  */
 const tutorial = [
-  { fala: "Este retângulo é a conta inteira. Vamos parti-lo.", show: { cortarRetangulo: true } },
-  { fala: "A parte grande é a das dezenas.", show: { destacarRegiao: 0 } },
-  { fala: "A parte pequena é a das unidades.", show: { destacarRegiao: 1 } },
-  { fala: "Agora junte as duas partes. A soma delas é a resposta.", show: { juntarRegioes: true } },
+  { fala: "Olhe as medidas do retângulo. O primeiro número fica deitado em cima.", show: { destacarMedida: "cima" } },
+  { fala: "O segundo número fica em pé, na lateral.", show: { destacarMedida: "lado" } },
+  { fala: "Cada pedaço vale o número de cima vezes o número do lado.", show: { destacarRegiao: 0 } },
+  { fala: "Este é o pedaço das dezenas.", show: { destacarRegiao: 0 } },
+  { fala: "E este é o das unidades.", show: { destacarRegiao: 1 } },
+  { fala: "Agora junte os dois pedaços. A soma deles é a resposta.", show: { juntarRegioes: true } },
 ];
 
 export const N4_09: FichaCompetencia = {
@@ -52,6 +54,9 @@ export const N4_09: FichaCompetencia = {
     { regra: "zero_esquecido", tag: MisconceptionTag.ZERO_ESQUECIDO },
   ],
   niveis: {
+    // O nível 1 alfabetiza no desenho, com conta que a criança já sabe de cor.
+    // O modelo de área é idioma novo depois de 27 nós usando o arranjo para
+    // contar; estrear idioma novo em conteúdo novo foi o erro do §6.36.
     1: { primitiva: "area", micro: "corte_marcado", andaime: "alto" },
     2: { primitiva: "area", micro: "corte_proprio", andaime: "alto" },
     3: { primitiva: "area", micro: "area_e_algoritmo", andaime: "medio" },
@@ -59,7 +64,7 @@ export const N4_09: FichaCompetencia = {
     5: { primitiva: "area", micro: "so_algoritmo", andaime: "nenhum", rt_alvo: 15000 },
   },
   micros: [
-    { id: "corte_marcado", alvo: "ver o retângulo já partido em dezenas e unidades", kinds: ["area"], params: { audio_prompt: "Escute e responda.", tutorial }, dominio },
+    { id: "corte_marcado", alvo: "aprender a LER o retângulo: medida em cima, medida na lateral, cada pedaço é um vezes o outro", kinds: ["area"], params: { audio_prompt: "Escute e responda.", tutorial }, dominio },
     { id: "corte_proprio", alvo: "imaginar o corte sem ele desenhado", kinds: ["area"], params: { audio_prompt: "Escute e responda.", tutorial }, dominio },
     { id: "area_e_algoritmo", alvo: "ligar cada região à linha correspondente da conta armada", kinds: ["area"], params: { audio_prompt: "Escute e responda." }, dominio },
     { id: "quatro_regioes", alvo: "partir os dois fatores: quatro regiões, quatro parcelas", kinds: ["area"], params: { audio_prompt: "Escute e responda." }, dominio },

@@ -22,9 +22,18 @@ describe("AreaStage — a tela de N4.09", () => {
       const nivel = (i % 5) + 1;
       const s = spec(nivel);
       const { container, unmount } = render(<AreaStage spec={s} />);
-      const rotulos = [...container.querySelectorAll("[aria-label]")]
-        .map(el => el.getAttribute("aria-label") ?? "").join(" ");
-      const numeros = (`${container.textContent ?? ""} ${rotulos}`.match(/\d+/g) ?? []).map(Number);
+      // Lido nó a nó, não no texto grudado: concatenar "11" e "10" de elementos
+      // vizinhos fabricava um "110" que não existe em lugar nenhum da tela, e o
+      // teste acusava um vazamento inventado por ele mesmo.
+      const pedacos: string[] = [];
+      const anda = (n: Node) => {
+        if (n.nodeType === 3) pedacos.push(n.textContent ?? "");
+        else n.childNodes.forEach(anda);
+      };
+      anda(container);
+      pedacos.push(...[...container.querySelectorAll("[aria-label]")]
+        .map(el => el.getAttribute("aria-label") ?? ""));
+      const numeros = pedacos.flatMap(t => (t.match(/\d+/g) ?? []).map(Number));
       expect(numeros, `nível ${nivel} falou ${s.resposta}`).not.toContain(s.resposta);
       unmount();
     }
@@ -81,7 +90,11 @@ describe("a micro-aula do corte", () => {
     expect(hasTutorial(q), "nível 1 sem micro-aula").toBe(true);
     const passos = tutorialSteps(q);
     expect(passos.length).toBeGreaterThanOrEqual(3);
-    expect(passos.some(p => (p.show as any)?.cortarRetangulo), "nenhum passo corta").toBe(true);
+    // A aula do nível 1 ALFABETIZA no desenho antes de cobrar a conta: aponta a
+    // medida de cima, aponta a da lateral, e só então fala das regiões. A
+    // convenção dos eixos é combinação, não descoberta (§6.36).
+    expect(passos.some(p => (p.show as any)?.destacarMedida === "cima"), "não aponta a medida de cima").toBe(true);
+    expect(passos.some(p => (p.show as any)?.destacarMedida === "lado"), "não aponta a medida da lateral").toBe(true);
     expect(passos.some(p => (p.show as any)?.juntarRegioes), "nenhum passo junta").toBe(true);
   });
 

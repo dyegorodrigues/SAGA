@@ -25,7 +25,12 @@ interface Props {
    * ficha F68 §8. Sem este fio ligado, declarar coreografia não produz nada na
    * tela — o defeito que atingiu as seis primeiras competências (§6.23).
    */
-  mostrar?: { cortarRetangulo?: boolean; destacarRegiao?: number; juntarRegioes?: boolean } | null;
+  mostrar?: {
+    cortarRetangulo?: boolean;
+    destacarRegiao?: number;
+    destacarMedida?: "cima" | "lado";
+    juntarRegioes?: boolean;
+  } | null;
 }
 
 export function AreaStage({ spec, onReplay, mostrar }: Props) {
@@ -94,6 +99,7 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
           corteMarcado={corteMarcado}
           regioesSeparadas={spec.regioesSeparadas || Boolean(mostrar?.cortarRetangulo)}
           destacada={mostrar?.destacarRegiao ?? null}
+          destacarMedida={mostrar?.destacarMedida ?? null}
           juntando={Boolean(mostrar?.juntarRegioes)}
         />
       )}

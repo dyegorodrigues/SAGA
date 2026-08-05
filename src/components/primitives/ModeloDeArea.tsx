@@ -54,6 +54,15 @@ interface Props {
   regioesSeparadas?: boolean;
   /** Qual região a micro-aula está acendendo. `null` acende todas. */
   destacada?: number | null;
+  /**
+   * Qual MEDIDA a aula está apontando: a de cima ou a da lateral.
+   *
+   * A convenção dos eixos — o primeiro fator deitado em cima, o segundo em pé
+   * na lateral — é combinação, não descoberta. A criança precisa que alguém
+   * aponte. Sem isto, ela vê números em duas bordas e deduz sozinha ou não
+   * deduz. Ver §6.36.
+   */
+  destacarMedida?: "cima" | "lado" | null;
   /** O passo final da aula: as regiões deslizam juntando-se. */
   juntando?: boolean;
 }
@@ -110,8 +119,14 @@ function indiceDaColuna(regioes: RegiaoSpec[], i: number): number {
 }
 
 export function ModeloDeArea({
-  regioes, corteMarcado, regioesSeparadas = false, destacada = null, juntando = false,
+  regioes, corteMarcado, regioesSeparadas = false, destacada = null,
+  destacarMedida = null, juntando = false,
 }: Props) {
+  /** Durante a aula, a medida apontada acende e a outra recua. */
+  const medida = (qual: "cima" | "lado") =>
+    destacarMedida === null || destacarMedida === qual
+      ? { opacity: 1, transform: "scale(1)" }
+      : { opacity: 0.3, transform: "scale(1)" };
   const reduzido = Boolean(useReducedMotion());
 
   const fileiras = [...new Set(regioes.map(r => r.linhas))];
@@ -138,7 +153,11 @@ export function ModeloDeArea({
               O nome escrito transforma a cor em legenda. Ver §6.35. */}
           <div className="flex" style={{ gap: vao }} aria-hidden="true">
             {colunas.map((c, i) => (
-              <div key={c} className="pb-1 text-center" style={{ width: larguras[i] }}>
+              <div
+                key={c}
+                className="pb-1 text-center transition-all"
+                style={{ width: larguras[i], ...medida("cima") }}
+              >
                 <div className="text-sm font-black" style={{ color: COR_DA_COLUNA[i % 2].tinta }}>
                   {c}
                 </div>
@@ -155,7 +174,11 @@ export function ModeloDeArea({
 
         <div className="flex" style={{ gap: 6 }}>
           {/* As medidas da esquerda: o outro fator. */}
-          <div className="flex flex-col" style={{ gap: vao, width: 18 }} aria-hidden="true">
+          <div
+            className="flex flex-col transition-all"
+            style={{ gap: vao, width: 18, ...medida("lado") }}
+            aria-hidden="true"
+          >
             {fileiras.map((f, j) => (
               <div
                 key={f}

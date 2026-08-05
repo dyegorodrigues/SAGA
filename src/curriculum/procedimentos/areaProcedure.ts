@@ -103,6 +103,24 @@ export function somaDasRegioes(c: Conta): number {
  *  testá-la contra si mesma foi o erro §6.11.
  * ------------------------------------------------------------------ */
 
+/**
+ * Os multiplicadores que a criança já sabe DE COR.
+ *
+ * O nível 1 não ensina multiplicação: ensina a **ler o retângulo**. Quem chega
+ * aqui vem de 27 competências usando o arranjo para CONTAR pontinhos, e aqui o
+ * retângulo passa a ter medidas escritas nas bordas — outro idioma, nunca
+ * apresentado (Padrão Ouro §6.36).
+ *
+ * Alfabetizar exige conteúdo velho: com `× 2`, `× 5` ou `× 10` a conta sai sem
+ * esforço, e toda a atenção sobra para a única coisa nova, que é o desenho.
+ * Uma tela não introduz mais de uma coisa nova por vez.
+ *
+ * O `× 10` fica de fora de propósito: multiplicar por dez é DESLOCAMENTO
+ * (N4.08), a competência anterior. Usá-lo aqui deixaria a criança resolver pelo
+ * caminho velho sem olhar o retângulo — e a alfabetização não aconteceria.
+ */
+export const FACEIS_DE_COR = [2, 5];
+
 /** Níveis 1–3 usam multiplicador de um dígito; 4 e 5, de dois. */
 export function digitosDoMultiplicador(nivel: number): 1 | 2 {
   return nivel >= 4 ? 2 : 1;
@@ -235,7 +253,8 @@ export function alternativas(c: Conta): Distrator[] {
 export function contasDoNivel(nivel: number): Conta[] {
   const bs = digitosDoMultiplicador(nivel) === 2
     ? [11, 12, 13, 14, 15, 21, 22, 23, 24, 25]
-    : [2, 3, 4, 5, 6, 7, 8, 9];
+    // O nível 1 alfabetiza: só fatos que a criança já sabe de cor.
+    : nivel === 1 ? FACEIS_DE_COR : [2, 3, 4, 5, 6, 7, 8, 9];
   const fora: Conta[] = [];
   for (let a = A_MIN; a <= A_MAX; a += 1) {
     for (const b of bs) {
