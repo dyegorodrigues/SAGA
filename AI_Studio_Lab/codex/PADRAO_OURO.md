@@ -215,9 +215,26 @@ sim, ele está medindo inventário e precisa virar regra.
 ```
 npx tsc --noEmit        # o Vitest NÃO checa tipos — só o tsc pega assinatura errada
 npx vitest run
+npm run sonda           # o jsdom NÃO faz layout — só o navegador pega tela quebrada
 npm run build
 npm run grafo:codigo    # fechar o bloco com o grafo em dia
 ```
+
+**Por que a sonda entrou na lista.** O Vitest roda no jsdom, onde toda caixa
+mede zero: `render` + `getByText` acham um rótulo mesmo quando ele está impresso
+por baixo de um desenho, fora da tela ou branco no branco. Seis defeitos reais
+passaram por 1074 testes por esse buraco (§6.28 a §6.32). A sonda abre cada cena
+num Chromium de verdade, a 390px, em oito sementes de sorteio, e mede quatro
+coisas que só existem com layout: **vazamento**, **colisão**, **contraste** e
+**cobertura**.
+
+Toda competência nova entra em `sonda/cenas.tsx` — pelo menos uma cena por
+estado que vale olhar (a pergunta, e a micro-aula se houver). Cena não
+cadastrada é cena não medida.
+
+`npm run sonda -- --fotos` salva um `.png` por tomada. É de lá que saem as
+capturas para revisão humana — que a sonda **não** substitui: ela pega tela
+quebrada, não pega tela burra.
 
 ---
 
@@ -514,3 +531,71 @@ dimensão que depende de outra se **deriva**, não se digita.
 
 **Irmão de §6.12 e §6.16:** o jsdom não mede nada. Toda vez que o defeito é de
 LAYOUT, ou existe uma conta que o teste faz, ou só a captura de tela pega.
+
+### 6.29 O marcador tapava o número que a pergunta manda ler
+`N1.07` pergunta *"o sapinho está no número! Qual vem DEPOIS?"* — e o sapinho
+ficava impresso **por cima do número em que ele está**. A criança não tinha como
+saber de onde partir; a única pergunta da competência virava adivinhação.
+
+A causa: o marcador pendia por deslocamento negativo (`-translate-y-6`) dentro
+da MESMA caixa dos rótulos. Qualquer ajuste fino de pixel resolvia para um valor
+e quebrava para outro.
+
+→ Elemento que se move sobre uma escala ganha **faixa própria**, e a escala
+desce a partir da BASE dele, calculada: `metade do marcador − a subida + folga`.
+Assim não existe posição que faça as duas caixas se encontrarem.
+→ **Colisão resolvida por construção, nunca por ajuste.** Se a correção é "subir
+mais uns pixels", ela vai voltar.
+
+### 6.30 Token de cor usado como classe não pinta nada
+O botão CONFIRMAR de `N1.07` era branco no branco. O código fazia:
+
+```tsx
+className={`... ${tokens.cor.acao.primaria} text-white`}   // ❌
+```
+
+`tokens.cor.acao.primaria` é um **valor** (`var(--cor-acao-primaria, #3b82f6)`),
+não uma classe do Tailwind. Interpolado no `className`, vira lixo silencioso. O
+TypeScript não vê — string é string — e o `axe` no jsdom também não, porque lá
+nada tem cor computada.
+
+A mesma varredura achou mais quatro textos ilegíveis por contraste, todos em
+lugares que importam: o enunciado da história (branco sobre âmbar, 1.67:1), os
+rótulos DEZENAS/UNIDADES (2.63:1), o sinal da operação (2.77:1) e o botão "Ver
+de novo" do relance (1.45:1) — o socorro de quem não conseguiu contar a tempo.
+
+→ Cor entra por `style`, nunca por `className`.
+→ Cor pensada para **preencher forma** (`elementos.base_A`) não serve para
+**escrever**. Quando o texto é o sinal da operação, use a paleta de operações,
+que já nasceu com contraste verificado.
+→ A sonda de layout mede contraste como quarta medida, com o cálculo da WCAG.
+
+### 6.31 Uma sonda que muda de resposta não é portão
+Os geradores sorteiam os números. A sonda media uma questão diferente a cada
+execução: um vazamento aparecia, sumia na seguinte, voltava na terceira.
+
+→ **Semear o sorteio.** Com semente fixa, "passou" quer dizer alguma coisa.
+→ **Mais de uma semente.** Três não pegavam o material de 9 dezenas estourando a
+largura; oito pegaram, em duas sementes distintas.
+→ **Esperar a animação acabar.** Medindo aos 650ms a sonda fotografava o
+material no meio da entrada escalonada — barras de alturas diferentes, caixas
+ainda crescendo. Medida de tela em movimento não é medida.
+→ E o irmão disso: **matar o servidor de verdade**. `npx vite` é um pai que gera
+o vite como filho; matar só o pai deixa a porta ocupada e a execução seguinte
+reporta o resultado ANTIGO. Passei minutos "consertando" o componente errado por
+causa disso.
+
+### 6.32 A tela inteira saía duas vezes
+`GameLoopExerciseRenderer` desenha o palco das competências do Padrão Ouro no
+topo — é lá que chega o `tutShow`, o fio da micro-aula. Logo abaixo, quem tem
+`uiProps` cai no `FichaRenderer`, que tem um `case` para os **mesmos kinds**.
+
+Resultado: a conta, o material e a dica apareciam **duas vezes**, uma embaixo da
+outra, em TODAS as seis competências entregues. Nenhum dos 1074 testes viu, e o
+motivo é estrutural: todos renderizam o palco direto (`<DeslocamentoStage
+spec={...} />`) e **nunca passam pelo caminho que a criança percorre**.
+
+→ Sempre que dois lugares sabem desenhar a mesma coisa, um teste precisa ler os
+dois e cobrar a interseção (`palcoUnico.test.ts`).
+→ **Testar o componente não é testar a tela.** Pelo menos uma medida tem que
+percorrer o caminho inteiro, do gerador ao pixel.

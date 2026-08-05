@@ -62,7 +62,7 @@ export function LinkingCubes({ groups, showNumbers = false, numberAbove = false,
             {idx < groups.length - 1 && (
               <div className="flex items-center justify-center px-4 mb-2">
                 {showPlus ? (
-                  <span className="text-4xl font-black text-slate-400" style={{ fontFamily: FONT }}>+</span>
+                  <span className="text-4xl font-black text-slate-500" style={{ fontFamily: FONT }}>+</span>
                 ) : (
                   <div className="w-4" />
                 )}
@@ -77,10 +77,10 @@ export function LinkingCubes({ groups, showNumbers = false, numberAbove = false,
           {groups.map((g, idx) => (
             <React.Fragment key={idx}>
               <span className="px-4 py-2 bg-slate-100 rounded-xl">{g.n}</span>
-              {idx < groups.length - 1 && <span className="text-slate-400">+</span>}
+              {idx < groups.length - 1 && <span className="text-slate-500">+</span>}
             </React.Fragment>
           ))}
-          <span className="text-slate-400">=</span>
+          <span className="text-slate-500">=</span>
           <span className="px-4 py-2 bg-slate-100 rounded-xl">
             {groups.reduce((sum, g) => sum + g.n, 0)}
           </span>

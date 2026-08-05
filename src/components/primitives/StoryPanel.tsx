@@ -64,7 +64,9 @@ export function StoryPanel({ step, p1Illustration, p1Text, p2Illustration, p2Tex
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="w-full px-4 py-3 rounded-3xl text-center font-black text-xl shadow-sm"
-            style={{ backgroundColor: tokens.cor.elementos.marcador, color: tokens.cor.texto.inverso, border: `2px solid ${tokens.cor.elementos.borda}` }}
+            // Branco sobre âmbar dava 1.67:1 — a PERGUNTA era o texto menos legível da
+            // tela. Tinta escura sobre o mesmo âmbar passa de 9:1 sem perder o destaque.
+            style={{ backgroundColor: tokens.cor.elementos.marcador, color: tokens.cor.texto.principal, border: `2px solid ${tokens.cor.elementos.borda}` }}
           >
             {p3Text}
           </motion.div>

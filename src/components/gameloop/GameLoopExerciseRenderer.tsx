@@ -36,6 +36,26 @@ import PlaceScene, { Place } from "../scenes/PlaceScene";
 import { hasAulinha, hasTutorial } from "../../utils/tutorials";
 import { shouldRenderQuestionOptions } from "./answerPolicy";
 
+/**
+ * Os `kind` cujo palco já é desenhado no topo deste componente.
+ *
+ * Todos eles também têm um `case` no `FichaRenderer`, então sem esta lista a
+ * tela sai duas vezes — a conta, o material e a dica repetidos um embaixo do
+ * outro em TODAS as competências do Padrão Ouro. Um teste lê esta constante
+ * contra os `case` do FichaRenderer, para que a próxima competência construída
+ * não repita o defeito por esquecimento. Ver Padrão Ouro §6.32.
+ *
+ * O palco de cima é o que vale: é ele que recebe `tutShow`, o fio da micro-aula.
+ */
+export const PALCOS_JA_DESENHADOS = new Set([
+  "story-bars",
+  "tabuada",
+  "decomposicao",
+  "ancora",
+  "familia",
+  "deslocamento",
+]);
+
 interface Props {
   q: Question;
   status: "right" | "wrong" | null;
@@ -89,11 +109,16 @@ export function GameLoopExerciseRenderer({
         {/* `tutShow` é o fio que faltava: sem ele, declarar coreografia na ficha
             não produz nada na tela. */}
         {q.kind === "deslocamento" && q.uiProps && <DeslocamentoStage spec={q.uiProps as never} mostrar={typeof tutShow === "object" ? tutShow : null} />}
+        {/* A partir daqui, quem tem `uiProps` cai no FichaRenderer — que também
+            sabe desenhar os palcos acima. Sem esta exclusão a tela saía DUAS
+            vezes: a conta, o material e a dica repetidos, um embaixo do outro.
+            Nenhum teste viu, porque todos renderizam o palco direto e nunca
+            passaram por aqui. Ver Padrão Ouro §6.32. */}
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}
         <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
-          {q.uiProps ? (
+          {q.uiProps && !PALCOS_JA_DESENHADOS.has(q.kind as string) ? (
             <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} promptDone={promptDone} />
 
           ) : (
@@ -459,7 +484,9 @@ export function GameLoopExerciseRenderer({
       <div className="mt-5">
         {(q.kind === "flash" || q.uiProps?.flashDurationMs) && (!flashHidden && status !== "right") ? (
           // durante o relance: sem números na tela, só o convite a OLHAR
-          <div className="text-center py-4" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: C.grape }}>
+          <div className="text-center py-4" // O roxo-uva da marca dá 4.35:1 neste tamanho — um fio abaixo do mínimo
+              // de 4.5:1. Um passo mais escuro passa sem mudar a identidade.
+              style={{ fontFamily: FONT, fontWeight: 800, fontSize: 15, color: "#5B3FD9" }}>
             👀 Olhe rápido...
           </div>
         ) : q.kind === "order" ? (

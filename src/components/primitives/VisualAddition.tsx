@@ -31,18 +31,18 @@ export function VisualAddition({ a, b, emojiA = "🍎", emojiB = "🍎", showNum
     <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-6 select-none p-4 w-full">
       <div className="flex items-center gap-2 md:gap-6">
         {renderBox(a, emojiA, a)}
-        <div className="text-4xl md:text-6xl font-black text-slate-400 mb-8 md:mb-12" style={{ fontFamily: FONT }}>
+        <div className="text-4xl md:text-6xl font-black text-slate-500 mb-8 md:mb-12" style={{ fontFamily: FONT }}>
           +
         </div>
         {renderBox(b, emojiB, b)}
       </div>
       <div className="flex items-center gap-2 md:gap-6 mt-2 md:mt-0">
-        <div className="text-4xl md:text-6xl font-black text-slate-400 md:mb-12" style={{ fontFamily: FONT }}>
+        <div className="text-4xl md:text-6xl font-black text-slate-500 md:mb-12" style={{ fontFamily: FONT }}>
           =
         </div>
         <div className="flex flex-col items-center gap-4">
           <div className="border-4 border-dashed border-slate-300 rounded-2xl w-24 h-24 md:w-32 md:h-32 flex items-center justify-center bg-slate-50/50 md:mb-[52px]">
-            <span className="text-3xl md:text-4xl text-slate-300 font-black">?</span>
+            <span className="text-3xl md:text-4xl text-slate-500 font-black">?</span>
           </div>
         </div>
       </div>
