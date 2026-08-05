@@ -127,6 +127,9 @@ export function GameLoopExerciseRenderer({
         {q.kind === "touchcount" && q.uiProps && (
           <TouchCount
             spec={q.uiProps as never}
+            // A voz do app entra aqui: a F27 e a F01 mandam falar o número no
+            // mesmo instante do ato, e a competência do N1.02 é ORAL.
+            falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "touchcount", touchcount: acao } as never)}
             disabled={status !== null}
             mostrar={typeof tutShow === "object" ? tutShow : null}

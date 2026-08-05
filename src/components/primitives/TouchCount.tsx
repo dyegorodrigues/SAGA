@@ -58,6 +58,14 @@ interface Props {
    * nada no estado inicial (`0`).
    */
   preenchidos?: number;
+  /**
+   * A voz do app. As duas fichas mandam a voz falar o número **no mesmo
+   * instante** do estouro/toque (F27 §4, F01 §4) — a competência do N1.02 é
+   * ORAL, e sem a fala o exercício vira um jogo de mira.
+   *
+   * Injetada em vez de importada para o palco continuar testável sem áudio.
+   */
+  falar?: (texto: string) => void;
   /** O passo atual da micro-aula, vindo do `tutShow` do GameLoop. */
   mostrar?: {
     /** Acende o conjunto inteiro: "vamos contar juntos". */
@@ -74,7 +82,19 @@ interface Props {
 /** O tamanho do alvo. Dedo de criança de 4 anos: nada abaixo disto. */
 const ALVO = 52;
 
-export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: Props) {
+/**
+ * O intervalo mínimo entre dois tiros, em milissegundos.
+ *
+ * Abaixo disto o canhão engasga. Não é anti-trapaça: é a F27 §4 dizendo que o
+ * *limite físico ensina o ritmo* — a criança que metralha nunca sincroniza a
+ * fala com a ação, que é a competência inteira do N1.02.
+ */
+const INTERVALO_MINIMO_DO_TIRO = 420;
+
+/** O canhão. A F27 §3 pede "grande (mínimo 120px)". */
+const CANHAO = 128;
+
+export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostrar }: Props) {
   const semMovimento = useReducedMotion();
   /** A ordem em que cada alvo foi contado. `0` = ainda não contado. */
   // `jaFeitos` da ficha é a âncora do counting-on: os alvos já feitos nascem
@@ -87,6 +107,11 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
   const [aviso, setAviso] = React.useState<string | null>(null);
   /** Ela voltou a tocar depois de a pergunta subir? É o marco da F01. */
   const [recontou, setRecontou] = React.useState(false);
+  /** O numeral que acabou de saltar no centro da cena (F27 §4). */
+  const [saltando, setSaltando] = React.useState<number | null>(null);
+  /** O canhão engasgou: tiro rápido demais. Não é erro — é limite físico. */
+  const [engasgou, setEngasgou] = React.useState(false);
+  const ultimoTiro = React.useRef(0);
 
   const contados = ordem.filter(o => o > 0).length;
   const terminou = contados === spec.total;
@@ -94,6 +119,8 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
 
   function tocar(i: number) {
     if (disabled) return;
+    // No rítmico quem dispara é o canhão: o balão não é botão.
+    if (spec.modo === "ritmico") return;
 
     // A ordem destes dois testes É o diagnóstico. Recontar, na F01, significa
     // exatamente voltar a tocar os objetos JÁ CONTADOS para responder "quantos
@@ -113,7 +140,51 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
       return;
     }
     setAviso(null);
-    setOrdem(atual => atual.map((o, j) => (j === i ? contados + 1 : o)));
+    const numero = contados + 1;
+    setOrdem(atual => atual.map((o, j) => (j === i ? numero : o)));
+    // F01 §4: "a voz fala o número no mesmo instante do salto".
+    falar?.(String(numero));
+  }
+
+  /**
+   * O disparo do canhão — a interação do modo `ritmico`.
+   *
+   * ### O que estava errado
+   *
+   * A primeira versão fazia a criança tocar CADA balão, que é a interação do
+   * modo `toque`. A F27 §3 põe **um canhão na base** e a §4 descreve o disparo:
+   * um toque no canhão, uma bala, um balão, um número. Colapsar os dois modos
+   * numa interação só apagou justamente o que a ficha ensina — *contar é agir
+   * no tempo certo*, não escolher alvo.
+   *
+   * ### O engasgo
+   *
+   * *"Não existe erro nesta ficha. Se tocar duas vezes rápido, o canhão engasga
+   * e não dispara. Limite físico ensina o ritmo."* (F27 §4). É a única coisa
+   * que ensina sincronia entre falar e agir — sem ela, a criança metralha e a
+   * correspondência um-a-um nunca se forma.
+   */
+  function dispararCanhao() {
+    if (disabled) return;
+    const agora = Date.now();
+    if (agora - ultimoTiro.current < INTERVALO_MINIMO_DO_TIRO) {
+      setEngasgou(true);
+      setAviso("Devagar! Um de cada vez.");
+      window.setTimeout(() => setEngasgou(false), 320);
+      return;
+    }
+    const proximo = ordem.findIndex(o => o === 0);
+    if (proximo < 0) return;
+
+    ultimoTiro.current = agora;
+    setEngasgou(false);
+    setAviso(null);
+    const numero = contados + 1;
+    setOrdem(atual => atual.map((o, j) => (j === proximo ? numero : o)));
+    // A voz fala o número no MESMO instante do estouro. A competência é oral.
+    falar?.(String(numero));
+    setSaltando(numero);
+    window.setTimeout(() => setSaltando(atual => (atual === numero ? null : atual)), 700);
   }
 
   function responder(n: number) {
@@ -195,7 +266,10 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
               key={i}
               type="button"
               onClick={() => tocar(i)}
-              disabled={disabled || estourado}
+              // No rítmico o balão é CENÁRIO: quem age é o canhão. Deixá-lo
+              // clicável ofereceria duas interações para a mesma ação e
+              // devolveria a escolha de alvo, que é o modo `toque`.
+              disabled={disabled || estourado || spec.modo === "ritmico"}
               // Sem `aria-hidden`: o alvo já feito CARREGA sentido — é a
               // âncora de onde continuar. Escondê-lo do leitor de tela tiraria
               // de quem não enxerga justamente a informação que a cena dá de
@@ -270,6 +344,22 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
           );
         })}
 
+        {/* O numeral que SALTA grande no centro, no instante do estouro
+            (F27 §4). Sem ele o número não é o produto do ato: aparecia direto
+            no contador, longe do balão, e a criança não ligava um ao outro.
+            No nível 4 em diante ele não aparece escrito — a voz continua. */}
+        {spec.modo === "ritmico" && saltando !== null && spec.mostraNumeral && (
+          <motion.span
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl font-black text-indigo-600"
+            initial={semMovimento ? false : { scale: 0 }}
+            animate={{ scale: [0, 1.4, 1] }}
+            transition={{ duration: 0.4 }}
+          >
+            {saltando}
+          </motion.span>
+        )}
+
         {/* A Mão Fantasma do nível 1. */}
         {mostrar?.maoFantasma !== undefined && spec.alvos[mostrar.maoFantasma] && (
           <motion.span
@@ -288,6 +378,32 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, mostrar }: P
           </motion.span>
         )}
       </div>
+
+      {/* O canhão da F27 §3: na base, centralizado, grande. É ele quem dispara —
+          um toque, uma bala, um balão, um número. */}
+      {spec.modo === "ritmico" && (
+        <div className="mt-2 flex justify-center">
+          <motion.button
+            type="button"
+            onClick={dispararCanhao}
+            disabled={disabled || terminou}
+            aria-label={terminou ? "Acabaram os balões" : "Disparar o canhão"}
+            // `amber-500` dava 2.13:1 com texto branco, abaixo do mínimo de 3:1 para
+            // texto grande — a sonda mediu. Um passo mais escuro passa sem mudar
+            // a cor do canhão.
+            className="rounded-3xl bg-amber-700 px-6 py-3 text-2xl font-black text-white shadow-lg disabled:opacity-40"
+            style={{ minWidth: CANHAO }}
+            animate={semMovimento ? undefined : {
+              // O recuo do §4 ("kickback 8px, 100ms") e o engasgo com fumaça.
+              y: engasgou ? 0 : [0, 8, 0],
+              rotate: engasgou ? [0, -3, 3, -3, 0] : 0,
+            }}
+            transition={{ duration: engasgou ? 0.3 : 0.18 }}
+          >
+            {engasgou ? "💨" : "🔥"} FOGO
+          </motion.button>
+        </div>
+      )}
 
       {/* Silêncio é proibido: o toque repetido responde, e não pune. */}
       <p

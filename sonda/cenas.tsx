@@ -148,7 +148,7 @@ export const CENAS: Cena[] = [
     nome: `N1.04 contar tocando (nível ${lvl})`,
     render: (s: number) => <ExercicioDaFicha ficha={N1_04} lvl={lvl} semente={s} />,
   })),
-  ...[1, 5].map(lvl => ({
+  ...[1, 3, 5].map(lvl => ({
     nome: `N1.02 canhão de balões (nível ${lvl})`,
     render: (s: number) => <ExercicioDaFicha ficha={N1_02} lvl={lvl} semente={s} />,
   })),

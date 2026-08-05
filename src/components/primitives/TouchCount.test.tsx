@@ -19,6 +19,11 @@ function semente(s0: number): () => number {
 const toque = (n: number, s = 42) => construirTouchCountSpec("toque", n, semente(s));
 const ritmico = (n: number, s = 42) => construirTouchCountSpec("ritmico", n, semente(s));
 
+/** O canhão do modo rítmico. */
+function canhao(container: HTMLElement) {
+  return container.querySelector('[aria-label^="Disparar"], [aria-label^="Acabaram"]') as HTMLButtonElement;
+}
+
 /** Toca todos os alvos, na ordem em que aparecem. */
 function contarTudo(container: HTMLElement) {
   const alvos = [...container.querySelectorAll('[aria-label*="ainda não contei"]')];
@@ -179,17 +184,8 @@ describe("o desmame do nível 5", () => {
     // que é exatamente o que o diagnóstico EXCESSO_ACAO observa.
     const { container } = render(<TouchCount spec={ritmico(2)} />);
     const alvo = container.querySelectorAll("button")[0];
-    fireEvent.click(alvo);
+    fireEvent.click(canhao(container));
     expect(alvo.querySelector("span")?.getAttribute("style") ?? "").toContain("opacity: 0");
-    expect(alvo.hasAttribute("disabled"), "balão estourado não recebe outro tiro").toBe(true);
-  });
-
-  it("mas o lugar do balão fica: os outros não escorregam sob o dedo", () => {
-    const { container } = render(<TouchCount spec={ritmico(2)} />);
-    const antes = [...container.querySelectorAll("button")].map(b => b.getAttribute("style"));
-    fireEvent.click(container.querySelectorAll("button")[0]);
-    const depois = [...container.querySelectorAll("button")].map(b => b.getAttribute("style"));
-    expect(depois).toEqual(antes);
   });
 
   it("no nível 5 nenhum alvo é cinza — ela segura de cabeça", () => {
@@ -208,27 +204,69 @@ describe("o desmame do nível 5", () => {
   });
 });
 
-describe("o modo rítmico — ficha F27", () => {
-  it("não tem teclado: a competência é ORAL", () => {
+describe("o modo rítmico — ficha F27: quem dispara é o CANHÃO", () => {
+  it("o balão não é botão — a criança não escolhe alvo", () => {
+    // A primeira versão fazia a criança tocar cada balão, que é a interação do
+    // modo `toque`. A F27 §3 põe um canhão na base, e a §4 descreve o disparo:
+    // um toque no canhão, uma bala, um balão, um número. Colapsar os dois modos
+    // apagou o que a ficha ensina — contar é AGIR NO TEMPO CERTO, não mirar.
+    const { container } = render(<TouchCount spec={ritmico(2)} />);
+    const baloes = [...container.querySelectorAll("button")]
+      .filter(b => (b.getAttribute("aria-label") ?? "").includes("balões"));
+    expect(baloes.length).toBeGreaterThan(0);
+    for (const b of baloes) expect(b.hasAttribute("disabled"), "balão clicável").toBe(true);
+  });
+
+  it("cada disparo estoura UM balão e produz UM número", () => {
+    // A regra inviolável da §4: nunca dois balões num tiro.
+    const { container } = render(<TouchCount spec={ritmico(2)} />);
+    fireEvent.click(canhao(container));
+    expect(container.querySelectorAll('[aria-label*="já contei"]')).toHaveLength(1);
+  });
+
+  it("o numeral SALTA no centro da cena, no instante do estouro", () => {
+    // Sem isso o número não é o produto do ato: ele aparecia direto no
+    // contador, longe do balão, e a criança não ligava um ao outro.
+    const { container } = render(<TouchCount spec={ritmico(2)} />);
+    fireEvent.click(canhao(container));
+    const cena = container.querySelector('[role="group"][aria-label^="Os balões"]')!;
+    expect(cena.textContent).toContain("1");
+  });
+
+  it("dois tiros rápidos: o canhão ENGASGA e não dispara", () => {
+    // "Não existe erro nesta ficha. Limite físico ensina o ritmo." (§4). É a
+    // única coisa que ensina sincronia entre falar e agir — sem ela a criança
+    // metralha e a correspondência um-a-um nunca se forma.
+    const { container } = render(<TouchCount spec={ritmico(2)} />);
+    fireEvent.click(canhao(container));
+    fireEvent.click(canhao(container));
+    expect(container.querySelectorAll('[aria-label*="já contei"]'),
+      "o segundo tiro imediato não podia estourar nada").toHaveLength(1);
+    expect(container.textContent).toContain("Devagar");
+  });
+
+  it("a voz fala o número junto com o estouro — a competência é ORAL", () => {
+    const falar = vi.fn();
+    const { container } = render(<TouchCount spec={ritmico(2)} falar={falar} />);
+    fireEvent.click(canhao(container));
+    expect(falar).toHaveBeenCalledWith("1");
+  });
+
+  it("não tem teclado: o fecho é a sequência, não uma escolha", () => {
     const s = ritmico(2);
-    const { container } = render(<TouchCount spec={s} />);
-    contarTudo(container);
+    const { container } = render(<TouchCount spec={s} preenchidos={s.total} />);
     expect(container.textContent).not.toContain("Quantos foram");
     expect(container.textContent).toContain(`Foram ${s.total}`);
   });
 
-  it("a sequência fica visível conforme ela estoura", () => {
-    const { container } = render(<TouchCount spec={ritmico(2)} />);
-    const alvos = [...container.querySelectorAll("button")];
-    fireEvent.click(alvos[0]);
-    fireEvent.click(alvos[1]);
+  it("a sequência fica visível no contador conforme ela estoura", () => {
+    const { container } = render(<TouchCount spec={ritmico(2)} preenchidos={2} />);
     const contador = container.querySelector('[aria-label="Números que já saíram"]');
     expect(contador?.textContent).toBe("12");
   });
 
   it("no nível 4 o numeral some da tela — ela segura a sequência de cabeça", () => {
-    const { container } = render(<TouchCount spec={ritmico(4)} />);
-    fireEvent.click(container.querySelectorAll("button")[0]);
+    const { container } = render(<TouchCount spec={ritmico(4)} preenchidos={1} />);
     expect(container.querySelector('[aria-label="Números que já saíram"]')).toBeNull();
   });
 
@@ -239,26 +277,22 @@ describe("o modo rítmico — ficha F27", () => {
     const s = ritmico(5);
     expect(s.jaFeitos).toBeGreaterThan(0);
     const { container } = render(<TouchCount spec={s} />);
-    const estourados = [...container.querySelectorAll("button")]
-      .filter(b => b.hasAttribute("disabled"));
-    expect(estourados).toHaveLength(s.jaFeitos);
+    const rastros = [...container.querySelectorAll("button")]
+      .filter(b => (b.getAttribute("aria-label") ?? "").includes("este já estourei"));
+    expect(rastros).toHaveLength(s.jaFeitos);
     expect(container.textContent).toContain(`Continue de ${s.jaFeitos}`);
 
     // O já-estourado deixa RASTRO: sumir sem marca transformaria a âncora num
     // buraco, e um buraco não conta nada.
-    const rastro = estourados[0].querySelector("span")!.getAttribute("style") ?? "";
-    expect(rastro, "o balão já estourado sumiu sem deixar rastro")
-      .toMatch(/opacity: 0\.2/);
-    expect(estourados[0].getAttribute("aria-label")).toContain("este já estourei");
+    const estilo = rastros[0].querySelector("span")!.getAttribute("style") ?? "";
+    expect(estilo, "o balão já estourado sumiu sem deixar rastro").toMatch(/opacity: 0\.2/);
   });
 
   it("e o que ela estoura continua a sequência, sem passar de dez", () => {
     const s = ritmico(5);
     const { container } = render(<TouchCount spec={s} />);
-    const livre = [...container.querySelectorAll("button")]
-      .find(b => !b.hasAttribute("disabled"))!;
-    fireEvent.click(livre);
-    expect(livre.getAttribute("aria-label")).toContain(`já contei: ${s.jaFeitos + 1}`);
+    fireEvent.click(canhao(container));
+    expect(container.querySelectorAll('[aria-label*="já contei"]')).toHaveLength(1);
     expect(s.total).toBeLessThanOrEqual(10);
   });
 });
