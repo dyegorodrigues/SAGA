@@ -1,8 +1,7 @@
 import { Question } from "../types";
 import { ri, pick, shuffle } from "../utils/generators";
 import { gVis_TakeApart, gVis_MissingAddendFrame } from "../utils/generatorsVisual";
-import { N1_10 } from "../curriculum/fichas/jornada/N1.10";
-import { Composer } from "../curriculum/Composer";
+import { legadoN1_10 } from "./legadoF0";
 
 export const numOpts = (ans: any, ...distractors: any[]) => {
   let res = [ans, ...distractors].filter(x => x != null && x !== ans);
@@ -14,8 +13,11 @@ export const numOpts = (ans: any, ...distractors: any[]) => {
   return shuffle([ans, ...res.slice(0, 3)]).map(x => ({ label: x, value: x }));
 };
 
+// Legado de verdade: alvo de rollback do canário do N1.10. Até este commit
+// chamava `Composer.generate` direto — servia ficha anunciando-se como legado,
+// e o rollback não devolvia nada. Ver PLANO_DO_BLOCO_F0.md §1.
 export const gN1_10 = (lvl: number): Question => {
-  return Composer.generate(N1_10, lvl, "a");
+  return legadoN1_10(lvl);
 };
 
 export const gN1_11 = (lvl: number): Question => {

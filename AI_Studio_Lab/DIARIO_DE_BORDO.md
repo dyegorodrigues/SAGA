@@ -765,3 +765,149 @@ De acordo com o §12.6 da BIBLIA_DO_SAGA.md, os renderizadores órfãos servem a
   rollback de N3.10 foram exercitados pelo caminho de produção e funcionam.
 - Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
   suíte em 636 testes e 40 arquivos.
+
+## 3 de agosto de 2026 — Andar 4: promoção de N3.10 a canário do Composer
+
+- O PR #20 foi mesclado em `origin/main = ea191c2` e a branch renasceu da main
+  atualizada, o que satisfez as duas condições que bloqueavam o Andar 4: base
+  mesclada e mudança separada da implementação.
+- N3.10 entrou em `COMPOSER_CANARIES`. A ativação quebrou exatamente **dois**
+  testes, ambos afirmando o estado anterior — raio de impacto mínimo, que é o
+  sinal de que o mecanismo está bem isolado.
+- O rollback foi exercitado pelo caminho de produção e devolve `kind: "story"`,
+  do gerador legado, na questão seguinte; a reativação devolve `story-bars`. É a
+  prova de que a correção de hoje cedo funciona no caso real para que foi feita.
+- N3.09 permanece canário e N3.11 permanece legado, sem alteração.
+- O repositório **não possui CI**: o PR #20 foi mesclado sem check runs, com o log
+  local como única evidência. Isso é dívida conhecida e pertence ao Lote E.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 637 testes e 40 arquivos.
+
+## 3 de agosto de 2026 — Andar 5 começa: integração contínua
+
+- O PR #20 foi mesclado com `total_count: 0` de check runs, porque o repositório
+  não possuía workflow algum. O protocolo manda "merge somente após checks
+  verdes" e, na prática, os checks eram o log local de quem publicava. A lacuna
+  já constava do dossiê do Codex e agora está fechada.
+- `.github/workflows/ci.yml` roda em PR e em push na `main` exatamente os gates
+  que o protocolo já exigia: auditar, fichas:auditar, grafo:check, lint, testes e
+  build. Nada de novo foi inventado; o que mudou é que deixou de depender de
+  alguém lembrar.
+- A guarda de binários virou job próprio, e dois detalhes precisaram de cuidado:
+  o Actions confere por padrão um merge commit sintético do PR, o que distorceria
+  o diff, então o checkout aponta para o head real; e `pr_text_guard.cjs` aceita
+  `PR_BASE`, que passa a ser preenchido com a base declarada do PR em vez de
+  presumir `origin/main`.
+- `npm ci` foi verificado contra o lockfile atual antes de entrar no workflow.
+- Gates locais: auditar, fichas:auditar, grafo:check, lint e testes aprovados;
+  suíte em 637 testes e 40 arquivos.
+
+## 3 de agosto de 2026 — Andar 4 fechado: observabilidade do canário
+
+- Correção de rota: o Andar 5 havia começado com o Andar 4 pela metade. Dos nove
+  itens da lista, cinco estavam feitos — branch, promoção, proveniência, rollback
+  e paridade — e quatro não: saves, telemetria, Jornada e observação de erro.
+- **Saves**: o progresso é indexado pelo id do nó, que a promoção não altera;
+  `graphId` e pré-requisitos permanecem idênticos antes e depois. Um progresso
+  salvo continua válido, e `applyJourneyAnswer` não conhece a origem do gerador —
+  promover um canário não exige migração de save.
+- **Telemetria**: a alternativa errada carrega tag de misconception, a certa não
+  gera diagnóstico e a tag é aceita por `trackMisconception` sem erro. O legado
+  `gN3_10` não oferece tag alguma, o que é exatamente o ganho da promoção.
+- **Jornada**: N3.10 aparece com `contentStatus: "explicit"` e a questão traz
+  kind, uiProps, prompt, alternativas e `evaluate` nos cinco níveis. As
+  alternativas são exibidas, porque aqui a barra é leitura e não a interação —
+  diferente de `vertical` e `array`.
+- **Observação de erro**: errar não avança o nível, a resposta correta aparece
+  exatamente uma vez, nenhuma alternativa é negativa e 500 amostras não produzem
+  laço nem exceção.
+- **"Canário único"** foi lido como *um nó por PR*, não como *um só canário no
+  sistema*: N3.09 já fora validada no Lote B e retirá-la seria regressão. O Plano
+  Mestre confirma ao exigir "trocar um único nó por PR".
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 651 testes e 41 arquivos.
+
+## 3 de agosto de 2026 — Contrato do canário: o padrão vira executável
+
+- **Causa da falha anterior identificada.** O Andar 4 foi declarado concluído a
+  partir da memória do que fora feito, e não da releitura da lista no momento de
+  fechar. Nenhum mecanismo cobrava a diferença, então a omissão de quatro itens
+  passou despercebida até a revisão do proprietário.
+- **A correção não é lembrar melhor, é não depender de lembrar.** Duas travas
+  passam a existir:
+  1. cada Andar do roteiro recebe uma tabela item-a-item com a evidência ao lado;
+     tabela não se preenche de memória;
+  2. o padrão do canário virou suíte executável que **enumera
+     `COMPOSER_CANARIES`** em vez de listar nós à mão.
+- **Inconsistência encontrada e fechada.** N3.10 foi promovido com nove
+  verificações; N3.09, promovido no Lote B, tinha apenas paridade. Dois canários
+  em produção com padrões diferentes é dívida silenciosa — o mais fraco só
+  aparece quando quebra. O contrato aplica as onze verificações a ambos, e N3.09
+  passa em todas: estava correto, apenas não estava verificado.
+- **A trava foi provada, não afirmada.** Simulando a promoção de N4.02 sem
+  declaração no contrato, oito testes falham imediatamente, começando por "todo
+  canário ativo está registrado neste contrato". O estado foi restaurado em
+  seguida.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 674 testes e 42 arquivos.
+
+## 3 de agosto de 2026 — Andar 5: E2E da missão diária e a repetição imediata
+
+- O E2E percorre o ciclo que a criança vive: criar criança, perfil, missão,
+  ouvir, responder, errar, recuperar, concluir, salvar, fechar, reabrir e
+  retomar. O ponto crítico é o meio: `State` é persistido com `JSON.stringify`,
+  e o dossiê já alertava que estado e questões podem conter funções que não
+  sobrevivem à serialização. O teste passa o estado por **round-trip JSON real**
+  em vez de reaproveitar o objeto em memória — e o progresso sobrevive inteiro.
+- **Defeito grave encontrado logo no primeiro teste.** A missão repetia a mesma
+  questão em sequência imediata. Medido antes de concluir qualquer coisa:
+  **95,3% das missões** traziam ao menos uma repetição e **32,4% dos pares
+  consecutivos eram idênticos** — mesmo kind, mesmo enunciado, mesma resposta.
+- Causa: cada fase chama o mesmo gerador em sequência — duas vezes o aquecimento,
+  cinco a fronteira, três a fluência, mais o laço de preenchimento. Geradores de
+  alcance pequeno colidem com frequência alta.
+- Correção em três camadas, cada uma revelada pela medição seguinte:
+  1. guarda de distinção com até oito tentativas nas fases geradas — caiu para
+     33,7% das missões e 4,8% dos pares;
+  2. o fecho era montado fora da guarda e depois do corte, sobrando exatamente
+     uma repetição por missão afetada; passou a comparar com a questão que de
+     fato ficou por último;
+  3. o fallback "Em construção" é **constante**, então repetir a geração devolve
+     sempre a mesma carta. Duas seguidas passaram a ser recusadas: missão mais
+     curta é melhor que missão preenchida com a mesma carta vazia.
+- Resultado medido em 300 missões por faixa: **0,0% em F0, F1, F2 e F3**, com os
+  tamanhos preservados em 8, 12, 16 e 20.
+- O resgate ficou de fora da guarda de propósito: sua fila é consumida por
+  `shift`, e tentar de novo descartaria um resgate legítimo.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 681 testes e 43 arquivos.
+
+## 3 de agosto de 2026 — Andar 5: telemetria negada em produção (C-06 confirmado)
+
+- **Defeito real em produção, confirmado por leitura cruzada.** O cliente grava
+  telemetria em `userStates/{userId}/Kids/{kidId}/TelemetryLogs`, mas
+  `firestore.rules` declarava apenas `match /userStates/{userId}`. No Firestore
+  uma regra de documento **não alcança as subcoleções dele**, então toda a
+  telemetria caía na negação padrão `allow read, write: if false`.
+- A falha era **silenciosa por construção**: `logTelemetryToCloud` engole a
+  exceção num `console.warn` para não interromper a aula da criança. O resultado
+  é que o Radar nunca recebeu dado algum da nuvem, e nada indicava isso.
+- Este é exatamente o **C-06** que o dossiê do Codex já registrava como suspeita;
+  a leitura cruzada entre o caminho gravado e o caminho declarado confirmou.
+- Correção: a subcoleção ganhou regra própria, restrita ao mesmo dono, e a
+  telemetria passou a ser **append-only** — `read` e `create` permitidos,
+  `update` e `delete` negados, porque histórico diagnóstico reescrito deixa de
+  ser evidência. A condição de posse foi extraída para a função `ehDono`.
+- **Guarda automática** em `firestoreRules.test.ts`: compara os caminhos que o
+  cliente monta com os caminhos que as regras declaram e falha quando aparece
+  caminho novo sem regra. Não substitui o emulador — não valida a lógica de
+  `allow` —, mas cobre a classe de defeito que o emulador sozinho não pega:
+  regra que simplesmente não existe.
+- A guarda foi **provada contra as regras antigas**: restaurando o arquivo de
+  produção, três testes falham e o relatório aponta
+  `userStates/*/Kids/*/TelemetryLogs` como caminho descoberto.
+- Dois tropeços no extrator, ambos corrigidos: a pilha de `match` não
+  acompanhava a profundidade real de chaves, e o regex parava no primeiro `{`,
+  que faz parte do próprio caminho em `{userId}`.
+- Gates: auditar, fichas:auditar, grafo:check, lint, pr:check e build aprovados;
+  suíte em 687 testes e 44 arquivos.

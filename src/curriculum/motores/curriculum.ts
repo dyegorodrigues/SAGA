@@ -127,12 +127,36 @@ Object.keys(FAIXAS_INFO).forEach(faixaId => {
       },
       lvlSkills: info.lvlSkills,
       prereqs: n.prereqs,
-      contentStatus: GENERATOR_MAP[n.id] || hasComposerFicha(n.id) ? "explicit" : "fallback",
+      // Reflete o que é SERVIDO, não o que está registrado. Uma ficha existir no
+      // catálogo sem estar ativa é o estado normal entre o PR que implementa e o
+      // que ativa — e nesse intervalo o nó continua caindo no fallback genérico.
+      // Marcá-lo "explicit" faria a Oficina prescrever resgate sobre conteúdo que
+      // não existe, exatamente o que o rescuePlanner promete nunca fazer.
+      // Getter pelo mesmo motivo de `generatorSource`: acompanha o rollback.
+      get contentStatus() {
+        return binding.source() === "fallback" ? "fallback" as const : "explicit" as const;
+      },
     });
   });
   
   CURRICULUM.push(mod);
 });
+
+/**
+ * O gerador legado de um nó, se existir.
+ *
+ * Existe para que o contrato do canário **descubra** o legado em vez de confiar
+ * numa declaração à mão: declarar é uma chance de declarar errado, e um legado
+ * errado faria o teste de paridade comparar a ficha nova com a coisa errada,
+ * passando sem verificar nada.
+ *
+ * Devolve `undefined` para os nós que nunca tiveram gerador próprio — os 46 que
+ * caem no placeholder genérico. Para esses, promover é ESTREIA, não substituição,
+ * e "paridade" não quer dizer nada.
+ */
+export function geradorLegadoDe(id: string): ((lvl: number) => Question) | undefined {
+  return GENERATOR_MAP[id];
+}
 
 export function getTrackById(id: string): Track | undefined {
   for (const mod of CURRICULUM) {

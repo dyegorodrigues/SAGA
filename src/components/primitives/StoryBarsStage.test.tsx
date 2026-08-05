@@ -40,14 +40,14 @@ describe("StoryBarsStage — a tela completa de N3.10", () => {
     expect(completo.getByLabelText(/Barra/)).toBeTruthy();
   });
 
-  it("nunca mostra na tela o número que a pergunta pede, em 200 amostras", () => {
-    for (let i = 0; i < 200; i += 1) {
+  // A varredura larga não precisa de React: ela interroga o que o Composer
+  // produziu. Rodar 200 renders para inspecionar uma estrutura de dados só
+  // gastava tempo — e estourava o limite quando a suíte roda em paralelo.
+  it("o Composer nunca entrega a resposta entre os números conhecidos, em 500 amostras", () => {
+    for (let i = 0; i < 500; i += 1) {
       const lvl = (i % 5) + 1;
-      const q = gerar(lvl);
-      const spec = q.uiProps as StoryBarsSpec;
-      const { container, unmount } = render(<StoryBarsStage spec={spec} />);
+      const spec = gerar(lvl).uiProps as StoryBarsSpec;
 
-      // Números visíveis na história e nos segmentos conhecidos da barra.
       const visiveis = [
         ...spec.story.beats.map(b => b.count),
         ...[spec.bars.part1, spec.bars.part2, spec.bars.whole]
@@ -55,7 +55,30 @@ describe("StoryBarsStage — a tela completa de N3.10", () => {
           .map(s => (s as { value: number }).value),
       ];
       expect(visiveis, `nível ${lvl}`).not.toContain(spec.answer);
-      expect(container.textContent).toBeTruthy();
+    }
+  });
+
+  it("a tela renderizada não diz o número que a pergunta pede", () => {
+    // O teste anterior verificava a ESTRUTURA e se chamava "não mostra na tela".
+    // Este lê a tela de verdade — inclusive os rótulos de acessibilidade, que
+    // são o que a criança não-leitora efetivamente ouve.
+    for (let i = 0; i < 25; i += 1) {
+      const lvl = (i % 5) + 1;
+      const spec = gerar(lvl).uiProps as StoryBarsSpec;
+      const { container, unmount } = render(<StoryBarsStage spec={spec} />);
+
+      const rotulos = [...container.querySelectorAll("[aria-label]")]
+        .map(el => el.getAttribute("aria-label") ?? "")
+        .join(" ");
+      const falado = `${container.textContent ?? ""} ${rotulos}`;
+
+      // Comparação numérica, não textual: com resposta 3, o "13" da história é
+      // legítimo e um `includes("3")` acusaria falso positivo.
+      const numeros = (falado.match(/\d+/g) ?? []).map(Number);
+
+      expect(container.textContent, `nível ${lvl} renderizou vazio`).toBeTruthy();
+      expect(numeros, `nível ${lvl} falou a resposta ${spec.answer}`)
+        .not.toContain(spec.answer);
       unmount();
     }
   });

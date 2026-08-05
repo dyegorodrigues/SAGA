@@ -172,7 +172,12 @@ export function EmojiRow({
                   }, 100);
                 }}
                 className="mt-2 select-none cursor-pointer active:translate-y-0.5 transition-all"
-                style={{ fontFamily: 'inherit', fontWeight: 800, fontSize: 13, color: tokens.cor.elementos.marcador, background: "#F1EDFF", border: `2px solid ${tokens.cor.elementos.marcador}`, borderRadius: 12, padding: "6px 14px" }}
+                // O âmbar do marcador sobre a lavanda dava 1.45:1: o botão que
+                // permite REVER a quantidade era o texto menos legível do
+                // relance — justamente o socorro de quem não conseguiu contar a
+                // tempo. A moldura continua âmbar (a identidade fica), a letra
+                // escurece para 6,4:1. Ver Padrão Ouro §6.30.
+                style={{ fontFamily: 'inherit', fontWeight: 800, fontSize: 13, color: "#92400E", background: "#F1EDFF", border: `2px solid ${tokens.cor.elementos.marcador}`, borderRadius: 12, padding: "6px 14px" }}
               >
                 👀 Ver de novo
               </button>

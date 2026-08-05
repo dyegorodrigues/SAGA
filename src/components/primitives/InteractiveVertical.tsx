@@ -2,7 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AnswerMeta, Question } from '../../types';
 import { tokens, UIState } from '../../styles/tokens';
+import { OPERACAO } from '../../styles/coresDeOperacao';
 import { getVerticalColumnStep, inferVerticalMisconception, verticalAnswerFromColumns, verticalDigitChoices } from './verticalProcedure';
+
+/**
+ * A tinta do sinal da operação e do dígito que está sendo digitado.
+ *
+ * Era `elementos.base_A` (#0EA5E9), pensado para PREENCHER formas, não para
+ * escrever: sobre branco dá 2.77:1, e o sinal — a única coisa que diz à criança
+ * se ela soma ou subtrai — ficava mais apagado que os números. O azul da adição
+ * do padrão do aplicativo já nasceu com contraste verificado (5.17:1).
+ * Ver Padrão Ouro §6.30.
+ */
+const TINTA_DA_CONTA = OPERACAO.adicao.cor;
 
 interface InteractiveVerticalProps {
   q: Question;
@@ -112,7 +124,7 @@ export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlg
         >
           <span 
             className="absolute left-4" 
-            style={{ color: tokens.cor.elementos.base_A }}
+            style={{ color: TINTA_DA_CONTA }}
           >
             {op}
           </span>
@@ -131,7 +143,7 @@ export function InteractiveVertical({ q, onAnswer, onMistake, onRegroup, showAlg
             return (
               <span key={`a${i}`} className="w-12 text-center relative">
                 {isActiveCol ? (
-                  <span style={{ color: tokens.cor.elementos.base_A }}>
+                  <span style={{ color: TINTA_DA_CONTA }}>
                     {currentInput}<span className="animate-pulse">_</span>
                   </span>
                 ) : (

@@ -34,7 +34,85 @@ export const MisconceptionTag = {
   COMPARA_SOMANDO: "compara-somando",
 
   /** Problemas aditivos: só resolve com a incógnita no fim; erra quando ela muda de posição */
-  SO_RESOLVE_CANONICO: "so-resolve-canonico"
+  SO_RESOLVE_CANONICO: "so-resolve-canonico",
+
+  /** Tabuada: somou os dois fatores em vez de multiplicar (5×4 → 9) */
+  SOMA_OS_FATORES: "soma-os-fatores",
+
+  /** Tabuada: devolveu um múltiplo vizinho — memorizou a lista sem o padrão que a gera (5×4 → 15 ou 25) */
+  TABUADA_TROCADA: "tabuada-trocada",
+
+  /** Decomposição: dobrou uma vez e parou, sem completar a estratégia (7×4 → 14) */
+  PAROU_NO_DOBRO: "parou-no-dobro",
+
+  /** Decomposição: aplicou a OUTRA estratégia — dobrou o dobro onde cabia dobro mais um grupo, ou o contrário (7×3 → 28) */
+  TROCOU_ESTRATEGIA: "trocou-estrategia",
+
+  /** Âncora: devolveu o fato fácil sem fazer o ajuste (7×9 → 70, que é 7×10) */
+  PAROU_NA_ANCORA: "parou-na-ancora",
+
+  /** Âncora: ajustou para o lado errado — somou onde era tirar, ou o contrário (7×9 → 77) */
+  DIRECAO_ERRADA: "direcao-errada",
+
+  /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
+  INVERTE_DIVISAO: "inverte-divisao",
+
+  /** Família ×÷: tratou a divisão como subtração (12÷3 → 9) */
+  DIVIDE_SUBTRAINDO: "divide-subtraindo",
+
+  /** Valor posicional: aplicou "acrescenta zero" sem entender — um zero no ×100 (23×100 → 230) */
+  ACRESCENTA_ZERO_SEM_ENTENDER: "acrescenta-zero-sem-entender",
+
+  /** Valor posicional: deslocou o número errado de ordens (12×30 → 36, esqueceu a dezena) */
+  ORDEM_ERRADA: "ordem-errada",
+
+  /** Multiplicação armada: esqueceu de somar o "vai um" da ordem anterior (27×3 → 61) */
+  ESQUECE_REAGRUPAMENTO: "esquece-reagrupamento",
+
+  /** Modelo de área: multiplicou só uma região e parou, sem somar as partes (13×4 → 40) */
+  PARCELA_UNICA: "parcela-unica",
+
+  /** Modelo de área: partiu pelo ALGARISMO, não pelo valor — leu o 1 de 13 como um, não como dez (13×4 → 16) */
+  CORTE_ERRADO: "corte-errado",
+
+  /** Multiplicação armada por 2 dígitos: esqueceu o zero da segunda linha (13×14 → 65) */
+  ZERO_ESQUECIDO: "zero-esquecido",
+
+  /** Pareamento: pôs dois ou mais itens no mesmo receptor — não tem a regra "um e só um" */
+  DISTRIBUICAO_DESIGUAL: "distribuicao-desigual",
+
+  /** Pareamento: deixou receptor vazio com item sobrando — perdeu o fio, não varreu todos */
+  PAREAMENTO_INCOMPLETO: "pareamento-incompleto",
+
+  /** Pareamento: disse que sobrou quando não sobrou — julgou pela aparência, não pelo pareamento */
+  COMPARACAO_VISUAL: "comparacao-visual",
+
+  /* --- contagem (fichas F01 e F27) ---------------------------------- */
+
+  /** Contar tocando: contou o mesmo objeto duas vezes — o dedo não marcou o que já passou */
+  RECONTOU: "recontou",
+
+  /** Contar tocando: perdeu um objeto pelo caminho — o fio se rompeu no arranjo difícil */
+  PULOU: "pulou",
+
+  /**
+   * Contar tocando: **o marco cognitivo**. Ela contou tudo, ouviu o último número,
+   * e ainda assim recontou para responder "quantos são?". Não sabe que o último
+   * número dito É a quantidade — ele soou como o nome do último objeto.
+   */
+  NAO_TEM_CARDINALIDADE: "nao-tem-cardinalidade",
+
+  /** Contar tocando: acerta em fila e erra no disperso — conta só com apoio espacial */
+  DEPENDE_DE_ORDEM: "depende-de-ordem",
+
+  /** Contagem rítmica: disparou mais vezes que havia alvos — não monitora o que resta */
+  EXCESSO_ACAO: "excesso-acao",
+
+  /** Contagem rítmica: parou antes de acabar — perdeu o fio ou o engajamento */
+  CONTAGEM_INCOMPLETA: "contagem-incompleta",
+
+  /** Contagem rítmica: mandada continuar do 4, começou do 1 — não desacoplou a sequência do início */
+  NAO_CONTA_A_PARTIR_DE: "nao-conta-a-partir-de"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

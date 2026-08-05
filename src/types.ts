@@ -1,3 +1,5 @@
+import type { EventoManipulacao } from "./curriculum/procedimentos/filtroMotor";
+
 export interface Kid {
   id: string;
   rt_max_s?: number;
@@ -48,9 +50,28 @@ export interface Option {
 
 /** Context from production interactions that do not select a Question option. */
 export interface AnswerMeta {
+  /**
+   * O que a criança fez com as peças no pareamento (N1.01).
+   *
+   * Ficha de PRODUÇÃO: o diagnóstico vem da ação, não da alternativa escolhida.
+   * Sem este campo, o Radar não teria como distinguir "pôs dois no mesmo" de
+   * "deixou um sem" — que pedem aulas diferentes.
+   */
+  pareamento?: {
+    porReceptor: number[];
+    naBandeja: number;
+    respostaDaPergunta?: "exato" | "sobra" | "falta";
+  };
+
   misconception?: string;
   source?: "vertical-column" | "array-grid";
   columnIndex?: number;
+  /**
+   * Assinatura do gesto, quando a resposta veio de manipulação (arrasto, corte,
+   * alinhamento, giro, posicionamento). Alimenta o filtro motor do §8.3-bis:
+   * sem isto, escorregão de dedo vira tag de misconception.
+   */
+  manipulacao?: EventoManipulacao;
 }
 
 export interface Question {
@@ -234,6 +255,12 @@ export interface LogEntry {
 
 export interface State {
   schemaVersion?: number;
+  /**
+   * Instante ISO da última gravação. Existe para reconciliar nuvem × local na
+   * abertura: sem ele, a nuvem vence sempre e uma sessão gravada só localmente
+   * some em silêncio. Ver `lib/reconciliacaoDeSaves.ts`.
+   */
+  updatedAt?: string;
   kids: Kid[];
   progress: Record<string, Record<string, Progress>>;
   dojoTracks?: Record<string, Record<string, DojoTrackState>>;

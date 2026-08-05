@@ -16,9 +16,12 @@
     "fichas:auditar": "node AI_Studio_Lab/tools/ficha_catalog_auditor.cjs",
     "grafo:gerar": "node scripts/generate-graph-artifacts.cjs",
     "grafo:check": "node scripts/generate-graph-artifacts.cjs --check",
+    "grafo:codigo": "graphify update . && graphify cluster-only .",
     "pr:check": "node AI_Studio_Lab/tools/pr_text_guard.cjs",
     "simular": "tsx simulated-learner-real.ts",
-    "contrato": "vitest run"
+    "contrato": "vitest run",
+    "sonda": "node scripts/sonda-layout.mjs",
+    "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -47,6 +50,7 @@
     "esbuild": "^0.25.0",
     "js-yaml": "^5.2.1",
     "jsdom": "^30.0.1",
+    "playwright-core": "^1.62.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

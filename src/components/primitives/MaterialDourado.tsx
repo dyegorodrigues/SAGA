@@ -45,21 +45,26 @@ export function MaterialDourado({ unidades, dezenas, centenas = 0, state = 'ocio
               </motion.div>
             ))}
           </div>
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Centenas</span>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Centenas</span>
         </div>
       )}
 
       {/* Dezenas */}
       {dezenas > 0 && (
         <div className="flex flex-col items-center gap-2">
-          <div className="flex gap-2 items-end justify-center">
+          {/* Centenas e unidades já quebravam linha; as dezenas eram a única
+              coluna sem limite — inconsistência, não decisão. Com 8 ou 9 barras
+              o material saía pela esquerda da tela e a criança perdia de vista
+              justamente a parcela maior. O limite cabe 5 por fileira, que é como
+              se conta mesmo: cinco e mais quatro. Ver Padrão Ouro §6.31. */}
+          <div className="flex max-w-[150px] flex-wrap items-end justify-center gap-2">
             {Array.from({ length: dezenas }).map((_, i) => (
               <motion.div key={`d-${i}`} initial={{ scale: 0, y: -20 }} animate={{ scale: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
                 <BlockTen />
               </motion.div>
             ))}
           </div>
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Dezenas</span>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Dezenas</span>
         </div>
       )}
 
@@ -73,12 +78,12 @@ export function MaterialDourado({ unidades, dezenas, centenas = 0, state = 'ocio
               </motion.div>
             ))}
           </div>
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Unidades</span>
+          <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Unidades</span>
         </div>
       )}
 
       {unidades === 0 && dezenas === 0 && centenas === 0 && (
-        <span className="text-slate-400 font-bold">Vazio</span>
+        <span className="text-slate-500 font-bold">Vazio</span>
       )}
     </div>
   );

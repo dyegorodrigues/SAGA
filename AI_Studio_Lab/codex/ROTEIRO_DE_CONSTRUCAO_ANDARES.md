@@ -97,14 +97,54 @@ incógnita variando; resposta não revelada; áudio funcionando; criança não l
 compreende a ação; sem rolagem; alvos de toque adequados; `reduced-motion`
 funcionando; testes passando; build passando; legado intacto.
 
+**Estado dos Andares 1–3: concluídos em 3/ago/2026** — conferido item a item
+contra o código em 4/ago, não de memória.
+
+| Item do gate | Evidência |
+|---|---|
+| Quatro estruturas executáveis | `ADDITIVE_STRUCTURES` em `additiveProcedure.ts`; `coversDistinctStructures` |
+| Cinco níveis + incógnita variando | `structuresForLevel`, `unknownSlotsForLevel`; contrato do canário cobre os cinco |
+| Resposta não revelada | `BarSlot` da incógnita não tem campo de valor; teste lê a tela renderizada e os rótulos de acessibilidade |
+| Áudio | `onReplay` em `StoryPanelStage`; `audioPrompt` na ficha |
+| Não leitora compreende | cada parte interrogada anuncia seu papel no texto e no `aria-label` |
+| Sem rolagem | 611/611/639/487/487 px contra alvo de 844 |
+| Alvos de toque | `minHeight: 80px` nas primitivas de toque (`EmojiRow`, `DragGroup`) |
+| `reduced-motion` | `useReducedMotion` em `StoryPanelStage` + regra global em `App.tsx`; teste dedicado |
+| Testes / build / legado | 739 testes, build verde, `gN3_10` intacto e exercido pelo teste de paridade |
+
 ### Andar 4 — Canário de N3.10, em PR separado
+
+**Estado: concluído em 3/ago/2026.**
+
 Nova branch; N3.10 como canário único; proveniência marcada; rollback explícito;
 comparação Composer × legado; testes de saves, telemetria e Jornada; observação de
 erros; então promover ou retirar.
 
 > **Implementação e ativação nunca devem ser o mesmo passo.**
 
+| Item | Evidência |
+|---|---|
+| Nova branch da main mesclada | `origin/main = ea191c2` após o PR #20 |
+| N3.10 promovida | `COMPOSER_CANARIES` |
+| Proveniência marcada | `generatorSource === "composer"` |
+| Rollback explícito | devolve `kind: "story"` na questão seguinte |
+| Composer × legado | `storyParity.test.ts` |
+| Saves | id, `graphId` e pré-requisitos preservados; save anterior segue válido |
+| Telemetria | tag de misconception emitida, aceita pelo Radar; legado não emite |
+| Jornada | `contentStatus: "explicit"`, questão completa nos cinco níveis |
+| Observação de erro | erro não avança nível; resposta única; sem negativos; 500 amostras sem laço |
+
+**Leitura de "canário único":** foi entendida como *um nó promovido por PR*, e não
+como *um único canário no sistema*. N3.09 já havia sido promovida e validada no
+Lote B; retirá-la seria regressão. O Plano Mestre confirma a leitura ao exigir
+"trocar um único nó por PR".
+
 ### Andar 5 — Lote E: confiabilidade antes de expansão
+
+**Estado: concluído em 4/ago/2026. Um único item depende de ação fora do
+repositório — publicar as regras e ligar o TTL no Console, dois cliques na mesma
+tela — e nada no app depende disso para funcionar hoje.**
+
 E2E da missão diária (criar criança → perfil → missão → ouvir → responder → errar →
 dica → recuperar → concluir → salvar → fechar → reabrir → retomar). Firestore:
 regras, gravações por sessão, custo de writes, offline, reconciliação entre
@@ -112,6 +152,31 @@ dispositivos, migração de saves, retenção, ausência de dados pessoais
 desnecessários. Radar: toque errado isolado não gera diagnóstico, erro motor é
 filtrado, misconception exige padrão, tags deduplicadas, recuperação observável.
 Oficina: ajuda concreta, fluxo não punitivo, limite de resgates, retorno coerente.
+
+| Item | Evidência |
+|---|---|
+| E2E da missão diária | `missaoDiaria.e2e.test.ts` — ciclo completo com ida e volta real pelo JSON do save |
+| Firestore: regras | `firestore.rules` autoriza a subcoleção de telemetria; `firestoreRules.test.ts` compara caminho gravado × caminho declarado |
+| Firestore: **publicação** das regras | ⏳ pendente de ação no Console — `PUBLICAR_REGRAS_FIRESTORE.md`. Até lá valem as regras antigas e a telemetria segue negada em silêncio |
+| Offline | escrita local primeiro, nuvem depois; erro de rede não vira alerta; cache persistente do Firestore com fallback declarado |
+| Reconciliação entre dispositivos | `reconciliacaoDeSaves.ts` — vence o carimbo mais recente, não o lado. Antes a nuvem vencia incondicionalmente e uma sessão só local sumia em silêncio |
+| Migração de saves | `migrate()` com `schemaVersion`; `updatedAt` ausente é tratado como save anterior ao carimbo |
+| Radar: toque errado isolado não gera diagnóstico | `radarOficina.e2e.test.ts` — três toques na mesma questão chegam ao Radar como um evento só |
+| Radar: erro motor é filtrado | `filtroMotor.ts` (§8.3-bis) + sonda de mutação: desligar o filtro derruba 6 testes |
+| Radar: misconception exige padrão | `getRescueItems` exige 2 ocorrências da mesma tag em ≤ 5 erros e ≤ 10 min |
+| Radar: tags deduplicadas | `Set` em `QuestionDiagnostics`; coberto por `questionDiagnostics.test.ts` |
+| Radar: recuperação observável | `recoveredAfterError`, preservado do envenenamento pelo filtro motor |
+| Oficina: ajuda concreta e não punitiva | escada acelerada de 2 acertos dentro do resgate (`progressEngine.test.ts`) |
+| Oficina: limite de resgates | `RESCUE_ESCALATION_LIMIT = 3`, com sondagem do pré-requisito anterior |
+| Oficina: retorno coerente | alvo é destravar (`RESCUE_UNLOCK_LEVEL`), nunca coroar; sem ficha real, retorna `null` em vez de fallback |
+| Custo de writes por sessão | `sincronizadorDeNuvem.ts` — 10 gravações do save por missão viram 1; upload anual cai de ~1,3 GB para ~136 MB. Medido, não estimado: `DADOS_E_RETENCAO.md` §3 |
+| Retenção | log diário 366 dias, hipóteses do Radar 15 por nó, telemetria 550 dias via campo `expiraEm` (TTL do Firestore). `DADOS_E_RETENCAO.md` §2 |
+| Ausência de dados pessoais desnecessários | inventário campo a campo em `DADOS_E_RETENCAO.md` §1. Um campo redundante removido (`parentUserId`); nenhum outro dado sem justificativa |
+
+**Dependência de ordem que vale registrar:** o amortecedor de gravações só é
+seguro porque a reconciliação por carimbo veio antes. Na ordem inversa, coalescer
+gravações teria aberto uma janela real de perda de progresso — o app fecharia com
+gravação pendente e a nuvem antiga venceria na abertura seguinte.
 
 ### Andar 6 — Migração gradual de F2
 Famílias pequenas: reagrupamento, grupos iguais, arranjos, problemas aditivos,

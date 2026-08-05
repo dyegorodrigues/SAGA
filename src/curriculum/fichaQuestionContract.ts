@@ -1,6 +1,14 @@
 import { Option, Question } from "../types";
 import { FichaParams } from "./schema";
 import { StoryBarsSpec } from "./procedimentos/storyBarsContract";
+import { TabuadaSpec } from "./procedimentos/tabuadaContract";
+import { DecomposicaoSpec } from "./procedimentos/decomposicaoContract";
+import { AncoraSpec } from "./procedimentos/ancoraContract";
+import { FamiliaSpec } from "./procedimentos/familiaContract";
+import { DeslocamentoSpec } from "./procedimentos/deslocamentoContract";
+import { AreaSpec } from "./procedimentos/areaContract";
+import { PareamentoSpec } from "./procedimentos/pareamentoContract";
+import { TouchCountSpec } from "./procedimentos/touchCountContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -26,6 +34,14 @@ export type FichaUiProps =
   | { vTop: number; vBot: number; vOp: "+" | "-"; showPlaceValue?: boolean; showRegroup?: boolean; showAlgorithm?: boolean }
   | { rows: number; cols: number; allowRotate: boolean; requireRotate: boolean; areaMode: boolean; showEquation: boolean; answerMode: "total" | "equation" }
   | StoryBarsSpec
+  | TabuadaSpec
+  | DecomposicaoSpec
+  | AncoraSpec
+  | FamiliaSpec
+  | DeslocamentoSpec
+  | AreaSpec
+  | PareamentoSpec
+  | TouchCountSpec
   | { text: string };
 
 interface BalanceItem {
@@ -35,6 +51,14 @@ interface BalanceItem {
 }
 
 export interface ComposerParams {
+  /**
+   * O modo da primitiva, quando ela tem mais de um.
+   *
+   * `TouchCount` aceita `"toque"` (F01) e `"ritmico"` (F27). Quem manda é a
+   * FICHA: deduzir o modo pelo id da competência funcionaria com duas e falharia
+   * em silêncio na terceira.
+   */
+  modo?: string;
   n_min?: number;
   n_max?: number;
   flash_ms?: number;

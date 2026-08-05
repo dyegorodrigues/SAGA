@@ -1,0 +1,58 @@
+name: Publicar regras do Firestore
+
+# As regras só valem depois de publicadas no projeto Firebase. Enquanto isso não
+# acontece, o arquivo do repositório é apenas intenção.
+#
+# Este workflow torna a publicação automática, mas depende de credencial que
+# ainda não existe. Sem o segredo, ele avisa e encerra sem falhar — de propósito,
+# para não pintar o repositório de vermelho por uma configuração pendente.
+#
+# Como ligar: AI_Studio_Lab/PUBLICAR_REGRAS_FIRESTORE.md, caminho B.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - firestore.rules
+      - .github/workflows/deploy-rules.yml
+  workflow_dispatch:
+
+jobs:
+  publicar:
+    name: Publicar regras
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar se a credencial existe
+        id: credencial
+        env:
+          CONTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PROJETO: ${{ vars.FIREBASE_PROJECT_ID }}
+        run: |
+          if [ -z "$CONTA" ] || [ -z "$PROJETO" ]; then
+            echo "pronto=nao" >> "$GITHUB_OUTPUT"
+            echo "::notice::Credencial do Firebase ausente. As regras precisam ser publicadas pelo Console — ver AI_Studio_Lab/PUBLICAR_REGRAS_FIRESTORE.md."
+          else
+            echo "pronto=sim" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.credencial.outputs.pronto == 'sim'
+        with:
+          node-version: '22'
+
+      - name: Publicar no Firebase
+        if: steps.credencial.outputs.pronto == 'sim'
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: /tmp/conta-servico.json
+          CONTA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          printf '%s' "$CONTA" > /tmp/conta-servico.json
+          npx --yes firebase-tools@latest deploy \
+            --only firestore:rules \
+            --project "${{ vars.FIREBASE_PROJECT_ID }}" \
+            --non-interactive
+          rm -f /tmp/conta-servico.json
