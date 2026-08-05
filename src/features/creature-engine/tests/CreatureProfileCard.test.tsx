@@ -96,13 +96,13 @@ describe("CreatureProfileCard", () => {
     const onUpdateKid = vi.fn();
     render(<CreatureProfileCard kid={kid} state={baseState()} onUpdateKid={onUpdateKid} />);
 
-    expect(screen.getByRole("button", { name: /Comer/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Brincar/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Dormir/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Carinho/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Treinar/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Comer/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Brincar/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Dormir/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Carinho/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Treinar/ })).toBeTruthy();
 
-    await waitFor(() => expect(screen.getByTestId("pmd-sprite")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId("pmd-sprite")).toBeTruthy());
     await waitFor(() => expect(onUpdateKid).toHaveBeenCalled());
     const persisted = onUpdateKid.mock.calls.at(-1)?.[0] as Kid & { creature?: { learning?: { stars?: number } } };
     expect(persisted.creature?.learning?.stars).toBe(20);
@@ -122,7 +122,7 @@ describe("CreatureProfileCard", () => {
     };
     expect(persisted.creature?.needs?.satiety).toBe(100);
     expect(persisted.creature?.lastReaction).toBe("eat");
-    expect(screen.getByRole("status")).toHaveTextContent(/recuperou energia/);
+    expect(screen.getByRole("status").textContent).toMatch(/recuperou energia/);
   });
 
   it("renames the partner through an accessible input", async () => {
@@ -136,7 +136,7 @@ describe("CreatureProfileCard", () => {
     fireEvent.change(input, { target: { value: "Raio" } });
     fireEvent.click(screen.getByRole("button", { name: "Salvar nome" }));
 
-    expect(screen.getByText(/Raio/)).toBeInTheDocument();
+    expect(screen.getByText(/Raio/)).toBeTruthy();
     const persisted = onUpdateKid.mock.calls.at(-1)?.[0] as Kid & { creature?: { nickname?: string } };
     expect(persisted.creature?.nickname).toBe("Raio");
   });
