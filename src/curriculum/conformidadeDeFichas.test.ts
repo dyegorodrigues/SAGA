@@ -66,7 +66,11 @@ function exigenciasDasFichas(): Exigencia[] {
       // linha tem outras crases — `arranjo`, por exemplo, é campo-chave da ficha,
       // não primitiva, e entrava na conta como se fosse componente faltando.
       const trecho = linha.split(/\*\*Primitiva:\*\*/)[1]?.split(/\*\*[A-ZÀ-Ú]/)[0] ?? "";
-      const primitivas = [...trecho.matchAll(/`([A-Za-z][A-Za-z0-9]*)`/g)].map(m => m[1]);
+      // O MODO conta como linguagem visual distinta. `ArrayGrid` para CONTAR e
+      // `ArrayGrid (modo área)` para LER MEDIDAS são dois desenhos diferentes, e
+      // tratá-los como o mesmo foi como o modelo de área estreou sem alfabeto.
+      const primitivas = [...trecho.matchAll(/`([A-Za-z][A-Za-z0-9]*)`\s*(?:\(modo ([^)]+)\))?/g)]
+        .map(m => (m[2] ? `${m[1]}#${m[2].trim()}` : m[1]));
       fora.push({ ficha: fichaAtual, competencia: decl[1], primitivas });
     }
   }
@@ -181,9 +185,16 @@ function primitivasExigidas(id: string): string[] {
   return [...new Set(fichas.flatMap(f => f.primitivas))].filter(p => !NAO_E_PRIMITIVA.has(p));
 }
 
-/** As que ela exige e o código não tem. */
+/**
+ * As que ela exige e o código não tem.
+ *
+ * A comparação é pela BASE, sem o modo: o arquivo chama-se `NumberBond.tsx`,
+ * não `NumberBond#triângulo.tsx`. O modo importa para a PROGRESSÃO (um modo novo
+ * é um desenho novo) e não para a existência do componente.
+ */
 function primitivasAusentes(id: string): string[] {
-  return primitivasExigidas(id).filter(p => !existem.has(p));
+  return [...new Set(primitivasExigidas(id).map(p => p.split("#")[0]))]
+    .filter(base => !existem.has(base));
 }
 
 describe("conformidade entre as fichas e o que o app serve", () => {
@@ -241,6 +252,69 @@ describe("conformidade entre as fichas e o que o app serve", () => {
     console.log(`\n=== TELA DIVERGE DA FICHA (${divergentes.length} de ${TODAS.length}) ===`);
     console.log(divergentes.join("\n"));
     if (naoAmostrados.length) console.log(`\n(não amostradas: ${naoAmostrados.join(", ")})`);
+  });
+
+  it("imprime a LINGUAGEM VISUAL que estreia sem alfabeto", () => {
+    // A causa-raiz dos erros pedagógicos (§6.36): cada tela era verificada
+    // contra a própria ficha, isolada, e nunca contra a HISTÓRIA da criança.
+    // Assim qualquer competência podia estrear um desenho novo com cara de
+    // continuidade — correto, testado, acessível e incompreensível.
+    //
+    // Aqui a pergunta que faltava vira conta: *a linguagem visual desta tela
+    // apareceu antes, na cadeia de pré-requisitos?*
+    //
+    // Não falha: é levantamento. Falhar pararia o projeto, já que o cânone
+    // inteiro foi escrito sem esta verificação existir.
+    const prereqsDe = new Map<string, string[]>(
+      (ALL_MATH_TRACKS as any[]).map(t => [t.id as string, (t.prereqs ?? []) as string[]]),
+    );
+
+    /** Toda competência que vem ANTES desta, transitivamente. */
+    function ancestrais(id: string): Set<string> {
+      const vistos = new Set<string>();
+      const fila = [...(prereqsDe.get(id) ?? [])];
+      while (fila.length) {
+        const atual = fila.shift()!;
+        if (vistos.has(atual)) continue;
+        vistos.add(atual);
+        fila.push(...(prereqsDe.get(atual) ?? []));
+      }
+      return vistos;
+    }
+
+    const trocaDeModo: string[] = [];
+    const ferramentaNova: string[] = [];
+    const raizes: string[] = [];
+
+    for (const id of TODAS) {
+      if (!porCompetencia.has(id)) continue;
+      const antes = ancestrais(id);
+      const jaVistas = new Set([...antes].flatMap(a => primitivasExigidas(a)));
+      const basesVistas = new Set([...jaVistas].map(p => p.split("#")[0]));
+      const estreando = primitivasExigidas(id).filter(p => !jaVistas.has(p));
+      if (estreando.length === 0) continue;
+
+      for (const p of estreando) {
+        const [base, modo] = p.split("#");
+        const linha = `${id}\t${p}\t(${antes.size} pré-requisitos)`;
+        if (antes.size === 0) { raizes.push(linha); continue; }
+        // A classe perigosa: a criança JÁ CONHECE a ferramenta e o desenho
+        // mudou de idioma sem aviso. Ela acha que sabe ler, e não sabe.
+        if (modo && basesVistas.has(base)) trocaDeModo.push(`${id}\t${base} vira "${modo}"\t(vinha de ${antes.size} nós usando ${base})`);
+        else ferramentaNova.push(linha);
+      }
+    }
+
+    console.log(`\n=== TROCA DE MODO SEM AVISO — a classe mais perigosa (${trocaDeModo.length}) ===`);
+    console.log("A criança já viu a ferramenta e o desenho mudou de idioma. Ela acha que sabe ler.");
+    console.log(trocaDeModo.join("\n"));
+
+    console.log(`\n=== FERRAMENTA NOVA SEM PRECEDENTE (${ferramentaNova.length}) ===`);
+    console.log("Estreia legítima quando a ferramenta É o assunto; grave quando o assunto também é novo.");
+    console.log(ferramentaNova.join("\n"));
+
+    console.log(`\n=== ESTREIAS NA RAIZ (${raizes.length}) ===`);
+    console.log(raizes.join("\n"));
   });
 
   it("imprime o quadro completo", () => {
