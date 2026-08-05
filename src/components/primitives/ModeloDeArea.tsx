@@ -252,12 +252,12 @@ export function ModeloDeArea({
             const cor = COR_DA_COLUNA[indiceDaColuna(regioes, i) % 2];
             return (
               <React.Fragment key={i}>
-                {i > 0 && <span className="text-slate-400"> + </span>}
+                {i > 0 && <span className="text-slate-600"> + </span>}
                 <span style={{ color: cor.tinta }}>{r.valor}</span>
               </React.Fragment>
             );
           })}
-          <span className="text-slate-400"> = </span>?
+          <span className="text-slate-600"> = </span>?
         </p>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import {
   Conta, Regiao, alternativas, corteVemMarcado, falaDoCorte,
-  mostraAlgoritmo, mostraArea, partir, regioes, resolver, separaRegioes,
+  algoritmoSoNaAula, mostraAlgoritmo, mostraArea, partir, regioes, resolver, separaRegioes,
 } from "./areaProcedure";
 
 /**
@@ -75,6 +75,13 @@ export interface AreaSpec {
   corte: string | null;
   /** A conta armada ao lado, com as parcelas mas SEM o total. */
   algoritmo: LinhaDoAlgoritmo[] | null;
+  /**
+   * A conta armada só deve aparecer durante a micro-aula (nível 4).
+   *
+   * Ela existe no spec — a aula precisa dela — mas a tela a esconde enquanto a
+   * criança responde. Ver `algoritmoSoNaAula` e Bíblia §12.3-bis.
+   */
+  algoritmoSoNaAula: boolean;
   alternativas: { valor: number; tag: string }[];
   resposta: number;
   /** A conta fechada — só depois de responder. */
@@ -142,6 +149,7 @@ export function construirAreaSpec(c: Conta, nivel: number): AreaSpec {
     regioesSeparadas: separaRegioes(nivel),
     corte: comArea ? falaDoCorte(c) : null,
     algoritmo: mostraAlgoritmo(nivel) ? montarAlgoritmo(c) : null,
+    algoritmoSoNaAula: algoritmoSoNaAula(nivel),
     alternativas: alternativas(c).map(a => ({ valor: a.valor, tag: a.tag })),
     resposta: resolver(c),
     recapitulacao: `${c.a} × ${c.b} = ${resolver(c)}`,

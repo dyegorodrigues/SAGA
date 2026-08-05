@@ -157,6 +157,31 @@ export function mostraAlgoritmo(nivel: number): boolean {
   return nivel >= 3;
 }
 
+/**
+ * No nível 4, a conta armada só aparece DURANTE a micro-aula.
+ *
+ * Bíblia §12.3-bis — *divulgação progressiva, uma tela nunca mostra tudo de uma
+ * vez*: três ou mais representações simultâneas são "excelente para **ensinar**
+ * e péssimo para **avaliar**". O nível 4 tinha cinco: duas aberturas, quatro
+ * regiões com conta dentro, a soma de quatro parcelas, a conta armada de duas
+ * linhas e a dica.
+ *
+ * E há um agravante próprio do nível 4: no nível 3 a correspondência é **uma
+ * região para uma linha**; no 4 são **quatro regiões para duas linhas** — cada
+ * linha vale duas regiões. É a parte mais difícil de enxergar do modelo inteiro,
+ * e estava sendo entregue estática, no meio do exercício, sem ninguém apontar.
+ *
+ * A sincronia que a ficha F68 §4 pede **continua acontecendo** — muda de lugar.
+ * Acontece na AULA, onde a voz pode dizer "esta linha aqui é estas duas regiões
+ * juntas". No nível 5 a conta armada volta sozinha, com a área já internalizada.
+ *
+ * Isto não é mudança de cânone: é aplicar o §12.3-bis, que a tabela da F68 §5
+ * estava contrariando sem perceber.
+ */
+export function algoritmoSoNaAula(nivel: number): boolean {
+  return nivel === 4;
+}
+
 /** No nível 5 só sobra o algoritmo: a área já foi internalizada. */
 export function mostraArea(nivel: number): boolean {
   return nivel <= 4;

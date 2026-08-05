@@ -69,9 +69,9 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
           className="flex items-center gap-1 text-xl font-black text-slate-500"
         >
           <span aria-hidden="true">{spec.abertura.inteiro}</span>
-          <span aria-hidden="true" className="text-slate-400">=</span>
+          <span aria-hidden="true" className="text-slate-600">=</span>
           <span aria-hidden="true" style={{ color: "#3730A3" }}>{spec.abertura.dezenas}</span>
-          <span aria-hidden="true" className="text-slate-400">+</span>
+          <span aria-hidden="true" className="text-slate-600">+</span>
           <span aria-hidden="true" style={{ color: "#92400E" }}>{spec.abertura.unidades}</span>
         </p>
       )}
@@ -86,9 +86,9 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
           className="-mt-2 flex items-center gap-1 text-xl font-black text-slate-500"
         >
           <span aria-hidden="true">{spec.aberturaDoMultiplicador.inteiro}</span>
-          <span aria-hidden="true" className="text-slate-400">=</span>
+          <span aria-hidden="true" className="text-slate-600">=</span>
           <span aria-hidden="true">{spec.aberturaDoMultiplicador.dezenas}</span>
-          <span aria-hidden="true" className="text-slate-400">+</span>
+          <span aria-hidden="true" className="text-slate-600">+</span>
           <span aria-hidden="true">{spec.aberturaDoMultiplicador.unidades}</span>
         </p>
       )}
@@ -104,7 +104,11 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
         />
       )}
 
-      {spec.algoritmo && (
+      {/* No nível 4 a conta armada fica só na aula: quatro regiões MAIS o
+          algoritmo na mesma tela são cinco representações simultâneas, que a
+          Bíblia §12.3-bis classifica como boas para ensinar e péssimas para
+          avaliar. A sincronia região↔linha continua — acontece na aula. */}
+      {spec.algoritmo && (!spec.algoritmoSoNaAula || Boolean(mostrar)) && (
         <div
           role="math"
           aria-label={`Conta armada: ${spec.algoritmo.map(l => `${l.conta} dá ${l.parcela}`).join(", ")}. Falta somar.`}
