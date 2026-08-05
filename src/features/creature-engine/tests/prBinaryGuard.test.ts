@@ -9,7 +9,7 @@ describe('PR binary guard wiring', () => {
     expect(gitignore).toContain('public/assets/creatures/pokemon-pmd/*.png');
     expect(gitignore).toContain('public/assets/creatures/pokemon-pmd/*.webp');
     expect(packageJson.scripts['pr:prepare']).toBe(
-      'npm run assets:pokemon-pmd:clean && npm run pr:check && npm run assets:pokemon-pmd:verify',
+      'PR_BASE=${PR_BASE:-ea191c2} npm run assets:pokemon-pmd:clean && PR_BASE=${PR_BASE:-ea191c2} npm run pr:check && PR_BASE=${PR_BASE:-ea191c2} npm run assets:pokemon-pmd:verify',
     );
     expect(packageJson.scripts['assets:pokemon-pmd:verify']).toBe('node scripts/guard-pr-binaries.cjs');
   });

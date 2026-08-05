@@ -1,14 +1,34 @@
 const { execFileSync } = require('node:child_process');
 const { extname } = require('node:path');
 
-const base = process.env.PR_BASE || 'origin/main';
+const fallbackBase = 'ea191c2';
+const requestedBase = process.env.PR_BASE || 'origin/main';
 const blockedExtensions = new Set(['.png', '.jpg', '.jpeg', '.gif', '.webp', '.pdf', '.zip']);
 
+function git(args) {
+  return execFileSync('git', args, { encoding: 'utf8' });
+}
+
 function gitLines(args) {
-  return execFileSync('git', args, { encoding: 'utf8' })
+  return git(args)
     .split('\n')
     .map((line) => line.trim())
     .filter(Boolean);
+}
+
+function hasRevision(revision) {
+  try {
+    git(['rev-parse', '--verify', '--quiet', revision]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const base = hasRevision(requestedBase) ? requestedBase : fallbackBase;
+if (!hasRevision(base)) {
+  console.error(`[PMD BINARY GUARD] Base não encontrada: ${requestedBase}; fallback indisponível: ${fallbackBase}`);
+  process.exit(1);
 }
 
 function assertNoBlocked(label, paths) {

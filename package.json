@@ -19,7 +19,7 @@
     "contrato": "vitest run",
     "assets:pokemon-pmd": "node scripts/pokemon-pmd-assets.cjs generate",
     "assets:pokemon-pmd:clean": "node scripts/pokemon-pmd-assets.cjs clean",
-    "pr:prepare": "npm run assets:pokemon-pmd:clean && npm run pr:check && npm run assets:pokemon-pmd:verify",
+    "pr:prepare": "PR_BASE=${PR_BASE:-ea191c2} npm run assets:pokemon-pmd:clean && PR_BASE=${PR_BASE:-ea191c2} npm run pr:check && PR_BASE=${PR_BASE:-ea191c2} npm run assets:pokemon-pmd:verify",
     "assets:pokemon-pmd:verify": "node scripts/guard-pr-binaries.cjs"
   },
   "dependencies": {
