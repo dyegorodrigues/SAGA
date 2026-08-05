@@ -9,8 +9,14 @@ on:
       - "server/services/creatureSpriteService*"
       - "scripts/creature-pmd-smoke.cjs"
       - "package.json"
+      - "docs/CREATURE_ENGINE.md"
+      - "docs/GOOGLE_AI_STUDIO_CREATURE_ENGINE.md"
       - ".github/workflows/creature-engine-ci.yml"
   workflow_dispatch:
+
+concurrency:
+  group: creature-engine-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
