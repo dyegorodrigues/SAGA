@@ -19,14 +19,20 @@
  *
  * | Operação | Cor | Contraste no branco | Mínimo WCAG |
  * |---|---|---|---|
- * | adição | `#00704A` | 6,15:1 | 4,5:1 |
- * | subtração | `#B34700` | 5,50:1 | 4,5:1 |
- * | multiplicação | `#7B2D8E` | 8,05:1 | 4,5:1 |
- * | divisão | `#0072B2` | 5,19:1 | 4,5:1 |
+ * | adição | `#2563EB` azul | 5,17:1 | 4,5:1 |
+ * | subtração | `#C2410C` laranja | 5,18:1 | 4,5:1 |
+ * | multiplicação | `#7E22CE` roxo | 6,98:1 | 4,5:1 |
+ * | divisão | `#0F766E` verde-petróleo | 5,47:1 | 4,5:1 |
  *
- * Sob simulação de deuteranopia (o daltonismo mais comum), os seis pares
- * ficaram entre 74 e 231 de distância — todos acima do limiar de 60 em que duas
- * cores passam a colidir.
+ * **A escolha é estética, e o dono do projeto decide.** O azul foi para a
+ * adição por ser a operação que a criança mais vê. Frio e quente separam a
+ * família aditiva (azul e laranja); roxo e verde-petróleo, a multiplicativa.
+ *
+ * A verificação de daltonismo é **rede de segurança, não decisão de design** —
+ * ela não escolhe a cor, só avisa se a escolha ficou ilegível. E ela não
+ * precisa dirigir nada, porque quem carrega o significado é o SÍMBOLO. Ainda
+ * assim: os seis pares ficaram entre 66 e 212 de distância sob deuteranopia,
+ * todos acima do limiar de 60.
  *
  * **O que ficou de fora, e por quê.** O vermelho é cor de erro no SAGA, e o
  * cânone proíbe vermelho de reprovação em tela de criança (§11.6) — uma operação
@@ -53,10 +59,10 @@ export interface EstiloDaOperacao {
 }
 
 export const OPERACAO: Record<Operacao, EstiloDaOperacao> = {
-  adicao: { simbolo: "+", cor: "#00704A", fundo: "#ECFDF5", verbo: "somados" },
-  subtracao: { simbolo: "−", cor: "#B34700", fundo: "#FFF7ED", verbo: "subtraídos" },
-  multiplicacao: { simbolo: "×", cor: "#7B2D8E", fundo: "#FAF5FF", verbo: "multiplicados" },
-  divisao: { simbolo: "÷", cor: "#0072B2", fundo: "#EFF6FF", verbo: "divididos" },
+  adicao: { simbolo: "+", cor: "#2563EB", fundo: "#EFF6FF", verbo: "somados" },
+  subtracao: { simbolo: "−", cor: "#C2410C", fundo: "#FFF7ED", verbo: "subtraídos" },
+  multiplicacao: { simbolo: "×", cor: "#7E22CE", fundo: "#FAF5FF", verbo: "multiplicados" },
+  divisao: { simbolo: "÷", cor: "#0F766E", fundo: "#F0FDFA", verbo: "divididos" },
 };
 
 /** A operação inversa — a que desfaz. */
