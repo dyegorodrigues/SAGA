@@ -23,6 +23,20 @@ describe("multiplicar por dez é DESLOCAR, não acrescentar zero", () => {
     expect(falaDaPromocao(10)).not.toMatch(/\d/);
   });
 
+  it("dizendo 'cada peça', o texto precisa listar TODAS as viagens", () => {
+    // O erro anterior: "cada peça sobe duas casas: cubinho vira placa" —
+    // prometia CADA e entregava UMA. Numa pergunta como 33 × 100 a criança tem
+    // barras e cubinhos, e metade do material dela ficava sem explicação.
+    for (const multiplicador of [10, 100]) {
+      const texto = falaDaPromocao(multiplicador);
+      const viagens = (texto.match(/vira/g) ?? []).length;
+      const esperado = 4 - ordensDeslocadas(multiplicador); // 4 casas
+      expect(viagens, `${texto} — ${viagens} viagens, esperado ${esperado}`).toBe(esperado);
+      expect(texto).toContain("cubinho");
+      expect(texto).toContain("barra");
+    }
+  });
+
   it("o material representa o número ANTES, nunca o depois", () => {
     expect(materialDe(23)).toEqual({ centenas: 0, dezenas: 2, unidades: 3 });
     expect(materialDe(230)).toEqual({ centenas: 2, dezenas: 3, unidades: 0 });

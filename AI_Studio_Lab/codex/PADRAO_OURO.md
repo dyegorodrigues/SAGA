@@ -455,9 +455,10 @@ origem do segundo, e o olho lia "duas barras" sem entender por quê.
 Pior: o desenho **ignorava quantas ordens sobem**. O ×100 saía idêntico ao ×10,
 com outro texto por baixo — dois níveis inteiros com a mesma figura.
 
-→ A forma certa é a **escada das casas** (UNIDADE · DEZENA · CENTENA), porque é
-isso que "subir uma casa" literalmente significa. Cada peça aparece **uma vez**,
-no lugar dela, e a criança vê PARA ONDE sobe.
+→ A forma certa é a **escada das casas** (UNIDADE · DEZENA · CENTENA · MILHAR —
+a quarta casa veio depois, ver §6.27), porque é isso que "subir uma casa"
+literalmente significa. Cada peça aparece **uma vez**, no lugar dela, e a
+criança vê PARA ONDE sobe.
 → **Setas são o caminho; casas são as paradas.** No ×100 as duas setas acendem
 (a peça percorre o caminho inteiro) e a dezena fica apagada (a peça não para
 nela). Apagar a primeira seta sugeriria que o caminho nem começa na unidade.
@@ -472,3 +473,44 @@ errado — e teste nenhum mede isso.
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.
+
+### 6.27 O texto prometia mais do que o desenho entregava
+A escada tinha **três** casas e o ×100 dizia "**cada** peça sobe duas casas: o
+cubinho vira placa". O desenho mostrava **uma** viagem: a da barra —
+dezena→milhar — caía fora da escada. Numa pergunta como `33 × 100`, metade do
+material da criança ficava sem explicação, e a palavra "cada" virava mentira.
+*(Apontado por um adulto: "cada uma sobe duas casas, não está errado isso aí?")*
+
+→ A escada precisa de **quatro** casas (UNIDADE · DEZENA · CENTENA · MILHAR)
+para que toda peça que sobe tenha para onde ir. Com quatro, o ×10 desenha três
+saltos de um degrau e o ×100 desenha dois saltos de dois — e "cada peça" passa a
+ser verdade no desenho.
+→ O desenho é gerado a partir das viagens (`origem + degraus < casas`), não
+escrito à mão. Quantificador em texto (`cada`, `todo`, `sempre`) é **promessa
+que o desenho tem que cumprir**: ou o desenho enumera, ou o texto perde o
+quantificador.
+→ O teste que segura isso conta as viagens no texto falado
+(`ocorrências de "vira" === 4 − ordens`), não confere uma frase fixa.
+
+**Regra geral:** antes de escrever qualquer frase de apoio, pergunte *"o desenho
+mostra tudo o que esta frase afirma?"*. Se não mostra, a frase está errada
+mesmo que a matemática esteja certa.
+
+### 6.28 Peça vazando da caixa imprime o rótulo por cima dela
+O cubão do milhar são três placas empilhadas com recuo. A caixa dele tinha a
+altura de **uma** placa, então as de trás vazavam por baixo e o rótulo `MILHAR`
+saía impresso **por cima da peça** — ilegível justamente na casa nova, a que a
+criança precisa aprender.
+
+Nenhum teste pegou: o jsdom **não faz layout**, então `render` + `getByText`
+acham o rótulo e passam mesmo com ele escondido atrás do desenho.
+
+→ Quando a geometria é calculada (empilhamento, recuo, sobreposição), ela sai do
+JSX e vira **função exportada** (`placasDoCubao()`, `PLACA`, `FAIXA`). Aí a
+continência vira aritmética: `left + PLACA ≤ FAIXA`, `top + PLACA ≤ FAIXA`.
+→ Sonda de mutação obrigatória: zerar o recuo tem que **quebrar** o teste.
+→ Constante mágica (`height: 40` ao lado de uma placa de 41px) é o cheiro. Toda
+dimensão que depende de outra se **deriva**, não se digita.
+
+**Irmão de §6.12 e §6.16:** o jsdom não mede nada. Toda vez que o defeito é de
+LAYOUT, ou existe uma conta que o teste faz, ou só a captura de tela pega.

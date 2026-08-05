@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import { DeslocamentoStage } from "./DeslocamentoStage";
+import { FAIXA, PLACA, placasDoCubao } from "./PromocaoDeOrdem";
 import { Composer } from "../../curriculum/Composer";
 import { N4_08 } from "../../curriculum/fichas/jornada/N4.08";
 import { DeslocamentoSpec } from "../../curriculum/procedimentos/deslocamentoContract";
@@ -108,8 +109,24 @@ describe("a micro-aula da promoção", () => {
       expect(r).toContain("cubinho");
       expect(r).toMatch(/unidade|dezena|centena/);
     }
-    expect(rotuloCem).toContain("pulando a dezena");
+    // O ×100 precisa dizer que uma casa fica de fora do caminho — é isso que
+    // distingue "sobe duas" de "sobe uma, duas vezes". Antes o texto dizia
+    // "pulando a dezena", verdade só para o cubinho: a barra pula a CENTENA.
+    expect(rotuloCem).toContain("pulando uma casa");
+    expect(rotuloDez).not.toContain("pulando");
     expect(rotuloDez).not.toBe(rotuloCem);
+  });
+
+  it("nenhuma placa do cubão vaza da caixa dele", () => {
+    // O rótulo MILHAR saiu impresso POR CIMA da peça: a caixa tinha a altura de
+    // uma placa e as três empilhadas ocupavam mais. Nenhum teste pegou porque o
+    // jsdom não faz layout — só a captura de tela mostrou. A geometria virou
+    // função justamente para esta conta existir. Ver Padrão Ouro §6.28.
+    for (const { left, top } of placasDoCubao()) {
+      expect(left + PLACA, "vaza pela direita").toBeLessThanOrEqual(FAIXA);
+      expect(top + PLACA, "vaza por baixo").toBeLessThanOrEqual(FAIXA);
+      expect(Math.min(left, top), "vaza por cima ou pela esquerda").toBeGreaterThanOrEqual(0);
+    }
   });
 
   it("a demonstração explica a promoção sem citar número algum", () => {

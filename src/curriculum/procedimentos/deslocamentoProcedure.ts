@@ -52,11 +52,22 @@ export function materialDe(numero: number): { centenas: number; dezenas: number;
   };
 }
 
-/** Como a voz descreve a promoção, sem dizer o resultado. */
+/**
+ * Como a voz descreve a promoção, sem dizer o resultado.
+ *
+ * **O texto tem que cobrir as MESMAS viagens que o desenho mostra.** A versão
+ * anterior dizia "cada peça sobe duas casas: cubinho vira placa" — prometia
+ * *cada* e entregava *uma*. Numa pergunta como `33 × 100`, a criança tem barras
+ * e cubinhos, e o texto explicava só metade do material dela.
+ */
 export function falaDaPromocao(multiplicador: number): string {
   const ordens = ordensDeslocadas(multiplicador);
-  if (ordens === 2) return "cada peça sobe duas casas: cubinho vira placa";
-  if (ordens === 1) return "cada peça sobe uma casa: cubinho vira barra, barra vira placa";
+  if (ordens === 2) {
+    return "cada peça sobe duas casas: o cubinho vira placa, a barra vira cubão";
+  }
+  if (ordens === 1) {
+    return "cada peça sobe uma casa: o cubinho vira barra, a barra vira placa, a placa vira cubão";
+  }
   return "";
 }
 
