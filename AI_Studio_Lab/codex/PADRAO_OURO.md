@@ -445,7 +445,30 @@ Promover as vinte e nove peças da tela mostraria o resultado — seria entregar
 resposta com aparência de aula. Uma peça ensina a regra e deixa a aplicação para
 a criança, que é o que se quer treinar.
 
-### 6.24 O Vitest não checa tipos
+### 6.25 O apoio visual precisa ser LIDO, não só estar correto
+A primeira micro-aula do deslocamento mostrava dois passos lado a lado:
+cubinho→barra e barra→placa. Estava tecnicamente certa e era ilegível — a barra
+aparecia **duas vezes**, uma como resultado do primeiro passo e outra como
+origem do segundo, e o olho lia "duas barras" sem entender por quê.
+*(Apontado por um adulto: "por que duas barras dentro do 14 × 10?")*
+
+Pior: o desenho **ignorava quantas ordens sobem**. O ×100 saía idêntico ao ×10,
+com outro texto por baixo — dois níveis inteiros com a mesma figura.
+
+→ A forma certa é a **escada das casas** (UNIDADE · DEZENA · CENTENA), porque é
+isso que "subir uma casa" literalmente significa. Cada peça aparece **uma vez**,
+no lugar dela, e a criança vê PARA ONDE sobe.
+→ **Setas são o caminho; casas são as paradas.** No ×100 as duas setas acendem
+(a peça percorre o caminho inteiro) e a dezena fica apagada (a peça não para
+nela). Apagar a primeira seta sugeriria que o caminho nem começa na unidade.
+→ O rótulo falado nomeia a **peça E a casa**: só casa é abstrato demais para
+quem ouve, só peça perde o "para onde", que é o conceito.
+
+**A regra geral:** todo elemento visual precisa responder *"por que ele está
+aqui e o que a criança entende ao olhar"*. Correto e ilegível é o mesmo que
+errado — e teste nenhum mede isso.
+
+### 6.26 O Vitest não checa tipos
 `applyJourneyAnswer(salvo, true, 1500)` passou no Vitest — o terceiro parâmetro
 é `isWarmup: boolean`. Só o `tsc` pegou.
 → `npx tsc --noEmit` é portão obrigatório, não opcional.

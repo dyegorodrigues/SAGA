@@ -74,6 +74,44 @@ describe("a micro-aula da promoção", () => {
     expect(container.querySelector('[aria-label^="Demonstração"]')).not.toBeNull();
   });
 
+  it("cada peça aparece UMA vez, na casa dela", () => {
+    // A primeira versão mostrava cubinho→barra e barra→placa lado a lado, e a
+    // barra aparecia duas vezes: resultado de um passo e origem do outro. O olho
+    // lia "duas barras" sem entender por quê. Ver Padrão Ouro §6.25.
+    const { container } = render(
+      <DeslocamentoStage spec={spec(1)} mostrar={{ promoverOrdens: true }} />);
+    const demo = container.querySelector('[aria-label^="Demonstração"]')!;
+    const texto = demo.textContent ?? "";
+    expect((texto.match(/UNIDADE/g) ?? []).length).toBe(1);
+    expect((texto.match(/DEZENA/g) ?? []).length).toBe(1);
+    expect((texto.match(/CENTENA/g) ?? []).length).toBe(1);
+  });
+
+  it("o ×100 desenha DIFERENTE do ×10 — dois degraus, não um", async () => {
+    // A versão anterior ignorava quantas ordens sobem: o nível 2 mostrava a
+    // mesma figura do nível 1 com outro texto por baixo.
+    const dez = render(<DeslocamentoStage spec={spec(1)} mostrar={{ promoverOrdens: true }} />);
+    const rotuloDez = dez.container.querySelector('[aria-label^="Demonstração"]')
+      ?.getAttribute("aria-label") ?? "";
+    dez.unmount();
+
+    const cem = render(<DeslocamentoStage spec={spec(2)} mostrar={{ promoverOrdens: true }} />);
+    const rotuloCem = cem.container.querySelector('[aria-label^="Demonstração"]')
+      ?.getAttribute("aria-label") ?? "";
+    cem.unmount();
+
+    expect(rotuloDez).toContain("uma casa");
+    expect(rotuloCem).toContain("duas casas");
+    // Os dois nomeiam a peça E a casa: só casa é abstrato para quem ouve, só
+    // peça perde o "para onde", que é o conceito.
+    for (const r of [rotuloDez, rotuloCem]) {
+      expect(r).toContain("cubinho");
+      expect(r).toMatch(/unidade|dezena|centena/);
+    }
+    expect(rotuloCem).toContain("pulando a dezena");
+    expect(rotuloDez).not.toBe(rotuloCem);
+  });
+
   it("a demonstração explica a promoção sem citar número algum", () => {
     // Promover as vinte e nove peças mostraria o RESULTADO. Uma peça ensina a
     // regra e deixa a aplicação para a criança.
