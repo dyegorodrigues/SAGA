@@ -18,7 +18,8 @@
     "pr:check": "node AI_Studio_Lab/tools/pr_text_guard.cjs",
     "simular": "tsx simulated-learner-real.ts",
     "contrato": "vitest run",
-    "sonda": "node scripts/sonda-layout.mjs"
+    "sonda": "node scripts/sonda-layout.mjs",
+    "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
