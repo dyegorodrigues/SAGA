@@ -199,6 +199,36 @@ Registrado aqui porque a memória da conversa não sobrevive e o repositório si
 recalculam tudo: `npm run fichas:conferir` (conformidade) e `npm run sonda`
 (layout).
 
+## 0. A regra que vale acima de todas as outras
+
+> **Existir não é estar certo.**
+
+Vale para tudo o que já está no repositório, sem exceção:
+
+- **As competências de alfabetização numérica (N1)** não estão prontas só porque
+  jogam. Precisam ser analisadas, revisadas, estudadas — e refeitas onde for o
+  caso.
+- **As primitivas** não estão boas só porque existem. O `Arranjo` precisou de um
+  parâmetro novo; o `InteractiveNumberLine` tinha o marcador tapando o número da
+  pergunta e o botão branco no branco. Toda primitiva é suspeita até ser olhada.
+- **Os `kind`** herdados do legado idem: um `kind` que devolve múltipla escolha
+  seca onde a ficha manda manipulativo está errado, ainda que funcione.
+- **As fichas** são o cânone, e o cânone é **adaptável**. Se durante a construção
+  aparecer um detalhe que pede reestruturação, isso não é violação: é o cânone
+  aprendendo. O que não pode é mudar sem estudo, sem registro e sem o autor
+  saber. Foi assim que a F68 ganhou o nível de alfabetização.
+
+**A pergunta que todo bloco tem de responder antes de ser dado como feito:**
+*isto está coerente com o aplicativo que o autor começou a construir?* Não com o
+que é mais fácil de programar, não com o que já estava lá.
+
+**E a mais dura:** o que ainda não sabemos que está errado é maior do que o que
+sabemos. Três auditorias executáveis existem justamente porque a inspeção humana
+não escala — mas nenhuma delas substitui alguém olhando a tela e perguntando
+"uma criança entenderia isto?".
+
+---
+
 ## 3-bis. A ORDEM NOVA, depois da descoberta da progressão (5/ago)
 
 A auditoria de progressão mudou a fila. Antes eu ia fechar o N4 e depois pagar
