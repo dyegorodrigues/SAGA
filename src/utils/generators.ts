@@ -1,12 +1,13 @@
 import { gVis_Scattered, gVis_VisualAddition, gVis_LinkingCubesSentence, gVis_Sequence } from "../utils/generatorsVisual";
-import { N1_01 } from "../curriculum/fichas/jornada/N1.01";
-import { Composer } from "../curriculum/Composer";
+import {
+  legadoAL_01,
+  legadoN1_01,
+  legadoN1_03,
+  legadoN1_04,
+  legadoN1_07,
+  legadoN1_08,
+} from "./legadoF0";
 
-import { N1_02 } from "../curriculum/fichas/jornada/N1.02";
-import { N1_03 } from "../curriculum/fichas/jornada/N1.03";
-import { N1_04 } from "../curriculum/fichas/jornada/N1.04";
-import { N1_07 } from "../curriculum/fichas/jornada/N1.07";
-import { N1_10 } from "../curriculum/fichas/jornada/N1.10";
 import { Question, Track } from "../types";
 import {
   C,
@@ -700,11 +701,14 @@ export function gGM_02(lvl: number): Question {
 }
 
 // --- FUNDAÇÃO SAGA: N1.01 a N1.09 ---
+//
+// Estes geradores são o LEGADO de verdade: o alvo de rollback do canário.
+// Até este commit, seis deles chamavam `Composer.generate` direto — serviam
+// ficha autoral enquanto `selectGenerator` os anunciava como `legacy`, e o
+// rollback não devolvia nada. Agora a ficha entra por `COMPOSER_FICHAS` e o
+// legado mora congelado em `legadoF0.ts`. Ver PLANO_DO_BLOCO_F0.md §1.
 export function gN1_01(lvl: number): Question {
-  // Sem microId à mão: a ficha F07 tem UM micro por nível, e o Composer resolve
-  // pelo `niveis[lvl].micro`. Passar "a"/"b" aqui — como a versão anterior
-  // fazia — colapsava os cinco níveis da ficha em dois.
-  return Composer.generate(N1_01, lvl);
+  return legadoN1_01(lvl);
 }
 
 export function gN1_02(lvl: number): Question {
@@ -712,11 +716,11 @@ export function gN1_02(lvl: number): Question {
 }
 
 export function gN1_03(lvl: number): Question {
-  return Composer.generate(N1_03, lvl, lvl <= 2 ? "a" : "b");
+  return legadoN1_03(lvl);
 }
 
 export function gN1_04(lvl: number): Question {
-  return Composer.generate(N1_04, lvl, lvl <= 2 ? "a" : "b");
+  return legadoN1_04(lvl);
 }
 
 export function gN1_05(lvl: number): Question {
@@ -784,21 +788,18 @@ export function gN1_06(lvl: number): Question {
 }
 
 export function gN1_07(lvl: number): Question {
-  return Composer.generate(N1_07, lvl, "a");
+  return legadoN1_07(lvl);
 }
 
-import { N1_08 } from "../curriculum/fichas/jornada/N1.08";
-import { N1_09 } from "../curriculum/fichas/jornada/N1.09";
-import { AL_01 } from "../curriculum/fichas/jornada/AL.01";
 export function gN1_09(lvl: number): Question {
   return gVis_Sequence(lvl);
 }
 export function gN1_08(lvl: number): Question {
-  return Composer.generate(N1_08, lvl, "a");
+  return legadoN1_08(lvl);
 }
 
 export function gAL_01(lvl: number): Question {
-  return Composer.generate(AL_01, lvl, "a");
+  return legadoAL_01(lvl);
 }
 
 

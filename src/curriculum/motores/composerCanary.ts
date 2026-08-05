@@ -8,6 +8,13 @@ import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
 import { N4_09 } from "../fichas/jornada/N4.09";
+import { N1_01 } from "../fichas/jornada/N1.01";
+import { N1_03 } from "../fichas/jornada/N1.03";
+import { N1_04 } from "../fichas/jornada/N1.04";
+import { N1_07 } from "../fichas/jornada/N1.07";
+import { N1_08 } from "../fichas/jornada/N1.08";
+import { N1_10 } from "../fichas/jornada/N1.10";
+import { AL_01 } from "../fichas/jornada/AL.01";
 import { Question, Track } from "../../types";
 
 type Generator = (level: number) => Question;
@@ -29,6 +36,19 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N4.06": N4_06,
   "N4.08": N4_08,
   "N4.09": N4_09,
+
+  // Bloco F0. Estes sete serviam ficha autoral chamando `Composer.generate`
+  // direto de dentro do gerador "legado" — o que fazia `selectGenerator`
+  // classificá-los como `legacy` enquanto entregava conteúdo de ficha, e
+  // transformava o rollback num no-op. Registrados aqui, passam pela mesma
+  // ponte que todos os outros. Ver PLANO_DO_BLOCO_F0.md §1.
+  "N1.01": N1_01,
+  "N1.03": N1_03,
+  "N1.04": N1_04,
+  "N1.07": N1_07,
+  "N1.08": N1_08,
+  "N1.10": N1_10,
+  "AL.01": AL_01,
 };
 
 /**
@@ -38,7 +58,16 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  * gerada, sem exigir rebuild: a decisão é resolvida a cada chamada, não na carga
  * do módulo.
  */
-export const COMPOSER_CANARIES = new Set<string>(["N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08"]);
+export const COMPOSER_CANARIES = new Set<string>([
+  "N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08",
+
+  // Estes seis JÁ eram servidos por ficha em produção antes deste commit, por
+  // fora do mecanismo. Ativá-los aqui não muda uma tela sequer: regulariza um
+  // estado que já existia e passa a permitir rollback, que antes não existia.
+  // Não confundir com ativação de canário novo — essa continua exigindo PR
+  // próprio, e é por isso que o N1.01 NÃO está nesta lista.
+  "N1.03", "N1.04", "N1.07", "N1.08", "N1.10", "AL.01",
+]);
 
 export interface GeneratorBinding {
   /** Resolve a origem a cada questão, refletindo o estado atual dos canários. */

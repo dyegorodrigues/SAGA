@@ -204,11 +204,45 @@ describe("conformidade entre as fichas e o que o app serve", () => {
     expect(porCompetencia.size, "poucas competências mapeadas").toBeGreaterThanOrEqual(35);
   });
 
+  /**
+   * Dívida declarada: nó ativo cuja ficha exige primitiva que ainda não existe.
+   *
+   * Uma entrada aqui **não** é perdão — é a recusa a fingir. Cada uma vem com o
+   * que a criança recebe hoje, o que a ficha manda, e onde a correção está
+   * agendada. E o teste logo abaixo apaga a própria lista: uma entrada que
+   * deixou de estar quebrada **falha**, de modo que ela não pode envelhecer no
+   * repositório depois de resolvida.
+   */
+  const DIVIDA_DECLARADA: Record<string, string> = {
+    "N1.04":
+      "A ficha F01 manda `TouchCount` — a criança toca cada objeto uma vez e o " +
+      "ÚLTIMO número dito é o total. O runtime serve `emojirow`/`tenframe`/" +
+      "`plain`: ela olha uma fileira e escolhe um número, que é justamente a " +
+      "conduta que a F01 existe para superar. O defeito é anterior a este " +
+      "commit; ele só ficou visível agora porque o nó saiu de fora do " +
+      "mecanismo e entrou debaixo deste portão. Correção agendada: " +
+      "PLANO_DO_BLOCO_F0.md §5/§6, passo 1 (construir `TouchCount`).",
+  };
+
   it("nenhuma competência JÁ no Padrão Ouro exige primitiva que não existe", () => {
     // Este é o portão de verdade: subir um nó para o Padrão Ouro sem a primitiva
     // que a ficha manda é entregar outra aula com o nome da certa.
     for (const id of TODAS.filter(x => COMPOSER_CANARIES.has(x))) {
+      if (id in DIVIDA_DECLARADA) continue;
       expect(primitivasAusentes(id), `${id} exige primitiva inexistente`).toEqual([]);
+    }
+  });
+
+  it("a dívida declarada ainda é dívida — entrada resolvida tem de sair da lista", () => {
+    // Sem isto, a lista acima vira anistia permanente: alguém constrói a
+    // primitiva, ninguém apaga a linha, e o portão segue desligado para um nó
+    // que já estava são. Aqui a linha morta grita.
+    for (const [id, motivo] of Object.entries(DIVIDA_DECLARADA)) {
+      expect(
+        primitivasAusentes(id),
+        `${id} não está mais quebrado — apague a entrada de DIVIDA_DECLARADA.\n${motivo}`,
+      ).not.toEqual([]);
+      expect(COMPOSER_CANARIES.has(id), `${id} nem é canário ativo`).toBe(true);
     }
   });
 

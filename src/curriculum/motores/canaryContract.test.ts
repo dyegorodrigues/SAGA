@@ -11,6 +11,12 @@ import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
+import { N1_03 } from "../fichas/jornada/N1.03";
+import { N1_04 } from "../fichas/jornada/N1.04";
+import { N1_07 } from "../fichas/jornada/N1.07";
+import { N1_08 } from "../fichas/jornada/N1.08";
+import { N1_10 } from "../fichas/jornada/N1.10";
+import { AL_01 } from "../fichas/jornada/AL.01";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
@@ -50,6 +56,16 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.07": N4_07,
   "N4.06": N4_06,
   "N4.08": N4_08,
+
+  // Bloco F0. Estes seis já eram servidos por ficha em produção, mas por fora
+  // do mecanismo — chamavam `Composer.generate` de dentro do gerador legado.
+  // Regularizá-los os traz, pela primeira vez, para debaixo deste contrato.
+  "N1.03": N1_03,
+  "N1.04": N1_04,
+  "N1.07": N1_07,
+  "N1.08": N1_08,
+  "N1.10": N1_10,
+  "AL.01": AL_01,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];
@@ -94,8 +110,30 @@ describe("contrato do canário do Composer", () => {
         for (let i = 0; i < 20; i += 1) {
           const autoral = Composer.generate(ficha, lvl);
           expect(autoral.evaluate?.(autoral.answer), `${id} autoral L${lvl}`).toBe(true);
-          expect(Number(autoral.answer), `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
           expect(autoral.isFallback, `${id} L${lvl} devolveu placeholder`).toBeFalsy();
+
+          // "Utilizável" era verificado como `Number(answer) >= 0`, o que
+          // supunha que todo canário é aritmético — verdade enquanto os sete
+          // primeiros eram contas. AL.01 é classificação: a resposta é o emoji
+          // intruso, e `Number("🚗")` é NaN. N1.01 será "sobra"/"exato"/"falta".
+          //
+          // O que a asserção realmente queria dizer é o que está escrito agora:
+          // a resposta existe e a criança consegue escolhê-la. É mais forte que
+          // a versão numérica — esta pega gabarito fora das alternativas, que
+          // aquela deixava passar.
+          expect(autoral.answer, `${id} autoral L${lvl}: sem gabarito`)
+            .not.toBeUndefined();
+          expect(String(autoral.answer ?? "").length, `${id} autoral L${lvl}: gabarito vazio`)
+            .toBeGreaterThan(0);
+          if (autoral.options?.length) {
+            expect(
+              autoral.options.map(o => String(o.value)),
+              `${id} autoral L${lvl}: gabarito fora das alternativas`,
+            ).toContain(String(autoral.answer));
+          }
+          if (typeof autoral.answer === "number") {
+            expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
+          }
         }
       }
     });
