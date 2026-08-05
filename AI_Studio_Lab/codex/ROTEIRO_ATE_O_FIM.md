@@ -199,6 +199,31 @@ Registrado aqui porque a memória da conversa não sobrevive e o repositório si
 recalculam tudo: `npm run fichas:conferir` (conformidade) e `npm run sonda`
 (layout).
 
+## 4-ter. A revisão que passou a bloquear N4.09
+
+Levantado em 5/ago pela pergunta *"esse recurso pedagógico é ensinado antes de
+forma mais simples?"*. A resposta é não, e isso muda o roteiro.
+
+**O achado:** `ArrayGrid` aparece em N3.06, N4.02, N4.03, N4.04 e N4.07 sempre
+como grade **para contar**; em N4.09 aparece como `(modo área)` — medidas nas
+bordas, nada para contar. É a única troca de modo do cânone inteiro, e ela não é
+ensinada em lugar nenhum.
+
+**O que isso implica:**
+
+1. **N4.09 não pode ser ativado como está.** Não por defeito de código — o código
+   passa em tudo — mas porque estreia um idioma visual sem alfabeto.
+2. **A F68 precisa de um degrau anterior**: o modelo de área apresentado com um
+   fato que a criança já sabe de cor (`10 × 2`), só para aprender a ler o
+   desenho. Conteúdo velho, desenho novo — nunca os dois de uma vez.
+3. **A mesma pergunta vale para as 27 divergentes e para as 41 estreias.** Toda
+   primitiva que estreia precisa de uma competência de alfabetização visual.
+
+**O mecanismo a construir:** `npm run fichas:conferir` verifica hoje QUAL
+primitiva a ficha pede. Falta verificar se essa primitiva (e o modo dela) já
+apareceu na cadeia de pré-requisitos. É a mesma auditoria, uma camada mais
+fundo, e teria pego este caso sozinha.
+
 ## 5. As três coisas que este roteiro assume — e que podem estar erradas
 
 1. **Que o legado do N1 é bom o bastante.** Assumido depois de ver as telas, não

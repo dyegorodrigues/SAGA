@@ -601,6 +601,49 @@ retângulo partido.
 competência que entrega primitiva diferente da que a ficha nomeia aparece na
 lista de divergentes, com nome e sobrenome.
 
+### 6.36 A causa-raiz: eu verifico a ficha, nunca a HISTÓRIA da criança
+Depois de quatro versões reprovadas do modelo de área, a pergunta certa veio de
+fora: *"esse recurso pedagógico é ensinado antes de forma mais simples, e vai
+evoluindo até chegar aqui?"*
+
+**Não é.** E o cânone mostra isso em uma linha:
+
+| Competência | Como usa o `ArrayGrid` |
+|---|---|
+| N3.06, N4.02, N4.03, N4.04, N4.07 | grade de unidades, **para contar** |
+| **N4.09** | **`(modo área)`** — a única troca de modo em todo o cânone |
+
+A criança passa cinco competências contando pontinhos dentro do retângulo. Em
+N4.09 o retângulo passa a ter as medidas escritas nas bordas e **nada para
+contar** — e ninguém ensinou essa mudança. Some junto a convenção dos eixos: o
+primeiro fator deitado em cima, o segundo em pé na esquerda. Isso é **convenção**,
+não descoberta; precisa ser mostrado, e não é.
+
+**Por que os erros continuavam aparecendo.** Cada tela era verificada contra a
+PRÓPRIA ficha, isolada. Nenhuma verificação perguntava: *"a linguagem visual que
+esta tela usa foi apresentada antes, numa forma mais simples, dentro da cadeia
+de pré-requisitos?"* Sem essa pergunta, toda competência pode estrear um idioma
+novo com cara de continuidade — e a tela fica correta, testada, acessível e
+incompreensível.
+
+**A regra:** uma tela não introduz mais de UMA coisa nova por vez. Se a
+competência traz conceito novo, a linguagem visual tem de ser velha. Se traz
+linguagem visual nova, ela precisa estrear numa competência ANTERIOR, com
+conteúdo que a criança já domina, só para aprender a ler o desenho.
+
+**O mecanismo que falta** (não construído; próximo passo registrado): estender
+`npm run fichas:conferir` com a **progressão de primitiva** — para cada
+competência, verificar se a primitiva (e o MODO dela) aparece em alguma
+competência da cadeia de pré-requisitos. Onde não aparecer, ou existe uma ficha
+de introdução faltando, ou a ficha atual precisa de um nível zero que ensine o
+desenho antes de cobrar a matemática.
+
+**Consequência imediata para N4.09:** o modelo de área não deveria estrear em
+`15 × 13`. Deveria estrear com um fato que a criança já sabe de cor — `10 × 2`,
+resposta óbvia — só para ela aprender a LER o retângulo. A ficha F68 começa no
+conteúdo novo com desenho novo, e é por isso que ela precisa ser revista antes
+de N4.09 ser ativado.
+
 ### 6.35 Cor sem legenda é enigma; e o resultado não é o caminho
 O modelo de área já estava correto e bonito. Um adulto olhou e disse: *"demorei
 para entender que o azul é a dezena"*, *"o vinte embaixo podia estar da mesma
