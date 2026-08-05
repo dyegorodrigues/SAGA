@@ -10,6 +10,7 @@ import { N4_03 } from "../fichas/jornada/N4.03";
 import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
+import { N4_08 } from "../fichas/jornada/N4.08";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
@@ -48,6 +49,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.04": N4_04,
   "N4.07": N4_07,
   "N4.06": N4_06,
+  "N4.08": N4_08,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];

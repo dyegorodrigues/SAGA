@@ -77,6 +77,18 @@ export function mostraMaterial(nivel: number): boolean {
 }
 
 /**
+ * O maior número que o nível apresenta.
+ *
+ * Onde há material, o número fica pequeno: **85 vira oito barras e cinco
+ * cubinhos**, e treze peças numa tela de 390px são ruído, não apoio. A ficha
+ * exemplifica com 23 justamente por isso. Sem material, o número pode crescer —
+ * o que se treina ali já é o deslocamento, não a leitura das peças.
+ */
+export function numeroMaximoDoNivel(nivel: number): number {
+  return mostraMaterial(nivel) ? 39 : 99;
+}
+
+/**
  * O resultado de esquecer o "vai um" da ordem das unidades.
  *
  * Em 27 × 3: sete vezes três é 21, escreve 1 e leva 2; dois vezes três é 6, mais

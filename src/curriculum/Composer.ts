@@ -55,6 +55,7 @@ import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract"
 import {
   ehPergunavelComDiagnostico as deslocamentoDiagnostica,
   multiplicadoresDoNivel,
+  numeroMaximoDoNivel,
 } from "./procedimentos/deslocamentoProcedure";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
@@ -609,8 +610,11 @@ export class Composer {
       }
 
       case "deslocamento": {
+        // O teto do número por nível existe para o MATERIAL caber: onde ele
+        // aparece, treze peças na tela viram ruído em vez de apoio.
+        const tetoDoNumero = numeroMaximoDoNivel(lvl);
         const candidatas = multiplicadoresDoNivel(lvl).flatMap(multiplicador =>
-          Array.from({ length: 89 }, (_, i) => ({ numero: i + 11, multiplicador })))
+          Array.from({ length: tetoDoNumero - 10 }, (_, i) => ({ numero: i + 11, multiplicador })))
           .filter(deslocamentoDiagnostica);
         if (!candidatas.length) {
           throw new Error(`Nível ${lvl} de ${ficha.id} ficou sem conta com valor diagnóstico.`);

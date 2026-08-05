@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { MisconceptionTag } from "../../constants/misconceptions";
 import {
   alternativas, distratores, ehPergunavelComDiagnostico, falaDaPromocao,
-  materialDe, mostraMaterial, multiplicadoresDoNivel, ordensDeslocadas,
+  materialDe, mostraMaterial, multiplicadoresDoNivel, numeroMaximoDoNivel, ordensDeslocadas,
   resolver, semReagrupar, tipoDe,
 } from "./deslocamentoProcedure";
 
@@ -45,6 +45,18 @@ describe("a escada dos cinco níveis", () => {
 
   it("o material sai no nível 3 — é o que faz o 3 ser mais difícil que o 1", () => {
     expect([1, 2, 3, 4, 5].map(mostraMaterial)).toEqual([true, true, false, false, false]);
+  });
+
+  it("onde há material, o número fica pequeno o bastante para as peças serem lidas", () => {
+    // 85 vira oito barras e cinco cubinhos: treze peças numa tela de 390px são
+    // ruído, não apoio. A ficha exemplifica com 23 justamente por isso.
+    for (const nivel of [1, 2]) {
+      const m = materialDe(numeroMaximoDoNivel(nivel));
+      expect(m.dezenas + m.unidades, `nível ${nivel} chegaria a ${m.dezenas + m.unidades} peças`)
+        .toBeLessThanOrEqual(12);
+    }
+    // Sem material o número pode crescer: o que se treina já é o deslocamento.
+    expect(numeroMaximoDoNivel(3)).toBeGreaterThan(numeroMaximoDoNivel(1));
   });
 
   it("cada nível difere observavelmente do anterior", () => {
