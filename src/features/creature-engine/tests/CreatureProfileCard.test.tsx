@@ -150,7 +150,7 @@ describe("CreatureProfileCard", () => {
     fireEvent.change(input, { target: { value: "Raio" } });
     fireEvent.click(screen.getByRole("button", { name: "Salvar nome" }));
 
-    expect(screen.getByText(/Raio/)).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /Raio/ })).toBeTruthy();
     const persisted = onPersist.mock.calls.at(-1)?.[0] as Kid & { creature?: { nickname?: string } };
     expect(persisted.creature?.nickname).toBe("Raio");
   });
