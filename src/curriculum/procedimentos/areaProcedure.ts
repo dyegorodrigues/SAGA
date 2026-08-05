@@ -113,6 +113,27 @@ export function corteVemMarcado(nivel: number): boolean {
   return nivel <= 1;
 }
 
+/**
+ * As regiões aparecem separadas por um vão?
+ *
+ * A tabela da ficha F68 §5 distingue três coisas, e eu tinha colapsado duas:
+ *
+ * | nível | o que a ficha manda | vão | linha tracejada |
+ * |---|---|---|---|
+ * | 1 | área com **corte marcado** | sim | sim |
+ * | 2 | área, **a criança faz o corte** | não | não |
+ * | 3 | área **+ algoritmo lado a lado** | sim | não |
+ * | 4 | área com **quatro regiões** | sim | não |
+ *
+ * No nível 2 o retângulo tem de estar INTEIRO — é a criança que o parte, na
+ * cabeça. Nos níveis 3 e 4 as regiões precisam ser identificáveis, porque cada
+ * uma corresponde a uma linha da conta armada; sem o vão, quatro regiões saem
+ * como dois blocos maciços e a criança não vê o que a ficha existe para mostrar.
+ */
+export function separaRegioes(nivel: number): boolean {
+  return mostraArea(nivel) && nivel !== 2;
+}
+
 /** A conta armada aparece ao lado da área a partir do nível 3. */
 export function mostraAlgoritmo(nivel: number): boolean {
   return nivel >= 3;

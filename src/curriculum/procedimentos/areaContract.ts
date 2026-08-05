@@ -1,6 +1,6 @@
 import {
   Conta, Regiao, alternativas, corteVemMarcado, falaDoCorte,
-  mostraAlgoritmo, mostraArea, partir, regioes, resolver,
+  mostraAlgoritmo, mostraArea, partir, regioes, resolver, separaRegioes,
 } from "./areaProcedure";
 
 /**
@@ -43,6 +43,8 @@ export interface AreaSpec {
   regioes: RegiaoSpec[];
   /** O corte já vem desenhado (nível 1) ou a criança o imagina? */
   corteMarcado: boolean;
+  /** As regiões aparecem afastadas umas das outras? Ver `separaRegioes`. */
+  regioesSeparadas: boolean;
   /** A dica do corte, em palavras. Nunca contém o produto. */
   corte: string | null;
   /** A conta armada ao lado, com as parcelas mas SEM o total. */
@@ -95,6 +97,7 @@ export function construirAreaSpec(c: Conta, nivel: number): AreaSpec {
       ? regioes(c).map(r => ({ linhas: r.linhas, colunas: r.colunas, valor: r.valor, descricao: descrever(r) }))
       : [],
     corteMarcado: corteVemMarcado(nivel),
+    regioesSeparadas: separaRegioes(nivel),
     corte: comArea ? falaDoCorte(c) : null,
     algoritmo: mostraAlgoritmo(nivel) ? montarAlgoritmo(c) : null,
     alternativas: alternativas(c).map(a => ({ valor: a.valor, tag: a.tag })),

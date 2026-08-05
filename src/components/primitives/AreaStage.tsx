@@ -56,6 +56,7 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
         <ModeloDeArea
           regioes={spec.regioes}
           corteMarcado={corteMarcado}
+          regioesSeparadas={spec.regioesSeparadas || Boolean(mostrar?.cortarRetangulo)}
           destacada={mostrar?.destacarRegiao ?? null}
           juntando={Boolean(mostrar?.juntarRegioes)}
         />

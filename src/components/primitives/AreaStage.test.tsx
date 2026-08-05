@@ -96,25 +96,48 @@ describe("a micro-aula do corte", () => {
     }
   });
 
-  it("todas as regiões usam o MESMO quadradinho — senão não é um retângulo", () => {
-    // Cada arranjo calculava o próprio lado a partir da largura disponível, e a
-    // região de 5 colunas saía com células menores que a de 10: as bordas não
-    // encostavam e o retângulo partido virava quatro grades soltas. Só a
-    // captura de tela mostrou; nenhum teste media. Ver Padrão Ouro §6.33.
+  it("cada região traz a conta que a gera escrita dentro dela", () => {
+    // A versão anterior mostrava só o resultado embaixo da região: saíam "20" e
+    // "10" soltos, e um adulto perguntou o que aquilo tinha a ver com 15 × 2.
+    // Tinha tudo — eram 10 × 2 e 5 × 2 — mas a tela não dizia. Ver §6.34.
     for (const lvl of [1, 2, 3, 4]) {
-      const { container, unmount } = render(<AreaStage spec={spec(lvl)} />);
-      const lados = [...container.querySelectorAll<HTMLElement>('[role="img"] > div')]
-        .map(el => el.style.width).filter(Boolean);
-      expect(lados.length, `nível ${lvl} sem quadradinhos`).toBeGreaterThan(0);
-      expect(new Set(lados).size, `nível ${lvl}: lados ${[...new Set(lados)].join(", ")}`).toBe(1);
+      const s = spec(lvl);
+      const { container, unmount } = render(<AreaStage spec={s} />);
+      const texto = container.textContent ?? "";
+      for (const r of s.regioes) {
+        expect(texto, `nível ${lvl}: falta "${r.colunas} × ${r.linhas}"`)
+          .toContain(`${r.colunas} × ${r.linhas}`);
+      }
       unmount();
     }
+  });
+
+  it("as regiões são PROPORCIONAIS: a das dezenas é maior que a das unidades", () => {
+    // É a proporção que ensina. Duas regiões do mesmo tamanho diriam que 10 e 5
+    // valem igual, que é o oposto do que a ficha existe para mostrar.
+    const s = spec(1);
+    const { container } = render(<AreaStage spec={s} />);
+    const caixas = [...container.querySelectorAll<HTMLElement>('[role="group"] div[style*="width"]')]
+      .filter(el => el.style.background)
+      .map(el => parseFloat(el.style.width));
+    expect(caixas.length).toBeGreaterThanOrEqual(2);
+    // A primeira coluna é a das dezenas; tem de ser a mais larga.
+    expect(caixas[0]).toBeGreaterThan(caixas[1]);
+  });
+
+  it("as duas colunas do retângulo têm cores diferentes", () => {
+    // Duas regiões da mesma cor coladas lêem como um bloco só, e a partição —
+    // o assunto inteiro — some. É o §6.17, que eu já tinha escrito e repeti.
+    const { container } = render(<AreaStage spec={spec(1)} />);
+    const fundos = [...container.querySelectorAll<HTMLElement>('[role="group"] div[style*="background"]')]
+      .map(el => el.style.background).filter(Boolean);
+    expect(new Set(fundos).size).toBeGreaterThan(1);
   });
 
   it("acender uma região apaga as outras — senão o destaque não destaca nada", () => {
     const s = spec(1);
     const { container } = render(<AreaStage spec={s} mostrar={{ destacarRegiao: 0 }} />);
-    const opacidades = [...container.querySelectorAll<HTMLElement>('[role="group"] > div > div > div')]
+    const opacidades = [...container.querySelectorAll<HTMLElement>('[role="group"] [style*="opacity"]')]
       .map(el => el.style.opacity).filter(Boolean);
     expect(new Set(opacidades).size, "todas as regiões com a mesma opacidade").toBeGreaterThan(1);
   });
@@ -125,7 +148,9 @@ describe("a micro-aula do corte", () => {
     const s = spec(2);
     expect(s.corteMarcado).toBe(false);
     const { container } = render(<AreaStage spec={s} mostrar={{ cortarRetangulo: true }} />);
-    expect(container.querySelector(".border-dashed")).not.toBeNull();
+    const tracejadas = [...container.querySelectorAll<HTMLElement>('[role="group"] [style*="border"]')]
+      .filter(el => el.style.border.includes("dashed"));
+    expect(tracejadas.length, "nenhuma divisa tracejada durante a aula").toBeGreaterThan(0);
   });
 
   it("não apresenta violações de acessibilidade durante a aula", async () => {
