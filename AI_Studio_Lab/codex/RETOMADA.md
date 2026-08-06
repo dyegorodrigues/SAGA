@@ -111,6 +111,12 @@ modo de relance estreia.
 
 ### O próximo passo
 
+**Antes do passo 3, uma varredura entrou na frente:** seis competências estavam
+**ativas servindo outra coisa** — tela errada com o nome da certa, que é pior
+que tela faltando, porque o Radar registra domínio do que a criança nunca fez.
+Três já corrigidas (`AL.01`, `N1.06`, `N1.09`); faltam `GE.01`, `GE.02`,
+`GM.02`. Tabela e achados em `PLANO_DO_BLOCO_F0.md §10`.
+
 **Passo 3 — `TenFrame`, plain e flash:** N1.08 (níveis 3-5, ficha F02), N1.10
 (JD5) e N1.11 (JD3). A escada plain→flash já está na ordem de pré-requisitos;
 construir os três juntos garante que o desenho seja **o mesmo** nos dois modos.
@@ -120,15 +126,21 @@ defeito nele: o botão "Ver de novo" estava a 1.45:1, corrigido em `422138e`.
 
 ### Estado dos canários
 
-Ativos: `N3.09 N3.10 N4.03 N4.04 N4.06 N4.07 N4.08 N1.07 N1.10 AL.01`
+Ativos: `N3.09 N3.10 N4.03 N4.04 N4.06 N4.07 N4.08 N1.07 N1.10` e, desde
+`ef92f10`, os seis do bloco F0: `N1.01 N1.02 N1.03 N1.04 N1.08 AL.02`.
 
 Implementados e **NÃO** ativados — a tela existe e não chega à criança:
-`N1.01` (pareamento, F07), `N1.02` (canhão, F27), `N1.04` (contar tocando, F01),
-`N1.03` (olhômetro, JD1), `N1.08` (mão relâmpago, JD2), `AL.02` (padrões, F52).
 
-N1.03 e N1.08 **saíram** dos canários no passo 2: a tela virou outra, e tela
-nova não estreia no PR que a escreve. O rollback delas cai em `legadoN1_03` e
-`legadoN1_08` — o mesmo relance que a produção servia, não regressão.
+| nó | ficha | o que a produção serve enquanto isso |
+|----|-------|--------------------------------------|
+| `AL.01` | F51, separar por atributo | `legadoAL_01` — o intruso de múltipla escolha |
+| `N1.06` | F05, ouvir e escolher | `plain` com o número **escrito** na tela |
+| `N1.09` | F04, produzir quantidade | `gVis_Sequence` — "conte a partir do 47" |
+| `N4.09` | — | legado |
+
+Ativar cada um é PR próprio, e o intervalo com a tela desligada é o que pega os
+defeitos: foi assim que apareceram o canhão que faltava na F27, o enunciado
+saindo duas vezes em três palcos e a mão que não parecia mão.
 
 Ativar cada um é **PR próprio**. Sempre.
 
@@ -215,6 +227,11 @@ Registrado porque o autor cobrou, e porque a próxima sessão não deve repetir.
 | P6 | A F52 §3 desenha "copie o padrão" e as §1/§5/§7/§8 descrevem "preencha a lacuna". Implementei a lacuna; a contradição segue no cânone | `AL.02.ts` |
 | P7 | Os degraus 3-5 da JD2 (duas mãos) não cabem na Jornada do N1.08 e foram alocados à trilha JD2 do **Dojo**, que ainda não os consome | `N1.08.ts` |
 | P4 | Falha de teste intermitente, vista uma vez, **não reproduzida** | idem |
+| P8 | O motor do Jardim do Dojo: as trilhas JD1-JD5 existem e nada as apresenta à criança | `fichas/dojo/jardim/index.ts` |
+| P9 | `AllFichas` mistura `FichaCompetencia` e `Track` — iterar aquilo rebenta com TypeError em vez de reprovar | `fichas/index.ts` |
+| P10 | 12 competências trocam de MODO sem aviso; `N3.02` faz `EmojiRow` virar "riscar" vindo de 7 nós | `conformidadeDeFichas.test.ts` |
+| P11 | `DragGroup` estreia em dois modos a partir de dois nós-raiz sem pré-requisito entre eles | `N1.01.ts`, `AL.01.ts` |
+| **P12** | **N1.09: a ficha diz "produzir quantidade", o grafo diz "contar até 20 e a partir de N" — e quatro arestas (`N1.12`, `N2.01`, `N3.03`, `AL.03`) dependem da leitura do grafo, que ficha nenhuma escreve. Decisão curricular, não de implementação.** | `PLANO_DO_BLOCO_F0.md §10.1` |
 | — | `scripts/e2e-screenshots.mjs` não chega à tela de exercício (seed velho) | commit `a2d6c87` |
 | — | N4.09 ativação; N4.10–N4.12; coreografia faltando em N3.10, N4.03/04/06/07 | `ROTEIRO_ATE_O_FIM.md §4-bis` |
 

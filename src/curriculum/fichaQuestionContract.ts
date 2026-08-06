@@ -12,6 +12,7 @@ import { TouchCountSpec } from "./procedimentos/touchCountContract";
 import { EmojiRowSpec } from "./procedimentos/emojiRowContract";
 import { ClassificacaoSpec } from "./procedimentos/classificacaoContract";
 import { AudioChoiceSpec } from "./procedimentos/audioChoiceContract";
+import { ProducaoSpec } from "./procedimentos/producaoContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -48,6 +49,7 @@ export type FichaUiProps =
   | EmojiRowSpec
   | ClassificacaoSpec
   | AudioChoiceSpec
+  | ProducaoSpec
   | { text: string };
 
 interface BalanceItem {

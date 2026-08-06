@@ -61,6 +61,7 @@ import { MisconceptionTag } from "../constants/misconceptions";
 import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProcedure";
 import { construirClassificacaoSpec } from "./procedimentos/classificacaoContract";
 import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
+import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
@@ -846,6 +847,23 @@ export class Composer {
           evaluate = candidate => candidate === "separado" || candidate === true;
         }
         promptOverride = spec.enunciado;
+        break;
+      }
+
+      case "touchplace": {
+        // Ficha F04 (N1.09). Ficha de PRODUÇÃO, e a mais literal delas: a
+        // resposta é a quantidade que a criança FEZ aparecer. Não há o que
+        // escolher — o número já foi dado pelo enunciado.
+        const spec = construirProducaoSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        // O valor que chega aqui é quantos objetos ficaram na cena.
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        // `undefined`, não `[]`: um array vazio é truthy e passa pelos
+        // `if (q.options)` do app como se houvesse alternativas. Teclado nesta
+        // tela devolveria a múltipla escolha que a ficha existe para tirar.
+        options = undefined;
         break;
       }
 

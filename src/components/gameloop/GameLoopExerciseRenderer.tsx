@@ -14,6 +14,7 @@ import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
 import { ClassificacaoStage } from "../primitives/ClassificacaoStage";
 import { AudioChoiceStage } from "../primitives/AudioChoiceStage";
+import { TouchPlaceStage } from "../primitives/TouchPlaceStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -66,6 +67,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "fileira",
   "classificacao",
   "audiochoice",
+  "touchplace",
 ]);
 
 interface Props {
@@ -182,6 +184,18 @@ export function GameLoopExerciseRenderer({
             // nunca diz "errou". O feedback é a informação que faltava.
             falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor, leitura) => handlePick(valor, undefined, { source: "audiochoice", audiochoice: leitura } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "touchplace" && q.uiProps && (
+          <TouchPlaceStage
+            spec={q.uiProps as never}
+            // §4: a voz CONTA a cada encaixe — "uma..." — e conta tudo no
+            // fecho. É a contagem no ato que liga a palavra à quantidade; sem
+            // ela a tela vira um quebra-cabeça de encaixar formas.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "touchplace", touchplace: acao } as never)}
             disabled={status !== null}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />

@@ -29,6 +29,7 @@ import { PareamentoStage } from './primitives/PareamentoStage';
 import { TouchCount } from './primitives/TouchCount';
 import { EmojiRowStage } from './primitives/EmojiRowStage';
 import { ClassificacaoStage } from './primitives/ClassificacaoStage';
+import { TouchPlaceStage } from './primitives/TouchPlaceStage';
 import { AudioChoiceStage } from './primitives/AudioChoiceStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
@@ -93,6 +94,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <AudioChoiceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'classificacao':
       return <ClassificacaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'touchplace':
+      return <TouchPlaceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'fileira':
       return <EmojiRowStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'array':

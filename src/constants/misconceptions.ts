@@ -194,7 +194,34 @@ export const MisconceptionTag = {
   NAO_ESCUTOU: "nao-escutou",
 
   /** Ouvir e escolher: acertou depois de repetir muitas vezes — reconhecimento ainda não automático */
-  PRECISA_REPETICAO: "precisa-repeticao"
+  PRECISA_REPETICAO: "precisa-repeticao",
+
+  /* --- produzir quantidade (ficha F04) ------------------------------ */
+
+  /** Produzir: parou antes do pedido — perdeu a conta durante a ação */
+  PRODUCAO_INCOMPLETA: "producao-incompleta",
+
+  /** Produzir: tentou colocar mais que o pedido — não segurou o número na memória enquanto agia */
+  NAO_MONITORA_ALVO: "nao-monitora-alvo",
+
+  /**
+   * Produzir: despejou a bandeja inteira — não processou o número, agiu por impulso.
+   *
+   * É um caso particular de `NAO_MONITORA_ALVO` e por isso vem antes dele no
+   * diagnóstico (§6.8): quem esvazia a bandeja também passou do pedido, e
+   * testar o genérico primeiro apagaria este para sempre. As aulas são
+   * diferentes — uma criança perdeu a conta, a outra nem começou a contar.
+   */
+  IGNORA_QUANTIDADE: "ignora-quantidade",
+
+  /**
+   * Produzir: acerta com as vagas fantasma na tela e erra sem elas.
+   *
+   * A única tag do bloco que **nenhuma questão isolada** produz: é a comparação
+   * entre duas questões. É também o que a §9 da F04 exige para dar domínio —
+   * "produzir com o alvo visível não prova cardinalidade produtiva".
+   */
+  DEPENDE_DE_ANDAIME: "depende-de-andaime"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

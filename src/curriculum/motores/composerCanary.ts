@@ -15,6 +15,7 @@ import { N1_04 } from "../fichas/jornada/N1.04";
 import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
+import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
@@ -56,6 +57,12 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.06": N1_06,
   "N1.07": N1_07,
   "N1.08": N1_08,
+
+  // N1.09 era servida por `gVis_Sequence`: "conte a partir do 47, quais vêm
+  // depois?", alternativas de texto, números até 119 — numa competência de
+  // faixa F0. E o `TouchPlace` que a F04 nomeia existia sem estar ligado a
+  // lugar nenhum, como o `AudioChoice` da F05. Registrada aqui e NÃO ativada.
+  "N1.09": N1_09,
   "N1.10": N1_10,
   "AL.01": AL_01,
 

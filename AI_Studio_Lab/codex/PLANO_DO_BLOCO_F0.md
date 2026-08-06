@@ -327,3 +327,73 @@ anterior (`COPIA_ULTIMO`, o alvo da ficha) e as duas meias-regras. Quatro peças
 | P8 | O motor do Jardim do Dojo: as trilhas existem e nada as apresenta | `fichas/dojo/jardim/index.ts` |
 | P9 | `AllFichas` mistura `FichaCompetencia` e `Track` — iterar aquilo rebenta com TypeError em vez de reprovar | `fichas/index.ts` |
 | P10 | 12 competências trocam de MODO sem aviso (levantamento do `fichas:conferir`); `N3.02` faz `EmojiRow` virar "riscar" vindo de 7 nós | `conformidadeDeFichas.test.ts` |
+| P11 | `DragGroup` estreia em DOIS modos (parear/laços) a partir de dois nós-raiz sem pré-requisito entre eles | `N1.01.ts`, `AL.01.ts` |
+| P12 | N1.09: a ficha e o grafo discordam de quem é a competência — quatro arestas dependem da leitura do grafo, que ficha nenhuma escreve | `§10.1` |
+
+---
+
+## §10 — As competências que estavam **ativas servindo outra coisa**
+
+O passo 2 fechou a escada do `EmojiRow`. Antes do passo 3 (`TenFrame`), uma
+varredura pelo que cada nó **realmente entrega hoje** achou seis competências
+ligadas em produção cuja tela não é a da ficha. Não é tela faltando: é tela
+errada com o nome da certa, que é pior — o Radar registra domínio de uma
+competência que a criança nunca praticou.
+
+| nó | o que a ficha manda | o que o gerador servia | estado |
+|----|---------------------|------------------------|--------|
+| AL.01 | F51: separar peças em laços | `intruso_math`: "qual é o diferente?" | ✅ reescrita, `06fa24d` |
+| N1.06 | F05: ouvir e escolher | `plain` com **"🔊 TRÊS" escrito na tela** | ✅ reescrita, `5e9b112` |
+| N1.09 | F04: produzir quantidade | `gVis_Sequence`: "conte a partir do 47" | ✅ este commit |
+| GE.01 | F47: onde está? | `plain` com dois emojis | ⏳ |
+| GE.02 | F48: que forma é essa? | `plain`: "🔴 ou 🟥?" | ⏳ |
+| GM.02 | F50: cabe mais ou menos? | `plain`: "Manhã ou Noite?" | ⏳ |
+
+Duas dessas três já corrigidas repetem o **mesmo achado estrutural**: a
+primitiva que a ficha nomeia — `AudioChoice` na F05, `TouchPlace` na F04 —
+existia no código, pronta, e **não tinha `case` em lugar nenhum**. Nem no
+Composer, nem no renderizador. Primitiva órfã é o defeito mais barato de
+procurar e o mais caro de não ver: ela faz o inventário parecer completo.
+
+### §10.1 — N1.09: a divergência que **não** é minha para resolver
+
+Dois documentos do cânone discordam sobre quem é N1.09:
+
+| documento | o que diz |
+|---|---|
+| `fichas/FICHAS_F0_COMPLETAS.md` | N1.09 = **produzir quantidade** (índice, §1 da F04 e lista de fechamento) |
+| `GRAFO_DE_CONHECIMENTO_SAGA.md` | N1.09 = **contagem até 20 e a partir de qualquer número**; "produzir conjunto: me dá N" é micro (d) da **N1.04** |
+
+Segui a **ficha** — é ela que especifica uma tela, é o que a tabela do §2 deste
+plano mapeia, e a F04 não caberia na N1.04, cujos cinco degraus já são da F01 e
+que ainda recebe a F03.
+
+**O que fica em aberto (P12):** quatro arestas do grafo — `N1.12`, `N2.01`,
+`N3.03`, `AL.03` — declaram N1.09 como pré-requisito querendo dizer *"conta até
+20 e continua de qualquer número"*. Nenhuma ficha do cânone escreve essa
+competência. Nada se perde agora (o legado `gVis_Sequence` segue como alvo de
+rollback, e o nó não foi ativado), mas **dar um nó próprio a "contar até 20" é
+decisão curricular**, e é do dono do cânone.
+
+### §10.2 — A §4 e a §5 da F04 se contradizem, e a §9 desempata
+
+A §4 diz que o objeto excedente *"não cola"*. A §5 diz que no nível 4 a criança
+*"precisa saber parar sozinha"*. Não dá para as duas valerem no mesmo nível: se
+a tela para por ela, ela nunca precisa parar.
+
+Quem decide é a §9, ao exigir **um acerto sem vaga fantasma**: num nível onde a
+tela trava o excedente, todo mundo acerta — a evidência que ela pede seria
+impossível de *não* obter, e o critério de domínio não significaria nada. Logo o
+limite físico vale **onde há vaga**, porque a vaga **é** o limite. Some a vaga,
+some o limite: é isso que "sem andaime" quer dizer.
+
+> Terceira vez no bloco que a própria ficha responde à dúvida em outra seção
+> (P1 na JD1, o degrau do padrão na F52, este). **Ler a ficha inteira continua
+> sendo mais barato que decidir.**
+
+### §10.3 — Duas divergências declaradas na F04
+
+| o que a ficha diz | o que fiz | por quê |
+|---|---|---|
+| §3 lista três elementos, nenhum botão | acrescentei **"Pronto!"**, visível só depois do 1º objeto | sem ele *"parou antes"* (§6) não é observável e a tela dos níveis 4-5 espera para sempre — e a §2 proíbe encerrar por tempo |
+| §8 fala *"Preciso de três estrelas"* | falas neutras de número e de tema | o nível 1 sorteia 1 a 3 em três temas: a fala literal estaria errada na maioria das vezes (mesma decisão da F01) |

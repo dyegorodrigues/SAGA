@@ -61,6 +61,8 @@ export interface AnswerMeta {
   audiochoice?: unknown;
   /** A leitura da classificação (F51): onde cada peça foi parar. */
   classificacao?: unknown;
+  /** A leitura da produção (F04): quantos colocou, e quantas vezes tentou passar. */
+  touchplace?: unknown;
   pareamento?: {
     porReceptor: number[];
     naBandeja: number;
