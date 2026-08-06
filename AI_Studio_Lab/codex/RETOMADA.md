@@ -111,11 +111,20 @@ modo de relance estreia.
 
 ### O próximo passo
 
-**Antes do passo 3, uma varredura entrou na frente:** seis competências estavam
-**ativas servindo outra coisa** — tela errada com o nome da certa, que é pior
-que tela faltando, porque o Radar registra domínio do que a criança nunca fez.
-Três já corrigidas (`AL.01`, `N1.06`, `N1.09`); faltam `GE.01`, `GE.02`,
-`GM.02`. Tabela e achados em `PLANO_DO_BLOCO_F0.md §10`.
+**Antes do passo 3, uma varredura entrou na frente**, e ela está **fechada**:
+competências ativas servindo outra coisa — tela errada com o nome da certa, que
+é pior que tela faltando, porque o Radar registra domínio do que a criança nunca
+fez. Corrigidas: `AL.01`, `N1.06`, `N1.09`, `GE.01`, `GE.02`; e a `GM.01`, que
+não era desse grupo — ela não tinha gerador nenhum.
+
+A `GM.02` **não era o caso**, e o §12 do plano registra a correção: ela serve
+"tempo cotidiano", que é o que o grafo diz que ela é, e a `GM.04` depende dessa
+leitura. Tabela e achados em `PLANO_DO_BLOCO_F0.md §10` e `§12`.
+
+**Quatro primitivas estavam órfãs** — existiam no código e não eram alcançáveis
+por nenhuma ficha: `AudioChoice`, `TouchPlace`, `ShapeCanvas` (importado no
+`FichaRenderer` sem `case`) e `Grupo`. É o defeito mais barato de procurar e o
+mais caro de não ver: ele faz o inventário parecer completo.
 
 **Passo 3 — `TenFrame`, plain e flash:** N1.08 (níveis 3-5, ficha F02), N1.10
 (JD5) e N1.11 (JD3). A escada plain→flash já está na ordem de pré-requisitos;
@@ -136,6 +145,9 @@ Implementados e **NÃO** ativados — a tela existe e não chega à criança:
 | `AL.01` | F51, separar por atributo | `legadoAL_01` — o intruso de múltipla escolha |
 | `N1.06` | F05, ouvir e escolher | `plain` com o número **escrito** na tela |
 | `N1.09` | F04, produzir quantidade | `gVis_Sequence` — "conte a partir do 47" |
+| `GE.01` | F47, onde está? | `plain` com a resposta em **palavras** |
+| `GE.02` | F48, que forma é essa? | `plain` com dois emojis, que **não giram** |
+| `GM.01` | F49, maior/menor/mais alto | **nada** — o nó não tinha gerador |
 | `N4.09` | — | legado |
 
 Ativar cada um é PR próprio, e o intervalo com a tela desligada é o que pega os
