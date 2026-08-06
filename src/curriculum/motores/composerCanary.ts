@@ -68,29 +68,27 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  */
 export const COMPOSER_CANARIES = new Set<string>([
   "N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08",
-
-  // Estes JÁ eram servidos por ficha em produção antes do commit que fechou a
-  // porta dos fundos. Ativá-los lá não mudou uma tela sequer: regularizou um
-  // estado que já existia e passou a permitir rollback, que antes não existia.
-  // Não confundir com ativação de canário novo — essa continua exigindo PR
-  // próprio, e é por isso que o N1.01 NÃO está nesta lista.
   "N1.07", "N1.10", "AL.01",
 
-  // O N1.04 SAIU daqui quando a ficha dele foi reescrita para `TouchCount`
-  // (F01) e a tela virou outra: ativá-la no mesmo commit que a escreveu é
-  // exatamente o que a regra dos PRs separados impede — e é o erro que eu já
-  // cometi uma vez com o N1.01. Enquanto isso a produção serve o legado.
-  // O N1.02 nasce registrado e desativado, pelo mesmo motivo.
+  // ---- ATIVAÇÃO do bloco F0 ----------------------------------------
   //
-  // **N1.03 e N1.08 SAEM daqui neste commit, e pela mesma regra.** As duas
-  // passaram a ser servidas pelo palco novo da fileira (`EmojiRowStage`), com o
-  // roteiro da §4, a coreografia da §8 e — no N1.08 — a mão da JD2 nos níveis 1
-  // e 2. É tela nova; tela nova não estreia no PR que a escreve.
+  // Estas seis foram escritas, medidas e olhadas nos passos 0 a 2, e ficaram
+  // desligadas o tempo todo — a regra do Padrão Ouro §7 diz que tela nova não
+  // estreia no PR que a escreve, e ela existe porque eu já a quebrei uma vez.
   //
-  // O rollback delas cai em `legadoN1_03` e `legadoN1_08`, que são as telas de
-  // relance que a produção servia até aqui — mesmo patamar, não regressão.
+  // O intervalo cumpriu o papel: foi com elas desligadas que apareceram o
+  // canhão que faltava na F27, a barra de alternativas duplicada do N1.01, o
+  // enunciado saindo duas vezes em três palcos, a mão que não parecia mão e o
+  // banco do padrão sem o distrator que o diagnóstico precisa.
   //
-  // A AL.02 nasce registrada e desativada: nunca foi canário.
+  // O que cada uma passa a servir:
+  //   N1.01  pareamento (F07)      — comparar sem contar, sem numeral nenhum
+  //   N1.02  canhão de balões (F27)— um tiro, um balão, um número
+  //   N1.03  olhômetro (JD1)       — reconhecer sem contar
+  //   N1.04  contar tocando (F01)  — o último número dito É o total
+  //   N1.08  a mão + a moldura     — a âncora do 5 (JD2 nos níveis 1-2, F02 no resto)
+  //   AL.02  padrões (F52)         — a regra de repetição, cinco degraus de verdade
+  "N1.01", "N1.02", "N1.03", "N1.04", "N1.08", "AL.02",
 ]);
 
 export interface GeneratorBinding {

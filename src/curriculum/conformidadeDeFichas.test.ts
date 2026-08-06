@@ -177,6 +177,57 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   fileira: ["EmojiRow"],
 };
 
+/**
+ * O MODO que a ficha nomeia, traduzido para o que o runtime chama.
+ *
+ * ### O defeito que isto corrige
+ *
+ * A tabela `PRIMITIVA_DO_KIND` traduz `kind → primitiva`, sem modo. Então a
+ * conferência comparava `EmojiRow#flash` (o que a JD1 pede) com `EmojiRow` (o
+ * que ela conseguia ver) e **contava como divergente uma competência correta**.
+ * Depois da ativação do bloco F0, cinco das 35 "divergências" eram isso: N1.01,
+ * N1.02, N1.03, N1.08 e AL.02 servem exatamente o modo que a ficha manda.
+ *
+ * Um auditor que acusa quem está certo é pior que um auditor ausente: ele
+ * esconde os erros de verdade no meio do barulho, e treina quem lê a ignorar a
+ * lista. Aqui o runtime **declara** o modo — `uiProps.modo` — e a comparação
+ * passa a ser a que importa.
+ *
+ * A tabela é escrita à mão, como a das primitivas, e pela mesma razão: se a
+ * ficha e o runtime discordarem do nome do modo, é a discordância que se quer
+ * ver, não uma normalização que a esconde.
+ */
+const MODO_DO_RUNTIME: Record<string, string> = {
+  ritmico: "rítmico",
+  toque: "toque",
+  flash: "flash",
+  "flash-mao": "flash, skin mão",
+  padrao: "padrão",
+  parear: "parear",
+};
+
+/**
+ * A primitiva que uma questão entrega, COM o modo quando ele existe.
+ *
+ * `pareamento` não carrega `modo` no spec porque só tem um: a F07 §1 diz
+ * `DragGroup (modo parear)` e o palco não faz outra coisa. Declarado aqui em
+ * vez de inventado no spec — o componente não precisa de um campo que nunca
+ * varia só para satisfazer um auditor.
+ */
+function primitivasDaQuestao(q: { kind: string; uiProps?: unknown }): string[] {
+  const bases = PRIMITIVA_DO_KIND[q.kind] ?? [];
+  const modoBruto = q.kind === "pareamento"
+    ? "parear"
+    : (q.uiProps as { modo?: string } | undefined)?.modo;
+  const modo = modoBruto ? MODO_DO_RUNTIME[modoBruto] : undefined;
+  // O modo qualifica a primeira primitiva — a que o palco é. Um palco composto
+  // (`story-bars` = StoryPanel + SingaporeBars) não tem modo declarado, e
+  // espalhar o modo por todas mentiria sobre as outras.
+  return modo && bases.length
+    ? [`${bases[0]}#${modo}`, ...bases.slice(1)]
+    : bases;
+}
+
 /** Como cada competência é servida hoje. */
 function comoEServida(id: string): "padrao-ouro" | "legado" | "vazio" {
   const t: any = (ALL_MATH_TRACKS as any[]).find(x => x.id === id);
@@ -274,20 +325,28 @@ describe("conformidade entre as fichas e o que o app serve", () => {
     for (const id of TODAS) {
       if (!porCompetencia.has(id) || comoEServida(id) === "vazio") continue;
       const track: any = (ALL_MATH_TRACKS as any[]).find(t => t.id === id);
-      let kinds: string[];
+      let questoes: { kind: string; uiProps?: unknown }[];
       try {
-        // Cinco níveis: uma competência pode trocar de primitiva na escada.
-        kinds = [...new Set([1, 2, 3, 4, 5].map(n => String(track.gen(n).kind)))];
+        // Cinco níveis: uma competência pode trocar de primitiva NA ESCADA, e
+        // também de modo — o N1.08 vira `fileira` no 1-2 e `tenframe` no 3-5.
+        questoes = [1, 2, 3, 4, 5].map(n => track.gen(n));
       } catch {
         naoAmostrados.push(id);
         continue;
       }
+      const kinds = [...new Set(questoes.map(q => String(q.kind)))];
       const desconhecidos = kinds.filter(k => !(k in PRIMITIVA_DO_KIND));
       if (desconhecidos.length) {
         naoAmostrados.push(`${id} (kind sem tradução: ${desconhecidos.join(", ")})`);
         continue;
       }
-      const entregues = new Set(kinds.flatMap(k => PRIMITIVA_DO_KIND[k]));
+      // A entrega inclui a forma SEM modo: uma ficha que pede `TenFrame` puro
+      // continua satisfeita por `TenFrame#flash` — o modo é um detalhe a mais,
+      // não uma primitiva diferente. O contrário é que não vale.
+      const entregues = new Set(questoes.flatMap(q => {
+        const comModo = primitivasDaQuestao(q);
+        return [...comModo, ...comModo.map(p => p.split("#")[0])];
+      }));
       const pedidas = primitivasExigidas(id);
       const faltou = pedidas.filter(p => !entregues.has(p));
       if (faltou.length) {
