@@ -231,6 +231,7 @@ Registrado porque o autor cobrou, e porque a próxima sessão não deve repetir.
 | P9 | `AllFichas` mistura `FichaCompetencia` e `Track` — iterar aquilo rebenta com TypeError em vez de reprovar | `fichas/index.ts` |
 | P10 | 12 competências trocam de MODO sem aviso; `N3.02` faz `EmojiRow` virar "riscar" vindo de 7 nós | `conformidadeDeFichas.test.ts` |
 | P11 | `DragGroup` estreia em dois modos a partir de dois nós-raiz sem pré-requisito entre eles | `N1.01.ts`, `AL.01.ts` |
+| P14 | Palcos novos precisam entrar no `PalcoEscalado` — desenho de tamanho fixo sem ele vaza em tela pequena, e a sonda só acusa se a cena estiver no catálogo | `PalcoEscalado.tsx`, `PLANO_DO_BLOCO_F0.md §11` |
 | P13 | A regra **extra** de domínio da §9 (F01 "um no disperso", F05 "um na primeira audição", F04 "um sem vaga") está testada no procedimento e não chega ao motor: `FichaDominio` só tem `acertos/de/sessoes` | `PLANO_DO_BLOCO_F0.md §10.4` |
 | **P12** | **N1.09: a ficha diz "produzir quantidade", o grafo diz "contar até 20 e a partir de N" — e quatro arestas (`N1.12`, `N2.01`, `N3.03`, `AL.03`) dependem da leitura do grafo, que ficha nenhuma escreve. Decisão curricular, não de implementação.** | `PLANO_DO_BLOCO_F0.md §10.1` |
 | — | `scripts/e2e-screenshots.mjs` não chega à tela de exercício (seed velho) | commit `a2d6c87` |

@@ -418,3 +418,61 @@ receber domínio da competência sem nunca ter feito a única questão que a pro
 Não é defeito de ficha nem de procedimento: é o schema assumindo que domínio é
 sempre contagem de acertos. Enquanto não houver campo, a regra é documentação
 executável esperando um ponto de ligação.
+
+---
+
+## §11 — As telas em qualquer aparelho, e o instrumento que media a si mesmo
+
+Vários palcos são desenhados em **pixels fixos** (326 de largura). Isso não é
+preguiça: a geometria deles **é** a resposta — a colisão entre vagas do
+`TouchPlace` é resolvida por construção (§6.29), e na cena da F47 um objeto 4px
+acima da linha errada não é feiura, é a questão trocada.
+
+Só que o app roda em qualquer tela:
+
+| aparelho | largura útil do palco | desenho de 326 |
+|---|---|---|
+| celular pequeno (320) | 260px | **vaza 66px** — §6.16 |
+| aparelho do projeto (390) | 330px | cabe |
+| tablet / desktop (`max-w-3xl`) | até 708px | ilha de 326 no meio de 708 |
+
+**A sonda não via porque media um viewport só, 390** — exatamente a largura em
+que o defeito não existe. O instrumento tinha o mesmo furo que o código.
+
+E ao medir 320 pela primeira vez, **todas** as cenas acusaram vazamento: o
+culpado era o `<section>` da própria página da sonda, travado em 390.
+
+> **A sonda estava medindo a própria régua.**
+
+Com o andaime seguindo o viewport (o mesmo `max-w-3xl` + `px-4` do app),
+apareceram os vazamentos de verdade: `N1.09`, `GE.01`, `N4.03`, `AL.02` e
+`N4.09` — este último não estava em nenhuma lista minha.
+
+### §11.1 — Por que escala, e não redesenho
+
+`PalcoEscalado` aplica uma **semelhança**: toda razão entre medidas é
+preservada. O que estava acima continua acima, o que não colidia continua sem
+colidir, o raio de encaixe continua proporcional ao objeto. **Nenhum contrato
+geométrico muda** — e a conta de ponteiro dos palcos já era por razão
+(`(clientX - r.left) / r.width * LARGURA`, onde `r.width` é a largura
+renderizada), então ela atravessa a escala sem uma linha de ajuste.
+
+Duas armadilhas, as duas achadas medindo:
+
+1. **O teto tem de vir da altura também.** A tela de jogo é
+   `h-[100dvh] overflow-hidden`: crescer só pela largura empurra a bandeja para
+   fora num celular deitado, sem barulho nenhum.
+2. **`transform` não muda a caixa de layout.** Com `mx-auto` e origem no
+   centro, um desenho de 390 dentro de uma caixa de 288 tem as margens `auto`
+   zeradas (elas não ficam negativas): o centro cai 51px à direita e o resultado
+   saía de 67 a 355 numa tela de 320 — **encolhido e ainda assim vazando**.
+   Origem no canto, e a margem centraliza com a largura já escalada.
+
+### §11.2 — O portão agora
+
+`npm run sonda` mede **três larguras**: 390 com as oito sementes (o portão de
+sempre), 320 e 900 com uma. Vazamento por largura não depende do sorteio,
+depende da tela — 800 tomadas no total.
+
+E `scripts/prints.mjs` aceita `PRINTS_LARGURA`, porque a sonda acusa vazamento e
+**não** acusa "ficou pequeno demais": isso continua sendo de olhar.
