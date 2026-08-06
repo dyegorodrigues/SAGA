@@ -209,8 +209,19 @@ describe("§7 — as falas são as da ficha, letra por letra", () => {
 
 describe("§9 — o domínio e a ficha", () => {
   it("3 de 3 em 2 sessões, em toda micro", () => {
+    // `toMatchObject`, não `toEqual`: a regra da §9 é sobre os três números. O
+    // objeto ganhou também a regra EXTRA (`exige`), e uma igualdade exata
+    // reprovava a ficha por declarar o que a própria §9 manda declarar (§2-bis).
     for (const m of N1_06.micros) {
-      expect(m.dominio, m.id).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+      expect(m.dominio, m.id).toMatchObject({ acertos: 3, de: 3, sessoes: 2 });
+    }
+  });
+
+  it("⚠️ a regra EXTRA da §9 está declarada, e é a primeira audição", () => {
+    // "Acertar depois de ouvir cinco vezes não prova reconhecimento." Sem esta
+    // declaração a regra ficava só no procedimento e não chegava à coroa (P13).
+    for (const m of N1_06.micros) {
+      expect(m.dominio.exige?.evidencia, m.id).toBe("primeira-audicao");
     }
   });
 

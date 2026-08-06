@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/formaProcedure";
 import { FichaCompetencia } from "../../schema";
@@ -46,7 +47,22 @@ import { FichaCompetencia } from "../../schema";
  * | 5 | **formas 3D** (cubo, esfera, cilindro) |
  */
 
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  /**
+   * §9: *"pelo menos um com a forma **girada**"*.
+   *
+   * É a evidência que obriga a colheita fora do nível 5 — o nível 5 desta ficha
+   * é o dos sólidos, onde giro não existe. Fosse colhida só no topo da escada,
+   * seria impossível, e a competência jamais coroaria.
+   */
+  exige: {
+    evidencia: Evidencia.FORMA_GIRADA,
+    descricao: "Reconhecer a forma mesmo com ela virada.",
+  },
+};
 
 /** §8, transcrita — os três beats do nível 2. */
 const coreografia = [

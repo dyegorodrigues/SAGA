@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag, MisconceptionTagType } from "../../constants/misconceptions";
 
 /**
@@ -234,4 +235,15 @@ const EXTENSO = [
 
 export function porExtenso(n: number): string {
   return EXTENSO[n] ?? String(n);
+}
+
+/**
+ * A evidência da §9 que ESTA resposta carrega (P13): acertou **sem repetir**.
+ *
+ * *"Acertar depois de ouvir cinco vezes não prova reconhecimento."*
+ */
+export function evidenciasDe(leitura: RespostaOuvida): string[] {
+  return leitura.resposta === leitura.alvo && leitura.repeticoes === 0
+    ? [Evidencia.PRIMEIRA_AUDICAO]
+    : [];
 }

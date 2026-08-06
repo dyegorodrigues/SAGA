@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
 
 /**
@@ -335,4 +336,14 @@ export function dominou(historico: AcaoDeProducao[]): boolean {
   const acertos = historico.filter(a => a.colocados === a.alvo && a.recusas === 0);
   if (acertos.length < 3) return false;
   return acertos.some(a => !a.comAndaime);
+}
+
+/**
+ * A evidência da §9 que ESTA resposta carrega (P13).
+ *
+ * Só o acerto conta: produzir a quantidade errada sem andaime não prova nada.
+ */
+export function evidenciasDe(acao: AcaoDeProducao): string[] {
+  const certo = acao.colocados === acao.alvo && acao.recusas === 0;
+  return certo && !acao.comAndaime ? [Evidencia.SEM_ANDAIME] : [];
 }

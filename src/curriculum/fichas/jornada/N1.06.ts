@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/audioChoiceProcedure";
 import { FichaCompetencia } from "../../schema";
@@ -65,7 +66,16 @@ import { FichaCompetencia } from "../../schema";
  * *"Acertar depois de ouvir cinco vezes não prova reconhecimento."* É por isso
  * que o palco conta as repetições e a tag `PRECISA_REPETICAO` existe.
  */
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  /** §9: *"acertar depois de ouvir cinco vezes não prova reconhecimento"*. */
+  exige: {
+    evidencia: Evidencia.PRIMEIRA_AUDICAO,
+    descricao: "Acertar ouvindo uma vez só, sem pedir de novo.",
+  },
+};
 
 /** §8, transcrita. */
 const coreografia = [

@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
 
 /**
@@ -236,4 +237,15 @@ export function dominou(historico: AcaoDeForma[]): boolean {
   const acertos = historico.filter(a => a.escolhida === a.pedida);
   if (acertos.length < 3) return false;
   return acertos.some(a => a.pedidaGirada);
+}
+
+/**
+ * A evidência da §9 que ESTA resposta carrega (P13).
+ *
+ * ⚠️ Esta é a que obriga a colheita fora do nível 5: o nível 5 da F48 é o dos
+ * sólidos, onde giro não existe. Colhida só no topo da escada, seria uma
+ * evidência impossível — e a competência jamais coroaria.
+ */
+export function evidenciasDe(acao: AcaoDeForma): string[] {
+  return acao.escolhida === acao.pedida && acao.pedidaGirada ? [Evidencia.FORMA_GIRADA] : [];
 }

@@ -263,8 +263,16 @@ describe("a ficha", () => {
   });
 
   it("§9: 3 de 3 em 2 sessões em toda micro", () => {
+    // `toMatchObject`, não `toEqual`: ver o comentário gêmeo na F05 (§2-bis).
     for (const m of N1_09.micros) {
-      expect(m.dominio, m.id).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+      expect(m.dominio, m.id).toMatchObject({ acertos: 3, de: 3, sessoes: 2 });
+    }
+  });
+
+  it("⚠️ a regra EXTRA da §9 está declarada, e é o acerto SEM vaga", () => {
+    // "Produzir com o alvo visível não prova cardinalidade produtiva." (P13)
+    for (const m of N1_09.micros) {
+      expect(m.dominio.exige?.evidencia, m.id).toBe("sem-andaime");
     }
   });
 

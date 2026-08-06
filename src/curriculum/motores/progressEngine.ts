@@ -14,6 +14,20 @@ export interface MasteryAttempt {
   isReview: boolean;
   practiceDay: string;
   previousPracticeDay?: string;
+  /**
+   * As condições que ESTA resposta satisfez — a §9 da ficha (P13).
+   *
+   * Vem do palco, que é o único que sabe: nem o valor da resposta nem o nível
+   * dizem se a criança acertou na primeira audição ou sem vaga fantasma.
+   */
+  evidencias?: string[];
+  /**
+   * A condição que a ficha EXIGE ter visto pelo menos uma vez.
+   *
+   * `undefined` numa ficha que não declara nada — e aí a dimensão não bloqueia,
+   * exatamente como não bloqueava antes de existir.
+   */
+  exigeEvidencia?: string;
 }
 
 export interface AnswerProgressResult {
@@ -110,6 +124,27 @@ export function legacyMasteryEvidence(): MasteryEvidence {
   };
 }
 
+/**
+ * O que ainda falta para a coroa, em português — para o painel dos pais.
+ *
+ * Existe porque a dimensão nova é a única que uma criança pode não alcançar
+ * **sem errar nada**: ela acerta tudo, sempre com andaime, e a coroa não vem.
+ * Sem uma frase que diga o quê, isso vira "o app travou".
+ */
+export function faltaParaCoroa(
+  evidence: MasteryEvidence | undefined,
+  descricaoDaEvidencia?: string,
+): string | null {
+  if (!evidence || evidence.crownedBy) return null;
+  if (evidence.comprehensionStreak < 3) return "Acertar três seguidas no último nível.";
+  if (evidence.independenceStreak < 3) return "Conseguir sem pedir dica.";
+  if (evidence.evidenciaDaFicha === false) {
+    return descricaoDaEvidencia ?? "Acertar uma vez na condição mais difícil da competência.";
+  }
+  if (evidence.retentionPasses < 1) return "Voltar a acertar depois de alguns dias.";
+  return null;
+}
+
 export function migrateLegacyCrown(progress: Progress): Progress {
   if (!progress.dom || progress.masteryEvidence) return progress;
   return { ...progress, masteryEvidence: legacyMasteryEvidence() };
@@ -139,7 +174,32 @@ function updateMasteryEvidence(
     fluencyStreak: before.masteryEvidence?.fluencyStreak || 0,
     retentionPasses: before.masteryEvidence?.retentionPasses || 0,
     candidateDay: before.masteryEvidence?.candidateDay,
+    evidenciaDaFicha: before.masteryEvidence?.evidenciaDaFicha,
+    evidenciasVistas: [...(before.masteryEvidence?.evidenciasVistas || [])],
   };
+
+  /**
+   * ⚠️ A evidência da ficha é colhida em QUALQUER nível, não só no 5.
+   *
+   * As três primeiras dimensões medem o desempenho no topo da escada, e por
+   * isso vivem atrás do `lvl !== 5`. A da ficha é outra coisa: é um FATO
+   * histórico — *"ela já fez isto uma vez"* —, e várias das condições da §9 só
+   * acontecem fora do nível 5.
+   *
+   * O caso que obriga: a F48 pede um acerto com a **forma girada**, e o nível 5
+   * dela é o dos sólidos, onde giro não existe. Colhida só no topo, essa
+   * evidência seria impossível e a competência jamais coroaria.
+   */
+  if (right && attempt.evidencias?.length) {
+    for (const nome of attempt.evidencias) {
+      if (!evidence.evidenciasVistas!.includes(nome)) evidence.evidenciasVistas!.push(nome);
+    }
+  }
+  evidence.evidenciaDaFicha = attempt.exigeEvidencia
+    ? evidence.evidenciasVistas!.includes(attempt.exigeEvidencia)
+    // Ficha que não declara condição extra não é bloqueada por ela — é o mesmo
+    // comportamento de antes de o campo existir.
+    : true;
 
   if (before.lvl !== 5) return evidence;
 
@@ -149,6 +209,9 @@ function updateMasteryEvidence(
     evidence.fluencyStreak = 0;
     evidence.retentionPasses = 0;
     evidence.candidateDay = undefined;
+    // `evidenciasVistas` NÃO é zerada: ela é histórico, não sequência. A §9 diz
+    // "pelo menos um acerto" naquela condição — errar depois não desfaz o que
+    // ela demonstrou uma vez.
     return evidence;
   }
 
@@ -156,12 +219,14 @@ function updateMasteryEvidence(
   evidence.independenceStreak = attempt.helpUsed
     ? 0
     : Math.min(3, evidence.independenceStreak + 1);
+  // Continua sendo medida — é telemetria e é o que a trilha do Dojo consome —,
+  // mas não coroa mais. Ver o comentário em `MasteryEvidence.fluencyStreak`.
   evidence.fluencyStreak = attempt.targetRtMs !== undefined && attempt.durationMs <= attempt.targetRtMs
     ? Math.min(3, evidence.fluencyStreak + 1)
     : 0;
 
   const coreReady = evidence.comprehensionStreak >= 3 &&
-    evidence.independenceStreak >= 3 && evidence.fluencyStreak >= 3;
+    evidence.independenceStreak >= 3 && evidence.evidenciaDaFicha === true;
   if (!coreReady) {
     evidence.retentionPasses = 0;
     evidence.candidateDay = undefined;

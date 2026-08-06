@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
 
 /**
@@ -174,4 +175,15 @@ export function dominou(historico: AcaoDeGrandeza[]): boolean {
   const acertos = historico.filter(a => a.escolhido === a.certo);
   if (acertos.length < 3) return false;
   return acertos.some(a => a.diferencaPequena);
+}
+
+/**
+ * A evidência da §9 que ESTA resposta carrega (P13).
+ *
+ * Acertar três diferenças gritantes mostra que ela enxerga, não que compara.
+ */
+export function evidenciasDe(acao: AcaoDeGrandeza): string[] {
+  return acao.escolhido === acao.certo && acao.diferencaPequena
+    ? [Evidencia.DIFERENCA_PEQUENA]
+    : [];
 }

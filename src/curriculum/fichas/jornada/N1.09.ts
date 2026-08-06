@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/producaoProcedure";
 import { FichaCompetencia } from "../../schema";
@@ -63,7 +64,16 @@ import { FichaCompetencia } from "../../schema";
  * vagas na tela, preencher todas é correspondência um-a-um (F07), não produção
  * de quantidade. A regra está em `dominou`, no procedimento.
  */
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  /** §9: *"produzir com o alvo visível não prova cardinalidade produtiva"*. */
+  exige: {
+    evidencia: Evidencia.SEM_ANDAIME,
+    descricao: "Produzir a quantidade certa sem as vagas fantasma na tela.",
+  },
+};
 
 /**
  * §8, a coreografia do nível 1 — com as falas **neutras de tema e de número**.

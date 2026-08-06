@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Progress } from "../../types";
-import { applyJourneyAnswer, migrateLegacyCrown } from "./progressEngine";
+import {
+  MasteryAttempt,
+  faltaParaCoroa, applyJourneyAnswer, migrateLegacyCrown } from "./progressEngine";
 
 function progress(overrides: Partial<Progress> = {}): Progress {
   return {
@@ -131,5 +133,82 @@ describe("progressEngine", () => {
     expect(first.progress.lvl).toBe(2);
     expect(second.progress.lvl).toBe(3);
     expect(second.transition).toEqual({ type: "level-up", level: 3 });
+  });
+});
+
+describe("P13 — a coroa passa a exigir a evidência que a ficha declara", () => {
+  const base: Progress = {
+    lvl: 5, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0, maxLvl: 5,
+  };
+  const tentativa = (extra: Partial<MasteryAttempt> = {}): MasteryAttempt => ({
+    durationMs: 60000,          // devagar de propósito: o relógio não pode reprovar
+    helpUsed: false,
+    isReview: false,
+    practiceDay: "2026-08-10",
+    ...extra,
+  });
+
+  function tresAcertos(exige?: string, evidencias?: string[]): Progress {
+    let p = base;
+    for (let i = 0; i < 3; i += 1) {
+      p = applyJourneyAnswer(p, true, false, tentativa({ exigeEvidencia: exige, evidencias })).progress;
+      p = { ...p, lvl: 5 };
+    }
+    return p;
+  }
+
+  it("⚠️ o RELÓGIO não coroa nem reprova mais — §5.1-bis", () => {
+    // Antes disto, `fluencyStreak` exigia responder dentro do `rt_alvo` três
+    // vezes seguidas, e sem `rt_alvo` declarado a criança NUNCA era coroada.
+    // Uma criança que entende tudo e responde devagar ficava sem a coroa.
+    const p = tresAcertos();
+    expect(p.masteryEvidence?.comprehensionStreak).toBe(3);
+    expect(p.masteryEvidence?.independenceStreak).toBe(3);
+    expect(p.masteryEvidence?.fluencyStreak).toBe(0);   // devagar, e tudo bem
+    expect(p.masteryEvidence?.evidenciaDaFicha).toBe(true);
+  });
+
+  it("⚠️ com evidência exigida e nunca demonstrada, a coroa NÃO vem", () => {
+    // É o caso que a P13 descreve: a criança acerta tudo, sempre com andaime, e
+    // recebia domínio de uma competência que nunca praticou sem apoio.
+    const p = tresAcertos("sem-andaime");
+    expect(p.masteryEvidence?.evidenciaDaFicha).toBe(false);
+    expect(p.dom).toBeFalsy();
+  });
+
+  it("demonstrada uma vez, a evidência fica — mesmo errando depois", () => {
+    // A §9 diz "pelo menos UM acerto" naquela condição: é fato histórico, não
+    // sequência. Errar depois zera as streaks, não desfaz o que ela mostrou.
+    let p = applyJourneyAnswer(base, true, false,
+      tentativa({ exigeEvidencia: "sem-andaime", evidencias: ["sem-andaime"] })).progress;
+    expect(p.masteryEvidence?.evidenciaDaFicha).toBe(true);
+
+    p = applyJourneyAnswer({ ...p, lvl: 5 }, false, false,
+      tentativa({ exigeEvidencia: "sem-andaime" })).progress;
+    expect(p.masteryEvidence?.comprehensionStreak).toBe(0);
+    expect(p.masteryEvidence?.evidenciasVistas).toContain("sem-andaime");
+  });
+
+  it("⚠️ a evidência é colhida FORA do nível 5 também", () => {
+    // O caso que obriga: a F48 pede um acerto com a forma girada, e o nível 5
+    // dela é o dos sólidos, onde giro não existe. Colhida só no topo, seria uma
+    // evidência impossível.
+    const noNivel2 = applyJourneyAnswer({ ...base, lvl: 2 }, true, false,
+      tentativa({ exigeEvidencia: "forma-girada", evidencias: ["forma-girada"] })).progress;
+    expect(noNivel2.masteryEvidence?.evidenciasVistas).toContain("forma-girada");
+  });
+
+  it("o resposta ERRADA não deixa evidência", () => {
+    const p = applyJourneyAnswer(base, false, false,
+      tentativa({ exigeEvidencia: "sem-andaime", evidencias: ["sem-andaime"] })).progress;
+    expect(p.masteryEvidence?.evidenciasVistas ?? []).not.toContain("sem-andaime");
+  });
+
+  it("`faltaParaCoroa` diz em português o que ainda falta", () => {
+    // Existe porque esta é a única dimensão que a criança pode não alcançar SEM
+    // ERRAR NADA. Sem uma frase, isso vira "o app travou".
+    const p = tresAcertos("sem-andaime");
+    expect(faltaParaCoroa(p.masteryEvidence, "Produzir sem as vagas fantasma."))
+      .toBe("Produzir sem as vagas fantasma.");
   });
 });

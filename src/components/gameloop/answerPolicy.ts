@@ -3,7 +3,11 @@ import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "
 import { AcaoDeProducao, diagnosticar as diagnosticarProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curriculum/procedimentos/posicaoProcedure";
 import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum/procedimentos/formaProcedure";
-import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
+import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza, evidenciasDe as evidenciasDaGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
+import { AcaoDeContagem, evidenciasDe as evidenciasDaContagem } from "../../curriculum/procedimentos/touchCountProcedure";
+import { RespostaOuvida, evidenciasDe as evidenciasDaEscuta } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from "../../curriculum/procedimentos/producaoProcedure";
+import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
 
@@ -117,4 +121,28 @@ export function shouldRenderQuestionOptions(q: Question): boolean {
     && q.kind !== "drag-group"
     && q.kind !== "array"
     && !PALCOS_QUE_RESPONDEM.has(q.kind as string);
+}
+
+/**
+ * As condições da §9 que ESTA resposta satisfez (P13).
+ *
+ * Espelha `misconceptionForAnswer`, e pela mesma razão: quem sabe se a criança
+ * acertou **na primeira audição** ou **sem vaga fantasma** é o palco, não o
+ * valor da resposta. A diferença é o sinal — o diagnóstico lê o erro, a
+ * evidência lê o acerto.
+ *
+ * Sem esta função, a `FichaDominio.exige` seria uma declaração que nada
+ * verifica: a criança receberia a coroa sem nunca ter feito a questão que a §9
+ * diz que prova a competência.
+ */
+export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
+  if (!meta) return [];
+  const achadas: string[] = [];
+  if (meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
+  if (meta.audiochoice) achadas.push(...evidenciasDaEscuta(meta.audiochoice as RespostaOuvida));
+  if (meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));
+  if (meta.forma) achadas.push(...evidenciasDaForma(meta.forma as AcaoF));
+  if (meta.grandeza) achadas.push(...evidenciasDaGrandeza(meta.grandeza as AcaoDeGrandeza));
+  if (meta.evidencias) achadas.push(...meta.evidencias);
+  return [...new Set(achadas)];
 }

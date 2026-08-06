@@ -11,6 +11,32 @@ export interface FichaDominio {
   acertos: number;
   de: number;
   sessoes: number;
+  /**
+   * A regra EXTRA da §9 — a condição sob a qual pelo menos um acerto precisa
+   * ter acontecido.
+   *
+   * ### Por que existe (pendência P13)
+   *
+   * Seis fichas do bloco F0 escrevem, na §9, uma segunda condição além da
+   * contagem de acertos:
+   *
+   * | ficha | regra extra |
+   * |---|---|
+   * | F01 (N1.04) | um acerto no arranjo **disperso** |
+   * | F05 (N1.06) | um acerto **na primeira audição** |
+   * | F04 (N1.13) | um acerto **sem vaga fantasma** |
+   * | F48 (GE.02) | um acerto com a forma **girada** |
+   * | F49 (GM.01) | um acerto com **diferença pequena** |
+   *
+   * Todas dizem a mesma coisa: *acertar não basta; é preciso ter acertado uma
+   * vez na condição que prova a competência*. Sem este campo a regra ficava
+   * escrita na ficha, testada no procedimento e **sem chegar ao motor** — a
+   * criança recebia domínio sem nunca ter feito a única questão que o prova.
+   *
+   * `evidencia` é o nome que o palco emite junto com a resposta; `descricao`
+   * existe para o painel dos pais dizer, em português, o que falta.
+   */
+  exige?: { evidencia: string; descricao: string };
 }
 
 export interface FichaMicro {

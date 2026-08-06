@@ -1048,6 +1048,8 @@ export class Composer {
       // (F02 manda "continue contando"; JD2 proíbe dizer "conte").
       howto: params.howto ?? ficha.howto,
       explain: params.explain ?? ficha.explain,
+      // P13: a condição da §9 viaja na questão até o motor de maestria.
+      ...(micro.dominio?.exige ? { exigeEvidencia: micro.dominio.exige.evidencia } : {}),
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
         ? ficha.niveis[lvl].rt_alvo! / 1000
         : undefined,

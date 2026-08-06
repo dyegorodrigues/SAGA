@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/grandezaProcedure";
 import { FichaCompetencia } from "../../schema";
@@ -57,7 +58,16 @@ import { FichaCompetencia } from "../../schema";
  * | 5 | **ordenar três** | seriação |
  */
 
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  /** §9: *"incluindo um com diferença pequena"* — enxergar não é comparar. */
+  exige: {
+    evidencia: Evidencia.DIFERENCA_PEQUENA,
+    descricao: "Acertar quando os dois são quase do mesmo tamanho.",
+  },
+};
 
 /** §8, transcrita. */
 const coreografia = [
