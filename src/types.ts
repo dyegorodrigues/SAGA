@@ -63,6 +63,8 @@ export interface AnswerMeta {
   classificacao?: unknown;
   /** A leitura da produção (F04): quantos colocou, e quantas vezes tentou passar. */
   touchplace?: unknown;
+  /** A leitura da posição (F47): onde estava o que ela tocou. */
+  posicao?: unknown;
   pareamento?: {
     porReceptor: number[];
     naBandeja: number;

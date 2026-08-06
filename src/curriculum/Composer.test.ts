@@ -90,12 +90,16 @@ describe("Composer de fichas", () => {
   });
 
   it("fails explicitly instead of returning an invalid question for an unknown builder", () => {
+    // A regra é "primitiva sem builder QUEBRA"; o nome usado aqui era só o
+    // exemplo — e era `shapecanvas`, que passou a ter builder quando a F47
+    // chegou. Um nome impossível por construção mantém a regra viva sem
+    // reprovar o dia em que a primitiva de exemplo for implementada (§2-bis).
     const invalid = {
       ...N1_01,
-      niveis: { 1: { primitiva: "shapecanvas" as const } },
+      niveis: { 1: { primitiva: "primitiva-que-nao-existe" as never } },
     };
     expect(() => Composer.generate(invalid, 1, "a")).toThrow(
-      "Primitiva shapecanvas ainda não possui builder",
+      "Primitiva primitiva-que-nao-existe ainda não possui builder",
     );
   });
 

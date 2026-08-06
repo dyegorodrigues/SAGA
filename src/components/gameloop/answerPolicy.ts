@@ -1,6 +1,7 @@
 import { diagnosticar as diagnosticarPareamento } from "../../curriculum/procedimentos/pareamentoProcedure";
 import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "../../curriculum/procedimentos/classificacaoProcedure";
 import { AcaoDeProducao, diagnosticar as diagnosticarProducao } from "../../curriculum/procedimentos/producaoProcedure";
+import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curriculum/procedimentos/posicaoProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
 
@@ -57,6 +58,13 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
+  // Ficha F47 (GE.01): a hipótese depende de ONDE estava o que ela tocou, e de
+  // ter tocado o próprio referencial — nada disso cabe num valor de alternativa.
+  if (meta?.posicao) {
+    const daAcao = diagnosticarPosicao(meta.posicao as AcaoDePosicao);
+    if (daAcao) return daAcao;
+  }
+
   const pickedOption = q.options?.find(option => option.value === value);
   return pickedOption?.misconception
     ? pickedOption.tag || pickedOption.misconception
@@ -82,7 +90,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
  * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
  * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
  */
-export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace"]);
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace", "shapecanvas"]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)

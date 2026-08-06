@@ -221,7 +221,24 @@ export const MisconceptionTag = {
    * entre duas questões. É também o que a §9 da F04 exige para dar domínio —
    * "produzir com o alvo visível não prova cardinalidade produtiva".
    */
-  DEPENDE_DE_ANDAIME: "depende-de-andaime"
+  DEPENDE_DE_ANDAIME: "depende-de-andaime",
+
+  /* --- posição no espaço (ficha F47) -------------------------------- */
+
+  /** Posição: trocou a preposição pela oposta — em cima por embaixo, dentro por fora */
+  INVERTE_PAR: "inverte-par",
+
+  /**
+   * Posição: escolheu sem olhar em relação a quê — tocou o próprio referencial.
+   *
+   * Com dois objetos na cena, todo erro de escolha é o objeto oposto: se o
+   * diagnóstico só olhasse os objetos, `INVERTE_PAR` seria a única tag possível.
+   * É por isso que o referencial também é tocável.
+   */
+  IGNORA_REFERENCIAL: "ignora-referencial",
+
+  /** Posição: errou no par que exige lateralidade — outra aula, não vocabulário */
+  ESQUERDA_DIREITA: "esquerda-direita"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

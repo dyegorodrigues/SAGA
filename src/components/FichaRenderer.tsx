@@ -30,6 +30,7 @@ import { TouchCount } from './primitives/TouchCount';
 import { EmojiRowStage } from './primitives/EmojiRowStage';
 import { ClassificacaoStage } from './primitives/ClassificacaoStage';
 import { TouchPlaceStage } from './primitives/TouchPlaceStage';
+import { CenaDePosicaoStage } from './primitives/CenaDePosicaoStage';
 import { AudioChoiceStage } from './primitives/AudioChoiceStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
@@ -96,6 +97,11 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <ClassificacaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'touchplace':
       return <TouchPlaceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    // O `ShapeCanvas` estava importado aqui e **sem `case` nenhum**: a
+    // primitiva que a F47 e a F48 nomeiam caía no `default`, que desenha
+    // "Ficha não implementada". Meio-órfã — importada, nunca alcançável.
+    case 'shapecanvas':
+      return <CenaDePosicaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'fileira':
       return <EmojiRowStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'array':

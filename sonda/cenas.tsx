@@ -40,6 +40,7 @@ import { AL_02 } from "../src/curriculum/fichas/jornada/AL.02";
 import { AL_01 } from "../src/curriculum/fichas/jornada/AL.01";
 import { N1_06 } from "../src/curriculum/fichas/jornada/N1.06";
 import { N1_09 } from "../src/curriculum/fichas/jornada/N1.09";
+import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 
 /** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
@@ -319,6 +320,20 @@ export const CENAS: Cena[] = [
     nome: "N1.09 micro-aula: as vagas pulsando",
     render: (s: number) => (
       <ExercicioDaFicha ficha={N1_09} lvl={1} semente={s} mostrar={{ pulsarVagas: true }} />
+    ),
+  },
+  // GE.01 — onde está? (F47), implementada e NÃO ativada. Os quatro pares da §5
+  // precisam de geometrias diferentes para serem legíveis, então cada nível é
+  // uma cena diferente: mesa, caixa aberta, muro (com oclusão) e árvore.
+  { nome: "GE.01 rollback: a resposta em palavras (nível 1)", render: (s) => <Exercicio id="GE.01" lvl={1} semente={s} /> },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `GE.01 onde está (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={GE_01} lvl={lvl} semente={s} />,
+  })),
+  {
+    nome: "GE.01 micro-aula: esta é a mesa",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarReferencial: true }} />
     ),
   },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },

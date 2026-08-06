@@ -62,6 +62,7 @@ import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProce
 import { construirClassificacaoSpec } from "./procedimentos/classificacaoContract";
 import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
 import { construirProducaoSpec } from "./procedimentos/producaoContract";
+import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
 import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
@@ -847,6 +848,20 @@ export class Composer {
           evaluate = candidate => candidate === "separado" || candidate === true;
         }
         promptOverride = spec.enunciado;
+        break;
+      }
+
+      case "shapecanvas": {
+        // Ficha F47 (GE.01), modo CENA. A resposta é o objeto que a criança
+        // toca — não existe alternativa. O gerador antigo fabricava as palavras
+        // "Em cima" e "Embaixo" como botões, e era isso que transformava a
+        // primeira geometria do currículo num exercício de leitura.
+        const spec = construirPosicaoSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
+        options = undefined;
         break;
       }
 
