@@ -68,7 +68,13 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  */
 export const COMPOSER_CANARIES = new Set<string>([
   "N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08",
-  "N1.07", "N1.10", "AL.01",
+  "N1.07", "N1.10",
+
+  // A AL.01 SAIU daqui: a ficha dela foi reescrita de `intruso_math` ("qual é
+  // o diferente?", múltipla escolha) para a F51 de verdade — separar peças em
+  // laços, com o "não pertence" como resposta. É tela nova, e tela nova não
+  // estreia no PR que a escreve. O rollback cai em `legadoAL_01`, que é o
+  // intruso que ela serve hoje.
 
   // ---- ATIVAÇÃO do bloco F0 ----------------------------------------
   //

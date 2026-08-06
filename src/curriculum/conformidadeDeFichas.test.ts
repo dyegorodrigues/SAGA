@@ -175,6 +175,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   pareamento: ["DragGroup"],
   touchcount: ["TouchCount"],
   fileira: ["EmojiRow"],
+  classificacao: ["DragGroup"],
 };
 
 /**
@@ -204,6 +205,7 @@ const MODO_DO_RUNTIME: Record<string, string> = {
   "flash-mao": "flash, skin mão",
   padrao: "padrão",
   parear: "parear",
+  "caixas/laços": "caixas/laços",
 };
 
 /**
@@ -218,7 +220,9 @@ function primitivasDaQuestao(q: { kind: string; uiProps?: unknown }): string[] {
   const bases = PRIMITIVA_DO_KIND[q.kind] ?? [];
   const modoBruto = q.kind === "pareamento"
     ? "parear"
-    : (q.uiProps as { modo?: string } | undefined)?.modo;
+    : q.kind === "classificacao"
+      ? "caixas/laços"
+      : (q.uiProps as { modo?: string } | undefined)?.modo;
   const modo = modoBruto ? MODO_DO_RUNTIME[modoBruto] : undefined;
   // O modo qualifica a primeira primitiva — a que o palco é. Um palco composto
   // (`story-bars` = StoryPanel + SingaporeBars) não tem modo declarado, e

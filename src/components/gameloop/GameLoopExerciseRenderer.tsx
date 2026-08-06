@@ -12,6 +12,7 @@ import { AreaStage } from "../primitives/AreaStage";
 import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
+import { ClassificacaoStage } from "../primitives/ClassificacaoStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -62,6 +63,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "pareamento",
   "touchcount",
   "fileira",
+  "classificacao",
 ]);
 
 interface Props {
@@ -158,6 +160,16 @@ export function GameLoopExerciseRenderer({
             onAnswer={(valor) => handlePick(valor)}
             disabled={status !== null}
             fase={faseDaCena}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "classificacao" && q.uiProps && (
+          <ClassificacaoStage
+            spec={q.uiProps as never}
+            // §4: a voz confirma o "fora" e repete o critério no erro suave.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "classificacao", classificacao: acao } as never)}
+            disabled={status !== null}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}

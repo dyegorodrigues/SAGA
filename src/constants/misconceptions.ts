@@ -153,7 +153,28 @@ export const MisconceptionTag = {
    * Não é "não vê a unidade": ela viu o padrão, e viu metade dele. O tratamento
    * é a moldura deslizando sobre as duas regras, não voltar ao AB.
    */
-  SO_UM_ATRIBUTO: "so-um-atributo"
+  SO_UM_ATRIBUTO: "so-um-atributo",
+
+  /* --- classificação (ficha F51) ------------------------------------ */
+
+  /**
+   * Classificar: força tudo para dentro do laço.
+   *
+   * É o erro que a F51 §2 chama de *"o que quase ninguém ensina"*: a criança
+   * acha que **tudo tem que caber em alguma caixa**. Deixar corretamente de
+   * fora é resposta certa, e esta tag existe para o app perceber quando ela
+   * ainda não sabe disso.
+   */
+  TUDO_CABE: "tudo-cabe",
+
+  /** Classificar: agrupou por outro atributo — separou por forma onde o critério era cor */
+  CRITERIO_ERRADO: "criterio-errado",
+
+  /** Classificar: o critério mudou e ela continuou no anterior — não reclassifica */
+  NAO_RECLASSIFICA: "nao-reclassifica",
+
+  /** Classificar: não aceita que uma peça pertença a DOIS grupos ao mesmo tempo */
+  SEM_INTERSECAO: "sem-intersecao"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

@@ -57,6 +57,8 @@ export interface AnswerMeta {
    * Sem este campo, o Radar não teria como distinguir "pôs dois no mesmo" de
    * "deixou um sem" — que pedem aulas diferentes.
    */
+  /** A leitura da classificação (F51): onde cada peça foi parar. */
+  classificacao?: unknown;
   pareamento?: {
     porReceptor: number[];
     naBandeja: number;

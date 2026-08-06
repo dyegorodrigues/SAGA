@@ -37,6 +37,7 @@ import { N1_01 } from "../src/curriculum/fichas/jornada/N1.01";
 import { N1_03 } from "../src/curriculum/fichas/jornada/N1.03";
 import { N1_08 } from "../src/curriculum/fichas/jornada/N1.08";
 import { AL_02 } from "../src/curriculum/fichas/jornada/AL.02";
+import { AL_01 } from "../src/curriculum/fichas/jornada/AL.01";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 
 /** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
@@ -267,6 +268,26 @@ export const CENAS: Cena[] = [
     nome: "AL.02 micro-aula: a moldura da unidade",
     render: (s: number) => (
       <ExercicioDaFicha ficha={AL_02} lvl={1} semente={s} mostrar={{ molduraUnidade: [0, 1] }} />
+    ),
+  },
+  // AL.01 — a classificação (F51), implementada e NÃO ativada. O rollback dela
+  // é o `intruso_math` que a produção serve hoje, e ele também é medido: uma
+  // tela de emergência quebrada não socorre.
+  { nome: "AL.01 rollback: intruso legado (nível 2)", render: (s) => <Exercicio id="AL.01" lvl={2} semente={s} /> },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `AL.01 classificar (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={AL_01} lvl={lvl} semente={s} />,
+  })),
+  {
+    nome: "AL.01 micro-aula: o laço aceso",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={AL_01} lvl={1} semente={s} mostrar={{ destacarLaco: true }} />
+    ),
+  },
+  {
+    nome: "AL.01 micro-aula: fica fora",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={AL_01} lvl={1} semente={s} mostrar={{ deixarFora: 1 }} />
     ),
   },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },

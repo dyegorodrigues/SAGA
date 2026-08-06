@@ -59,6 +59,7 @@ import { ModoDeContagem } from "./procedimentos/touchCountProcedure";
 import { EmojiRowSpec, chaveDaPeca, construirEmojiRowSpec } from "./procedimentos/emojiRowContract";
 import { MisconceptionTag } from "../constants/misconceptions";
 import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProcedure";
+import { construirClassificacaoSpec } from "./procedimentos/classificacaoContract";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -776,6 +777,34 @@ export class Composer {
             ...(tag ? { misconception: tag, tag } : {}),
           };
         });
+        break;
+      }
+
+      case "classificacao": {
+        // Ficha F51 (AL.01). Ficha de PRODUÇÃO: a criança separa, não escolhe.
+        // A única escolha é o nível 5 — "por que estas estão juntas?" —, cujas
+        // alternativas são CRITÉRIOS, nunca peças.
+        const spec = construirClassificacaoSpec(lvl, Math.random);
+        uiProps = spec;
+
+        if (spec.forma === "descobrir") {
+          answer = spec.resposta!;
+          options = spec.alternativas!.map(a => ({ value: a.valor, label: a.rotulo }));
+          evaluate = candidate => candidate === answer;
+        } else {
+          // Nos níveis 1 a 4 não há alternativa: quem julga é o palco, que
+          // recusa a peça no laço errado (§4, "empurrada de volta") e só
+          // termina quando tudo está no lugar. Fabricar alternativas aqui
+          // devolveria a múltipla escolha que esta ficha existe para tirar do
+          // caminho — e foi exatamente ela que a AL.01 servia até agora.
+          //
+          // O que o Radar recebe não vem do valor: vem da AÇÃO, lida em
+          // `answerPolicy` a partir das tentativas recusadas.
+          answer = "separado";
+          options = undefined;
+          evaluate = candidate => candidate === "separado" || candidate === true;
+        }
+        promptOverride = spec.enunciado;
         break;
       }
 

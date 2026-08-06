@@ -1,4 +1,5 @@
 import { diagnosticar as diagnosticarPareamento } from "../../curriculum/procedimentos/pareamentoProcedure";
+import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "../../curriculum/procedimentos/classificacaoProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
 
@@ -37,6 +38,15 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
+  // Ficha F51 (AL.01): não há alternativa que carregue a hipótese — o erro está
+  // no que a criança TENTOU fazer com as peças. E as tentativas são a única
+  // fonte: o erro é empurrado de volta (§4), então o estado final está sempre
+  // certo e `TUDO_CABE` — o alvo da ficha — nunca apareceria no repouso.
+  if (meta?.classificacao) {
+    const daAcao = diagnosticarClassificacao(meta.classificacao as AcaoDeClassificacao);
+    if (daAcao) return daAcao;
+  }
+
   const pickedOption = q.options?.find(option => option.value === value);
   return pickedOption?.misconception
     ? pickedOption.tag || pickedOption.misconception
@@ -62,7 +72,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
  * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
  * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
  */
-export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira"]);
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao"]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)
