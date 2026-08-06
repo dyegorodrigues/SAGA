@@ -183,13 +183,15 @@ describe("o rollback devolve a tela anterior — e é observável", () => {
   it("tela nova nasce DESLIGADA: implementação e ativação são PRs distintos", () => {
     // A regra, e o motivo dela: uma tela que a criança nunca viu não vai a ela
     // no mesmo commit que a escreveu. Quem entra aqui é todo nó cuja FICHA foi
-    // reescrita — N1.01 (pareamento, F07), N1.04 (contar tocando, F01) e N1.02
-    // (canhão, F27), que nasce agora.
+    // reescrita — N1.01 (pareamento, F07), N1.04 (contar tocando, F01), N1.02
+    // (canhão, F27), e agora N1.03 (olhômetro, JD1) e N1.08 (mão relâmpago,
+    // JD2), que passaram para o palco novo da fileira com o roteiro da §4 e a
+    // coreografia da §8.
     //
     // Os demais continuam ativos porque suas fichas não mudaram: para eles, a
     // ativação só regularizou um estado que já existia em produção, sem trocar
     // uma tela sequer.
-    const DESLIGADOS = ["N1.01", "N1.02", "N1.04"];
+    const DESLIGADOS = ["N1.01", "N1.02", "N1.03", "N1.04", "N1.08"];
     for (const id of DESLIGADOS) {
       expect(COMPOSER_CANARIES.has(id), `${id} não deveria estar ativo`).toBe(false);
       expect(hasComposerFicha(id), `${id} deveria estar registrado`).toBe(true);

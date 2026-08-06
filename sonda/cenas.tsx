@@ -34,6 +34,10 @@ import { DeslocamentoStage } from "../src/components/primitives/DeslocamentoStag
 import { AreaStage } from "../src/components/primitives/AreaStage";
 import { N4_09 } from "../src/curriculum/fichas/jornada/N4.09";
 import { N1_01 } from "../src/curriculum/fichas/jornada/N1.01";
+import { N1_03 } from "../src/curriculum/fichas/jornada/N1.03";
+import { N1_08 } from "../src/curriculum/fichas/jornada/N1.08";
+import { AL_02 } from "../src/curriculum/fichas/jornada/AL.02";
+import { Fase } from "../src/components/primitives/EmojiRowStage";
 
 /** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
 export const LARGURA_DO_APARELHO = 390;
@@ -107,11 +111,22 @@ function Exercicio({ id, lvl, semente }: { id: string; lvl: number; semente: num
  * Renderizar só o palco, como eu vinha fazendo, mede o layout do palco e esconde
  * o enquadramento: dá para aprovar uma tela que, dentro do cartão, não cabe.
  */
-function ExercicioDaFicha({ ficha, lvl, semente, mostrar }: {
-  ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown;
+function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
+  ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown; fase?: Fase;
 }) {
   const q = comSemente(semente, () => Composer.generate(ficha, lvl));
   return (
+    <>
+      {/* A caixa do enunciado que o app desenha ACIMA do palco (GameLoop.tsx).
+          Ela faltava aqui, e a falta escondeu o enunciado saindo DUAS vezes em
+          todo palco que imprimia o próprio: o palco só, sem o enquadramento do
+          app, é o print errado da RETOMADA §7.4. */}
+      {q.prompt && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
+          style={{ borderColor: "#D9E5F8", color: "#22315C", background: "#fff", borderWidth: 3 }}>
+          {q.prompt}
+        </div>
+      )}
     <GameLoopExerciseRenderer
       q={q} status={null} idx={0} handlePick={nada} timeLeft={30} promptDone
       guidedIdx={null} mockTutorialN={null} tutShow={(mostrar ?? null) as never}
@@ -121,7 +136,9 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar }: {
       setShowClockTutorial={nada} sound={false} peekAgain={nada} setJourneyDone={nada}
       orderTaps={[]} handleOrderTap={nada} orderShake={null} hiddenOpts={[]}
       armedOpt={null} setArmedOpt={nada}
+      faseDaCena={fase}
     />
+    </>
   );
 }
 
@@ -166,7 +183,74 @@ export const CENAS: Cena[] = [
         mostrar={{ destacarFileira: "receptores", maoFantasma: true }} />
     ),
   },
-  { nome: "N1.03 comparar (nível 2)", render: (s) => <Exercicio id="N1.03" lvl={2} semente={s} /> },
+  // N1.03 (JD1), N1.08 (JD2) e AL.02 (F52) — a escada de modos do `EmojiRow`,
+  // implementada e NÃO ativada. Montadas pela ficha e desenhadas pelo
+  // renderizador REAL do app.
+  //
+  // A fase é PRESA: a tela percorre cinco fases em quatro segundos (§4), e a
+  // sonda mede aos 1500ms. Sem prender, ela fotografaria uma fase diferente a
+  // cada execução — e uma sonda que muda de resposta não é portão (§6.31).
+  //
+  // Duas fases por nível, porque são dois layouts distintos: o RELANCE tem os
+  // objetos na área e nenhuma alternativa; a PERGUNTA tem a área vazia e a barra
+  // de alternativas embaixo. Medir só uma esconde metade da tela — foi
+  // exatamente assim que a barra duplicada do N1.01 passou despercebida.
+  // Os dois alvos de ROLLBACK. N1.03 e N1.08 saíram dos canários neste commit,
+  // e é o legado que a produção serve enquanto a ativação não vem. Uma tela de
+  // emergência quebrada não socorre — por isso ela também é medida.
+  { nome: "N1.03 rollback: relance legado (nível 2)", render: (s) => <Exercicio id="N1.03" lvl={2} semente={s} /> },
+  { nome: "N1.08 rollback: caixa mágica legada (nível 2)", render: (s) => <Exercicio id="N1.08" lvl={2} semente={s} /> },
+
+  ...[1, 3, 5].flatMap(lvl => ([
+    {
+      nome: `N1.03 olhômetro relance (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_03} lvl={lvl} semente={s} fase="flash" />,
+    },
+    {
+      nome: `N1.03 olhômetro pergunta (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_03} lvl={lvl} semente={s} fase="perguntando" />,
+    },
+  ])),
+  {
+    nome: "N1.03 revelação do erro (padrão de dado)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_03} lvl={5} semente={s} fase="revelando" />,
+  },
+  {
+    nome: "N1.03 micro-aula: a fileira parada",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_03} lvl={1} semente={s} mostrar={{ revelar: 2 }} />
+    ),
+  },
+  ...[1, 2].flatMap(lvl => ([
+    {
+      nome: `N1.08 mão relâmpago (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_08} lvl={lvl} semente={s} fase="flash" />,
+    },
+    {
+      nome: `N1.08 mão relâmpago pergunta (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_08} lvl={lvl} semente={s} fase="perguntando" />,
+    },
+  ])),
+  {
+    nome: "N1.08 revelação: a mão cheia em bloco",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_08} lvl={2} semente={s} fase="revelando" />,
+  },
+  {
+    nome: "N1.08 micro-aula: a mão parada",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_08} lvl={1} semente={s} mostrar={{ revelar: { mao: 3 } }} />
+    ),
+  },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `AL.02 padrão (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={AL_02} lvl={lvl} semente={s} fase="perguntando" />,
+  })),
+  {
+    nome: "AL.02 micro-aula: a moldura da unidade",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={AL_02} lvl={1} semente={s} mostrar={{ molduraUnidade: [0, 1] }} />
+    ),
+  },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },
   { nome: "N3.01 primeira soma (nível 2)", render: (s) => <Exercicio id="N3.01" lvl={2} semente={s} /> },
   { nome: "N3.03 amigos do dez (nível 2)", render: (s) => <Exercicio id="N3.03" lvl={2} semente={s} /> },

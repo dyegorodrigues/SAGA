@@ -160,6 +160,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   deslocamento: ["MaterialDourado"],
   pareamento: ["DragGroup"],
   touchcount: ["TouchCount"],
+  fileira: ["EmojiRow"],
 };
 
 /** Como cada competência é servida hoje. */

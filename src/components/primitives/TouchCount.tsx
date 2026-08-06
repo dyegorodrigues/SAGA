@@ -206,12 +206,10 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
 
   return (
     <div className="w-full max-w-[390px] px-3 py-2">
-      <p
-        aria-label={spec.falado}
-        className="mb-2 text-center text-xl font-black leading-tight text-slate-800"
-      >
-        {spec.enunciado}
-      </p>
+      {/* O enunciado NÃO sai aqui: o app já o desenha na caixa acima do palco
+          (`GameLoop.tsx` → `q.prompt`). Imprimir de novo punha a pergunta duas
+          vezes na tela — o §6.32 outra vez, e desta vez escondido porque a
+          sonda montava o palco sem o enquadramento do app. */}
 
       {/* O contador do modo rítmico: a sequência fica visível, 1 · 2 · 3.
           No nível 4 ela some — a competência é oral e ele precisa segurar

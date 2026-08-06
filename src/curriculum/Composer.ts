@@ -56,6 +56,9 @@ import { TEMAS, construirPareamentoSpec } from "./procedimentos/pareamentoContra
 import { cenasDoNivel as pareamentoCenasDoNivel, desfechoDe } from "./procedimentos/pareamentoProcedure";
 import { construirTouchCountSpec } from "./procedimentos/touchCountContract";
 import { ModoDeContagem } from "./procedimentos/touchCountProcedure";
+import { chaveDaPeca, construirEmojiRowSpec } from "./procedimentos/emojiRowContract";
+import { MisconceptionTag } from "../constants/misconceptions";
+import { ModoDaFileira } from "./procedimentos/emojiRowProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -132,6 +135,38 @@ function numericOptions(answer: number, min: number, max: number) {
   return values
     .map(value => ({ label: String(value), value }))
     .sort(() => Math.random() - 0.5);
+}
+
+/**
+ * A hipótese que uma alternativa da fileira carrega — §6 das fichas JD1, JD2 e F52.
+ *
+ * Fica aqui, e não em `tagNumericDistractors`, porque duas das três tags **não
+ * são regras sobre o valor**: `CHUTE_SEGURO` fala da POSIÇÃO na tela e
+ * `COPIA_ULTIMO` fala da peça anterior à lacuna. O parser de `"n+1"` não tem
+ * como expressá-las, e forçá-las ali produziria tag errada em silêncio.
+ *
+ * A ordem é a armadilha §6.8: do mais específico ao mais genérico. Com
+ * `OFF_BY_ONE` na frente, ele engoliria `CHUTE_SEGURO` toda vez que a
+ * alternativa central caísse a um do alvo.
+ */
+function tagDaAlternativa(
+  spec: { modo: string; resposta: number | string; central: number | string | null; sequencia?: { anterior: { emoji: string; quantidade: number } } },
+  valor: number | string,
+): string | undefined {
+  if (valor === spec.resposta) return undefined;
+
+  if (spec.modo === "padrao") {
+    return spec.sequencia && valor === chaveDaPeca(spec.sequencia.anterior)
+      ? MisconceptionTag.COPIA_ULTIMO
+      : MisconceptionTag.NAO_VE_UNIDADE;
+  }
+
+  if (valor === spec.central) return MisconceptionTag.CHUTE_SEGURO;
+  if (typeof valor === "number" && typeof spec.resposta === "number"
+    && Math.abs(valor - spec.resposta) === 1) {
+    return MisconceptionTag.OFF_BY_ONE;
+  }
+  return undefined;
 }
 
 function tagNumericDistractors(
@@ -699,6 +734,44 @@ export class Composer {
         break;
       }
 
+      case "fileira": {
+        // Fichas JD1 (N1.03, olhômetro), JD2 (N1.08, mão relâmpago) e F52
+        // (AL.02, padrões) — os três modos da escada do `EmojiRow`.
+        //
+        // A ficha diz o MODO, igual ao `touchcount`, e pelo mesmo motivo:
+        // deduzir pelo id da competência funcionaria com três nós e apagaria em
+        // silêncio o dia em que um quarto usasse a primitiva. Faltando o modo,
+        // isto QUEBRA — barulho na hora certa vale mais que uma tela plausível
+        // e errada, que foi como o canhão da F27 desenhou peixinhos.
+        const MODOS: ModoDaFileira[] = ["plain", "flash", "flash-mao", "padrao"];
+        if (!MODOS.includes(params.modo as ModoDaFileira)) {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva fileira exige params.modo em `
+            + `${JSON.stringify(MODOS)} — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+        const modo = params.modo as ModoDaFileira;
+        const spec = construirEmojiRowSpec(modo, lvl, Math.random);
+
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
+
+        // As alternativas saem NA ORDEM DO SPEC, sem embaralhar. No relance a
+        // ordem é numérica e a do meio é a que a tag `CHUTE_SEGURO` observa:
+        // embaralhar aqui apagaria o diagnóstico que a §6 das duas fichas pede.
+        options = spec.alternativas.map(a => {
+          const tag = tagDaAlternativa(spec, a.valor);
+          return {
+            value: a.valor,
+            label: a.rotulo,
+            ...(tag ? { misconception: tag, tag } : {}),
+          };
+        });
+        break;
+      }
+
       case "area": {
         // As contas do nível já vêm filtradas pelo valor diagnóstico: o
         // procedimento é dono da regra, o Composer só sorteia. Sortear aqui e
@@ -817,8 +890,11 @@ export class Composer {
     }
 
     return {
-      howto: ficha.howto,
-      explain: ficha.explain,
+      // A micro pode sobrescrever a fala quando a competência é servida por
+      // mais de uma ficha e as §7 delas se contradizem — é o caso do N1.08
+      // (F02 manda "continue contando"; JD2 proíbe dizer "conte").
+      howto: params.howto ?? ficha.howto,
+      explain: params.explain ?? ficha.explain,
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
         ? ficha.niveis[lvl].rt_alvo! / 1000
         : undefined,

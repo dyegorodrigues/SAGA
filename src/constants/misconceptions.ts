@@ -112,7 +112,39 @@ export const MisconceptionTag = {
   CONTAGEM_INCOMPLETA: "contagem-incompleta",
 
   /** Contagem rítmica: mandada continuar do 4, começou do 1 — não desacoplou a sequência do início */
-  NAO_CONTA_A_PARTIR_DE: "nao-conta-a-partir-de"
+  NAO_CONTA_A_PARTIR_DE: "nao-conta-a-partir-de",
+
+  /* --- subitização e padrões (fichas JD1, JD2 e F52) ----------------- */
+
+  /**
+   * Relance: escolheu a alternativa do MEIO sem ter visto.
+   *
+   * É uma hipótese sobre posição, não sobre valor — e por isso o construtor de
+   * alternativas precisa variar onde a resposta cai. Com a certa sempre no meio,
+   * chutar o meio acertaria sempre e a tag nunca poderia existir.
+   */
+  CHUTE_SEGURO: "chute-seguro",
+
+  /**
+   * Relance: acerta com apoio de formato (fila, padrão de dado, mão canônica) e
+   * erra sem ele. Subitiza a FIGURA, não a quantidade.
+   */
+  DEPENDE_DE_FORMATO: "depende-de-formato",
+
+  /** Mão relâmpago: responde 5 a qualquer mão com o polegar levantado — fixou "mão = 5" */
+  ANCORA_CINCO_RIGIDA: "ancora-cinco-rigida",
+
+  /** Mão relâmpago: com duas mãos, responde o de uma só — não integra os dois conjuntos */
+  IGNORA_SEGUNDA_MAO: "ignora-segunda-mao",
+
+  /** Padrões: repetiu o último elemento visto em vez de continuar a regra — **o alvo da F52** */
+  COPIA_ULTIMO: "copia-ultimo",
+
+  /** Padrões: não identifica o pedaço que se repete */
+  NAO_VE_UNIDADE: "nao-ve-unidade",
+
+  /** Padrões: só resolve o AB; erra assim que a unidade cresce */
+  SO_AB: "so-ab"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

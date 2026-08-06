@@ -16,6 +16,7 @@ import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { AL_01 } from "../fichas/jornada/AL.01";
+import { AL_02 } from "../fichas/jornada/AL.02";
 import { Question, Track } from "../../types";
 
 type Generator = (level: number) => Question;
@@ -51,6 +52,11 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.08": N1_08,
   "N1.10": N1_10,
   "AL.01": AL_01,
+
+  // AL.02 nunca teve ficha em runtime: era servida por `gAL_02`, que devolve
+  // sempre `🔴🔵🔴🔵🔴` com duas alternativas, ignorando o nível. Os cinco
+  // degraus da F52 §5 não existiam. Registrada aqui e NÃO ativada.
+  "AL.02": AL_02,
 };
 
 /**
@@ -63,18 +69,28 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
 export const COMPOSER_CANARIES = new Set<string>([
   "N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08",
 
-  // Estes seis JÁ eram servidos por ficha em produção antes deste commit, por
-  // fora do mecanismo. Ativá-los aqui não muda uma tela sequer: regulariza um
-  // estado que já existia e passa a permitir rollback, que antes não existia.
+  // Estes JÁ eram servidos por ficha em produção antes do commit que fechou a
+  // porta dos fundos. Ativá-los lá não mudou uma tela sequer: regularizou um
+  // estado que já existia e passou a permitir rollback, que antes não existia.
   // Não confundir com ativação de canário novo — essa continua exigindo PR
   // próprio, e é por isso que o N1.01 NÃO está nesta lista.
-  "N1.03", "N1.07", "N1.08", "N1.10", "AL.01",
+  "N1.07", "N1.10", "AL.01",
 
-  // O N1.04 SAIU daqui neste commit. A ficha dele foi reescrita para `TouchCount`
-  // (F01) e a tela é nova: ativá-la no mesmo commit que a escreveu é exatamente
-  // o que a regra dos PRs separados impede — e é o erro que eu já cometi uma vez
-  // com o N1.01. Enquanto isso a produção serve o legado congelado.
+  // O N1.04 SAIU daqui quando a ficha dele foi reescrita para `TouchCount`
+  // (F01) e a tela virou outra: ativá-la no mesmo commit que a escreveu é
+  // exatamente o que a regra dos PRs separados impede — e é o erro que eu já
+  // cometi uma vez com o N1.01. Enquanto isso a produção serve o legado.
   // O N1.02 nasce registrado e desativado, pelo mesmo motivo.
+  //
+  // **N1.03 e N1.08 SAEM daqui neste commit, e pela mesma regra.** As duas
+  // passaram a ser servidas pelo palco novo da fileira (`EmojiRowStage`), com o
+  // roteiro da §4, a coreografia da §8 e — no N1.08 — a mão da JD2 nos níveis 1
+  // e 2. É tela nova; tela nova não estreia no PR que a escreve.
+  //
+  // O rollback delas cai em `legadoN1_03` e `legadoN1_08`, que são as telas de
+  // relance que a produção servia até aqui — mesmo patamar, não regressão.
+  //
+  // A AL.02 nasce registrada e desativada: nunca foi canário.
 ]);
 
 export interface GeneratorBinding {

@@ -62,7 +62,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
  * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
  * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
  */
-export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount"]);
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira"]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)

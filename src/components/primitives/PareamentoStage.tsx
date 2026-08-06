@@ -112,9 +112,8 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
 
   return (
     <div className="flex w-full flex-col items-center gap-4 select-none">
-      <p className="px-3 text-center text-xl font-black text-slate-800" aria-label={spec.falado}>
-        {spec.enunciado}
-      </p>
+      {/* O enunciado não sai aqui: o app já o desenha acima do palco. Ver a
+          nota igual em `TouchCount` e o teste `palcoUnico`. */}
 
       {/* Quem recebe. Fica em cima, como manda a F07 §3. */}
       <div

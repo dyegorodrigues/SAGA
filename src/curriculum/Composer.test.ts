@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Composer } from "./Composer";
+import { MisconceptionTag } from "../constants/misconceptions";
 import { N1_01 } from "./fichas/jornada/N1.01";
 import { N1_03 } from "./fichas/jornada/N1.03";
+import { N1_08 } from "./fichas/jornada/N1.08";
 import { N1_04 } from "./fichas/jornada/N1.04";
 import { JOURNEY_FICHAS } from "./fichas";
 import { N3_09 } from "./fichas/jornada/N3.09";
@@ -10,16 +12,12 @@ import { N4_02 } from "./fichas/jornada/N4.02";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
-    // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. A N1.03
-    // demonstra sozinha — o micro "a" declara `emojirow`, e o nível 5 manda
-    // `scattered`. Se o Composer olhasse o micro, viria emojirow aqui.
-    const scattered = Composer.generate(N1_03, 5, "a");
-    expect(scattered.kind).toBe("scattered");
-    expect(scattered.n).toBeTypeOf("number");
-    expect(scattered.uiProps.ordered).toBe(false);
-
-    const flash = Composer.generate(N1_03, 1, "a");
-    expect(flash.kind).toBe("emojirow");
+    // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. Quem
+    // demonstra hoje é o N1.08, servido por DUAS fichas: a JD2 (mão relâmpago,
+    // `fileira`) nos níveis 1-2 e a F02 (moldura de dez, `tenframe`) nos 3-5.
+    // Se o Composer olhasse o micro, os cinco níveis viriam iguais.
+    expect(Composer.generate(N1_08, 1).kind).toBe("fileira");
+    expect(Composer.generate(N1_08, 3).kind).toBe("tenframe");
   });
 
   it("N1.04 é `touchcount` nos CINCO níveis — a ficha F01 não tem outra primitiva", () => {
@@ -35,18 +33,19 @@ describe("Composer de fichas", () => {
   });
 
   it("normalizes legacy tutorial speech into the runtime contract", () => {
-    const question = Composer.generate(N1_03, 1, "a");
-    expect(question.tutorial?.[0]?.say).toBe(
-      "Preste atenção, eles vão sumir rapidinho!",
-    );
+    // A coreografia da JD1 §8, transcrita: o `fala` da ficha vira `say` no
+    // runtime, e o `show` chega ao palco.
+    const question = Composer.generate(N1_03, 1);
+    expect(question.tutorial?.[0]?.say).toBe("Prepare o olho!");
+    expect(question.tutorial?.[0]?.show).toEqual({ fixarOlhar: true });
   });
 
   it("converts the level response-time target from milliseconds to seconds", () => {
-    expect(Composer.generate(N1_03, 5, "a").rt_max_s).toBe(1.5);
+    expect(Composer.generate(N1_03, 5).rt_max_s).toBe(1.5);
   });
 
   it("attaches canonical misconception tags only to matching numeric distractors", () => {
-    const question = Composer.generate(N1_03, 5, "a");
+    const question = Composer.generate(N1_08, 3);
     const wrongOptions = question.options?.filter(option => option.value !== question.answer) || [];
     const mappedOffByOne = wrongOptions.filter(option =>
       typeof option.value === "number" && Math.abs(option.value - question.answer) === 1
@@ -54,7 +53,7 @@ describe("Composer de fichas", () => {
 
     expect(wrongOptions.length).toBeGreaterThan(0);
     expect(mappedOffByOne.length).toBeGreaterThan(0);
-    expect(mappedOffByOne.every(option => option.misconception === "OFF_BY_ONE")).toBe(true);
+    expect(mappedOffByOne.every(option => option.misconception === MisconceptionTag.OFF_BY_ONE)).toBe(true);
     expect(question.options?.find(option => option.value === question.answer)?.misconception).toBeUndefined();
   });
 
@@ -109,8 +108,8 @@ describe("Composer de fichas", () => {
       }],
     };
 
-    expect(() => Composer.generate(malformed, 1, "a")).toThrow(
-      "Parâmetro n_min inválido em N1.03/a",
+    expect(() => Composer.generate(malformed, 1, "estreia")).toThrow(
+      "Parâmetro n_min inválido em N1.03/estreia",
     );
   });
 
