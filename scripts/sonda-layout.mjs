@@ -37,6 +37,21 @@ const BASE = `http://localhost:${PORTA}/sonda/`;
 const CHROME = process.env.SONDA_CHROME
   || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const SALVAR_FOTOS = process.argv.includes("--fotos");
+
+/**
+ * O laço de trabalho, ao lado do portão.
+ *
+ * - `npm run sonda` → 54 cenas × 8 sementes. É o PORTÃO, e continua igual.
+ * - `npm run sonda -- N1.03` → só as cenas do N1.03.
+ * - `SONDA_SEMENTES=1 npm run sonda -- N1.03` → uma semente. Segundos.
+ *
+ * Isto existe porque o instrumento virou gargalo: onze minutos por conserto
+ * empurra quem está construindo a rodar o portão só no fim — e aí os defeitos
+ * chegam todos juntos, que é o oposto do que a sonda foi feita para evitar.
+ * O portão continua sendo as oito sementes; o que mudou é poder olhar antes.
+ */
+const FILTRO = process.argv.slice(2).find(a => !a.startsWith("--")) ?? "";
+const SEMENTES = process.env.SONDA_SEMENTES ?? "";
 const PASTA_FOTOS = process.env.SONDA_FOTOS || "/tmp/sonda-saga";
 
 /**
@@ -238,14 +253,33 @@ try {
   const erros = [];
   pagina.on("pageerror", (e) => erros.push(String(e).slice(0, 160)));
 
-  await pagina.goto(BASE, { waitUntil: "networkidle" });
+  await pagina.goto(BASE + (SEMENTES ? `?sementes=${SEMENTES}` : ""), { waitUntil: "networkidle" });
   await pagina.waitForFunction(() => window.sonda?.total > 0, { timeout: 30000 });
   const quantas = await pagina.evaluate(() => window.sonda.total);
   const largura = await pagina.evaluate(() => document.documentElement.clientWidth);
 
   if (SALVAR_FOTOS) fs.mkdirSync(PASTA_FOTOS, { recursive: true });
 
+  // Quais tomadas visitar. Sem filtro, todas — é o portão.
+  //
+  // Com filtro, só as que interessam: `npm run sonda -- N1.03` mede uma
+  // competência em segundos em vez de onze minutos. O filtro é escolhido ANTES
+  // do laço, e não dentro dele, porque o custo da tomada é a espera de 1,5s
+  // pela tela parar — visitar para depois descartar não economizaria nada.
+  const nomes = await pagina.evaluate(() => window.sonda.nomes?.() ?? []);
+  const alvos = [];
   for (let i = 0; i < quantas; i += 1) {
+    if (FILTRO && !(nomes[i] ?? "").toLowerCase().includes(FILTRO.toLowerCase())) continue;
+    alvos.push(i);
+  }
+  if (FILTRO && alvos.length === 0) {
+    console.log(`nenhuma cena casa com "${FILTRO}". Cenas disponíveis:`);
+    console.log([...new Set(nomes.map(n => n.replace(/ \[semente .*/, "")))].map(n => "  " + n).join("\n"));
+    throw new Error(`filtro "${FILTRO}" não casou com cena nenhuma`);
+  }
+  if (FILTRO) console.log(`filtro "${FILTRO}": ${alvos.length} de ${quantas} tomadas\n`);
+
+  for (const i of alvos) {
     await pagina.evaluate((n) => window.sonda.ir(n), i);
     // As peças entram escalonadas (0.1s por peça, até nove peças). Medir aos
     // 650ms fotografava o material no MEIO da animação: barras de alturas

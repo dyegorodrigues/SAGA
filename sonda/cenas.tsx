@@ -58,7 +58,25 @@ const nada = () => {};
  * semente fixa, "passou" quer dizer alguma coisa; com três, a cena é medida com
  * números pequenos e grandes, que é onde o material estoura a largura.
  */
-const SEMENTES = [1, 7, 42, 99, 123, 777, 2024, 31415];
+const TODAS_AS_SEMENTES = [1, 7, 42, 99, 123, 777, 2024, 31415];
+
+/**
+ * As sementes desta execução.
+ *
+ * O PORTÃO usa as oito. O LAÇO DE TRABALHO usa uma — `?sementes=1` na URL.
+ *
+ * A diferença não é cosmética: oito sementes × 54 cenas × 1,5s de espera são
+ * onze minutos, e onze minutos por conserto transforma o instrumento de medida
+ * em gargalo. Foi o que aconteceu construindo esta escada: eu tinha nove
+ * defeitos na mão e rodei o portão inteiro três vezes, que é exatamente o erro
+ * já registrado na RETOMADA §7.3 e que eu repeti com outro nome.
+ */
+const SEMENTES = (() => {
+  const pedido = new URLSearchParams(location.search).get("sementes");
+  if (!pedido) return TODAS_AS_SEMENTES;
+  const n = Number(pedido);
+  return Number.isFinite(n) && n > 0 ? TODAS_AS_SEMENTES.slice(0, n) : TODAS_AS_SEMENTES;
+})();
 
 /** Roda `f` com o sorteio preso a uma semente, e devolve o acaso depois. */
 function comSemente<T>(semente: number, f: () => T): T {
@@ -313,6 +331,9 @@ function App() {
       // página no meio da corrida — foi o que aconteceu quando editei um
       // componente com a sonda rodando, e a corrida inteira morreu na tomada 45.
       nome: () => TOMADAS[Math.min(i, TOMADAS.length - 1)]?.nome ?? "(cena perdida no recarregamento)",
+      // Todos os nomes de uma vez: é o que permite ao driver escolher QUAIS
+      // tomadas visitar antes de gastar 1,5s em cada uma delas.
+      nomes: () => TOMADAS.map(t => t.nome),
       ir: (n: number) => setI(n),
     };
   }, [i]);

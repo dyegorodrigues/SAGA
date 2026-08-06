@@ -56,7 +56,11 @@ function exigenciasDasFichas(): Exigencia[] {
   for (const arquivo of readdirSync(PASTA_FICHAS).filter(a => a.endsWith(".md"))) {
     let fichaAtual = "?";
     for (const linha of readFileSync(join(PASTA_FICHAS, arquivo), "utf8").split("\n")) {
-      const titulo = linha.match(/^#\s*FICHA\s+(F\d+)/i);
+      // `JD1`…`JD5` também são fichas do cânone. Lendo só `F\d+`, o título
+      // delas não casava e o relatório atribuía a competência à ficha ANTERIOR:
+      // o N1.03 aparecia como "F27". Auditor que erra o nome do que auditou é
+      // pior que auditor ausente — o número parecia certo.
+      const titulo = linha.match(/^#\s*FICHA\s+((?:F|JD)\d+)/i);
       if (titulo) fichaAtual = titulo[1];
       // `N1.01` e `GM.03` convivem: o dígito do meio é opcional. Sem o `?`,
       // GE/GM/AL/PE inteiras sumiam da auditoria em silêncio.

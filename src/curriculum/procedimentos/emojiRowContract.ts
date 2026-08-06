@@ -115,8 +115,32 @@ const MARGEM = 14;
  */
 const PASSO_MAXIMO = 18;
 
-/** Distância mínima entre centros no disperso. */
-const AFASTAMENTO = 26;
+/**
+ * Distância mínima entre centros no disperso, em pontos percentuais da ALTURA.
+ *
+ * ### O erro que isto corrige
+ *
+ * A primeira versão media `hypot(dx, dy)` com os dois em percentual, como se o
+ * campo fosse quadrado. Ele não é: 330 × 146. Vinte e seis por cento na
+ * horizontal são 86px; na vertical, 38px. Dois objetos "afastados" verticalmente
+ * ficavam a 38px um do outro — e o desenho tem 40px. A sonda pegou uma colisão
+ * de 27% na semente 31415, e a criança teria visto uma lagarta em cima da outra.
+ *
+ * É a mesma família do padrão de dado esticado, e do §6.33: **percentual não é
+ * distância** quando as duas dimensões não são iguais. A conta abaixo corrige
+ * o eixo x pela proporção antes de medir.
+ */
+const AFASTAMENTO = 30;
+
+/**
+ * A proporção do campo do relance — largura ÷ altura.
+ *
+ * Vem do palco (`ALTURA_DA_AREA − FAIXA_DO_NUMERAL` = 146px de altura para
+ * ~330px de largura). Está escrita aqui porque a geometria mora no contrato,
+ * e um teste compara o resultado em PIXEL, não em percentual, para que mudar a
+ * altura da área sem mexer aqui quebre em vez de encostar dois objetos.
+ */
+export const PROPORCAO_DO_CAMPO = 330 / 146;
 
 /**
  * O padrão de dado, para 1 a 5 — JD1 §5, nível 3 e 4.
@@ -172,7 +196,8 @@ export function posicionarFileira(
       const cand = { x: MARGEM + sorteio() * util, y: MARGEM + sorteio() * util };
       const d = fora.length === 0
         ? Infinity
-        : Math.min(...fora.map(p => Math.hypot(p.x - cand.x, p.y - cand.y)));
+        : Math.min(...fora.map(p => Math.hypot(
+          (p.x - cand.x) * PROPORCAO_DO_CAMPO, p.y - cand.y)));
       if (d >= AFASTAMENTO) { melhor = cand; break; }
       if (d > melhorDistancia) { melhorDistancia = d; melhor = cand; }
     }

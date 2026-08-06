@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   EMOJIS_DO_RELANCE,
   PADRAO_DE_DADO,
+  PROPORCAO_DO_CAMPO,
   chaveDaPeca,
   construirEmojiRowSpec,
   dedosDe,
@@ -86,16 +87,33 @@ describe("as posições", () => {
     }
   });
 
-  it("no disperso os objetos não se sobrepõem", () => {
-    // Dois objetos colados fariam a criança ver um só — e o erro seria do app.
+  it("no disperso os objetos não se sobrepõem — medido em PIXEL", () => {
+    // A primeira versão media em percentual, como se o campo fosse quadrado.
+    // Ele é 330 × 146: 26% na vertical são 38px, e o desenho tem 40. A sonda
+    // pegou uma colisão de 27% que este teste aprovava. Agora a conta é a
+    // mesma que o olho faz — distância na tela, não no sistema de coordenadas.
+    const LARGURA_PX = 330;
+    const ALTURA_PX = 146;
+    const DESENHO_PX = 40;
     for (const s of SEMENTES) {
-      const pts = posicionarFileira(5, "disperso", semente(s));
-      for (let i = 0; i < pts.length; i += 1) {
-        for (let j = i + 1; j < pts.length; j += 1) {
-          expect(Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y)).toBeGreaterThan(12);
+      for (const n of [3, 4, 5]) {
+        const pts = posicionarFileira(n, "disperso", semente(s));
+        for (let i = 0; i < pts.length; i += 1) {
+          for (let j = i + 1; j < pts.length; j += 1) {
+            const dx = ((pts[i].x - pts[j].x) / 100) * LARGURA_PX;
+            const dy = ((pts[i].y - pts[j].y) / 100) * ALTURA_PX;
+            expect(Math.hypot(dx, dy), `${n} objetos, semente ${s}`)
+              .toBeGreaterThan(DESENHO_PX);
+          }
         }
       }
     }
+  });
+
+  it("a correção de proporção é o que segura o disperso — sonda de mutação", () => {
+    // Sem o fator, a mesma cena colide. Se alguém "simplificar" a conta de
+    // volta para percentual puro, este teste cai antes da sonda.
+    expect(PROPORCAO_DO_CAMPO).toBeGreaterThan(2);
   });
 });
 

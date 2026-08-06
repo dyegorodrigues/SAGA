@@ -543,7 +543,10 @@ function AreaVazia() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-1">
       <span aria-hidden style={{ fontSize: 52, lineHeight: 1 }}>🙈</span>
-      <span className="text-sm font-bold" style={{ color: "#6B7AA8" }}>
+      {/* `C.sub` (#6B7AA8) dá 4.22:1 sobre o branco — um fio abaixo do mínimo
+          de 4.5:1, e a sonda mediu. Um passo mais escuro passa sem mudar a
+          identidade da paleta. Mesma correção do §6.30. */}
+      <span className="text-sm font-bold" style={{ color: "#4A5680" }}>
         Sumiram!
       </span>
     </div>
