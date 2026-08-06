@@ -179,10 +179,59 @@ que é precisamente como as quatro rejeições do modelo de área aconteceram.
 | id | Pendência | Tipo | Estado |
 |----|-----------|------|--------|
 | P0 | Porta dos fundos do canário (7 nós) | mecanismo | **fechada neste commit** |
-| P1 | `EmojiRow` estreia em modo *flash* no N1.03, que não tem pré-requisito | pedagógica (ficha JD1) | aberta — decidir no passo 2 |
-| P2 | Gate de conformidade não conhece `excecaoCPA: "perceptual"` | mecanismo | aberta — antes do passo 2 |
+| P1 | `EmojiRow` estreia em modo *flash* no N1.03, que não tem pré-requisito | **não era pedagógica** | **fechada no passo 2** — ver §8 |
+| P2 | Gate de conformidade não conhece `excecaoCPA: "perceptual"` | mecanismo | **latente** — o gate não cobra nível abstrato de ninguém hoje, então não morde; morderá quando alguém escrever essa verificação sem a exceção |
 | P3 | `TouchCount` inexistente bloqueia N1.02 e N1.04 | código | aberta — é o passo 1 |
 | P4 | Falha de teste intermitente vista uma vez, não reproduzida em 7 execuções, nome não capturado | desconhecida | **aberta e sem pista** |
 
 P4 fica escrita porque não foi resolvida. Não reproduzir não é o mesmo que não
 existir, e apagar a linha seria transformar ignorância em confiança.
+
+
+---
+
+## §8 — Como a P1 fechou, e por que a resposta não era a esperada
+
+A pendência foi escrita como **decisão pedagógica sobre a ficha JD1**: o
+`EmojiRow` estreando em modo *flash* num nó raiz, e a pergunta era se o cânone
+precisava de uma competência nova só para alfabetizar o desenho.
+
+Não precisava. Ao abrir a JD1 inteira — e não só a §5, que é o que eu vinha
+lendo — o degrau que faltava já estava escrito nela:
+
+| Seção | O que ela manda | Estava no código? |
+|---|---|---|
+| §4 Preparação | *"um ponto pisca no centro da área (fixa o olhar)"* | ❌ |
+| §4 Contagem regressiva | *"três pulsos suaves: 3… 2… 1, **só visual**"* | ❌ |
+| §4 A pergunta | *"400ms de silêncio, depois os botões sobem da base"* | ❌ |
+| §4 Acerto | *"os objetos **reaparecem** por 800ms confirmando o que ela viu"* | ❌ |
+| §4 Erro suave | *"reaparecem **agrupados no padrão de dado**"* | ❌ |
+| §8 Coreografia | `{ fala: "Viu? Eram dois.", mostra: { revelar: 2 } }` | ❌ |
+
+Cada `revelar` **é a fileira parada** — o degrau *plain*. A criança vê o
+desenho em repouso três vezes por questão; só nunca **antes** do relance, que é
+precisamente o que protege a competência (§2: *"se os objetos ficam na tela, a
+criança conta um a um e a competência não é treinada"*).
+
+E a primeira exposição de todas é a **micro-aula do nível 1**, que pisca uma
+quantidade de **demonstração**, diz quanto era e mostra parada — sem cobrar
+nada. É o *"nível zero que ensina o desenho antes de cobrar a matemática"* do
+Padrão Ouro §6.36, escrito pela própria ficha antes de eu chegar.
+
+> **P1 não era decisão pedagógica: era ficha lida pela metade.**
+
+O mecanismo que impede a volta está em `emojiRowProcedure.test.ts`: todo nível
+onde um modo de relance **estreia** precisa declarar coreografia com um beat de
+`revelar`. Sem ele, a escada perde o primeiro degrau outra vez — e o defeito é
+invisível na tela, porque ela continua correta, testada e acessível.
+
+### A lição de método, que é maior que a pendência
+
+Eu tinha lido a §5 (a tabela dos níveis) e pulado a §4 e a §8. É **exatamente**
+o mesmo erro que fez o canhão da F27 ficar faltando — registrado na RETOMADA §7
+como *"li a ficha pela metade"* — e eu o repeti no passo seguinte, com outra
+ficha, sem perceber.
+
+Honrar a ficha é a ficha **inteira**. Quando uma pendência parecer pedir decisão
+pedagógica, o primeiro passo é reler todas as nove seções: a resposta costuma
+estar numa seção que ninguém abriu.

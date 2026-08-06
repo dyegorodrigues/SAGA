@@ -42,12 +42,29 @@ Ver `PADRAO_OURO.md §6.36`.
 
 ```bash
 npm run fichas:conferir   # o que a FICHA manda × o que o app SERVE
-npm run sonda             # tela quebrada que o jsdom não vê (~280 tomadas)
-npx vitest run            # o resto (1354 testes)
+npm run sonda             # tela quebrada que o jsdom não vê (~430 tomadas, ~11 min)
+npx vitest run            # o resto
 npx tsc --noEmit          # o Vitest NÃO faz typecheck
 ```
 
 **Rode os quatro de uma vez, não um por defeito encontrado.** Ver §7.
+
+### O laço de trabalho, que NÃO é o portão
+
+A sonda inteira leva onze minutos. Rodá-la a cada conserto transforma o
+instrumento de medida em gargalo — e foi o que aconteceu construindo a escada
+do `EmojiRow`: três ciclos de print→conserto→print com nove defeitos na mão.
+
+```bash
+npm run sonda -- "N1.03"                   # só as cenas dessa competência
+SONDA_SEMENTES=1 npm run sonda -- "N1.03"  # uma semente: 25 segundos
+```
+
+O portão continua sendo as oito sementes. O que mudou é **poder olhar antes**.
+E o método é um só:
+
+> construir → **um** print por cena, uma semente → juntar **todos** os defeitos
+> → **um** lote de correções → sonda filtrada → portão inteiro **uma** vez.
 
 ## 4. Onde o trabalho está agora (ago/2026)
 
@@ -62,6 +79,7 @@ ordem previne.
 |---|-------|--------|
 | 0 | Fechar a porta dos fundos do canário | ✅ `6cdb550` |
 | 1 | `TouchCount` — N1.02 (F27) e N1.04 (F01) | ✅ `67f679a`, `0fd267b`, `a2d6c87`, `2f2ac29` |
+| 2 | `EmojiRow` — a escada de modos, e a **P1** | ✅ `696012b`, `422138e` |
 
 **Passo 0.** Sete nós do F0 serviam ficha autoral chamando `Composer.generate`
 de dentro do gerador "legado": o rollback era um no-op e a proveniência mentia.
@@ -73,23 +91,43 @@ lista — foi uma lista que deixou o N1.10 escapar).
 fundamentais do app. Os dois modos e por que são a mesma primitiva estão
 documentados em `procedimentos/touchCountProcedure.ts`.
 
+**Passo 2.** Três fichas (JD1/N1.03, JD2/N1.08, F52/AL.02), um palco
+(`EmojiRowStage`, composto a partir do próprio `EmojiRow`), um procedimento com
+as três tabelas §5 transcritas do Markdown. A AL.02 **não existia em runtime**:
+era servida por uma questão fixa que ignorava o nível.
+
+**A P1 fechou, e a resposta não era a esperada.** Ela estava escrita como
+decisão pedagógica sobre a ficha JD1. Não era: a §4 e a §8 da própria ficha já
+mandavam preparar o olho, contar 3-2-1, revelar o desenho **parado** e dizer
+quanto era — e **nada disso tinha sido implementado**. O degrau *plain* que
+faltava na escada estava no cânone desde sempre.
+
+> **P1 não era decisão pedagógica: era ficha lida pela metade.**
+
+Detalhe inteiro em `PLANO_DO_BLOCO_F0.md §8`. O guarda contra a volta:
+`emojiRowProcedure.test.ts` exige um beat de `revelar` em todo nível onde um
+modo de relance estreia.
+
 ### O próximo passo
 
-**Passo 2 — a escada de modos do `EmojiRow`:** N1.03 (flash), N1.08/JD2 (flash
-com skin de mão), AL.02 (padrão). Junto vem a **pendência P1** do plano: o
-`EmojiRow` estreia em modo *flash* no N1.03, que **não tem pré-requisito
-nenhum** — a criança encontra o desenho piscando antes de ter visto o desenho
-parado. É decisão pedagógica sobre a ficha JD1, e a ficha é adaptável.
+**Passo 3 — `TenFrame`, plain e flash:** N1.08 (níveis 3-5, ficha F02), N1.10
+(JD5) e N1.11 (JD3). A escada plain→flash já está na ordem de pré-requisitos;
+construir os três juntos garante que o desenho seja **o mesmo** nos dois modos.
 
-O `EmojiRow` que já existe **não é ponto de partida confiável**: entra como
-suspeito, igual a todo o resto (§1).
+O `TenFrame` que já existe entra como **suspeito** (§1) — e já se sabe de um
+defeito nele: o botão "Ver de novo" estava a 1.45:1, corrigido em `422138e`.
 
 ### Estado dos canários
 
-Ativos: `N3.09 N3.10 N4.03 N4.04 N4.06 N4.07 N4.08 N1.03 N1.07 N1.08 N1.10 AL.01`
+Ativos: `N3.09 N3.10 N4.03 N4.04 N4.06 N4.07 N4.08 N1.07 N1.10 AL.01`
 
 Implementados e **NÃO** ativados — a tela existe e não chega à criança:
-`N1.01` (pareamento, F07), `N1.02` (canhão, F27), `N1.04` (contar tocando, F01).
+`N1.01` (pareamento, F07), `N1.02` (canhão, F27), `N1.04` (contar tocando, F01),
+`N1.03` (olhômetro, JD1), `N1.08` (mão relâmpago, JD2), `AL.02` (padrões, F52).
+
+N1.03 e N1.08 **saíram** dos canários no passo 2: a tela virou outra, e tela
+nova não estreia no PR que a escreve. O rollback delas cai em `legadoN1_03` e
+`legadoN1_08` — o mesmo relance que a produção servia, não regressão.
 
 Ativar cada um é **PR próprio**. Sempre.
 
@@ -170,8 +208,11 @@ Registrado porque o autor cobrou, e porque a próxima sessão não deve repetir.
 
 | id | O que é | Onde |
 |----|---------|------|
-| P1 | `EmojiRow` estreia em *flash* no N1.03, sem pré-requisito | `PLANO_DO_BLOCO_F0.md §7` |
-| P2 | Gate de conformidade não conhece `excecaoCPA: "perceptual"` | idem |
+| ~~P1~~ | **fechada** no passo 2 — era ficha lida pela metade | `PLANO_DO_BLOCO_F0.md §8` |
+| P2 | Gate de conformidade não conhece `excecaoCPA: "perceptual"` — **latente**: nenhum gate cobra nível abstrato hoje, então não morde | `PLANO_DO_BLOCO_F0.md §7` |
+| P5 | O `FichaCompetencia` tem **um** `explain` por competência, e o N1.08 é servido por duas fichas cujas §7 se contradizem. Resolvido por override na micro (`params.explain`) — mas o schema continua assumindo uma ficha por competência | `fichaQuestionContract.ts` |
+| P6 | A F52 §3 desenha "copie o padrão" e as §1/§5/§7/§8 descrevem "preencha a lacuna". Implementei a lacuna; a contradição segue no cânone | `AL.02.ts` |
+| P7 | Os degraus 3-5 da JD2 (duas mãos) não cabem na Jornada do N1.08 e foram alocados à trilha JD2 do **Dojo**, que ainda não os consome | `N1.08.ts` |
 | P4 | Falha de teste intermitente, vista uma vez, **não reproduzida** | idem |
 | — | `scripts/e2e-screenshots.mjs` não chega à tela de exercício (seed velho) | commit `a2d6c87` |
 | — | N4.09 ativação; N4.10–N4.12; coreografia faltando em N3.10, N4.03/04/06/07 | `ROTEIRO_ATE_O_FIM.md §4-bis` |
