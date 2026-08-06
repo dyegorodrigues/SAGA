@@ -17,6 +17,7 @@ import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
 import { GE_01 } from "../fichas/jornada/GE.01";
+import { GE_02 } from "../fichas/jornada/GE.02";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
@@ -76,6 +77,11 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // pedia a resposta em PALAVRAS ("Em cima"/"Embaixo") — leitura, numa
   // competência de faixa F0. Registrada aqui e NÃO ativada.
   "GE.01": GE_01,
+
+  // GE.02 era servida por `gGE_02`, uma questão fixa com dois emojis: "🔴 ou
+  // 🟥?". Emoji NÃO GIRA — a única coisa que a F48 existe para ensinar não
+  // tinha como acontecer na tela. Registrada aqui e NÃO ativada.
+  "GE.02": GE_02,
 };
 
 /**

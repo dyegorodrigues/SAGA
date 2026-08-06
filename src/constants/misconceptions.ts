@@ -238,7 +238,24 @@ export const MisconceptionTag = {
   IGNORA_REFERENCIAL: "ignora-referencial",
 
   /** Posição: errou no par que exige lateralidade — outra aula, não vocabulário */
-  ESQUERDA_DIREITA: "esquerda-direita"
+  ESQUERDA_DIREITA: "esquerda-direita",
+
+  /* --- formas planas (ficha F48) ------------------------------------ */
+
+  /**
+   * Formas: não reconhece a forma girada — **o alvo da ficha**.
+   *
+   * A assinatura é dupla: a certa estava GIRADA e ela escolheu uma que estava
+   * EM PÉ. É a conduta que a §2 descreve nome por nome — "ela memorizou uma
+   * imagem, não a propriedade".
+   */
+  SO_ORIENTACAO_PADRAO: "so-orientacao-padrao",
+
+  /** Formas: trocou quadrado por retângulo — não comparou o comprimento dos lados */
+  CONFUNDE_QUADRADO_RETANGULO: "confunde-quadrado-retangulo",
+
+  /** Formas: escolheu pela aparência geral, sem contar os lados */
+  IGNORA_LADOS: "ignora-lados"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

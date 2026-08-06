@@ -92,7 +92,7 @@ export const GE_01: FichaCompetencia = {
       fonte: "F47",
       alvo: "em cima / embaixo — a primeira relação, com a mesa como referência",
       kinds: ["shapecanvas"],
-      params: { audio_prompt: FALAS.howto, tutorial: coreografia },
+      params: { modo: "cena", audio_prompt: FALAS.howto, tutorial: coreografia },
       dominio,
     },
     {
@@ -101,6 +101,7 @@ export const GE_01: FichaCompetencia = {
       alvo: "dentro / fora — o referencial passa a conter, não a sustentar",
       kinds: ["shapecanvas"],
       params: {
+        modo: "cena",
         howto: "Olhe a caixa. Agora veja qual objeto está dentro dela.",
         explain: "Compare com a caixa: um está dentro, outro está do lado de fora.",
       },
@@ -112,6 +113,7 @@ export const GE_01: FichaCompetencia = {
       alvo: "na frente / atrás — a relação que depende de quem tapa quem",
       kinds: ["shapecanvas"],
       params: {
+        modo: "cena",
         howto: "Olhe o muro. Um objeto está escondido atrás dele.",
         explain: "Quem está atrás fica tapado pelo muro. Quem está na frente tapa o muro.",
       },
@@ -123,6 +125,7 @@ export const GE_01: FichaCompetencia = {
       alvo: "esquerda / direita — o par que exige lateralidade, e tem tag própria",
       kinds: ["shapecanvas"],
       params: {
+        modo: "cena",
         howto: "Olhe a árvore. Um objeto está do lado esquerdo dela.",
         explain: "Compare com a árvore: um está de um lado, outro do outro.",
       },
@@ -134,6 +137,7 @@ export const GE_01: FichaCompetencia = {
       alvo: "inverte: em vez de apontar onde está, ela COLOCA onde foi pedido",
       kinds: ["shapecanvas"],
       params: {
+        modo: "cena",
         howto: "Pegue o objeto e solte no lugar que eu pedi.",
         explain: "Olhe a referência primeiro. Depois solte o objeto no lugar certo.",
       },

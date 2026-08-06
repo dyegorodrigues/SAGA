@@ -63,6 +63,7 @@ import { construirClassificacaoSpec } from "./procedimentos/classificacaoContrac
 import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
 import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
+import { construirFormaSpec } from "./procedimentos/formaContract";
 import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
@@ -852,10 +853,39 @@ export class Composer {
       }
 
       case "shapecanvas": {
-        // Ficha F47 (GE.01), modo CENA. A resposta é o objeto que a criança
-        // toca — não existe alternativa. O gerador antigo fabricava as palavras
-        // "Em cima" e "Embaixo" como botões, e era isso que transformava a
-        // primeira geometria do currículo num exercício de leitura.
+        // Duas fichas nomeiam o `ShapeCanvas`, em modos diferentes:
+        //   F47 (GE.01) — modo CENA: um referencial e dois objetos
+        //   F48 (GE.02) — modo FORMAS: 3 a 4 figuras em contêineres idênticos
+        //
+        // A ficha diz o modo; o Composer não adivinha pelo id da competência.
+        // Adivinhar funcionaria hoje, com duas fichas, e apagaria em silêncio o
+        // dia em que uma terceira usar a primitiva. Faltando o modo, isto
+        // QUEBRA — é a mesma regra do `touchcount`, e ela existe porque um
+        // `?? padrão` já fez o canhão de balões desenhar peixinhos.
+        if (params.modo !== "cena" && params.modo !== "formas") {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva shapecanvas exige params.modo `
+            + `"cena" ou "formas" — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+
+        if (params.modo === "formas") {
+          // A resposta é a FIGURA que ela toca. O gerador antigo dava dois
+          // emojis como alternativas — e emoji não gira, então a única coisa
+          // que esta ficha ensina não tinha como ser exercitada.
+          const spec = construirFormaSpec(lvl, Math.random);
+          answer = spec.resposta;
+          uiProps = spec;
+          evaluate = candidate => String(candidate) === String(answer);
+          promptOverride = spec.enunciado;
+          options = undefined;
+          break;
+        }
+
+        // Modo cena. A resposta é o objeto que a criança toca — não existe
+        // alternativa. O gerador antigo fabricava as palavras "Em cima" e
+        // "Embaixo" como botões, e era isso que transformava a primeira
+        // geometria do currículo num exercício de leitura.
         const spec = construirPosicaoSpec(lvl, Math.random);
         answer = spec.resposta;
         uiProps = spec;

@@ -2,6 +2,7 @@ import { diagnosticar as diagnosticarPareamento } from "../../curriculum/procedi
 import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "../../curriculum/procedimentos/classificacaoProcedure";
 import { AcaoDeProducao, diagnosticar as diagnosticarProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curriculum/procedimentos/posicaoProcedure";
+import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
 
@@ -62,6 +63,14 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
   // ter tocado o próprio referencial — nada disso cabe num valor de alternativa.
   if (meta?.posicao) {
     const daAcao = diagnosticarPosicao(meta.posicao as AcaoDePosicao);
+    if (daAcao) return daAcao;
+  }
+
+  // Ficha F48 (GE.02): a hipótese depende de a certa estar GIRADA e a escolhida
+  // estar em pé — a assinatura do alvo da ficha. Nenhum valor de alternativa
+  // carrega isso.
+  if (meta?.forma) {
+    const daAcao = diagnosticarForma(meta.forma as AcaoDeForma);
     if (daAcao) return daAcao;
   }
 

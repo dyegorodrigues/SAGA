@@ -65,6 +65,8 @@ export interface AnswerMeta {
   touchplace?: unknown;
   /** A leitura da posição (F47): onde estava o que ela tocou. */
   posicao?: unknown;
+  /** A leitura da forma (F48): o que ela tocou, e se a certa estava girada. */
+  forma?: unknown;
   pareamento?: {
     porReceptor: number[];
     naBandeja: number;

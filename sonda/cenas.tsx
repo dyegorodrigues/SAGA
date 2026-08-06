@@ -41,6 +41,7 @@ import { AL_01 } from "../src/curriculum/fichas/jornada/AL.01";
 import { N1_06 } from "../src/curriculum/fichas/jornada/N1.06";
 import { N1_09 } from "../src/curriculum/fichas/jornada/N1.09";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
+import { GE_02 } from "../src/curriculum/fichas/jornada/GE.02";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 
 /**
@@ -345,6 +346,20 @@ export const CENAS: Cena[] = [
     nome: "GE.01 micro-aula: esta é a mesa",
     render: (s: number) => (
       <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarReferencial: true }} />
+    ),
+  },
+  // GE.02 — que forma é essa? (F48), implementada e NÃO ativada. Os cinco
+  // degraus mudam a MESMA pergunta: forma pura, girada, com cor e tamanho
+  // variando, dentro de um objeto do mundo, e enfim em três dimensões.
+  { nome: "GE.02 rollback: dois emojis que não giram (nível 1)", render: (s) => <Exercicio id="GE.02" lvl={1} semente={s} /> },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `GE.02 que forma é essa (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={lvl} semente={s} />,
+  })),
+  {
+    nome: "GE.02 micro-aula: mesmo virado é triângulo",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarForma: 360 }} />
     ),
   },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },
