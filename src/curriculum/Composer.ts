@@ -60,6 +60,8 @@ import { EmojiRowSpec, chaveDaPeca, construirEmojiRowSpec } from "./procedimento
 import { MisconceptionTag } from "../constants/misconceptions";
 import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProcedure";
 import { construirClassificacaoSpec } from "./procedimentos/classificacaoContract";
+import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
+import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -174,6 +176,25 @@ function tagDaAlternativa(
     && Math.abs(valor - spec.resposta) === 1) {
     return MisconceptionTag.OFF_BY_ONE;
   }
+  return undefined;
+}
+
+/**
+ * A hipótese que uma alternativa do ouvir-e-escolher carrega — §6 da F05.
+ *
+ * Fica aqui pelo mesmo motivo do `tagDaAlternativa` da fileira: `NAO_ESCUTOU`
+ * fala da POSIÇÃO na tela e `CONFUSAO_FONOLOGICA` fala do SOM. O parser de
+ * `"n+1"` não expressa nenhuma das duas.
+ *
+ * A ordem importa: o par fonológico vem antes do vizinho numérico, porque 6 e 7
+ * são as duas coisas ao mesmo tempo — e a aula de quem não distinguiu o som não
+ * é a mesma de quem não reconheceu o símbolo.
+ */
+function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
   return undefined;
 }
 
@@ -777,6 +798,26 @@ export class Composer {
             ...(tag ? { misconception: tag, tag } : {}),
           };
         });
+        break;
+      }
+
+      case "audiochoice": {
+        // Ficha F05 (N1.06). A pergunta é o SOM: o alvo não aparece escrito em
+        // lugar nenhum além das alternativas. É a única competência do app que
+        // não depende de leitura, e o gerador antigo a resolvia lendo — ele
+        // imprimia "🔊 TRÊS" na tela.
+        const spec = construirAudioChoiceSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        // As alternativas saem NA ORDEM DO SPEC. Embaralhar aqui destruiria a
+        // tag `NAO_ESCUTOU` da §6, que é uma hipótese sobre a POSIÇÃO.
+        options = spec.alternativas.map(v => ({
+          value: v,
+          label: String(v),
+          ...(tagDaEscuta(spec, v) ? { misconception: tagDaEscuta(spec, v)!, tag: tagDaEscuta(spec, v)! } : {}),
+        }));
         break;
       }
 

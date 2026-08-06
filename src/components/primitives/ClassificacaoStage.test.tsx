@@ -63,9 +63,17 @@ describe("ClassificacaoStage — a tela de AL.01 (F51)", () => {
     const deFora = s.pecas.find(p => destinoCerto(p, criterios).length === 0)!;
     const { container } = render(<ClassificacaoStage spec={s} />);
 
+    const naBandeja = () => [...container
+      .querySelector('[aria-label="Peças para separar"]')!
+      .querySelectorAll("button")]
+      .filter(b => b.getAttribute("aria-label") === nomeDaPeca(deFora)).length;
+
+    const antes = naBandeja();
     por(container, nomeDaPeca(deFora), `Laço: ${s.lacos[0].rotulo}`);
-    // Continua na bandeja: o laço não a aceitou.
-    expect(screen.getByLabelText(nomeDaPeca(deFora))).toBeTruthy();
+    // Continua na bandeja: o laço não a aceitou. Contamos em vez de buscar por
+    // rótulo porque duas peças idênticas partilham o rótulo — e isso é correto:
+    // elas vão para o mesmo lugar.
+    expect(naBandeja()).toBe(antes);
     expect(container.textContent).toContain("Este laço é só dos");
   });
 

@@ -12,6 +12,7 @@ import { N1_01 } from "../fichas/jornada/N1.01";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_03 } from "../fichas/jornada/N1.03";
 import { N1_04 } from "../fichas/jornada/N1.04";
+import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_10 } from "../fichas/jornada/N1.10";
@@ -48,6 +49,11 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.02": N1_02,
   "N1.03": N1_03,
   "N1.04": N1_04,
+
+  // N1.06 nunca teve ficha em runtime, e o gerador dela ESCREVIA o número por
+  // extenso na tela ("🔊 TRÊS"): a única competência do app que existe para não
+  // depender de leitura era resolvida lendo. Registrada aqui e NÃO ativada.
+  "N1.06": N1_06,
   "N1.07": N1_07,
   "N1.08": N1_08,
   "N1.10": N1_10,

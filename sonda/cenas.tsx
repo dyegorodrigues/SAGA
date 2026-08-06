@@ -38,6 +38,7 @@ import { N1_03 } from "../src/curriculum/fichas/jornada/N1.03";
 import { N1_08 } from "../src/curriculum/fichas/jornada/N1.08";
 import { AL_02 } from "../src/curriculum/fichas/jornada/AL.02";
 import { AL_01 } from "../src/curriculum/fichas/jornada/AL.01";
+import { N1_06 } from "../src/curriculum/fichas/jornada/N1.06";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 
 /** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
@@ -288,6 +289,20 @@ export const CENAS: Cena[] = [
     nome: "AL.01 micro-aula: fica fora",
     render: (s: number) => (
       <ExercicioDaFicha ficha={AL_01} lvl={1} semente={s} mostrar={{ deixarFora: 1 }} />
+    ),
+  },
+  // N1.06 — ouvir e escolher (F05), implementada e NÃO ativada. A §3 manda a
+  // tela ser deliberadamente VAZIA: é a única do bloco onde isso não é o
+  // defeito §6.6, porque o que preenche a tela é o áudio.
+  { nome: "N1.06 rollback: o número escrito na tela (nível 2)", render: (s) => <Exercicio id="N1.06" lvl={2} semente={s} /> },
+  ...[1, 4, 5].map(lvl => ({
+    nome: `N1.06 ouvir e escolher (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={N1_06} lvl={lvl} semente={s} />,
+  })),
+  {
+    nome: "N1.06 micro-aula: aperte pra escutar",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_06} lvl={1} semente={s} mostrar={{ pulsar: "botaoSom" }} />
     ),
   },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },

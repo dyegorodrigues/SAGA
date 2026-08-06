@@ -174,7 +174,27 @@ export const MisconceptionTag = {
   NAO_RECLASSIFICA: "nao-reclassifica",
 
   /** Classificar: não aceita que uma peça pertença a DOIS grupos ao mesmo tempo */
-  SEM_INTERSECAO: "sem-intersecao"
+  SEM_INTERSECAO: "sem-intersecao",
+
+  /* --- ouvir e escolher (ficha F05) --------------------------------- */
+
+  /** Ouvir e escolher: escolheu o numeral vizinho — ouviu certo, não reconhece o símbolo */
+  CONFUNDE_VIZINHO: "confunde-vizinho",
+
+  /**
+   * Ouvir e escolher: escolheu um número que SOA parecido (seis/sete, três/treze).
+   *
+   * Não é o mesmo que vizinho numérico: 3 e 13 estão a dez de distância e
+   * confundem mais que 3 e 4. Tratar as duas coisas como uma faria o Radar
+   * mandar treinar contagem quando o que falhou foi o ouvido.
+   */
+  CONFUSAO_FONOLOGICA: "confusao-fonologica",
+
+  /** Ouvir e escolher: escolheu a primeira opção sem ter ouvido de novo */
+  NAO_ESCUTOU: "nao-escutou",
+
+  /** Ouvir e escolher: acertou depois de repetir muitas vezes — reconhecimento ainda não automático */
+  PRECISA_REPETICAO: "precisa-repeticao"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

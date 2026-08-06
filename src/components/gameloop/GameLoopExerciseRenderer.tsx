@@ -13,6 +13,7 @@ import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
 import { ClassificacaoStage } from "../primitives/ClassificacaoStage";
+import { AudioChoiceStage } from "../primitives/AudioChoiceStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -64,6 +65,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "touchcount",
   "fileira",
   "classificacao",
+  "audiochoice",
 ]);
 
 interface Props {
@@ -169,6 +171,17 @@ export function GameLoopExerciseRenderer({
             // §4: a voz confirma o "fora" e repete o critério no erro suave.
             falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "classificacao", classificacao: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "audiochoice" && q.uiProps && (
+          <AudioChoiceStage
+            spec={q.uiProps as never}
+            // §4: a voz confirma no acerto e REPETE o número no erro — ela
+            // nunca diz "errou". O feedback é a informação que faltava.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, leitura) => handlePick(valor, undefined, { source: "audiochoice", audiochoice: leitura } as never)}
             disabled={status !== null}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />

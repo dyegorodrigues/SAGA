@@ -176,6 +176,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   touchcount: ["TouchCount"],
   fileira: ["EmojiRow"],
   classificacao: ["DragGroup"],
+  audiochoice: ["AudioChoice"],
 };
 
 /**
