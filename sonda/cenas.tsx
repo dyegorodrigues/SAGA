@@ -43,7 +43,18 @@ import { N1_09 } from "../src/curriculum/fichas/jornada/N1.09";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 
-/** A largura do aparelho da criança. Não é palpite: é o tablet do projeto. */
+/**
+ * A largura do aparelho da criança.
+ *
+ * ⚠️ Era **fixa em 390** — e por isso a sonda mediu, durante todo este bloco,
+ * exatamente a largura em que as cenas cabem. Medir com o viewport em 320
+ * acusava vazamento em TODAS elas, e o culpado era este `<section>`: o andaime
+ * continuava com 390px enquanto o aparelho tinha 320. A sonda estava medindo a
+ * própria régua.
+ *
+ * Agora ela segue o viewport, como o app segue (`max-w-3xl` na tela de jogo,
+ * `px-4` de respiro). 390 continua sendo o padrão quando não há viewport.
+ */
 export const LARGURA_DO_APARELHO = 390;
 
 interface Cena {
@@ -382,7 +393,10 @@ function Palco({ cena, semente }: { cena: Cena; semente: number }) {
   return (
     <section
       data-cena={cena.nome}
-      style={{ width: LARGURA_DO_APARELHO, background: "#fff", overflow: "visible" }}
+      // `max-w-3xl` + `px-4` é o enquadramento real da tela de jogo (App.tsx).
+      // O palco recebe a mesma caixa que a criança recebe, em qualquer largura.
+      className="mx-auto w-full px-4"
+      style={{ maxWidth: 768, background: "#fff", overflow: "visible" }}
     >
       {cena.render(semente)}
     </section>

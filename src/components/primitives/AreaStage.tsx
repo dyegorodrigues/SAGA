@@ -1,5 +1,6 @@
 import React from "react";
 import { ModeloDeArea } from "./ModeloDeArea";
+import { PalcoEscalado } from "./PalcoEscalado";
 import { OPERACAO } from "../../styles/coresDeOperacao";
 import { AreaSpec } from "../../curriculum/procedimentos/areaContract";
 
@@ -40,6 +41,7 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
   const corteMarcado = spec.corteMarcado || Boolean(mostrar?.cortarRetangulo);
 
   return (
+    <PalcoEscalado>
     <div className="flex flex-col items-center gap-3">
       <div className="flex items-center gap-3">
         <p className="text-4xl font-black" style={{ color: cor }} aria-label={spec.falado}>
@@ -131,5 +133,6 @@ export function AreaStage({ spec, onReplay, mostrar }: Props) {
         </p>
       )}
     </div>
+    </PalcoEscalado>
   );
 }

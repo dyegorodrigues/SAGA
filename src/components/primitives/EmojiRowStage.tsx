@@ -1,4 +1,5 @@
 import React from "react";
+import { PalcoEscalado } from "./PalcoEscalado";
 import { motion, useReducedMotion } from "motion/react";
 import { EmojiRow } from "./EmojiRow";
 import { MaoDeDedos } from "./MaoDeDedos";
@@ -109,8 +110,17 @@ const ALTURA_DA_AREA = 176;
  * 390 − 28 (padrão do cartão) − 24 (o `px-3` deste palco) − 4 (a borda da área)
  * − 8 (a folga do `px-1` da fila). Medida, não chutada: é o §6.16, e foi uma
  * largura chutada que fez a reta numérica rolar na horizontal.
+ *
+ * ⚠️ Ela é a largura DE PROJETO, não a do aparelho. Num celular de 320px a
+ * caixa útil cai para 260 e esta fila de 326 vazava — a sonda não via porque
+ * media um viewport só, justamente o de 390. Quem resolve é o `PalcoEscalado`,
+ * que escala o desenho inteiro por semelhança: a fila continua com 326 no
+ * sistema de coordenadas dela, e cabe em qualquer tela.
  */
 const LARGURA_UTIL = 326;
+
+/** O desenho inteiro deste palco, no aparelho do projeto. */
+const LARGURA_DE_PROJETO = 390;
 
 /** O vão entre as casas do padrão. */
 const VAO = 4;
@@ -383,7 +393,8 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
   const perguntando = fase === "perguntando" || fase === "revelando";
 
   return (
-    <div className="w-full max-w-[390px] px-3 py-2">
+    <PalcoEscalado>
+    <div className="px-3 py-2" style={{ width: LARGURA_DE_PROJETO }}>
       {/* O enunciado NÃO sai aqui: o app já o desenha na caixa acima do palco
           (`GameLoop.tsx` → `q.prompt`). Imprimir de novo punha a pergunta duas
           vezes na tela — o §6.32, escondido porque a sonda montava o palco sem
@@ -487,6 +498,7 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
         </div>
       )}
     </div>
+    </PalcoEscalado>
   );
 }
 

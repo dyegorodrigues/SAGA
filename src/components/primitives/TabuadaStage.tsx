@@ -2,6 +2,7 @@ import React from "react";
 import { Quadrado100 } from "./Quadrado100";
 import { Arranjo } from "./Arranjo";
 import { NumberLine } from "./NumberLine";
+import { PalcoEscalado } from "./PalcoEscalado";
 import { QuadroSpec, SaltosSpec, TabuadaSpec } from "../../curriculum/procedimentos/tabuadaContract";
 
 /**
@@ -101,6 +102,7 @@ function Saltos({ saltos }: { saltos: SaltosSpec }) {
 
 export function TabuadaStage({ spec, onReplay }: Props) {
   return (
+    <PalcoEscalado>
     <div className="flex flex-col items-center gap-3">
       <div className="flex items-center gap-3">
         <p className="text-4xl font-black text-slate-800" aria-label={spec.falado}>
@@ -122,5 +124,6 @@ export function TabuadaStage({ spec, onReplay }: Props) {
       {spec.saltos && <Saltos saltos={spec.saltos} />}
       {spec.quadro && <Quadro quadro={spec.quadro} />}
     </div>
+    </PalcoEscalado>
   );
 }

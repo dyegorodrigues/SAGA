@@ -1,5 +1,6 @@
 import React from "react";
 import { TouchPlace } from "./TouchPlace";
+import { PalcoEscalado } from "./PalcoEscalado";
 import {
   ProducaoSpec,
   ancoraMaisProxima,
@@ -149,7 +150,8 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
   }
 
   return (
-    <div className="flex w-full flex-col items-center select-none">
+    <PalcoEscalado>
+    <div className="flex flex-col items-center select-none">
       <TouchPlace
         tema={spec.tema}
         ancoras={spec.ancoras}
@@ -217,5 +219,6 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
         )}
       </div>
     </div>
+    </PalcoEscalado>
   );
 }

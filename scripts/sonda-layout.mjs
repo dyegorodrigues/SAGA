@@ -52,6 +52,25 @@ const SALVAR_FOTOS = process.argv.includes("--fotos");
  */
 const FILTRO = process.argv.slice(2).find(a => !a.startsWith("--")) ?? "";
 const SEMENTES = process.env.SONDA_SEMENTES ?? "";
+
+/**
+ * ⚠️ A largura da medição — e por que ela deixou de ser uma só.
+ *
+ * A sonda mediu 390px desde o primeiro dia, porque 390 é o aparelho do projeto.
+ * Só que o app roda em qualquer tela: a tela de jogo é `max-w-3xl` (768px), e
+ * num celular pequeno de 320px a área útil do palco cai para 260px.
+ *
+ * As cenas construídas com desenho de tamanho fixo — 326px de largura — passam
+ * folgadas em 390 e **vazam 66px em 320**. Rolagem horizontal, que é o §6.16.
+ * Nenhum teste via, e a sonda também não: ela olhava exatamente a largura em
+ * que o defeito não existe.
+ *
+ * O portão passou a medir três larguras. As extras rodam com UMA semente — o
+ * vazamento por largura não depende do sorteio, depende da tela —, então o
+ * custo é pequeno perto de descobrir isto num aparelho de verdade.
+ */
+const LARGURAS = (process.env.SONDA_LARGURAS ?? "390,320,900")
+  .split(",").map(n => Number(n.trim())).filter(n => Number.isFinite(n) && n > 0);
 const PASTA_FOTOS = process.env.SONDA_FOTOS || "/tmp/sonda-saga";
 
 /**
@@ -245,15 +264,23 @@ const servidor = await subirServidor();
 const navegador = await chromium.launch({ executablePath: CHROME });
 
 let total = 0;
-try {
+
+/**
+ * Uma passada completa numa largura.
+ *
+ * A primeira largura da lista é o PORTÃO — todas as sementes. As demais rodam
+ * com uma só: vazamento por largura não depende do sorteio, depende da tela.
+ */
+async function medirNaLargura(larguraDoAparelho, sementes) {
   const pagina = await navegador.newPage({
-    viewport: { width: 390, height: 900 },
+    viewport: { width: larguraDoAparelho, height: 900 },
     deviceScaleFactor: 2,
   });
+  let achadosDaPassada = 0;
   const erros = [];
   pagina.on("pageerror", (e) => erros.push(String(e).slice(0, 160)));
 
-  await pagina.goto(BASE + (SEMENTES ? `?sementes=${SEMENTES}` : ""), { waitUntil: "networkidle" });
+  await pagina.goto(BASE + (sementes ? `?sementes=${sementes}` : ""), { waitUntil: "networkidle" });
   await pagina.waitForFunction(() => window.sonda?.total > 0, { timeout: 30000 });
   const quantas = await pagina.evaluate(() => window.sonda.total);
   const largura = await pagina.evaluate(() => document.documentElement.clientWidth);
@@ -277,7 +304,7 @@ try {
     console.log([...new Set(nomes.map(n => n.replace(/ \[semente .*/, "")))].map(n => "  " + n).join("\n"));
     throw new Error(`filtro "${FILTRO}" não casou com cena nenhuma`);
   }
-  if (FILTRO) console.log(`filtro "${FILTRO}": ${alvos.length} de ${quantas} tomadas\n`);
+  if (FILTRO) console.log(`filtro "${FILTRO}": ${alvos.length} de ${quantas} tomadas`);
 
   for (const i of alvos) {
     // O vite observa a árvore INTEIRA — inclusive Markdown. Qualquer arquivo
@@ -299,14 +326,14 @@ try {
     const achados = await pagina.evaluate(medir, { largura, folga: 1, invasaoMinima: 0.25 });
 
     if (SALVAR_FOTOS) {
-      const arquivo = path.join(PASTA_FOTOS, `${String(i).padStart(2, "0")}-${nome.replace(/[^\w.]+/g, "_")}.png`);
+      const arquivo = path.join(PASTA_FOTOS, `${larguraDoAparelho}-${String(i).padStart(2, "0")}-${nome.replace(/[^\w.]+/g, "_")}.png`);
       await pagina.screenshot({ path: arquivo, fullPage: true });
     }
 
     if (achados.length === 0) {
       console.log(`  ok   ${nome}`);
     } else {
-      total += achados.length;
+      achadosDaPassada += achados.length;
       console.log(`  FALHA ${nome}`);
       for (const a of achados) {
         console.log(`        ${a.tipo}: ${a.alvo} ${a.texto ? `(${a.texto}) ` : ""}— ${a.detalhe}`);
@@ -316,7 +343,19 @@ try {
 
   if (erros.length) {
     console.log("\nerros de página:\n" + erros.slice(0, 5).map((e) => "  " + e).join("\n"));
-    total += erros.length;
+    achadosDaPassada += erros.length;
+  }
+  await pagina.close();
+  return achadosDaPassada;
+}
+
+try {
+  for (const [ordem, larguraDoAparelho] of LARGURAS.entries()) {
+    // O portão é a primeira largura, com as sementes de sempre. As outras
+    // medem a mesma cena em telas diferentes, com uma semente.
+    const sementes = ordem === 0 ? SEMENTES : "1";
+    console.log(`\n── ${larguraDoAparelho}px ${ordem === 0 ? "(portão)" : "(uma semente)"} ──`);
+    total += await medirNaLargura(larguraDoAparelho, sementes);
   }
 } finally {
   await navegador.close();

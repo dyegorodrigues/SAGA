@@ -30,7 +30,10 @@ const browser = await chromium.launch({
   args: ["--no-sandbox"],
 });
 const page = await browser.newPage({
-  viewport: { width: 390, height: 640 }, deviceScaleFactor: 2,
+  // A largura é escolhível: `PRINTS_LARGURA=320 node scripts/prints.mjs "..."`.
+  // Olhar a mesma cena em 320 e em 900 é o que mostra o que a sonda mede e o
+  // que ela não mede — ela acusa vazamento, não acusa "ficou pequeno demais".
+  viewport: { width: Number(process.env.PRINTS_LARGURA ?? 390), height: 640 }, deviceScaleFactor: 2,
 });
 await page.goto(BASE, { waitUntil: "networkidle" });
 await page.waitForFunction(() => window.sonda?.total > 0, { timeout: 30000 });

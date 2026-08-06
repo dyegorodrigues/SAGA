@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import { ShapeCanvas } from "./ShapeCanvas";
+import { PalcoEscalado } from "./PalcoEscalado";
 import {
   ALTURA_DA_CENA,
   ALVO_MINIMO,
@@ -154,7 +155,8 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
   }
 
   return (
-    <div className="flex w-full flex-col items-center gap-3 select-none">
+    <PalcoEscalado>
+    <div className="flex flex-col items-center gap-3 select-none">
       <div ref={campo} onClick={spec.produz ? soltar : undefined} style={{ cursor: spec.produz && naMao ? "pointer" : "default" }}>
         <ShapeCanvas
           cena={{ pecas: spec.referencial.pecas, largura: LARGURA_DA_CENA, altura: ALTURA_DA_CENA }}
@@ -235,5 +237,6 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
         </p>
       )}
     </div>
+    </PalcoEscalado>
   );
 }
