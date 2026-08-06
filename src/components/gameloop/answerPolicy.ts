@@ -3,6 +3,7 @@ import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "
 import { AcaoDeProducao, diagnosticar as diagnosticarProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curriculum/procedimentos/posicaoProcedure";
 import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum/procedimentos/formaProcedure";
+import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
 
@@ -74,6 +75,14 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
+  // Ficha F49 (GM.01): a hipótese depende de ela ter decidido ANTES de a linha
+  // do chão existir, e de qual objeto vence no outro atributo. Nenhum valor de
+  // alternativa carrega isso.
+  if (meta?.grandeza) {
+    const daAcao = diagnosticarGrandeza(meta.grandeza as AcaoDeGrandeza);
+    if (daAcao) return daAcao;
+  }
+
   const pickedOption = q.options?.find(option => option.value === value);
   return pickedOption?.misconception
     ? pickedOption.tag || pickedOption.misconception
@@ -99,7 +108,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
  * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
  * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
  */
-export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace", "shapecanvas"]);
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace", "shapecanvas", "grandeza"]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)

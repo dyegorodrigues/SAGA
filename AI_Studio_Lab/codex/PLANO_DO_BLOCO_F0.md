@@ -476,3 +476,66 @@ depende da tela — 800 tomadas no total.
 
 E `scripts/prints.mjs` aceita `PRINTS_LARGURA`, porque a sonda acusa vazamento e
 **não** acusa "ficou pequeno demais": isso continua sendo de olhar.
+
+---
+
+## §12 — GM.01/GM.02: a correção de um erro meu, e a P15
+
+Eu tinha listado a `GM.02` entre as competências "ativas servindo outra coisa",
+porque `gGM_02` serve *"Manhã ou Noite?"* e a F50 diz na §1 que é a GM.02.
+**Estava errado**, e a verificação mostrou por quê:
+
+| documento | GM.02 |
+|---|---|
+| `GRAFO_DE_CONHECIMENTO_SAGA.md` | **"Tempo cotidiano"** — partes do dia, ontem/hoje/amanhã |
+| `grafo_saga.ts` | **"Tempo cotidiano"** |
+| `FICHAS_F0_COMPLETAS.md` (F50) | "capacidade e massa" |
+
+`gGM_02` serve exatamente o que o grafo diz que a GM.02 é. E há uma prova a mais
+que o caso do N1.09 não tinha: **`GM.04` (Horas) declara `Pré-req: N1.06,
+GM.02`** — ler relógio depende de saber partes do dia, não de saber pesar.
+
+Mais: o grafo põe *"pesado/leve, cheio/vazio"* **dentro da GM.01**, junto com
+comprido/curto e alto/baixo. O conteúdo da F50 já tem casa — a mesma da F49.
+
+**E o achado que mudou a prioridade:** a `GM.01` **não tem gerador nenhum**. Não
+está em `curriculum.ts`. Competência de faixa F0, duas fichas escritas no
+cânone, zero código — servida pelo fallback genérico.
+
+Então: construí a **GM.01 pela F49**, que é a ficha que reivindica esse nó na
+§1. Reassinar a GM.02 mataria uma competência viva e quebraria a aresta da
+GM.04 — perda, que é o que não se faz.
+
+### §12.1 — O `Grupo` era a quarta primitiva órfã, e estava errado
+
+`Grupo` não estava ligado a lugar nenhum — depois do `AudioChoice`, do
+`TouchPlace` e do `ShapeCanvas`, o quarto caso. E, pior que órfão, **contrário à
+ficha**: ele usa `items-center`, com cada objeto flutuando no meio da própria
+caixa, e sem linha de chão.
+
+> §2 da F49: *"as bases precisam estar alinhadas na mesma linha horizontal.
+> Comparar altura com objetos flutuando em posições diferentes ensina errado."*
+
+Ganhou um modo `chao`: alinhamento pela base e a faixa de chão desenhada na
+**mesma distância do topo nas duas caixas**, porque o valor vem do contrato. Se
+cada caixa calculasse, elas poderiam divergir e a comparação inteira seria falsa.
+
+E o print mostrou a segunda metade do problema: desenhado como fio fino na cor
+da borda, o chão lia como moldura do cartão. Numa ficha cuja regra dura é a
+linha de base, o chão precisa ser **inconfundível** — virou faixa.
+
+### §12.2 — `BASE_DESALINHADA` só existe porque a tela dá o alinhamento
+
+A §2 **obriga** a tela a alinhar as bases. Com elas alinhadas, quem sobe mais É
+o mais alto: a condição que produz esse erro foi removida da tela de propósito,
+e a tag da §6 ficaria testada e nunca emitida.
+
+A assinatura que sobra vem da própria §4: a linha de chão **se desenha** na
+abertura (1,2s). Responder antes dela é decidir sem a referência — que é
+exatamente o que a tag nomeia.
+
+### §12.3 — Pendências
+
+| id | O que é | Onde |
+|----|---------|------|
+| **P15** | A F50 (capacidade e massa) não tem nó com vaga: o grafo põe o conteúdo dela na GM.01, cujos cinco degraus já são da F49; e a §1 dela reivindica a GM.02, que é "tempo cotidiano" no grafo e tem a aresta da GM.04 dependendo dessa leitura. Decisão curricular, irmã da P12. | `GM.01.ts`, `§12` |

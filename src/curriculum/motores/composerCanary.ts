@@ -18,6 +18,7 @@ import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
+import { GM_01 } from "../fichas/jornada/GM.01";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
@@ -82,6 +83,11 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // 🟥?". Emoji NÃO GIRA — a única coisa que a F48 existe para ensinar não
   // tinha como acontecer na tela. Registrada aqui e NÃO ativada.
   "GE.02": GE_02,
+
+  // GM.01 não tinha gerador NENHUM: não está em `curriculum.ts`, e caía no
+  // fallback genérico. Uma competência de faixa F0 com duas fichas escritas no
+  // cânone e zero código. Registrada aqui e NÃO ativada.
+  "GM.01": GM_01,
 };
 
 /**

@@ -64,6 +64,7 @@ import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
 import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
 import { construirFormaSpec } from "./procedimentos/formaContract";
+import { construirGrandezaSpec } from "./procedimentos/grandezaContract";
 import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
@@ -890,6 +891,18 @@ export class Composer {
         answer = spec.resposta;
         uiProps = spec;
         evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
+        options = undefined;
+        break;
+      }
+
+      case "grandeza": {
+        // Ficha F49 (GM.01). A resposta é QUAL objeto — não uma palavra, e não
+        // uma alternativa. O nó não tinha gerador nenhum: caía no fallback.
+        const spec = construirGrandezaSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
         promptOverride = spec.enunciado;
         options = undefined;
         break;

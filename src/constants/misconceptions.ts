@@ -255,7 +255,25 @@ export const MisconceptionTag = {
   CONFUNDE_QUADRADO_RETANGULO: "confunde-quadrado-retangulo",
 
   /** Formas: escolheu pela aparência geral, sem contar os lados */
-  IGNORA_LADOS: "ignora-lados"
+  IGNORA_LADOS: "ignora-lados",
+
+  /* --- comparação de grandezas (ficha F49) -------------------------- */
+
+  /**
+   * Grandezas: julgou sem a referência do chão.
+   *
+   * A §2 da F49 obriga a tela a alinhar as bases — e com elas alinhadas, quem
+   * sobe mais É o mais alto: a condição que produz este erro foi removida da
+   * tela de propósito. A assinatura que sobra vem da §4: a linha de chão **se
+   * desenha** na abertura, e responder antes dela é decidir sem referência.
+   */
+  BASE_DESALINHADA: "base-desalinhada",
+
+  /** Grandezas: comparou largura quando a pergunta era altura — julgou o volume */
+  CONFUNDE_ATRIBUTOS: "confunde-atributos",
+
+  /** Grandezas: acerta a diferença gritante e erra a pequena — enxerga, não compara */
+  SO_DIFERENCA_GRANDE: "so-diferenca-grande"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

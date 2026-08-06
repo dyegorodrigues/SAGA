@@ -15,6 +15,7 @@ import { AudioChoiceSpec } from "./procedimentos/audioChoiceContract";
 import { ProducaoSpec } from "./procedimentos/producaoContract";
 import { PosicaoSpec } from "./procedimentos/posicaoContract";
 import { FormaSpec } from "./procedimentos/formaContract";
+import { GrandezaSpec } from "./procedimentos/grandezaContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -54,6 +55,7 @@ export type FichaUiProps =
   | ProducaoSpec
   | PosicaoSpec
   | FormaSpec
+  | GrandezaSpec
   | { text: string };
 
 interface BalanceItem {

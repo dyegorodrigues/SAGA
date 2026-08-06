@@ -42,6 +42,7 @@ import { N1_06 } from "../src/curriculum/fichas/jornada/N1.06";
 import { N1_09 } from "../src/curriculum/fichas/jornada/N1.09";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { GE_02 } from "../src/curriculum/fichas/jornada/GE.02";
+import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 
 /**
@@ -360,6 +361,18 @@ export const CENAS: Cena[] = [
     nome: "GE.02 micro-aula: mesmo virado é triângulo",
     render: (s: number) => (
       <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarForma: 360 }} />
+    ),
+  },
+  // GM.01 — maior, menor, mais alto (F49), implementada e NÃO ativada. Não há
+  // cena de rollback: o nó não tinha gerador nenhum.
+  ...[1, 3, 4, 5].map(lvl => ({
+    nome: `GM.01 comparar grandeza (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={GM_01} lvl={lvl} semente={s} />,
+  })),
+  {
+    nome: "GM.01 micro-aula: os dois estão no chão",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarLinhaBase: true }} />
     ),
   },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },
