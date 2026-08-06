@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { MisconceptionTag } from "../../constants/misconceptions";
+import { Evidencia } from "../../constants/evidencias";
 import {
   ESCADA_DE_MODOS,
   FALAS,
@@ -389,10 +390,24 @@ describe("§7 — as falas são as da ficha, letra por letra", () => {
 
 describe("§9 — o critério de domínio é o da ficha", () => {
   it("JD1 e JD2: 4 de 5 em 2 sessões — frouxo de propósito", () => {
+    // ⚠️ Só os micros de FILEIRA. O N1.08 é servido por duas fichas — a JD2 nos
+    // níveis 1-2 e a F02 nos 3-5 —, e a F02 §9 pede outro critério (3 de 3, com
+    // a regra extra das duas fileiras). Varrer todos os micros da competência
+    // misturava as duas §9 numa só.
     for (const ficha of [N1_03, N1_08]) {
-      for (const m of ficha.micros) {
+      for (const m of ficha.micros.filter(m => m.kinds[0] === "fileira")) {
         expect(m.dominio, `${ficha.id}/${m.id}`).toEqual({ acertos: 4, de: 5, sessoes: 2 });
       }
+    }
+  });
+
+  it("F02 §9: 3 de 3 em 2 sessões, e a regra extra das duas fileiras", () => {
+    const daMoldura = N1_08.micros.filter(m => m.kinds[0] === "moldura");
+    expect(daMoldura.length).toBe(3);
+    for (const m of daMoldura) {
+      expect(m.dominio, `N1.08/${m.id}`).toMatchObject({ acertos: 3, de: 3, sessoes: 2 });
+      expect(m.dominio.exige?.evidencia, `N1.08/${m.id}`)
+        .toBe(Evidencia.ESTRUTURA_DAS_DUAS_FILEIRAS);
     }
   });
 

@@ -273,7 +273,53 @@ export const MisconceptionTag = {
   CONFUNDE_ATRIBUTOS: "confunde-atributos",
 
   /** Grandezas: acerta a diferença gritante e erra a pequena — enxerga, não compara */
-  SO_DIFERENCA_GRANDE: "so-diferenca-grande"
+  SO_DIFERENCA_GRANDE: "so-diferenca-grande",
+
+  /* --- a moldura de dez (fichas F02, JD3 e JD5) ---------------------- */
+
+  /** Moldura: somou as casas vazias às cheias — não distingue ocupado de vago */
+  CONTA_VAZIOS: "conta-vazios",
+
+  /**
+   * Moldura: acerta até 5 e erra de 6 a 10 — **o mais importante da F02**.
+   *
+   * Não vê a fileira cheia como unidade: conta as dez de uma em uma, e a
+   * estrutura que a ficha existe para instalar não se instalou.
+   */
+  NAO_USA_ESTRUTURA: "nao-usa-estrutura",
+
+  /**
+   * Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam.
+   *
+   * A JD3 §6 chama de "a tag-chave": *"não é descuido — é a criança fazendo
+   * exatamente o que o olho pede"*. O olho é treinado para contar o que está
+   * lá; contar o que não está é uma inversão perceptual.
+   */
+  RESPONDE_O_CHEIO: "responde-o-cheio",
+
+  /** Moldura relâmpago: erra quando faltam mais de 5 — não usa a fileira como unidade */
+  SEM_ANCORA_CINCO: "sem-ancora-cinco",
+
+  /**
+   * Moldura de dez, nível 5: respondeu quantos TEM onde a pergunta era quantos
+   * faltam — *"não processou o complemento"* (F02 §6).
+   *
+   * ⚠️ É o mesmo gesto que a `RESPONDE_O_CHEIO` da JD3, e são duas tags de
+   * propósito. Cada ficha nomeia a sua, e o nome é o que a Oficina lê: na F02 o
+   * tratamento é a moldura mostrando os dois números fechando dez; na JD3 é a
+   * ficha inteira, porque lá a inversão **é** a competência. Unificar as duas
+   * mandaria a criança da F02 para a oficina errada.
+   */
+  INVERTE_PERGUNTA: "inverte-pergunta",
+
+  /** Ver e imaginar: respondeu o número de visíveis — leu a tela, não operou */
+  RESPONDE_O_VISIVEL: "responde-o-visivel",
+
+  /** Ver e imaginar: respondeu o total — não entendeu que a pergunta é sobre a parte oculta */
+  RESPONDE_O_TODO: "responde-o-todo",
+
+  /** Ver e imaginar: acerta com moldura e erra sem — não tem imagem mental estável */
+  DEPENDE_DE_ESTRUTURA: "depende-de-estrutura"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

@@ -43,7 +43,10 @@ import { N1_13 } from "../src/curriculum/fichas/jornada/N1.13";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { GE_02 } from "../src/curriculum/fichas/jornada/GE.02";
 import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
+import { N1_10 } from "../src/curriculum/fichas/jornada/N1.10";
+import { N1_11 } from "../src/curriculum/fichas/jornada/N1.11";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
+import { FaseDaMoldura } from "../src/components/primitives/MolduraStage";
 
 /**
  * A largura do aparelho da criança.
@@ -147,7 +150,8 @@ function Exercicio({ id, lvl, semente }: { id: string; lvl: number; semente: num
  * o enquadramento: dá para aprovar uma tela que, dentro do cartão, não cabe.
  */
 function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
-  ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown; fase?: Fase;
+  ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown;
+  fase?: Fase | FaseDaMoldura;
 }) {
   const q = comSemente(semente, () => Composer.generate(ficha, lvl));
   return (
@@ -373,6 +377,88 @@ export const CENAS: Cena[] = [
     nome: "GM.01 micro-aula: os dois estão no chão",
     render: (s: number) => (
       <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarLinhaBase: true }} />
+    ),
+  },
+  // ---- A moldura de dez: três fichas, uma primitiva ------------------------
+  //
+  // A fase é PRESA nas três, e pela mesma razão da `fileira`: a JD3 percorre
+  // cinco estados em três segundos e a JD5 tem a tampa deslizando. Sem prender,
+  // a sonda fotografaria um estado diferente a cada execução (§6.31).
+  //
+  // N1.08 níveis 3-5 (F02) — a moldura que a ficha pede. Os níveis 1-2 são a
+  // JD2 (a mão) e já estão medidos acima.
+  ...[3, 4, 5].map(lvl => ({
+    nome: `N1.08 moldura de dez pergunta (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={N1_08} lvl={lvl} semente={s} fase="perguntando" />,
+  })),
+  {
+    // O flash do nível 4: as fichas na tela, sem barra de alternativas ainda.
+    nome: "N1.08 moldura relâmpago (nível 4, mostrando)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_08} lvl={4} semente={s} fase="mostrando" />,
+  },
+  {
+    // §4: a fileira de cima acende INTEIRA. É o momento pedagógico central da
+    // F02, e é layout — a fileira acesa não pode cobrir o que está embaixo.
+    nome: "N1.08 revelação: a fileira acesa em bloco",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_08} lvl={3} semente={s} fase="revelando" />,
+  },
+  {
+    nome: "N1.08 micro-aula: a moldura vazia",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_08} lvl={3} semente={s} mostrar={{ moldura: { vazia: true } }} />
+    ),
+  },
+  // N1.11 (JD3) — a moldura relâmpago. Competência que NÃO tinha ficha nenhuma;
+  // implementada e NÃO ativada. O estado `vazio` é a ficha inteira: são os 300ms
+  // em que só a moldura vazia fica na tela, e é o que a criança leva para a
+  // resposta.
+  { nome: "N1.11 rollback: amigos do 10 legados (nível 2)", render: (s) => <Exercicio id="N1.11" lvl={2} semente={s} /> },
+  ...[1, 3, 5].flatMap(lvl => ([
+    {
+      nome: `N1.11 moldura relâmpago mostrando (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={lvl} semente={s} fase="mostrando" />,
+    },
+    {
+      nome: `N1.11 moldura relâmpago pergunta (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={lvl} semente={s} fase="perguntando" />,
+    },
+  ])),
+  {
+    nome: "N1.11 o vazio sozinho (os 300ms que são a ficha)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={2} semente={s} fase="vazio" />,
+  },
+  {
+    nome: "N1.11 regressiva: três pulsos sem número",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={1} semente={s} fase="regressiva" />,
+  },
+  {
+    nome: "N1.11 revelação do erro: as vazias piscando em bloco",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={4} semente={s} fase="revelando" />,
+  },
+  {
+    nome: "N1.11 micro-aula: as que faltavam se preenchem",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_11} lvl={1} semente={s} mostrar={{ preencherFaltantes: 2 }} />
+    ),
+  },
+  // N1.10 (JD5) — ver e imaginar. Estava ATIVA servindo o `bond` simbólico; a
+  // ficha foi reescrita e o nó saiu dos canários, então o rollback é o bond, e
+  // ele também é medido: tela de emergência quebrada não socorre.
+  { nome: "N1.10 rollback: o number bond simbólico (nível 2)", render: (s) => <Exercicio id="N1.10" lvl={2} semente={s} /> },
+  ...[1, 4, 5].flatMap(lvl => ([
+    {
+      nome: `N1.10 ver e imaginar antes da tampa (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={lvl} semente={s} fase="mostrando" />,
+    },
+    {
+      nome: `N1.10 ver e imaginar com a tampa (nível ${lvl})`,
+      render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={lvl} semente={s} fase="perguntando" />,
+    },
+  ])),
+  {
+    nome: "N1.10 micro-aula: vou esconder um",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={N1_10} lvl={1} semente={s} mostrar={{ taparN: 1 }} />
     ),
   },
   { nome: "N1.07 numeral na reta (nível 2)", render: (s) => <Exercicio id="N1.07" lvl={2} semente={s} /> },

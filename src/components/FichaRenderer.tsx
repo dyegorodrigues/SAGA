@@ -33,6 +33,7 @@ import { TouchPlaceStage } from './primitives/TouchPlaceStage';
 import { CenaDePosicaoStage } from './primitives/CenaDePosicaoStage';
 import { FormaStage } from './primitives/FormaStage';
 import { GrandezaStage } from './primitives/GrandezaStage';
+import { MolduraStage } from './primitives/MolduraStage';
 import { AudioChoiceStage } from './primitives/AudioChoiceStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
@@ -107,6 +108,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return (uiProps as { opcoes?: unknown }).opcoes
         ? <FormaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />
         : <CenaDePosicaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'moldura':
+      return <MolduraStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'grandeza':
       return <GrandezaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'fileira':

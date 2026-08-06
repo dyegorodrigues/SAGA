@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { TRACKS_PRE, TRACKS_ANO1 } from "../curriculum/motores/curriculum";
+import { PALCOS_QUE_RESPONDEM } from "../components/gameloop/answerPolicy";
 
 /**
  * A cinta de segurança do Matemágica (Constituição, regra 5).
@@ -39,8 +40,19 @@ describe.each(ALL_TRACKS.map((t) => [`${t.grade}/${t.id}`, t] as const))(
           // TECLADO escalado ao escopo (1-3, 1-5, 1-10) — com quatro teclas,
           // chutar acertaria em 25% e a cardinalidade deixaria de ser observável.
           // O escopo do teclado tem guarda própria no contrato do canário.
-          const PALCO_PROPRIO = ["vertical", "numberline-interactive", "numberline",
-            "drag-group", "draggroup", "tenframe", "plain", "emojirow", "touchcount"];
+          //
+          // ⚠️ A lista dos palcos autorais vem de `PALCOS_QUE_RESPONDEM`, que já
+          // é a fonte da verdade em `answerPolicy.ts` — é ela que decide se a
+          // barra genérica aparece por baixo da cena. Mantida à mão aqui, ela
+          // atrasava um palco por vez: o `moldura` reprovou este teste depois de
+          // estar certo em todo lugar, porque só esta cópia não sabia dele
+          // (§6.32, duas fontes para a mesma verdade).
+          //
+          // O que sobra escrito são os kinds LEGADOS de palco próprio, que
+          // nasceram antes daquele conjunto existir.
+          const PALCO_PROPRIO = [...PALCOS_QUE_RESPONDEM, "vertical",
+            "numberline-interactive", "numberline", "drag-group", "draggroup",
+            "tenframe", "plain", "emojirow"];
           if (!PALCO_PROPRIO.includes(q.kind) && q.isFallback !== true) {
             expect(Array.isArray(q.options), ctx).toBe(true);
             expect(q.options.length, ctx).toBeGreaterThanOrEqual(2);

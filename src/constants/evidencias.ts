@@ -63,6 +63,22 @@ export const Evidencia = {
    * Acertar três diferenças gritantes mostra que ela enxerga, não que compara.
    */
   DIFERENCA_PEQUENA: "diferenca-pequena",
+
+  /**
+   * F02 (N1.08): um acerto com quantidade **entre 6 e 10**.
+   *
+   * É o que exige usar a estrutura das DUAS fileiras — abaixo de seis, a
+   * criança resolve na fileira de cima e a moldura de dez não é testada.
+   */
+  ESTRUTURA_DAS_DUAS_FILEIRAS: "estrutura-das-duas-fileiras",
+
+  /**
+   * JD5 (N1.10): um acerto com total **acima de cinco**.
+   *
+   * §9: *"pelo menos um acerto no nível 4+, que exige memória de trabalho
+   * real"*. Guardar três na cabeça é subitização; guardar oito é memória.
+   */
+  TOTAL_ALEM_DE_CINCO: "total-alem-de-cinco",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

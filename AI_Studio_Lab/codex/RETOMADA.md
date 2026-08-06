@@ -126,12 +126,30 @@ por nenhuma ficha: `AudioChoice`, `TouchPlace`, `ShapeCanvas` (importado no
 `FichaRenderer` sem `case`) e `Grupo`. É o defeito mais barato de procurar e o
 mais caro de não ver: ele faz o inventário parecer completo.
 
-**Passo 3 — `TenFrame`, plain e flash:** N1.08 (níveis 3-5, ficha F02), N1.10
-(JD5) e N1.11 (JD3). A escada plain→flash já está na ordem de pré-requisitos;
-construir os três juntos garante que o desenho seja **o mesmo** nos dois modos.
+**Passo 3 — `TenFrame`, plain e flash: ✅ FECHADO.** N1.08 (níveis 3-5, ficha
+F02), N1.10 (JD5) e N1.11 (JD3). Detalhe inteiro em `PLANO_DO_BLOCO_F0.md §14`.
 
-O `TenFrame` que já existe entra como **suspeito** (§1) — e já se sabe de um
-defeito nele: o botão "Ver de novo" estava a 1.45:1, corrigido em `422138e`.
+O `TenFrame` entrou como **suspeito** (§1) e o era: cinco divergências entre a
+primitiva e as fichas que a nomeiam. A pior — **o flash escondia a moldura junto
+com as fichas**, quando a JD3 §4 manda o contrário (*"a moldura vazia permanece
+300ms — o vazio é a última coisa que a criança vê"*). A ficha inteira mora
+nesses 300ms.
+
+Três defeitos só apareceram **relendo a ficha depois de o código compilar**:
+
+1. a tampa da JD5 cobria **uma fileira só** — escondendo sete de dez, metade dos
+   escondidos continuava à vista e a criança contava a resposta;
+2. a tampa ficava **fechada no erro**, quando a §4 manda levantar nos dois casos;
+3. a F02 §6 tem uma linha que **só existe no nível 5** (`INVERTE_PERGUNTA`), e
+   sem o nível dentro da ação ela virava `CONTA_VAZIOS`.
+
+E um quarto veio do **print**, não de teste nenhum: com a pergunta no ar, eu
+tinha deixado a moldura vazia na tela. A JD3 §3 diz *"a área fica vazia enquanto
+ela responde"* — e com as dez casas à vista a criança **conta as vazias uma a
+uma**, que é o que a §7 proíbe e o que a ficha existe para dispensar.
+
+> Três defeitos passaram pelo compilador e por 1786 testes. Quem os pegou foi
+> reler a ficha inteira e olhar a tela.
 
 ### Estado dos canários
 
@@ -148,7 +166,19 @@ Implementados e **NÃO** ativados — a tela existe e não chega à criança:
 | `GE.01` | F47, onde está? | `plain` com a resposta em **palavras** |
 | `GE.02` | F48, que forma é essa? | `plain` com dois emojis, que **não giram** |
 | `GM.01` | F49, maior/menor/mais alto | **nada** — o nó não tinha gerador |
+| `N1.10` | JD5, ver e imaginar | `gN1_10` — o **number bond** simbólico, que ela servia ATIVA |
+| `N1.11` | JD3, moldura relâmpago | `gN1_11` — o nó nunca teve ficha |
 | `N4.09` | — | legado |
+
+⚠️ A **`N1.10` saiu dos canários** neste passo. Ela estava **ativa** servindo o
+`bond` — o diagrama parte-todo, simbólico, com números escritos — onde a JD5
+pede a operação mental *antes* do símbolo. Tela nova não estreia no PR que a
+escreve, e a `N1.10` virou tela nova.
+
+A **`N1.08` continua ativa** e é a única exceção do bloco: ela já era canário, e
+os níveis 3-5 dela mudam de tela nesta entrega. A troca é consciente — os três
+degraus da F02 §5 apontavam para a **mesma micro**, então o que a criança recebia
+naqueles níveis era a mesma pergunta três vezes.
 
 Ativar cada um é PR próprio, e o intervalo com a tela desligada é o que pega os
 defeitos: foi assim que apareceram o canhão que faltava na F27, o enunciado
@@ -244,12 +274,25 @@ Registrado porque o autor cobrou, e porque a próxima sessão não deve repetir.
 | P10 | 12 competências trocam de MODO sem aviso; `N3.02` faz `EmojiRow` virar "riscar" vindo de 7 nós | `conformidadeDeFichas.test.ts` |
 | P11 | `DragGroup` estreia em dois modos a partir de dois nós-raiz sem pré-requisito entre eles | `N1.01.ts`, `AL.01.ts` |
 | ~~P12~~ | **fechada** — a F04 virou `N1.13`; a N1.09 continua sendo "contar até 20", que é o que quatro arestas precisam | `PLANO_DO_BLOCO_F0.md §13.1` |
-| ~~P13~~ | **fechada** — a regra extra da §9 virou a terceira dimensão da coroa, no lugar do cronômetro (que violava o §5.1-bis) | `PLANO_DO_BLOCO_F0.md §14` |
+| ~~P13~~ | **fechada** — a regra extra da §9 virou a terceira dimensão da coroa, no lugar do cronômetro (que violava o §5.1-bis) | `PLANO_DO_BLOCO_F0.md §10.4` |
 | ~~P15~~ | **decidida** — a F50 vai para `GM.05` (capacidade e massa); o nó nasce junto com a ficha, não antes | `PLANO_DO_BLOCO_F0.md §13.2` |
 | P14 | Palcos novos precisam entrar no `PalcoEscalado` — desenho de tamanho fixo sem ele vaza em tela pequena, e a sonda só acusa se a cena estiver no catálogo | `PalcoEscalado.tsx`, `PLANO_DO_BLOCO_F0.md §11` |
+| P16 | A **F28** — a outra ficha da N1.11, os amigos do 10 como *conta*. A JD3 (implementada) é a percepção; a §2 dela diz que a forma simbólica é outra competência. A F28 não tem código | `N1.11.ts`, `PLANO_DO_BLOCO_F0.md §14.7` |
+| P17 | O `bond` (parte-todo **simbólico**) é a N1.10 na faixa F1 e hoje só existe no gerador legado. Ativando a JD5, a N1.10 fica sem a forma simbólica até a ficha F1 existir | `N1.10.ts`, `PLANO_DO_BLOCO_F0.md §14.7` |
 | — | `scripts/e2e-screenshots.mjs` não chega à tela de exercício (seed velho) | commit `a2d6c87` |
 | — | N4.09 ativação; N4.10–N4.12; coreografia faltando em N3.10, N4.03/04/06/07 | `ROTEIRO_ATE_O_FIM.md §4-bis` |
 
+### A fila, na ordem
+
+1. **F50 → nó `GM.05`** (capacidade e massa). Decidida na P15; o nó nasce junto
+   com a ficha, nunca antes — nó sem ficha cai no fallback genérico, que é o
+   defeito que a `GM.01` tinha.
+2. **Os PRs de ativação**, um por nó: `AL.01`, `N1.06`, `N1.13`, `GE.01`,
+   `GE.02`, `GM.01`, `N1.10`, `N1.11`. Implementação e ativação são dois PRs.
+3. **P8** — o motor do Jardim do Dojo. As cinco trilhas JD1-JD5 agora têm ficha
+   (JD2 e JD3 escritas no cânone v3.1, todas implementadas), e **nada as
+   apresenta à criança**.
+
 ## 9. Branch
 
-`claude/install-superpowers-repo-bst25i`. Nunca empurre para outra.
+`claude/install-superpowers-repo-bst25i-hrg5jr`. Nunca empurre para outra.

@@ -5,6 +5,7 @@ import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curric
 import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum/procedimentos/formaProcedure";
 import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza, evidenciasDe as evidenciasDaGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
 import { AcaoDeContagem, evidenciasDe as evidenciasDaContagem } from "../../curriculum/procedimentos/touchCountProcedure";
+import { AcaoDaMoldura, diagnosticar as diagnosticarMoldura, evidenciasDe as evidenciasDaMoldura } from "../../curriculum/procedimentos/tenFrameProcedure";
 import { RespostaOuvida, evidenciasDe as evidenciasDaEscuta } from "../../curriculum/procedimentos/audioChoiceProcedure";
 import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
@@ -87,6 +88,15 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
+  // Fichas F02, JD3 e JD5: a hipótese depende do que a CENA mostrava — quantas
+  // casas estavam cheias, se o vazio estava disperso, quantas a tampa cobriu.
+  // "Responder o cheio" e "responder o visível" são o mesmo gesto com
+  // significados opostos, e só o spec os separa.
+  if (meta?.moldura) {
+    const daAcao = diagnosticarMoldura(meta.moldura as AcaoDaMoldura);
+    if (daAcao) return daAcao;
+  }
+
   const pickedOption = q.options?.find(option => option.value === value);
   return pickedOption?.misconception
     ? pickedOption.tag || pickedOption.misconception
@@ -112,7 +122,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
  * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
  * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
  */
-export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace", "shapecanvas", "grandeza"]);
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace", "shapecanvas", "grandeza", "moldura"]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)
@@ -143,6 +153,7 @@ export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
   if (meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));
   if (meta.forma) achadas.push(...evidenciasDaForma(meta.forma as AcaoF));
   if (meta.grandeza) achadas.push(...evidenciasDaGrandeza(meta.grandeza as AcaoDeGrandeza));
+  if (meta.moldura) achadas.push(...evidenciasDaMoldura(meta.moldura as AcaoDaMoldura));
   if (meta.evidencias) achadas.push(...meta.evidencias);
   return [...new Set(achadas)];
 }

@@ -18,6 +18,7 @@ import { TouchPlaceStage } from "../primitives/TouchPlaceStage";
 import { CenaDePosicaoStage } from "../primitives/CenaDePosicaoStage";
 import { FormaStage } from "../primitives/FormaStage";
 import { GrandezaStage } from "../primitives/GrandezaStage";
+import { MolduraStage, FaseDaMoldura } from "../primitives/MolduraStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -73,6 +74,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "touchplace",
   "shapecanvas",
   "grandeza",
+  "moldura",
 ]);
 
 interface Props {
@@ -114,7 +116,7 @@ interface Props {
    *
    * A criança nunca recebe isto: o GameLoop não passa a prop.
    */
-  faseDaCena?: FaseDaFileira;
+  faseDaCena?: FaseDaFileira | FaseDaMoldura;
 }
 
 export function GameLoopExerciseRenderer({
@@ -168,7 +170,7 @@ export function GameLoopExerciseRenderer({
             falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor) => handlePick(valor)}
             disabled={status !== null}
-            fase={faseDaCena}
+            fase={faseDaCena as FaseDaFileira | undefined}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}
@@ -193,9 +195,23 @@ export function GameLoopExerciseRenderer({
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}
-        {/* O `shapecanvas` serve DUAS fichas. Quem distingue é o spec: o da
-            F48 traz `opcoes`, o da F47 traz `referencial`. Ler o spec em vez
-            de guardar um campo "modo" evita duas fontes para a mesma verdade. */}
+        {/* A moldura serve TRÊS fichas (F02, JD3, JD5). Quem distingue é o
+            `modo` do spec, e ele vem do `params` da ficha — não há campo
+            adivinhado aqui. A fase é presa só pela sonda: a JD3 percorre cinco
+            estados em três segundos e o flash é o conteúdo da ficha. */}
+        {q.kind === "moldura" && q.uiProps && (
+          <MolduraStage
+            spec={q.uiProps as never}
+            // §4 da JD5: a contagem em voz alta na abertura é OBRIGATÓRIA — sem
+            // ela a criança não constrói o total na memória e o exercício vira
+            // adivinhação.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "moldura", moldura: acao } as never)}
+            disabled={status !== null}
+            fase={faseDaCena as FaseDaMoldura | undefined}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
         {q.kind === "grandeza" && q.uiProps && (
           <GrandezaStage
             spec={q.uiProps as never}
@@ -207,6 +223,9 @@ export function GameLoopExerciseRenderer({
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}
+        {/* O `shapecanvas` serve DUAS fichas. Quem distingue é o spec: o da
+            F48 traz `opcoes`, o da F47 traz `referencial`. Ler o spec em vez
+            de guardar um campo "modo" evita duas fontes para a mesma verdade. */}
         {q.kind === "shapecanvas" && q.uiProps && "opcoes" in q.uiProps && (
           <FormaStage
             spec={q.uiProps as never}

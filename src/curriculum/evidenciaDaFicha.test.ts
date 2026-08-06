@@ -6,6 +6,7 @@ import { evidenciasDe as daEscuta } from "./procedimentos/audioChoiceProcedure";
 import { evidenciasDe as daProducao } from "./procedimentos/producaoProcedure";
 import { evidenciasDe as daForma } from "./procedimentos/formaProcedure";
 import { evidenciasDe as daGrandeza } from "./procedimentos/grandezaProcedure";
+import { evidenciasDe as daMoldura } from "./procedimentos/tenFrameProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -49,6 +50,19 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.DIFERENCA_PEQUENA,
     emitir: () => daGrandeza({
       escolhido: 0, certo: 0, vencedorDoOutroAtributo: 1, diferencaPequena: true, antesDoChao: false,
+    }),
+  },
+  {
+    nome: "F02 (moldura) — acerto com seis ou mais, usando as duas fileiras",
+    evidencia: Evidencia.ESTRUTURA_DAS_DUAS_FILEIRAS,
+    emitir: () => daMoldura({ modo: "contar", nivel: 3, resposta: 7, alvo: 7, cheias: 7, casas: 10 }),
+  },
+  {
+    nome: "JD5 (moldura) — acerto com mais de cinco guardados na cabeça",
+    evidencia: Evidencia.TOTAL_ALEM_DE_CINCO,
+    emitir: () => daMoldura({
+      modo: "escondidos", nivel: 4, resposta: 3, alvo: 3, cheias: 8, casas: 10,
+      total: 8, visiveis: 5,
     }),
   },
 ];

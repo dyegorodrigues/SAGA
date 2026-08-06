@@ -1,7 +1,7 @@
 // schema.ts
 // Definindo o contrato estrito para o Motor de Fichas (Substituindo os generators.ts hardcoded)
 
-export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis" | "visual-addition" | "scattered" | "linking-cubes" | "missing-addend-frame" | "take-apart" | "sequence" | "multiple_choice" | "sentencebuilder" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza";
+export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis" | "visual-addition" | "scattered" | "linking-cubes" | "missing-addend-frame" | "take-apart" | "sequence" | "multiple_choice" | "sentencebuilder" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza" | "moldura";
 
 export interface FichaParams {
   [key: string]: unknown;

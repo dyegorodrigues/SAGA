@@ -616,3 +616,121 @@ tinha e que este bloco passou o dia removendo. Criar a `GM.05` vazia trocaria
 uma pendência de papel por uma competência quebrada na tela da criança. Ela
 nasce junto com a implementação da F50, que é a próxima ficha da fila depois do
 passo 3.
+
+---
+
+## §14 — Passo 3: a moldura de dez, três fichas numa primitiva
+
+O passo 3 do plano dizia *"`TenFrame` plain e flash"*. Ao ler as três fichas
+inteiras, o que estava escrito ali era pouco: a moldura de dez não serve uma
+competência, serve **três**, e duas delas não existiam em código.
+
+| ficha | competência | pergunta | estado antes |
+|---|---|---|---|
+| **F02** | N1.08 (níveis 3-5) | *"quantas você vê?"* | os três degraus apontavam para a MESMA micro |
+| **JD3** | N1.11 | *"quantos faltam pra encher?"* | **nenhuma ficha em código** |
+| **JD5** | N1.10 | *"quantos ficaram escondidos?"* | ficha servindo `bond`, e **ativa** |
+
+### §14.1 — O que a auditoria do `TenFrame` encontrou
+
+Cinco divergências entre a primitiva e as fichas que a nomeiam:
+
+1. **Sempre dez casas.** A F02 §3 manda cinco nos níveis 1-2 (*"5 numa fileira
+   (níveis 1-2) ou 10 em duas fileiras de 5 (níveis 3+)"*). O código escrevia
+   `Array.from({ length: 10 })`. O primeiro degrau da ficha não existia.
+2. **Sem o modo "faltam".** A JD3 inteira e o nível 5 da F02.
+3. **Sem o modo "escondidos".** A JD5 inteira.
+4. **Ocupação como número.** `filled: number` só sabe dizer *"as n primeiras"*.
+   O nível 5 da JD3 preenche **disperso** de propósito — *"com casas vazias
+   espalhadas, o vazio perde a forma e a criança precisa integrar"*. Aquele
+   degrau era impossível de representar.
+5. **O flash escondia a moldura junto com as fichas**, e punha um 🙈 no lugar.
+   A JD3 §4 manda o oposto: *"as fichas somem. **A moldura vazia permanece
+   300ms** e depois some também — o vazio é a última coisa que a criança vê."*
+   E explica por quê: *"a competência é sobre o vazio. Se o vazio só existir
+   junto com o cheio, a criança olha para o cheio."* **A ficha inteira mora
+   nesses 300ms.**
+
+### §14.2 — Três defeitos que só apareceram relendo a ficha inteira
+
+Encontrados depois de o código já compilar, e cada um é uma linha de §4 ou §6
+que eu tinha lido pela metade:
+
+**a) A tampa da JD5 cobria uma fileira só.** Ela era um retângulo de grade com
+`gridColumn` calculado a partir do primeiro índice tapado. Escondendo sete de
+dez, o bloco atravessa as duas fileiras e **metade dos escondidos continuava à
+vista** — a criança respondia contando o que devia estar tapado. Agora é uma
+tampa por faixa (`faixasDaTampa`), e um teste percorre os cinco níveis
+verificando que toda casa escondida está sob alguma.
+
+**b) A tampa ficava fechada no erro.** §4: no acerto *"a tampa levanta
+revelando os escondidos"*; no erro suave *"a tampa levanta devagar, revelando um
+por um, e a voz conta os escondidos"*. Nas duas ela levanta — e mantê-la fechada
+escondia exatamente a informação que o erro pediu.
+
+**c) A F02 §6 tem uma linha que só existe no nível 5.** *"Respondeu quantos tem
+em vez de quantos faltam → `INVERTE_PERGUNTA` — não processou o complemento."*
+Sem o nível dentro da ação, aquela resposta virava `CONTA_VAZIOS`, e a Oficina
+treinaria a coisa errada. A `AcaoDaMoldura` passou a carregar o `nivel`.
+
+⚠️ **`INVERTE_PERGUNTA` e `RESPONDE_O_CHEIO` são o mesmo gesto com dois nomes,
+e ficaram os dois.** Cada ficha nomeia a sua, e o nome é o que a Oficina lê: na
+F02 a inversão é um degrau dentro de uma ficha sobre estrutura; na JD3 a
+inversão **é** a competência. Unificar mandaria a criança da F02 para a oficina
+errada.
+
+### §14.3 — Divergência declarada: a F02 §5 no nível 5
+
+A tabela manda *"1 a 10"* no nível 5. Mas o nível 5 é a pergunta invertida, e
+com a moldura **cheia** a resposta é zero: a tela mostraria dez casas ocupadas
+perguntando quantas faltam. Zero não está na reta numérica de uma criança de F0,
+e questão sem resposta possível de dar é o §6.2. O intervalo efetivo ali é
+**1 a 9** — que é o que a JD3 já faz, pelo mesmo motivo.
+
+### §14.4 — Divergência declarada: o teto de alternativas
+
+A JD3 §3 diz *"Opções — **2 a 3 numerais**, na base"*, e o motivo é a ficha: com
+0,7s de exposição a resposta é percepção, não escolha entre muitos — quatro
+botões viram leitura. A F02 (*"teclado escalado ao escopo"*) e a JD5 (cinco
+numerais no desenho da §3) ficam em quatro. `TETO_DE_ALTERNATIVAS` guarda os
+três números num lugar só.
+
+### §14.5 — A §9 de cada uma, e a coroa (P13)
+
+| ficha | domínio | evidência exigida |
+|---|---|---|
+| F02 | 3 de 3, 2 sessões | `ESTRUTURA_DAS_DUAS_FILEIRAS` — *"pelo menos um acerto com quantidade entre 6 e 10"* |
+| JD3 | 4 de 5, 2 sessões | **nenhuma** — a §9 dela não pede condição extra |
+| JD5 | 3 de 3, 2 sessões | `TOTAL_ALEM_DE_CINCO` — *"pelo menos um acerto no nível 4+ (total até 10), que exige memória de trabalho real"* |
+
+A JD3 **não** ganhou `exige`, e isso é deliberado: declarar o que a ficha não
+pede seria endurecer o cânone por conta própria. A velocidade dos amigos do 10 é
+treinada na trilha **FD1** do Dojo, não aqui (§5.1-bis).
+
+Na JD5 a evidência lê o **total**, não o nível: guardar três na cabeça é
+subitização — a criança vê três sem contar. Guardar oito é memória de trabalho,
+que é o que a ficha diz medir. É a leitura da intenção da §9, e está declarada
+na ficha.
+
+### §14.6 — O que ficou ligado, e o que não
+
+- **N1.10 SAIU dos canários.** Estava ativa servindo `bond` — o diagrama
+  parte-todo, simbólico, com números escritos — onde a JD5 pede a operação
+  mental **antes** do símbolo. É tela nova, e tela nova não estreia no PR que a
+  escreve (§7 do Padrão Ouro). O rollback cai em `gN1_10`, que é o bond que ela
+  serve hoje, e a cena dele é medida pela sonda: tela de emergência quebrada não
+  socorre.
+- **N1.11 registrada e NÃO ativada.** Nunca teve ficha; tem duas no cânone (F28
+  e esta). O rollback é `gN1_11`.
+- **N1.08 continua ativa** — ela já era canário —, e os níveis 3-5 dela mudam de
+  tela nesta entrega. É a única exceção do bloco, e ela é consciente: os degraus
+  antigos apontavam todos para a mesma micro, então o que a criança recebia
+  naqueles três níveis era a mesma pergunta três vezes. O rollback continua
+  disponível pelo mesmo caminho de sempre.
+
+### §14.7 — Pendências que ficam
+
+| id | o quê |
+|---|---|
+| **P16** | A **F28** — a outra ficha da N1.11, os amigos do 10 como *conta*. A JD3 é a percepção; a F28 é a forma simbólica, e a §2 da JD3 diz explicitamente que são competências diferentes. A F28 não tem código. |
+| **P17** | O `bond` continua sendo a primitiva da N1.10 na faixa F1 (parte-todo simbólico). Hoje ele é servido pelo gerador legado; quando a JD5 for ativada, a N1.10 fica sem a forma simbólica até a ficha F1 existir. |

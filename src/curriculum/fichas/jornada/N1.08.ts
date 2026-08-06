@@ -1,6 +1,8 @@
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/emojiRowProcedure";
 import { FichaCompetencia } from "../../schema";
+import { Evidencia } from "../../../constants/evidencias";
+import { FALAS as FALAS_MOLDURA } from "../../procedimentos/tenFrameProcedure";
 
 /**
  * N1.08 — a âncora do 5. **Duas fichas, uma competência.**
@@ -49,6 +51,22 @@ import { FichaCompetencia } from "../../schema";
  */
 
 /** JD2 §9 e F02: critério frouxo, coerente com a JD1. Sem critério de tempo. */
+/**
+ * §9 da F02: 3 de 3 em 2 sessões — **e a regra extra**: pelo menos um acerto
+ * com quantidade **entre 6 e 10**, que é o que exige usar a estrutura das duas
+ * fileiras. Abaixo de seis, a criança resolve na fileira de cima e a moldura de
+ * dez não é testada (P13).
+ */
+const dominioDaMoldura = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  exige: {
+    evidencia: Evidencia.ESTRUTURA_DAS_DUAS_FILEIRAS,
+    descricao: "Acertar uma vez com seis ou mais, usando a fileira cheia como um bloco.",
+  },
+};
+
 const dominio = { acertos: 4, de: 5, sessoes: 2 };
 
 /**
@@ -91,9 +109,14 @@ export const N1_08: FichaCompetencia = {
   niveis: {
     1: { primitiva: "fileira", micro: "mao_canonica", andaime: "mao_fantasma" },
     2: { primitiva: "fileira", micro: "mao_livre", andaime: "alto" },
-    3: { primitiva: "tenframe", micro: "moldura", andaime: "medio" },
-    4: { primitiva: "tenframe", micro: "moldura", andaime: "minimo" },
-    5: { primitiva: "tenframe", micro: "moldura", rt_alvo: 2500 },
+    // Os três degraus da F02 §5 apontavam para a MESMA micro: a segunda
+    // fileira, o flash e a pergunta invertida chegavam iguais à criança. O
+    // nível 5 é "quantos faltam para encher?", que a ficha chama de "a semente
+    // direta dos amigos do 10 (N1.11)" — e sem ele a ponte entre as duas
+    // competências não existia em lugar nenhum.
+    3: { primitiva: "moldura", micro: "moldura_dez", andaime: "medio" },
+    4: { primitiva: "moldura", micro: "moldura_flash", andaime: "minimo" },
+    5: { primitiva: "moldura", micro: "moldura_faltam", rt_alvo: 2500 },
   },
 
   micros: [
@@ -126,20 +149,28 @@ export const N1_08: FichaCompetencia = {
       dominio,
     },
     {
-      id: "moldura",
+      id: "moldura_dez",
       fonte: "F02",
-      alvo: "reconhecer quantidades em dezena incompleta via estrutura de cinco",
-      kinds: ["tenframe"],
-      params: {
-        n_min: 5,
-        n_max: 10,
-        flash_ms: 1500,
-        moldura: 10,
-        escopo_teclado: "1-10",
-        audio_prompt: "A Caixa Mágica abriu e fechou! Quantos você viu?",
-        tutorial: [{ fala: "Esta é a caixa mágica! Tente ver os números sem contar um por um!" }],
-      },
-      dominio,
+      alvo: "a segunda fileira entra: ver 5+n, não contar de um em um",
+      kinds: ["moldura"],
+      params: { modo: "contar", audio_prompt: FALAS_MOLDURA.contar.audioPrompt, howto: FALAS_MOLDURA.contar.howto, explain: FALAS_MOLDURA.contar.explain },
+      dominio: dominioDaMoldura,
+    },
+    {
+      id: "moldura_flash",
+      fonte: "F02",
+      alvo: "a moldura pisca: a estrutura tem de estar instalada, não construída na hora",
+      kinds: ["moldura"],
+      params: { modo: "contar", audio_prompt: FALAS_MOLDURA.contar.audioPrompt, howto: FALAS_MOLDURA.contar.howto, explain: FALAS_MOLDURA.contar.explain },
+      dominio: dominioDaMoldura,
+    },
+    {
+      id: "moldura_faltam",
+      fonte: "F02",
+      alvo: "a pergunta INVERTE — quantos faltam para encher? A semente dos amigos do 10",
+      kinds: ["moldura"],
+      params: { modo: "contar", audio_prompt: FALAS_MOLDURA.faltam.audioPrompt, howto: FALAS_MOLDURA.faltam.howto, explain: FALAS_MOLDURA.faltam.explain },
+      dominio: dominioDaMoldura,
     },
   ],
 
@@ -148,5 +179,10 @@ export const N1_08: FichaCompetencia = {
     { id: MisconceptionTag.ANCORA_CINCO_RIGIDA, descricao: "Responde 5 para qualquer mão com polegar levantado: fixou 'mão = 5' e não vê a variação." },
     { id: MisconceptionTag.IGNORA_SEGUNDA_MAO, descricao: "Em duas mãos, responde só o de uma delas: não integra os dois conjuntos." },
     { id: MisconceptionTag.DEPENDE_DE_FORMATO, descricao: "Acerta a mão canônica e erra a livre: subitiza só com apoio estrutural." },
+    // As três linhas da §6 da F02 que faltavam: os níveis 3-5 desta ficha são
+    // moldura, e o Radar não tinha como nomear o que acontece neles.
+    { id: MisconceptionTag.CONTA_VAZIOS, descricao: "Contou as células vazias junto: não distingue ocupado de vago." },
+    { id: MisconceptionTag.NAO_USA_ESTRUTURA, descricao: "Acerta até 5 e erra de 6 a 10: não vê a fileira cheia como unidade — o mais importante da F02." },
+    { id: MisconceptionTag.INVERTE_PERGUNTA, descricao: "No nível 5, respondeu quantos tem em vez de quantos faltam: não processou o complemento." },
   ],
 };

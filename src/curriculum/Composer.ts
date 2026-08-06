@@ -65,6 +65,8 @@ import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
 import { construirFormaSpec } from "./procedimentos/formaContract";
 import { construirGrandezaSpec } from "./procedimentos/grandezaContract";
+import { construirMolduraSpec } from "./procedimentos/tenFrameContract";
+import { ModoDaMoldura } from "./procedimentos/tenFrameProcedure";
 import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
@@ -892,6 +894,31 @@ export class Composer {
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = spec.enunciado;
+        options = undefined;
+        break;
+      }
+
+      case "moldura": {
+        // Três fichas, uma moldura: F02 (N1.08, "quantas você vê?"), JD3
+        // (N1.11, "quantos faltam?") e JD5 (N1.10, "quantos escondidos?").
+        //
+        // A ficha diz o MODO; o Composer não adivinha pelo id. Faltando o modo,
+        // isto QUEBRA — a mesma regra do `touchcount` e do `shapecanvas`, e ela
+        // existe porque um `?? padrão` já fez o canhão desenhar peixinhos.
+        if (params.modo !== "contar" && params.modo !== "faltam" && params.modo !== "escondidos") {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva moldura exige params.modo `
+            + `"contar", "faltam" ou "escondidos" — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+        const spec = construirMolduraSpec(params.modo as ModoDaMoldura, lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        // As alternativas moram no palco: o diagnóstico depende do que a CENA
+        // mostrava (quantas cheias, se o vazio estava disperso, quantas a tampa
+        // cobriu), e isso não cabe no valor de uma alternativa da barra.
         options = undefined;
         break;
       }

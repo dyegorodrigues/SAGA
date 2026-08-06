@@ -71,6 +71,8 @@ export interface AnswerMeta {
   forma?: unknown;
   /** A leitura da grandeza (F49): o que ela tocou, e se o chão já existia. */
   grandeza?: unknown;
+  /** A leitura da moldura (F02/JD3/JD5): o que a cena mostrava quando ela decidiu. */
+  moldura?: unknown;
   /**
    * As condições que ESTA resposta satisfez — a §9 de cada ficha (P13).
    *

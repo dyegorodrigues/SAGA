@@ -20,6 +20,7 @@ import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
 import { N1_10 } from "../fichas/jornada/N1.10";
+import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { Question, Track } from "../../types";
@@ -66,7 +67,14 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // 20". São duas competências reais; cada uma ganhou seu nó (P12, §13 do
   // plano). Registrada aqui e NÃO ativada.
   "N1.13": N1_13,
+  // N1.10 foi REESCRITA: servia `bond` (o diagrama parte-todo, simbólico) nos
+  // cinco níveis, e a JD5 pede a tampa deslizando sobre o grupo — a operação
+  // mental ANTES do símbolo. Estava ativa; saiu dos canários por isso.
   "N1.10": N1_10,
+
+  // N1.11 não tinha ficha nenhuma, e tem DUAS no cânone (F28 e JD3). Esta é a
+  // JD3 — os amigos do 10 como percepção do vazio, antes de virarem conta.
+  "N1.11": N1_11,
   "AL.01": AL_01,
 
   // AL.02 nunca teve ficha em runtime: era servida por `gAL_02`, que devolve
@@ -99,7 +107,13 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  */
 export const COMPOSER_CANARIES = new Set<string>([
   "N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08",
-  "N1.07", "N1.10",
+  "N1.07",
+
+  // A N1.10 SAIU daqui: a ficha dela foi reescrita de `bond` (diagrama
+  // parte-todo, com números escritos) para a JD5 de verdade — a tampa que cobre
+  // parte do grupo, sem símbolo nenhum. É tela nova, e tela nova não estreia no
+  // PR que a escreve. O rollback cai em `gN1_10`, que é o bond que ela serve
+  // hoje.
 
   // A AL.01 SAIU daqui: a ficha dela foi reescrita de `intruso_math` ("qual é
   // o diferente?", múltipla escolha) para a F51 de verdade — separar peças em
