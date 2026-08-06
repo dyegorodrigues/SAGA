@@ -115,6 +115,12 @@ Sem número nenhum na tela. Três potinhos, três peixinhos nadando. Tutor: *"Ca
 
 ### Nível 2 — ver grupos dentro de grupos (N1.08, N1.09)
 - **Caixa Mágica (N1.08):** subitização conceitual — 6 aparece como 3+3, 7 como 5+2 (sub-base 5: uma mão cheia + dois). A criança vê a estrutura interna dos números. Este é o berço direto dos amigos dos números.
+- **Produzir quantidade (N1.13):** *"me dá 5"* — a criança **faz aparecer** a
+  quantidade pedida, em vez de ler quantos são. 🧒 *Erro:* contar 5 perfeitamente
+  e não conseguir separar 5 — é comum, e é o teste real da cardinalidade: quem
+  entendeu que "cinco" é uma quantidade consegue produzi-la. Ficha F04.
+  *(Competência criada em ago/2026 ao separar dois conceitos que dividiam o mesmo
+  número de nó — ver `codex/PLANO_DO_BLOCO_F0.md §13`.)*
 - **Contar de qualquer ponto (N1.09):** "comece do 7 e conte até 12"; contar pra trás de 10 até 0 (o foguete decolando). Pré-requisito motor do counting-on da adição.
 
 ### Nível 3 — a arquitetura parte-todo (N1.10, N1.11, N1.12)

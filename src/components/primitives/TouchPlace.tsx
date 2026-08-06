@@ -11,14 +11,15 @@ import {
 import { Vagas } from "../../curriculum/procedimentos/producaoProcedure";
 
 /**
- * `TouchPlace` — a primitiva da ficha F04 (N1.09), *Produzir Quantidade*.
+ * `TouchPlace` — a primitiva da ficha F04 (N1.13), *Produzir Quantidade*.
  *
  * ---
  *
  * ### O que a versão anterior não fazia
  *
  * A primitiva existia e **não estava ligada em lugar nenhum** — nem caso no
- * Composer, nem caso no renderizador. O nó N1.09 era servido por
+ * Composer, nem caso no renderizador. E o nó que a ficha reivindicava (N1.09)
+ * era servido por
  * `gVis_Sequence`, que pergunta *"conte a partir do 47 — quais números vêm
  * depois?"* com alternativas de texto e números até 119, numa competência da
  * faixa F0 cuja criança tem quatro anos e ainda não lê. Nada da F04 chegava à

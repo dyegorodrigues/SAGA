@@ -2,7 +2,7 @@ import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
 
 /**
- * Procedimento da ficha **F04 — Produzir Quantidade** (N1.09).
+ * Procedimento da ficha **F04 — Produzir Quantidade** (N1.13).
  *
  * *"O inverso de contar: em vez de ler quantos são, fazer aparecer quantos foram
  * pedidos."*

@@ -144,7 +144,7 @@ Implementados e **NÃO** ativados — a tela existe e não chega à criança:
 |----|-------|--------------------------------------|
 | `AL.01` | F51, separar por atributo | `legadoAL_01` — o intruso de múltipla escolha |
 | `N1.06` | F05, ouvir e escolher | `plain` com o número **escrito** na tela |
-| `N1.09` | F04, produzir quantidade | `gVis_Sequence` — "conte a partir do 47" |
+| `N1.13` | F04, produzir quantidade | **nada** — o nó é novo, criado ao fechar a P12 |
 | `GE.01` | F47, onde está? | `plain` com a resposta em **palavras** |
 | `GE.02` | F48, que forma é essa? | `plain` com dois emojis, que **não giram** |
 | `GM.01` | F49, maior/menor/mais alto | **nada** — o nó não tinha gerador |

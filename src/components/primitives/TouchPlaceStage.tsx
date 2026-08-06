@@ -15,7 +15,7 @@ import {
 } from "../../curriculum/procedimentos/producaoProcedure";
 
 /**
- * `TouchPlaceStage` — a tela de N1.09, ficha F04.
+ * `TouchPlaceStage` — a tela de N1.13, ficha F04.
  *
  * ---
  *
