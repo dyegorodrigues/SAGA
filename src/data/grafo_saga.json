@@ -94,6 +94,16 @@
       ]
     },
     {
+      "id": "N1.13",
+      "nome": "Produzir quantidade",
+      "strand": "N1",
+      "faixa": "F0",
+      "prereqs": [
+        "N1.02",
+        "N1.04"
+      ]
+    },
+    {
       "id": "AL.01",
       "nome": "Classificação e o intruso",
       "strand": "AL",

@@ -5,11 +5,11 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import { TouchPlaceStage } from "./TouchPlaceStage";
 import { Composer } from "../../curriculum/Composer";
-import { N1_09 } from "../../curriculum/fichas/jornada/N1.09";
+import { N1_13 } from "../../curriculum/fichas/jornada/N1.13";
 import { ProducaoSpec } from "../../curriculum/procedimentos/producaoContract";
 import { AcaoDeProducao } from "../../curriculum/procedimentos/producaoProcedure";
 
-const spec = (lvl: number) => Composer.generate(N1_09, lvl).uiProps as ProducaoSpec;
+const spec = (lvl: number) => Composer.generate(N1_13, lvl).uiProps as ProducaoSpec;
 
 /** Pega um da bandeja e solta na primeira vaga livre. O gesto da ficha. */
 function colocarUm(container: HTMLElement) {
@@ -19,7 +19,7 @@ function colocarUm(container: HTMLElement) {
   fireEvent.click(vaga ?? (container.querySelector('[aria-label^="Colocar "]') as HTMLElement));
 }
 
-describe("TouchPlaceStage — a tela de N1.09 (F04)", () => {
+describe("TouchPlaceStage — a tela de N1.13 (F04)", () => {
   it("NÃO imprime o enunciado: quem o desenha é o app, acima do palco", () => {
     const s = spec(1);
     const { container } = render(<TouchPlaceStage spec={s} />);

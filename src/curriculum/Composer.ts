@@ -909,7 +909,7 @@ export class Composer {
       }
 
       case "touchplace": {
-        // Ficha F04 (N1.09). Ficha de PRODUÇÃO, e a mais literal delas: a
+        // Ficha F04 (N1.13). Ficha de PRODUÇÃO, e a mais literal delas: a
         // resposta é a quantidade que a criança FEZ aparecer. Não há o que
         // escolher — o número já foi dado pelo enunciado.
         const spec = construirProducaoSpec(lvl, Math.random);

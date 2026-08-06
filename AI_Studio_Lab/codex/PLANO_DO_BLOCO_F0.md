@@ -539,3 +539,80 @@ exatamente o que a tag nomeia.
 | id | O que é | Onde |
 |----|---------|------|
 | **P15** | A F50 (capacidade e massa) não tem nó com vaga: o grafo põe o conteúdo dela na GM.01, cujos cinco degraus já são da F49; e a §1 dela reivindica a GM.02, que é "tempo cotidiano" no grafo e tem a aresta da GM.04 dependendo dessa leitura. Decisão curricular, irmã da P12. | `GM.01.ts`, `§12` |
+
+---
+
+## §13 — P12 e P15 fechadas: quando o cânone tem mais competências que nós
+
+As duas pendências são o mesmo problema com dois rostos: **uma ficha reivindica
+um nó que já é de outra competência**. E a resposta certa, nas duas, não é
+escolher um vencedor — é reconhecer que são competências diferentes.
+
+### §13.1 — P12: a F04 não é a N1.09
+
+| documento | o que diz sobre a N1.09 |
+|---|---|
+| `fichas/FICHAS_F0_COMPLETAS.md` | "produção de quantidade" (F04), em três lugares |
+| `GRAFO_DE_CONHECIMENTO_SAGA.md` | "contagem até 20 e a partir de qualquer número" |
+| `curriculum/grafo_saga.yaml` | idem |
+
+O empate se resolve pelas **consequências**, não pela contagem de citações:
+
+> **Quatro arestas dependem de a N1.09 significar "contar além do dez":**
+> `N1.12` (reta numérica até 20), `N2.01` (dezena e unidades), `N3.03` (contar a
+> partir do maior) e `AL.03` (contagem por saltos).
+
+Nenhuma dessas quatro precisa de *"me dá cinco"*. Entregar a N1.09 para a F04
+faria as quatro mentirem **em silêncio**: a criança receberia domínio colocando
+estrelas e seria encaminhada para "dezena e unidades" sem nunca ter contado além
+de dez. Nada quebraria; ela só chegaria despreparada, e o app diria que estava
+pronta.
+
+**A decisão: nó novo.** A F04 passou a ser a **`N1.13 — Produzir quantidade`**
+(F0, pré-req `N1.02` + `N1.04`), e a N1.09 continua sendo a contagem. Nada se
+perde, nenhuma aresta muda de sentido, e as duas competências existem.
+
+E o próprio grafo já apontava para isso: ele lista *"produzir conjunto: 'me dá
+N'"* como **micro (d) da N1.04**. A intuição estava certa — produzir é o teste
+de **saída** da cardinalidade —, mas a N1.04 já tem os cinco degraus da F01 e
+ainda recebe a F03. Nó separado com pré-requisito direto guarda o parentesco sem
+espremer dez degraus em cinco.
+
+**Editado no cânone:** a §1 da F04, a linha do índice e a lista de fechamento do
+bloco passaram a dizer N1.13, cada uma com a nota do porquê; o
+`GRAFO_DE_CONHECIMENTO_SAGA.md` ganhou o verbete da N1.13 e um aviso na N1.09; e
+o nó entrou pelo **YAML canônico**, não pelo `.ts` — que é artefato gerado. Eu
+tinha editado o gerado primeiro, e o portão `graphArtifacts.test.ts` pegou.
+
+**E um defeito colhido no caminho:** `gVis_Sequence`, o legado que serve a
+N1.09, sorteava o início entre 10 e 89 — uma criança de **F0** recebia *"conte a
+partir do 87"* e listas até 119. O grafo escreve as micros desta competência e
+nenhuma passa de vinte. Conserto de escopo, uma linha; a competência continua
+sem ficha no cânone, e isso segue registrado.
+
+### §13.2 — P15: a F50 tem casa decidida, e ela não é a GM.02
+
+Mesmo formato. A F50 ("Cabe mais ou menos?" — capacidade e massa) diz na §1 ser
+a `GM.02`. Não é:
+
+| | |
+|---|---|
+| `GM.02` no grafo | **"tempo cotidiano"** — partes do dia, ontem/hoje/amanhã |
+| o que `gGM_02` serve hoje | exatamente isso |
+| `GM.04` (Horas) | declara `GM.02` como pré-requisito **querendo dizer partes do dia** |
+
+Reassinar a GM.02 mataria uma competência viva e quebraria essa aresta — o mesmo
+erro que a P12 evitou, do outro lado.
+
+**A decisão: `GM.05 — Capacidade e massa`** (F0, pré-req `GM.01`). É onde o
+conteúdo da F50 pertence: o grafo põe *"pesado/leve, cheio/vazio"* dentro da
+GM.01, mas os cinco degraus daquele nó já são da F49, e a F50 tem cinco próprios
+— capacidade com formatos diferentes e peso contraintuitivo são degraus de
+verdade, não variações.
+
+**O nó ainda não foi criado, e isto é deliberado.** Um nó sem ficha e sem
+gerador cai no fallback genérico — que é precisamente o defeito que a `GM.01`
+tinha e que este bloco passou o dia removendo. Criar a `GM.05` vazia trocaria
+uma pendência de papel por uma competência quebrada na tela da criança. Ela
+nasce junto com a implementação da F50, que é a próxima ficha da fila depois do
+passo 3.

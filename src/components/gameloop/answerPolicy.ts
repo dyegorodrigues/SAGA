@@ -55,7 +55,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
-  // Ficha F04 (N1.09): mesma família. O que ela produziu é a resposta, e o que
+  // Ficha F04 (N1.13): mesma família. O que ela produziu é a resposta, e o que
   // ela TENTOU produzir é o diagnóstico — nos níveis com vaga o excedente é
   // empurrado de volta (§4), então o estado final está sempre certo e
   // `NAO_MONITORA_ALVO` nunca apareceria no repouso.

@@ -4,7 +4,7 @@ import { FALAS } from "../../procedimentos/producaoProcedure";
 import { FichaCompetencia } from "../../schema";
 
 /**
- * F04 — Produzir quantidade. *O inverso de contar.*
+ * F04 — Produzir quantidade (N1.13). *O inverso de contar.*
  *
  * ---
  *
@@ -23,13 +23,16 @@ import { FichaCompetencia } from "../../schema";
  *
  * ---
  *
- * ### ⚠️ De quem é esta competência — divergência declarada
+ * ### De quem é esta competência — a P12, fechada
  *
- * A ficha diz N1.09 em três lugares; o `GRAFO_DE_CONHECIMENTO_SAGA.md` chama
- * N1.09 de *"contagem até 20 e a partir de qualquer número"* e põe *"produzir
- * conjunto: 'me dá N'"* como micro (d) da N1.04. Sigo a ficha, e a pendência
- * **P12** registra o que fica em aberto. O raciocínio inteiro está no cabeçalho
- * de `producaoProcedure.ts`.
+ * A ficha dizia N1.09 na §1. O `GRAFO_DE_CONHECIMENTO_SAGA.md` chama N1.09 de
+ * *"contagem até 20 e a partir de qualquer número"*, e **quatro arestas
+ * dependem dessa leitura** — `N1.12`, `N2.01`, `N3.03` e `AL.03`. Nenhuma
+ * precisa de "me dá cinco"; todas precisam de contar além do dez.
+ *
+ * São duas competências reais, não uma com dois nomes: **esta ficha passou a
+ * ser a `N1.13`**, e a N1.09 continua sendo a contagem até vinte. Nada se
+ * perde e nenhuma aresta muda de sentido. Ver `PLANO_DO_BLOCO_F0.md §13`.
  *
  * ### O que esta versão corrigiu
  *
@@ -90,13 +93,14 @@ const coreografia = [
   { fala: "Agora você coloca as outras!", show: { pulsarVagas: true } },
 ];
 
-export const N1_09: FichaCompetencia = {
-  id: "N1.09",
+export const N1_13: FichaCompetencia = {
+  id: "N1.13",
   nome: "Produzir quantidade",
   strand: "N1",
   faixa: "F0",
   // §2: produzir exige a sequência oral (N1.02) e a cardinalidade (N1.04) já
-  // firmes — é o teste de saída dela, não o de entrada.
+  // firmes — é o teste de SAÍDA da cardinalidade, não o de entrada. Foi este
+  // parentesco que fez o grafo listar "produzir conjunto" como micro da N1.04.
   prereqs: ["N1.02", "N1.04"],
   bncc: "EI03ET07",
 

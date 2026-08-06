@@ -15,7 +15,7 @@ import { N1_04 } from "../fichas/jornada/N1.04";
 import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
-import { N1_09 } from "../fichas/jornada/N1.09";
+import { N1_13 } from "../fichas/jornada/N1.13";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
@@ -61,11 +61,11 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.07": N1_07,
   "N1.08": N1_08,
 
-  // N1.09 era servida por `gVis_Sequence`: "conte a partir do 47, quais vêm
-  // depois?", alternativas de texto, números até 119 — numa competência de
-  // faixa F0. E o `TouchPlace` que a F04 nomeia existia sem estar ligado a
-  // lugar nenhum, como o `AudioChoice` da F05. Registrada aqui e NÃO ativada.
-  "N1.09": N1_09,
+  // N1.13 — a F04, "produzir quantidade". O nó é NOVO: a ficha reivindicava a
+  // N1.09, mas quatro arestas do grafo dependem da N1.09 significar "contar até
+  // 20". São duas competências reais; cada uma ganhou seu nó (P12, §13 do
+  // plano). Registrada aqui e NÃO ativada.
+  "N1.13": N1_13,
   "N1.10": N1_10,
   "AL.01": AL_01,
 

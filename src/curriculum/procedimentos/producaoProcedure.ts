@@ -9,29 +9,26 @@ import { MisconceptionTag } from "../../constants/misconceptions";
  *
  * ---
  *
- * ### ⚠️ Divergência declarada: de quem é esta ficha
+ * ### A P12, fechada: esta ficha é a N1.13
  *
- * Dois documentos do cânone discordam sobre o id desta competência, e a regra é
- * divergir em voz alta:
+ * A F04 dizia, na §1, ser a `N1.09`. O `GRAFO_DE_CONHECIMENTO_SAGA.md` chama a
+ * N1.09 de *"contagem até 20 e a partir de qualquer número"* — e **quatro
+ * arestas dependem dessa leitura**: `N1.12` (reta até 20), `N2.01` (dezena e
+ * unidades), `N3.03` (contar a partir do maior) e `AL.03` (contagem por
+ * saltos). Nenhuma delas precisa de *"me dá cinco"*; todas precisam de contar
+ * além do dez.
  *
- * - **`fichas/FICHAS_F0_COMPLETAS.md`** diz **N1.09** em três lugares — o índice
- *   (linha 40), a §1 da própria ficha e a lista de fechamento do bloco.
- * - **`GRAFO_DE_CONHECIMENTO_SAGA.md`** chama N1.09 de *"Contagem até 20 e a
- *   partir de qualquer número"* e põe *"produzir conjunto: 'me dá N'"* como a
- *   **micro (d) da N1.04** (cardinalidade).
+ * Entregar a N1.09 para a F04 faria as quatro mentirem em silêncio: a criança
+ * receberia domínio **colocando estrelas** e seria encaminhada para "dezena e
+ * unidades" sem nunca ter contado além de dez.
  *
- * Sigo a **ficha**, porque é ela que especifica uma tela, porque é o que o
- * `PLANO_DO_BLOCO_F0.md §1` mapeia, e porque a F04 não caberia na N1.04: aquele
- * nó já tem os cinco degraus da F01 e ainda recebe a F03.
+ * São duas competências reais, não uma com dois nomes — e o próprio grafo já
+ * dizia isso ao listar *"produzir conjunto: 'me dá N'"* como micro da **N1.04**,
+ * a cardinalidade. Produzir é o teste de SAÍDA da cardinalidade; contar até
+ * vinte é a extensão da sequência. Cada uma ganhou seu nó: esta é a `N1.13`,
+ * criada em `grafo_saga.ts`, e a N1.09 continua sendo a contagem.
  *
- * **O que isso deixa em aberto, e está registrado como pendência P12:** quatro
- * arestas do grafo (`N1.12`, `N2.01`, `N3.03`, `AL.03`) declaram N1.09 como
- * pré-requisito querendo dizer *"conta até 20 e continua de qualquer número"*.
- * Nenhuma ficha do cânone escreve essa competência. Nada se perde agora — o
- * legado `gVis_Sequence` continua sendo o alvo de rollback —, mas a decisão de
- * dar um nó próprio a "contar até 20" é curricular, e é do dono do cânone.
- *
- * ---
+ * Nada se perdeu e nenhuma aresta mudou de sentido. Ver `PLANO_DO_BLOCO_F0.md §13`.
  *
  * ### O que a §2 exige do motor, e por que ele é diferente de todos os outros
  *

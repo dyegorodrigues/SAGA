@@ -27,7 +27,7 @@ import {
   bandejaTemExcedente,
   construirProducaoSpec,
 } from "./producaoContract";
-import { N1_09 } from "../fichas/jornada/N1.09";
+import { N1_13 } from "../fichas/jornada/N1.13";
 
 function semente(s: number): () => number {
   let x = s >>> 0;
@@ -254,24 +254,24 @@ describe("§7 — as falas são as da ficha, letra por letra", () => {
 describe("a ficha", () => {
   it("os cinco níveis são `touchplace` — a F04 não tem outra primitiva", () => {
     for (let n = 1; n <= 5; n += 1) {
-      expect(N1_09.niveis![n].primitiva, `nível ${n}`).toBe("touchplace");
+      expect(N1_13.niveis![n].primitiva, `nível ${n}`).toBe("touchplace");
     }
   });
 
   it("cada nível tem micro própria: os cinco degraus da §5 existem", () => {
-    expect(new Set([1, 2, 3, 4, 5].map(n => N1_09.niveis![n].micro)).size).toBe(5);
+    expect(new Set([1, 2, 3, 4, 5].map(n => N1_13.niveis![n].micro)).size).toBe(5);
   });
 
   it("§9: 3 de 3 em 2 sessões em toda micro", () => {
     // `toMatchObject`, não `toEqual`: ver o comentário gêmeo na F05 (§2-bis).
-    for (const m of N1_09.micros) {
+    for (const m of N1_13.micros) {
       expect(m.dominio, m.id).toMatchObject({ acertos: 3, de: 3, sessoes: 2 });
     }
   });
 
   it("⚠️ a regra EXTRA da §9 está declarada, e é o acerto SEM vaga", () => {
     // "Produzir com o alvo visível não prova cardinalidade produtiva." (P13)
-    for (const m of N1_09.micros) {
+    for (const m of N1_13.micros) {
       expect(m.dominio.exige?.evidencia, m.id).toBe("sem-andaime");
     }
   });
@@ -279,11 +279,11 @@ describe("a ficha", () => {
   it("⚠️ a ficha não declara distratores — é ficha de produção", () => {
     // A resposta é o que ela FEZ. Alternativa aqui devolveria a múltipla escolha
     // que o `gVis_Sequence` servia no lugar desta competência.
-    expect(N1_09.distratores).toEqual([]);
+    expect(N1_13.distratores).toEqual([]);
   });
 
   it("as quatro tags da §6 estão declaradas", () => {
-    expect(N1_09.erros_tipicos!.map(e => e.id).sort()).toEqual([
+    expect(N1_13.erros_tipicos!.map(e => e.id).sort()).toEqual([
       MisconceptionTag.DEPENDE_DE_ANDAIME,
       MisconceptionTag.IGNORA_QUANTIDADE,
       MisconceptionTag.NAO_MONITORA_ALVO,
@@ -292,7 +292,7 @@ describe("a ficha", () => {
   });
 
   it("o nível 1 declara a coreografia da §8", () => {
-    const beats = N1_09.micros.find(m => m.id === "vagas_pulsando")!.params.tutorial as
+    const beats = N1_13.micros.find(m => m.id === "vagas_pulsando")!.params.tutorial as
       { show?: Record<string, unknown> }[];
     expect(beats.some(b => b.show?.pulsarVagas === true)).toBe(true);
     expect(beats.some(b => b.show?.maoFantasma !== undefined)).toBe(true);

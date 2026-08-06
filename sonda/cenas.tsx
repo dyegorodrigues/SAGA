@@ -39,7 +39,7 @@ import { N1_08 } from "../src/curriculum/fichas/jornada/N1.08";
 import { AL_02 } from "../src/curriculum/fichas/jornada/AL.02";
 import { AL_01 } from "../src/curriculum/fichas/jornada/AL.01";
 import { N1_06 } from "../src/curriculum/fichas/jornada/N1.06";
-import { N1_09 } from "../src/curriculum/fichas/jornada/N1.09";
+import { N1_13 } from "../src/curriculum/fichas/jornada/N1.13";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { GE_02 } from "../src/curriculum/fichas/jornada/GE.02";
 import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
@@ -324,15 +324,15 @@ export const CENAS: Cena[] = [
   // que valem olhar: a vaga pulsando (nível 1), o contorno discreto (nível 3) e
   // a CENA LIVRE (nível 4), que é onde a ficha diz estar o salto — e onde a
   // tela tem de sustentar até 12 objetos sem vaga nenhuma guiando.
-  { nome: "N1.09 rollback: contar a partir de 47 em texto (nível 2)", render: (s) => <Exercicio id="N1.09" lvl={2} semente={s} /> },
+  { nome: "N1.09 (o nó antigo) segue com o legado de contagem (nível 2)", render: (s) => <Exercicio id="N1.09" lvl={2} semente={s} /> },
   ...[1, 3, 4, 5].map(lvl => ({
-    nome: `N1.09 produzir quantidade (nível ${lvl})`,
-    render: (s: number) => <ExercicioDaFicha ficha={N1_09} lvl={lvl} semente={s} />,
+    nome: `N1.13 produzir quantidade (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={N1_13} lvl={lvl} semente={s} />,
   })),
   {
     nome: "N1.09 micro-aula: as vagas pulsando",
     render: (s: number) => (
-      <ExercicioDaFicha ficha={N1_09} lvl={1} semente={s} mostrar={{ pulsarVagas: true }} />
+      <ExercicioDaFicha ficha={N1_13} lvl={1} semente={s} mostrar={{ pulsarVagas: true }} />
     ),
   },
   // GE.01 — onde está? (F47), implementada e NÃO ativada. Os quatro pares da §5

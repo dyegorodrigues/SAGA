@@ -37,7 +37,7 @@
 | 6 | **F05** — Ouvir e Escolher | N1.06 | ligar o som do número ao símbolo escrito | ✅ completa |
 | 7 | **JD4** — Próximo Passo | N1.07 | o sucessor: o que vem depois | ✅ completa |
 | 8 | **F02** — Moldura de Dez | N1.08 | a âncora do 5 e do 10 | ✅ completa |
-| 9 | **F04** — Produzir Quantidade | N1.09 | produzir, não só ler quantidade | ✅ completa |
+| 9 | **F04** — Produzir Quantidade | N1.13 | produzir, não só ler quantidade | ✅ completa |
 | 10 | **JD5** — Ver e Imaginar | N1.10 | parte-todo mental (pré-subtração) | ✅ completa |
 | 11 | **F28** — Amigos do 10 | N1.11 | a estratégia-rainha do cálculo mental | ✅ completa |
 | 12 | **F19** — Reta Numérica | N1.12 | o número como posição no espaço | ✅ completa |
@@ -1012,7 +1012,13 @@ Quantas estrelas voce ve?
 *O inverso de contar: em vez de ler quantos são, fazer aparecer quantos foram pedidos.*
 
 ## 1. Identidade
-**Competência:** N1.09 (produção de quantidade) · **Primitiva:** `TouchPlace` · **Faixa:** F0 · **Temas:** espaço, dinos, resgate
+**Competência:** N1.13 (produção de quantidade) · **Primitiva:** `TouchPlace` · **Faixa:** F0 · **Temas:** espaço, dinos, resgate
+
+> ⚠️ **Esta ficha dizia N1.09 até ago/2026.** O `GRAFO_DE_CONHECIMENTO_SAGA.md`
+> chama a N1.09 de *"contagem até 20 e a partir de qualquer número"*, e quatro
+> arestas dependem dessa leitura — `N1.12`, `N2.01`, `N3.03` e `AL.03`. Nenhuma
+> precisa de *"me dá cinco"*; todas precisam de contar além do dez. São duas
+> competências reais, e cada uma ganhou seu nó. Ver `codex/PLANO_DO_BLOCO_F0.md §13`.
 
 ## 2. Fundamento
 
@@ -1905,7 +1911,7 @@ Copie o padrao!
 **Estas cinco são a fundação de tudo.** Uma criança que domina as cinco tem o que precisa para entrar em adição, e uma que pula qualquer uma delas trava mais tarde sem que ninguém entenda por quê.
 
 ## Próximo bloco
-F05 (ouvir e escolher · N1.06) · JD4 (sucessor · N1.07) · F02 (moldura · N1.08) · F04 (produzir quantidade · N1.09) · JD5 (parte-todo mental · N1.10) · F28 (amigos do 10 · N1.11) · F19 (reta numérica · N1.12)
+F05 (ouvir e escolher · N1.06) · JD4 (sucessor · N1.07) · F02 (moldura · N1.08) · F04 (produzir quantidade · N1.13) · JD5 (parte-todo mental · N1.10) · F28 (amigos do 10 · N1.11) · F19 (reta numérica · N1.12)
 
 ---
 
