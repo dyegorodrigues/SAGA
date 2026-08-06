@@ -397,3 +397,24 @@ some o limite: é isso que "sem andaime" quer dizer.
 |---|---|---|
 | §3 lista três elementos, nenhum botão | acrescentei **"Pronto!"**, visível só depois do 1º objeto | sem ele *"parou antes"* (§6) não é observável e a tela dos níveis 4-5 espera para sempre — e a §2 proíbe encerrar por tempo |
 | §8 fala *"Preciso de três estrelas"* | falas neutras de número e de tema | o nível 1 sorteia 1 a 3 em três temas: a fala literal estaria errada na maioria das vezes (mesma decisão da F01) |
+| §4 descreve **arrasto** (*"o objeto segue o dedo"*, ímã de 70px) | só toque: tocar a bandeja → tocar a vaga, área de 80px | o adendo §8.3-bis prevalece sobre a ficha e nomeia a F04 na lista de exposição motora alta. A vaga responde ao toque em vez de acender na aproximação — sem arrasto não há aproximação |
+
+### §10.4 — P13: a regra extra da §9 não tem onde morar no schema
+
+Três fichas do bloco já trazem, na §9, uma **segunda** condição de domínio além
+do `acertos/de/sessoes`:
+
+| ficha | regra extra |
+|---|---|
+| F01 (N1.04) | pelo menos um acerto no arranjo **disperso** |
+| F05 (N1.06) | pelo menos um acerto **na primeira audição** |
+| F04 (N1.09) | pelo menos um acerto **sem vaga fantasma** |
+
+Nas três a regra está implementada e testada no procedimento (`dominou`), e nas
+três ela **não chega ao motor de maestria**: `FichaDominio` só carrega
+`acertos`, `de` e `sessoes`. O efeito é o mesmo nos três casos — a criança pode
+receber domínio da competência sem nunca ter feito a única questão que a prova.
+
+Não é defeito de ficha nem de procedimento: é o schema assumindo que domínio é
+sempre contagem de acertos. Enquanto não houver campo, a regra é documentação
+executável esperando um ponto de ligação.
