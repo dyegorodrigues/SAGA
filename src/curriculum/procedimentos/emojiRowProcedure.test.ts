@@ -11,6 +11,7 @@ import {
   comprimentoDaSequencia,
   configuracaoDaMao,
   degrauAnterior,
+  ehCrescente,
   diagnosticarMao,
   diagnosticarOlhometro,
   diagnosticarPadrao,
@@ -174,8 +175,17 @@ describe("F52 §5 — os padrões", () => {
   it("a lacuna só vai para o meio no nível 4", () => {
     expect([1, 2, 3, 4, 5].map(lacunaNoMeio)).toEqual([false, false, false, true, false]);
   });
-  it("nível 5 é o padrão crescente — a ponte para AL.03/AL.04", () => {
-    expect(unidadesDoNivel(5)).toEqual(["CRESCENTE"]);
+  it("nível 5 traz o crescente NOS DOIS formatos — §6.36", () => {
+    // Só `CRESCENTE` faria duas mudanças de uma vez: a alternação do objeto
+    // SOME e o crescimento ENTRA. `CRESCENTE_ALTERNADO` mantém a alternação
+    // que a criança domina desde o nível 1 e acrescenta só o crescimento.
+    expect(unidadesDoNivel(5)).toEqual(["CRESCENTE", "CRESCENTE_ALTERNADO"]);
+  });
+
+  it("os dois crescentes têm passo 1: a unidade é o TAMANHO, não o conjunto", () => {
+    expect(ehCrescente("CRESCENTE")).toBe(true);
+    expect(ehCrescente("CRESCENTE_ALTERNADO")).toBe(true);
+    expect(ehCrescente("ABC")).toBe(false);
   });
   it("a moldura da unidade é andaime de nível 1-2, e some depois", () => {
     expect([1, 2, 3, 4, 5].map(mostraMolduraDaUnidade)).toEqual([true, true, false, false, false]);
@@ -306,6 +316,23 @@ describe("diagnóstico — F52 §6", () => {
     expect(diagnosticarPadrao({
       resposta: "🟡", correta: "🔴", anterior: "🔵", unidade: "AAB", acertouEmAB: true,
     })).toBe(MisconceptionTag.SO_AB);
+  });
+
+  it("no alternado, continuar UMA das duas regras é SO_UM_ATRIBUTO", () => {
+    // Acertou o número e errou o objeto: ela viu o padrão, e viu metade dele.
+    expect(diagnosticarPadrao({
+      resposta: "🍎x4", correta: "🍌x4", anterior: "🍎x3", unidade: "CRESCENTE_ALTERNADO",
+    })).toBe(MisconceptionTag.SO_UM_ATRIBUTO);
+    // Acertou o objeto e errou o número.
+    expect(diagnosticarPadrao({
+      resposta: "🍌x3", correta: "🍌x4", anterior: "🍎x3", unidade: "CRESCENTE_ALTERNADO",
+    })).toBe(MisconceptionTag.SO_UM_ATRIBUTO);
+  });
+
+  it("copiar o último continua vindo antes — é o alvo da ficha", () => {
+    expect(diagnosticarPadrao({
+      resposta: "🍎x3", correta: "🍌x4", anterior: "🍎x3", unidade: "CRESCENTE_ALTERNADO",
+    })).toBe(MisconceptionTag.COPIA_ULTIMO);
   });
 
   it("qualquer outro erro é NAO_VE_UNIDADE", () => {

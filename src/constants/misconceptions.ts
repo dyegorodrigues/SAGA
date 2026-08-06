@@ -144,7 +144,16 @@ export const MisconceptionTag = {
   NAO_VE_UNIDADE: "nao-ve-unidade",
 
   /** Padrões: só resolve o AB; erra assim que a unidade cresce */
-  SO_AB: "so-ab"
+  SO_AB: "so-ab",
+
+  /**
+   * Padrões: no crescente alternado, continuou UMA das duas regras e esqueceu a
+   * outra — acertou a quantidade e errou o objeto, ou o contrário.
+   *
+   * Não é "não vê a unidade": ela viu o padrão, e viu metade dele. O tratamento
+   * é a moldura deslizando sobre as duas regras, não voltar ao AB.
+   */
+  SO_UM_ATRIBUTO: "so-um-atributo"
 } as const;
 
 export type MisconceptionTagType = typeof MisconceptionTag[keyof typeof MisconceptionTag];

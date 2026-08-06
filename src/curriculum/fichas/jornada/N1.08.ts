@@ -99,6 +99,7 @@ export const N1_08: FichaCompetencia = {
   micros: [
     {
       id: "mao_canonica",
+      fonte: "JD2",
       alvo: "reconhecer 1 a 5 pela mão canônica — a mão cheia já é cinco",
       kinds: ["fileira"],
       params: {
@@ -113,6 +114,7 @@ export const N1_08: FichaCompetencia = {
     },
     {
       id: "mao_livre",
+      fonte: "JD2",
       alvo: "reconhecer a mão em qualquer configuração: 4 é 'mão sem o polegar', não 'um-dois-três-quatro'",
       kinds: ["fileira"],
       params: {
@@ -125,6 +127,7 @@ export const N1_08: FichaCompetencia = {
     },
     {
       id: "moldura",
+      fonte: "F02",
       alvo: "reconhecer quantidades em dezena incompleta via estrutura de cinco",
       kinds: ["tenframe"],
       params: {

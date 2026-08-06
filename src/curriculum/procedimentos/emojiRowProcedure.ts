@@ -215,7 +215,12 @@ export function duasMaos(config: ConfiguracaoDaMao): boolean {
  * ------------------------------------------------------------------ */
 
 /** A unidade de repetição do nível, escrita como as letras da ficha. */
-export type UnidadeDePadrao = "AB" | "AAB" | "ABB" | "ABC" | "CRESCENTE";
+export type UnidadeDePadrao =
+  | "AB" | "AAB" | "ABB" | "ABC"
+  /** "1 bola, 2 bolas, 3 bolas…" — o exemplo da §5. */
+  | "CRESCENTE"
+  /** "1 maçã, 2 bananas, 3 maçãs…" — cresce E alterna. Ver `unidadesDoNivel`. */
+  | "CRESCENTE_ALTERNADO";
 
 /**
  * As unidades possíveis no nível.
@@ -230,8 +235,44 @@ export function unidadesDoNivel(nivel: number): UnidadeDePadrao[] {
   if (nivel === 2) return ["AAB", "ABB"];
   if (nivel === 3) return ["ABC"];
   if (nivel === 4) return ["AB", "AAB", "ABB", "ABC"];
-  return ["CRESCENTE"];
+  return ["CRESCENTE", "CRESCENTE_ALTERNADO"];
 }
+
+/** A unidade é de crescimento — o passo é o tamanho, não o conjunto de peças. */
+export function ehCrescente(u: UnidadeDePadrao): boolean {
+  return u === "CRESCENTE" || u === "CRESCENTE_ALTERNADO";
+}
+
+/**
+ * ### ⚠️ O degrau que faltava no nível 5, e por que ele é DOIS
+ *
+ * A §5 escreve o nível 5 como *"padrão crescente (1 bola, 2 bolas, 3 bolas…)"* —
+ * o mesmo objeto, a quantidade subindo. Implementado só assim, o degrau tem um
+ * defeito que o Padrão Ouro §6.36 nomeia:
+ *
+ * | | níveis 1 a 4 | nível 5 (só `CRESCENTE`) |
+ * |---|---|---|
+ * | o objeto | **alterna** | para de alternar |
+ * | a quantidade | uma por casa | **começa a crescer** |
+ *
+ * São **duas** mudanças de uma vez — uma coisa some e outra entra —, e a regra
+ * que governa tudo diz que uma tela introduz no máximo UMA. A criança que passou
+ * quatro níveis lendo "o que muda é o desenho" chega num nível onde o desenho
+ * parou de mudar, e tem de descobrir sozinha que agora o que fala é o tamanho
+ * do grupo.
+ *
+ * `CRESCENTE_ALTERNADO` — *1 maçã, 2 bananas, 3 maçãs, ?* — **mantém** a
+ * alternação que ela já domina e acrescenta só o crescimento. É o mesmo idioma
+ * do nível anterior com uma regra a mais, que é exatamente o que a §2 chama de
+ * *"encontrar a regra geral"*: duas regras compostas, e não uma trocada por outra.
+ *
+ * **Os dois convivem no nível 5**, sorteados — o mesmo recurso que a própria
+ * ficha usa no nível 2 (*"AAB **ou** ABB"*) e que a §9 exige no domínio
+ * (*"incluindo pelo menos um padrão que não seja AB"*): variedade dentro do
+ * degrau, para o critério medir a regra e não uma figura decorada.
+ *
+ * Divergência declarada: a §5 dá um exemplo, e este código serve dois.
+ */
 
 /** A lacuna fica no meio da sequência? Só no nível 4 (§5). */
 export function lacunaNoMeio(nivel: number): boolean {
@@ -254,7 +295,7 @@ export function comprimentoDaSequencia(unidade: UnidadeDePadrao): number {
   // Três repetições completas é o mínimo para a regra ser inferível: com duas,
   // "ABAB" também se lê como uma unidade "ABAB" que ninguém viu repetir. Com o
   // crescente, três termos já mostram o passo (1, 2, 3 → 4).
-  const tamanho = unidade === "CRESCENTE" ? 1 : unidade.length;
+  const tamanho = ehCrescente(unidade) ? 1 : unidade.length;
   return tamanho * 3;
 }
 
@@ -433,6 +474,18 @@ export function diagnosticarPadrao(r: RespostaDoPadrao): MisconceptionTagType | 
   if (r.resposta === r.correta) return undefined;
 
   if (r.resposta === r.anterior) return MisconceptionTag.COPIA_ULTIMO;
+
+  // No crescente alternado há DUAS regras, e continuar só uma é um erro
+  // informativo: ela viu o padrão, e viu metade dele. Diagnosticar isso como
+  // "não vê a unidade" mandaria treinar o que ela já sabe.
+  if (r.unidade === "CRESCENTE_ALTERNADO" && r.correta.includes("x")) {
+    const [objetoCerto, tamanhoCerto] = r.correta.split("x");
+    const [objetoDado, tamanhoDado] = r.resposta.split("x");
+    if (objetoDado === objetoCerto || tamanhoDado === tamanhoCerto) {
+      return MisconceptionTag.SO_UM_ATRIBUTO;
+    }
+  }
+
   if (r.unidade !== "AB" && r.acertouEmAB) return MisconceptionTag.SO_AB;
   return MisconceptionTag.NAO_VE_UNIDADE;
 }

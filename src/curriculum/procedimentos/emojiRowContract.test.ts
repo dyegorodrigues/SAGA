@@ -196,6 +196,11 @@ describe("o padrão — F52", () => {
         const seq = montarSequencia(nivel, semente(s));
         if (seq.unidade === "CRESCENTE") {
           expect(seq.correta.quantidade).toBe(seq.anterior.quantidade + 1);
+          expect(seq.correta.emoji).toBe(seq.anterior.emoji);
+        } else if (seq.unidade === "CRESCENTE_ALTERNADO") {
+          // As duas regras: o grupo cresce E o objeto troca.
+          expect(seq.correta.quantidade).toBe(seq.anterior.quantidade + 1);
+          expect(seq.correta.emoji).not.toBe(seq.anterior.emoji);
         } else {
           const tam = seq.unidade.length;
           const referencia = seq.casas[seq.lacuna - tam];
@@ -224,6 +229,44 @@ describe("o padrão — F52", () => {
       const seq = montarSequencia(1, semente(s));
       expect(seq.molduras.length).toBeGreaterThanOrEqual(2);
     }
+  });
+
+  it("o crescente alternado troca o objeto A CADA casa, e o grupo cresce", () => {
+    // As duas regras ao mesmo tempo: é isso que faz o degrau ser "encontrar a
+    // regra geral" em vez de "ver o grupo ficar maior".
+    let viuAlternado = false;
+    for (const s of SEMENTES) {
+      const seq = montarSequencia(5, semente(s));
+      if (seq.unidade !== "CRESCENTE_ALTERNADO") continue;
+      viuAlternado = true;
+      const cheias = seq.casas.map((c, i) => c ?? seq.correta);
+      for (let i = 1; i < cheias.length; i += 1) {
+        expect(cheias[i].quantidade, `semente ${s}`).toBe(cheias[i - 1].quantidade + 1);
+        expect(cheias[i].emoji, `semente ${s}`).not.toBe(cheias[i - 1].emoji);
+      }
+    }
+    expect(viuAlternado, "nenhuma semente sorteou o alternado").toBe(true);
+  });
+
+  it("no alternado, o banco traz as DUAS meias-regras — senão a tag não acontece", () => {
+    // A peça que continua só o crescimento (4🐶 quando a certa é 4🐱) e a que
+    // continua só a troca (3🐱). Sem elas no banco, `SO_UM_ATRIBUTO` existe no
+    // procedimento e nunca chega à tela.
+    for (const s of SEMENTES) {
+      const seq = montarSequencia(5, semente(s));
+      if (seq.unidade !== "CRESCENTE_ALTERNADO") continue;
+      const chaves = seq.banco.map(chaveDaPeca);
+      expect(chaves).toContain(chaveDaPeca({ emoji: seq.anterior.emoji, quantidade: seq.correta.quantidade }));
+      expect(chaves).toContain(chaveDaPeca({ emoji: seq.correta.emoji, quantidade: seq.anterior.quantidade }));
+      expect(chaves).toContain(chaveDaPeca(seq.anterior));
+      // Teto do cânone §9.1: 3 a 4 alternativas.
+      expect(chaves.length).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it("o nível 5 sorteia os dois formatos — senão o degrau vira uma figura decorada", () => {
+    const vistos = new Set(SEMENTES.map(s => montarSequencia(5, semente(s)).unidade));
+    expect(vistos.size).toBe(2);
   });
 
   it("no crescente, peças do mesmo emoji não colidem na chave", () => {

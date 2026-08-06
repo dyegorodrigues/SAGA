@@ -79,6 +79,7 @@ ordem previne.
 |---|-------|--------|
 | 0 | Fechar a porta dos fundos do canário | ✅ `6cdb550` |
 | 1 | `TouchCount` — N1.02 (F27) e N1.04 (F01) | ✅ `67f679a`, `0fd267b`, `a2d6c87`, `2f2ac29` |
+| 2 | `EmojiRow` — a escada de modos: N1.03 (JD1), N1.08 (JD2), AL.02 (F52) | ✅ `696012b` em diante |
 | 2 | `EmojiRow` — a escada de modos, e a **P1** | ✅ `696012b`, `422138e` |
 
 **Passo 0.** Sete nós do F0 serviam ficha autoral chamando `Composer.generate`

@@ -280,11 +280,21 @@ try {
   if (FILTRO) console.log(`filtro "${FILTRO}": ${alvos.length} de ${quantas} tomadas\n`);
 
   for (const i of alvos) {
+    // O vite observa a árvore INTEIRA — inclusive Markdown. Qualquer arquivo
+    // salvo enquanto a sonda roda recarrega a página, `window.sonda` deixa de
+    // existir e a corrida morre no meio com um TypeError seco. Aconteceu na
+    // tomada 45 editando um componente, e na 184 editando o PLANO em Markdown.
+    //
+    // Esperar o palco voltar transforma um crash em uma pausa. A regra humana
+    // continua valendo — não se edita nada com a sonda rodando —, mas ela não
+    // pode ser a única coisa entre onze minutos de medição e um stack trace.
+    await pagina.waitForFunction(() => typeof window.sonda?.ir === "function", { timeout: 60000 });
     await pagina.evaluate((n) => window.sonda.ir(n), i);
     // As peças entram escalonadas (0.1s por peça, até nove peças). Medir aos
     // 650ms fotografava o material no MEIO da animação: barras de alturas
     // diferentes, caixas ainda crescendo. A medida tem que ser da tela parada.
     await pagina.waitForTimeout(1500);
+    await pagina.waitForFunction(() => typeof window.sonda?.nome === "function", { timeout: 60000 });
     const nome = await pagina.evaluate(() => window.sonda.nome());
     const achados = await pagina.evaluate(medir, { largura, folga: 1, invasaoMinima: 0.25 });
 

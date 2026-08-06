@@ -99,6 +99,7 @@ export const AL_02: FichaCompetencia = {
   micros: [
     {
       id: "ab",
+      fonte: "F52",
       alvo: "ver o pedaço que se repete num padrão AB e continuar a sequência",
       kinds: ["fileira"],
       params: { modo: "padrao", audio_prompt: FALAS.padrao.audioPrompt, tutorial: coreografia },
@@ -106,6 +107,7 @@ export const AL_02: FichaCompetencia = {
     },
     {
       id: "aab_abb",
+      fonte: "F52",
       alvo: "a unidade tem três peças: contar o pedaço, não o último elemento",
       kinds: ["fileira"],
       params: { modo: "padrao", audio_prompt: FALAS.padrao.audioPrompt },
@@ -113,6 +115,7 @@ export const AL_02: FichaCompetencia = {
     },
     {
       id: "abc",
+      fonte: "F52",
       alvo: "três elementos distintos: nenhuma peça se repete dentro da unidade",
       kinds: ["fileira"],
       params: { modo: "padrao", audio_prompt: FALAS.padrao.audioPrompt },
@@ -120,6 +123,7 @@ export const AL_02: FichaCompetencia = {
     },
     {
       id: "lacuna_no_meio",
+      fonte: "F52",
       alvo: "a lacuna muda de lugar: continuar deixa de ser 'olhar o último'",
       kinds: ["fileira"],
       params: { modo: "padrao", audio_prompt: FALAS.padrao.audioPrompt },
@@ -127,6 +131,7 @@ export const AL_02: FichaCompetencia = {
     },
     {
       id: "crescente",
+      fonte: "F52",
       alvo: "padrão que muda de TAMANHO — a ponte para a sequência numérica (AL.03/AL.04)",
       kinds: ["fileira"],
       params: { modo: "padrao", audio_prompt: FALAS.padrao.audioPrompt },

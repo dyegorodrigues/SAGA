@@ -56,9 +56,9 @@ import { TEMAS, construirPareamentoSpec } from "./procedimentos/pareamentoContra
 import { cenasDoNivel as pareamentoCenasDoNivel, desfechoDe } from "./procedimentos/pareamentoProcedure";
 import { construirTouchCountSpec } from "./procedimentos/touchCountContract";
 import { ModoDeContagem } from "./procedimentos/touchCountProcedure";
-import { chaveDaPeca, construirEmojiRowSpec } from "./procedimentos/emojiRowContract";
+import { EmojiRowSpec, chaveDaPeca, construirEmojiRowSpec } from "./procedimentos/emojiRowContract";
 import { MisconceptionTag } from "../constants/misconceptions";
-import { ModoDaFileira } from "./procedimentos/emojiRowProcedure";
+import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -150,15 +150,22 @@ function numericOptions(answer: number, min: number, max: number) {
  * alternativa central caísse a um do alvo.
  */
 function tagDaAlternativa(
-  spec: { modo: string; resposta: number | string; central: number | string | null; sequencia?: { anterior: { emoji: string; quantidade: number } } },
+  spec: EmojiRowSpec,
   valor: number | string,
 ): string | undefined {
   if (valor === spec.resposta) return undefined;
 
   if (spec.modo === "padrao") {
-    return spec.sequencia && valor === chaveDaPeca(spec.sequencia.anterior)
-      ? MisconceptionTag.COPIA_ULTIMO
-      : MisconceptionTag.NAO_VE_UNIDADE;
+    // Delegado ao procedimento: a regra de diagnóstico mora num lugar só. Com a
+    // cópia aqui, o `SO_UM_ATRIBUTO` do crescente alternado existiria no
+    // procedimento e nunca chegaria à alternativa — tag testada e nunca emitida.
+    if (!spec.sequencia) return undefined;
+    return diagnosticarPadrao({
+      resposta: String(valor),
+      correta: String(spec.resposta),
+      anterior: chaveDaPeca(spec.sequencia.anterior),
+      unidade: spec.sequencia.unidade,
+    });
   }
 
   if (valor === spec.central) return MisconceptionTag.CHUTE_SEGURO;

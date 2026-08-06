@@ -8,6 +8,7 @@ import {
   arranjoDoOlhometro,
   comprimentoDaSequencia,
   configuracaoDaMao,
+  ehCrescente,
   duasMaos,
   exposicaoDaMao,
   exposicaoDoOlhometro,
@@ -363,10 +364,19 @@ export function montarSequencia(nivel: number, sorteio: () => number): Sequencia
   let cheia: PecaDoPadrao[];
   let tamanhoDaUnidade: number;
 
-  if (unidade === "CRESCENTE") {
+  if (ehCrescente(unidade)) {
     // "1 bola, 2 bolas, 3 bolas…" — a unidade é o PASSO, não um conjunto de
     // peças, e é por isso que este nível é a ponte para a sequência numérica.
-    cheia = Array.from({ length: comprimento + 1 }, (_, i) => ({ emoji: paleta[0], quantidade: i + 1 }));
+    //
+    // No `CRESCENTE_ALTERNADO` o objeto continua alternando enquanto o grupo
+    // cresce: são DUAS regras ao mesmo tempo, e é isso que faz o degrau ser
+    // "encontrar a regra geral" em vez de "ver o grupo ficar maior". Ver a
+    // decisão inteira em `emojiRowProcedure → unidadesDoNivel`.
+    const alterna = unidade === "CRESCENTE_ALTERNADO";
+    cheia = Array.from({ length: comprimento + 1 }, (_, i) => ({
+      emoji: paleta[alterna ? i % 2 : 0],
+      quantidade: i + 1,
+    }));
     tamanhoDaUnidade = 1;
   } else {
     const letras = unidade.split("");
@@ -390,9 +400,37 @@ export function montarSequencia(nivel: number, sorteio: () => number): Sequencia
     for (let i = lacuna + 1; i < cheia.length; i += 1) casas.push(cheia[i]);
   }
 
-  const banco = [...new Map(
-    cheia.slice(0, Math.max(comprimento, lacuna + 1) + 1).map(p => [chaveDaPeca(p), p]),
-  ).values()];
+  // O banco.
+  //
+  // §3 pede *"uma de cada tipo usado"*, e para AB/AAB/ABC isso é exatamente o
+  // conjunto de peças distintas. Para o **crescente** a frase não fecha: cada
+  // casa é um tipo diferente, e o banco viraria a sequência inteira repetida.
+  //
+  // Pior: no alternado, o banco por "tipos usados" não contém a peça que
+  // continua SÓ o crescimento e ignora a troca de objeto (4🐶 quando a certa é
+  // 4🐱). Essa é a alternativa mais informativa do nível — é ela que separa
+  // "viu as duas regras" de "viu uma" —, e sem ela a tag `SO_UM_ATRIBUTO`
+  // existe no procedimento e nunca chega à tela. Distrator que não está no
+  // banco é diagnóstico que não acontece (§6).
+  //
+  // Então no crescente o banco é **diagnóstico**, não inventário: a certa, a
+  // anterior (`COPIA_ULTIMO`, o alvo da ficha) e as duas meias-regras. Quatro
+  // peças, que é o teto do cânone §9.1.
+  const correta = cheia[lacuna];
+  const anterior = cheia[lacuna - 1];
+  const banco = ehCrescente(unidade)
+    ? [...new Map(([
+      correta,
+      anterior,
+      // Continuou o crescimento e esqueceu a troca.
+      { emoji: anterior.emoji, quantidade: correta.quantidade },
+      // Continuou a troca e esqueceu o crescimento.
+      { emoji: correta.emoji, quantidade: anterior.quantidade },
+    ] as PecaDoPadrao[]).map(p => [chaveDaPeca(p), p])).values()]
+      .sort((a, b) => a.quantidade - b.quantidade)
+    : [...new Map(
+      cheia.slice(0, Math.max(comprimento, lacuna + 1) + 1).map(p => [chaveDaPeca(p), p]),
+    ).values()];
 
   const molduras: number[][] = [];
   for (let i = 0; i + tamanhoDaUnidade <= lacuna; i += tamanhoDaUnidade) {
@@ -402,8 +440,8 @@ export function montarSequencia(nivel: number, sorteio: () => number): Sequencia
   return {
     casas,
     lacuna,
-    correta: cheia[lacuna],
-    anterior: cheia[lacuna - 1],
+    correta,
+    anterior,
     banco,
     molduras,
     unidade,
@@ -580,7 +618,16 @@ export function falaDaRevelacao(spec: EmojiRowSpec, acertou: boolean): string | 
     if (!seq) return null;
     // "contando o padrão em voz alta": a unidade, dita na ordem, e o convite a
     // continuar. Sem nomear a peça certa — a fala ensina a regra, não o gabarito.
-    return `Olha o pedaço que se repete: são ${seq.unidade === "CRESCENTE" ? "grupos que crescem" : `${seq.molduras[0]?.length ?? 2} peças`}, e depois tudo de novo.`;
+    // A fala nomeia AS REGRAS, nunca a peça certa: ensina o padrão, não o
+    // gabarito. No alternado ela precisa dizer as duas, senão a criança que
+    // continuou só uma ouve que estava certa.
+    if (seq.unidade === "CRESCENTE_ALTERNADO") {
+      return "Olha as duas regras: o grupo cresce, e o desenho troca. As duas juntas.";
+    }
+    if (seq.unidade === "CRESCENTE") {
+      return "Olha o que se repete: cada grupo tem um a mais que o de antes.";
+    }
+    return `Olha o pedaço que se repete: são ${seq.molduras[0]?.length ?? 2} peças, e depois tudo de novo.`;
   }
 
   if (spec.modo === "flash-mao") {

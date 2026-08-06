@@ -30,6 +30,16 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { ALL_MATH_TRACKS } from "./motores/curriculum";
 import { COMPOSER_CANARIES } from "./motores/composerCanary";
+import { JARDIM_FICHAS, JOURNEY_FICHAS } from "./fichas";
+
+/**
+ * As fichas de verdade.
+ *
+ * `AllFichas` mistura `FichaCompetencia` com `Track` — as quatro trilhas Sensei
+ * do Dojo entram lá como trilha, sem `micros`. Iterar aquilo aqui rebenta com
+ * TypeError em vez de reprovar a regra, que é pior que não ter regra.
+ */
+const FICHAS = [...JOURNEY_FICHAS, ...JARDIM_FICHAS];
 
 const RAIZ = join(__dirname, "..", "..");
 const PASTA_FICHAS = join(RAIZ, "AI_Studio_Lab/pedagogia/fichas");
@@ -351,6 +361,50 @@ describe("conformidade entre as fichas e o que o app serve", () => {
 
     console.log(`\n=== ESTREIAS NA RAIZ (${raizes.length}) ===`);
     console.log(raizes.join("\n"));
+  });
+
+  it("micros de fichas DIFERENTES não compartilham a mesma voz — pendência P5", () => {
+    // `FichaCompetencia` tem UMA voz, e várias competências vêm de DUAS fichas
+    // do cânone: N1.08 de F02 + JD2, N1.04 de F01 + F03, N1.11 de F28 + JD3.
+    // As §7 delas podem se contradizer — o explain da F02 manda "continue
+    // contando" e a JD2 proíbe em negrito dizer "conte" na tela dela.
+    //
+    // Este é o portão: quando uma micro declara de que ficha veio, duas fontes
+    // distintas não podem falar com a mesma boca.
+    for (const ficha of FICHAS) {
+      const porFonte = new Map<string, string[]>();
+      for (const micro of ficha.micros) {
+        if (!micro.fonte) continue;
+        const voz = String((micro.params as Record<string, unknown>).explain ?? ficha.explain ?? "");
+        porFonte.set(micro.fonte, [...(porFonte.get(micro.fonte) ?? []), voz]);
+      }
+      if (porFonte.size < 2) continue;
+      const vozes = [...porFonte.entries()].map(([fonte, vs]) => [fonte, vs[0]] as const);
+      const distintas = new Set(vozes.map(([, v]) => v));
+      expect(
+        distintas.size,
+        `${ficha.id}: fichas ${vozes.map(([f]) => f).join(" + ")} falam com a mesma voz.\n`
+        + `Declare o explain da micro em params.explain — ver P5 em schema.ts.`,
+      ).toBe(vozes.length);
+    }
+  });
+
+  it("imprime as competências de DUAS fichas que ainda têm uma voz só", () => {
+    // Levantamento, não portão: a maioria das competências antigas nunca
+    // declarou `fonte`, e falhar aqui pararia o projeto. O portão acima cobre
+    // quem já declarou.
+    const pendentes: string[] = [];
+    for (const [id, fichas] of porCompetencia) {
+      const nomes = [...new Set(fichas.map(f => f.ficha))];
+      if (nomes.length < 2) continue;
+      const runtime = FICHAS.find(f => f.id === id);
+      if (!runtime) continue;
+      if (runtime.micros.every(m => m.fonte)) continue;
+      pendentes.push(`${id}\tfichas ${nomes.join(" + ")}\tmicros sem fonte declarada`);
+    }
+    console.log(`\n=== DUAS FICHAS, UMA VOZ (${pendentes.length}) ===`);
+    console.log("Cada uma pode estar servindo a §7 da ficha errada. Ver P5.");
+    console.log(pendentes.join("\n"));
   });
 
   it("imprime o quadro completo", () => {

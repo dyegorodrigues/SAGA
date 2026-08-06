@@ -235,3 +235,95 @@ ficha, sem perceber.
 Honrar a ficha é a ficha **inteira**. Quando uma pendência parecer pedir decisão
 pedagógica, o primeiro passo é reler todas as nove seções: a resposta costuma
 estar numa seção que ninguém abriu.
+
+---
+
+## §9 — P5 e P7 fechadas, e o degrau que faltava no padrão
+
+Três decisões tomadas no mesmo lote, todas nascidas de olhar a tela pronta.
+
+### §9.1 — P5: uma competência, duas fichas, **uma voz só**
+
+`FichaCompetencia` tem um `howto` e um `explain`. Bastava enquanto cada
+competência vinha de uma ficha. Não vem:
+
+| Competência | Fichas | O conflito |
+|---|---|---|
+| **N1.08** | F02 + JD2 | o `explain` da F02 diz *"continue **contando** os de baixo"*; a JD2 §7 **proíbe em negrito** dizer "conte" na tela dela |
+| N1.04 | F01 + F03 | — |
+| N1.11 | F28 + JD3 | — |
+| N1.10 | JD5 + F02 | — |
+
+Sem separar as vozes, a tela da mão herdava a fala da moldura e **ensinava o
+erro que a ficha combate**.
+
+**A solução:** a micro declara `fonte` — de que ficha do cânone ela veio — e
+pode carregar a própria voz em `params.howto` / `params.explain`. O que fecha a
+pendência não é o override (esse já existia, improvisado): é o **portão** em
+`conformidadeDeFichas.test.ts` — *micros de fontes diferentes não podem falar
+com a mesma boca*. E o levantamento ao lado imprime as competências de duas
+fichas que ainda têm uma voz só, para a dívida não envelhecer calada.
+
+### §9.2 — P7: o Jardim do Dojo não existia em código
+
+A JD2 §5 tem **cinco** degraus; a Jornada do N1.08 comporta dois, porque três
+dos cinco níveis dela pertencem à F02. Três degraus ficavam sem lugar.
+
+Ao procurar onde eles moravam, a descoberta: **o Jardim do Dojo não existia**.
+`fichas/dojo/` tinha só as quatro trilhas Sensei (FD), e mesmo elas como `Track`
+solto, sem ficha. As trilhas JD1–JD5 viviam apenas no Markdown — e o `DOJO_SAGA
+§7` as chama de *"a camada MAIS importante"* para quem tem 4 anos.
+
+**A solução:** `fichas/dojo/jardim/` nasce com JD1 e JD2 completas, cinco níveis
+cada. A Jornada instala a âncora do 5 (níveis 1-2, uma mão); o Jardim automatiza
+a decomposição *"uma mão cheia e dois — sete"* até virar reflexo, com os três
+degraus de duas mãos. **Nenhum exercício se perde**, e um teste prova que os
+cinco níveis geram questão — senão a alegação vira promessa.
+
+O que NÃO foi construído, e por quê: o motor que apresenta o Jardim à criança.
+Ele é um pilar autônomo do Dojo e merece o próprio passo, não uma carona no
+passo da primitiva. JD3 e JD5 dependem do `TenFrame` e entram no passo 3.
+
+**A diferença que justifica a separação:** a Jornada mede compreensão e o
+relógio é silencioso (§5.1-bis); o Jardim mede automaticidade e o relógio **é**
+o instrumento. Por isso as trilhas não entram no grafo — entrar faria o
+desbloqueio depender de velocidade, que o cânone proíbe.
+
+### §9.3 — O nível 5 do padrão fazia DUAS mudanças de uma vez
+
+A F52 §5 escreve o nível 5 como *"padrão crescente (1 bola, 2 bolas, 3
+bolas…)"*. Implementado ao pé da letra, o degrau tem o defeito do §6.36:
+
+| | níveis 1 a 4 | nível 5 (só `CRESCENTE`) |
+|---|---|---|
+| o objeto | **alterna** | para de alternar |
+| a quantidade | uma por casa | **começa a crescer** |
+
+Uma coisa some e outra entra — duas mudanças, e a regra manda no máximo uma. A
+criança que passou quatro níveis lendo *"o que muda é o desenho"* chega num
+nível onde o desenho parou de mudar.
+
+**A solução:** `CRESCENTE_ALTERNADO` — *1 🐶, 2 🐱, 3 🐶, ?* — mantém a
+alternação que ela domina e acrescenta só o crescimento. Duas regras compostas,
+que é o que a §2 chama de *"encontrar a regra geral"*. Os dois formatos convivem
+no nível 5, sorteados, pelo mesmo recurso que a ficha usa no nível 2 (*"AAB **ou**
+ABB"*).
+
+**E o defeito que só o print mostrou:** o banco por *"uma de cada tipo usado"*
+(§3) não continha a peça que continua **só o crescimento** e ignora a troca —
+`4 🐶` quando a certa é `4 🐱`. Essa é a alternativa mais informativa do nível,
+e sem ela a tag `SO_UM_ATRIBUTO` existia no procedimento e nunca chegava à tela.
+
+> **Distrator que não está no banco é diagnóstico que não acontece.**
+
+No crescente o banco passou a ser **diagnóstico**, não inventário: a certa, a
+anterior (`COPIA_ULTIMO`, o alvo da ficha) e as duas meias-regras. Quatro peças
+— o teto do cânone §9.1 —, e cada uma carrega uma hipótese.
+
+### §9.4 — Pendências que ficam
+
+| id | O que é | Onde |
+|----|---------|------|
+| P8 | O motor do Jardim do Dojo: as trilhas existem e nada as apresenta | `fichas/dojo/jardim/index.ts` |
+| P9 | `AllFichas` mistura `FichaCompetencia` e `Track` — iterar aquilo rebenta com TypeError em vez de reprovar | `fichas/index.ts` |
+| P10 | 12 competências trocam de MODO sem aviso (levantamento do `fichas:conferir`); `N3.02` faz `EmojiRow` virar "riscar" vindo de 7 nós | `conformidadeDeFichas.test.ts` |

@@ -112,6 +112,7 @@ export const N1_03: FichaCompetencia = {
   micros: [
     {
       id: "estreia",
+      fonte: "JD1",
       alvo: "ver o desenho parado antes de vê-lo sumir — e então reconhecer 1 ou 2 num relance",
       kinds: ["fileira"],
       params: {
@@ -123,6 +124,7 @@ export const N1_03: FichaCompetencia = {
     },
     {
       id: "fila",
+      fonte: "JD1",
       alvo: "reconhecer até 3 numa fila, com menos tempo",
       kinds: ["fileira"],
       params: { modo: "flash", audio_prompt: FALAS.olhometro.audioPrompt },
@@ -130,6 +132,7 @@ export const N1_03: FichaCompetencia = {
     },
     {
       id: "dado",
+      fonte: "JD1",
       alvo: "usar a figura do dado como apoio — o andaime perceptual antes do disperso",
       kinds: ["fileira"],
       params: {
@@ -141,6 +144,7 @@ export const N1_03: FichaCompetencia = {
     },
     {
       id: "dado_rapido",
+      fonte: "JD1",
       alvo: "sustentar o reconhecimento até 5, com a exposição caindo",
       kinds: ["fileira"],
       params: { modo: "flash", audio_prompt: FALAS.olhometro.audioPrompt },
@@ -148,6 +152,7 @@ export const N1_03: FichaCompetencia = {
     },
     {
       id: "disperso",
+      fonte: "JD1",
       alvo: "reconhecer SEM figura de apoio: quantidade, não formato",
       kinds: ["fileira"],
       params: { modo: "flash", audio_prompt: FALAS.olhometro.audioPrompt },

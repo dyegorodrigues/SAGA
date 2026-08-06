@@ -16,6 +16,26 @@ export interface FichaDominio {
 export interface FichaMicro {
   id: string; // Ex: 'a', 'b'
   alvo: string; // O que está sendo treinado especificamente
+  /**
+   * De qual ficha do cânone esta micro veio. Ex: `"JD2"`, `"F02"`, `"F52"`.
+   *
+   * ### Por que existe (pendência P5)
+   *
+   * `FichaCompetencia` tem **uma** voz — um `howto`, um `explain` —, e isso
+   * bastava enquanto cada competência vinha de uma ficha só. Várias vêm de
+   * duas: N1.08 de F02 + JD2, N1.04 de F01 + F03, N1.11 de F28 + JD3, N1.10 de
+   * JD5. E as §7 delas podem se contradizer: o `explain` da F02 diz *"continue
+   * contando os de baixo"* e a JD2 **proíbe em negrito** dizer "conte" na tela
+   * dela, porque é o erro que a ficha combate.
+   *
+   * Sem declarar a origem, a tela da mão herda a fala da moldura e ensina o
+   * erro — e nada no código sabe que isso é um problema. Com a origem
+   * declarada, o portão de conformidade cobra: micros de fichas diferentes não
+   * compartilham voz.
+   *
+   * A voz própria entra em `params.howto` / `params.explain` / `audio_prompt`.
+   */
+  fonte?: string;
   kinds: KindType[]; // Array das mecânicas UI autorizadas
   params: FichaParams; // Parâmetros numéricos para o gerador
   dominio: FichaDominio; // Regras de domínio específicas desta micro
