@@ -227,7 +227,16 @@ export function ClassificacaoStage({ spec, onAnswer, disabled, falar, resolvidas
         borderStyle: selecionada === null ? "dashed" : "solid",
         background: lacoAceso ? "#F5F3FF" : "#FAFAFF",
       }}
-      animate={semMovimento || !lacoAceso ? undefined : { scale: [1, 1.03, 1] }}
+      // O pulso é de BRILHO, não de escala.
+      //
+      // Escalar um elemento que ocupa a largura da tela vaza por construção:
+      // a prateleira "fica fora" mede 384px, e 384 × 1,03 são 396 num aparelho
+      // de 390. A sonda pegou em oito sementes. Ajustar a largura para caber o
+      // scale seria o conserto que volta no dia em que alguém mudar a margem —
+      // §6.29: colisão se resolve por construção, nunca por ajuste de pixel.
+      //
+      // Brilho comunica "olha aqui" igual, e não mexe na geometria.
+      animate={semMovimento || !lacoAceso ? undefined : { opacity: [1, 0.72, 1] }}
       transition={{ duration: 0.9, repeat: lacoAceso ? Infinity : 0 }}
     >
       <span className="text-xs font-black uppercase tracking-wide" style={{ color: "#6D28D9" }}>
@@ -360,7 +369,9 @@ export function ClassificacaoStage({ spec, onAnswer, disabled, falar, resolvidas
           borderStyle: selecionada === null ? "dashed" : "solid",
           background: "#FFFBEB",
         }}
-        animate={semMovimento || maoFora === undefined ? undefined : { scale: [1, 1.03, 1] }}
+        // Brilho, não escala — ver a nota no laço. Este é o elemento que a
+        // sonda flagrou vazando: ele ocupa a largura inteira.
+        animate={semMovimento || maoFora === undefined ? undefined : { opacity: [1, 0.72, 1] }}
         transition={{ duration: 0.9, repeat: maoFora !== undefined ? Infinity : 0 }}
       >
         <span className="text-xs font-black uppercase tracking-wide" style={{ color: "#92400E" }}>
