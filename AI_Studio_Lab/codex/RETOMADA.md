@@ -81,6 +81,10 @@ ordem previne.
 | 1 | `TouchCount` — N1.02 (F27) e N1.04 (F01) | ✅ `67f679a`, `0fd267b`, `a2d6c87`, `2f2ac29` |
 | 2 | `EmojiRow` — a escada de modos: N1.03 (JD1), N1.08 (JD2), AL.02 (F52) | ✅ `696012b` em diante |
 | 2 | `EmojiRow` — a escada de modos, e a **P1** | ✅ `696012b`, `422138e` |
+| — | A varredura: 6 competências **ativas servindo outra coisa** | ✅ `PLANO §10`, `§12` |
+| — | Telas em qualquer aparelho (`PalcoEscalado`); a sonda mede 3 larguras | ✅ `PLANO §11` |
+| — | **P12**, **P13**, **P15** fechadas | ✅ `PLANO §10.4`, `§13` |
+| 3 | `TenFrame` — a moldura de dez: N1.08 (F02), N1.11 (JD3), N1.10 (JD5) | ✅ `80e5231` |
 
 **Passo 0.** Sete nós do F0 serviam ficha autoral chamando `Composer.generate`
 de dentro do gerador "legado": o rollback era um no-op e a proveniência mentia.
@@ -148,13 +152,23 @@ tinha deixado a moldura vazia na tela. A JD3 §3 diz *"a área fica vazia enquan
 ela responde"* — e com as dez casas à vista a criança **conta as vazias uma a
 uma**, que é o que a §7 proíbe e o que a ficha existe para dispensar.
 
-> Três defeitos passaram pelo compilador e por 1786 testes. Quem os pegou foi
-> reler a ficha inteira e olhar a tela.
+E um **quinto** veio do print seguinte: o enunciado dizia *"quantas estrelas
+você vê?"* e a moldura desenhava discos azuis genéricos (§6.34). A criança desta
+faixa **não lê** — a única pergunta é a falada, e voz e tela dizendo coisas
+diferentes é defeito. Os três temas da F02 §1 entraram, com concordância (§6.5:
+*"Quantas ovos"* saiu da primeira tentativa).
+
+> Cinco defeitos passaram pelo compilador e pelos testes. Quem os pegou foi
+> reler a ficha inteira e **olhar a tela**.
+
+Portões deste passo: `fichas:conferir` 9/9 · sonda **1170 tomadas** em três
+larguras, sem vazamento nem colisão · `vitest` **1903** · `tsc` limpo.
+*(A mensagem do commit `80e5231` diz "1320 tomadas"; o número certo é 1170.)*
 
 ### Estado dos canários
 
-Ativos: `N3.09 N3.10 N4.03 N4.04 N4.06 N4.07 N4.08 N1.07 N1.10` e, desde
-`ef92f10`, os seis do bloco F0: `N1.01 N1.02 N1.03 N1.04 N1.08 AL.02`.
+Ativos: `N3.09 N3.10 N4.03 N4.04 N4.06 N4.07 N4.08 N1.07` e, desde `ef92f10`,
+os seis do bloco F0: `N1.01 N1.02 N1.03 N1.04 N1.08 AL.02`.
 
 Implementados e **NÃO** ativados — a tela existe e não chega à criança:
 
@@ -185,6 +199,28 @@ defeitos: foi assim que apareceram o canhão que faltava na F27, o enunciado
 saindo duas vezes em três palcos e a mão que não parecia mão.
 
 Ativar cada um é **PR próprio**. Sempre.
+
+### Se outro agente trabalhar aqui antes da próxima sessão
+
+O estado inteiro está no repositório, não em conversa nenhuma. Ordem de leitura:
+
+1. este arquivo;
+2. `PLANO_DO_BLOCO_F0.md` — o §14 é o passo 3, e os §10 a §13 são as decisões
+   que reorganizaram o grafo (P12, P13, P15);
+3. `AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md` e as fichas em
+   `AI_Studio_Lab/pedagogia/fichas/` — **o cânone**;
+4. `PADRAO_OURO.md §1` (o trilho de sete passos) e `§6` (as armadilhas).
+
+E as três regras que não se negociam, porque cada uma custou caro:
+
+- **honrar a ficha é a ficha INTEIRA** — §3 estrutura, §4 roteiro *e* interação,
+  §5 os cinco níveis transcritos, §6 diagnóstico, §7 falas, §8 coreografia,
+  §9 domínio. Quatro dos cinco defeitos do passo 3 eram §4 ou §6 lidas pela
+  metade;
+- **divergir da ficha é permitido; divergir em silêncio, não** — toda
+  divergência deste passo está escrita no código, com a citação ao lado;
+- **implementação e ativação são dois PRs.** Tela nova não estreia no PR que a
+  escreve.
 
 ## 5. Como se trabalha aqui
 
