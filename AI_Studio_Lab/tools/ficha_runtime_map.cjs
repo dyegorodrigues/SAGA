@@ -11,7 +11,14 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
  */
 const FICHA_RUNTIME_MAP = [
   { primitive: "ArrayGrid", kinds: ["array", "area-model"], componentFiles: [component("ArrayGrid")], builderKinds: ["arraygrid"], rendererKinds: ["array"] },
-  { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice")], builderKinds: [], rendererKinds: [] },
+  {
+    primitive: "AudioChoice",
+    kinds: ["audiochoice"],
+    componentFiles: [component("AudioChoice"), component("AudioChoiceStage")],
+    builderKinds: ["audiochoice"],
+    rendererKinds: ["audiochoice"],
+    note: "F05/N1.06: som→símbolo; Stage possui autoplay/retry/feedback temporal e GameLoop mantém autoria única do enunciado.",
+  },
   { primitive: "Balanca", kinds: ["balanca"], componentFiles: [component("Balanca")], builderKinds: ["balanca"], rendererKinds: ["balanca"] },
   { primitive: "DragGroup", kinds: ["draggroup"], componentFiles: [component("DragGroup")], builderKinds: ["draggroup"], rendererKinds: ["draggroup"] },
   { primitive: "EmojiRow", kinds: ["emojirow"], componentFiles: [component("EmojiRow")], builderKinds: ["emojirow"], rendererKinds: ["emojirow"] },
@@ -42,7 +49,14 @@ const FICHA_RUNTIME_MAP = [
   },
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
-  { primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform"], componentFiles: [component("ShapeCanvas")], builderKinds: [], rendererKinds: [] },
+  {
+    primitive: "ShapeCanvas",
+    kinds: ["shapes", "symmetry", "geo-transform"],
+    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage")],
+    builderKinds: ["shapecanvas"],
+    rendererKinds: ["shapecanvas"],
+    note: "F47/GE.01 e F48/GE.02 compartilham o ShapeCanvas; Composer seleciona modo cena/formas e o renderer despacha ao Stage correspondente.",
+  },
   { primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table"], componentFiles: [component("SingaporeBars")], builderKinds: [], rendererKinds: ["singapore-bars"] },
   { primitive: "StoryPanel", kinds: ["story", "scene"], componentFiles: [component("StoryPanel")], builderKinds: [], rendererKinds: [] },
   { primitive: "TenFrame", kinds: ["tenframe"], componentFiles: [component("TenFrame")], builderKinds: ["tenframe"], rendererKinds: ["tenframe"] },
