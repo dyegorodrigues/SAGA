@@ -1,87 +1,83 @@
 name: CI
 
+# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
+# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
+# tudo localmente e passe a ser condição verificável no PR.
+
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
 
-permissions:
-  contents: write
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  fechar-f05:
-    name: Registrar fechamento F05
-    if: github.event_name == 'pull_request' && github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: codex/corrigir-n106
-          fetch-depth: 0
-      - name: Registrar handoff curto
-        run: |
-          if ! grep -q 'Registro Codex - N1.06 / F05' AI_Studio_Lab/codex/RETOMADA.md; then
-            printf '%s\n' '' '---' '' '## Registro Codex - N1.06 / F05 (7/ago/2026)' '' \
-              '- Branch codex/corrigir-n106, PR #27: CORRECAO FECHADA, NAO ATIVADA.' \
-              '- F05 auditada de ponta a ponta: ficha -> grafo -> Composer -> audiochoice -> Stage/Renderer -> GameLoop -> Radar -> Chromium.' \
-              '- Corrigidos: autoplay/convite, retry autoral, feedback concorrente, Radar/evidencia, reset com alvo repetido, tela vazia e grade 2x2 para 4 opcoes.' \
-              '- Divergencia declarada: NAO_ESCUTOU nao pode nascer da primeira opcao apos autoplay; exige estado temporal anterior ao fim da primeira audicao.' \
-              '- GameLoop permanece unico dono de q.prompt; Stage apenas sinaliza o fim da primeira audicao.' \
-              '- questionDiagnostics agora preserva hipotese embutida em acao terminal correta; efeito compartilhado com F51/F04.' \
-              '- CI final verde: run 31188064450. Visual final: run 31188061774, 8 sementes, Chromium real, prints inspecionados.' \
-              '- N1.06 segue fora de COMPOSER_CANARIES; ativacao somente em PR separado.' \
-              '- Auditoria F04/N1.13 ja achou: falta arrasto real, mao fantasma incompleta, reset de spec ausente, corrida no autofecho, conflito de retry e DEPENDE_DE_ANDAIME sem consumidor longitudinal.' \
-              '- PRIMITIVAS_SAGA.md esta atrasado para AudioChoice/TouchPlace; nao usar esse inventario como verdade de runtime.' \
-              >> AI_Studio_Lab/codex/RETOMADA.md
-          fi
-          rm -f .github/workflows/visual-n106.yml
-          git diff --check
-      - name: Restaurar CI original e commitar
-        run: |
-          git fetch origin main --depth=1
-          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git commit -m 'docs: registra fechamento da correcao F05'
-          git push origin HEAD:codex/corrigir-n106
-
   gates:
     name: Gates do SAGA
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
-      - run: npm run auditar
-      - run: npm run fichas:auditar
-      - run: npm run grafo:check
-      - run: npm run lint
-      - run: npm test -- --run
-      - run: npm run build
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
+      # órfãos e deriva de nomenclatura.
+      - name: Auditoria do catálogo
+        run: npm run auditar
+
+      - name: Auditoria das fichas
+        run: npm run fichas:auditar
+
+      # O grafo é artefato derivado; o modo --check falha se alguém editar o
+      # gerado sem regerar a partir do YAML canônico.
+      - name: Sincronia do grafo
+        run: npm run grafo:check
+
+      - name: TypeScript
+        run: npm run lint
+
+      - name: Testes
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
 
   guarda-textual:
-    name: Guarda de binarios
+    name: Guarda de binários
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     if: github.event_name == 'pull_request'
+
     steps:
       - uses: actions/checkout@v4
         with:
+          # Por padrão o Actions confere um merge commit sintético do PR, o que
+          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
+          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: git fetch origin ${{ github.base_ref }} --depth=1
-      - env:
+
+      - name: Buscar a base do PR
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      # O criador de PR deste ambiente não aceita binários no diff textual.
+      # Falhar aqui é mais barato que descobrir na hora de publicar.
+      - name: Verificar ausência de binários no diff
+        env:
           PR_BASE: origin/${{ github.base_ref }}
         run: node AI_Studio_Lab/tools/pr_text_guard.cjs
