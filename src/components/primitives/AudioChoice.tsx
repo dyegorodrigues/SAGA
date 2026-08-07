@@ -4,31 +4,11 @@ import { tokens } from '../../styles/tokens';
 import { speak } from '../Mascot';
 
 /**
- * `AudioChoice` — a primitiva da ficha F05 (N1.06).
+ * `AudioChoice` — a primitiva da ficha F05 (N1.06), Ouvir e Escolher.
  *
- * ---
- *
- * ### A §3, que é curta e manda em tudo
- *
- * > *"A tela é deliberadamente **vazia**. Nada de cenário, nada de mascote,
- * > nada de objeto. Só o botão de som e os numerais. Qualquer elemento extra
- * > compete com a única coisa que importa: o som."*
- *
- * É a única tela do bloco onde o vazio **não** é o defeito §6.6 — aqui o vazio
- * é o conteúdo, e o que preenche a tela é o áudio.
- *
- * ### O botão é AZUL, e isso não é gosto
- *
- * A §7 escreve o howto: *"Aperte o **botão azul**."* Cor é como uma criança de
- * 4 anos que ainda não lê encontra o alvo.
- *
- * ### O que a primitiva NÃO sabe
- *
- * Ela desenha e reporta. Quem conta repetições, decide acerto e roda a
- * coreografia é o `AudioChoiceStage` — a primitiva não conhece nível, ficha nem
- * diagnóstico.
+ * A tela é deliberadamente econômica: botão de som + numerais. A primitiva
+ * desenha e reporta; nível, diagnóstico e coreografia pertencem ao palco/ficha.
  */
-
 export interface AudioChoiceProps {
   /** A palavra que a voz diz: "três". Nunca aparece escrita. */
   audioPrompt: string;
@@ -36,45 +16,34 @@ export interface AudioChoiceProps {
   onSelect: (option: number | string) => void;
   /** Desliga a primitiva inteira — inclusive o botão de som. */
   disabled?: boolean;
-  /**
-   * Desliga só as alternativas, sem calar o botão de som.
-   *
-   * A §4 exige exatamente isto durante o erro suave: o numeral volta enquanto
-   * o botão continua pulsando, convidando a ouvir de novo.
-   */
+  /** Desliga só as alternativas, mantendo o replay disponível no erro suave. */
   optionsDisabled?: boolean;
   /** Multiplicador da velocidade da fala. Nível 5 acelera a voz (§5). */
   velocidade?: number;
   /** Avisa que a criança pediu para ouvir de novo. */
   onRepetir?: () => void;
-  /**
-   * A primeira execução automática terminou. É o relógio canônico que autoriza
-   * as opções a subir da base — antes disso, a §4 manda haver só o botão.
-   */
+  /** A primeira execução automática terminou e as opções já podem subir. */
   onPrimeiraAudicao?: () => void;
-  /**
-   * A execução automática da §4. Durante a micro-aula fica falsa: a
-   * coreografia §8 narra a demonstração e não pode disputar voz com autoplay.
-   */
+  /** Na micro-aula fica falsa: a coreografia §8 é dona da narração. */
   autoPlay?: boolean;
-  /** §4: o numeral escolhido cresce e brilha, ou desliza de volta. */
+  /** §4: o numeral escolhido cresce/brilha ou desliza de volta. */
   realceDaOpcao?: (opcao: number | string) => 'acerto' | 'erro' | null;
-  /** §8: o botão de som pulsa — "pode apertar de novo". */
+  /** §8: o botão pulsa para convidar ao replay. */
   pulsarBotao?: boolean;
-  /** §8: as opções pulsam — "agora ache o três". */
+  /** §8: as opções pulsam no beat "agora ache". */
   pulsarOpcoes?: boolean;
-  /** §8: o beat falado mostra ondas mesmo sem disparar outro TTS interno. */
+  /** §8: ondas no beat falado, sem disparar TTS interno concorrente. */
   ondasAtivas?: boolean;
-  /** As opções já subiram da base? §4: entram DEPOIS da primeira audição. */
+  /** As opções já subiram da base? */
   mostrarOpcoes?: boolean;
 }
 
-/** §3: "mínimo 120px". O botão é o elemento dominante da tela. */
+/** §3: mínimo 120px; 160 mantém o áudio como elemento dominante. */
 const BOTAO = 160;
 const DURACAO_DA_AUDICAO = 1200;
-
 const AZUL = '#2563EB';
 const AZUL_ESCURO = '#1D4ED8';
+const LADO_DA_OPCAO = 80;
 
 export function AudioChoice({
   audioPrompt,
@@ -99,8 +68,8 @@ export function AudioChoice({
   useEffect(() => { primeiraAudicaoRef.current = onPrimeiraAudicao; }, [onPrimeiraAudicao]);
 
   /**
-   * A referência das `options` faz parte da identidade da questão. Duas
-   * questões consecutivas podem pedir a MESMA palavra; depender só de
+   * A referência das opções faz parte da identidade observável da questão.
+   * Duas questões consecutivas podem pedir a MESMA palavra; depender só de
    * `audioPrompt` faria a segunda nascer sem a execução automática.
    */
   useEffect(() => {
@@ -109,8 +78,6 @@ export function AudioChoice({
     return () => {
       if (fimDaFala.current !== null) window.clearTimeout(fimDaFala.current);
     };
-    // `tocar` é intencionalmente local; a cena muda por palavra OU por novo
-    // conjunto de opções, que é a identidade observável da questão.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [audioPrompt, options, autoPlay]);
 
@@ -135,6 +102,18 @@ export function AudioChoice({
   const opcoesDesligadas = Boolean(disabled) || Boolean(optionsDisabled);
   const mostrarOndas = tocando || ondasAtivas;
 
+  /**
+   * Layout sem pista posicional:
+   * - 2 opções: 1×2
+   * - 3 opções: 1×3
+   * - 4 opções: 2×2
+   *
+   * O flex anterior virava 3+1 no cartão real de 390px. A quarta alternativa
+   * ficava sozinha no centro e ganhava saliência visual, exatamente o tipo de
+   * atalho que pode contaminar uma tarefa de reconhecimento som→símbolo.
+   */
+  const colunasDeOpcoes = options.length === 4 ? 2 : Math.max(1, options.length);
+
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-8 py-4">
       <motion.button
@@ -151,8 +130,6 @@ export function AudioChoice({
           border: `4px solid ${AZUL_ESCURO}`,
           color: tokens.cor.texto.inverso,
         }}
-        // §4 abertura: scale 0 → 1; depois, quando as opções já subiram, o
-        // pulso lento comunica "pode apertar de novo".
         initial={{ scale: 0 }}
         animate={pulsarBotao ? { scale: [1, 1.06, 1] } : { scale: 1 }}
         transition={{ duration: 1.2, repeat: pulsarBotao ? Infinity : 0 }}
@@ -165,18 +142,24 @@ export function AudioChoice({
             style={{ border: `4px solid ${AZUL}` }}
             initial={{ scale: 1, opacity: 0.55 }}
             animate={{ scale: 1.3, opacity: 0 }}
-            transition={{ duration: 0.9, repeat: Infinity, ease: "easeOut" }}
+            transition={{ duration: 0.9, repeat: Infinity, ease: 'easeOut' }}
           />
         )}
       </motion.button>
 
       {mostrarOpcoes && (
-        <div role="group" aria-label="Números" className="flex flex-wrap justify-center gap-4">
+        <div
+          role="group"
+          aria-label="Números"
+          data-colunas={colunasDeOpcoes}
+          className="grid justify-center gap-4"
+          style={{ gridTemplateColumns: `repeat(${colunasDeOpcoes}, ${LADO_DA_OPCAO}px)` }}
+        >
           {options.map((opt, i) => {
             const realce = realceDaOpcao?.(opt) ?? null;
             return (
               <motion.button
-                key={i}
+                key={String(opt)}
                 type="button"
                 whileTap={opcoesDesligadas ? {} : { scale: 0.95 }}
                 onClick={() => !opcoesDesligadas && onSelect(opt)}
@@ -189,7 +172,6 @@ export function AudioChoice({
                   color: tokens.cor.texto.principal,
                   border: `2px solid ${realce === 'acerto' ? '#16A34A' : tokens.cor.elementos.borda}`,
                 }}
-                // §4: o escolhido "cresce e brilha"; o errado "desliza de volta".
                 initial={{ opacity: 0, y: 16 }}
                 animate={{
                   opacity: 1,
