@@ -19,12 +19,12 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          import re, textwrap
+          import re
           src = Path('.github/workflows/n106-boundary-patch.yml').read_text()
           m = re.search(r"python3 - <<'PY'\n(.*?)\n          PY", src, re.S)
           if not m:
               raise SystemExit('bloco Python do patch não encontrado')
-          code = textwrap.dedent(m.group(1))
+          code = '\n'.join(line[10:] if line.startswith('          ') else line for line in m.group(1).splitlines())
           exec(compile(code, 'n106-boundary-patch', 'exec'))
           Path('.github/workflows/n106-boundary-run.yml').unlink()
           PY
