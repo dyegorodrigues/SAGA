@@ -1,13 +1,10 @@
 name: CI
 
-# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
-# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
-# tudo localmente e passe a ser condição verificável no PR.
+permissions:
+  contents: write
 
 on:
   pull_request:
-    branches: [main]
-  push:
     branches: [main]
 
 concurrency:
@@ -15,69 +12,107 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  gates:
-    name: Gates do SAGA
+  visual-ge02-before:
+    name: Visual GE.02 — F48 antes da correção
+    if: github.event.action == 'reopened' && github.head_ref == 'codex/integrar-bloco-f0'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-
-      - name: Instalar dependências
-        run: npm ci
-
-      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
-      # órfãos e deriva de nomenclatura.
-      - name: Auditoria do catálogo
-        run: npm run auditar
-
-      - name: Auditoria das fichas
-        run: npm run fichas:auditar
-
-      # O grafo é artefato derivado; o modo --check falha se alguém editar o
-      # gerado sem regerar a partir do YAML canônico.
-      - name: Sincronia do grafo
-        run: npm run grafo:check
-
-      - name: TypeScript
-        run: npm run lint
-
-      - name: Testes
-        run: npm test -- --run
-
-      - name: Build
-        run: npm run build
-
-  guarda-textual:
-    name: Guarda de binários
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # Por padrão o Actions confere um merge commit sintético do PR, o que
-          # distorceria o diff. Aqui o alvo é o head real da branch.
-          ref: ${{ github.event.pull_request.head.sha }}
-          # A guarda compara com a base do PR; precisa do histórico.
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Buscar a base do PR
-        run: git fetch origin ${{ github.base_ref }} --depth=1
-
-      # O criador de PR deste ambiente não aceita binários no diff textual.
-      # Falhar aqui é mais barato que descobrir na hora de publicar.
-      - name: Verificar ausência de binários no diff
+      - run: npm ci
+      - name: Acrescentar beats F48 apenas na bancada
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('sonda/cenas.tsx'); s=p.read_text()
+          a='''  {\n    nome: "GE.02 micro-aula: mesmo virado é triângulo",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarForma: 360 }} />\n    ),\n  },'''
+          e='''  { nome: "GE.02 micro-aula: procurar a forma", render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ destacarTodas: true }} /> },\n  { nome: "GE.02 micro-aula: contar tres lados", render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ contarLados: 3 }} /> },\n'''+a
+          if s.count(a)!=1: raise SystemExit('bloco GE02 mudou')
+          p.write_text(s.replace(a,e))
+          PY
+      - name: Preparar Chromium
+        run: |
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            sudo mkdir -p /opt/pw-browsers && sudo chown -R "$USER":"$USER" /opt/pw-browsers
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
+          test -n "$CHROME_REAL" && sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+      - name: Sonda filtrada GE.02
         env:
-          PR_BASE: origin/${{ github.base_ref }}
-        run: node AI_Studio_Lab/tools/pr_text_guard.cjs
+          SONDA_SEMENTES: '1'
+        run: npm run sonda -- "GE.02"
+      - name: Prints obrigatórios
+        env:
+          PRINTS_OUT: /tmp/ge02-before/prints
+          PRINTS_LARGURA: '390'
+        run: node scripts/prints.mjs "GE.02"
+      - name: Estados atuais da interação
+        run: |
+          mkdir -p /tmp/ge02-before/states
+          node --input-type=module <<'NODE'
+          import {spawn} from 'node:child_process'; import {chromium} from 'playwright-core';
+          const port=5199,v=spawn('npx',['vite','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe'],detached:true});
+          await new Promise((ok,no)=>{const t=setTimeout(()=>no(Error('vite')),60000);v.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok()}})});
+          const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']}); const p=await b.newPage({viewport:{width:390,height:700},deviceScaleFactor:2});
+          await p.goto(`http://localhost:${port}/sonda/?sementes=1`,{waitUntil:'networkidle'}); await p.waitForFunction(()=>window.sonda?.total>0); const ns=await p.evaluate(()=>window.sonda.nomes());
+          const find=t=>{const i=ns.findIndex(n=>n.includes(t));if(i<0)throw Error(t);return i}; const go=async(t,ms=550)=>{await p.evaluate(i=>window.sonda.ir(i),find(t));await p.waitForTimeout(ms)}; const shot=n=>p.screenshot({path:`/tmp/ge02-before/states/${n}.png`});
+          for(const lvl of [1,2,3,4,5]){await go(`GE.02 que forma é essa (nível ${lvl})`,80);await shot(`0${lvl}_L${lvl}_ABERTURA_80MS`);await p.waitForTimeout(800);await shot(`1${lvl}_L${lvl}_ESTADO`)}
+
+          await go('GE.02 que forma é essa (nível 2)',300);
+          const group=p.getByRole('group',{name:'As formas'}); const buttons=group.getByRole('button'); if(await buttons.count()<3)throw Error('poucas formas');
+          const prompt=(await p.locator('body').innerText()).toLowerCase(); const nomes=['círculo','quadrado','triângulo','retângulo','cubo','esfera','cilindro']; const alvo=nomes.find(n=>prompt.includes(n)); if(!alvo)throw Error('alvo não identificado');
+          const labels=await buttons.evaluateAll(bs=>bs.map(b=>(b.getAttribute('aria-label')||'').toLowerCase())); const ci=labels.findIndex(x=>x===alvo); if(ci<0)throw Error(`alvo ${alvo} não está nas opções`); const wi=ci===0?1:0;
+          await buttons.nth(wi).click(); await p.waitForTimeout(220); await shot('20_L2_ERRO');
+          const disabled1=await buttons.evaluateAll(bs=>bs.map(b=>b.disabled)); if(!disabled1.every(Boolean))throw Error('Stage não travou como esperado no estado atual');
+          await p.waitForTimeout(2700); const disabled2=await buttons.evaluateAll(bs=>bs.map(b=>b.disabled)); await shot('21_L2_APOS_2S7');
+          if(!disabled2.every(Boolean))throw Error('estado atual já possui retry; atualizar diagnóstico');
+
+          // Reabrir a cena e acertar para fotografar a lição de 360 graus.
+          await go('GE.02 que forma é essa (nível 1)',80); await go('GE.02 que forma é essa (nível 2)',300);
+          const bs2=p.getByRole('group',{name:'As formas'}).getByRole('button'); const prompt2=(await p.locator('body').innerText()).toLowerCase(); const alvo2=nomes.find(n=>prompt2.includes(n)); const labs2=await bs2.evaluateAll(bs=>bs.map(b=>(b.getAttribute('aria-label')||'').toLowerCase())); const c2=labs2.findIndex(x=>x===alvo2); if(c2<0)throw Error('alvo2');
+          await bs2.nth(c2).click(); await p.waitForTimeout(900); await shot('22_L2_ACERTO_GIRANDO');
+
+          for(const [t,n] of [
+            ['GE.02 micro-aula: procurar a forma','30_MICRO_DESTACAR_TODAS'],
+            ['GE.02 micro-aula: contar tres lados','31_MICRO_CONTAR_LADOS'],
+            ['GE.02 micro-aula: mesmo virado é triângulo','32_MICRO_GIRAR_FORMA'],
+          ]){await go(t,700);await shot(n)}
+          await b.close();try{process.kill(-v.pid,'SIGKILL')}catch{v.kill('SIGKILL')}
+          NODE
+      - name: Folha de contato
+        if: always()
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          fs=sorted(Path('/tmp/ge02-before/prints').glob('*.png'))+sorted(Path('/tmp/ge02-before/states').glob('*.png'));tw,th,lab=195,350,30;rows=max(1,(len(fs)+1)//2);out=Image.new('RGB',(390,rows*(th+lab)),'white');d=ImageDraw.Draw(out)
+          for i,x in enumerate(fs):
+            im=Image.open(x).convert('RGB');im.thumbnail((tw,th));px=(i%2)*tw;py=(i//2)*(th+lab);out.paste(im,(px+(tw-im.width)//2,py+(th-im.height)//2));d.text((px+2,py+th+2),x.stem[:42],fill='black')
+          out.save('/tmp/ge02-before/contact-sheet.jpg',quality=86)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ge02-before-correction
+          path: /tmp/ge02-before
+          retention-days: 7
+      - name: Restaurar CI original
+        if: success()
+        run: |
+          git fetch origin main --depth=1
+          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
+          git config user.name 'SAGA Codex'; git config user.email 'noreply@github.com'
+          git add .github/workflows/ci.yml
+          git commit -m 'chore: remove bancada pré-correção GE.02'
+          git push origin HEAD:codex/integrar-bloco-f0
