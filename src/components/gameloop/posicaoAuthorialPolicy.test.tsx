@@ -31,7 +31,7 @@ describe("F47 — política autoral da casca", () => {
     const alvo = emphasisForQuestion(q47);
     expect(alvo).toBe((q47.uiProps as any).pedida);
     const { container } = render(<div data-shell-prompt><QuestionPrompt q={q47} /></div>);
-    expect(screen.getByText(alvo!)).toHaveAttribute("data-prompt-emphasis");
+    expect(screen.getByText(alvo!).getAttribute("data-prompt-emphasis")).not.toBeNull();
     expect(container.textContent).toBe(q47.prompt);
     expect(container.querySelectorAll("[data-shell-prompt]")).toHaveLength(1);
   });
