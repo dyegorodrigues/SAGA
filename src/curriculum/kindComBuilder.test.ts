@@ -80,6 +80,9 @@ describe("todo kind do KindType ou tem builder, ou é dívida declarada", () => 
     // Se a regex quebrar, os dois testes abaixo passariam varrendo nada.
     expect(todos.length).toBeGreaterThan(30);
     expect(todos).toContain("moldura");
+    // F04 já é cadeia executável: declarar TouchPlace como isolado em qualquer
+    // inventário volta a criar a dessincronia que este bloco acabou de encontrar.
+    expect(comBuilder).toContain("touchplace");
   });
 
   it("⚠️ nenhum kind novo entra no tipo sem builder e sem registro", () => {
