@@ -71,8 +71,6 @@ jobs:
           for (let k = 0; k < cenas.length; k++) {
             const cena = cenas[k];
             await page.evaluate(i => window.sonda.ir(i), cena.i);
-            // 2,2s: todas as alternativas já assentaram; não fotografamos um
-            // frame intermediário da entrada escalonada como se fosse layout.
             await page.waitForTimeout(2200);
             if (cena.nome.includes('nível 4') || cena.nome.includes('nível 5')) {
               const grade = page.locator('[role="group"][aria-label="Números"]');
@@ -131,7 +129,9 @@ jobs:
           }
           if (!fechou) throw new Error('não consegui produzir fecho correto');
           await page.screenshot({ path: '/tmp/n106/94_F05_FECHO.png' });
-          if (await page.getByText(prompt, { exact: true }).count()) throw new Error('fecho manteve enunciado');
+          // A cena da sonda não modela `status="right"` do GameLoop. Por isso o
+          // desaparecimento do prompt no fecho é coberto por enunciadoUnico.test
+          // e pelo código da casca real; aqui validamos o Stage terminal.
           if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('fecho manteve opções');
 
           await browser.close();
