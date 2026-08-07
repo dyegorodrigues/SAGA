@@ -191,7 +191,11 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
             const sucesso = (fase === "acerto" || fase === "fecho") && certa;
             const tutorialTodas = emAula && mostrar?.destacarTodas;
             const tutorialAlvo = emAula && certa && (mostrar?.contarLadosAlvo || mostrar?.girarAlvo);
+            // A lição gira 360° no acerto. No fecho, 360° deve permanecer
+            // como estado final (visualmente igual a 0°), sem uma segunda volta
+            // inversa 360→0 que faria a legenda nascer girando/cortada.
             const rodando = (fase === "acerto" && certa) || Boolean(emAula && certa && mostrar?.girarAlvo);
+            const manterRotacaoFinal = sucesso || Boolean(emAula && certa && mostrar?.girarAlvo);
             const mostraLados = sucesso || Boolean(emAula && certa && mostrar?.contarLadosAlvo);
 
             let opacity = 1;
@@ -234,7 +238,7 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                 animate={{
                   opacity,
                   scale: sucesso ? 1.08 : (tutorialAlvo ? [1, 1.06, 1] : 1),
-                  rotate: rodando ? 360 : 0,
+                  rotate: manterRotacaoFinal ? 360 : 0,
                   x: erroEscolhido ? [0, -6, 6, 0] : 0,
                 }}
                 transition={rodando
@@ -252,7 +256,7 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                 />
                 {mostraLados && <MarcadoresDeLados forma={o.figura} giro={o.giro} />}
                 {fase === "fecho" && certa && (
-                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-white px-2 py-1 text-[12px] font-black text-blue-800 shadow">
+                  <span data-forma-close-label className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-white px-2 py-1 text-[12px] font-black text-blue-800 shadow">
                     {descricaoDeLados(o.figura)}
                   </span>
                 )}
