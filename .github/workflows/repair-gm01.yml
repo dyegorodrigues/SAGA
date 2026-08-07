@@ -1,0 +1,216 @@
+name: Repair GM01
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  repair:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Aplicar candidato no workspace do runner
+        run: |
+          python3 -m py_compile AI_Studio_Lab/tools/gm01_repair_candidate.py
+          python3 AI_Studio_Lab/tools/gm01_repair_candidate.py
+          git diff --check
+
+      - name: Contratos e regressões focadas
+        run: |
+          npm run fichas:conferir
+          npm run auditar
+          npm run fichas:auditar
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run \
+            src/curriculum/procedimentos/grandezaProcedure.test.ts \
+            src/components/primitives/GrandezaStage.f49.test.tsx \
+            src/components/gameloop/grandezaAuthorialPolicy.test.ts \
+            src/components/gameloop/answerPolicy.test.ts \
+            src/curriculum/evidenciaDaFicha.test.ts
+
+      - name: Preparar Chromium
+        run: |
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
+          test -n "$CHROME_REAL"
+          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+
+      - name: Sonda rápida e prints
+        env:
+          SONDA_SEMENTES: '1'
+          PRINTS_OUT: /tmp/gm01-candidate/prints
+          PRINTS_LARGURA: '390'
+        run: |
+          mkdir -p /tmp/gm01-candidate/prints
+          npm run sonda -- "GM.01"
+          node scripts/prints.mjs "GM.01"
+
+      - name: Provar eixos, retry, medida e seriação em Chromium
+        run: |
+          mkdir -p /tmp/gm01-candidate/states
+          node --input-type=module <<'NODE'
+          import {spawn} from 'node:child_process';
+          import {chromium} from 'playwright-core';
+          const port=5199;
+          const vite=spawn('npx',['vite','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe'],detached:true});
+          await new Promise((ok,no)=>{const t=setTimeout(()=>no(new Error('vite nao subiu')),60000);vite.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok();}})});
+          const browser=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:390,height:720},deviceScaleFactor:2});
+          await page.goto(`http://localhost:${port}/sonda/?sementes=1`,{waitUntil:'networkidle'});
+          await page.waitForFunction(()=>window.sonda?.total>0);
+          const nomes=await page.evaluate(()=>window.sonda.nomes());
+          const achar=t=>{const i=nomes.findIndex(n=>n.includes(t));if(i<0)throw new Error(`cena ausente: ${t}`);return i;};
+          const ir=async(t,ms=80)=>{await page.evaluate(i=>window.sonda.ir(i),achar(t));await page.waitForTimeout(ms);};
+          const shot=n=>page.screenshot({path:`/tmp/gm01-candidate/states/${n}.png`});
+          const buttons=()=>page.locator('button[aria-label]').filter({has:page.locator('[data-grandeza-object]')});
+          const alvo=async()=>{
+            const text=(await page.locator('body').innerText()).toLowerCase();
+            const eixo=await page.locator('[data-grandeza-stage]').getAttribute('data-grandeza-eixo');
+            const vals=await buttons().evaluateAll((bs,eixo)=>bs.map(b=>{
+              const o=b.querySelector('[data-grandeza-object]');
+              const h=Number(o?.getAttribute('data-grandeza-altura'));
+              const c=Number(o?.getAttribute('data-grandeza-comprimento'));
+              return eixo==='horizontal'?c:eixo==='uniforme'?h*c:h;
+            }),eixo);
+            const maior=text.includes('mais alto')||text.includes('mais comprido')||text.includes('do maior para o menor');
+            let i=0; for(let k=1;k<vals.length;k++) if((maior&&vals[k]>vals[i])||(!maior&&vals[k]<vals[i])) i=k;
+            return {i,vals,eixo,text};
+          };
+
+          // Abertura: linha está fisicamente desenhando e objetos pousando.
+          await ir('GM.01 comparar grandeza (nível 1)',80);
+          const ref80=await page.locator('[data-grupo-referencia="chao"]').first().evaluate(e=>getComputedStyle(e).transform);
+          const obj80=await page.locator('[data-grandeza-object]').first().evaluate(e=>({opacity:getComputedStyle(e).opacity,transform:getComputedStyle(e).transform}));
+          await shot('01_L1_ABERTURA_80MS');
+          if((ref80==='none'||ref80.includes('matrix(1, 0, 0, 1')) && obj80.opacity==='1' && obj80.transform==='none') throw new Error('abertura continua visualmente inerte');
+          await page.waitForTimeout(1250); await shot('02_L1_ASSENTADO');
+
+          // L2: referência vertical + dimensão-alvo comprimento.
+          await ir('GM.01 comparar grandeza (nível 2)',1350);
+          if(await page.locator('[data-grupo-referencia="inicio"]').count()!==2) throw new Error('L2 não alinhou pontos de início');
+          if(await page.locator('[data-grupo-referencia="chao"]').count()) throw new Error('L2 ainda usa chão de altura');
+          const a2=await alvo(); if(a2.eixo!=='horizontal'||!a2.text.includes('comprid')) throw new Error('L2 não é comprimento horizontal');
+          await shot('03_L2_COMPRIMENTO_HORIZONTAL');
+
+          // L3: régua antes da resposta.
+          await ir('GM.01 comparar grandeza (nível 3)',1350);
+          if(await page.locator('[data-grandeza-guide]').count()<1) throw new Error('L3 continua sem régua fantasma antes da decisão');
+          await shot('04_L3_REGUA_ANTES');
+
+          // Erro real: escolha o extremo oposto, aguarde feedback e prove retry.
+          await ir('GM.01 comparar grandeza (nível 1)',1350);
+          let a=await alvo(); let bs=buttons(); const wrong=a.i===0?1:0;
+          await bs.nth(wrong).click(); await page.waitForTimeout(250);
+          if(await page.locator('[data-grandeza-guide]').count()<1) throw new Error('erro não mostra comparação');
+          await shot('05_L1_ERRO_COM_GUIA');
+          await page.waitForTimeout(2100); bs=buttons();
+          if(await bs.nth(0).isDisabled()) throw new Error('erro continua travando o palco');
+          await shot('06_L1_RETRY');
+
+          // Acerto: seta na dimensão, depois fecho com guia.
+          a=await alvo(); await bs.nth(a.i).click(); await page.waitForTimeout(550);
+          if(await page.locator('[data-grandeza-measure-arrow]').count()!==1) throw new Error('acerto sem seta de medida');
+          await shot('07_L1_ACERTO_MEDIDO');
+          await page.waitForTimeout(1350);
+          if(await page.locator('[data-grandeza-measure-arrow]').count()) throw new Error('seta não cedeu ao fecho');
+          if(await page.locator('[data-grandeza-guide]').count()<1) throw new Error('fecho sem linha comparativa');
+          await shot('08_L1_FECHO');
+
+          // L5: ordem errada COMEÇA pelo item certo e ainda assim precisa ser erro + retry.
+          await ir('GM.01 comparar grandeza (nível 5)',1350);
+          a=await alvo(); bs=buttons();
+          const vals=a.vals; const indices=[...vals.keys()];
+          const maior=a.text.includes('do maior para o menor');
+          const ordem=indices.sort((x,y)=>maior?vals[y]-vals[x]:vals[x]-vals[y]);
+          const errada=[ordem[0],ordem[2],ordem[1]];
+          for(const i of errada) await bs.nth(i).click();
+          await page.waitForTimeout(250); await shot('09_L5_ORDEM_ERRADA');
+          await page.waitForTimeout(2100); bs=buttons();
+          if(await bs.nth(0).isDisabled()) throw new Error('L5 não voltou para retry');
+          if(await page.locator('[data-grandeza-order]').count()) throw new Error('ordem errada não foi limpa');
+          await shot('10_L5_RETRY_LIMPO');
+
+          // Beats da micro-aula.
+          await ir('GM.01 micro-aula: os dois estão no chão',600); await shot('11_MICRO_REFERENCIA');
+          await ir('GM.01 micro-aula: veja qual sobe mais',1350);
+          if(await page.locator('[data-grandeza-guide]').count()<1) throw new Error('microaula sem régua');
+          await shot('12_MICRO_REGUA');
+          await ir('GM.01 micro-aula: este é mais alto',700); await shot('13_MICRO_DESTAQUE');
+
+          await browser.close();
+          try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
+          NODE
+
+      - name: Portão final — 8 sementes, suíte e build
+        env:
+          SONDA_SEMENTES: '8'
+        run: |
+          npm run sonda -- "GM.01"
+          npm test -- --run
+          npm run build
+
+      - name: Folha de contato
+        if: always()
+        run: |
+          python3 -m pip install --quiet pillow
+          mkdir -p /tmp/gm01-candidate
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          fs=sorted(Path('/tmp/gm01-candidate/prints').glob('*.png'))+sorted(Path('/tmp/gm01-candidate/states').glob('*.png'))
+          tw,th,lab,cols=195,350,30,2; rows=max(1,(len(fs)+cols-1)//cols)
+          out=Image.new('RGB',(cols*tw,rows*(th+lab)),'white'); d=ImageDraw.Draw(out)
+          for i,x in enumerate(fs):
+            im=Image.open(x).convert('RGB'); im.thumbnail((tw,th)); px=(i%cols)*tw; py=(i//cols)*(th+lab)
+            out.paste(im,(px+(tw-im.width)//2,py+(th-im.height)//2)); d.text((px+2,py+th+2),x.stem[:42],fill='black')
+          out.save('/tmp/gm01-candidate/contact-sheet.jpg',quality=86)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gm01-repair-candidate
+          path: /tmp/gm01-candidate
+          retention-days: 7
+
+      - name: Publicar commit atômico e apagar bancada
+        run: |
+          rm .github/workflows/repair-gm01.yml AI_Studio_Lab/tools/gm01_repair_candidate.py
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add \
+            AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md \
+            src/curriculum/fichas/jornada/GM.01.ts \
+            src/curriculum/procedimentos/grandezaProcedure.ts \
+            src/curriculum/procedimentos/grandezaContract.ts \
+            src/curriculum/procedimentos/grandezaProcedure.test.ts \
+            src/components/primitives/Grupo.tsx \
+            src/components/primitives/GrandezaStage.tsx \
+            src/components/primitives/GrandezaStage.f49.test.tsx \
+            src/components/gameloop/answerPolicy.ts \
+            src/components/gameloop/grandezaAuthorialPolicy.test.ts \
+            sonda/cenas.tsx \
+            .github/workflows/repair-gm01.yml \
+            AI_Studio_Lab/tools/gm01_repair_candidate.py
+          git diff --cached --check
+          git commit -m 'GM.01/F49: compara cada grandeza no eixo correto'
+          git push origin HEAD:codex/integrar-bloco-f0
