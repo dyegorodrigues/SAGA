@@ -1,5 +1,6 @@
 // Divergência temporal F05 fechada e validada no gate visual 31188061774.
 // Este PR corrige a ficha; N1.06 permanece fora de COMPOSER_CANARIES.
+// O handoff desta correção é registrado em RETOMADA.md antes do PR fechar.
 import { describe, expect, it } from "vitest";
 import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
