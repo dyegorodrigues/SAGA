@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import { motion } from "motion/react";
 import {
   ALTURA_DA_CENA,
@@ -374,10 +375,14 @@ export function TouchPlace({
         )}
       </button>
 
-      {/* Objeto realmente seguindo o dedo. Fixed evita distorção do PalcoEscalado. */}
-      {arrasto?.ativo && (
+      {/* O PalcoEscalado usa transform. `position: fixed` dentro de um ancestral
+          transformado deixa de ser relativo à viewport e desloca o sprite do dedo.
+          O portal tira o ghost dessa árvore transformada sem alterar a geometria
+          lógica do palco: clientX/clientY continuam coordenadas da viewport. */}
+      {arrasto?.ativo && typeof document !== "undefined" && createPortal(
         <span
           aria-hidden
+          data-touchplace-drag-ghost
           className="pointer-events-none fixed z-50 flex items-center justify-center"
           style={{
             left: arrasto.x - LADO_DO_OBJETO / 2,
@@ -389,7 +394,8 @@ export function TouchPlace({
           }}
         >
           {tema.emoji}
-        </span>
+        </span>,
+        document.body,
       )}
 
       {/* §8/§7.1-bis: demonstra bandeja0 → vaga0 com OBJETO + mão. Não altera
