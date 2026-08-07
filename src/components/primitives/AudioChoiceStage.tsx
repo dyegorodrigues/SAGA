@@ -19,10 +19,14 @@ interface Props {
 const TEMPO_ERRO_SUAVE = 1800;
 
 /**
- * F05: botão sozinho → primeira audição automática → opções. No erro, o numeral
- * volta e o botão continua disponível; só o acerto produz o fecho com o símbolo
- * correto sozinho. A versão anterior mostrava opções desde o primeiro frame e
- * travava toda a tela depois de qualquer escolha errada.
+ * F05: botão sozinho → primeira audição automática → enunciado + opções. No
+ * erro, o numeral volta e o botão continua disponível; só o acerto produz o
+ * fecho com o símbolo correto sozinho.
+ *
+ * O palco é dono também do enunciado. O GameLoop esconde o balão/mascote para
+ * esta ficha, e a abertura da §4 exige literalmente "nada mais na tela" além do
+ * botão. Renderizar a pergunta aqui, somente depois da primeira audição, mantém
+ * §3 (há enunciado) e §4 (abertura sem pista visual) verdadeiras ao mesmo tempo.
  */
 export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
   const [repeticoes, setRepeticoes] = React.useState(0);
@@ -83,28 +87,39 @@ export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: P
   return (
     <div className="flex w-full flex-col items-center select-none">
       {!acertou && (
-        <AudioChoice
-          audioPrompt={spec.palavra}
-          options={spec.alternativas}
-          onSelect={escolher}
-          disabled={disabled || emAula}
-          optionsDisabled={errouEmFeedback}
-          velocidade={spec.velocidade}
-          autoPlay={!emAula}
-          onPrimeiraAudicao={() => setOpcoesVisiveis(true)}
-          onRepetir={() => setRepeticoes(r => r + 1)}
-          realceDaOpcao={o => {
-            if (escolha === null) return null;
-            if (acertou) return Number(o) === spec.resposta ? "acerto" : null;
-            return Number(o) === escolha ? "erro" : null;
-          }}
-          pulsarBotao={emAula
-            ? mostrar?.pulsar === "botaoSom"
-            : opcoesVisiveis && !acertou}
-          pulsarOpcoes={emAula ? mostrar?.pulsarOpcoes === true : false}
-          ondasAtivas={emAula && mostrar?.ondasSonoras === true}
-          mostrarOpcoes={mostrarOpcoes}
-        />
+        <>
+          {mostrarOpcoes && (
+            <p
+              data-enunciado-audiochoice
+              className="mb-3 px-3 text-center text-[17px] font-bold leading-snug"
+              style={{ color: "#22315C" }}
+            >
+              {spec.enunciado}
+            </p>
+          )}
+          <AudioChoice
+            audioPrompt={spec.palavra}
+            options={spec.alternativas}
+            onSelect={escolher}
+            disabled={disabled || emAula}
+            optionsDisabled={errouEmFeedback}
+            velocidade={spec.velocidade}
+            autoPlay={!emAula}
+            onPrimeiraAudicao={() => setOpcoesVisiveis(true)}
+            onRepetir={() => setRepeticoes(r => r + 1)}
+            realceDaOpcao={o => {
+              if (escolha === null) return null;
+              if (acertou) return Number(o) === spec.resposta ? "acerto" : null;
+              return Number(o) === escolha ? "erro" : null;
+            }}
+            pulsarBotao={emAula
+              ? mostrar?.pulsar === "botaoSom"
+              : opcoesVisiveis && !acertou}
+            pulsarOpcoes={emAula ? mostrar?.pulsarOpcoes === true : false}
+            ondasAtivas={emAula && mostrar?.ondasSonoras === true}
+            mostrarOpcoes={mostrarOpcoes}
+          />
+        </>
       )}
 
       {/* §4 Fecho: somente depois do ACERTO o numeral correto fica sozinho. */}
