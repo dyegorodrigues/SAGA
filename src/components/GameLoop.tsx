@@ -8,9 +8,13 @@ import {
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
 import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
+import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./gameloop/authorialStagePolicy";
+import { AcaoDeProducao, dependeDeAndaime } from "../curriculum/procedimentos/producaoProcedure";
+import { MisconceptionTag } from "../constants/misconceptions";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
+  recordQuestionHypothesis,
   summarizeQuestionDiagnostics,
 } from "./gameloop/questionDiagnostics";
 
@@ -182,6 +186,8 @@ export function GameLoop({
   const aulaEndRef = useRef<null | (() => void)>(null);
   const qRef = useRef<Question>(q);
   const questionDiagnosticsRef = useRef(createQuestionDiagnostics());
+  // F04: histórico apenas da missão. Não vira campo persistente no save.
+  const producaoHistoricoRef = useRef<AcaoDeProducao[]>([]);
 
   useEffect(() => {
     if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
@@ -225,6 +231,10 @@ export function GameLoop({
     applyTheme(kid.theme);
     pickVoice();
   }, [kid.theme]);
+
+  useEffect(() => {
+    producaoHistoricoRef.current = [];
+  }, [track.id]);
 
   // reset do sequenciamento a cada questão nova (+ mata timers de aulinha em curso)
   useEffect(() => {
@@ -458,6 +468,21 @@ export function GameLoop({
 
     const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
     recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
+    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
+
+    // F04 §6: DEPENDE_DE_ANDAIME é comparação ENTRE questões. Os dois
+    // warmups um nível abaixo fornecem a observação com vagas antes de L4.
+    if (answerMeta?.touchplace) {
+      const acao = answerMeta.touchplace as AcaoDeProducao;
+      producaoHistoricoRef.current.push(acao);
+      if (dependeDeAndaime(producaoHistoricoRef.current)) {
+        recordQuestionHypothesis(questionDiagnosticsRef.current, MisconceptionTag.DEPENDE_DE_ANDAIME);
+      }
+    }
+
+    // Palco autoral registra a tentativa acima, mas mantém a própria tela
+    // recuperável. Não entra no contador genérico de 3 erros.
+    if (!right && ownsAuthorialRetry(q, answerMeta)) return;
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
@@ -630,7 +655,7 @@ export function GameLoop({
       onCommit(p, right, starGain + nextBonus, durationMs, isLast);
     }
 
-    if (sound) {
+    if (sound && !feedbackAutoral) {
       if (right) sfx.right();
       else sfx.wrong();
       if (currentToast && currentToast.startsWith("Subiu")) sfx.level();
@@ -644,17 +669,17 @@ export function GameLoop({
     // Ao ERRAR: o momento de ensino — mostra/fala o PORQUÊ (explain).
     const SHORT_OK = ["Isso! 🎉", "Muito bem! ⭐", "Boa! 👏", "Acertou! 🌟", "Perfeito! ✨"];
     const firstOkOfMission = right && ok === 0;
-    const baseFb = right
+    const baseFb = feedbackAutoral ? "" : right
       ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])
       : OOPS[Math.floor(Math.random() * OOPS.length)];
-    const showExplain = !!q.explain && !right;
+    const showExplain = !feedbackAutoral && !!q.explain && !right;
     const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;
 
     setProg(p);
     setStatus(right ? "right" : "wrong");
     setSel(val);
     setToast(currentToast);
-    setMsg(fb);
+    setMsg(feedbackAutoral ? null : fb);
     
 
     setOk(nextOk);
@@ -687,19 +712,18 @@ export function GameLoop({
     // A criança pode PULAR a qualquer momento clicando no botão 'Avançar' ou tocando na tela
     advanceRef.current = doTransition;
 
-    if (sound) {
+    if (sound && !feedbackAutoral) {
       speak(fb, {
         pitch: right ? 1.3 : 1.05,
       });
-      // Auto-avanço de segurança: 10 segundos se a criança não clicar no botão 'Avançar'
       if (val !== "__timeout__") {
         setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
       }
-    } else {
-      // Sem som: auto-avanço em 10s se não clicar no botão
-      if (val !== "__timeout__") {
-        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
-      }
+    } else if (val !== "__timeout__") {
+      // A F04 já mostrou/falou o fecho antes de publicar a resposta terminal.
+      // Depois do commit de progresso, uma curta saída preserva a fluidez.
+      const espera = feedbackAutoral ? 400 : 10000;
+      setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);
     }
   };
 
