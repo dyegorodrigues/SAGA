@@ -55,7 +55,9 @@ Este documento substitui: `grafo_competencias.md` (legado), as listas de ilhas d
 | **GM** | Grandezas e Medidas | esmeralda | ●● | ●● | ●●● | ●● | |
 | **PE** | Probabilidade e Estatística | índigo | | ● | ● | ● | ● |
 
-**Total: 88 competências.** Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
+**Total: 89 competências.** *(88 até ago/2026; a `N1.13` nasceu quando a P12
+separou "produzir quantidade" de "contar até 20" — duas competências que
+disputavam o mesmo nó. Ver §15.8 da Bíblia.)* Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
 
 ---
 

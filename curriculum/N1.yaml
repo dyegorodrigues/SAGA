@@ -157,3 +157,17 @@ nodes:
       - "order"
       - "plain."
     micros:
+
+  # N1.13 — a ficha F04 ("Produzir Quantidade") reivindicava a N1.09 na §1 dela.
+  # Não é: quatro arestas do grafo (N1.12, N2.01, N3.03, AL.03) dependem de a
+  # N1.09 significar "contar até 20", e todo o material didático já dizia isso.
+  # São duas competências reais, e cada uma ganhou seu nó. Ver PLANO §13 (P12).
+  N1.13:
+    title: "Produzir quantidade"
+    objective: "produzir um conjunto com N elementos a pedido — o inverso de contar."
+    prereqs:
+      - "N1.02"
+      - "N1.04"
+    kinds:
+      - "touchplace"
+    micros:
