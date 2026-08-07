@@ -1,5 +1,8 @@
 from pathlib import Path
 
+# ---------------------------------------------------------------------------
+# Auditor curricular: 90 nós + invariantes semânticos GM.12.
+# ---------------------------------------------------------------------------
 p = Path('AI_Studio_Lab/tools/catalog_auditor.cjs')
 s = p.read_text(encoding='utf-8')
 
@@ -15,12 +18,23 @@ if s.count(anchor) != 1:
     raise SystemExit('catalog_auditor: âncora REJECTED_DUPLICATE_IDS mudou')
 s = s.replace(anchor, addition, 1)
 
-# As duas fontes canônicas declaram a mesma contagem. O regex é intencionalmente
-# literal: se alguém editar uma e não a outra, o auditor deve falhar ruidosamente.
 s = s.replace('/as 89 competências:/', '/as 90 competências:/')
 s = s.replace('/\\*\\*Total: 89 competências\\.\\*\\*/', '/\\*\\*Total: 90 competências\\.\\*\\*/')
 if 'as 89 competências:' in s or 'Total: 89 competências' in s:
     raise SystemExit('catalog_auditor: ainda há invariante vivo de 89 competências')
-
 p.write_text(s, encoding='utf-8')
-print('catalog_auditor retified for 90/GM.12')
+
+# ---------------------------------------------------------------------------
+# Auditor de fichas: Recipientes é uma dívida NOVA e proposital. A igualdade
+# exata desta lista força a remoção assim que o componente real for construído.
+# ---------------------------------------------------------------------------
+p = Path('src/curriculum/conformidadeDeFichas.test.ts')
+s = p.read_text(encoding='utf-8')
+old = 'export const PRIMITIVAS_PENDENTES = ["Moedas", "Regua"];'
+new = 'export const PRIMITIVAS_PENDENTES = ["Moedas", "Recipientes", "Regua"];'
+if s.count(old) != 1:
+    raise SystemExit('conformidadeDeFichas: PRIMITIVAS_PENDENTES mudou')
+s = s.replace(old, new, 1)
+p.write_text(s, encoding='utf-8')
+
+print('catalog/conformidade auditors retified for 90/GM.12')
