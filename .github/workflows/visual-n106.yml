@@ -4,68 +4,15 @@ on:
   pull_request:
     branches: [main]
 
-permissions:
-  contents: write
-
 concurrency:
   group: visual-n106-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  patch-f05:
-    if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: codex/corrigir-n106
-          fetch-depth: 0
-      - name: Aplicar patch e limpar executores antigos
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          def replace_once(path, old, new):
-              p = Path(path)
-              s = p.read_text()
-              n = s.count(old)
-              if n != 1:
-                  raise SystemExit(f"{path}: esperado 1, achei {n}: {old[:70]}")
-              p.write_text(s.replace(old, new))
-
-          replace_once(
-              "src/components/gameloop/GameLoopExerciseRenderer.tsx",
-              '{hasTutorial(q) && q.kind !== "vertical" && !status && (',
-              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (',
-          )
-
-          replace_once(
-              "sonda/cenas.tsx",
-              '      {q.prompt && (\n        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"',
-              '      {q.prompt && q.kind !== "audiochoice" && (\n        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"',
-          )
-
-          replace_once(
-              "src/curriculum/Composer.ts",
-              '  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;\n',
-              '  // ⚠️ Divergência declarada F05 §4×§6: autoplay termina antes das opções.\n'
-              '  // Primeira posição não prova NAO_ESCUTOU; só o runtime conhece esse tempo.\n',
-          )
-          Path(".github/workflows/n106-cleanup-patch.yml").unlink(missing_ok=True)
-          PY
-          git diff --check
-          git fetch origin main --depth=1
-          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A
-          git commit -m 'fix: fecha a fronteira autoral F05'
-          git push origin HEAD:codex/corrigir-n106
-
-  visual:
+  visual-final:
     if: github.head_ref == 'codex/corrigir-n106'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -87,17 +34,18 @@ jobs:
           fi
           test -n "$CHROME_REAL"
           sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
-      - name: Sonda rápida N1.06
+      - name: Portão final — 8 sementes de N1.06
         env:
-          SONDA_SEMENTES: '1'
+          SONDA_SEMENTES: '8'
         run: npm run sonda -- "N1.06"
-      - name: Capturar cenas e estados temporais
+      - name: Capturar cenas e provar estados temporais
         run: |
           rm -rf /tmp/n106 && mkdir -p /tmp/n106
           node --input-type=module <<'NODE'
           import { spawn } from 'node:child_process';
           import { chromium } from 'playwright-core';
           const porta = 5198;
+          const prompt = 'Aperte e escute. Que número você ouviu?';
           const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], {
             stdio: ['ignore', 'pipe', 'pipe'], detached: true,
           });
@@ -119,10 +67,21 @@ jobs:
           console.log('CENAS_N106=' + JSON.stringify(cenas.map(x => x.nome)));
           if (!cenas.length) throw new Error('nenhuma cena N1.06 encontrada');
           const safe = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 90);
+
           for (let k = 0; k < cenas.length; k++) {
-            await page.evaluate(i => window.sonda.ir(i), cenas[k].i);
-            await page.waitForTimeout(1500);
-            await page.screenshot({ path: `/tmp/n106/${String(k + 1).padStart(2, '0')}_${safe(cenas[k].nome)}.png` });
+            const cena = cenas[k];
+            await page.evaluate(i => window.sonda.ir(i), cena.i);
+            // 2,2s: todas as alternativas já assentaram; não fotografamos um
+            // frame intermediário da entrada escalonada como se fosse layout.
+            await page.waitForTimeout(2200);
+            if (cena.nome.includes('nível 4') || cena.nome.includes('nível 5')) {
+              const grade = page.locator('[role="group"][aria-label="Números"]');
+              if (await grade.count()) {
+                const colunas = await grade.getAttribute('data-colunas');
+                if (colunas !== '2') throw new Error(`${cena.nome}: quatro opções não formam 2x2`);
+              }
+            }
+            await page.screenshot({ path: `/tmp/n106/${String(k + 1).padStart(2, '0')}_${safe(cena.nome)}.png` });
           }
 
           const nivel1 = cenas.find(x => x.nome.includes('ouvir e escolher (nível 1)'));
@@ -130,12 +89,12 @@ jobs:
           await page.evaluate(i => window.sonda.ir(i), nivel1.i);
           await page.waitForTimeout(100);
           await page.screenshot({ path: '/tmp/n106/90_F05_ABERTURA_100ms.png' });
-          if (await page.locator('[data-enunciado-audiochoice]').count()) throw new Error('enunciado apareceu cedo');
+          if (await page.getByText(prompt, { exact: true }).count()) throw new Error('enunciado apareceu cedo');
           if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('opções apareceram cedo');
 
           await page.waitForTimeout(1250);
           await page.screenshot({ path: '/tmp/n106/91_F05_CONVITE_1350ms.png' });
-          if (!(await page.locator('[data-enunciado-audiochoice]').count())) throw new Error('enunciado não apareceu após audição');
+          if ((await page.getByText(prompt, { exact: true }).count()) !== 1) throw new Error('enunciado não apareceu UMA vez após audição');
           if (!(await page.locator('[role="group"][aria-label="Números"]').count())) throw new Error('opções não apareceram após audição');
           if (await page.getByText('👉 Como faz? 🫵', { exact: true }).count()) throw new Error('controle genérico invadiu a F05');
 
@@ -153,8 +112,8 @@ jobs:
           }
           if (!(await produzirErro())) throw new Error('não consegui produzir erro suave');
           await page.screenshot({ path: '/tmp/n106/92_F05_ERRO_SUAVE.png' });
-          if ((await page.locator('[data-fecho-audiochoice]').count())) throw new Error('erro revelou o fecho');
-          if ((await page.locator('button[aria-label="Escutar o número"]:disabled').count())) throw new Error('erro travou o replay');
+          if (await page.locator('[data-fecho-audiochoice]').count()) throw new Error('erro revelou o fecho');
+          if (await page.locator('button[aria-label="Escutar o número"]:disabled').count()) throw new Error('erro travou o replay');
 
           await page.waitForTimeout(1850);
           await page.screenshot({ path: '/tmp/n106/93_F05_RETRY.png' });
@@ -172,7 +131,7 @@ jobs:
           }
           if (!fechou) throw new Error('não consegui produzir fecho correto');
           await page.screenshot({ path: '/tmp/n106/94_F05_FECHO.png' });
-          if (await page.locator('[data-enunciado-audiochoice]').count()) throw new Error('fecho manteve enunciado');
+          if (await page.getByText(prompt, { exact: true }).count()) throw new Error('fecho manteve enunciado');
           if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('fecho manteve opções');
 
           await browser.close();
@@ -201,6 +160,6 @@ jobs:
           PY
       - uses: actions/upload-artifact@v4
         with:
-          name: n106-prints
+          name: n106-prints-final
           path: /tmp/n106
           retention-days: 7
