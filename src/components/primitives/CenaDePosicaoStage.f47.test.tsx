@@ -35,10 +35,10 @@ describe("F47 — contrato temporal e motor da cena de posição", () => {
     expect(falar).toHaveBeenCalledWith(`Esse está ${errada.posicao}. Eu pedi ${s.pedida}.`);
     expect(container.querySelectorAll("[data-position-error-label]")).toHaveLength(1);
     expect(container.querySelectorAll("[data-position-close-label]")).toHaveLength(0);
-    expect(objeto(container, s.pedida)).toBeDisabled();
+    expect(objeto(container, s.pedida).disabled).toBe(true);
 
     act(() => vi.advanceTimersByTime(2000));
-    expect(objeto(container, s.pedida)).not.toBeDisabled();
+    expect(objeto(container, s.pedida).disabled).toBe(false);
     fireEvent.click(objeto(container, s.pedida));
     expect(onAnswer).toHaveBeenCalledTimes(2);
   });
@@ -116,6 +116,6 @@ describe("F47 — contrato temporal e motor da cena de posição", () => {
 
     rerender(<CenaDePosicaoStage spec={s2} />);
     expect(container.querySelectorAll("[data-position-close-label]")).toHaveLength(0);
-    expect(screen.getByLabelText(`${s2.referencial.nome} (a referência)`)).not.toBeDisabled();
+    expect((screen.getByLabelText(`${s2.referencial.nome} (a referência)`) as HTMLButtonElement).disabled).toBe(false);
   });
 });
