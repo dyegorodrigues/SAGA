@@ -32,6 +32,12 @@ const builtInPrimitives = new Set(["plain"]);
 const composerSource = fs.readFileSync(COMPOSER_PATH, "utf8");
 const rendererSource = RENDERER_PATHS.map((file) => fs.readFileSync(file, "utf8")).join("\n");
 
+const composerTem = (kind) => composerSource.includes(`case "${kind}"`) || composerSource.includes(`case '${kind}'`);
+const rendererTem = (kind) => rendererSource.includes(`kind === "${kind}"`)
+  || rendererSource.includes(`kind === '${kind}'`)
+  || rendererSource.includes(`case "${kind}"`)
+  || rendererSource.includes(`case '${kind}'`);
+
 function parseFichaFile(file) {
   const source = fs.readFileSync(path.join(FICHAS_DIR, file), "utf8");
   const headings = [...source.matchAll(/^# FICHA\s+(\S+)\s+—\s+(.+)$/gm)];
@@ -93,10 +99,12 @@ check(runtimeMapByPrimitive.size === FICHA_RUNTIME_MAP.length, "o mapa runtime p
 for (const primitive of primitiveUsage.keys()) {
   check(runtimeMapByPrimitive.has(primitive), `primitiva autoral ${primitive} não está no mapa runtime`);
 }
+
 for (const entry of FICHA_RUNTIME_MAP) {
   check(primitiveUsage.has(entry.primitive), `mapa runtime contém primitiva não usada ${entry.primitive}`);
   check(entry.kinds.length > 0, `${entry.primitive} não declara kind semântico`);
   check(entry.builtin || entry.componentFiles.length > 0 || entry.note, `${entry.primitive} não documenta componente nem lacuna`);
+
   for (const file of entry.componentFiles) {
     const absoluteFile = path.join(ROOT, file);
     check(fs.existsSync(absoluteFile), `${entry.primitive} aponta para componente inexistente ${file}`);
@@ -107,13 +115,37 @@ for (const entry of FICHA_RUNTIME_MAP) {
       }
     }
   }
+
   for (const kind of entry.builderKinds) {
-    check(composerSource.includes(`case "${kind}"`) || composerSource.includes(`case '${kind}'`), `${entry.primitive} declara builder ausente para ${kind}`);
+    check(composerTem(kind), `${entry.primitive} declara builder ausente para ${kind}`);
   }
   for (const kind of entry.rendererKinds) {
-    const doubleQuoted = `kind === "${kind}"`;
-    const singleQuoted = `case '${kind}'`;
-    check(rendererSource.includes(doubleQuoted) || rendererSource.includes(singleQuoted), `${entry.primitive} declara renderer ausente para ${kind}`);
+    check(rendererTem(kind), `${entry.primitive} declara renderer ausente para ${kind}`);
+  }
+
+  /**
+   * Guarda REVERSA contra documentação atrasada.
+   *
+   * O auditor antigo só perguntava "o que o mapa declara existe?". Assim
+   * AudioChoice, TouchPlace e ShapeCanvas ganharam builder+renderer, mas o mapa
+   * continuou dizendo "isolado" e todos os gates ficaram verdes.
+   *
+   * Para primitivas cujo nome autoral vira naturalmente o dispatch kind
+   * (`AudioChoice`→`audiochoice`, `ShapeCanvas`→`shapecanvas`, ...), se código e
+   * renderer já provam a cadeia, o mapa É obrigado a reconhecer o mesmo kind.
+   * Não aplicamos a heurística quando um dos lados não existe: aliases legítimos
+   * como MaterialDourado→tens e NumberBond→bond continuam explícitos pelo mapa.
+   */
+  const kindConvencional = entry.primitive.replace(/[^A-Za-z0-9]/g, "").toLowerCase();
+  if (composerTem(kindConvencional) && rendererTem(kindConvencional)) {
+    check(
+      entry.builderKinds.includes(kindConvencional),
+      `${entry.primitive}: Composer já possui ${kindConvencional}, mas builderKinds do mapa está atrasado`
+    );
+    check(
+      entry.rendererKinds.includes(kindConvencional),
+      `${entry.primitive}: renderer já possui ${kindConvencional}, mas rendererKinds do mapa está atrasado`
+    );
   }
 }
 
