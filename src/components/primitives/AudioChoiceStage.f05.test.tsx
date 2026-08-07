@@ -74,6 +74,24 @@ describe("F05 — roteiro real de ouvir e escolher", () => {
     expect(container.querySelector("[data-fecho-audiochoice]")?.textContent).toBe(String(s.resposta));
   });
 
+  it("nova questão com o mesmo alvo reinicia a abertura e a primeira audição", () => {
+    vi.useFakeTimers();
+    const s = spec();
+    const { container, rerender } = render(<AudioChoiceStage spec={s} />);
+    act(() => { vi.advanceTimersByTime(1200); });
+    fireEvent.click(screen.getByRole("button", { name: String(s.resposta) }));
+    expect(container.querySelector("[data-fecho-audiochoice]")).not.toBeNull();
+
+    const seguinte: AudioChoiceSpec = { ...s, alternativas: [...s.alternativas] };
+    rerender(<AudioChoiceStage spec={seguinte} />);
+    expect(container.querySelector("[data-fecho-audiochoice]")).toBeNull();
+    expect(screen.getByLabelText("Escutar o número")).toBeTruthy();
+    expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
+
+    act(() => { vi.advanceTimersByTime(1200); });
+    expect(screen.getByRole("group", { name: "Números" })).toBeTruthy();
+  });
+
   it("a microaula não disputa voz com autoplay e respeita os três beats da §8", () => {
     vi.useFakeTimers();
     const s = spec();
