@@ -31,16 +31,26 @@ describe("question diagnostics", () => {
     });
   });
 
-  it("hipótese longitudinal não inventa uma nova tentativa", () => {
+  it("uma tentativa pode sustentar hipótese imediata + longitudinal", () => {
     const diagnostics = createQuestionDiagnostics();
-    recordQuestionAttempt(diagnostics, false, "producao-incompleta");
-    recordQuestionHypothesis(diagnostics, "depende-de-andaime");
+    recordQuestionAttempt(diagnostics, false, ["producao-incompleta", "depende-de-andaime"]);
 
     expect(summarizeQuestionDiagnostics(diagnostics, false)).toEqual({
       attemptCount: 1,
       recoveredAfterError: false,
       misconceptionTags: ["producao-incompleta", "depende-de-andaime"],
     });
+  });
+
+  it("a API longitudinal continua sem inventar tentativa", () => {
+    const diagnostics = createQuestionDiagnostics();
+    recordQuestionAttempt(diagnostics, false, "producao-incompleta");
+    recordQuestionHypothesis(diagnostics, "depende-de-andaime");
+
+    expect(summarizeQuestionDiagnostics(diagnostics, false).attemptCount).toBe(1);
+    expect(summarizeQuestionDiagnostics(diagnostics, false).misconceptionTags).toEqual([
+      "producao-incompleta", "depende-de-andaime",
+    ]);
   });
 
   it("não reporta recuperação quando a resposta terminal é errada", () => {
