@@ -9,29 +9,49 @@ import { AudioChoiceSpec } from "../../curriculum/procedimentos/audioChoiceContr
 
 vi.mock("../Mascot", () => ({ speak: vi.fn() }));
 
-const spec = () => Composer.generate(N1_06, 2).uiProps as AudioChoiceSpec;
+const spec = (nivel = 2) => Composer.generate(N1_06, nivel).uiProps as AudioChoiceSpec;
 
 afterEach(() => {
   vi.useRealTimers();
 });
 
 describe("F05 — roteiro real de ouvir e escolher", () => {
-  it("abre só com o botão; enunciado e opções aparecem apenas após a primeira audição", () => {
+  it("abre só com o botão; após a primeira audição revela opções e sinaliza a casca", () => {
     vi.useFakeTimers();
     const s = spec();
-    const { container } = render(<AudioChoiceStage spec={s} />);
+    const onPrimeiraAudicaoConcluida = vi.fn();
+    render(
+      <AudioChoiceStage
+        spec={s}
+        onPrimeiraAudicaoConcluida={onPrimeiraAudicaoConcluida}
+      />,
+    );
 
     expect(screen.getByLabelText("Escutar o número")).toBeTruthy();
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
-    expect(container.querySelector("[data-enunciado-audiochoice]")).toBeNull();
+    expect(screen.queryByText(s.enunciado)).toBeNull();
 
     act(() => { vi.advanceTimersByTime(1199); });
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
-    expect(container.querySelector("[data-enunciado-audiochoice]")).toBeNull();
+    expect(onPrimeiraAudicaoConcluida).not.toHaveBeenCalled();
 
     act(() => { vi.advanceTimersByTime(1); });
     expect(screen.getByRole("group", { name: "Números" })).toBeTruthy();
-    expect(container.querySelector("[data-enunciado-audiochoice]")?.textContent).toBe(s.enunciado);
+    expect(onPrimeiraAudicaoConcluida).toHaveBeenCalledTimes(1);
+    // O palco nunca se apropria do enunciado; o GameLoop é quem o desenha.
+    expect(screen.queryByText(s.enunciado)).toBeNull();
+  });
+
+  it("quatro alternativas formam 2×2 simétrico, sem opção isolada", () => {
+    vi.useFakeTimers();
+    const s = spec(4);
+    render(<AudioChoiceStage spec={s} />);
+    act(() => { vi.advanceTimersByTime(1200); });
+
+    const grupo = screen.getByRole("group", { name: "Números" });
+    expect(s.alternativas).toHaveLength(4);
+    expect(grupo.getAttribute("data-colunas")).toBe("2");
+    expect(grupo.querySelectorAll("button")).toHaveLength(4);
   });
 
   it("erro não revela a resposta e não trava: botão de som continua ativo e a opção volta", () => {
@@ -70,7 +90,6 @@ describe("F05 — roteiro real de ouvir e escolher", () => {
     expect(onAnswer.mock.calls[1][1].tentativa).toBe(2);
     expect(screen.queryByLabelText("Escutar o número")).toBeNull();
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
-    expect(container.querySelector("[data-enunciado-audiochoice]")).toBeNull();
     expect(container.querySelector("[data-fecho-audiochoice]")?.textContent).toBe(String(s.resposta));
   });
 
