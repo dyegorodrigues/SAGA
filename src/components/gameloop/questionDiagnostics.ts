@@ -16,7 +16,15 @@ export const createQuestionDiagnostics = (): QuestionDiagnostics => ({
   misconceptionTags: new Set<string>(),
 });
 
-/** Records touches in memory; persistence remains reserved for the terminal answer. */
+/**
+ * Registra a história da questão em memória; só a resposta terminal persiste.
+ *
+ * Importante: uma hipótese pode nascer de uma ação que TERMINA correta. F51 e
+ * F04 acumulam tentativas dentro da própria primitiva; F05 pode acertar depois
+ * de várias repetições. Nesses casos `misconception` descreve a trajetória, não
+ * o valor terminal. Descartá-la quando `isCorrect === true` apagava exatamente
+ * os erros recuperados que o Radar precisa enxergar.
+ */
 export function recordQuestionAttempt(
   diagnostics: QuestionDiagnostics,
   isCorrect: boolean,
@@ -24,7 +32,7 @@ export function recordQuestionAttempt(
 ): void {
   diagnostics.attemptCount += 1;
   diagnostics.hadError ||= !isCorrect;
-  if (!isCorrect && misconception) diagnostics.misconceptionTags.add(misconception);
+  if (misconception) diagnostics.misconceptionTags.add(misconception);
 }
 
 export function summarizeQuestionDiagnostics(
