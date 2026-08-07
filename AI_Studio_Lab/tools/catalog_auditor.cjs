@@ -10,10 +10,11 @@ const sorted = (items) => [...items].sort((a, b) => a.localeCompare(b));
 
 const failures = [];
 const warnings = [];
-// 88 até ago/2026. A P12 separou "produzir quantidade" (F04) de "contar até
-// 20": duas competências disputavam a N1.09, e quatro arestas do grafo
-// dependiam do segundo significado. A F04 ganhou a N1.13. Ver §15.8 da Bíblia.
-const EXPECTED_COMPETENCIES = 89;
+// 88 no fechamento da reconciliação original. A P12 criou N1.13 ao separar
+// “produzir quantidade” de “contar até 20” (89). A auditoria P15 criou GM.12
+// ao separar massa/capacidade de GM.02 (tempo) e GM.05 (unidades) (90).
+// Ver Bíblia v3.3 e DECISAO_P15_F50.md.
+const EXPECTED_COMPETENCIES = 90;
 const EXPECTED_FLUENCY_TRACKS = 13;
 const EXPECTED_AUTHORED_FICHAS = 92;
 const REJECTED_DUPLICATE_IDS = ["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"];
@@ -59,6 +60,24 @@ check(
 for (const rejectedId of REJECTED_DUPLICATE_IDS) {
   check(!yamlIdSet.has(rejectedId), `${rejectedId} foi rejeitado por duplicação e reapareceu no grafo`);
 }
+
+// P15/GM.12: não basta contar 90. Protegemos a SEMÂNTICA da separação para
+// impedir que uma edição futura recicle um ID ocupado e volte a mascarar nós.
+const gm01 = yamlNodes.find((node) => node.id === "GM.01");
+const gm02 = yamlNodes.find((node) => node.id === "GM.02");
+const gm05 = yamlNodes.find((node) => node.id === "GM.05");
+const gm12 = yamlNodes.find((node) => node.id === "GM.12");
+check(Boolean(gm01), "GM.01 ausente — comparação direta é a base de grandezas");
+check(Boolean(gm12), "GM.12 ausente — F50 precisa de nó próprio para massa/capacidade");
+check(gm02?.nome === "Tempo cotidiano", "GM.02 foi sequestrado: deve continuar Tempo cotidiano");
+check(
+  JSON.stringify(gm12?.prereqs || []) === JSON.stringify(["GM.01"]),
+  `GM.12 deve depender apenas de GM.01; recebeu ${JSON.stringify(gm12?.prereqs || [])}`
+);
+check(
+  JSON.stringify(gm05?.prereqs || []) === JSON.stringify(["GM.12", "N2.02"]),
+  `GM.05 deve depender de GM.12 + N2.02; recebeu ${JSON.stringify(gm05?.prereqs || [])}`
+);
 
 for (const node of yamlNodes) {
   for (const prereq of node.prereqs || []) {
@@ -264,8 +283,8 @@ const registeredJourneyFichaIds = registeredFichaIds.filter((id) => yamlIdSet.ha
 const unregisteredFichaIds = fichaIds.filter((id) => !registeredFichaIds.includes(id));
 
 const declaredCountSources = [
-  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 89 competências:/],
-  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 89 competências\.\*\*/],
+  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 90 competências:/],
+  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 90 competências\.\*\*/],
   ["Manual", "AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md", /89 de 89/],
   ["Método", "AI_Studio_Lab/pedagogia/METODO_SAGA.md", /grafo de 89 competências/],
 ];

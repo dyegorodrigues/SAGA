@@ -4,12 +4,20 @@ color: "esmeralda"
 nodes:
   GM.01:
     title: "Comparação direta de grandezas"
-    objective: "comprido/curto, alto/baixo, pesado/leve, cheio/vazio, grande/pequeno — comparando dois objetos lado a lado."
+    objective: "comprido/curto, alto/baixo e grande/pequeno — dimensões diretamente visíveis comparadas a partir da mesma referência."
     prereqs:
     kinds:
-      - "plain"
+      - "groups"
       - "scene"
-      - "balance (balança visual para peso)."
+    micros:
+  GM.12:
+    title: "Massa e capacidade: comparação e conservação"
+    objective: "comparar pesado/leve e mais/menos capacidade sem julgar pelo tamanho aparente e sem depender de unidades padronizadas."
+    prereqs:
+      - "GM.01"
+    kinds:
+      - "balance (comparação física)"
+      - "containers (despejo em recipiente de referência)."
     micros:
   GM.02:
     title: "Tempo cotidiano"
@@ -43,7 +51,7 @@ nodes:
     title: "Medidas padronizadas (cm/m, g/kg, mL/L)"
     objective: "medir com régua virtual e escolher a unidade sensata."
     prereqs:
-      - "GM.01"
+      - "GM.12"
       - "N2.02"
     kinds:
       - "measure (régua arrastável — PRIORIDADE 3)"

@@ -46,11 +46,11 @@
 | 14 | **F47** — Onde está? | GE.01 | posição no espaço | ✅ |
 | 15 | **F48** — Que forma é essa? | GE.02 | reconhecer forma mesmo girada | ✅ |
 | 16 | **F49** — Maior, menor, mais alto | GM.01 | comparar grandezas com base alinhada | ✅ |
-| 17 | **F50** — Cabe mais ou menos? | GM.02 | peso e capacidade independem do tamanho | ✅ |
+| 17 | **F50** — Cabe mais ou menos? | GM.12 | peso e capacidade independem do tamanho | ✅ |
 | 18 | **F51** — Separar por atributo | AL.01 | classificar — e o "não pertence" | ✅ |
 | 19 | **F52** — O que vem depois? | AL.02 | padrões — a regra geral | ✅ |
 
-**Legenda de progresso:** ✅ **21 fichas · 15 competências · bloco F0 COMPLETO** *(v3.1: JD2 e JD3 escritas — o Jardim do Dojo fica completo, JD1 a JD5)*
+**Legenda de progresso:** ✅ **21 fichas autorais completas.** A auditoria de IDs tornou visível uma lacuna do grafo: **GM.02 (tempo cotidiano) ainda não tem ficha autoral própria**. Portanto “fichas escritas” não é sinônimo de “cobertura integral do F0”. *(JD1 a JD5 permanecem completos.)*
 
 *Três fichas deste bloco (JD5, F28, F19) tratam competências que **pertencem à faixa F1** no grafo (N1.10, N1.11, N1.12). Estão aqui porque a criança as encontra antes — o número da faixa indica a complexidade do conceito, não a ordem de contato.*
 
@@ -1693,7 +1693,9 @@ Qual dinossauro e MAIS ALTO?
 *Capacidade e peso — as grandezas que não se veem.*
 
 ## 1. Identidade
-**Competência:** GM.02 (capacidade e massa) · **Primitiva:** `Balanca` + `ShapeCanvas` · **Faixa:** F0
+**Competência:** GM.12 (massa e capacidade: comparação e conservação) · **Primitiva:** `Balanca` + `Recipientes` · **Faixa:** F0
+
+> **Retificação P15 — ago/2026.** A ficha antiga dizia GM.02, mas esse ID pertence a **tempo cotidiano**. A tentativa posterior de usar GM.05 também foi rejeitada porque GM.05 já é **medidas padronizadas**. F50 recebe o novo ID estável GM.12. A criança aprende primeiro a comparar/conservar massa e capacidade sem unidade; g/kg e mL/L ficam para GM.05.
 
 ## 2. Fundamento
 **O que a criança aprende:** que peso e capacidade são grandezas **independentes do tamanho aparente**.
@@ -1713,10 +1715,10 @@ Qual dinossauro e MAIS ALTO?
 | **Instrução** | a voz fala. O prato mais baixo pulsa | 1,3s |
 | **Acerto** | o objeto certo brilha, e a balança **oscila e estabiliza** mostrando claramente o desnível | 1,8s |
 | **Abertura (capacidade)** | dois recipientes de formatos diferentes com a mesma cor de líquido | 1,2s |
-| **A verificação** | botão "despejar": o líquido de um **é transferido para um recipiente-padrão graduado**, depois o outro. As alturas ficam comparáveis. | 2,5s |
+| **A verificação** | botão "despejar": o líquido de um **é transferido para um recipiente-padrão transparente **sem marcações numéricas****, depois o outro. As alturas ficam comparáveis. | 2,5s |
 | **Erro suave** | o despejo acontece automaticamente, mostrando a verdade | 2,5s |
 
-**O despejo no recipiente-padrão é o que ensina.** Comparar formatos diferentes é impossível; comparar no mesmo recipiente é trivial.
+**O despejo no recipiente-padrão é o que ensina.** Em F0 esse recipiente NÃO tem números nem unidade: ele só coloca as duas quantidades sob a mesma referência. Graduação em mL/L pertence a GM.05. Comparar formatos diferentes é impossível; comparar no mesmo recipiente é trivial.
 
 ## 5. Os 5 níveis
 | Nível | Conteúdo |

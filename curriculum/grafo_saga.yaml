@@ -1,5 +1,5 @@
 # GRAFO DE CONHECIMENTO — SAGA · Matemática 4-12 anos · v1.0 (jul/2026)
-# Versão executável do GRAFO_DE_CONHECIMENTO_SAGA.md (fonte humana). 88 nós.
+# Versão executável do GRAFO_DE_CONHECIMENTO_SAGA.md (fonte humana). 90 nós.
 # Regra de desbloqueio: nó aberto <=> todos os prereqs com maxLvl >= 3 ou dom=true.
 # Nós com prereqs [] são raízes (sempre abertos).
 # faixa: F0 4-5 · F1 5-7 · F2 7-9 · F3 9-11 · F4 11-12 (referência, não trava)
@@ -40,6 +40,10 @@ nodes:
   - { id: GE.01, nome: "Posição e localização espacial",         strand: GE, faixa: F0, prereqs: [] }
   - { id: GE.02, nome: "Formas planas básicas",                  strand: GE, faixa: F0, prereqs: [AL.01] }
   - { id: GM.01, nome: "Comparação direta de grandezas",         strand: GM, faixa: F0, prereqs: [] }
+  # GM.12 — F50. O ID GM.02 é tempo cotidiano e GM.05 já era medidas
+  # padronizadas antes da P15. Massa/capacidade são uma competência própria,
+  # conceitualmente entre comparação direta e unidades convencionais.
+  - { id: GM.12, nome: "Massa e capacidade: comparação e conservação", strand: GM, faixa: F0, prereqs: [GM.01] }
   - { id: GM.02, nome: "Tempo cotidiano",                        strand: GM, faixa: F0, prereqs: [] }
 
   # ---------- F1 — Números até 100 e estrutura aditiva ----------
@@ -82,7 +86,7 @@ nodes:
   - { id: GE.03, nome: "Atributos de figuras e simetria",        strand: GE, faixa: F2, prereqs: [GE.02] }
   - { id: GE.04, nome: "Sólidos geométricos",                    strand: GE, faixa: F2, prereqs: [GE.02] }
   - { id: GE.05, nome: "Localização em malhas e mapas",          strand: GE, faixa: F2, prereqs: [GE.01] }
-  - { id: GM.05, nome: "Medidas padronizadas (cm/m, g/kg, L)",   strand: GM, faixa: F2, prereqs: [GM.01, N2.02] }
+  - { id: GM.05, nome: "Medidas padronizadas (cm/m, g/kg, L)",   strand: GM, faixa: F2, prereqs: [GM.12, N2.02] }
   - { id: GM.06, nome: "Horas e minutos; duração",               strand: GM, faixa: F2, prereqs: [GM.04, AL.03] }
   - { id: GM.07, nome: "Perímetro",                              strand: GM, faixa: F2, prereqs: [GM.05, N3.11] }
   - { id: PE.02, nome: "Gráficos de barras; possível/provável",  strand: PE, faixa: F2, prereqs: [PE.01, N2.02] }

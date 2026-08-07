@@ -395,3 +395,11 @@ verificado em 7/ago/2026. Apagar qualquer uma perde trabalho.
 A auditoria sistêmica da F48 encontrou uma contradição entre artefatos canônicos: a ficha punha sólidos no nível 5 de `GE.02`, enquanto `curriculum/GE.yaml` define `GE.02` como **formas planas básicas** e `GE.04` como **sólidos geométricos**; a F59 confirma que cubo/esfera/cilindro pertencem à GE.04. A ficha foi retificada de forma explícita: o nível 5 agora mistura representações planas já aprendidas (pura + objeto do mundo, giro, cor e tamanho), testando transferência sem introduzir vocabulário 3D.
 
 A mesma auditoria encontrou problemas independentes no palco: erro sem retry autoral, abertura cinematográfica ausente, comparação de erro incompleta, coreografia fixa em “triângulo” apesar de alvo sorteado, `destacarTodas` inerte, contagem de lados apenas textual e giro aplicado a todas as opções. A correção mantém `ShapeCanvas` compartilhado com F47 sem misturar as duas semânticas: `AnswerMeta.forma` identifica a autoria da F48; `AnswerMeta.posicao` continua identificando a F47.
+
+
+### Checkpoint Codex — F48/F49 fechadas; P15/F50 retificada
+
+- `GE.02/F48`: correção fechada, não ativada; sólidos permanecem em GE.04; CI original final verde.
+- `GM.01/F49`: correção fechada, não ativada; comprimento usa eixo horizontal real, altura usa base comum, L3 tem régua antes da decisão, erro/retry e seriação são autorais; CI original final verde.
+- P15 foi reaberta por conflito histórico: GM.02=tempo, GM.05=medidas padronizadas. A decisão vigente cria **GM.12** para massa/capacidade conceituais e torna GM.12 pré-requisito de GM.05.
+- Próximo passo: primeiro validar a matriz em 90 nós sem runtime falso; depois implementar F50/GM.12 com Balanca + nova primitiva `Recipientes`.
