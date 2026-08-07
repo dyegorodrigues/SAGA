@@ -118,8 +118,9 @@ modo de relance estreia.
 **Antes do passo 3, uma varredura entrou na frente**, e ela está **fechada**:
 competências ativas servindo outra coisa — tela errada com o nome da certa, que
 é pior que tela faltando, porque o Radar registra domínio do que a criança nunca
-fez. Corrigidas: `AL.01`, `N1.06`, `N1.09`, `GE.01`, `GE.02`; e a `GM.01`, que
-não era desse grupo — ela não tinha gerador nenhum.
+fez. Corrigidas: `AL.01`, `N1.06`, `N1.13` *(a F04 — o nó que a P12 criou; ela
+reivindicava a `N1.09`, que continua sendo "contar até 20")*, `GE.01`, `GE.02`; e
+a `GM.01`, que não era desse grupo — ela não tinha gerador nenhum.
 
 A `GM.02` **não era o caso**, e o §12 do plano registra a correção: ela serve
 "tempo cotidiano", que é o que o grafo diz que ela é, e a `GM.04` depende dessa
@@ -256,14 +257,33 @@ declarado em `touchCountContract.ts → totalDoToque`.
 
 ## 6. Merge
 
-A branch está **segura para merge**. Nenhuma tela nova chega à criança: N1.01,
-N1.02 e N1.04 estão implementados e desativados.
+A branch está **segura para merge**, e a razão é sempre a mesma: **nenhuma tela
+nova chega à criança**. Tudo que foi construído está registrado em
+`COMPOSER_FICHAS` e **fora** de `COMPOSER_CANARIES` — a regra dos dois PRs.
 
-A única mudança que uma criança percebe é o **N1.04**, que saiu dos canários
-porque a ficha dele foi reescrita neste trabalho. Ele volta ao legado congelado
-— outra tela de "olhar e escolher um número", da mesma família da que servia
-antes. Não é regressão pedagógica; é o mesmo patamar, esperando o PR de
-ativação, que é quando a criança finalmente ganha o contar-tocando da F01.
+Duas mudanças que uma criança percebe, e as duas são para o **legado**, não para
+a tela nova:
+
+| nó | o que muda | por quê |
+|----|-----------|---------|
+| `N1.10` | volta ao `bond` do gerador legado | a ficha dela foi reescrita para a JD5; tela nova não estreia no PR que a escreve |
+| `N1.08` níveis 3-5 | ganham a moldura da F02 | **exceção consciente**: o nó já era canário, e os três degraus apontavam para a mesma micro — a criança recebia a mesma pergunta três vezes |
+
+O `N1.10` não é regressão pedagógica: ele volta ao mesmo patamar em que estava,
+esperando o PR de ativação, que é quando a criança ganha a operação mental sem
+símbolo que a JD5 descreve.
+
+### Depois do merge
+
+Quem retomar **sai de `main`**, não desta branch:
+
+```bash
+git fetch origin main && git checkout -b <nova-branch> origin/main
+```
+
+Branch de trabalho não é lugar de morar. Ela existe para um bloco, é mesclada, e
+o próximo bloco sai do tronco — senão duas cadeias longas divergem e o merge
+vira arqueologia.
 
 ## 7. Por que esta sessão rendeu menos, e o que mudou
 

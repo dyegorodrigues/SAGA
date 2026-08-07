@@ -36,12 +36,31 @@ pare e registre — não conserte às cegas.
 
 ## 1. Branch
 
-Trabalhe em **branch nova**, saindo do estado atual:
+**Sim: branch nova, sempre.** De onde ela sai depende de o autor já ter mesclado
+o trabalho anterior. Confira antes de criar:
 
 ```bash
-git fetch origin claude/install-superpowers-repo-bst25i-hrg5jr
-git checkout -b codex/<nome-curto-do-trabalho> origin/claude/install-superpowers-repo-bst25i-hrg5jr
+git fetch origin
+git log --oneline origin/main -3
 ```
+
+**Caso A — o passo 3 já está em `main`** (você vê ali o commit
+*"Passo 3: a moldura de dez"*). É o caso preferido:
+
+```bash
+git checkout -b codex/<nome-curto-do-trabalho> origin/main
+```
+
+**Caso B — `main` ainda não recebeu** (o commit não aparece). Saia da branch do
+Claude, que é onde o trabalho está:
+
+```bash
+git checkout -b codex/<nome-curto> origin/claude/install-superpowers-repo-bst25i-hrg5jr
+```
+
+No caso B, quando o autor mesclar aquela branch, traga `main` para a sua antes
+de abrir o PR (`git merge origin/main`) — assim o seu PR mostra só o **seu**
+diff, e não os 23 commits do passo anterior de novo.
 
 **Nunca empurre para `claude/install-superpowers-repo-bst25i-hrg5jr`.** Aquela
 branch é de outro agente e será retomada; dois agentes escrevendo nela produzem
