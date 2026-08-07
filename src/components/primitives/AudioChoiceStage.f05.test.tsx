@@ -16,18 +16,22 @@ afterEach(() => {
 });
 
 describe("F05 — roteiro real de ouvir e escolher", () => {
-  it("abre só com o botão; as opções aparecem apenas após a primeira audição", () => {
+  it("abre só com o botão; enunciado e opções aparecem apenas após a primeira audição", () => {
     vi.useFakeTimers();
-    render(<AudioChoiceStage spec={spec()} />);
+    const s = spec();
+    const { container } = render(<AudioChoiceStage spec={s} />);
 
     expect(screen.getByLabelText("Escutar o número")).toBeTruthy();
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
+    expect(container.querySelector("[data-enunciado-audiochoice]")).toBeNull();
 
     act(() => { vi.advanceTimersByTime(1199); });
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
+    expect(container.querySelector("[data-enunciado-audiochoice]")).toBeNull();
 
     act(() => { vi.advanceTimersByTime(1); });
     expect(screen.getByRole("group", { name: "Números" })).toBeTruthy();
+    expect(container.querySelector("[data-enunciado-audiochoice]")?.textContent).toBe(s.enunciado);
   });
 
   it("erro não revela a resposta e não trava: botão de som continua ativo e a opção volta", () => {
