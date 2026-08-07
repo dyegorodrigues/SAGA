@@ -1,0 +1,168 @@
+name: Audit GM01
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  audit:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Ampliar a sonda apenas no workspace do runner
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('sonda/cenas.tsx')
+          s=p.read_text(encoding='utf-8')
+          old='''  ...[1, 3, 4, 5].map(lvl => ({\n    nome: `GM.01 comparar grandeza (nível ${lvl})`,\n    render: (s: number) => <ExercicioDaFicha ficha={GM_01} lvl={lvl} semente={s} />,\n  })),\n  {\n    nome: "GM.01 micro-aula: os dois estão no chão",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarLinhaBase: true }} />\n    ),\n  },'''
+          new='''  ...[1, 2, 3, 4, 5].map(lvl => ({\n    nome: `GM.01 comparar grandeza (nível ${lvl})`,\n    render: (s: number) => <ExercicioDaFicha ficha={GM_01} lvl={lvl} semente={s} />,\n  })),\n  {\n    nome: "GM.01 micro-aula: os dois estão no chão",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarLinhaBase: true }} />\n    ),\n  },\n  {\n    nome: "GM.01 micro-aula: veja qual sobe mais",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GM_01} lvl={3} semente={s} mostrar={{ subirLinhaTracejada: true }} />\n    ),\n  },\n  {\n    nome: "GM.01 micro-aula: este é mais alto",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarMaior: true }} />\n    ),\n  },'''
+          if s.count(old)!=1: raise SystemExit('bloco GM.01 da sonda mudou')
+          p.write_text(s.replace(old,new,1),encoding='utf-8')
+          PY
+          git diff --check
+      - name: Preparar Chromium
+        run: |
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
+          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+      - name: Prints e sonda pré-correção
+        env:
+          SONDA_SEMENTES: '1'
+          PRINTS_OUT: /tmp/gm01-audit/prints
+          PRINTS_LARGURA: '390'
+        run: |
+          mkdir -p /tmp/gm01-audit/prints
+          npm run sonda -- "GM.01"
+          node scripts/prints.mjs "GM.01"
+      - name: Estados temporais e relatório observável
+        run: |
+          mkdir -p /tmp/gm01-audit/states
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import {spawn} from 'node:child_process';
+          import {chromium} from 'playwright-core';
+          const port=5199;
+          const vite=spawn('npx',['vite','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe'],detached:true});
+          await new Promise((ok,no)=>{const t=setTimeout(()=>no(new Error('vite nao subiu')),60000);vite.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok();}})});
+          const browser=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:390,height:720},deviceScaleFactor:2});
+          await page.goto(`http://localhost:${port}/sonda/?sementes=1`,{waitUntil:'networkidle'});
+          await page.waitForFunction(()=>window.sonda?.total>0);
+          const nomes=await page.evaluate(()=>window.sonda.nomes());
+          const achar=t=>{const i=nomes.findIndex(n=>n.includes(t));if(i<0)throw new Error(`cena ausente: ${t}`);return i;};
+          const ir=async(t,ms=80)=>{await page.evaluate(i=>window.sonda.ir(i),achar(t));await page.waitForTimeout(ms);};
+          const shot=n=>page.screenshot({path:`/tmp/gm01-audit/states/${n}.png`});
+          const report={};
+          const botoes=()=>page.locator('button[aria-label*=" 1"], button[aria-label*=" 2"], button[aria-label*=" 3"]');
+          const prompt=()=>page.locator('body').innerText();
+          const heights=async()=>page.locator('button[aria-label] span[aria-hidden]').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().height).filter(x=>x>10));
+          const widths=async()=>page.locator('button[aria-label] span[aria-hidden]').evaluateAll(es=>es.map(e=>e.getBoundingClientRect().width).filter(x=>x>10));
+          const pickByDimension=async(kind,wantCorrect=true)=>{
+            const text=(await prompt()).toLowerCase();
+            const buttons=page.locator('button[aria-label]').filter({has:page.locator('span[aria-hidden]')});
+            const vals=await buttons.evaluateAll((bs,kind)=>bs.map(b=>{const e=b.querySelector('span[aria-hidden]');const r=e?.getBoundingClientRect();return kind==='width'?r?.width:r?.height;}),kind);
+            const maior=/mais alto|mais comprido|maior/.test(text) && !/mais baixo|mais curto|menor/.test(text);
+            let correct=0;
+            for(let i=1;i<vals.length;i++){if((maior && vals[i]>vals[correct])||(!maior && vals[i]<vals[correct]))correct=i;}
+            return wantCorrect?correct:(correct===0?1:0);
+          };
+
+          // L1: abertura real ou apenas espera lógica?
+          await ir('GM.01 comparar grandeza (nível 1)',80);
+          await shot('01_L1_ABERTURA_80MS');
+          await page.waitForTimeout(1250);
+          await shot('02_L1_ASSENTADO_1330MS');
+
+          // L2: pergunta de comprimento x dimensão que realmente decide a resposta.
+          await ir('GM.01 comparar grandeza (nível 2)',1400);
+          const h2=await heights(), w2=await widths(), t2=(await prompt()).toLowerCase();
+          report.l2={prompt:t2.includes('comprid')?'comprimento':'outro',heights:h2,widths:w2};
+          await shot('03_L2_COMPRIMENTO');
+
+          // L3: a ajuda da régua deveria existir antes da decisão.
+          await ir('GM.01 comparar grandeza (nível 3)',1600);
+          report.l3={linhasTracejadasAntes:await page.locator('[style*="dashed"]').count()};
+          await shot('04_L3_DIFERENCA_PEQUENA_ANTES');
+
+          // L1 erro: palco local continua bloqueado depois dos 2,2/2,5s?
+          await ir('GM.01 comparar grandeza (nível 1)',1400);
+          let buttons=page.locator('button[aria-label]').filter({has:page.locator('span[aria-hidden]')});
+          const wrong=await pickByDimension('height',false);
+          await buttons.nth(wrong).click(); await page.waitForTimeout(250);
+          await shot('05_L1_ERRO');
+          await page.waitForTimeout(2600);
+          buttons=page.locator('button[aria-label]').filter({has:page.locator('span[aria-hidden]')});
+          report.retryL1={disabledDepois:await buttons.nth(0).isDisabled()};
+          await shot('06_L1_DEPOIS_DO_ERRO');
+
+          // L1 acerto: medir se aparece instrumento/seta e um fecho distinto.
+          await ir('GM.01 comparar grandeza (nível 1)',1400);
+          buttons=page.locator('button[aria-label]').filter({has:page.locator('span[aria-hidden]')});
+          const right=await pickByDimension('height',true);
+          await buttons.nth(right).click(); await page.waitForTimeout(600);
+          await shot('07_L1_ACERTO_600MS');
+          report.acertoL1={svg:await page.locator('svg').count(),setaDeclarada:await page.locator('[data-grandeza-measure-arrow]').count()};
+          await page.waitForTimeout(1800); await shot('08_L1_POS_ACERTO_2400MS');
+
+          // L5: sequência errada e estado posterior.
+          await ir('GM.01 comparar grandeza (nível 5)',1400);
+          buttons=page.locator('button[aria-label]').filter({has:page.locator('span[aria-hidden]')});
+          const hs=await buttons.evaluateAll(bs=>bs.map(b=>b.querySelector('span[aria-hidden]')?.getBoundingClientRect().height||0));
+          const text5=(await prompt()).toLowerCase();
+          const desc=/maior/.test(text5) && !/menor.*maior/.test(text5);
+          const correctOrder=hs.map((v,i)=>({v,i})).sort((a,b)=>desc?b.v-a.v:a.v-b.v).map(x=>x.i);
+          const wrongOrder=[...correctOrder].reverse();
+          for(const i of wrongOrder) await buttons.nth(i).click();
+          await page.waitForTimeout(250); await shot('09_L5_ORDEM_ERRADA');
+          await page.waitForTimeout(2600);
+          buttons=page.locator('button[aria-label]').filter({has:page.locator('span[aria-hidden]')});
+          report.retryL5={disabledDepois:await buttons.nth(0).isDisabled()};
+          await shot('10_L5_DEPOIS_DO_ERRO');
+
+          // Três beats do tutorial.
+          await ir('GM.01 micro-aula: os dois estão no chão',500); await shot('11_MICRO_CHAO');
+          await ir('GM.01 micro-aula: veja qual sobe mais',500); await shot('12_MICRO_REGUA');
+          await ir('GM.01 micro-aula: este é mais alto',500); await shot('13_MICRO_DESTAQUE');
+
+          fs.writeFileSync('/tmp/gm01-audit/audit.json',JSON.stringify(report,null,2));
+          console.log(JSON.stringify(report,null,2));
+          await browser.close();
+          try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gm01-pre-correction
+          path: /tmp/gm01-audit
+          retention-days: 7
+      - name: Remover a bancada da branch
+        if: always()
+        run: |
+          git reset --hard HEAD
+          rm -f .github/workflows/audit-gm01.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add .github/workflows/audit-gm01.yml
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore: remove bancada temporária GM.01'
+            git push origin HEAD:codex/integrar-bloco-f0
+          fi
