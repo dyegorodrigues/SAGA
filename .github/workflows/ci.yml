@@ -23,16 +23,32 @@ jobs:
         with:
           ref: codex/corrigir-n106
           fetch-depth: 0
-      - name: Atualizar RETOMADA e limpar bancada
-        run: python3 -c "from pathlib import Path; import base64; p=Path('AI_Studio_Lab/codex/RETOMADA.md'); s=p.read_text(); marker='## Registro Codex — N1.06 / F05 (7/ago/2026)'; reg=base64.b64decode('CgotLS0KCiMjIFJlZ2lzdHJvIENvZGV4IOKAlCBOMS4wNiAvIEYwNSAoNy9hZ28vMjAyNikKCioqQnJhbmNoOioqIGBjb2RleC9jb3JyaWdpci1uMTA2YCDCtyAqKlBSOioqICMyNyDCtyAqKmVzdGFkbzoqKiBjb3JyZcOnw6NvIGZlY2hhZGEsCioqTsODTyBhdGl2YWRhKiouIGBOMS4wNmAgY29udGludWEgZm9yYSBkZSBgQ09NUE9TRVJfQ0FOQVJJRVNgOyBhIHByb2R1w6fDo28gc2VndWUKbm8gcm9sbGJhY2sgbGVnYWRvIGF0w6kgZXhpc3RpciBQUiBzZXBhcmFkbyBkZSBhdGl2YcOnw6NvLgoKQSBGMDUgZm9pIHJlbGlkYSDCpzHigJPCpzkgZSBhdWRpdGFkYSBjb21vIHNpc3RlbWE6IGZpY2hhL0LDrWJsaWEg4oaSIGdyYWZvIOKGkiBDb21wb3NlciDihpIKYGF1ZGlvY2hvaWNlYCDihpIgU3RhZ2UvUmVuZGVyZXIg4oaSIEdhbWVMb29wIOKGkiBSYWRhci9ldmlkw6puY2lhIOKGkiBzb25kYS9DaHJvbWl1bS4KRGVmZWl0b3MgY29uZmlybWFkb3MgYW50ZXMgZGEgYXRpdmHDp8Ojbzogb3DDp8O1ZXMgYW50ZXMgZGEgcHJpbWVpcmEgYXVkacOnw6NvOyBlcnJvCnRyYXZhbmRvIGEgdGVsYSBlIHBvZGVuZG8gcmV2ZWxhciBhIHJlc3Bvc3RhOyBhdXRvcGxheSBuw6NvIHJlaW5pY2lhbmRvIGNvbSBhbHZvCmlndWFsIG5hIHF1ZXN0w6NvIHNlZ3VpbnRlOyBiZWF0IGRlIG9uZGFzIGluZXJ0ZTsgZmVlZGJhY2svdm96IGdlbsOpcmljb3MgZG8KR2FtZUxvb3AgcG9yIGNpbWEgZG8gZmVlZGJhY2sgYXV0b3JhbDsgbWFzY290ZS9iYWzDo28vY2FydMOjby9gQ29tbyBmYXo/YCBpbnZhZGluZG8KYSB0ZWxhIHZhemlhOyBkaWFnbsOzc3RpY28gYGF1ZGlvY2hvaWNlYCBzZW0gY2hlZ2FyIGFvIFJhZGFyOyBldmlkw6puY2lhIGRlCmBQUklNRUlSQV9BVURJQ0FPYCBwb3Nzw612ZWwgZGVwb2lzIGRlIHByaW1laXJhIHJlc3Bvc3RhIGVycmFkYTsgaGlww7N0ZXNlcwpjdW11bGF0aXZhcyBhcGFnYWRhcyBwb3IgYHF1ZXN0aW9uRGlhZ25vc3RpY3NgOyBxdWF0cm8gYWx0ZXJuYXRpdmFzIGVtIDMrMQpjcmlhbmRvIHBpc3RhIHBvc2ljaW9uYWw7IGUgdW1hIHByaW1laXJhIHNvbHXDp8OjbyBxdWUgY29sb2NvdSBvIGVudW5jaWFkbyBkZW50cm8KZG8gU3RhZ2UgZSBmb2kgY29ycmV0YW1lbnRlIHJlcHJvdmFkYSBwZWxhIGludmFyacOhdmVsIGdsb2JhbCBgZW51bmNpYWRvVW5pY29gLgoKKipBcnF1aXRldHVyYSBmaW5hbDoqKiBTdGFnZSBkZXNlbmhhIGEgaW50ZXJhw6fDo28gZSBzaW5hbGl6YSBvIGZpbSBkYSBwcmltZWlyYQphdWRpw6fDo287IFJlbmRlcmVyIGFwZW5hcyB0cmFuc3BvcnRhIG8gZXZlbnRvOyBvICoqR2FtZUxvb3AgY29udGludWEgc2VuZG8gbyDDum5pY28KZG9ubyBkZSBgcS5wcm9tcHRgKiogZSBvIHJldmVsYSBubyBtb21lbnRvIGNvcnJldG8uIE8gcGFsY28gcG9zc3VpIHJldHJ5L2ZlZWRiYWNrCmF1dG9yYWw7IG8gR2FtZUxvb3AgcmVnaXN0cmEgYSB0ZW50YXRpdmEgZSBuw6NvIGZhbGEgcG9yIGNpbWEuIGBhdWRpb0Nob2ljZVJ1bnRpbWVgCmNvbmNlbnRyYSBkaWFnbsOzc3RpY28vZXZpZMOqbmNpYSB0ZW1wb3JhbC4gUXVhdHJvIG9ww6fDtWVzIHVzYW0gMsOXMjsgZHVhcyAxw5cyOyB0csOqcwoxw5czLiBBIGNvcnJlw6fDo28gY29tcGFydGlsaGFkYSBkZSBgcXVlc3Rpb25EaWFnbm9zdGljc2AgcHJlc2VydmEgdW1hIGhpcMOzdGVzZQplbWJ1dGlkYSBudW1hIGHDp8OjbyB0ZXJtaW5hbCBjb3JyZXRhIOKAlCBuZWNlc3PDoXJpbyB0YW1iw6ltIHBhcmEgRjUxL0YwNC4KCioq4pqg77iPIERpdmVyZ8OqbmNpYSBkZWNsYXJhZGEgRjA1IMKnNCDDlyDCpzYg4oCUIGBOQU9fRVNDVVRPVWAuKiogQSDCpzQgbWFuZGEgbyDDoXVkaW8gdG9jYXIKYXV0b21hdGljYW1lbnRlIGFudGVzIGRlIGFzIG9ww6fDtWVzIGFwYXJlY2VyZW07IHBvcnRhbnRvIOKAnHByaW1laXJhIG9ww6fDo28gc2VtCmFwZXJ0YXIgcmVwbGF54oCdIG7Do28gcHJvdmEgcXVlIGEgY3JpYW7Dp2EgbsOjbyBvdXZpdS4gQSB0YWcgZmljb3UgcmVzdHJpdGEgYW8gZXN0YWRvCnRlbXBvcmFsIGRlZmVuc2l2byBlbSBxdWUgdW1hIHJlc3Bvc3RhIG9jb3JyZSBhbnRlcyBkbyBmaW0gZGEgcHJpbWVpcmEgYXVkacOnw6NvOwphIHBvc2nDp8OjbyBlc3TDoXRpY2EgbnVuY2EgYSBlbWl0ZS4KCioqUG9ydMO1ZXM6KiogQ0kgY29tcGxldG8gdmVyZGUgbm8gcnVuIGAzMTE4ODA2NDQ1MGAgKGNhdMOhbG9nbywgZmljaGFzLCBncmFmbywKVHlwZVNjcmlwdCwgdGVzdGVzLCBidWlsZCBlIGd1YXJkYSkuIFBvcnTDo28gdmlzdWFsIGZpbmFsIHZlcmRlIG5vIHJ1bgpgMzExODgwNjE3NzRgOiAqKjggc2VtZW50ZXMqKiwgQ2hyb21pdW0gcmVhbCwgYWJlcnR1cmEg4oaSIGNvbnZpdGUg4oaSIGVycm8gc3VhdmUg4oaSCnJldHJ5IOKGkiBmZWNobyBlIG7DrXZlaXMgMS80LzUuIE9zIHByaW50cyBMNC9MNSBjb25maXJtYXJhbSBncmFkZSAyw5cyIHNpbcOpdHJpY2EuCkEgZm90byBkaW7Dom1pY2EgZG8gZmVjaG8gZGEgc29uZGEgbWFudMOpbSBvIHByb21wdCBwb3JxdWUgYSBjYXNjYSBzaW1wbGlmaWNhZGEgbsOjbwptb2RlbGEgYHN0YXR1cz0icmlnaHQiYDsgbm8gYXBwIHJlYWwgbyBHYW1lTG9vcCBvIGVzY29uZGUgcG9yIGAhc3RhdHVzYCwgcHJvdGVnaWRvCnBvciBgZW51bmNpYWRvVW5pY28udGVzdC50c2AuIE7Do28gc2UgbXVkb3UgcnVudGltZSBwYXJhIHNhdGlzZmF6ZXIgZXNzZSBmYWxzbwplc3RhZG8gZGEgYmFuY2FkYS4KCioqSW52ZW50w6FyaW8gZG9jdW1lbnRhbDoqKiBgQUlfU3R1ZGlvX0xhYi9wZWRhZ29naWEvUFJJTUlUSVZBU19TQUdBLm1kYCBlc3TDoQphdHJhc2FkbyBuZXN0YSDDoXJlYSDigJQgYWluZGEgZGVzY3JldmUgYEF1ZGlvQ2hvaWNlYC9gVG91Y2hQbGFjZWAgY29tbyDigJxmYWx0YW5kbwpsaWdhcuKAnSwgZW1ib3JhIENvbXBvc2VyIGUgcmVuZGVyZXIgasOhIG9zIGFsY2FuY2VtLiBUcmF0YXIgZXNzZSBpbnZlbnTDoXJpbyBjb21vCmhpc3TDs3JpY28gYXTDqSByZXZpc8OjbyBkb2N1bWVudGFsIHByw7NwcmlhLgoKIyMjIEF1ZGl0b3JpYSBwYXJhbGVsYSBqw6EgY29uZmlybWFkYSDigJQgTjEuMTMgLyBGMDQKCk5lbmh1bSBjw7NkaWdvIEYwNCBmb2kgbWlzdHVyYWRvIG5lc3RlIFBSLiBQYXJhIGEgcHLDs3hpbWEgYnJhbmNoIGRhIGZpbGEgasOhIGZvaQpjb25maXJtYWRvOiBncmFmbyBjb2VyZW50ZSAoYE4xLjEzYCBuYXNjZSBkZSBgTjEuMDIgKyBOMS4wNGAsIHNlbSB1c3VycGFyIE4xLjA5KTsKYFRvdWNoUGxhY2VgIHRlbSB0b3F1ZSBhbHRlcm5hdGl2byBtYXMgbsOjbyBvICoqYXJyYXN0byoqIGV4aWdpZG8gcG9yIEYwNCDCpzQgKwphZGVuZG8gwqc4LjMtYmlzOyBNw6NvIEZhbnRhc21hIG7Do28gZGVtb25zdHJhIGRlIGZhdG8gYmFuZGVqYTDihpJ2YWdhMDsKYFRvdWNoUGxhY2VTdGFnZWAgbsOjbyByZXNldGEgZW0gbm92YSBgc3BlY2A7IGV4aXN0ZSBjb3JyaWRhIGRlIH41MDBtcyBubwphdXRvLWZlY2hvIGNhcGF6IGRlIHBlcmRlciByZWN1c2EgcmVjZW50ZTsgbyByZXRyeS9mZWVkYmFjayBhdXRvcmFsIGNvbmZsaXRhIGNvbQpvIHJldHJ5IGdlbsOpcmljbyBkbyBHYW1lTG9vcDsgYERFUEVOREVfREV9BTkRBSU1FYCBleGlzdGUgbm8gcHJvY2VkaW1lbnRvL3Rlc3RlCm1hcyBuw6NvIHRlbSBjb25zdW1pZG9yIGUgZGV2ZSBzZXIgbGlnYWRvIGNvbW8gZGlhZ27Ds3N0aWNvICoqbG9uZ2l0dWRpbmFsKio7IGEKc3VzcGVpdGEgZGUgY29ycnVww6fDo28gYXV0b23DoXRpY2EgZGEgY29yb2EgcG9yIHJlY3VzYXMgbsOjbyBmb2kgY29uZmlybWFkYSDigJQgbsOjbwphbHRlcmFyIGBwcm9ncmVzc0VuZ2luZWAgc2VtIHByb3ZhIHJlcHJvZHV6w612ZWwuCgpQcsOzeGltbyB0cmFiYWxobzogYnJhbmNoIHByw7NwcmlhIGRhIGBtYWluYCBwYXJhICoqTjEuMTMvRjA0KiosIGNvcnJpZ2lyIG8gbG90ZSwKZ2VyYXIvYWJyaXIgcHJpbnRzIGUgcyDzbyBkZXBvaXMgcGVuc2FyIGVtIGF0aXZhw6fDo28uCg==').decode(); p.write_text(s if marker in s else s+reg); Path('.github/workflows/visual-n106.yml').unlink(missing_ok=True)"
-      - name: Restaurar a CI original e commitar
+      - name: Registrar handoff curto
+        run: |
+          if ! grep -q 'Registro Codex - N1.06 / F05' AI_Studio_Lab/codex/RETOMADA.md; then
+            printf '%s\n' '' '---' '' '## Registro Codex - N1.06 / F05 (7/ago/2026)' '' \
+              '- Branch codex/corrigir-n106, PR #27: CORRECAO FECHADA, NAO ATIVADA.' \
+              '- F05 auditada de ponta a ponta: ficha -> grafo -> Composer -> audiochoice -> Stage/Renderer -> GameLoop -> Radar -> Chromium.' \
+              '- Corrigidos: autoplay/convite, retry autoral, feedback concorrente, Radar/evidencia, reset com alvo repetido, tela vazia e grade 2x2 para 4 opcoes.' \
+              '- Divergencia declarada: NAO_ESCUTOU nao pode nascer da primeira opcao apos autoplay; exige estado temporal anterior ao fim da primeira audicao.' \
+              '- GameLoop permanece unico dono de q.prompt; Stage apenas sinaliza o fim da primeira audicao.' \
+              '- questionDiagnostics agora preserva hipotese embutida em acao terminal correta; efeito compartilhado com F51/F04.' \
+              '- CI final verde: run 31188064450. Visual final: run 31188061774, 8 sementes, Chromium real, prints inspecionados.' \
+              '- N1.06 segue fora de COMPOSER_CANARIES; ativacao somente em PR separado.' \
+              '- Auditoria F04/N1.13 ja achou: falta arrasto real, mao fantasma incompleta, reset de spec ausente, corrida no autofecho, conflito de retry e DEPENDE_DE_ANDAIME sem consumidor longitudinal.' \
+              '- PRIMITIVAS_SAGA.md esta atrasado para AudioChoice/TouchPlace; nao usar esse inventario como verdade de runtime.' \
+              >> AI_Studio_Lab/codex/RETOMADA.md
+          fi
+          rm -f .github/workflows/visual-n106.yml
+          git diff --check
+      - name: Restaurar CI original e commitar
         run: |
           git fetch origin main --depth=1
           git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -m 'docs: registra fechamento da correção F05'
+          git commit -m 'docs: registra fechamento da correcao F05'
           git push origin HEAD:codex/corrigir-n106
 
   gates:
@@ -45,25 +61,17 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - name: Instalar dependências
-        run: npm ci
-      - name: Auditoria do catálogo
-        run: npm run auditar
-      - name: Auditoria das fichas
-        run: npm run fichas:auditar
-      - name: Sincronia do grafo
-        run: npm run grafo:check
-      - name: TypeScript
-        run: npm run lint
-      - name: Testes
-        run: npm test -- --run
-      - name: Build
-        run: npm run build
+      - run: npm ci
+      - run: npm run auditar
+      - run: npm run fichas:auditar
+      - run: npm run grafo:check
+      - run: npm run lint
+      - run: npm test -- --run
+      - run: npm run build
 
   guarda-textual:
-    name: Guarda de binários
+    name: Guarda de binarios
     runs-on: ubuntu-latest
-    timeout-minutes: 5
     if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
@@ -73,9 +81,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Buscar a base do PR
-        run: git fetch origin ${{ github.base_ref }} --depth=1
-      - name: Verificar ausência de binários no diff
-        env:
+      - run: git fetch origin ${{ github.base_ref }} --depth=1
+      - env:
           PR_BASE: origin/${{ github.base_ref }}
         run: node AI_Studio_Lab/tools/pr_text_guard.cjs
