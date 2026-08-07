@@ -8,6 +8,7 @@ import { GE_01 } from "../../curriculum/fichas/jornada/GE.01";
 import { LARGURA_DA_CENA, ALTURA_DA_CENA, PosicaoSpec } from "../../curriculum/procedimentos/posicaoContract";
 
 const spec = (lvl: number) => Composer.generate(GE_01, lvl).uiProps as PosicaoSpec;
+const LADO_OBJETO_PRODUZIDO = 64;
 
 function objeto(container: HTMLElement, posicao: string) {
   const el = [...container.querySelectorAll<HTMLButtonElement>('button[aria-label^="Objeto "]')]
@@ -126,8 +127,8 @@ describe("F47 — contrato temporal e motor da cena de posição", () => {
     expect(colocado).toBeTruthy();
     expect(parseFloat(colocado!.style.left)).toBeGreaterThanOrEqual(0);
     expect(parseFloat(colocado!.style.top)).toBeGreaterThanOrEqual(0);
-    expect(parseFloat(colocado!.style.left) + 52).toBeLessThanOrEqual(LARGURA_DA_CENA);
-    expect(parseFloat(colocado!.style.top) + 52).toBeLessThanOrEqual(ALTURA_DA_CENA);
+    expect(parseFloat(colocado!.style.left) + LADO_OBJETO_PRODUZIDO).toBeLessThanOrEqual(LARGURA_DA_CENA);
+    expect(parseFloat(colocado!.style.top) + LADO_OBJETO_PRODUZIDO).toBeLessThanOrEqual(ALTURA_DA_CENA);
     expect(onAnswer.mock.calls[0][1].escolhida).toBe(s.pedida);
   });
 
