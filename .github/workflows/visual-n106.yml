@@ -42,7 +42,6 @@ jobs:
           node --input-type=module <<'NODE'
           import { spawn } from 'node:child_process';
           import { chromium } from 'playwright-core';
-          import fs from 'node:fs';
           const porta = 5198;
           const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], { stdio: ['ignore','pipe','pipe'], detached: true });
           await new Promise((ok,no) => {
@@ -69,6 +68,7 @@ jobs:
           NODE
       - name: Folha de contato
         run: |
+          python3 -m pip install --quiet pillow
           python3 - <<'PY'
           from PIL import Image, ImageDraw
           from pathlib import Path
