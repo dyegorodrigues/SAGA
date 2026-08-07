@@ -6,6 +6,7 @@ import { TouchPlace } from "./TouchPlace";
 
 const base = {
   tema: {
+    id: "f04-test",
     emoji: "⭐",
     singular: "estrela",
     plural: "estrelas",
