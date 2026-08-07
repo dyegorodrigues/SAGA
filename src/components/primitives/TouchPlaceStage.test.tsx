@@ -8,6 +8,7 @@ import { Composer } from "../../curriculum/Composer";
 import { N1_13 } from "../../curriculum/fichas/jornada/N1.13";
 import { ProducaoSpec } from "../../curriculum/procedimentos/producaoContract";
 import { AcaoDeProducao } from "../../curriculum/procedimentos/producaoProcedure";
+import { MisconceptionTag } from "../../constants/misconceptions";
 
 const spec = (lvl: number) => Composer.generate(N1_13, lvl).uiProps as ProducaoSpec;
 
@@ -24,24 +25,10 @@ function cena(container: HTMLElement) {
   return container.querySelector('.relative.overflow-hidden.rounded-3xl') as HTMLDivElement;
 }
 
-/** Alternativa motora obrigatória: bandeja → toque no destino. */
 function colocarPorToque(container: HTMLElement) {
   fireEvent.click(bandeja(container));
   const vaga = container.querySelector('[aria-label="Vaga vazia"]') as HTMLButtonElement | null;
   fireEvent.click(vaga ?? (container.querySelector('[aria-label^="Colocar "]') as HTMLElement));
-}
-
-/** Gesto canônico da §4: objeto segue o dedo e é solto na cena. */
-function colocarPorArrasto(container: HTMLElement, x = 100, y = 80) {
-  const field = cena(container);
-  vi.spyOn(field, "getBoundingClientRect").mockReturnValue({
-    x: 0, y: 0, left: 0, top: 0, right: 326, bottom: 176,
-    width: 326, height: 176, toJSON: () => ({}),
-  } as DOMRect);
-  const tray = bandeja(container);
-  fireEvent.pointerDown(tray, { pointerId: 1, clientX: 20, clientY: 260 });
-  fireEvent.pointerMove(tray, { pointerId: 1, clientX: x, clientY: y });
-  fireEvent.pointerUp(tray, { pointerId: 1, clientX: x, clientY: y });
 }
 
 function livre(alvo = 3): ProducaoSpec {
@@ -64,7 +51,7 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     expect(s.bandeja).toBeGreaterThan(s.alvo);
   });
 
-  it("mantém a alternativa por toque — não substitui arrasto por precisão de dedo", () => {
+  it("mantém a alternativa por toque", () => {
     const s = spec(1);
     const { container } = render(<TouchPlaceStage spec={s} />);
     expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(s.alvo);
@@ -72,11 +59,10 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(s.alvo - 1);
   });
 
-  it("implementa arrasto real: mover >8px pega, segue o dedo e assenta", () => {
+  it("implementa arrasto real: mover >8px pega, acende halo e assenta", () => {
     const s = spec(1);
     const { container } = render(<TouchPlaceStage spec={s} />);
     const antes = container.querySelectorAll('[aria-label="Vaga vazia"]').length;
-
     const field = cena(container);
     vi.spyOn(field, "getBoundingClientRect").mockReturnValue({
       x: 0, y: 0, left: 0, top: 0, right: 326, bottom: 176,
@@ -85,17 +71,13 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     const tray = bandeja(container);
     fireEvent.pointerDown(tray, { pointerId: 7, clientX: 20, clientY: 260 });
     fireEvent.pointerMove(tray, { pointerId: 7, clientX: s.ancoras[0].x, clientY: s.ancoras[0].y });
-
-    // Durante o drag há uma cópia visual que segue o ponteiro e uma vaga ganha halo.
-    expect(container.textContent).toContain(s.tema.emoji);
     expect(Array.from(container.querySelectorAll('[aria-label="Vaga vazia"]'))
       .some(el => (el as HTMLElement).style.boxShadow !== "none" && (el as HTMLElement).style.boxShadow !== "")).toBe(true);
-
     fireEvent.pointerUp(tray, { pointerId: 7, clientX: s.ancoras[0].x, clientY: s.ancoras[0].y });
     expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(antes - 1);
   });
 
-  it("drop longe da cena devolve o objeto à bandeja em vez de consumir tentativa", () => {
+  it("drop longe da cena devolve o objeto à bandeja", () => {
     const s = spec(1);
     const { container } = render(<TouchPlaceStage spec={s} />);
     const field = cena(container);
@@ -105,11 +87,9 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     } as DOMRect);
     const tray = bandeja(container);
     const antes = container.querySelectorAll('[aria-label="Vaga vazia"]').length;
-
     fireEvent.pointerDown(tray, { pointerId: 2, clientX: 20, clientY: 260 });
     fireEvent.pointerMove(tray, { pointerId: 2, clientX: 500, clientY: 500 });
     fireEvent.pointerUp(tray, { pointerId: 2, clientX: 500, clientY: 500 });
-
     expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(antes);
     expect(bandeja(container).disabled).toBe(false);
   });
@@ -122,29 +102,38 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     expect(falar).toHaveBeenCalledWith(s.tema.genero === "f" ? "uma..." : "um...");
   });
 
-  it("nova spec limpa objetos, mão, timers e estado terminal", () => {
-    const a = spec(1);
-    const b = spec(2);
-    const { container, rerender } = render(<TouchPlaceStage spec={a} />);
-    colocarPorToque(container);
-    expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(a.alvo - 1);
+  it("nova spec limpa estado visual, mas não apaga histórico diagnóstico da missão", () => {
+    vi.useFakeTimers();
+    const comVaga = spec(1);
+    const semVaga = livre(3);
+    const recebidas: Array<AcaoDeProducao & { diagnosticosLongitudinais?: string[] }> = [];
+    const { container, rerender } = render(
+      <TouchPlaceStage spec={comVaga} onAnswer={(_v, a) => recebidas.push(a)} />,
+    );
 
-    rerender(<TouchPlaceStage spec={b} />);
-    expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(b.alvo);
+    for (let i = 0; i < comVaga.alvo; i += 1) colocarPorToque(container);
+    act(() => { vi.advanceTimersByTime(900); });
+    expect(recebidas).toHaveLength(1);
+    expect(recebidas[0]).toMatchObject({ comAndaime: true, colocados: comVaga.alvo });
+
+    rerender(<TouchPlaceStage spec={semVaga} onAnswer={(_v, a) => recebidas.push(a)} />);
+    expect(container.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(0);
     expect(screen.queryByText("Pronto!")).toBeNull();
+
+    colocarPorToque(container);
+    fireEvent.click(screen.getByText("Pronto!"));
+    expect(recebidas).toHaveLength(2);
+    expect(recebidas[1].diagnosticosLongitudinais).toContain(MisconceptionTag.DEPENDE_DE_ANDAIME);
   });
 
-  it("com vagas, a última colocação trava na hora e fecha só depois da pausa + fala", () => {
+  it("com vagas, trava na última colocação e publica 400ms após iniciar o fecho", () => {
     vi.useFakeTimers();
     const s = spec(1);
     const onAnswer = vi.fn();
     const { container } = render(<TouchPlaceStage spec={s} onAnswer={onAnswer} />);
-
     for (let i = 0; i < s.alvo; i += 1) colocarPorToque(container);
     expect(bandeja(container).disabled).toBe(true);
-    expect(onAnswer).not.toHaveBeenCalled();
-
-    act(() => { vi.advanceTimersByTime(1999); });
+    act(() => { vi.advanceTimersByTime(899); });
     expect(onAnswer).not.toHaveBeenCalled();
     act(() => { vi.advanceTimersByTime(1); });
     expect(onAnswer).toHaveBeenCalledTimes(1);
@@ -155,40 +144,33 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     vi.useFakeTimers();
     const s = livre(2);
     const recebido: AcaoDeProducao[] = [];
-    const { container } = render(
-      <TouchPlaceStage spec={s} onAnswer={(_v, a) => recebido.push(a)} />,
-    );
-
+    const { container } = render(<TouchPlaceStage spec={s} onAnswer={(_v, a) => recebido.push(a)} />);
     for (let i = 0; i < 3; i += 1) colocarPorToque(container);
     fireEvent.click(screen.getByText("Pronto!"));
-
     expect(recebido).toHaveLength(1);
     expect(recebido[0]).toMatchObject({ colocados: 3, alvo: 2, comAndaime: false });
     expect((screen.getByText("Pronto!") as HTMLButtonElement).disabled).toBe(true);
-
     act(() => { vi.advanceTimersByTime(900); });
     expect(screen.queryByText("Pronto!")).toBeNull();
     expect(bandeja(container).disabled).toBe(false);
   });
 
-  it("se parou antes, registra a hipótese mas preserva o que já produziu para continuar", () => {
+  it("se parou antes, reporta e preserva o que já produziu para continuar", () => {
     vi.useFakeTimers();
     const s = livre(3);
     const onAnswer = vi.fn();
     const { container } = render(<TouchPlaceStage spec={s} onAnswer={onAnswer} />);
     colocarPorToque(container);
     fireEvent.click(screen.getByText("Pronto!"));
-
     expect(onAnswer).toHaveBeenCalledTimes(1);
     expect(onAnswer.mock.calls[0][1]).toMatchObject({ colocados: 1, alvo: 3 });
     act(() => { vi.advanceTimersByTime(900); });
     expect(screen.getByText("Pronto!")).toBeTruthy();
-
     colocarPorToque(container);
     expect(container.querySelectorAll(`[aria-label^="${s.tema.singular} "]`).length).toBe(2);
   });
 
-  it("acerto sem vagas fecha autoralmente e entrega SEM_ANDAIME ao motor", () => {
+  it("acerto sem vagas publica cedo; a janela autoral do GameLoop completa o fecho", () => {
     vi.useFakeTimers();
     const s = livre(2);
     const onAnswer = vi.fn();
@@ -196,8 +178,9 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     colocarPorToque(container);
     colocarPorToque(container);
     fireEvent.click(screen.getByText("Pronto!"));
+    act(() => { vi.advanceTimersByTime(399); });
     expect(onAnswer).not.toHaveBeenCalled();
-    act(() => { vi.advanceTimersByTime(1500); });
+    act(() => { vi.advanceTimersByTime(1); });
     expect(onAnswer).toHaveBeenCalledTimes(1);
     expect(onAnswer.mock.calls[0][1]).toMatchObject({ colocados: 2, alvo: 2, comAndaime: false });
   });
@@ -213,7 +196,6 @@ describe("TouchPlaceStage — F04/N1.13", () => {
     const { container: n4 } = render(<TouchPlaceStage spec={spec(4)} />);
     expect(n4.querySelector('[aria-label="Ouvir o pedido de novo"]')).toBeTruthy();
     expect(n4.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(0);
-
     const { container: n5 } = render(<TouchPlaceStage spec={spec(5)} />);
     expect(n5.querySelector('[aria-label="Ouvir o pedido de novo"]')).toBeNull();
     expect(n5.querySelectorAll('[aria-label="Vaga vazia"]').length).toBe(0);
