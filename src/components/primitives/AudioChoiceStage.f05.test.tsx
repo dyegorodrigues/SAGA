@@ -70,6 +70,7 @@ describe("F05 — roteiro real de ouvir e escolher", () => {
     expect(onAnswer.mock.calls[1][1].tentativa).toBe(2);
     expect(screen.queryByLabelText("Escutar o número")).toBeNull();
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
+    expect(container.querySelector("[data-enunciado-audiochoice]")).toBeNull();
     expect(container.querySelector("[data-fecho-audiochoice]")?.textContent).toBe(String(s.resposta));
   });
 
