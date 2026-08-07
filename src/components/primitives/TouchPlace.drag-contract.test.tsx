@@ -6,7 +6,7 @@ import { TouchPlace } from "./TouchPlace";
 
 const base = {
   tema: {
-    id: "f04-test",
+    id: "espaco" as const,
     emoji: "⭐",
     singular: "estrela",
     plural: "estrelas",
@@ -36,8 +36,6 @@ describe("F04 — contrato motor", () => {
     expect(tray).toBeTruthy();
     expect(tray.tagName).toBe("BUTTON");
     expect(tray.getAttribute("aria-label")).toContain("Pegar");
-    // React não serializa handlers no DOM; o contrato de regressão estrutural
-    // fica no data marker + classe touch-none + testes comportamentais do Stage.
     expect(tray.className).toContain("touch-none");
   });
 
