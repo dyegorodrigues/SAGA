@@ -1,3 +1,4 @@
+// Trigger temporário: o reconciliador sobrescreve este arquivo no mesmo lote.
 import { describe, expect, it } from "vitest";
 import { Question } from "../../types";
 import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./authorialStagePolicy";
@@ -12,8 +13,6 @@ describe("F04 — autoria de feedback/retry", () => {
   });
 
   it("sem leitura TouchPlace o GameLoop não presume autoria", () => {
-    // O kind sozinho não basta: isto impede silenciar feedback de um uso futuro
-    // da primitiva que não publique a ação autoral da F04.
     expect(ownsAuthorialRetry(f04)).toBe(false);
     expect(ownsAuthorialFeedback(f04)).toBe(false);
   });
