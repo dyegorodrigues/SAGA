@@ -14,7 +14,14 @@ describe("ClassificacaoStage — semântica HTML dos alvos", () => {
     for (let nivel = 1; nivel <= 4; nivel += 1) {
       const s = spec(nivel);
       const { container, unmount } = render(
-        <ClassificacaoStage spec={s} resolvidas={s.pecas.length} />,
+        <ClassificacaoStage
+          spec={s}
+          resolvidas={s.pecas.length}
+          // O nível 3 agora é duas telas reais. Para medir peças JÁ resolvidas,
+          // a sonda/teste precisa dizer de qual metade está falando; sem isso a
+          // primeira metade conclui legitimamente e inicia a reclassificação.
+          faseReclassificacao={nivel === 3 ? "segunda" : undefined}
+        />,
       );
 
       expect(container.querySelector("button button"), `nível ${nivel}`).toBeNull();
