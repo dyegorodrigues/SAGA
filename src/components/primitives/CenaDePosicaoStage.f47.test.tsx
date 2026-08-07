@@ -104,6 +104,43 @@ describe("F47 — contrato temporal e motor da cena de posição", () => {
     expect(onAnswer.mock.calls[0][1].escolhida).toBe(s.pedida);
   });
 
+  it("nível 5 confina o objeto colocado dentro do campo sem mudar a relação julgada", () => {
+    const s = spec(5);
+    const onAnswer = vi.fn();
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+      x: 20, y: 30, left: 20, top: 30,
+      width: LARGURA_DA_CENA, height: ALTURA_DA_CENA,
+      right: 20 + LARGURA_DA_CENA, bottom: 30 + ALTURA_DA_CENA,
+      toJSON: () => ({}),
+    } as DOMRect);
+    const { container } = render(<CenaDePosicaoStage spec={s} onAnswer={onAnswer} />);
+    const tray = screen.getByLabelText("Pegar o objeto");
+    const clientX = 20 + LARGURA_DA_CENA / 2;
+    const clientY = s.pedida === "em cima" ? 31 : 30 + ALTURA_DA_CENA - 1;
+
+    fireEvent.pointerDown(tray, { pointerId: 9, clientX: 180, clientY: 540 });
+    fireEvent.pointerMove(tray, { pointerId: 9, clientX, clientY });
+    fireEvent.pointerUp(tray, { pointerId: 9, clientX, clientY });
+
+    const colocado = container.querySelector<HTMLElement>('[aria-label^="Objeto colocado "]');
+    expect(colocado).toBeTruthy();
+    expect(parseFloat(colocado!.style.left)).toBeGreaterThanOrEqual(0);
+    expect(parseFloat(colocado!.style.top)).toBeGreaterThanOrEqual(0);
+    expect(parseFloat(colocado!.style.left) + 52).toBeLessThanOrEqual(LARGURA_DA_CENA);
+    expect(parseFloat(colocado!.style.top) + 52).toBeLessThanOrEqual(ALTURA_DA_CENA);
+    expect(onAnswer.mock.calls[0][1].escolhida).toBe(s.pedida);
+  });
+
+  it("microaula dá um destaque visual inequívoco ao objeto demonstrado", () => {
+    const s = spec(1);
+    const { container } = render(<CenaDePosicaoStage spec={s} mostrar={{ destacarObjeto: 0 }} />);
+    const alvo = objeto(container, s.objetos[0].posicao);
+    expect(alvo.style.borderWidth).toBe("3px");
+    expect(alvo.style.borderStyle).toBe("solid");
+    expect(alvo.style.backgroundColor).not.toBe("transparent");
+    expect(alvo.style.backgroundColor).not.toBe("");
+  });
+
   it("trocar a spec limpa fecho, erro e estado motor da questão anterior", () => {
     vi.useFakeTimers();
     const s1 = spec(1);
