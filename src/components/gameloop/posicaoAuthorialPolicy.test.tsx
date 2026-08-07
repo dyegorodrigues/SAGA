@@ -12,6 +12,7 @@ import { emphasisForQuestion, QuestionPrompt } from "./QuestionPrompt";
 const q47 = Composer.generate(GE_01, 1) as Question;
 const q48 = Composer.generate(GE_02, 2) as Question;
 const meta47 = { posicao: { pedida: "em cima", escolhida: "embaixo", par: "cima-baixo" } } as any;
+const meta48 = { forma: { pedida: "quadrado", escolhida: "retangulo", pedidaGirada: true, escolhidaEmPe: true } } as any;
 
 describe("F47 — política autoral da casca", () => {
   it("F47 possui retry/feedback próprios e preserva os 3,3s de cinema", () => {
@@ -23,8 +24,18 @@ describe("F47 — política autoral da casca", () => {
 
   it("não sequestra F48 só porque ela também usa shapecanvas", () => {
     expect(q48.kind).toBe("shapecanvas");
-    expect(ownsAuthorialRetry(q48, { forma: {} } as any)).toBe(false);
-    expect(ownsAuthorialFeedback(q48, { forma: {} } as any)).toBe(false);
+
+    // A fronteira é o contrato da questão + o metadado da ação. F47 não pode
+    // reivindicar uma cena de formas com seu metadado de posição.
+    expect(ownsAuthorialRetry(q48, meta47)).toBe(false);
+    expect(ownsAuthorialFeedback(q48, meta47)).toBe(false);
+
+    // F48, porém, TEM sua própria autoria de retry/feedback. O teste antigo
+    // esperava false aqui porque foi escrito antes da correção F48 e acabou
+    // congelando uma ausência de comportamento como se fosse requisito.
+    expect(ownsAuthorialRetry(q48, meta48)).toBe(true);
+    expect(ownsAuthorialFeedback(q48, meta48)).toBe(true);
+    expect(authorialFeedbackHoldMs(q48, meta48)).toBe(3700);
   });
 
   it("enfatiza a preposição sem criar um segundo enunciado", () => {
