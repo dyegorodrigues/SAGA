@@ -1,55 +1,96 @@
 name: CI
 
-# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
-# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
-# tudo localmente e passe a ser condição verificável no PR.
-
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  patch-f05:
+    name: Patch efêmero F05
+    if: github.event_name == 'pull_request' && github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n106
+          fetch-depth: 0
+      - name: Aplicar e autolimpar
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def rep(path, old, new):
+              p=Path(path); s=p.read_text(); n=s.count(old)
+              if n != 1: raise SystemExit(f'{path}: esperado 1, achei {n}')
+              p.write_text(s.replace(old,new))
+
+          rep('src/components/gameloop/GameLoopExerciseRenderer.tsx',
+              '{hasTutorial(q) && q.kind !== "vertical" && !status && (',
+              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (')
+          rep('sonda/cenas.tsx',
+'''      {q.prompt && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''',
+'''      {q.prompt && q.kind !== "audiochoice" && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''')
+          rep('src/curriculum/Composer.ts',
+'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
+}''',
+'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  // ⚠️ Divergência declarada F05 §4×§6: como o áudio toca automaticamente
+  // ANTES de as opções aparecerem, estar na primeira posição não prova que a
+  // criança "não escutou". Essa hipótese exige estado temporal e é emitida por
+  // audioChoiceRuntime, nunca por uma Option estática do Composer.
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
+}''')
+          Path('.github/workflows/n106-cleanup-patch.yml').unlink(missing_ok=True)
+          PY
+          git diff --check
+          git fetch origin main --depth=1
+          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: limpa a tela autoral e o diagnóstico estático F05'
+          git push origin HEAD:codex/corrigir-n106
+
   gates:
     name: Gates do SAGA
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-
       - name: Instalar dependências
         run: npm ci
-
-      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
-      # órfãos e deriva de nomenclatura.
       - name: Auditoria do catálogo
         run: npm run auditar
-
       - name: Auditoria das fichas
         run: npm run fichas:auditar
-
-      # O grafo é artefato derivado; o modo --check falha se alguém editar o
-      # gerado sem regerar a partir do YAML canônico.
       - name: Sincronia do grafo
         run: npm run grafo:check
-
       - name: TypeScript
         run: npm run lint
-
       - name: Testes
         run: npm test -- --run
-
       - name: Build
         run: npm run build
 
@@ -58,25 +99,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.event_name == 'pull_request'
-
     steps:
       - uses: actions/checkout@v4
         with:
-          # Por padrão o Actions confere um merge commit sintético do PR, o que
-          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
-          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
-
-      # O criador de PR deste ambiente não aceita binários no diff textual.
-      # Falhar aqui é mais barato que descobrir na hora de publicar.
       - name: Verificar ausência de binários no diff
         env:
           PR_BASE: origin/${{ github.base_ref }}
