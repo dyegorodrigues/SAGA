@@ -62,11 +62,11 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "TenFrame", kinds: ["tenframe"], componentFiles: [component("TenFrame")], builderKinds: ["tenframe"], rendererKinds: ["tenframe"] },
   {
     primitive: "TouchCount",
-    kinds: ["emojirow"],
-    componentFiles: [component("EmojiRow")],
-    builderKinds: ["emojirow"],
-    rendererKinds: ["emojirow"],
-    note: "Alias autoral semântico: EmojiRow já oferece contagem por toque e áudio.",
+    kinds: ["touchcount"],
+    componentFiles: [component("TouchCount")],
+    builderKinds: ["touchcount"],
+    rendererKinds: ["touchcount"],
+    note: "N1.02/F27 e N1.04/F01: primitiva própria de contagem por toque; compartilha gramática visual com EmojiRow, mas possui contrato/runtime distintos.",
   },
   {
     primitive: "TouchPlace",
