@@ -1,5 +1,9 @@
 name: CI
 
+# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
+# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
+# tudo localmente e passe a ser condição verificável no PR.
+
 on:
   pull_request:
     branches: [main]
@@ -15,24 +19,37 @@ jobs:
     name: Gates do SAGA
     runs-on: ubuntu-latest
     timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
+
       - name: Instalar dependências
         run: npm ci
+
+      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
+      # órfãos e deriva de nomenclatura.
       - name: Auditoria do catálogo
         run: npm run auditar
+
       - name: Auditoria das fichas
         run: npm run fichas:auditar
+
+      # O grafo é artefato derivado; o modo --check falha se alguém editar o
+      # gerado sem regerar a partir do YAML canônico.
       - name: Sincronia do grafo
         run: npm run grafo:check
+
       - name: TypeScript
         run: npm run lint
+
       - name: Testes
         run: npm test -- --run
+
       - name: Build
         run: npm run build
 
@@ -41,121 +58,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.event_name == 'pull_request'
+
     steps:
       - uses: actions/checkout@v4
         with:
+          # Por padrão o Actions confere um merge commit sintético do PR, o que
+          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
+          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      # O criador de PR deste ambiente não aceita binários no diff textual.
+      # Falhar aqui é mais barato que descobrir na hora de publicar.
       - name: Verificar ausência de binários no diff
         env:
           PR_BASE: origin/${{ github.base_ref }}
         run: node AI_Studio_Lab/tools/pr_text_guard.cjs
-
-  visual-ge01:
-    name: Visual GE.01 — F47 antes da correção
-    if: github.event_name == 'pull_request' && github.head_ref == 'codex/integrar-bloco-f0'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: codex/integrar-bloco-f0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
-      - name: Preparar Chromium
-        run: |
-          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
-          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -z "$CHROME_REAL" ]; then
-            sudo mkdir -p /opt/pw-browsers
-            sudo chown -R "$USER":"$USER" /opt/pw-browsers
-            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
-            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
-          fi
-          test -n "$CHROME_REAL"
-          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
-      - name: Sonda filtrada GE.01
-        env:
-          SONDA_SEMENTES: '1'
-        run: npm run sonda -- "GE.01"
-      - name: Prints obrigatórios do briefing
-        env:
-          PRINTS_OUT: /tmp/ge01/prints
-          PRINTS_LARGURA: '390'
-        run: node scripts/prints.mjs "GE.01"
-      - name: Fotografar estados de interação atuais
-        run: |
-          mkdir -p /tmp/ge01/states
-          node --input-type=module <<'NODE'
-          import { spawn } from 'node:child_process';
-          import { chromium } from 'playwright-core';
-          const porta = 5199;
-          const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], { stdio:['ignore','pipe','pipe'], detached:true });
-          await new Promise((ok,no)=>{ const t=setTimeout(()=>no(new Error('vite nao subiu')),60000); vite.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok();}}); });
-          const browser = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
-          const page = await browser.newPage({ viewport:{width:390,height:640}, deviceScaleFactor:2 });
-          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`, {waitUntil:'networkidle'});
-          await page.waitForFunction(()=>window.sonda?.total>0);
-          const nomes = await page.evaluate(()=>window.sonda.nomes());
-          const achar=t=>{const i=nomes.findIndex(n=>n.includes(t)); if(i<0) throw new Error(`cena ausente: ${t}`); return i;};
-          const ir=async t=>{await page.evaluate(i=>window.sonda.ir(i), achar(t)); await page.waitForTimeout(450);};
-
-          // Nível 1: registrar um estado pós-resposta para verificar seta/rotulagem.
-          await ir('GE.01 onde está (nível 1)');
-          const objetos = page.locator('button[aria-label^="Objeto "]');
-          if ((await objetos.count()) !== 2) throw new Error('GE.01 L1 não tem exatamente dois objetos tocáveis');
-          await objetos.first().click();
-          await page.waitForTimeout(180);
-          await page.screenshot({path:'/tmp/ge01/states/90_GE01_POS_RESPOSTA.png'});
-
-          // Nível 5: estado atual após pegar o objeto. O print mostra se existe
-          // gesto de produção legível antes de qualquer correção.
-          await ir('GE.01 onde está (nível 5)');
-          const pegar = page.getByRole('button',{name:'Pegar o objeto'});
-          if (!(await pegar.count())) throw new Error('GE.01 L5 sem objeto de produção');
-          await pegar.click();
-          await page.waitForTimeout(120);
-          await page.screenshot({path:'/tmp/ge01/states/91_GE01_L5_OBJETO_NA_MAO.png'});
-
-          // Tentar arrasto real hoje: mover do centro da bandeja para dentro do campo.
-          const b=await pegar.boundingBox();
-          if(!b) throw new Error('bandeja sem geometria');
-          const start={x:b.x+b.width/2,y:b.y+b.height/2};
-          await page.mouse.move(start.x,start.y); await page.mouse.down(); await page.mouse.move(195,280,{steps:8}); await page.waitForTimeout(120);
-          await page.screenshot({path:'/tmp/ge01/states/92_GE01_L5_TENTATIVA_DE_ARRASTO.png'});
-          await page.mouse.up();
-
-          await ir('GE.01 micro-aula: esta é a mesa');
-          await page.screenshot({path:'/tmp/ge01/states/93_GE01_MICRO_REFERENCIAL.png'});
-
-          await browser.close();
-          try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
-          NODE
-      - name: Folha de contato
-        run: |
-          python3 -m pip install --quiet pillow
-          python3 - <<'PY'
-          from PIL import Image, ImageDraw
-          from pathlib import Path
-          files=sorted(Path('/tmp/ge01/prints').glob('*.png'))+sorted(Path('/tmp/ge01/states').glob('*.png'))
-          tw,th,label,cols=195,320,28,2
-          rows=(len(files)+cols-1)//cols
-          out=Image.new('RGB',(cols*tw,rows*(th+label)),'white'); draw=ImageDraw.Draw(out)
-          for i,p in enumerate(files):
-              im=Image.open(p).convert('RGB'); im.thumbnail((tw,th)); x=(i%cols)*tw; y=(i//cols)*(th+label)
-              out.paste(im,(x+(tw-im.width)//2,y+(th-im.height)//2)); draw.text((x+3,y+th+2),p.stem[:40],fill='black')
-          out.save('/tmp/ge01/contact-sheet.jpg',quality=84)
-          PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ge01-before-correction
-          path: /tmp/ge01
-          retention-days: 7
