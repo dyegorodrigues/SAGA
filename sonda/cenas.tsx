@@ -153,14 +153,19 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
   ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown;
   fase?: Fase | FaseDaMoldura;
 }) {
-  const q = comSemente(semente, () => Composer.generate(ficha, lvl));
+  const q = React.useMemo(
+    () => comSemente(semente, () => Composer.generate(ficha, lvl)),
+    [ficha, lvl, semente],
+  );
+  const [audioPromptVisible, setAudioPromptVisible] = React.useState(false);
+  React.useEffect(() => setAudioPromptVisible(false), [ficha.id, lvl, semente]);
   return (
     <>
       {/* A caixa do enunciado que o app desenha ACIMA do palco (GameLoop.tsx).
           Ela faltava aqui, e a falta escondeu o enunciado saindo DUAS vezes em
           todo palco que imprimia o próprio: o palco só, sem o enquadramento do
           app, é o print errado da RETOMADA §7.4. */}
-      {q.prompt && q.kind !== "audiochoice" && (
+      {q.prompt && (q.kind !== "audiochoice" || audioPromptVisible) && (
         <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
           style={{ borderColor: "#D9E5F8", color: "#22315C", background: "#fff", borderWidth: 3 }}>
           {q.prompt}
@@ -176,6 +181,7 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
       orderTaps={[]} handleOrderTap={nada} orderShake={null} hiddenOpts={[]}
       armedOpt={null} setArmedOpt={nada}
       faseDaCena={fase}
+      onFirstAuditionComplete={() => setAudioPromptVisible(true)}
     />
     </>
   );

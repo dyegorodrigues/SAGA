@@ -221,6 +221,7 @@ export function GameLoop({
   // criança nunca viu a aulinha deste kind (depois disso, só botão/algoritmo)
   const [autoAula, setAutoAula] = useState(() => hasAulinha(q) && !aulaSeen(kid.id, q.kind));
   const [promptDone, setPromptDone] = useState(!sound);
+  const [audioChoicePromptVisible, setAudioChoicePromptVisible] = useState(false);
   
   // Update autoAula state on question change
   useEffect(() => {
@@ -240,6 +241,7 @@ export function GameLoop({
     setGuidedNarr(null);
     setTutShow(null);
     setJourneyDone(false);
+    setAudioChoicePromptVisible(false);
     stopAulaTimers();
     setGuidedIdx(null);
     setQErrors(0);
@@ -986,6 +988,16 @@ export function GameLoop({
         
       </div>
 
+      {q.kind === "audiochoice" && audioChoicePromptVisible && !status && (
+        <div
+          data-audiochoice-prompt
+          className="mb-3 flex-shrink-0 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
+          style={{ borderColor: C.line, color: C.ink, background: C.card, fontFamily: FONT }}
+        >
+          {q.prompt}
+        </div>
+      )}
+
       {q.kind !== "audiochoice" && q.review && !status && (
         <div className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-md text-xs font-bold mb-3">
           🧠 Prática Espaçada / Revisão Inteligente
@@ -998,6 +1010,7 @@ export function GameLoop({
         timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
         mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
         flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
+        onFirstAuditionComplete={() => setAudioChoicePromptVisible(true)}
       />
       </div>
       {/* Botão AVANÇAR — surge ao responder; deixa a criança seguir no ritmo dela */}

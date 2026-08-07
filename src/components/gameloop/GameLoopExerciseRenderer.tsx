@@ -105,6 +105,8 @@ interface Props {
   hiddenOpts: any[];
   armedOpt: any;
   setArmedOpt: (v: any) => void;
+  /** F05: a primeira audição terminou; a casca pode revelar q.prompt. */
+  onFirstAuditionComplete?: () => void;
   /**
    * Prende a fase de um palco que tem roteiro no tempo. **Só a sonda passa.**
    *
@@ -125,7 +127,8 @@ export function GameLoopExerciseRenderer({
   sel, totalQFor, track,
   aulaSuggest, guidedNarr, playAulinha,
   setShowClockTutorial, sound, peekAgain, setJourneyDone, orderTaps,
-  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt, faseDaCena
+  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt,
+  onFirstAuditionComplete, faseDaCena
 
 }: Props) {
   return (
@@ -192,6 +195,7 @@ export function GameLoopExerciseRenderer({
             falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor, leitura) => handlePick(valor, undefined, { source: "audiochoice", audiochoice: leitura } as never)}
             disabled={status !== null}
+            onPrimeiraAudicaoConcluida={onFirstAuditionComplete}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}
