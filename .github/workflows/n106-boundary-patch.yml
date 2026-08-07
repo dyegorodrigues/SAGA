@@ -1,0 +1,235 @@
+name: Patch N1.06 boundary
+
+on:
+  push:
+    branches: [codex/corrigir-n106]
+    paths: ['.github/workflows/n106-boundary-patch.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n106
+      - name: Aplicar patch estrutural F05
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def rep(path, old, new):
+              p = Path(path)
+              s = p.read_text()
+              n = s.count(old)
+              if n != 1:
+                  raise SystemExit(f'{path}: esperado 1 ocorrência, achei {n}')
+              p.write_text(s.replace(old, new))
+
+          # answerPolicy: o conhecimento pedagógico fica na fronteira, não no GameLoop.
+          rep('src/components/gameloop/answerPolicy.ts',
+'''import { RespostaOuvida, evidenciasDe as evidenciasDaEscuta } from "../../curriculum/procedimentos/audioChoiceProcedure";''',
+'''import {
+  RespostaOuvidaRuntime,
+  diagnosticarAudioChoiceRuntime,
+  evidenciasAudioChoiceRuntime,
+} from "../../curriculum/procedimentos/audioChoiceRuntime";''')
+
+          rep('src/components/gameloop/answerPolicy.ts',
+'''export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta): boolean {
+  if (value === "__timeout__") return false;
+  // Escorregão de dedo jamais é resposta terminal: a criança não decidiu nada.
+  if (isMotorSlip(meta)) return true;
+  return Boolean(q.options || q.groups || meta?.source);
+}
+''',
+'''export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta): boolean {
+  if (value === "__timeout__") return false;
+  // Escorregão de dedo jamais é resposta terminal: a criança não decidiu nada.
+  if (isMotorSlip(meta)) return true;
+  return Boolean(q.options || q.groups || meta?.source);
+}
+
+/**
+ * F05 §4: o próprio palco possui o ciclo erro → repetir som → tentar de novo.
+ * O GameLoop só registra a tentativa; não acrescenta "Ops", não esconde opção
+ * e não transforma a terceira tentativa em erro terminal.
+ */
+export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
+  return q.kind === "audiochoice" && meta?.audiochoice !== undefined;
+}
+
+/** F05 também possui voz/fecho autorais; o GameLoop não fala por cima. */
+export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
+  return q.kind === "audiochoice" && meta?.audiochoice !== undefined;
+}
+''')
+
+          rep('src/components/gameloop/answerPolicy.ts',
+'''  if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
+
+  // Ficha de PRODUÇÃO (N1.01/F07):''',
+'''  if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
+
+  // F05/N1.06: a hipótese depende do histórico de audição/tentativa do palco.
+  if (meta?.audiochoice) {
+    return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
+  }
+
+  // Ficha de PRODUÇÃO (N1.01/F07):''')
+
+          rep('src/components/gameloop/answerPolicy.ts',
+'''  if (meta.audiochoice) achadas.push(...evidenciasDaEscuta(meta.audiochoice as RespostaOuvida));''',
+'''  if (meta.audiochoice) achadas.push(...evidenciasAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime));''')
+
+          # Stage: tipa explicitamente a leitura temporal usada pelo Radar.
+          rep('src/components/primitives/AudioChoiceStage.tsx',
+'''import { FALAS, RespostaOuvida } from "../../curriculum/procedimentos/audioChoiceProcedure";''',
+'''import { FALAS } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import { RespostaOuvidaRuntime } from "../../curriculum/procedimentos/audioChoiceRuntime";''')
+          rep('src/components/primitives/AudioChoiceStage.tsx',
+'''  onAnswer?: (valor: number, leitura: RespostaOuvida) => void;''',
+'''  onAnswer?: (valor: number, leitura: RespostaOuvidaRuntime) => void;''')
+          rep('src/components/primitives/AudioChoiceStage.tsx',
+'''    const leitura = {
+      resposta: n,
+      alvo: spec.alvo,
+      alternativas: spec.alternativas,
+      repeticoes,
+      // Campos adicionais preservam a diferença entre primeira audição e
+      // primeira RESPOSTA. O procedimento legado ainda os ignora; o fio com o
+      // Radar é tratado separadamente na fronteira do GameLoop.
+      tentativa,
+      primeiraAudicaoConcluida: true,
+    } as RespostaOuvida & { tentativa: number; primeiraAudicaoConcluida: boolean };''',
+'''    const leitura: RespostaOuvidaRuntime = {
+      resposta: n,
+      alvo: spec.alvo,
+      alternativas: spec.alternativas,
+      repeticoes,
+      tentativa,
+      primeiraAudicaoConcluida: true,
+    };''')
+
+          # GameLoop: respeita autoria do palco sem importar regra pedagógica F05.
+          rep('src/components/GameLoop.tsx',
+'''import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";''',
+'''import {
+  evidenciasDaResposta,
+  isMotorSlip,
+  isRetryableAnswer,
+  misconceptionForAnswer,
+  ownsAuthorialFeedback,
+  ownsAuthorialRetry,
+} from "./gameloop/answerPolicy";''')
+
+          rep('src/components/GameLoop.tsx',
+'''    if (sound && !done && !status && q.kind !== "journey" && !autoAula) {''',
+'''    if (sound && !done && !status && q.kind !== "journey" && q.kind !== "audiochoice" && !autoAula) {''')
+
+          rep('src/components/GameLoop.tsx',
+'''    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
+    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
+
+    // --- CAMADA 1 (Erro Suave) ---''',
+'''    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
+    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
+    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
+
+    // Palco autoral: registra a tentativa no Radar, mas mantém o ciclo de erro
+    // dentro da própria primitiva. F05 exige repetições ilimitadas (§4).
+    if (!right && ownsAuthorialRetry(q, answerMeta)) return;
+
+    // --- CAMADA 1 (Erro Suave) ---''')
+
+          rep('src/components/GameLoop.tsx',
+'''    if (sound) {
+      if (right) sfx.right();
+      else sfx.wrong();
+      if (currentToast && currentToast.startsWith("Subiu")) sfx.level();
+    }
+''',
+'''    if (sound && !feedbackAutoral) {
+      if (right) sfx.right();
+      else sfx.wrong();
+      if (currentToast && currentToast.startsWith("Subiu")) sfx.level();
+    }
+''')
+
+          rep('src/components/GameLoop.tsx',
+'''    const baseFb = right
+      ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])
+      : OOPS[Math.floor(Math.random() * OOPS.length)];
+    const showExplain = !!q.explain && !right;
+    const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;
+''',
+'''    const baseFb = feedbackAutoral ? "" : right
+      ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])
+      : OOPS[Math.floor(Math.random() * OOPS.length)];
+    const showExplain = !feedbackAutoral && !!q.explain && !right;
+    const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;
+''')
+
+          rep('src/components/GameLoop.tsx',
+'''    setMsg(fb);''',
+'''    setMsg(feedbackAutoral ? null : fb);''')
+
+          rep('src/components/GameLoop.tsx',
+'''    if (sound) {
+      speak(fb, {
+        pitch: right ? 1.3 : 1.05,
+      });
+      // Auto-avanço de segurança: 10 segundos se a criança não clicar no botão 'Avançar'
+      if (val !== "__timeout__") {
+        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
+      }
+    } else {
+      // Sem som: auto-avanço em 10s se não clicar no botão
+      if (val !== "__timeout__") {
+        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
+      }
+    }''',
+'''    if (sound && !feedbackAutoral) {
+      speak(fb, {
+        pitch: right ? 1.3 : 1.05,
+      });
+      if (val !== "__timeout__") {
+        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
+      }
+    } else if (val !== "__timeout__") {
+      // F05 §4 fecha a associação som-símbolo em 1,5s; os demais mantêm a
+      // janela de segurança histórica de 10s.
+      const espera = feedbackAutoral ? 1500 : 10000;
+      setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);
+    }''')
+
+          # A F05 não recebe mascote/balão narrador: a tela inteira é o instrumento.
+          rep('src/components/GameLoop.tsx',
+'''      <div className="mb-4 flex-shrink-0 flex items-start gap-3">''',
+'''      <div
+        className="mb-4 flex-shrink-0 flex items-start gap-3"
+        style={q.kind === "audiochoice" ? { display: "none" } : undefined}
+      >''')
+          rep('src/components/GameLoop.tsx',
+'''      {q.review && !status && (''',
+'''      {q.kind !== "audiochoice" && q.review && !status && (''')
+
+          # O Stage já foi desenhado acima; não deixa um cartão vazio embaixo.
+          rep('src/components/gameloop/GameLoopExerciseRenderer.tsx',
+'''...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {})''',
+'''...(q.kind === "order" || q.kind === "groups" || q.kind === "audiochoice" ? { display: "none" } : {})''')
+
+          # O workflow é bancada efêmera; não vai para a main.
+          Path('.github/workflows/n106-boundary-patch.yml').unlink()
+          PY
+          git diff --check
+      - name: Commitar somente a branch de trabalho
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: integra fluxo autoral F05 ao GameLoop'
+          git push origin HEAD:codex/corrigir-n106
