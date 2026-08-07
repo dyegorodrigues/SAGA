@@ -53,6 +53,65 @@ jobs:
           PRINTS_OUT=/tmp/prints node scripts/prints.mjs "AL.01"
           ls -lh /tmp/prints
 
+      # O nível 3 é temporal: a primeira foto só mostra a primeira classificação.
+      # Este driver joga a primeira metade sem conhecer a resposta: tenta o laço;
+      # se a peça volta, tenta FORA. Depois fotografa a troca e a segunda metade.
+      - name: Capturar transição e segunda fase do nível 3
+        run: |
+          node --input-type=module <<'NODE'
+          import { spawn } from 'node:child_process';
+          import { chromium } from 'playwright-core';
+
+          const porta = 5197;
+          const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], {
+            stdio: ['ignore', 'pipe', 'pipe'], detached: true,
+          });
+          await new Promise((ok, no) => {
+            const t = setTimeout(() => no(new Error('vite não subiu')), 60000);
+            vite.stdout.on('data', d => {
+              if (String(d).includes('ready in')) { clearTimeout(t); ok(); }
+            });
+          });
+
+          const browser = await chromium.launch({
+            executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+            args: ['--no-sandbox'],
+          });
+          const page = await browser.newPage({ viewport: { width: 390, height: 640 }, deviceScaleFactor: 2 });
+          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`, { waitUntil: 'networkidle' });
+          await page.waitForFunction(() => window.sonda?.total > 0);
+          const nomes = await page.evaluate(() => window.sonda.nomes());
+          const indice = nomes.findIndex(n => n.startsWith('AL.01 classificar (nível 3)'));
+          if (indice < 0) throw new Error('cena AL.01 nível 3 não encontrada');
+          await page.evaluate(i => window.sonda.ir(i), indice);
+          await page.waitForTimeout(350);
+
+          const bandeja = page.locator('[aria-label="Peças para separar"]');
+          const fora = page.locator('[aria-label="Deixar fora dos laços"]');
+          const laco = page.locator('button[aria-label^="Laço:"]').first();
+
+          let guarda = 0;
+          while (await bandeja.locator('button').count()) {
+            if (++guarda > 30) throw new Error('não consegui terminar a primeira classificação');
+            const antes = await bandeja.locator('button').count();
+            await bandeja.locator('button').first().click();
+            await laco.click();
+            await page.waitForTimeout(25);
+            if (await bandeja.locator('button').count() === antes) {
+              await bandeja.locator('button').first().click();
+              await fora.click();
+              await page.waitForTimeout(25);
+            }
+          }
+
+          await page.waitForTimeout(80);
+          await page.screenshot({ path: '/tmp/prints/AL.01_nivel_3_TRANSICAO.png' });
+          await page.waitForTimeout(2600);
+          await page.screenshot({ path: '/tmp/prints/AL.01_nivel_3_SEGUNDA_CLASSIFICACAO.png' });
+          await browser.close();
+          try { process.kill(-vite.pid, 'SIGKILL'); } catch { vite.kill('SIGKILL'); }
+          NODE
+
       - name: Montar folha de contato
         run: |
           python3 -m pip install --quiet pillow
