@@ -42,12 +42,9 @@ interface Props {
   onClick?: () => void;
   disabled?: boolean;
   /**
-   * Peça já colocada dentro de um alvo interativo.
-   *
-   * Um alvo da classificação é um `<button>`. Renderizar outra peça-botão
-   * dentro dele produz `<button>` aninhado — HTML inválido e risco de
-   * hidratação. A peça continua semanticamente exposta como imagem nomeada,
-   * mas deixa de fingir que é clicável quando já está resolvida.
+   * Força representação estática quando o chamador sabe que a peça já está
+   * resolvida. Na prática, `disabled` sem `onClick` também é estático: não há
+   * ação para executar e manter um `<button>` ali só cria semântica falsa.
    */
   statico?: boolean;
 }
@@ -105,7 +102,10 @@ export function PecaDeAtributo({ peca, selecionada, brilhando, onClick, disabled
     </svg>
   );
 
-  if (statico) {
+  // Peça sem ação, já resolvida, é conteúdo — não outro botão. Isso evita o
+  // `<button>` dentro de `<button>` que o React sinalizou em AL.01 e mantém a
+  // peça acessível pelo nome sem criar um alvo de toque falso.
+  if (statico || (disabled && !onClick)) {
     return (
       <span role="img" aria-label={nomeDaPeca(peca)} className={className} style={style}>
         {desenho}
