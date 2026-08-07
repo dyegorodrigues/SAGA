@@ -1,11 +1,12 @@
 import React from "react";
 import { AudioChoice } from "./AudioChoice";
 import { AudioChoiceSpec } from "../../curriculum/procedimentos/audioChoiceContract";
-import { FALAS, RespostaOuvida } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import { FALAS } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import { RespostaOuvidaRuntime } from "../../curriculum/procedimentos/audioChoiceRuntime";
 
 interface Props {
   spec: AudioChoiceSpec;
-  onAnswer?: (valor: number, leitura: RespostaOuvida) => void;
+  onAnswer?: (valor: number, leitura: RespostaOuvidaRuntime) => void;
   disabled?: boolean;
   falar?: (texto: string) => void;
   mostrar?: {
@@ -57,17 +58,14 @@ export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: P
     // §4: nenhum "errou". O feedback é ouvir novamente a informação-alvo.
     falar?.(certo ? FALAS.acerto(spec.alvo) : FALAS.erroSuave(spec.alvo));
 
-    const leitura = {
+    const leitura: RespostaOuvidaRuntime = {
       resposta: n,
       alvo: spec.alvo,
       alternativas: spec.alternativas,
       repeticoes,
-      // Campos adicionais preservam a diferença entre primeira audição e
-      // primeira RESPOSTA. O procedimento legado ainda os ignora; o fio com o
-      // Radar é tratado separadamente na fronteira do GameLoop.
       tentativa,
       primeiraAudicaoConcluida: true,
-    } as RespostaOuvida & { tentativa: number; primeiraAudicaoConcluida: boolean };
+    };
     onAnswer?.(n, leitura);
 
     if (!certo) {

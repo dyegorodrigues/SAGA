@@ -268,7 +268,7 @@ export function GameLoopExerciseRenderer({
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}
-        <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
+        <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" || q.kind === "audiochoice" ? { display: "none" } : {}) }}>
           {q.uiProps && !PALCOS_JA_DESENHADOS.has(q.kind as string) ? (
             <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} promptDone={promptDone} />
 

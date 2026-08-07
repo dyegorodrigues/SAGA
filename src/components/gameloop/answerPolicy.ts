@@ -6,7 +6,11 @@ import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum
 import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza, evidenciasDe as evidenciasDaGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
 import { AcaoDeContagem, evidenciasDe as evidenciasDaContagem } from "../../curriculum/procedimentos/touchCountProcedure";
 import { AcaoDaMoldura, diagnosticar as diagnosticarMoldura, evidenciasDe as evidenciasDaMoldura } from "../../curriculum/procedimentos/tenFrameProcedure";
-import { RespostaOuvida, evidenciasDe as evidenciasDaEscuta } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import {
+  RespostaOuvidaRuntime,
+  diagnosticarAudioChoiceRuntime,
+  evidenciasAudioChoiceRuntime,
+} from "../../curriculum/procedimentos/audioChoiceRuntime";
 import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
@@ -29,10 +33,29 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
   return Boolean(q.options || q.groups || meta?.source);
 }
 
+/**
+ * F05 §4: o próprio palco possui o ciclo erro → repetir som → tentar de novo.
+ * O GameLoop só registra a tentativa; não acrescenta "Ops", não esconde opção
+ * e não transforma a terceira tentativa em erro terminal.
+ */
+export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
+  return q.kind === "audiochoice" && meta?.audiochoice !== undefined;
+}
+
+/** F05 também possui voz/fecho autorais; o GameLoop não fala por cima. */
+export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
+  return q.kind === "audiochoice" && meta?.audiochoice !== undefined;
+}
+
 export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
   // Antes de qualquer hipótese diagnóstica, o filtro motor. Uma tag nascida de
   // gesto escorregado contamina o Radar e dispara Oficina injusta (§8.3-bis).
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
+
+  // F05/N1.06: a hipótese depende do histórico de audição/tentativa do palco.
+  if (meta?.audiochoice) {
+    return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
+  }
 
   // Ficha de PRODUÇÃO (N1.01/F07): não há alternativa que carregue a hipótese —
   // o erro está no que a criança FEZ com as peças. Sem esta leitura, distribuir
@@ -149,7 +172,7 @@ export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
   if (!meta) return [];
   const achadas: string[] = [];
   if (meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
-  if (meta.audiochoice) achadas.push(...evidenciasDaEscuta(meta.audiochoice as RespostaOuvida));
+  if (meta.audiochoice) achadas.push(...evidenciasAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime));
   if (meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));
   if (meta.forma) achadas.push(...evidenciasDaForma(meta.forma as AcaoF));
   if (meta.grandeza) achadas.push(...evidenciasDaGrandeza(meta.grandeza as AcaoDeGrandeza));

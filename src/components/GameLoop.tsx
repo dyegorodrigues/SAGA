@@ -7,7 +7,14 @@ import {
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
-import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
+import {
+  evidenciasDaResposta,
+  isMotorSlip,
+  isRetryableAnswer,
+  misconceptionForAnswer,
+  ownsAuthorialFeedback,
+  ownsAuthorialRetry,
+} from "./gameloop/answerPolicy";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
@@ -383,7 +390,7 @@ export function GameLoop({
   useEffect(() => {
     // journey narra sozinho; na 1ª visita com aulinha automática, a AULA vem primeiro
     // e o enunciado é falado ao fim dela (ver efeito da aulinha)
-    if (sound && !done && !status && q.kind !== "journey" && !autoAula) {
+    if (sound && !done && !status && q.kind !== "journey" && q.kind !== "audiochoice" && !autoAula) {
       const isFirstQ = idx === 0;
       const isNewKind = lastSpokenKindRef.current !== q.kind;
       const isNewPrompt = lastSpokenPromptRef.current !== q.prompt;
@@ -458,6 +465,11 @@ export function GameLoop({
 
     const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
     recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
+    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
+
+    // Palco autoral: registra a tentativa no Radar, mas mantém o ciclo de erro
+    // dentro da própria primitiva. F05 exige repetições ilimitadas (§4).
+    if (!right && ownsAuthorialRetry(q, answerMeta)) return;
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
@@ -630,7 +642,7 @@ export function GameLoop({
       onCommit(p, right, starGain + nextBonus, durationMs, isLast);
     }
 
-    if (sound) {
+    if (sound && !feedbackAutoral) {
       if (right) sfx.right();
       else sfx.wrong();
       if (currentToast && currentToast.startsWith("Subiu")) sfx.level();
@@ -644,17 +656,17 @@ export function GameLoop({
     // Ao ERRAR: o momento de ensino — mostra/fala o PORQUÊ (explain).
     const SHORT_OK = ["Isso! 🎉", "Muito bem! ⭐", "Boa! 👏", "Acertou! 🌟", "Perfeito! ✨"];
     const firstOkOfMission = right && ok === 0;
-    const baseFb = right
+    const baseFb = feedbackAutoral ? "" : right
       ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])
       : OOPS[Math.floor(Math.random() * OOPS.length)];
-    const showExplain = !!q.explain && !right;
+    const showExplain = !feedbackAutoral && !!q.explain && !right;
     const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;
 
     setProg(p);
     setStatus(right ? "right" : "wrong");
     setSel(val);
     setToast(currentToast);
-    setMsg(fb);
+    setMsg(feedbackAutoral ? null : fb);
     
 
     setOk(nextOk);
@@ -687,19 +699,18 @@ export function GameLoop({
     // A criança pode PULAR a qualquer momento clicando no botão 'Avançar' ou tocando na tela
     advanceRef.current = doTransition;
 
-    if (sound) {
+    if (sound && !feedbackAutoral) {
       speak(fb, {
         pitch: right ? 1.3 : 1.05,
       });
-      // Auto-avanço de segurança: 10 segundos se a criança não clicar no botão 'Avançar'
       if (val !== "__timeout__") {
         setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
       }
-    } else {
-      // Sem som: auto-avanço em 10s se não clicar no botão
-      if (val !== "__timeout__") {
-        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
-      }
+    } else if (val !== "__timeout__") {
+      // F05 §4 fecha a associação som-símbolo em 1,5s; os demais mantêm a
+      // janela de segurança histórica de 10s.
+      const espera = feedbackAutoral ? 1500 : 10000;
+      setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);
     }
   };
 
@@ -936,7 +947,10 @@ export function GameLoop({
       </div>
 
       {/* Narrative Mascot Header Row */}
-      <div className="mb-4 flex-shrink-0 flex items-start gap-3">
+      <div
+        className="mb-4 flex-shrink-0 flex items-start gap-3"
+        style={q.kind === "audiochoice" ? { display: "none" } : undefined}
+      >
         <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`}>
           <Mascote 
             theme={kid.theme} 
@@ -972,7 +986,7 @@ export function GameLoop({
         
       </div>
 
-      {q.review && !status && (
+      {q.kind !== "audiochoice" && q.review && !status && (
         <div className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-md text-xs font-bold mb-3">
           🧠 Prática Espaçada / Revisão Inteligente
         </div>
