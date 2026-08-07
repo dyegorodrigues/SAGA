@@ -219,7 +219,9 @@ export function ClassificacaoStage({
       setColocado({}); // §4: as MESMAS peças voltam ao centro.
       setSelecionada(null);
       setTentativas({}); // diagnóstico da reclassificação lê só a SEGUNDA tentativa.
-      setAviso("Agora mudou!");
+      // A faixa de fase abaixo já anuncia a mudança. Duplicar a mesma frase no
+      // `aviso` criaria duas regiões aria-live dizendo a mesma coisa.
+      setAviso(null);
       return;
     }
 
@@ -405,16 +407,11 @@ export function ClassificacaoStage({
       className="relative flex flex-col items-center justify-start gap-1 rounded-[32px] border-4 p-2"
       style={{
         width: largura,
-        // Baixo quando vazio, cresce com as peças. Uma moldura de 96px sem nada
-        // dentro é a moldura vazia lida como bug do §6.6 — e aqui ela ocupava
-        // um quarto da tela no primeiro segundo do exercício.
         minHeight: dentroDe(indices).length > 0 ? 92 : 62,
         borderColor: "#6D28D9",
         borderStyle: selecionada === null ? "dashed" : "solid",
         background: lacoAceso ? "#F5F3FF" : "#FAFAFF",
       }}
-      // O pulso é de BRILHO, não de escala. Escalar um alvo que ocupa a largura
-      // da tela vaza por construção (§6.29).
       animate={semMovimento || !lacoAceso ? undefined : { opacity: [1, 0.72, 1] }}
       transition={{ duration: 0.9, repeat: lacoAceso ? Infinity : 0 }}
     >
@@ -429,13 +426,7 @@ export function ClassificacaoStage({
     </motion.button>
   );
 
-  /**
-   * Os dois laços que **se cruzam** — §5, nível 4.
-   *
-   * Duas elipses de verdade, com borda, sobrepostas: a interseção existe no
-   * desenho antes de existir no rótulo. Três caixas lado a lado com "OS DOIS"
-   * seriam corretas para quem lê e ilegíveis para a criança desta faixa.
-   */
+  /** Os dois laços que **se cruzam** — §5, nível 4. */
   const lacosCruzados = () => {
     const LARGURA = 62;
     const SOBRA = 100 - LARGURA;
@@ -499,7 +490,6 @@ export function ClassificacaoStage({
         </div>
       )}
 
-      {/* Os laços. No nível 4 eles se CRUZAM (§5). */}
       <div className="flex w-full items-stretch justify-center gap-1">
         {intersecao ? (
           lacosCruzados()
@@ -508,8 +498,6 @@ export function ClassificacaoStage({
         )}
       </div>
 
-      {/* A bandeja: o que ainda não foi decidido. Mesma caixa tracejada do
-          `PareamentoStage` — é a bandeja da mesma primitiva. */}
       <div
         role="group"
         aria-label={naBandeja.length > 0 ? "Peças para separar" : "A bandeja está vazia"}
@@ -555,8 +543,6 @@ export function ClassificacaoStage({
         )}
       </div>
 
-      {/* A prateleira do FORA. Um alvo de verdade, porque "não pertence" é uma
-          decisão — §2. Sem ela, ficar de fora seria não fazer nada. */}
       <motion.button
         type="button"
         onClick={() => colocar([])}
@@ -582,7 +568,6 @@ export function ClassificacaoStage({
         </span>
       </motion.button>
 
-      {/* Silêncio é proibido: toda ação responde, e o erro não pune. */}
       <p
         role="status"
         aria-live="polite"
