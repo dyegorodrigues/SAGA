@@ -1,165 +1,117 @@
-name: Visual N1.06
+name: Close N1.06 correction
 
 on:
   pull_request:
     branches: [main]
 
-concurrency:
-  group: visual-n106-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: write
 
 jobs:
-  visual-final:
-    if: github.head_ref == 'codex/corrigir-n106'
+  close:
+    if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
           ref: codex/corrigir-n106
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
-      - name: Preparar Chrome
+          fetch-depth: 0
+      - name: Registrar handoff e remover bancada
         run: |
-          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
-          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -z "$CHROME_REAL" ]; then
-            sudo mkdir -p /opt/pw-browsers
-            sudo chown -R "$USER":"$USER" /opt/pw-browsers
-            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
-            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
-          fi
-          test -n "$CHROME_REAL"
-          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
-      - name: Portão final — 8 sementes de N1.06
-        env:
-          SONDA_SEMENTES: '8'
-        run: npm run sonda -- "N1.06"
-      - name: Capturar cenas e provar estados temporais
-        run: |
-          rm -rf /tmp/n106 && mkdir -p /tmp/n106
-          node --input-type=module <<'NODE'
-          import { spawn } from 'node:child_process';
-          import { chromium } from 'playwright-core';
-          const porta = 5198;
-          const prompt = 'Aperte e escute. Que número você ouviu?';
-          const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], {
-            stdio: ['ignore', 'pipe', 'pipe'], detached: true,
-          });
-          await new Promise((ok, no) => {
-            const t = setTimeout(() => no(new Error('vite não subiu')), 60000);
-            vite.stdout.on('data', d => {
-              if (String(d).includes('ready in')) { clearTimeout(t); ok(); }
-            });
-          });
-          const browser = await chromium.launch({
-            executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
-            args: ['--no-sandbox'],
-          });
-          const page = await browser.newPage({ viewport: { width: 390, height: 640 }, deviceScaleFactor: 2 });
-          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`, { waitUntil: 'networkidle' });
-          await page.waitForFunction(() => window.sonda?.total > 0);
-          const nomes = await page.evaluate(() => window.sonda.nomes());
-          const cenas = nomes.map((nome, i) => ({ nome, i })).filter(x => x.nome.includes('N1.06'));
-          console.log('CENAS_N106=' + JSON.stringify(cenas.map(x => x.nome)));
-          if (!cenas.length) throw new Error('nenhuma cena N1.06 encontrada');
-          const safe = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 90);
-
-          for (let k = 0; k < cenas.length; k++) {
-            const cena = cenas[k];
-            await page.evaluate(i => window.sonda.ir(i), cena.i);
-            await page.waitForTimeout(2200);
-            if (cena.nome.includes('nível 4') || cena.nome.includes('nível 5')) {
-              const grade = page.locator('[role="group"][aria-label="Números"]');
-              if (await grade.count()) {
-                const colunas = await grade.getAttribute('data-colunas');
-                if (colunas !== '2') throw new Error(`${cena.nome}: quatro opções não formam 2x2`);
-              }
-            }
-            await page.screenshot({ path: `/tmp/n106/${String(k + 1).padStart(2, '0')}_${safe(cena.nome)}.png` });
-          }
-
-          const nivel1 = cenas.find(x => x.nome.includes('ouvir e escolher (nível 1)'));
-          if (!nivel1) throw new Error('nível 1 não encontrado');
-          await page.evaluate(i => window.sonda.ir(i), nivel1.i);
-          await page.waitForTimeout(100);
-          await page.screenshot({ path: '/tmp/n106/90_F05_ABERTURA_100ms.png' });
-          if (await page.getByText(prompt, { exact: true }).count()) throw new Error('enunciado apareceu cedo');
-          if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('opções apareceram cedo');
-
-          await page.waitForTimeout(1250);
-          await page.screenshot({ path: '/tmp/n106/91_F05_CONVITE_1350ms.png' });
-          if ((await page.getByText(prompt, { exact: true }).count()) !== 1) throw new Error('enunciado não apareceu UMA vez após audição');
-          if (!(await page.locator('[role="group"][aria-label="Números"]').count())) throw new Error('opções não apareceram após audição');
-          if (await page.getByText('👉 Como faz? 🫵', { exact: true }).count()) throw new Error('controle genérico invadiu a F05');
-
-          async function produzirErro() {
-            const opcoes = page.locator('[role="group"][aria-label="Números"] button');
-            const total = await opcoes.count();
-            for (let i = 0; i < total; i++) {
-              await opcoes.nth(i).click();
-              await page.waitForTimeout(120);
-              if (!(await page.locator('[data-fecho-audiochoice]').count())) return true;
-              await page.evaluate(idx => window.sonda.ir(idx), nivel1.i);
-              await page.waitForTimeout(1350);
-            }
-            return false;
-          }
-          if (!(await produzirErro())) throw new Error('não consegui produzir erro suave');
-          await page.screenshot({ path: '/tmp/n106/92_F05_ERRO_SUAVE.png' });
-          if (await page.locator('[data-fecho-audiochoice]').count()) throw new Error('erro revelou o fecho');
-          if (await page.locator('button[aria-label="Escutar o número"]:disabled').count()) throw new Error('erro travou o replay');
-
-          await page.waitForTimeout(1850);
-          await page.screenshot({ path: '/tmp/n106/93_F05_RETRY.png' });
-          let fechou = false;
-          for (let tentativa = 0; tentativa < 4 && !fechou; tentativa++) {
-            const opts = page.locator('[role="group"][aria-label="Números"] button');
-            const total = await opts.count();
-            for (let i = 0; i < total && !fechou; i++) {
-              if (await opts.nth(i).isDisabled()) continue;
-              await opts.nth(i).click();
-              await page.waitForTimeout(120);
-              fechou = (await page.locator('[data-fecho-audiochoice]').count()) > 0;
-              if (!fechou) await page.waitForTimeout(1850);
-            }
-          }
-          if (!fechou) throw new Error('não consegui produzir fecho correto');
-          await page.screenshot({ path: '/tmp/n106/94_F05_FECHO.png' });
-          // A cena da sonda não modela `status="right"` do GameLoop. Por isso o
-          // desaparecimento do prompt no fecho é coberto por enunciadoUnico.test
-          // e pelo código da casca real; aqui validamos o Stage terminal.
-          if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('fecho manteve opções');
-
-          await browser.close();
-          try { process.kill(-vite.pid, 'SIGKILL'); } catch { vite.kill('SIGKILL'); }
-          NODE
-      - name: Folha de contato
-        run: |
-          python3 -m pip install --quiet pillow
           python3 - <<'PY'
-          from PIL import Image, ImageDraw
           from pathlib import Path
-          files = sorted(Path('/tmp/n106').glob('*.png'))
-          tw, th, label = 195, 320, 30
-          cols = 2
-          rows = (len(files) + 1) // 2
-          out = Image.new('RGB', (cols * tw, rows * (th + label)), 'white')
-          draw = ImageDraw.Draw(out)
-          for i, p in enumerate(files):
-              im = Image.open(p).convert('RGB')
-              im.thumbnail((tw, th))
-              x = (i % 2) * tw
-              y = (i // 2) * (th + label)
-              out.paste(im, (x + (tw - im.width) // 2, y + (th - im.height) // 2))
-              draw.text((x + 3, y + th + 3), p.stem[:42], fill='black')
-          out.save('/tmp/n106/contact-sheet.jpg', quality=82)
+          p = Path('AI_Studio_Lab/codex/RETOMADA.md')
+          s = p.read_text()
+          marker = '## Registro Codex — N1.06 / F05 (7/ago/2026)'
+          if marker not in s:
+              s += '''
+
+---
+
+## Registro Codex — N1.06 / F05 (7/ago/2026)
+
+**Branch:** `codex/corrigir-n106` · **PR:** #27 · **estado:** correção fechada,
+**NÃO ativada**. `N1.06` continua fora de `COMPOSER_CANARIES`; produção segue no
+rollback legado até existir PR separado de ativação.
+
+A F05 foi relida §1–§9 e auditada como sistema: ficha/Bíblia → grafo → Composer →
+`audiochoice` → Stage/Renderer → GameLoop → Radar/evidência → sonda/Chromium.
+Os defeitos confirmados antes da ativação foram:
+
+1. opções apareciam antes da primeira audição automática;
+2. erro travava a tela e podia revelar a resposta correta;
+3. autoplay podia não reiniciar quando a questão seguinte tinha o mesmo alvo;
+4. o beat de ondas da §8 não produzia efeito;
+5. GameLoop narrava/punha feedback genérico por cima do feedback autoral da F05;
+6. mascote, balão, cartão genérico e `Como faz?` invadiam a tela deliberadamente vazia;
+7. `audiochoice` não chegava ao Radar e `PRIMEIRA_AUDICAO` podia ser concedida
+   depois de uma primeira resposta errada;
+8. `questionDiagnostics` apagava hipóteses embutidas numa ação terminal correta
+   (defeito transversal que também atingia F51/F04);
+9. quatro alternativas quebravam em **3+1**, criando uma pista posicional;
+10. a primeira tentativa de sincronizar o enunciado dentro do Stage violou a
+    invariável global `enunciadoUnico`; a decisão foi revertida arquiteturalmente,
+    sem afrouxar o teste.
+
+**Arquitetura final da F05:** o Stage desenha a interação e emite o evento de fim
+da primeira audição; o Renderer só transporta esse evento; o **GameLoop continua
+sendo o único dono de `q.prompt`** e o revela no momento correto. O palco possui o
+retry/feedback da ficha; o GameLoop registra a tentativa e não fala por cima.
+`audioChoiceRuntime` concentra diagnóstico/evidência temporal. Quatro alternativas
+usam grade 2×2; duas usam 1×2; três usam 1×3.
+
+**⚠️ Divergência declarada F05 §4 × §6 — `NAO_ESCUTOU`.** A §4 manda o áudio tocar
+automaticamente **antes** de as opções aparecerem; portanto "escolheu a primeira
+opção sem apertar replay" não prova que a criança não ouviu. `NAO_ESCUTOU` ficou
+restrito ao estado temporal defensivo em que uma resposta ocorre antes do fim da
+primeira audição. A posição estática da alternativa nunca emite essa tag.
+
+**Portões finais do runtime:** CI completo verde no run `31188064450` (catálogo,
+fichas, grafo, TypeScript, testes, build e guarda de binários). Portão visual final
+verde no run `31188061774`: **8 sementes**, Chromium real, abertura → convite →
+erro suave → retry → fecho e níveis 1/4/5. Prints L4/L5 confirmaram 2×2 simétrico.
+A foto dinâmica do fecho da sonda mantém o prompt porque a casca simplificada não
+modela `status="right"`; o app real o esconde por `!status`, protegido por
+`enunciadoUnico.test.ts`. Não se alterou runtime para satisfazer esse falso estado
+da bancada.
+
+**Inventário documental:** `AI_Studio_Lab/pedagogia/PRIMITIVAS_SAGA.md` está
+atrasado nesta área — ainda descreve `AudioChoice`/`TouchPlace` como "faltando
+ligar", embora Composer e renderer já os alcancem. Tratar o inventário como
+histórico, não como verdade de runtime, até revisão documental própria.
+
+### Auditoria paralela já confirmada — N1.13 / F04
+
+Nenhum código da F04 foi misturado neste PR. A leitura sistêmica já confirmou,
+para a próxima branch da fila:
+
+- grafo coerente: `N1.13` nasce de `N1.02 + N1.04` e não usurpa `N1.09`;
+- `TouchPlace` tem alternativa por toque, mas **não implementa o arrasto** exigido
+  pela F04 §4 + adendo §8.3-bis (o cânone exige arrasto **e** toque alternativo);
+- Mão Fantasma aponta, mas não demonstra de fato `bandeja0 → vaga0`;
+- `TouchPlaceStage` não reseta estado ao receber nova `spec`;
+- há uma corrida de ~500ms no auto-fecho: depois da última vaga a interação ainda
+  pode ocorrer, e o callback pode capturar `recusas` antigo;
+- o erro autoral de `TouchPlaceStage` entra em conflito com o retry genérico do
+  GameLoop e pode deixar a tela encerrada enquanto o motor espera nova tentativa;
+- `DEPENDE_DE_ANDAIME` existe no procedimento/teste, mas não tem consumidor fora
+  deles. É diagnóstico **longitudinal** e deve ser ligado no nível de histórico,
+  não inventado a partir de uma questão isolada;
+- a suspeita de que recusas contaminariam automaticamente a coroa **não foi
+  confirmada**: não alterar `progressEngine` sem uma prova reproduzível.
+
+Próxima execução deve criar branch própria da `main` para **N1.13/F04**, corrigir
+o lote, gerar/abrir prints e só depois pensar em ativação. Nenhum destes achados
+justifica alterar ficha canônica ou grafo silenciosamente.
+'''
+              p.write_text(s)
+          Path('.github/workflows/visual-n106.yml').unlink()
           PY
-      - uses: actions/upload-artifact@v4
-        with:
-          name: n106-prints-final
-          path: /tmp/n106
-          retention-days: 7
+          git diff --check
+      - name: Commitar fechamento na branch N1.06
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'docs: registra fechamento da correção F05'
+          git push origin HEAD:codex/corrigir-n106
