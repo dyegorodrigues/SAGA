@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // O drag deve permanecer sem setState cruzado e sem animação de sombra inválida.
 import React from "react";
-import { render } from "@testing-library/react";
+import { fireEvent, render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { TouchPlace } from "./TouchPlace";
 
@@ -38,6 +38,22 @@ describe("F04 — contrato motor", () => {
     expect(tray.tagName).toBe("BUTTON");
     expect(tray.getAttribute("aria-label")).toContain("Pegar");
     expect(tray.className).toContain("touch-none");
+  });
+
+  it("o ghost do drag sai da árvore transformada — coordenadas continuam da viewport", () => {
+    const { container } = render(<TouchPlace {...base} />);
+    const tray = container.querySelector('[data-touchplace-tray]') as HTMLButtonElement;
+
+    fireEvent.pointerDown(tray, { pointerId: 9, clientX: 20, clientY: 240 });
+    fireEvent.pointerMove(tray, { pointerId: 9, clientX: 120, clientY: 80 });
+
+    const ghost = document.body.querySelector('[data-touchplace-drag-ghost]') as HTMLElement | null;
+    expect(ghost).toBeTruthy();
+    // Se voltar para dentro do PalcoEscalado, `position: fixed` passa a usar o
+    // ancestral transformado como containing block e o sprite deixa de seguir o dedo.
+    expect(container.querySelector('[data-touchplace-drag-ghost]')).toBeNull();
+    expect(ghost?.parentElement).toBe(document.body);
+    expect(ghost?.className).toContain("fixed");
   });
 
   it("a Mão Fantasma usa objeto + mão, sem ocupar vaga real", () => {
