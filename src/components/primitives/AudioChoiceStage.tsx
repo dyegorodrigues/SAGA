@@ -9,6 +9,11 @@ interface Props {
   onAnswer?: (valor: number, leitura: RespostaOuvidaRuntime) => void;
   disabled?: boolean;
   falar?: (texto: string) => void;
+  /**
+   * Sinal temporal para a CASCA do app. O palco não imprime enunciado: quando
+   * a primeira audição termina, avisa o GameLoop, que passa a mostrar q.prompt.
+   */
+  onPrimeiraAudicaoConcluida?: () => void;
   mostrar?: {
     pulsar?: string;
     ondasSonoras?: boolean;
@@ -19,21 +24,31 @@ interface Props {
 const TEMPO_ERRO_SUAVE = 1800;
 
 /**
- * F05: botão sozinho → primeira audição automática → enunciado + opções. No
- * erro, o numeral volta e o botão continua disponível; só o acerto produz o
- * fecho com o símbolo correto sozinho.
+ * F05: botão sozinho → primeira audição automática → opções. No erro, o
+ * numeral volta e o botão continua disponível; só o acerto produz o fecho.
  *
- * O palco é dono também do enunciado. O GameLoop esconde o balão/mascote para
- * esta ficha, e a abertura da §4 exige literalmente "nada mais na tela" além do
- * botão. Renderizar a pergunta aqui, somente depois da primeira audição, mantém
- * §3 (há enunciado) e §4 (abertura sem pista visual) verdadeiras ao mesmo tempo.
+ * O ENUNCIADO NÃO mora aqui. A fronteira Padrão Ouro é: palco desenha a
+ * interação; GameLoop desenha q.prompt. Este palco apenas emite o momento em
+ * que a casca pode revelá-lo sem violar a abertura da §4.
  */
-export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
+export function AudioChoiceStage({
+  spec,
+  onAnswer,
+  disabled,
+  falar,
+  onPrimeiraAudicaoConcluida,
+  mostrar,
+}: Props) {
   const [repeticoes, setRepeticoes] = React.useState(0);
   const [tentativas, setTentativas] = React.useState(0);
   const [escolha, setEscolha] = React.useState<number | null>(null);
   const [opcoesVisiveis, setOpcoesVisiveis] = React.useState(false);
   const erroTimer = React.useRef<number | null>(null);
+  const primeiraAudicaoCallback = React.useRef(onPrimeiraAudicaoConcluida);
+
+  React.useEffect(() => {
+    primeiraAudicaoCallback.current = onPrimeiraAudicaoConcluida;
+  }, [onPrimeiraAudicaoConcluida]);
 
   const emAula = mostrar != null && Object.keys(mostrar).length > 0;
   const acertou = escolha !== null && escolha === spec.resposta;
@@ -50,6 +65,11 @@ export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: P
     };
   }, [spec]);
 
+  function primeiraAudicaoTerminou() {
+    setOpcoesVisiveis(true);
+    primeiraAudicaoCallback.current?.();
+  }
+
   function escolher(valor: number | string) {
     const n = Number(valor);
     if (disabled || emAula || escolha !== null || !opcoesVisiveis || Number.isNaN(n)) return;
@@ -59,7 +79,6 @@ export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: P
     setEscolha(n);
     const certo = n === spec.resposta;
 
-    // §4: nenhum "errou". O feedback é ouvir novamente a informação-alvo.
     falar?.(certo ? FALAS.acerto(spec.alvo) : FALAS.erroSuave(spec.alvo));
 
     const leitura: RespostaOuvidaRuntime = {
@@ -73,8 +92,6 @@ export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: P
     onAnswer?.(n, leitura);
 
     if (!certo) {
-      // A opção "desliza de volta" e a criança pode tentar novamente. O botão
-      // de som permanece ativo durante este intervalo (§4).
       erroTimer.current = window.setTimeout(() => {
         erroTimer.current = null;
         setEscolha(null);
@@ -87,42 +104,30 @@ export function AudioChoiceStage({ spec, onAnswer, disabled, falar, mostrar }: P
   return (
     <div className="flex w-full flex-col items-center select-none">
       {!acertou && (
-        <>
-          {mostrarOpcoes && (
-            <p
-              data-enunciado-audiochoice
-              className="mb-3 px-3 text-center text-[17px] font-bold leading-snug"
-              style={{ color: "#22315C" }}
-            >
-              {spec.enunciado}
-            </p>
-          )}
-          <AudioChoice
-            audioPrompt={spec.palavra}
-            options={spec.alternativas}
-            onSelect={escolher}
-            disabled={disabled || emAula}
-            optionsDisabled={errouEmFeedback}
-            velocidade={spec.velocidade}
-            autoPlay={!emAula}
-            onPrimeiraAudicao={() => setOpcoesVisiveis(true)}
-            onRepetir={() => setRepeticoes(r => r + 1)}
-            realceDaOpcao={o => {
-              if (escolha === null) return null;
-              if (acertou) return Number(o) === spec.resposta ? "acerto" : null;
-              return Number(o) === escolha ? "erro" : null;
-            }}
-            pulsarBotao={emAula
-              ? mostrar?.pulsar === "botaoSom"
-              : opcoesVisiveis && !acertou}
-            pulsarOpcoes={emAula ? mostrar?.pulsarOpcoes === true : false}
-            ondasAtivas={emAula && mostrar?.ondasSonoras === true}
-            mostrarOpcoes={mostrarOpcoes}
-          />
-        </>
+        <AudioChoice
+          audioPrompt={spec.palavra}
+          options={spec.alternativas}
+          onSelect={escolher}
+          disabled={disabled || emAula}
+          optionsDisabled={errouEmFeedback}
+          velocidade={spec.velocidade}
+          autoPlay={!emAula}
+          onPrimeiraAudicao={primeiraAudicaoTerminou}
+          onRepetir={() => setRepeticoes(r => r + 1)}
+          realceDaOpcao={o => {
+            if (escolha === null) return null;
+            if (acertou) return Number(o) === spec.resposta ? "acerto" : null;
+            return Number(o) === escolha ? "erro" : null;
+          }}
+          pulsarBotao={emAula
+            ? mostrar?.pulsar === "botaoSom"
+            : opcoesVisiveis && !acertou}
+          pulsarOpcoes={emAula ? mostrar?.pulsarOpcoes === true : false}
+          ondasAtivas={emAula && mostrar?.ondasSonoras === true}
+          mostrarOpcoes={mostrarOpcoes}
+        />
       )}
 
-      {/* §4 Fecho: somente depois do ACERTO o numeral correto fica sozinho. */}
       {acertou && (
         <p
           data-fecho-audiochoice
