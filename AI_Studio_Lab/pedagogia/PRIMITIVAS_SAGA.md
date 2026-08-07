@@ -47,15 +47,18 @@ várias que antes constavam como “faltando ligar” **já foram ligadas**.
 | `ScatteredItems` | `scattered` | conservação/contagem dispersa |
 | `ShapeCanvas` | `shapecanvas` | **F47/GE.01 + F48/GE.02**; despacha para Stage específico |
 | `TenFrame` | `tenframe` | moldura de dez |
-| `TouchCount` | alias de `EmojiRow` | contagem por toque/áudio |
+| `TouchCount` | `touchcount` | **F27/N1.02 + F01/N1.04**; primitiva própria de contagem por toque |
 | `TouchPlace` | `touchplace` | **F04/N1.13**; produção de quantidade, arrasto, retry autoral |
 | `plain` | `plain` | alternativa/simbólico básico |
 
-### Três ligações que não podem voltar a aparecer como “faltando”
+### Quatro ligações que não podem voltar a aparecer como “faltando”
 
 - **`AudioChoice`** já possui builder, renderer e Stage executável. O fluxo F05 foi
   auditado em Chromium, inclusive abertura → primeira audição → opções → erro →
   retry → fecho.
+- **`TouchCount`** não é apenas alias de `EmojiRow`: existe `TouchCount.tsx`,
+  builder `touchcount`, renderer `touchcount` e contrato próprio. Ele compartilha
+  gramática visual com a fileira, mas mede outra ação.
 - **`TouchPlace`** já possui builder, renderer e Stage executável. O gesto canônico
   é arrasto real com alternativa por toque; o ghost sai do `PalcoEscalado` por
   portal para continuar sob o dedo.
@@ -93,7 +96,7 @@ A Bíblia também nomeia modos/kinds que não correspondem 1:1 às 25 primitivas
 autorais acima. Não contar cada nome como “um componente faltando”. Antes de
 construir, classificar em uma destas categorias:
 
-1. **alias** de primitiva existente (`TouchCount` → `EmojiRow`);
+1. **alias** de primitiva existente;
 2. **modo** de componente existente (`flash`, `clock-set`, `fact-family`);
 3. **renderer legado** que precisa de builder;
 4. **mecânica realmente nova**.
@@ -145,8 +148,8 @@ Antes de criar primitiva nova, responder obrigatoriamente:
 
 O problema histórico era unilateral: o auditor verificava “o que o mapa declara
 existe”, mas não verificava “o código evoluiu e o mapa ficou velho”. Por isso
-`AudioChoice`, `TouchPlace` e `ShapeCanvas` puderam estar executáveis enquanto a
-documentação ainda dizia “isolado”.
+`AudioChoice`, `TouchCount`, `TouchPlace` e `ShapeCanvas` puderam evoluir enquanto
+a documentação ainda descrevia estados anteriores.
 
 A partir da v1.2, `ficha_catalog_auditor.cjs` também faz a checagem reversa para
 kinds convencionais. Se Composer + renderer já provam a cadeia e o mapa não a
@@ -156,8 +159,8 @@ Isso transforma este inventário de memória humana em contrato verificável.
 
 ---
 
-*Changelog: v1.2 (ago/2026) — sincroniza `AudioChoice`, `TouchPlace` e
-`ShapeCanvas` com o runtime real; corrige os totais do mapa autoral para
+*Changelog: v1.2 (ago/2026) — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace`
+e `ShapeCanvas` com o runtime real; corrige os totais do mapa autoral para
 17 executáveis / 4 renderer-sem-builder / 3 isoladas / 1 ausente; adiciona guarda
 reversa no auditor. v1.1 — introduziu o mapa autoral→runtime auditável e resolveu
-semanticamente `TouchCount`, `Moedas` e `Regua`. v1.0 — inventário inaugural.*
+semanticamente `Moedas` e `Regua`. v1.0 — inventário inaugural.*
