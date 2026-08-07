@@ -19,6 +19,19 @@ describe("question diagnostics", () => {
     });
   });
 
+  it("preserva hipótese embutida numa resposta terminal correta", () => {
+    const diagnostics = createQuestionDiagnostics();
+    // F51/F04 podem reportar no final uma ação correta que carrega tentativas
+    // anteriores; F05 pode acertar depois de repetição excessiva.
+    recordQuestionAttempt(diagnostics, true, "precisa-repeticao");
+
+    expect(summarizeQuestionDiagnostics(diagnostics, true)).toEqual({
+      attemptCount: 1,
+      recoveredAfterError: false,
+      misconceptionTags: ["precisa-repeticao"],
+    });
+  });
+
   it("does not report recovery when the terminal answer is wrong", () => {
     const diagnostics = createQuestionDiagnostics();
     recordQuestionAttempt(diagnostics, false);
