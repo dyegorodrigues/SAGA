@@ -1,0 +1,101 @@
+name: Patch F04 engine
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'codex/corrigir-n113' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n113
+          fetch-depth: 0
+      - name: Integrar F04 ao GameLoop sem feedback concorrente
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/components/GameLoop.tsx')
+          s = p.read_text()
+
+          def rep(old, new):
+              global s
+              n = s.count(old)
+              if n != 1:
+                  raise SystemExit(f'esperado 1, achei {n}: {old[:100]!r}')
+              s = s.replace(old, new)
+
+          rep(
+            'import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";\n',
+            'import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";\n'
+            'import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./gameloop/authorialStagePolicy";\n'
+            'import { AcaoDeProducao, dependeDeAndaime } from "../curriculum/procedimentos/producaoProcedure";\n'
+            'import { MisconceptionTag } from "../constants/misconceptions";\n'
+          )
+          rep(
+            '  recordQuestionAttempt,\n  summarizeQuestionDiagnostics,\n',
+            '  recordQuestionAttempt,\n  recordQuestionHypothesis,\n  summarizeQuestionDiagnostics,\n'
+          )
+          rep(
+            '  const questionDiagnosticsRef = useRef(createQuestionDiagnostics());\n',
+            '  const questionDiagnosticsRef = useRef(createQuestionDiagnostics());\n'
+            '  // F04: histórico apenas da missão. Não vira campo persistente no save.\n'
+            '  const producaoHistoricoRef = useRef<AcaoDeProducao[]>([]);\n'
+          )
+          rep(
+            '  useEffect(() => {\n    applyTheme(kid.theme);\n    pickVoice();\n  }, [kid.theme]);\n',
+            '  useEffect(() => {\n    applyTheme(kid.theme);\n    pickVoice();\n  }, [kid.theme]);\n\n'
+            '  useEffect(() => {\n    producaoHistoricoRef.current = [];\n  }, [track.id]);\n'
+          )
+          rep(
+            '    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);\n    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);\n\n    // --- CAMADA 1 (Erro Suave) ---',
+            '    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);\n'
+            '    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);\n'
+            '    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);\n\n'
+            '    // F04 §6: DEPENDE_DE_ANDAIME é comparação ENTRE questões. Os dois\n'
+            '    // warmups um nível abaixo fornecem a observação com vagas antes de L4.\n'
+            '    if (answerMeta?.touchplace) {\n'
+            '      const acao = answerMeta.touchplace as AcaoDeProducao;\n'
+            '      producaoHistoricoRef.current.push(acao);\n'
+            '      if (dependeDeAndaime(producaoHistoricoRef.current)) {\n'
+            '        recordQuestionHypothesis(questionDiagnosticsRef.current, MisconceptionTag.DEPENDE_DE_ANDAIME);\n'
+            '      }\n'
+            '    }\n\n'
+            '    // Palco autoral registra a tentativa acima, mas mantém a própria tela\n'
+            '    // recuperável. Não entra no contador genérico de 3 erros.\n'
+            '    if (!right && ownsAuthorialRetry(q, answerMeta)) return;\n\n'
+            '    // --- CAMADA 1 (Erro Suave) ---'
+          )
+          rep(
+            '    if (sound) {\n      if (right) sfx.right();\n      else sfx.wrong();\n      if (currentToast && currentToast.startsWith("Subiu")) sfx.level();\n    }\n',
+            '    if (sound && !feedbackAutoral) {\n      if (right) sfx.right();\n      else sfx.wrong();\n      if (currentToast && currentToast.startsWith("Subiu")) sfx.level();\n    }\n'
+          )
+          rep(
+            '    const baseFb = right\n      ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])\n      : OOPS[Math.floor(Math.random() * OOPS.length)];\n    const showExplain = !!q.explain && !right;\n    const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;\n',
+            '    const baseFb = feedbackAutoral ? "" : right\n      ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])\n      : OOPS[Math.floor(Math.random() * OOPS.length)];\n    const showExplain = !feedbackAutoral && !!q.explain && !right;\n    const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;\n'
+          )
+          rep(
+            '    setMsg(fb);\n',
+            '    setMsg(feedbackAutoral ? null : fb);\n'
+          )
+          rep(
+            '    if (sound) {\n      speak(fb, {\n        pitch: right ? 1.3 : 1.05,\n      });\n      // Auto-avanço de segurança: 10 segundos se a criança não clicar no botão \'Avançar\'\n      if (val !== "__timeout__") {\n        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);\n      }\n    } else {\n      // Sem som: auto-avanço em 10s se não clicar no botão\n      if (val !== "__timeout__") {\n        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);\n      }\n    }',
+            '    if (sound && !feedbackAutoral) {\n      speak(fb, {\n        pitch: right ? 1.3 : 1.05,\n      });\n      if (val !== "__timeout__") {\n        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);\n      }\n    } else if (val !== "__timeout__") {\n      // A F04 já mostrou/falou o fecho antes de publicar a resposta terminal.\n      // Depois do commit de progresso, uma curta saída preserva a fluidez.\n      const espera = feedbackAutoral ? 400 : 10000;\n      setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);\n    }'
+          )
+
+          p.write_text(s)
+          Path('.github/workflows/f04-engine-patch.yml').unlink()
+          PY
+          git diff --check
+      - name: Commitar na branch F04
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: integra retry e diagnostico longitudinal da F04'
+          git push origin HEAD:codex/corrigir-n113
