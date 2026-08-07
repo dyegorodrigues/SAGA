@@ -160,7 +160,7 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
           Ela faltava aqui, e a falta escondeu o enunciado saindo DUAS vezes em
           todo palco que imprimia o próprio: o palco só, sem o enquadramento do
           app, é o print errado da RETOMADA §7.4. */}
-      {q.prompt && (
+      {q.prompt && q.kind !== "audiochoice" && (
         <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
           style={{ borderColor: "#D9E5F8", color: "#22315C", background: "#fff", borderWidth: 3 }}>
           {q.prompt}

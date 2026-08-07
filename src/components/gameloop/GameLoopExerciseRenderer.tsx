@@ -610,7 +610,7 @@ export function GameLoopExerciseRenderer({
       )}
 
       {/* Tutorial guiado 👉 (generalizado): a mãozinha do Contar, para as cenas novas */}
-      {hasTutorial(q) && q.kind !== "vertical" && !status && (
+      {hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (
         guidedNarr !== null ? (
           <div
             className="mt-3 mx-auto p-3 rounded-2xl text-center mk-optin"
