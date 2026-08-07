@@ -146,24 +146,28 @@ export function TouchPlace({
   }
 
   function moverArrasto(e: React.PointerEvent<HTMLButtonElement>) {
-    setArrasto(atual => {
-      if (!atual || atual.pointerId !== e.pointerId) return atual;
-      const distancia = Math.hypot(e.clientX - atual.inicioX, e.clientY - atual.inicioY);
-      const virouArrasto = atual.ativo || distancia >= LIMIAR_DE_ARRASTO;
-      if (virouArrasto && !atual.ativo) {
-        onPegar();
-        suprimirClick.current = true;
-      }
+    const atual = arrasto;
+    if (!atual || atual.pointerId !== e.pointerId) return;
 
-      const r = campo.current?.getBoundingClientRect();
-      if (virouArrasto && r && r.width && r.height) {
-        const p = pontoLogico(r, e.clientX, e.clientY);
-        setHalo(ancoraEmHalo(ancoras, ocupadas, p));
-      } else {
-        setHalo(-1);
-      }
-      return { ...atual, x: e.clientX, y: e.clientY, ativo: virouArrasto };
-    });
+    const distancia = Math.hypot(e.clientX - atual.inicioX, e.clientY - atual.inicioY);
+    const virouArrasto = atual.ativo || distancia >= LIMIAR_DE_ARRASTO;
+
+    // Efeitos no Stage ficam FORA do updater de estado deste componente. Chamar
+    // onPegar() dentro de setArrasto(prev => ...) fazia React atualizar o pai
+    // enquanto TouchPlace ainda calculava o próprio estado.
+    if (virouArrasto && !atual.ativo) {
+      onPegar();
+      suprimirClick.current = true;
+    }
+
+    const r = campo.current?.getBoundingClientRect();
+    if (virouArrasto && r && r.width && r.height) {
+      const p = pontoLogico(r, e.clientX, e.clientY);
+      setHalo(ancoraEmHalo(ancoras, ocupadas, p));
+    } else {
+      setHalo(-1);
+    }
+    setArrasto({ ...atual, x: e.clientX, y: e.clientY, ativo: virouArrasto });
   }
 
   function terminarArrasto(e: React.PointerEvent<HTMLButtonElement>) {
@@ -224,7 +228,9 @@ export function TouchPlace({
         animate={{
           x: balanco ? [0, -7, 7, -4, 0] : 0,
           filter: fechando ? "brightness(1.18)" : "brightness(1)",
-          boxShadow: arrasto?.ativo && !comAndaime ? `0 0 0 5px ${tema.vaga}55` : "none",
+          boxShadow: arrasto?.ativo && !comAndaime
+            ? `0 0 0 5px ${tema.vaga}55`
+            : "0 0 0 0px rgba(0,0,0,0)",
         }}
         transition={{ duration: balanco ? 0.45 : 0.5 }}
       >
