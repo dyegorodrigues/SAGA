@@ -1,3 +1,4 @@
+// Gate visual final da F05: run 31188061774, 8 sementes em Chromium real.
 import { describe, expect, it } from "vitest";
 import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
