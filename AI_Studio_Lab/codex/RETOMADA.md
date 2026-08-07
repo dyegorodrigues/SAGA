@@ -125,9 +125,10 @@ A `GM.02` **não era o caso**, e o §12 do plano registra a correção: ela serv
 "tempo cotidiano", que é o que o grafo diz que ela é, e a `GM.04` depende dessa
 leitura. Tabela e achados em `PLANO_DO_BLOCO_F0.md §10` e `§12`.
 
-**Quatro primitivas estavam órfãs** — existiam no código e não eram alcançáveis
+**Cinco primitivas estavam órfãs** — existiam no código e não eram alcançáveis
 por nenhuma ficha: `AudioChoice`, `TouchPlace`, `ShapeCanvas` (importado no
-`FichaRenderer` sem `case`) e `Grupo`. É o defeito mais barato de procurar e o
+`FichaRenderer` sem `case`), `Grupo` e — achada na varredura do `KindType` —
+`SentenceBuilder`. É o defeito mais barato de procurar e o
 mais caro de não ver: ele faz o inventário parecer completo.
 
 **Passo 3 — `TenFrame`, plain e flash: ✅ FECHADO.** N1.08 (níveis 3-5, ficha
@@ -315,6 +316,7 @@ Registrado porque o autor cobrou, e porque a próxima sessão não deve repetir.
 | P14 | Palcos novos precisam entrar no `PalcoEscalado` — desenho de tamanho fixo sem ele vaza em tela pequena, e a sonda só acusa se a cena estiver no catálogo | `PalcoEscalado.tsx`, `PLANO_DO_BLOCO_F0.md §11` |
 | P16 | A **F28** — a outra ficha da N1.11, os amigos do 10 como *conta*. A JD3 (implementada) é a percepção; a §2 dela diz que a forma simbólica é outra competência. A F28 não tem código | `N1.11.ts`, `PLANO_DO_BLOCO_F0.md §14.7` |
 | P17 | O `bond` (parte-todo **simbólico**) é a N1.10 na faixa F1 e hoje só existe no gerador legado. Ativando a JD5, a N1.10 fica sem a forma simbólica até a ficha F1 existir | `N1.10.ts`, `PLANO_DO_BLOCO_F0.md §14.7` |
+| P18 | **Nove kinds do `KindType` sem builder** no Composer: o tipo promete o que o motor não entrega, e uma ficha que os declare quebra na geração da questão. Travados como dívida declarada — registrados, **não pagos**. Inclui o `SentenceBuilder`, a **quinta primitiva órfã** | `kindComBuilder.test.ts` |
 | — | `scripts/e2e-screenshots.mjs` não chega à tela de exercício (seed velho) | commit `a2d6c87` |
 | — | N4.09 ativação; N4.10–N4.12; coreografia faltando em N3.10, N4.03/04/06/07 | `ROTEIRO_ATE_O_FIM.md §4-bis` |
 

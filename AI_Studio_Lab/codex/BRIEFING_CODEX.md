@@ -28,7 +28,7 @@ olhos em vez de confiar neste texto:
 npm run fichas:conferir && npm run sonda && npx vitest run && npx tsc --noEmit
 ```
 
-Estado esperado hoje: **9/9 · 1170 tomadas sem vazamento · 1903 testes · tsc
+Estado esperado hoje: **9/9 · 1170 tomadas sem vazamento · 1908 testes · tsc
 limpo**. Se algo estiver vermelho **antes** de você tocar em qualquer coisa,
 pare e registre — não conserte às cegas.
 
@@ -117,9 +117,10 @@ um portão desligado.
 
 ## 3. A fila, na ordem
 
-### 🟢 Tarefa 1 — A varredura das primitivas declaradas e inalcançáveis
+### ✅ Tarefa 1 — FEITA (commit `HEAD~1`, `kindComBuilder.test.ts`)
 
-**Risco: nenhum.** Não muda comportamento. Faça esta primeira.
+Ficou pronta antes de o crédito acabar. Está aqui só para você saber o que
+existe — **não refaça**. Comece pela tarefa 2.
 
 `KindType` em `src/curriculum/schema.ts` declara 39 primitivas. **Nove não têm
 builder no Composer** — uma ficha que as declare quebra na geração da questão,
@@ -135,11 +136,15 @@ repositório já encontrou quatro vezes (primitiva órfã, tag testada e nunca
 emitida, distrator ausente do banco): **declarado num lugar, esperado noutro, e
 nada ligando os dois.**
 
-**O que fazer:** um teste que trave a lista como **dívida declarada**, no
-formato que `conformidadeDeFichas.test.ts` já usa (`DIVIDA_DECLARADA`) — cada
-kind sem builder listado com o motivo, e o teste **falhando** se aparecer um
-novo fora da lista *ou* se um da lista ganhar builder e a linha não for
-removida. Não implemente os nove builders; só impeça a descoberta por acidente.
+`src/curriculum/kindComBuilder.test.ts` trava os nove como **dívida
+declarada**, cada um com o motivo, e é escrito ao contrário: falha se aparecer
+um kind novo sem builder **e** falha se um da lista ganhar builder sem a linha
+ser removida. Os builders **não** foram implementados — a dívida está registrada,
+não paga.
+
+Achado de lado: `SentenceBuilder` é a **quinta primitiva órfã** (existe em
+`components/primitives/` e não é alcançável por ninguém). Virou a pendência
+**P18**.
 
 ### 🟡 Tarefa 2 — Os PRs de ativação, um por vez
 
