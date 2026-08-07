@@ -5,11 +5,15 @@ on:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: visual-al01-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   visual:
-    name: Sonda e prints AL.01
+    name: Sonda rápida e prints AL.01
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -33,10 +37,14 @@ jobs:
           ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
           /opt/pw-browsers/chromium-1194/chrome-linux/chrome --version
 
-      - name: Rodar sonda filtrada de AL.01
+      # LAÇO DE TRABALHO, não o portão final: RETOMADA §3 manda uma semente
+      # enquanto se corrige, e as oito somente no fechamento do lote.
+      - name: Rodar sonda rápida de AL.01
+        env:
+          SONDA_SEMENTES: '1'
         run: npm run sonda -- "AL.01"
 
-      - name: Gerar prints de AL.01
+      - name: Gerar um print por cena de AL.01
         run: |
           rm -rf /tmp/prints
           PRINTS_OUT=/tmp/prints node scripts/prints.mjs "AL.01"
