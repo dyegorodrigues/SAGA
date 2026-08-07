@@ -6,6 +6,7 @@ import {
   ownsAuthorialFeedback,
   ownsAuthorialRetry,
 } from "./answerPolicy";
+import { unbundleMisconceptions } from "./misconceptionBundle";
 
 const q: Question = { kind: "touchplace", prompt: "Coloque 3", answer: 3, uiProps: {} };
 
@@ -30,7 +31,7 @@ describe("F04 na fronteira com o GameLoop integrado", () => {
       comAndaime: false,
       diagnosticosLongitudinais: [MisconceptionTag.DEPENDE_DE_ANDAIME],
     };
-    expect(misconceptionForAnswer(q, 2, { touchplace: leitura })).toEqual([
+    expect(unbundleMisconceptions(misconceptionForAnswer(q, 2, { touchplace: leitura }))).toEqual([
       MisconceptionTag.PRODUCAO_INCOMPLETA,
       MisconceptionTag.DEPENDE_DE_ANDAIME,
     ]);
