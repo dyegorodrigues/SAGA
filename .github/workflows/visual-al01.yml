@@ -42,13 +42,12 @@ jobs:
           PRINTS_OUT=/tmp/prints node scripts/prints.mjs "AL.01"
           ls -lh /tmp/prints
 
-      - name: Montar folha de contato para inspeção no agente
+      - name: Montar folha de contato
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
           from PIL import Image, ImageDraw
           from pathlib import Path
-          import base64, io
 
           files = sorted(Path('/tmp/prints').glob('*.png'))
           if not files:
@@ -72,11 +71,14 @@ jobs:
               label = path.stem.replace('_', ' ')[:42]
               draw.text((x+4, y+thumb_h+4), f'{i+1}. {label}', fill='black')
 
-          buf = io.BytesIO()
-          sheet.save(buf, format='JPEG', quality=72, optimize=True)
-          data = base64.b64encode(buf.getvalue()).decode('ascii')
-          print('CONTACT_SHEET_B64_BEGIN')
-          print(data)
-          print('CONTACT_SHEET_B64_END')
+          sheet.save('/tmp/prints/contact-sheet.jpg', quality=78, optimize=True)
           print(f'CONTACT_SHEET_COUNT={len(files)}')
           PY
+
+      - name: Publicar prints para inspeção
+        uses: actions/upload-artifact@v4
+        with:
+          name: al01-prints
+          path: /tmp/prints
+          if-no-files-found: error
+          retention-days: 7
