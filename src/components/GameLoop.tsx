@@ -7,14 +7,17 @@ import {
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
-import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
-import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./gameloop/authorialStagePolicy";
-import { AcaoDeProducao, dependeDeAndaime } from "../curriculum/procedimentos/producaoProcedure";
-import { MisconceptionTag } from "../constants/misconceptions";
+import {
+  evidenciasDaResposta,
+  isMotorSlip,
+  isRetryableAnswer,
+  misconceptionForAnswer,
+  ownsAuthorialFeedback,
+  ownsAuthorialRetry,
+} from "./gameloop/answerPolicy";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
-  recordQuestionHypothesis,
   summarizeQuestionDiagnostics,
 } from "./gameloop/questionDiagnostics";
 
@@ -186,8 +189,6 @@ export function GameLoop({
   const aulaEndRef = useRef<null | (() => void)>(null);
   const qRef = useRef<Question>(q);
   const questionDiagnosticsRef = useRef(createQuestionDiagnostics());
-  // F04: histórico apenas da missão. Não vira campo persistente no save.
-  const producaoHistoricoRef = useRef<AcaoDeProducao[]>([]);
 
   useEffect(() => {
     if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
@@ -220,6 +221,7 @@ export function GameLoop({
   // criança nunca viu a aulinha deste kind (depois disso, só botão/algoritmo)
   const [autoAula, setAutoAula] = useState(() => hasAulinha(q) && !aulaSeen(kid.id, q.kind));
   const [promptDone, setPromptDone] = useState(!sound);
+  const [audioChoicePromptVisible, setAudioChoicePromptVisible] = useState(false);
   
   // Update autoAula state on question change
   useEffect(() => {
@@ -232,10 +234,6 @@ export function GameLoop({
     pickVoice();
   }, [kid.theme]);
 
-  useEffect(() => {
-    producaoHistoricoRef.current = [];
-  }, [track.id]);
-
   // reset do sequenciamento a cada questão nova (+ mata timers de aulinha em curso)
   useEffect(() => {
     setOrderTaps([]);
@@ -243,6 +241,7 @@ export function GameLoop({
     setGuidedNarr(null);
     setTutShow(null);
     setJourneyDone(false);
+    setAudioChoicePromptVisible(false);
     stopAulaTimers();
     setGuidedIdx(null);
     setQErrors(0);
@@ -393,7 +392,7 @@ export function GameLoop({
   useEffect(() => {
     // journey narra sozinho; na 1ª visita com aulinha automática, a AULA vem primeiro
     // e o enunciado é falado ao fim dela (ver efeito da aulinha)
-    if (sound && !done && !status && q.kind !== "journey" && !autoAula) {
+    if (sound && !done && !status && q.kind !== "journey" && q.kind !== "audiochoice" && !autoAula) {
       const isFirstQ = idx === 0;
       const isNewKind = lastSpokenKindRef.current !== q.kind;
       const isNewPrompt = lastSpokenPromptRef.current !== q.prompt;
@@ -470,18 +469,8 @@ export function GameLoop({
     recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
     const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
 
-    // F04 §6: DEPENDE_DE_ANDAIME é comparação ENTRE questões. Os dois
-    // warmups um nível abaixo fornecem a observação com vagas antes de L4.
-    if (answerMeta?.touchplace) {
-      const acao = answerMeta.touchplace as AcaoDeProducao;
-      producaoHistoricoRef.current.push(acao);
-      if (dependeDeAndaime(producaoHistoricoRef.current)) {
-        recordQuestionHypothesis(questionDiagnosticsRef.current, MisconceptionTag.DEPENDE_DE_ANDAIME);
-      }
-    }
-
-    // Palco autoral registra a tentativa acima, mas mantém a própria tela
-    // recuperável. Não entra no contador genérico de 3 erros.
+    // Palco autoral: registra a tentativa no Radar, mas mantém o ciclo de erro
+    // dentro da própria primitiva. F05 exige repetições ilimitadas (§4).
     if (!right && ownsAuthorialRetry(q, answerMeta)) return;
 
     // --- CAMADA 1 (Erro Suave) ---
@@ -720,9 +709,9 @@ export function GameLoop({
         setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
       }
     } else if (val !== "__timeout__") {
-      // A F04 já mostrou/falou o fecho antes de publicar a resposta terminal.
-      // Depois do commit de progresso, uma curta saída preserva a fluidez.
-      const espera = feedbackAutoral ? 400 : 10000;
+      // F05 §4 fecha a associação som-símbolo em 1,5s; os demais mantêm a
+      // janela de segurança histórica de 10s.
+      const espera = feedbackAutoral ? 1500 : 10000;
       setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);
     }
   };
@@ -960,7 +949,10 @@ export function GameLoop({
       </div>
 
       {/* Narrative Mascot Header Row */}
-      <div className="mb-4 flex-shrink-0 flex items-start gap-3">
+      <div
+        className="mb-4 flex-shrink-0 flex items-start gap-3"
+        style={q.kind === "audiochoice" ? { display: "none" } : undefined}
+      >
         <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`}>
           <Mascote 
             theme={kid.theme} 
@@ -996,7 +988,17 @@ export function GameLoop({
         
       </div>
 
-      {q.review && !status && (
+      {q.kind === "audiochoice" && audioChoicePromptVisible && !status && (
+        <div
+          data-audiochoice-prompt
+          className="mb-3 flex-shrink-0 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
+          style={{ borderColor: C.line, color: C.ink, background: C.card, fontFamily: FONT }}
+        >
+          {q.prompt}
+        </div>
+      )}
+
+      {q.kind !== "audiochoice" && q.review && !status && (
         <div className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-md text-xs font-bold mb-3">
           🧠 Prática Espaçada / Revisão Inteligente
         </div>
@@ -1008,6 +1010,7 @@ export function GameLoop({
         timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
         mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
         flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
+        onFirstAuditionComplete={() => setAudioChoicePromptVisible(true)}
       />
       </div>
       {/* Botão AVANÇAR — surge ao responder; deixa a criança seguir no ritmo dela */}
