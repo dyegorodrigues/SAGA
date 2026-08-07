@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main]
+    branches: [main, codex/corrigir-n113]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -58,7 +58,7 @@ jobs:
 
   visual-f04:
     name: Visual F04 — N1.13
-    if: github.event_name == 'pull_request' && github.head_ref == 'codex/corrigir-n113'
+    if: github.head_ref == 'codex/corrigir-n113' || github.ref == 'refs/heads/codex/corrigir-n113'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -145,13 +145,15 @@ jobs:
           const tb=await tray.boundingBox(), sb=await slot.boundingBox();
           if(!tb||!sb)throw new Error('bandeja/vaga sem geometria');
           const start={x:tb.x+tb.width/2,y:tb.y+tb.height/2}, end={x:sb.x+sb.width/2,y:sb.y+sb.height/2};
+          const vagasAntes=await page.locator('[aria-label="Vaga vazia"]').count();
           await page.mouse.move(start.x,start.y); await page.mouse.down(); await page.mouse.move(end.x,end.y,{steps:8}); await page.waitForTimeout(120);
           await page.screenshot({path:'/tmp/f04/states/90_DRAG_HALO.png'});
           const halos=await page.locator('[aria-label="Vaga vazia"]').evaluateAll(ns=>ns.filter(n=>getComputedStyle(n).boxShadow!=='none').length);
           if(halos<1)throw new Error('drag sem halo');
           await page.mouse.up(); await page.waitForTimeout(250);
           await page.screenshot({path:'/tmp/f04/states/91_DROP.png'});
-          if((await page.locator('[aria-label="Vaga vazia"]').count()) >= (await page.locator('[aria-label="Vaga vazia"]').count()) + 1) throw new Error('drop invalido');
+          const vagasDepois=await page.locator('[aria-label="Vaga vazia"]').count();
+          if(vagasDepois!==vagasAntes-1)throw new Error(`drop nao ocupou uma vaga: ${vagasAntes} -> ${vagasDepois}`);
 
           await ir('N1.13 produzir quantidade (nível 4)');
           if(await page.locator('[aria-label="Vaga vazia"]').count())throw new Error('L4 ainda tem vaga');
