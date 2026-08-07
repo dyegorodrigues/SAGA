@@ -1,0 +1,107 @@
+name: Retify P15 GM12 v3
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  retify:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Aplicar matriz e atualizar os fiscais
+        run: |
+          python3 -m py_compile AI_Studio_Lab/tools/p15_gm12_retification.py AI_Studio_Lab/tools/p15_gm12_auditor_fix.py
+          python3 AI_Studio_Lab/tools/p15_gm12_retification.py
+          python3 AI_Studio_Lab/tools/p15_gm12_auditor_fix.py
+          npm run grafo:gerar
+          git diff --check
+
+      - name: Provar a matriz e a dívida explícita
+        run: |
+          node <<'NODE'
+          const fs=require('node:fs'); const YAML=require('yaml');
+          const g=YAML.parse(fs.readFileSync('curriculum/grafo_saga.yaml','utf8'));
+          const nodes=g.nodes||[], ids=nodes.map(n=>n.id), by=Object.fromEntries(nodes.map(n=>[n.id,n]));
+          if(nodes.length!==90||new Set(ids).size!==90) throw new Error(`grafo: ${nodes.length} nós/${new Set(ids).size} IDs`);
+          if(by['GM.02']?.nome!=='Tempo cotidiano') throw new Error('GM.02 foi sequestrado');
+          if(JSON.stringify(by['GM.12']?.prereqs)!==JSON.stringify(['GM.01'])) throw new Error(`GM.12 incorreto: ${JSON.stringify(by['GM.12'])}`);
+          if(JSON.stringify(by['GM.05']?.prereqs)!==JSON.stringify(['GM.12','N2.02'])) throw new Error(`GM.05 incorreto: ${JSON.stringify(by['GM.05'])}`);
+          const st=new Map(); function v(id,t=[]){if(st.get(id)===1)throw new Error(`ciclo ${[...t,id].join(' -> ')}`);if(st.get(id)===2)return;st.set(id,1);for(const p of by[id].prereqs||[]){if(!by[p])throw new Error(`${id}->${p} ausente`);v(p,[...t,id]);}st.set(id,2);} ids.forEach(x=>v(x));
+          const f50=fs.readFileSync('AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md','utf8').split('# FICHA F50 —')[1].split('# FICHA F51 —')[0];
+          if(!f50.includes('GM.12 (massa e capacidade')||!f50.includes('`Balanca` + `Recipientes`')) throw new Error('F50 não migrou integralmente');
+          if(f50.includes('recipiente-padrão graduado')) throw new Error('F50 vazou unidade de GM.05');
+          const pend=fs.readFileSync('src/curriculum/conformidadeDeFichas.test.ts','utf8');
+          if(!pend.includes('["Moedas", "Recipientes", "Regua"]')) throw new Error('Recipientes não está na dívida explícita');
+          const rm=fs.readFileSync('src/curriculum/fichaRuntimeMap.test.ts','utf8');
+          if(!rm.includes('Primitivas declaradas: 26')||!rm.includes('Recipientes: ausente')) throw new Error('contrato do mapa não protege Recipientes');
+          console.log('GM.12: matriz, DAG e dívida de infraestrutura coerentes.');
+          NODE
+
+      - name: Gates completos
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npm test -- --run
+          npm run build
+
+      - name: Cobertura honesta
+        run: |
+          node AI_Studio_Lab/tools/catalog_auditor.cjs | tee /tmp/catalog.txt
+          node AI_Studio_Lab/tools/ficha_catalog_auditor.cjs | tee /tmp/fichas.txt
+          grep -q 'YAML agregado: 90 nós' /tmp/catalog.txt
+          grep -q 'Markdown humano: 90 competências' /tmp/catalog.txt
+          grep -q 'TypeScript runtime: 90 nós' /tmp/catalog.txt
+          grep -q 'Primitivas declaradas: 26' /tmp/fichas.txt
+          grep -q 'Recipientes: ausente' /tmp/fichas.txt
+
+      - name: Publicar retificação e apagar todas as bancadas
+        run: |
+          rm -f \
+            .github/workflows/retify-p15-gm12.yml \
+            .github/workflows/retify-p15-gm12-v2.yml \
+            .github/workflows/retify-p15-gm12-v3.yml \
+            AI_Studio_Lab/tools/p15_gm12_retification.py \
+            AI_Studio_Lab/tools/p15_gm12_auditor_fix.py
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add \
+            curriculum/grafo_saga.yaml curriculum/GM.yaml \
+            src/data/grafo_saga.json src/curriculum/grafo_saga.ts \
+            AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md \
+            AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md \
+            AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md \
+            src/curriculum/fichas/jornada/GM.01.ts \
+            AI_Studio_Lab/tools/ficha_runtime_map.cjs \
+            AI_Studio_Lab/tools/catalog_auditor.cjs \
+            src/curriculum/conformidadeDeFichas.test.ts \
+            src/curriculum/fichaRuntimeMap.test.ts \
+            AI_Studio_Lab/codex/PLANO_DO_BLOCO_F0.md \
+            AI_Studio_Lab/codex/BRIEFING_CODEX.md \
+            AI_Studio_Lab/codex/RETOMADA.md \
+            .github/workflows/retify-p15-gm12.yml \
+            .github/workflows/retify-p15-gm12-v2.yml \
+            .github/workflows/retify-p15-gm12-v3.yml \
+            AI_Studio_Lab/tools/p15_gm12_retification.py \
+            AI_Studio_Lab/tools/p15_gm12_auditor_fix.py
+          git diff --cached --check
+          git commit -m 'curriculo: separa massa e capacidade no GM.12'
+          git push origin HEAD:codex/integrar-bloco-f0
