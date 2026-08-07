@@ -373,3 +373,18 @@ Creature Lab — renderer, catálogo de animações PMD, entrada Vite própria) 
 `codex/criar-branch-para-creature-engine-tamagotchi` (3 commits, guardas de
 binário PMD). **Nenhuma das duas está na `main`, e uma não contém a outra** —
 verificado em 7/ago/2026. Apagar qualquer uma perde trabalho.
+
+---
+
+## Registro Codex - N1.06 / F05 (7/ago/2026)
+
+- Branch codex/corrigir-n106, PR #27: CORRECAO FECHADA, NAO ATIVADA.
+- F05 auditada de ponta a ponta: ficha -> grafo -> Composer -> audiochoice -> Stage/Renderer -> GameLoop -> Radar -> Chromium.
+- Corrigidos: autoplay/convite, retry autoral, feedback concorrente, Radar/evidencia, reset com alvo repetido, tela vazia e grade 2x2 para 4 opcoes.
+- Divergencia declarada: NAO_ESCUTOU nao pode nascer da primeira opcao apos autoplay; exige estado temporal anterior ao fim da primeira audicao.
+- GameLoop permanece unico dono de q.prompt; Stage apenas sinaliza o fim da primeira audicao.
+- questionDiagnostics agora preserva hipotese embutida em acao terminal correta; efeito compartilhado com F51/F04.
+- CI final verde: run 31188064450. Visual final: run 31188061774, 8 sementes, Chromium real, prints inspecionados.
+- N1.06 segue fora de COMPOSER_CANARIES; ativacao somente em PR separado.
+- Auditoria F04/N1.13 ja achou: falta arrasto real, mao fantasma incompleta, reset de spec ausente, corrida no autofecho, conflito de retry e DEPENDE_DE_ANDAIME sem consumidor longitudinal.
+- PRIMITIVAS_SAGA.md esta atrasado para AudioChoice/TouchPlace; nao usar esse inventario como verdade de runtime.

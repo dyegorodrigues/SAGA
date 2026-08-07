@@ -1,3 +1,5 @@
+import { unbundleMisconceptions } from "./misconceptionBundle";
+
 export interface QuestionDiagnostics {
   attemptCount: number;
   hadError: boolean;
@@ -17,11 +19,9 @@ export const createQuestionDiagnostics = (): QuestionDiagnostics => ({
 });
 
 /**
- * Registra uma resposta/tentativa observável.
- *
- * Uma hipótese pode estar embutida numa ação que TERMINA correta: F51/F04
- * acumulam tentativas dentro da primitiva. Descartá-la por `isCorrect` apagava
- * o histórico que o Radar precisa enxergar.
+ * Registra UMA tentativa observável. O contrato vindo de answerPolicy continua
+ * string; se ela embute várias hipóteses, o bundle é aberto aqui sem inflar o
+ * contador de tentativas.
  */
 export function recordQuestionAttempt(
   diagnostics: QuestionDiagnostics,
@@ -30,13 +30,11 @@ export function recordQuestionAttempt(
 ): void {
   diagnostics.attemptCount += 1;
   diagnostics.hadError ||= !isCorrect;
-  if (misconception) diagnostics.misconceptionTags.add(misconception);
+  unbundleMisconceptions(misconception)
+    .forEach(tag => diagnostics.misconceptionTags.add(tag));
 }
 
-/**
- * Acrescenta uma hipótese derivada de HISTÓRICO sem fingir que houve outro
- * toque. Ex.: F04 `DEPENDE_DE_ANDAIME` compara questões com e sem vaga.
- */
+/** Mantida para hipóteses de histórico produzidas por outros motores. */
 export function recordQuestionHypothesis(
   diagnostics: QuestionDiagnostics,
   misconception?: string,

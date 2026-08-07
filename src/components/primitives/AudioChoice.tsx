@@ -4,120 +4,123 @@ import { tokens } from '../../styles/tokens';
 import { speak } from '../Mascot';
 
 /**
- * `AudioChoice` — a primitiva da ficha F05 (N1.06).
+ * `AudioChoice` — a primitiva da ficha F05 (N1.06), Ouvir e Escolher.
  *
- * ---
- *
- * ### A §3, que é curta e manda em tudo
- *
- * > *"A tela é deliberadamente **vazia**. Nada de cenário, nada de mascote,
- * > nada de objeto. Só o botão de som e os numerais. Qualquer elemento extra
- * > compete com a única coisa que importa: o som."*
- *
- * É a única tela do bloco onde o vazio **não** é o defeito §6.6 — aqui o vazio
- * é o conteúdo, e o que preenche a tela é o áudio.
- *
- * ### O botão é AZUL, e isso não é gosto
- *
- * A §7 escreve o howto: *"Aperte o **botão azul**."* O botão estava **âmbar**,
- * pintado com `tokens.cor.elementos.marcador`. A voz mandava apertar um botão
- * que não existia na tela — é o §6.27, quantificador em texto é promessa que o
- * desenho tem de cumprir, e aqui a promessa é uma cor. Uma criança de 4 anos
- * que ainda não lê depende da cor para achar o alvo.
- *
- * ### O que a primitiva NÃO sabe
- *
- * Ela desenha e reporta. Quem conta repetições, decide acerto e roda a
- * coreografia é o `AudioChoiceStage` — a primitiva não conhece nível, ficha nem
- * diagnóstico.
+ * A tela é deliberadamente econômica: botão de som + numerais. A primitiva
+ * desenha e reporta; nível, diagnóstico e coreografia pertencem ao palco/ficha.
  */
-
 export interface AudioChoiceProps {
   /** A palavra que a voz diz: "três". Nunca aparece escrita. */
   audioPrompt: string;
   options: (number | string)[];
   onSelect: (option: number | string) => void;
+  /** Desliga a primitiva inteira — inclusive o botão de som. */
   disabled?: boolean;
-  /**
-   * Multiplicador da velocidade da fala.
-   *
-   * §5, nível 5: *"a voz fala mais rápido — reconhecimento automático"*. É o
-   * mesmo instrumento da exposição caindo na JD1: o degrau final aumenta a
-   * automaticidade, não o número.
-   */
+  /** Desliga só as alternativas, mantendo o replay disponível no erro suave. */
+  optionsDisabled?: boolean;
+  /** Multiplicador da velocidade da fala. Nível 5 acelera a voz (§5). */
   velocidade?: number;
-  /**
-   * Avisa que a criança pediu para ouvir de novo.
-   *
-   * §4: *"sem limite de repetições, sem penalidade"*. O número não pune — ele
-   * informa: a §9 exige pelo menos um acerto **na primeira audição**, e sem
-   * contar as repetições esse critério não teria como existir.
-   */
+  /** Avisa que a criança pediu para ouvir de novo. */
   onRepetir?: () => void;
-  /** §4: o numeral escolhido cresce e brilha, ou desliza de volta. */
+  /** A primeira execução automática terminou e as opções já podem subir. */
+  onPrimeiraAudicao?: () => void;
+  /** Na micro-aula fica falsa: a coreografia §8 é dona da narração. */
+  autoPlay?: boolean;
+  /** §4: o numeral escolhido cresce/brilha ou desliza de volta. */
   realceDaOpcao?: (opcao: number | string) => 'acerto' | 'erro' | null;
-  /** §8: o botão de som pulsa — "pode apertar de novo". */
+  /** §8: o botão pulsa para convidar ao replay. */
   pulsarBotao?: boolean;
-  /** §8: as opções pulsam — "agora ache o três". */
+  /** §8: as opções pulsam no beat "agora ache". */
   pulsarOpcoes?: boolean;
-  /** As opções já subiram da base? §4: elas entram DEPOIS da primeira audição. */
+  /** §8: ondas no beat falado, sem disparar TTS interno concorrente. */
+  ondasAtivas?: boolean;
+  /** As opções já subiram da base? */
   mostrarOpcoes?: boolean;
 }
 
-/** §3: "mínimo 120px". O botão é o elemento dominante da tela. */
+/** §3: mínimo 120px; 160 mantém o áudio como elemento dominante. */
 const BOTAO = 160;
-
-/**
- * O azul da §7.
- *
- * `tokens.cor.acao.primaria` é um **valor CSS**, não uma classe — usá-lo em
- * `className` não pinta nada (§6.30). Entra por `style`, como manda a regra.
- */
+const DURACAO_DA_AUDICAO = 1200;
 const AZUL = '#2563EB';
 const AZUL_ESCURO = '#1D4ED8';
+const LADO_DA_OPCAO = 80;
 
 export function AudioChoice({
   audioPrompt,
   options,
   onSelect,
   disabled,
+  optionsDisabled,
   velocidade = 1,
   onRepetir,
+  onPrimeiraAudicao,
+  autoPlay = true,
   realceDaOpcao,
   pulsarBotao,
   pulsarOpcoes,
+  ondasAtivas,
   mostrarOpcoes = true,
 }: AudioChoiceProps) {
   const [tocando, setTocando] = useState(false);
-  /** A primeira execução é automática (§4) e NÃO conta como repetição. */
-  const jaTocouSozinho = useRef(false);
+  const fimDaFala = useRef<number | null>(null);
+  const primeiraAudicaoRef = useRef(onPrimeiraAudicao);
 
+  useEffect(() => { primeiraAudicaoRef.current = onPrimeiraAudicao; }, [onPrimeiraAudicao]);
+
+  /**
+   * A referência das opções faz parte da identidade observável da questão.
+   * Duas questões consecutivas podem pedir a MESMA palavra; depender só de
+   * `audioPrompt` faria a segunda nascer sem a execução automática.
+   */
   useEffect(() => {
-    jaTocouSozinho.current = false;
+    if (!autoPlay) return;
     tocar(true);
-    // A cena muda quando a palavra muda; é essa a dependência.
+    return () => {
+      if (fimDaFala.current !== null) window.clearTimeout(fimDaFala.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audioPrompt]);
+  }, [audioPrompt, options, autoPlay]);
+
+  useEffect(() => () => {
+    if (fimDaFala.current !== null) window.clearTimeout(fimDaFala.current);
+  }, []);
 
   function tocar(automatico = false) {
+    if (fimDaFala.current !== null) window.clearTimeout(fimDaFala.current);
     setTocando(true);
     speak(audioPrompt, { rate: velocidade } as never);
-    if (automatico) {
-      jaTocouSozinho.current = true;
-    } else {
-      onRepetir?.();
-    }
-    // A fala não expõe evento de fim aqui; 1,2s é o tempo da §4.
-    window.setTimeout(() => setTocando(false), 1200);
+    if (!automatico) onRepetir?.();
+
+    fimDaFala.current = window.setTimeout(() => {
+      fimDaFala.current = null;
+      setTocando(false);
+      if (automatico) primeiraAudicaoRef.current?.();
+    }, DURACAO_DA_AUDICAO);
   }
+
+  const somDesligado = Boolean(disabled) || tocando;
+  const opcoesDesligadas = Boolean(disabled) || Boolean(optionsDisabled);
+  const mostrarOndas = tocando || ondasAtivas;
+
+  /**
+   * Layout sem pista posicional:
+   * - 2 opções: 1×2
+   * - 3 opções: 1×3
+   * - 4 opções: 2×2
+   *
+   * O flex anterior virava 3+1 no cartão real de 390px. A quarta alternativa
+   * ficava sozinha no centro e ganhava saliência visual, exatamente o tipo de
+   * atalho que pode contaminar uma tarefa de reconhecimento som→símbolo.
+   */
+  const colunasDeOpcoes = options.length === 4 ? 2 : Math.max(1, options.length);
 
   return (
     <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-8 py-4">
       <motion.button
         type="button"
-        whileTap={disabled ? {} : { scale: 0.95 }}
-        onClick={() => !disabled && tocar()}
-        disabled={disabled}
+        whileTap={somDesligado ? {} : { scale: 0.95 }}
+        onClick={() => !somDesligado && tocar()}
+        disabled={somDesligado}
         aria-label="Escutar o número"
         className="relative flex items-center justify-center rounded-full shadow-lg"
         style={{
@@ -127,43 +130,40 @@ export function AudioChoice({
           border: `4px solid ${AZUL_ESCURO}`,
           color: tokens.cor.texto.inverso,
         }}
-        // §4: o botão fica com "um pulso lento e contínuo, dizendo 'pode
-        // apertar de novo'". Escala aqui não vaza: ele tem 160px numa tela de
-        // 390 e é centrado.
+        initial={{ scale: 0 }}
         animate={pulsarBotao ? { scale: [1, 1.06, 1] } : { scale: 1 }}
         transition={{ duration: 1.2, repeat: pulsarBotao ? Infinity : 0 }}
       >
-        <span aria-hidden className="text-6xl">{tocando ? '🔊' : '🔈'}</span>
-        {/* §4: "ondas sonoras pulsam saindo do botão".
-            O `animate-ping` do Tailwind escala para **2x**: sobre um botão de
-            160px isso são 320px, e o print mostrou a onda cobrindo o enunciado
-            em cima e as alternativas embaixo. Onda que tapa a resposta não é
-            onda, é ruído — e a §3 manda a tela ser vazia justamente para nada
-            competir com o som.
-            Um anel próprio, até 1,3x, sai do botão sem alcançar nada. */}
-        {tocando && (
+        <span aria-hidden className="text-6xl">{mostrarOndas ? '🔊' : '🔈'}</span>
+        {mostrarOndas && (
           <motion.span
             aria-hidden
             className="pointer-events-none absolute inset-0 rounded-full"
             style={{ border: `4px solid ${AZUL}` }}
             initial={{ scale: 1, opacity: 0.55 }}
             animate={{ scale: 1.3, opacity: 0 }}
-            transition={{ duration: 0.9, repeat: Infinity, ease: "easeOut" }}
+            transition={{ duration: 0.9, repeat: Infinity, ease: 'easeOut' }}
           />
         )}
       </motion.button>
 
       {mostrarOpcoes && (
-        <div role="group" aria-label="Números" className="flex flex-wrap justify-center gap-4">
+        <div
+          role="group"
+          aria-label="Números"
+          data-colunas={colunasDeOpcoes}
+          className="grid justify-center gap-4"
+          style={{ gridTemplateColumns: `repeat(${colunasDeOpcoes}, ${LADO_DA_OPCAO}px)` }}
+        >
           {options.map((opt, i) => {
             const realce = realceDaOpcao?.(opt) ?? null;
             return (
               <motion.button
-                key={i}
+                key={String(opt)}
                 type="button"
-                whileTap={disabled ? {} : { scale: 0.95 }}
-                onClick={() => !disabled && onSelect(opt)}
-                disabled={disabled}
+                whileTap={opcoesDesligadas ? {} : { scale: 0.95 }}
+                onClick={() => !opcoesDesligadas && onSelect(opt)}
+                disabled={opcoesDesligadas}
                 className="flex h-20 w-20 items-center justify-center rounded-2xl text-3xl font-black shadow-md"
                 style={{
                   backgroundColor: realce === 'acerto' ? '#D1FAE5'
@@ -172,8 +172,6 @@ export function AudioChoice({
                   color: tokens.cor.texto.principal,
                   border: `2px solid ${realce === 'acerto' ? '#16A34A' : tokens.cor.elementos.borda}`,
                 }}
-                // §4: o escolhido "cresce e brilha"; o errado "desliza de volta
-                // para a posição". As opções sobem escalonadas a cada 100ms.
                 initial={{ opacity: 0, y: 16 }}
                 animate={{
                   opacity: 1,

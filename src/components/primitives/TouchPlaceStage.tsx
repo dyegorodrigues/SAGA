@@ -11,15 +11,23 @@ import {
   AcaoDeProducao,
   FALAS,
   ROTULO_DE_FECHO,
+  dependeDeAndaime,
   encerraSozinha,
 } from "../../curriculum/procedimentos/producaoProcedure";
+import { MisconceptionTag } from "../../constants/misconceptions";
 
 /** §4: última vaga preenchida → 500ms de pausa → brilho/fecho. */
 const PAUSA_DO_FECHO = 500;
-/** A voz/fecho visual permanece por 1,5s antes de publicar a resposta terminal. */
-const DURACAO_DO_FECHO = 1500;
+/**
+ * O GameLoop mantém qualquer palco autoral por 1,5s depois que recebe a resposta.
+ * Publicamos 400ms depois de começar o fecho: a janela restante completa os
+ * 1,9s da ficha (1,5s de fecho + 400ms de transição) sem somar animação ao RT.
+ */
+const ATE_PUBLICAR_NO_FECHO = 400;
 /** Erro suave do `Pronto!`: informa, devolve a ação à criança e não avança. */
 const DURACAO_DO_ERRO = 900;
+
+type AcaoComHistorico = AcaoDeProducao & { diagnosticosLongitudinais?: string[] };
 
 interface Props {
   spec: ProducaoSpec;
@@ -37,12 +45,13 @@ interface Props {
  *
  * Regras de fronteira:
  * - o palco conta cada encaixe e possui o feedback/retry da produção;
- * - o GameLoop recebe cada declaração `Pronto!` para diagnóstico, mas não fala
- *   por cima nem transforma o erro suave em erro terminal;
+ * - o GameLoop recebe cada declaração `Pronto!` para progresso/Radar, mas não
+ *   fala por cima nem transforma o erro suave em erro terminal;
  * - nos níveis com vagas, a última vaga trava a interação IMEDIATAMENTE e só
- *   então espera 500ms para o fecho. A janela de animação nunca vira uma janela
- *   diagnóstica para um dedo rápido (§8.3-bis);
- * - uma nova `spec` é uma nova questão: nenhum estado/timer vaza entre elas.
+ *   então espera 500ms para iniciar o fecho;
+ * - estado visual/timers resetam a cada `spec`, mas o histórico diagnóstico
+ *   permanece durante a vida do palco: `DEPENDE_DE_ANDAIME` é comparação entre
+ *   questões, não uma propriedade de uma resposta isolada.
  */
 export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
   const [ocupadas, setOcupadas] = React.useState<number[]>([]);
@@ -56,6 +65,7 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
   const relogios = React.useRef<number[]>([]);
   const recusasRef = React.useRef(0);
   const encerradoRef = React.useRef(false);
+  const historicoRef = React.useRef<AcaoDeProducao[]>([]);
 
   function limparRelogios() {
     relogios.current.forEach(window.clearTimeout);
@@ -63,7 +73,8 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
   }
 
   React.useEffect(() => {
-    // Nova questão = estado novo, mesmo que tema/alvo coincidam.
+    // Nova questão = estado visual novo, mesmo que tema/alvo coincidam.
+    // O histórico NÃO zera aqui: ele é justamente o sinal longitudinal da §6.
     limparRelogios();
     setOcupadas([]);
     setNaMao(false);
@@ -90,17 +101,28 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
     relogios.current.push(id);
   }
 
-  function leitura(quantos: number, recusasFinais = recusasRef.current): AcaoDeProducao {
-    return {
+  /**
+   * Registra UMA ação observável no histórico da missão. Se a sequência passou
+   * a provar “acerta com vaga, erra sem”, anexa a hipótese longitudinal sem
+   * substituir o diagnóstico imediato da mesma tentativa.
+   */
+  function leitura(quantos: number, recusasFinais = recusasRef.current): AcaoComHistorico {
+    const base: AcaoDeProducao = {
       colocados: quantos,
       alvo: spec.alvo,
       bandeja: spec.bandeja,
       recusas: recusasFinais,
       comAndaime: spec.comAndaime,
     };
+    const proximoHistorico = [...historicoRef.current, base];
+    const longitudinal = dependeDeAndaime(proximoHistorico)
+      ? [MisconceptionTag.DEPENDE_DE_ANDAIME]
+      : undefined;
+    historicoRef.current.push(base);
+    return longitudinal ? { ...base, diagnosticosLongitudinais: longitudinal } : base;
   }
 
-  function encerrar(quantos: number) {
+  function publicar(quantos: number) {
     if (encerradoRef.current) return;
     encerradoRef.current = true;
     setEncerrado(true);
@@ -134,9 +156,6 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
       falar?.(FALAS.excesso(spec.alvo, spec.tema.genero));
 
       // A pausa cinematográfica depois da última vaga não é teste conceitual.
-      // Se a tela já alcançou o alvo, não somamos recusa por um toque que caiu
-      // na janela de animação. Em níveis sem andaime o excesso fica materializado
-      // como `colocados > alvo`, que é evidência legítima de não ter parado.
       if (colocados < spec.alvo) {
         setRecusas(r => {
           const proxima = r + 1;
@@ -153,24 +172,20 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
     falar?.(FALAS.aoEncaixar(agora.length, spec.tema.genero));
 
     if (encerraSozinha(spec.nivel) && agora.length >= spec.alvo) {
-      // Trava já no último encaixe. Os 500ms são silêncio pedagógico, não uma
-      // chance escondida para produzir outro diagnóstico.
       setFechando(true);
       agendar(() => {
         falar?.(FALAS.fecho(spec.alvo, spec.tema.genero, spec.tema.plural, spec.tema.singular));
-        agendar(() => encerrar(agora.length), DURACAO_DO_FECHO);
+        // O GameLoop mantém o palco por mais 1,5s; publicar aqui evita somar toda
+        // a animação ao tempo de reação e fecha o roteiro em ~2,4s após o gesto.
+        agendar(() => publicar(agora.length), ATE_PUBLICAR_NO_FECHO);
       }, PAUSA_DO_FECHO);
     }
   }
 
   /**
-   * Divergência já declarada no procedimento: níveis sem vaga precisam de um
-   * ato explícito de “parei”; timer de silêncio é proibido pela §2.
-   *
-   * Se faltou, preserva o que ela já produziu e permite completar. Se passou,
-   * reinicia a tentativa depois do feedback porque sem gesto de remoção não há
-   * caminho honesto de volta ao alvo. Em ambos os casos o GameLoop recebe a
-   * tentativa para o Radar, mas o palco continua dono do retry.
+   * Níveis sem vaga precisam de um ato explícito de “parei”; timer de silêncio
+   * é proibido pela §2. Se faltou, preserva o produzido. Se passou, reinicia a
+   * tentativa depois do feedback porque a ficha não oferece gesto de remoção.
    */
   function concluir() {
     if (travado || colocados === 0) return;
@@ -179,7 +194,7 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
     if (certo) {
       setFechando(true);
       falar?.(FALAS.fecho(spec.alvo, spec.tema.genero, spec.tema.plural, spec.tema.singular));
-      agendar(() => encerrar(colocados), DURACAO_DO_FECHO);
+      agendar(() => publicar(colocados), ATE_PUBLICAR_NO_FECHO);
       return;
     }
 
@@ -189,8 +204,6 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
 
     agendar(() => {
       if (colocados > spec.alvo) {
-        // Sem vaga não existe “desencaixar” na ficha. Uma nova tentativa limpa
-        // é menos ambígua que deixar a criança presa num estado irrecuperável.
         setOcupadas([]);
         setNaMao(false);
         setRecusas(0);
@@ -221,10 +234,7 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
           maoFantasma={emAula ? mostrar?.maoFantasma != null : false}
         />
 
-        <div
-          className="mt-3 flex items-center justify-center gap-3"
-          style={{ width: LARGURA_DA_CENA, height: 48 }}
-        >
+        <div className="mt-3 flex items-center justify-center gap-3" style={{ width: LARGURA_DA_CENA, height: 48 }}>
           {spec.repetivel && !encerrado && (
             <button
               type="button"
@@ -232,13 +242,7 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
               disabled={travado}
               aria-label="Ouvir o pedido de novo"
               className="flex items-center justify-center rounded-2xl"
-              style={{
-                width: 56,
-                height: 44,
-                backgroundColor: "#F8FAFC",
-                border: "2px solid #C7D7F0",
-                fontSize: 22,
-              }}
+              style={{ width: 56, height: 44, backgroundColor: "#F8FAFC", border: "2px solid #C7D7F0", fontSize: 22 }}
             >
               <span aria-hidden>🔊</span>
             </button>
@@ -250,14 +254,7 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
               onClick={concluir}
               disabled={travado}
               className="rounded-2xl px-6"
-              style={{
-                height: 44,
-                backgroundColor: "#2563EB",
-                border: "2px solid #1D4ED8",
-                color: "#FFFFFF",
-                fontSize: 17,
-                fontWeight: 800,
-              }}
+              style={{ height: 44, backgroundColor: "#2563EB", border: "2px solid #1D4ED8", color: "#FFFFFF", fontSize: 17, fontWeight: 800 }}
             >
               {ROTULO_DE_FECHO}
             </button>

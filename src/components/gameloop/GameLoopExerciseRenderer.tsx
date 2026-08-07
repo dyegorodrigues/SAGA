@@ -105,6 +105,8 @@ interface Props {
   hiddenOpts: any[];
   armedOpt: any;
   setArmedOpt: (v: any) => void;
+  /** F05: a primeira audição terminou; a casca pode revelar q.prompt. */
+  onFirstAuditionComplete?: () => void;
   /**
    * Prende a fase de um palco que tem roteiro no tempo. **Só a sonda passa.**
    *
@@ -125,7 +127,8 @@ export function GameLoopExerciseRenderer({
   sel, totalQFor, track,
   aulaSuggest, guidedNarr, playAulinha,
   setShowClockTutorial, sound, peekAgain, setJourneyDone, orderTaps,
-  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt, faseDaCena
+  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt,
+  onFirstAuditionComplete, faseDaCena
 
 }: Props) {
   return (
@@ -192,6 +195,7 @@ export function GameLoopExerciseRenderer({
             falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor, leitura) => handlePick(valor, undefined, { source: "audiochoice", audiochoice: leitura } as never)}
             disabled={status !== null}
+            onPrimeiraAudicaoConcluida={onFirstAuditionComplete}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}
@@ -268,7 +272,7 @@ export function GameLoopExerciseRenderer({
         {q.kind !== "rapid-fire" && q.kind !== "singapore-bars" && (
           <>
         {/* Dynamic Canvas Area (escondida no `order`: as próprias peças são a cena) */}
-        <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" ? { display: "none" } : {}) }}>
+        <div className="mk-pop" style={{ background: C.card, borderRadius: 24, boxShadow: `0 6px 0 ${C.line}`, padding: "20px 14px", ...(q.kind === "order" || q.kind === "groups" || q.kind === "audiochoice" ? { display: "none" } : {}) }}>
           {q.uiProps && !PALCOS_JA_DESENHADOS.has(q.kind as string) ? (
             <FichaRenderer key={idx} question={q} onAnswer={handlePick} disabled={status !== null} promptDone={promptDone} />
 
@@ -610,7 +614,7 @@ export function GameLoopExerciseRenderer({
       )}
 
       {/* Tutorial guiado 👉 (generalizado): a mãozinha do Contar, para as cenas novas */}
-      {hasTutorial(q) && q.kind !== "vertical" && !status && (
+      {hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (
         guidedNarr !== null ? (
           <div
             className="mt-3 mx-auto p-3 rounded-2xl text-center mk-optin"

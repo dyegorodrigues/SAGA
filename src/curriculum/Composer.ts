@@ -199,7 +199,10 @@ function tagDaAlternativa(
 function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
   if (valor === spec.alvo) return undefined;
   if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
-  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
+  // ⚠️ Divergência declarada F05 §4×§6: como o áudio toca automaticamente
+  // ANTES de as opções aparecerem, estar na primeira posição não prova que a
+  // criança "não escutou". Essa hipótese exige estado temporal e é emitida por
+  // audioChoiceRuntime, nunca por uma Option estática do Composer.
   if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
   return undefined;
 }
