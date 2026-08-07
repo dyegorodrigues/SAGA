@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
 
+# Executor efêmero: existe só para aplicar o patch na branch e se apaga no commit.
 jobs:
   patch:
     if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
