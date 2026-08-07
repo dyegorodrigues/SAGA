@@ -16,7 +16,12 @@ import { AcaoDePosicao, FALAS, Preposicao } from "../../curriculum/procedimentos
 const DURACAO_ERRO = 2000;
 const INICIO_FECHO = 1800;
 const LIMIAR_ARRASTO = 8;
-const LADO_GHOST = 64;
+// Ghost e objeto colocado são o MESMO objeto motor. Uma medida única impede
+// deriva entre o que o dedo move, o que a cena desenha e a zona segura.
+const LADO_OBJETO_PRODUCAO = 64;
+const LADO_GHOST = LADO_OBJETO_PRODUCAO;
+const RAIO_OBJETO_POSTO = LADO_OBJETO_PRODUCAO / 2 + 4;
+const ELEVACAO_ACERTO = 10;
 
 type Drag = {
   pointerId: number;
@@ -162,13 +167,26 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
     };
   }
 
+  function confinarPonto(ponto: Ponto): Ponto {
+    return {
+      x: Math.min(LARGURA_DA_CENA - RAIO_OBJETO_POSTO, Math.max(RAIO_OBJETO_POSTO, ponto.x)),
+      // No acerto o objeto flutua 10px para cima (§4); a margem superior já
+      // reserva esse cinema para ele nunca ser cortado durante a celebração.
+      y: Math.min(
+        ALTURA_DA_CENA - RAIO_OBJETO_POSTO,
+        Math.max(RAIO_OBJETO_POSTO + ELEVACAO_ACERTO, ponto.y),
+      ),
+    };
+  }
+
   function soltarNoPonto(ponto: Ponto | null) {
     setNaMao(false);
     setDrag(null);
     dragRef.current = null;
     if (!ponto || travado || !spec.produz) return;
-    setPosto(ponto);
-    responder(posicaoDoPonto(spec, ponto));
+    const contido = confinarPonto(ponto);
+    setPosto(contido);
+    responder(posicaoDoPonto(spec, contido));
   }
 
   /** Alternativa motora: pega com toque e depois toca onde quer colocar. */
@@ -253,8 +271,10 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
           top: o.y - ALVO_MINIMO / 2,
           width: ALVO_MINIMO,
           height: ALVO_MINIMO,
-          background: "transparent",
-          border: "none",
+          background: emFoco ? "rgba(37, 99, 235, 0.12)" : "transparent",
+          border: emFoco ? "3px solid #2563EB" : "3px solid transparent",
+          borderRadius: "50%",
+          boxShadow: emFoco ? "0 0 0 5px rgba(37, 99, 235, 0.10)" : "none",
           padding: 0,
           fontSize: o.tamanho,
           lineHeight: 1,
@@ -421,10 +441,10 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
                 aria-label={`Objeto colocado ${posicaoDoPonto(spec, posto)} ${spec.referencial.doNome}`}
                 className="absolute flex items-center justify-center"
                 style={{
-                  left: posto.x - 32,
-                  top: posto.y - 32,
-                  width: 64,
-                  height: 64,
+                  left: posto.x - LADO_OBJETO_PRODUCAO / 2,
+                  top: posto.y - LADO_OBJETO_PRODUCAO / 2,
+                  width: LADO_OBJETO_PRODUCAO,
+                  height: LADO_OBJETO_PRODUCAO,
                   fontSize: 44,
                   lineHeight: 1,
                   zIndex: 6,
@@ -434,7 +454,7 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
                   scale: respondeu ? 1.15 : 1,
                   opacity: 1,
                   x: feedbackErro ? [0, -6, 6, -4, 4, 0] : 0,
-                  y: respondeu ? -10 : 0,
+                  y: respondeu ? -ELEVACAO_ACERTO : 0,
                 }}
               >
                 {spec.alvoDaProducao.emoji}
@@ -442,7 +462,11 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
                   <span
                     data-position-error-label
                     className="absolute rounded-lg px-1.5"
-                    style={{ top: 54, fontSize: 12, fontWeight: 800, color: "#B45309", backgroundColor: "white", whiteSpace: "nowrap" }}
+                    style={{
+                      top: posto.y > ALTURA_DA_CENA / 2 ? -18 : 54,
+                      fontSize: 12, fontWeight: 800, color: "#B45309",
+                      backgroundColor: "white", whiteSpace: "nowrap",
+                    }}
                   >
                     {posicaoDoPonto(spec, posto)}
                   </span>
@@ -451,7 +475,11 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
                   <span
                     data-position-close-label
                     className="absolute rounded-lg px-1.5"
-                    style={{ top: 54, fontSize: 12, fontWeight: 800, color: "#15803D", backgroundColor: "white", whiteSpace: "nowrap" }}
+                    style={{
+                      top: posto.y > ALTURA_DA_CENA / 2 ? -18 : 54,
+                      fontSize: 12, fontWeight: 800, color: "#15803D",
+                      backgroundColor: "white", whiteSpace: "nowrap",
+                    }}
                   >
                     {spec.pedida}
                   </span>

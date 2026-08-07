@@ -1,10 +1,13 @@
 name: CI
 
-permissions:
-  contents: write
+# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
+# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
+# tudo localmente e passe a ser condição verificável no PR.
 
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 concurrency:
@@ -12,129 +15,69 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  finalize-f47:
-    name: Fechar F47 após inspeção humana
-    if: github.event.action == 'reopened' && github.head_ref == 'codex/integrar-bloco-f0'
+  gates:
+    name: Gates do SAGA
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 15
+
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: codex/integrar-bloco-f0
-          fetch-depth: 0
+
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-      - run: npm ci
-      - name: Corrigir dimensão motora, elevação e rótulo nas bordas
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('src/components/primitives/CenaDePosicaoStage.tsx'); s=p.read_text()
-          old='''const LIMIAR_ARRASTO = 8;\nconst LADO_GHOST = 64;'''
-          new='''const LIMIAR_ARRASTO = 8;\n// Ghost e objeto colocado são o MESMO objeto motor. Uma medida única impede\n// deriva entre o que o dedo move, o que a cena desenha e a zona segura.\nconst LADO_OBJETO_PRODUCAO = 64;\nconst LADO_GHOST = LADO_OBJETO_PRODUCAO;\nconst RAIO_OBJETO_POSTO = LADO_OBJETO_PRODUCAO / 2 + 4;\nconst ELEVACAO_ACERTO = 10;'''
-          if s.count(old)!=1: raise SystemExit('constantes F47 mudaram')
-          s=s.replace(old,new)
 
-          old='''  function soltarNoPonto(ponto: Ponto | null) {\n    setNaMao(false);\n    setDrag(null);\n    dragRef.current = null;\n    if (!ponto || travado || !spec.produz) return;\n    setPosto(ponto);\n    responder(posicaoDoPonto(spec, ponto));\n  }'''
-          new='''  function confinarPonto(ponto: Ponto): Ponto {\n    return {\n      x: Math.min(LARGURA_DA_CENA - RAIO_OBJETO_POSTO, Math.max(RAIO_OBJETO_POSTO, ponto.x)),\n      // No acerto o objeto flutua 10px para cima (§4); a margem superior já\n      // reserva esse cinema para ele nunca ser cortado durante a celebração.\n      y: Math.min(\n        ALTURA_DA_CENA - RAIO_OBJETO_POSTO,\n        Math.max(RAIO_OBJETO_POSTO + ELEVACAO_ACERTO, ponto.y),\n      ),\n    };\n  }\n\n  function soltarNoPonto(ponto: Ponto | null) {\n    setNaMao(false);\n    setDrag(null);\n    dragRef.current = null;\n    if (!ponto || travado || !spec.produz) return;\n    const contido = confinarPonto(ponto);\n    setPosto(contido);\n    responder(posicaoDoPonto(spec, contido));\n  }'''
-          if s.count(old)!=1: raise SystemExit('soltarNoPonto mudou')
-          s=s.replace(old,new)
+      - name: Instalar dependências
+        run: npm ci
 
-          old='''          background: "transparent",\n          border: "none",\n          padding: 0,\n          fontSize: o.tamanho,\n          lineHeight: 1,\n          zIndex: 4,'''
-          new='''          background: emFoco ? "rgba(37, 99, 235, 0.12)" : "transparent",\n          border: emFoco ? "3px solid #2563EB" : "3px solid transparent",\n          borderRadius: "50%",\n          boxShadow: emFoco ? "0 0 0 5px rgba(37, 99, 235, 0.10)" : "none",\n          padding: 0,\n          fontSize: o.tamanho,\n          lineHeight: 1,\n          zIndex: 4,'''
-          if s.count(old)!=1: raise SystemExit('estilo objeto mudou')
-          s=s.replace(old,new)
+      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
+      # órfãos e deriva de nomenclatura.
+      - name: Auditoria do catálogo
+        run: npm run auditar
 
-          old='''                  left: posto.x - 32,\n                  top: posto.y - 32,\n                  width: 64,\n                  height: 64,'''
-          new='''                  left: posto.x - LADO_OBJETO_PRODUCAO / 2,\n                  top: posto.y - LADO_OBJETO_PRODUCAO / 2,\n                  width: LADO_OBJETO_PRODUCAO,\n                  height: LADO_OBJETO_PRODUCAO,'''
-          if s.count(old)!=1: raise SystemExit('medida hardcoded mudou')
-          s=s.replace(old,new)
-          s=s.replace('''                  y: respondeu ? -10 : 0,''','''                  y: respondeu ? -ELEVACAO_ACERTO : 0,''')
+      - name: Auditoria das fichas
+        run: npm run fichas:auditar
 
-          old='''                    style={{ top: 54, fontSize: 12, fontWeight: 800, color: "#B45309", backgroundColor: "white", whiteSpace: "nowrap" }}'''
-          new='''                    style={{\n                      top: posto.y > ALTURA_DA_CENA / 2 ? -18 : 54,\n                      fontSize: 12, fontWeight: 800, color: "#B45309",\n                      backgroundColor: "white", whiteSpace: "nowrap",\n                    }}'''
-          if s.count(old)!=1: raise SystemExit('rotulo erro mudou')
-          s=s.replace(old,new)
-          old='''                    style={{ top: 54, fontSize: 12, fontWeight: 800, color: "#15803D", backgroundColor: "white", whiteSpace: "nowrap" }}'''
-          new='''                    style={{\n                      top: posto.y > ALTURA_DA_CENA / 2 ? -18 : 54,\n                      fontSize: 12, fontWeight: 800, color: "#15803D",\n                      backgroundColor: "white", whiteSpace: "nowrap",\n                    }}'''
-          if s.count(old)!=1: raise SystemExit('rotulo fecho mudou')
-          s=s.replace(old,new)
-          p.write_text(s)
-          PY
-      - name: Regressões focadas
-        run: |
-          npm run lint
-          npx vitest run src/components/primitives/CenaDePosicaoStage.test.tsx src/components/primitives/CenaDePosicaoStage.f47.test.tsx src/components/gameloop/posicaoAuthorialPolicy.test.tsx src/components/gameloop/answerPolicy.test.ts
-      - name: Beats extras somente na bancada
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('sonda/cenas.tsx'); s=p.read_text()
-          a='''  {\n    nome: "GE.01 micro-aula: esta é a mesa",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarReferencial: true }} />\n    ),\n  },'''
-          e=a+'''\n  { nome: "GE.01 micro-aula: objeto em cima", render: (s: number) => <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarObjeto: 0 }} /> },\n  { nome: "GE.01 micro-aula: objeto embaixo", render: (s: number) => <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarObjeto: 1 }} /> },'''
-          if s.count(a)!=1: raise SystemExit('cenas GE01 mudaram')
-          p.write_text(s.replace(a,e))
-          PY
-      - name: Preparar Chromium
-        run: |
-          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
-          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          if [ -z "$CHROME_REAL" ]; then
-            sudo mkdir -p /opt/pw-browsers && sudo chown -R "$USER":"$USER" /opt/pw-browsers
-            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
-            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
-          fi
-          test -n "$CHROME_REAL" && sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
-      - name: Portão final GE.01 — 8 sementes
-        env:
-          SONDA_SEMENTES: '8'
-        run: npm run sonda -- "GE.01"
-      - name: Prints e estados críticos
-        run: |
-          mkdir -p /tmp/ge01-final/prints /tmp/ge01-final/states
-          PRINTS_OUT=/tmp/ge01-final/prints PRINTS_LARGURA=390 node scripts/prints.mjs "GE.01"
-          node --input-type=module <<'NODE'
-          import {spawn} from 'node:child_process'; import {chromium} from 'playwright-core';
-          const port=5199,v=spawn('npx',['vite','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe'],detached:true});
-          await new Promise((ok,no)=>{const t=setTimeout(()=>no(Error('vite')),60000);v.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok()}})});
-          const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']}); const p=await b.newPage({viewport:{width:390,height:700},deviceScaleFactor:2});
-          await p.goto(`http://localhost:${port}/sonda/?sementes=1`,{waitUntil:'networkidle'}); await p.waitForFunction(()=>window.sonda?.total>0); const ns=await p.evaluate(()=>window.sonda.nomes());
-          const find=t=>{const i=ns.findIndex(n=>n.includes(t));if(i<0)throw Error(t);return i}; const go=async t=>{await p.evaluate(i=>window.sonda.ir(i),find(t));await p.waitForTimeout(650)}; const field=()=>p.locator('div.relative.overflow-hidden.select-none.rounded-2xl').first();
-          await go('GE.01 onde está (nível 5)'); let tray=p.getByRole('button',{name:'Pegar o objeto'}),tb=await tray.boundingBox(),f=await field().boundingBox();if(!tb||!f)throw Error('geo'); const ped=(await p.locator('body').innerText()).toLowerCase().includes('embaixo')?'embaixo':'em cima';
-          const drag=async y=>{tb=await p.getByRole('button',{name:'Pegar o objeto'}).boundingBox();f=await field().boundingBox();if(!tb||!f)throw Error('geo');await p.mouse.move(tb.x+tb.width/2,tb.y+tb.height/2);await p.mouse.down();await p.mouse.move(f.x+f.width/2,y,{steps:10});await p.mouse.up()};
-          await drag(ped==='em cima'?f.y+f.height-2:f.y+2); await p.waitForTimeout(260); await p.screenshot({path:'/tmp/ge01-final/states/01_ERRO_BORDA.png'});
-          const err=p.locator('[data-position-error-label]'); if(await err.count()!=1)throw Error('rotulo erro ausente'); let eb=await err.boundingBox(); f=await field().boundingBox(); if(!eb||!f||eb.y<f.y-1||eb.y+eb.height>f.y+f.height+1)throw Error('rotulo erro cortado');
-          await p.waitForTimeout(2000); f=await field().boundingBox(); if(!f)throw Error('geo'); await drag(ped==='em cima'?f.y+2:f.y+f.height-2); await p.waitForTimeout(300); if(await p.locator('[data-position-arrow]').count()!=1)throw Error('seta ausente'); await p.screenshot({path:'/tmp/ge01-final/states/02_ACERTO_BORDA.png'});
-          for(const [t,n] of [['GE.01 micro-aula: objeto em cima','03_MICRO_OBJETO_0.png'],['GE.01 micro-aula: objeto embaixo','04_MICRO_OBJETO_1.png']]){await go(t);await p.screenshot({path:`/tmp/ge01-final/states/${n}`});if(await p.locator('button[style*="rgb(37, 99, 235)"]').count()<1)throw Error('halo ausente')}
-          await b.close();try{process.kill(-v.pid,'SIGKILL')}catch{v.kill('SIGKILL')}
-          NODE
-      - name: Folha de contato
-        if: always()
-        run: |
-          python3 -m pip install --quiet pillow
-          mkdir -p /tmp/ge01-final
-          python3 - <<'PY'
-          from PIL import Image,ImageDraw
-          from pathlib import Path
-          fs=sorted(Path('/tmp/ge01-final/prints').glob('*.png'))+sorted(Path('/tmp/ge01-final/states').glob('*.png'));tw,th,lab=195,350,30;rows=max(1,(len(fs)+1)//2);out=Image.new('RGB',(390,rows*(th+lab)),'white');d=ImageDraw.Draw(out)
-          for i,x in enumerate(fs):
-            im=Image.open(x).convert('RGB');im.thumbnail((tw,th));px=(i%2)*tw;py=(i//2)*(th+lab);out.paste(im,(px+(tw-im.width)//2,py+(th-im.height)//2));d.text((px+2,py+th+2),x.stem[:42],fill='black')
-          out.save('/tmp/ge01-final/contact-sheet.jpg',quality=86)
-          PY
-      - uses: actions/upload-artifact@v4
-        if: always()
+      # O grafo é artefato derivado; o modo --check falha se alguém editar o
+      # gerado sem regerar a partir do YAML canônico.
+      - name: Sincronia do grafo
+        run: npm run grafo:check
+
+      - name: TypeScript
+        run: npm run lint
+
+      - name: Testes
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+  guarda-textual:
+    name: Guarda de binários
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
         with:
-          name: ge01-final-closure
-          path: /tmp/ge01-final
-          retention-days: 7
-      - name: Restaurar CI original e publicar
-        run: |
-          git fetch origin main --depth=1
-          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
-          git config user.name 'SAGA Codex'; git config user.email 'noreply@github.com'
-          git add src/components/primitives/CenaDePosicaoStage.tsx .github/workflows/ci.yml
-          git diff --cached --check
-          git commit -m 'GE.01/F47: fecha gesto, bordas e coreografia visual'
-          git push origin HEAD:codex/integrar-bloco-f0
+          # Por padrão o Actions confere um merge commit sintético do PR, o que
+          # distorceria o diff. Aqui o alvo é o head real da branch.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # A guarda compara com a base do PR; precisa do histórico.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Buscar a base do PR
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      # O criador de PR deste ambiente não aceita binários no diff textual.
+      # Falhar aqui é mais barato que descobrir na hora de publicar.
+      - name: Verificar ausência de binários no diff
+        env:
+          PR_BASE: origin/${{ github.base_ref }}
+        run: node AI_Studio_Lab/tools/pr_text_guard.cjs
