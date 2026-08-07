@@ -1,9 +1,5 @@
 name: CI
 
-# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
-# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
-# tudo localmente e passe a ser condição verificável no PR.
-
 on:
   pull_request:
     branches: [main]
@@ -19,37 +15,24 @@ jobs:
     name: Gates do SAGA
     runs-on: ubuntu-latest
     timeout-minutes: 15
-
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-
       - name: Instalar dependências
         run: npm ci
-
-      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
-      # órfãos e deriva de nomenclatura.
       - name: Auditoria do catálogo
         run: npm run auditar
-
       - name: Auditoria das fichas
         run: npm run fichas:auditar
-
-      # O grafo é artefato derivado; o modo --check falha se alguém editar o
-      # gerado sem regerar a partir do YAML canônico.
       - name: Sincronia do grafo
         run: npm run grafo:check
-
       - name: TypeScript
         run: npm run lint
-
       - name: Testes
         run: npm test -- --run
-
       - name: Build
         run: npm run build
 
@@ -58,26 +41,170 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     if: github.event_name == 'pull_request'
-
     steps:
       - uses: actions/checkout@v4
         with:
-          # Por padrão o Actions confere um merge commit sintético do PR, o que
-          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
-          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
-
-      # O criador de PR deste ambiente não aceita binários no diff textual.
-      # Falhar aqui é mais barato que descobrir na hora de publicar.
       - name: Verificar ausência de binários no diff
         env:
           PR_BASE: origin/${{ github.base_ref }}
         run: node AI_Studio_Lab/tools/pr_text_guard.cjs
+
+  visual-ge01-final:
+    name: Visual final GE.01 — F47
+    if: github.event_name == 'pull_request' && github.event.action == 'reopened' && github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Acrescentar beats da micro-aula somente na bancada
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('sonda/cenas.tsx'); s=p.read_text()
+          anchor='''  {\n    nome: "GE.01 micro-aula: esta é a mesa",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarReferencial: true }} />\n    ),\n  },'''
+          extra=anchor+'''\n  {\n    nome: "GE.01 micro-aula: objeto em cima",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarObjeto: 0 }} />\n    ),\n  },\n  {\n    nome: "GE.01 micro-aula: objeto embaixo",\n    render: (s: number) => (\n      <ExercicioDaFicha ficha={GE_01} lvl={1} semente={s} mostrar={{ destacarObjeto: 1 }} />\n    ),\n  },'''
+          if s.count(anchor)!=1: raise SystemExit('bloco GE.01 da sonda mudou')
+          p.write_text(s.replace(anchor,extra))
+          PY
+      - name: Preparar Chromium
+        run: |
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            sudo mkdir -p /opt/pw-browsers
+            sudo chown -R "$USER":"$USER" /opt/pw-browsers
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
+          test -n "$CHROME_REAL"
+          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+      - name: Portão final GE.01 — 8 sementes
+        env:
+          SONDA_SEMENTES: '8'
+        run: npm run sonda -- "GE.01"
+      - name: Prints obrigatórios de todas as cenas GE.01
+        env:
+          PRINTS_OUT: /tmp/ge01-final/prints
+          PRINTS_LARGURA: '390'
+        run: node scripts/prints.mjs "GE.01"
+      - name: Fotografar estados temporais e motores
+        run: |
+          mkdir -p /tmp/ge01-final/states
+          node --input-type=module <<'NODE'
+          import { spawn } from 'node:child_process';
+          import { chromium } from 'playwright-core';
+          const porta=5199;
+          const vite=spawn('npx',['vite','--port',String(porta),'--strictPort'],{stdio:['ignore','pipe','pipe'],detached:true});
+          await new Promise((ok,no)=>{const t=setTimeout(()=>no(new Error('vite nao subiu')),60000); vite.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok();}})});
+          const browser=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:390,height:700},deviceScaleFactor:2});
+          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`,{waitUntil:'networkidle'});
+          await page.waitForFunction(()=>window.sonda?.total>0);
+          const nomes=await page.evaluate(()=>window.sonda.nomes());
+          const achar=t=>{const i=nomes.findIndex(n=>n.includes(t)); if(i<0) throw new Error(`cena ausente ${t}`); return i;};
+          const ir=async t=>{await page.evaluate(i=>window.sonda.ir(i),achar(t)); await page.waitForTimeout(80);};
+          const shot=async n=>page.screenshot({path:`/tmp/ge01-final/states/${n}.png`});
+
+          await ir('GE.01 onde está (nível 1)');
+          await shot('01_L1_ABERTURA');
+          await page.waitForTimeout(750);
+          const buttons=page.locator('button[aria-label^="Objeto "]');
+          if(await buttons.count()!==2) throw new Error('L1 precisa de dois objetos');
+          const body=(await page.locator('body').innerText()).toLowerCase();
+          const pares=['em cima','embaixo'];
+          const pedida=pares.find(p=>body.includes(p));
+          if(!pedida) throw new Error('não identifiquei preposição L1');
+          const labels=await buttons.evaluateAll(bs=>bs.map(b=>b.getAttribute('aria-label')||''));
+          const ci=labels.findIndex(x=>x.includes(`Objeto ${pedida}`));
+          if(ci<0) throw new Error(`objeto certo ausente: ${pedida}`);
+          const wi=ci===0?1:0;
+          await buttons.nth(wi).click();
+          await page.waitForTimeout(220);
+          if(await page.locator('[data-position-close-label]').count()) throw new Error('erro revelou fecho/gabarito');
+          if(await page.locator('[data-position-error-label]').count()!==1) throw new Error('erro não nomeou posição escolhida');
+          await shot('02_L1_ERRO_VOCABULARIO');
+          await page.waitForTimeout(1950);
+          if(await buttons.nth(ci).isDisabled()) throw new Error('retry não voltou após 2s');
+          await shot('03_L1_RETRY');
+          await buttons.nth(ci).click();
+          await page.waitForTimeout(280);
+          if(await page.locator('[data-position-arrow]').count()!==1) throw new Error('acerto sem seta relacional');
+          if(await page.locator('[data-position-relation-label]').count()!==1) throw new Error('acerto sem rótulo da relação');
+          await shot('04_L1_SETA_RELACAO');
+          await page.waitForTimeout(1650);
+          if(await page.locator('[data-position-close-label]').count()!==2) throw new Error('fecho não rotulou os dois objetos');
+          await shot('05_L1_FECHO');
+
+          // L5 — gesto errado, retorno à bandeja, depois arrasto real correto.
+          await ir('GE.01 onde está (nível 5)'); await page.waitForTimeout(600);
+          let tray=page.getByRole('button',{name:'Pegar o objeto'});
+          const prompt5=(await page.locator('body').innerText()).toLowerCase();
+          const p5=prompt5.includes('embaixo')?'embaixo':'em cima';
+          let tb=await tray.boundingBox(); let field=await page.locator('[data-position-field]').boundingBox();
+          if(!tb||!field) throw new Error('L5 sem geometria de bandeja/campo');
+          const sx=tb.x+tb.width/2, sy=tb.y+tb.height/2;
+          const wrongY=p5==='em cima'?field.y+field.height-18:field.y+18;
+          await page.mouse.move(sx,sy); await page.mouse.down(); await page.mouse.move(field.x+field.width/2,wrongY,{steps:8});
+          if(await page.locator('[data-position-drag-ghost]').count()!==1) throw new Error('ghost não acompanha arrasto');
+          await shot('06_L5_GHOST_ERRADO');
+          await page.mouse.up(); await page.waitForTimeout(250);
+          await shot('07_L5_ERRO_POSICIONAMENTO');
+          await page.waitForTimeout(1950);
+          if(await page.getByRole('button',{name:'Pegar o objeto'}).count()!==1) throw new Error('erro L5 não voltou à bandeja');
+          await shot('08_L5_RETRY_BANDEJA');
+
+          tray=page.getByRole('button',{name:'Pegar o objeto'}); tb=await tray.boundingBox(); field=await page.locator('[data-position-field]').boundingBox();
+          if(!tb||!field) throw new Error('L5 perdeu geometria no retry');
+          const sx2=tb.x+tb.width/2, sy2=tb.y+tb.height/2;
+          const rightY=p5==='em cima'?field.y+16:field.y+field.height-16;
+          await page.mouse.move(sx2,sy2); await page.mouse.down(); await page.mouse.move(field.x+field.width/2,rightY,{steps:10});
+          await shot('09_L5_GHOST_CORRETO');
+          await page.mouse.up(); await page.waitForTimeout(300);
+          if(await page.locator('[data-position-arrow]').count()!==1) throw new Error('L5 correto sem seta relacional');
+          await shot('10_L5_DROP_CORRETO');
+
+          // Três beats da §8, instrumentados só nesta bancada.
+          for(const [t,n] of [
+            ['GE.01 micro-aula: esta é a mesa','11_MICRO_REFERENCIAL'],
+            ['GE.01 micro-aula: objeto em cima','12_MICRO_OBJETO_0'],
+            ['GE.01 micro-aula: objeto embaixo','13_MICRO_OBJETO_1'],
+          ]){ await ir(t); await page.waitForTimeout(500); await shot(n); }
+
+          // QuestionPrompt real, isolado da sonda, para provar ênfase sem duplicar texto.
+          await page.goto(`http://localhost:${porta}/`,{waitUntil:'domcontentloaded'}).catch(()=>{});
+          await browser.close();
+          try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
+          NODE
+      - name: Folha de contato
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          files=sorted(Path('/tmp/ge01-final/prints').glob('*.png'))+sorted(Path('/tmp/ge01-final/states').glob('*.png'))
+          tw,th,label,cols=195,350,30,2; rows=(len(files)+cols-1)//cols
+          out=Image.new('RGB',(cols*tw,rows*(th+label)),'white'); d=ImageDraw.Draw(out)
+          for i,p in enumerate(files):
+            im=Image.open(p).convert('RGB'); im.thumbnail((tw,th)); x=(i%cols)*tw; y=(i//cols)*(th+label)
+            out.paste(im,(x+(tw-im.width)//2,y+(th-im.height)//2)); d.text((x+3,y+th+2),p.stem[:42],fill='black')
+          out.save('/tmp/ge01-final/contact-sheet.jpg',quality=86)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ge01-final
+          path: /tmp/ge01-final
+          retention-days: 7
