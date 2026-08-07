@@ -30,8 +30,9 @@ jobs:
 
       - name: Aplicar candidato somente no workspace do runner
         run: |
-          python3 -m py_compile AI_Studio_Lab/tools/f48_repair_candidate.py
+          python3 -m py_compile AI_Studio_Lab/tools/f48_repair_candidate.py AI_Studio_Lab/tools/f48_candidate_fix.py
           python3 AI_Studio_Lab/tools/f48_repair_candidate.py
+          python3 AI_Studio_Lab/tools/f48_candidate_fix.py
           git diff --check
 
       - name: Contratos e regressões focadas
@@ -98,7 +99,6 @@ jobs:
             const i=labs.findIndex(x=>x.includes(alvo)); if(i<0)throw new Error(`alvo ${alvo} não está nas opções: ${labs}`); return i;
           };
 
-          // Abertura §4: aos 80ms o conjunto ainda está entrando; depois assenta.
           await ir('GE.02 que forma é essa (nível 2)',80);
           const op80=await botoes().evaluateAll(bs=>bs.map(b=>({opacity:getComputedStyle(b).opacity,transform:getComputedStyle(b).transform})));
           await shot('01_L2_ABERTURA_80MS');
@@ -106,7 +106,6 @@ jobs:
           await shot('02_L2_ABERTURA_ASSENTADA');
           if(!op80.some(x=>x.opacity!== '1' || x.transform!=='none')) throw new Error('abertura cinematográfica continua inerte');
 
-          // Erro: comparação lado a lado, sem terminal; após 2,5s a mesma questão volta.
           let certo=await indiceCerto(); let bs=botoes(); const errado=certo===0?1:0;
           await bs.nth(errado).click(); await page.waitForTimeout(220);
           if(await page.locator('[data-forma-comparison]').count()!==1) throw new Error('erro sem comparação de propriedades');
@@ -117,7 +116,6 @@ jobs:
           if(await bs.nth(certo).isDisabled()) throw new Error('retry F48 não voltou');
           await shot('04_L2_RETRY');
 
-          // Acerto: somente a certa gira, os lados aparecem, depois fica sozinha no fecho.
           await bs.nth(certo).click(); await page.waitForTimeout(700);
           if(await page.locator('[data-forma-spinning=true]').count()!==1) throw new Error('giro de acerto não está restrito ao alvo');
           if((await page.locator('[data-forma-side-marker]').count())+(await page.locator('[data-forma-side-zero]').count())<1) throw new Error('acerto não conta lados visualmente');
@@ -126,7 +124,6 @@ jobs:
           if(await page.locator('[data-forma-close=true]').count()!==1) throw new Error('fecho F48 ausente');
           await shot('06_L2_FECHO_NUMERADO');
 
-          // N5 retificado: duas representações reais + duas puras; nenhuma forma 3D.
           await ir('GE.02 que forma é essa (nível 5)',900);
           if(await page.locator('[data-forma-representacao=real]').count()!==2) throw new Error('N5 não tem duas representações reais');
           if(await page.locator('[data-forma-representacao=pura]').count()!==2) throw new Error('N5 não tem duas representações puras');
@@ -134,7 +131,6 @@ jobs:
           if(/cubo|esfera|cilindro/.test(text5)) throw new Error('N5 ainda invadiu GE.04');
           await shot('07_L5_MISTURA_2D');
 
-          // Os três beats da §8 são observáveis e sem triângulo hardcoded.
           await ir('GE.02 micro-aula: procurar a forma',650);
           const cores=await botoes().evaluateAll(bs=>bs.map(b=>getComputedStyle(b).borderColor));
           if(!cores.every(x=>x==='rgb(96, 165, 250)')) throw new Error(`destacarTodas não é visível: ${cores}`);
@@ -187,7 +183,7 @@ jobs:
         run: |
           git fetch origin main --depth=1
           git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
-          rm AI_Studio_Lab/tools/f48_repair_candidate.py
+          rm AI_Studio_Lab/tools/f48_repair_candidate.py AI_Studio_Lab/tools/f48_candidate_fix.py
           git config user.name 'SAGA Codex'
           git config user.email 'noreply@github.com'
           git add \
@@ -203,7 +199,8 @@ jobs:
             src/components/gameloop/formaAuthorialPolicy.test.ts \
             sonda/cenas.tsx \
             .github/workflows/ci.yml \
-            AI_Studio_Lab/tools/f48_repair_candidate.py
+            AI_Studio_Lab/tools/f48_repair_candidate.py \
+            AI_Studio_Lab/tools/f48_candidate_fix.py
           git diff --cached --check
           git commit -m 'GE.02/F48: preserva invariância 2D e fecha feedback autoral'
           git push origin HEAD:codex/integrar-bloco-f0
