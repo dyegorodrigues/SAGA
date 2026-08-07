@@ -32,6 +32,13 @@ describe("F05 na fronteira com o GameLoop", () => {
     expect(ownsAuthorialFeedback(q, meta)).toBe(true);
   });
 
+  it("não sequestra o feedback de outras primitivas", () => {
+    const outra: Question = { kind: "plain", prompt: "?", answer: 6 };
+    const meta = { audiochoice: leitura };
+    expect(ownsAuthorialRetry(outra, meta)).toBe(false);
+    expect(ownsAuthorialFeedback(outra, meta)).toBe(false);
+  });
+
   it("a leitura de áudio chega ao Radar com a tag fonológica específica", () => {
     expect(misconceptionForAnswer(q, 7, { audiochoice: leitura }))
       .toBe(MisconceptionTag.CONFUSAO_FONOLOGICA);
