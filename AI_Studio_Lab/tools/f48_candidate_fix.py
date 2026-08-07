@@ -3,8 +3,9 @@ from pathlib import Path
 ROOT = Path('.')
 
 # Este script roda DEPOIS de f48_repair_candidate.py, ainda só no workspace do
-# runner. Ele corrige duas coisas que o primeiro portão descobriu antes de
-# qualquer publicação: sintaxe do YAML no teste e discriminação forte F47/F48.
+# runner. Ele corrige descobertas dos portões antes de qualquer publicação:
+# sintaxe do YAML no teste, discriminação forte F47/F48 e stacking visual dos
+# marcadores de lados em rotações específicas.
 
 # 1) Teste do grafo: curriculum/GE.yaml é mapa `GE.02:`, não lista `id: GE.02`.
 p = ROOT / 'src/curriculum/procedimentos/formaProcedure.test.ts'
@@ -51,6 +52,25 @@ new = '''  it("metadado errado não sequestra a outra ficha da família shapecan
 if s.count(old) != 1:
     raise SystemExit('formaAuthorialPolicy: teste cruzado mudou')
 s = s.replace(old, new, 1)
+p.write_text(s, encoding='utf-8')
+
+# 4) Chromium/8 sementes: em certas rotações os números dos lados estavam
+# geometricamente no lugar, mas perdiam o pixel para outro stacking context do
+# desenho/sibling. Os números são a camada didática do beat, portanto ficam
+# explicitamente acima da figura e o botão-alvo sobe acima dos irmãos enquanto
+# os marcadores estão visíveis.
+p = ROOT / 'src/components/primitives/FormaStage.tsx'
+s = p.read_text(encoding='utf-8')
+old = 'className="pointer-events-none absolute inset-0"\n      style={{ transform: `rotate(${giro}deg)`, transformOrigin: "center" }}'
+new = 'className="pointer-events-none absolute inset-0 z-30"\n      style={{ transform: `rotate(${giro}deg)`, transformOrigin: "center" }}'
+if s.count(old) != 1:
+    raise SystemExit('FormaStage: camada de marcadores mudou')
+s = s.replace(old, new, 1)
+old2 = 'padding: 0,\n                }}'
+new2 = 'padding: 0,\n                  zIndex: mostraLados ? 20 : undefined,\n                }}'
+if s.count(old2) != 1:
+    raise SystemExit('FormaStage: style do botão mudou')
+s = s.replace(old2, new2, 1)
 p.write_text(s, encoding='utf-8')
 
 print('F48 candidate fixes applied')
