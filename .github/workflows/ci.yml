@@ -95,7 +95,7 @@ jobs:
           const botoes=()=>page.locator('button[data-forma-figura]');
           const indiceCerto=async()=>{
             const alvo=await alvoAtual(); if(!alvo)throw new Error('alvo não identificado');
-            const labs=await botoes().evaluateAll(bs=>bs.map(b=>norm(b.getAttribute('aria-label')||'')));
+            const labs=await botoes().evaluateAll(bs=>bs.map(b=>(b.getAttribute('aria-label')||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()));
             const i=labs.findIndex(x=>x.includes(alvo)); if(i<0)throw new Error(`alvo ${alvo} não está nas opções: ${labs}`); return i;
           };
 
