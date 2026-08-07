@@ -26,15 +26,18 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Instalar Chromium do Playwright
+      - name: Preparar Chrome para a sonda
         run: |
-          sudo mkdir -p /opt/pw-browsers
-          sudo chown -R "$USER":"$USER" /opt/pw-browsers
-          PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
-          CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            sudo mkdir -p /opt/pw-browsers
+            sudo chown -R "$USER":"$USER" /opt/pw-browsers
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
           test -n "$CHROME_REAL"
-          mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
-          ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
           /opt/pw-browsers/chromium-1194/chrome-linux/chrome --version
 
       # LAÇO DE TRABALHO, não o portão final: RETOMADA §3 manda uma semente
