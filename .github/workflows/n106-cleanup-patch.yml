@@ -1,0 +1,66 @@
+name: Patch final N1.06
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n106
+      - name: Aplicar correções pequenas de fronteira
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def rep(path, old, new):
+              p=Path(path); s=p.read_text(); n=s.count(old)
+              if n != 1: raise SystemExit(f'{path}: esperado 1, achei {n}')
+              p.write_text(s.replace(old,new))
+
+          rep('src/components/gameloop/GameLoopExerciseRenderer.tsx',
+              '{hasTutorial(q) && q.kind !== "vertical" && !status && (',
+              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (')
+
+          rep('sonda/cenas.tsx',
+'''      {q.prompt && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''',
+'''      {q.prompt && q.kind !== "audiochoice" && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''')
+
+          rep('src/curriculum/Composer.ts',
+'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
+}''',
+'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  // ⚠️ Divergência declarada F05 §4×§6: como o áudio toca automaticamente
+  // ANTES de as opções aparecerem, estar na primeira posição não prova que a
+  // criança "não escutou". Essa hipótese exige estado temporal e é emitida por
+  // audioChoiceRuntime, nunca por uma Option estática do Composer.
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
+}''')
+
+          Path('.github/workflows/n106-cleanup-patch.yml').unlink()
+          PY
+          git diff --check
+      - name: Commitar somente na branch N1.06
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: limpa a tela autoral e o diagnóstico estático F05'
+          git push origin HEAD:codex/corrigir-n106
