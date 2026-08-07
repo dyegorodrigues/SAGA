@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+// O drag deve permanecer sem setState cruzado e sem animação de sombra inválida.
 import React from "react";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
