@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from "react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
 import axe from "axe-core";
 import { CenaDePosicaoStage } from "./CenaDePosicaoStage";
 import { Composer } from "../../curriculum/Composer";
@@ -26,8 +26,6 @@ describe("CenaDePosicaoStage — a tela de GE.01 (F47)", () => {
   });
 
   it("⚠️ a resposta é o OBJETO, não uma palavra escrita", () => {
-    // O gerador antigo dava dois botões: "Em cima" e "Embaixo". Numa faixa em
-    // que a criança não lê, isso é a competência trocada por leitura.
     const { container } = render(<CenaDePosicaoStage spec={spec(1)} />);
     const textos = [...container.querySelectorAll("button")].map(b => b.textContent ?? "");
     expect(textos.some(t => /em cima|embaixo/i.test(t))).toBe(false);
@@ -60,9 +58,8 @@ describe("CenaDePosicaoStage — a tela de GE.01 (F47)", () => {
     expect(falar).toHaveBeenCalledWith(`Esse está ${errada.posicao}. Eu pedi ${s.pedida}.`);
   });
 
-  it("⚠️ tocar o referencial NÃO encerra a questão — vira aula", () => {
-    // A §6 precisa do gesto para observar `IGNORA_REFERENCIAL`, mas punir uma
-    // criança que ainda está entendendo a pergunta seria cobrar protocolo.
+  it("⚠️ tocar o referencial NÃO encerra a questão — vira aula e depois devolve o retry", () => {
+    vi.useFakeTimers();
     const s = spec(1);
     const recebido: AcaoDePosicao[] = [];
     const { container } = render(
@@ -71,9 +68,15 @@ describe("CenaDePosicaoStage — a tela de GE.01 (F47)", () => {
     fireEvent.click(screen.getByLabelText(`${s.referencial.nome} (a referência)`));
     expect(recebido[0].escolhida).toBeNull();
 
-    // E ela continua podendo responder.
+    // Enquanto a voz está ensinando, outro toque não abre uma fala concorrente.
+    fireEvent.click(objetoEm(container, s.pedida));
+    expect(recebido).toHaveLength(1);
+
+    // Terminada a janela de vocabulário, ela continua na MESMA questão.
+    act(() => vi.advanceTimersByTime(2000));
     fireEvent.click(objetoEm(container, s.pedida));
     expect(recebido[1].escolhida).toBe(s.pedida);
+    vi.useRealTimers();
   });
 
   it("o rótulo da posição só aparece DEPOIS da resposta — antes é gabarito", () => {
