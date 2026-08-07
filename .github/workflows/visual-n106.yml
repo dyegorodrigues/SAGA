@@ -1,0 +1,90 @@
+name: Visual N1.06
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: visual-n106-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    if: github.head_ref == 'codex/corrigir-n106'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Preparar Chrome
+        run: |
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            sudo mkdir -p /opt/pw-browsers
+            sudo chown -R "$USER":"$USER" /opt/pw-browsers
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
+          test -n "$CHROME_REAL"
+          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+      - name: Sonda rápida N1.06
+        env:
+          SONDA_SEMENTES: '1'
+        run: npm run sonda -- "N1.06"
+      - name: Capturar todas as cenas N1.06 sem percorrer o catálogo
+        run: |
+          rm -rf /tmp/n106 && mkdir -p /tmp/n106
+          node --input-type=module <<'NODE'
+          import { spawn } from 'node:child_process';
+          import { chromium } from 'playwright-core';
+          import fs from 'node:fs';
+          const porta = 5198;
+          const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], { stdio: ['ignore','pipe','pipe'], detached: true });
+          await new Promise((ok,no) => {
+            const t=setTimeout(()=>no(new Error('vite não subiu')),60000);
+            vite.stdout.on('data',d=>{ if(String(d).includes('ready in')){clearTimeout(t);ok();} });
+          });
+          const browser = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
+          const page = await browser.newPage({ viewport:{width:390,height:640}, deviceScaleFactor:2 });
+          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`, {waitUntil:'networkidle'});
+          await page.waitForFunction(()=>window.sonda?.total>0);
+          const nomes = await page.evaluate(()=>window.sonda.nomes());
+          const alvos = nomes.map((nome,i)=>({nome,i})).filter(x=>x.nome.includes('N1.06'));
+          console.log('CENAS_N106=' + JSON.stringify(alvos.map(x=>x.nome)));
+          if(!alvos.length) throw new Error('nenhuma cena N1.06 encontrada');
+          const safe = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,90);
+          for (let k=0;k<alvos.length;k++) {
+            const {nome,i}=alvos[k];
+            await page.evaluate(idx=>window.sonda.ir(idx), i);
+            await page.waitForTimeout(1500);
+            await page.screenshot({path:`/tmp/n106/${String(k+1).padStart(2,'0')}_${safe(nome)}.png`});
+          }
+          await browser.close();
+          try { process.kill(-vite.pid,'SIGKILL'); } catch { vite.kill('SIGKILL'); }
+          NODE
+      - name: Folha de contato
+        run: |
+          python3 - <<'PY'
+          from PIL import Image, ImageDraw
+          from pathlib import Path
+          files=sorted(Path('/tmp/n106').glob('*.png'))
+          tw,th,label=195,320,30
+          cols=2; rows=(len(files)+1)//2
+          out=Image.new('RGB',(cols*tw,rows*(th+label)),'white'); d=ImageDraw.Draw(out)
+          for i,p in enumerate(files):
+            im=Image.open(p).convert('RGB'); im.thumbnail((tw,th))
+            x=(i%2)*tw; y=(i//2)*(th+label)
+            out.paste(im,(x+(tw-im.width)//2,y+(th-im.height)//2))
+            d.text((x+3,y+th+3),p.stem[:42],fill='black')
+          out.save('/tmp/n106/contact-sheet.jpg',quality=82)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: n106-prints
+          path: /tmp/n106
+          retention-days: 7
