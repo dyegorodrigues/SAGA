@@ -11,6 +11,13 @@ describe("F04 — autoria de feedback/retry", () => {
     expect(ownsAuthorialFeedback(f04, meta)).toBe(true);
   });
 
+  it("sem leitura TouchPlace o GameLoop não presume autoria", () => {
+    // O kind sozinho não basta: isto impede silenciar feedback de um uso futuro
+    // da primitiva que não publique a ação autoral da F04.
+    expect(ownsAuthorialRetry(f04)).toBe(false);
+    expect(ownsAuthorialFeedback(f04)).toBe(false);
+  });
+
   it("não sequestra outras primitivas", () => {
     const outra: Question = { kind: "plain", prompt: "?", answer: 3 };
     expect(ownsAuthorialRetry(outra, meta)).toBe(false);
