@@ -55,7 +55,9 @@ jobs:
 
       # O nível 3 é temporal: a primeira foto só mostra a primeira classificação.
       # Este driver joga a primeira metade sem conhecer a resposta: tenta o laço;
-      # se a peça volta, tenta FORA. Depois fotografa a troca e a segunda metade.
+      # se a peça volta, tenta FORA. O sinal de fim não é "bandeja vazia" — ao
+      # terminar, a própria ficha devolve TODAS as peças ao centro. O sinal é o
+      # estado pedagógico explícito `Agora mudou!`.
       - name: Capturar transição e segunda fase do nível 3
         run: |
           node --input-type=module <<'NODE'
@@ -89,14 +91,20 @@ jobs:
           const bandeja = page.locator('[aria-label="Peças para separar"]');
           const fora = page.locator('[aria-label="Deixar fora dos laços"]');
           const laco = page.locator('button[aria-label^="Laço:"]').first();
+          const mudou = page.getByText('Agora mudou!', { exact: true });
 
           let guarda = 0;
-          while (await bandeja.locator('button').count()) {
+          while (!(await mudou.count())) {
             if (++guarda > 30) throw new Error('não consegui terminar a primeira classificação');
             const antes = await bandeja.locator('button').count();
+            if (antes === 0) {
+              await page.waitForTimeout(30);
+              continue;
+            }
             await bandeja.locator('button').first().click();
             await laco.click();
             await page.waitForTimeout(25);
+            if (await mudou.count()) break;
             if (await bandeja.locator('button').count() === antes) {
               await bandeja.locator('button').first().click();
               await fora.click();
