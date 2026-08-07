@@ -4,6 +4,10 @@
 > cópia do repositório**, porque duplicar o SAGA dentro dele criaria arquivos
 > concorrentes e risco de editar a cópia errada.
 
+> **Trabalhando aqui sem a conversa que produziu o estado?** Comece por
+> [`RETOMADA.md`](./RETOMADA.md) e, se você é um agente recebendo uma tarefa,
+> pelo [`BRIEFING_CODEX.md`](./BRIEFING_CODEX.md).
+
 ## Estado preservado
 
 > **Marco de continuidade (2/ago/2026):** o Lote C liga F98/N4.02 ao ArrayGrid
@@ -37,14 +41,14 @@ sem equivaler a publicação: a evidência final é o commit presente em `origin
 
 ## Baseline técnico vigente
 
-- grafo canônico: 88 competências e 13 trilhas de fluência;
+- grafo canônico: 89 competências e 13 trilhas de fluência *(88 até ago/2026; a `N1.13` nasceu quando a P12 separou "produzir quantidade" de "contar até 20" — Bíblia §15.8);*
 - geradores explícitos: 42/88;
 - fallbacks “Em construção”: 46/88;
-- fichas autorais recebidas: 92, cobrindo 88/88 competências;
+- fichas autorais recebidas: 92, cobrindo 89/89 competências;
 - fichas TypeScript de Jornada no disco/registradas: 15/15;
 - fichas Dojo no disco/registradas: 4/4;
 - fichas fora de `AllFichas`: nenhuma;
-- YAMLs individuais por strand: 88 nós, sincronizados por ID e pré-requisitos com
+- YAMLs individuais por strand: 89 nós, sincronizados por ID e pré-requisitos com
   o grafo agregado; JSON/TypeScript são artefatos gerados e verificáveis.
 - mapa autoral→runtime: 25 primitivas mapeadas; 13 executáveis, cinco com renderer
   sem builder, seis componentes isolados e uma lacuna real (`Regua`/`measure`).

@@ -2,7 +2,8 @@
 
 > **Nota de atualização (2/ago/2026):** este dossiê continua válido como histórico
 > das decisões e implementações, mas os números 95/53 foram superados pelo cânone
-> v3.2 recebido depois. O baseline vigente é **88 competências, 13 trilhas e 92
+> v3.2 recebido depois. O baseline **daquele dia** era 88 competências (hoje
+> são **89**, ver P12), 13 trilhas e 92
 > fichas autorais**; a ordem executiva está em
 > `AI_Studio_Lab/pedagogia/PLANO_MESTRE_SAGA.md`.
 

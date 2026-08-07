@@ -14,7 +14,7 @@ divergia do estado real, a divergência está marcada.
 
 ## 1. Estado do projeto, em termos simples
 
-Fundação existente: 88 competências canônicas, 13 trilhas de fluência, 92 fichas
+Fundação existente: 89 competências canônicas *(88 até ago/2026; ver P12)*, 13 trilhas de fluência, 92 fichas
 autorais em cinco blocos, grafo determinístico, Composer incremental, Radar,
 Oficina, painel dos pais, auditoria curricular e runtime com caminhos autorais e
 legados convivendo.
@@ -135,7 +135,8 @@ erros; então promover ou retirar.
 | Observação de erro | erro não avança nível; resposta única; sem negativos; 500 amostras sem laço |
 
 **Leitura de "canário único":** foi entendida como *um nó promovido por PR*, e não
-como *um único canário no sistema*. N3.09 já havia sido promovida e validada no
+como *um único canário no sistema*. *(Confirmada pelo tempo: hoje são treze
+canários ativos, promovidos um por PR.)* N3.09 já havia sido promovida e validada no
 Lote B; retirá-la seria regressão. O Plano Mestre confirma a leitura ao exigir
 "trocar um único nó por PR".
 

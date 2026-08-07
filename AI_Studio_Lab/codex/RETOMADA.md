@@ -206,6 +206,10 @@ Ativar cada um é **PR próprio**. Sempre.
 
 ### Se outro agente trabalhar aqui antes da próxima sessão
 
+👉 **O roteiro dele é o [`BRIEFING_CODEX.md`](./BRIEFING_CODEX.md)** — a fila de
+tarefas por risco crescente, as regras com a cicatriz de cada uma, e o que ele
+não deve tocar. Entregue aquele arquivo, não esta seção.
+
 O estado inteiro está no repositório, não em conversa nenhuma. Ordem de leitura:
 
 1. este arquivo;
@@ -355,4 +359,17 @@ Registrado porque o autor cobrou, e porque a próxima sessão não deve repetir.
 
 ## 9. Branch
 
-`claude/install-superpowers-repo-bst25i-hrg5jr`. Nunca empurre para outra.
+**Saia sempre de `main`.** O bloco F0 foi entregue pelo PR #24 e a branch que o
+produziu (`claude/install-superpowers-repo-bst25i-hrg5jr`) foi **apagada** depois
+do merge — branch de trabalho não é lugar de morar.
+
+```bash
+git fetch origin main && git checkout -b <nova-branch> origin/main
+```
+
+⚠️ **Duas branches no remoto não pertencem a este trabalho e não devem ser
+apagadas:** `agent/creature-engine-tamagotchi` (35 commits, ~4.000 linhas do
+Creature Lab — renderer, catálogo de animações PMD, entrada Vite própria) e
+`codex/criar-branch-para-creature-engine-tamagotchi` (3 commits, guardas de
+binário PMD). **Nenhuma das duas está na `main`, e uma não contém a outra** —
+verificado em 7/ago/2026. Apagar qualquer uma perde trabalho.

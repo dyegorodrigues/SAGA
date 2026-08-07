@@ -1,5 +1,16 @@
 # Handoff de continuidade — estado após a correção do canário
 
+> ## ⛔ SUPERADO EM 7/AGO/2026 — leia a [`RETOMADA.md`](./RETOMADA.md)
+>
+> **Este arquivo descreve o repositório de 3/ago e não vale mais como estado.**
+> A afirmação *"N3.09 segue como único canário"* estava certa naquele dia e hoje
+> são **treze** canários ativos; o "Lote D não implementado" também foi
+> ultrapassado pelo bloco F0.
+>
+> Fica no repositório porque o **raciocínio** dele continua válido — em especial
+> por que não republicar um commit local antigo sobre uma base superada. Mas
+> nenhum número aqui deve ser usado para decidir nada.
+
 ## Base e publicação
 
 - Base desta atualização: `origin/main = 3c9acbd` (`Revise AGENTS.md with new SAGA guidelines`).
