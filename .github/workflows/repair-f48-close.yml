@@ -85,7 +85,7 @@ jobs:
           const transform=await page.locator('button[data-forma-close=true]').evaluate(el=>getComputedStyle(el).transform);
           if(transform && transform!=='none') {
             const m=transform.match(/matrix\(([^)]+)\)/);
-            if(m){const [a,b]=m[1].split(',').map(Number); if(Math.abs(b)>0.05 || Math.abs(a-1)>0.05) throw new Error(`fecho ainda inclinado: ${transform}`);}
+            if(m){const [,b,c]=m[1].split(',').map(Number); if(Math.abs(b)>0.05 || Math.abs(c)>0.05) throw new Error(`fecho ainda girado: ${transform}`);}
           }
           await page.screenshot({path:'/tmp/f48-close/fecho-estavel.png'});
           await browser.close();
