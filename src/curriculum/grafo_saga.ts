@@ -16,6 +16,7 @@ export const grafoSaga: GrafoNode[] = [
   { id: "N1.07", nome: "Ordem, sucessor e antecessor até 10", strand: "N1", faixa: "F0", prereqs: ["N1.02","N1.06"] },
   { id: "N1.08", nome: "Subitização conceitual (moldura de 10)", strand: "N1", faixa: "F0", prereqs: ["N1.03","N1.04"] },
   { id: "N1.09", nome: "Contagem até 20 e a partir de N", strand: "N1", faixa: "F0", prereqs: ["N1.02","N1.04"] },
+  { id: "N1.13", nome: "Produzir quantidade", strand: "N1", faixa: "F0", prereqs: ["N1.02","N1.04"] },
   { id: "AL.01", nome: "Classificação e o intruso", strand: "AL", faixa: "F0", prereqs: [] },
   { id: "AL.02", nome: "Padrões de repetição", strand: "AL", faixa: "F0", prereqs: ["AL.01"] },
   { id: "GE.01", nome: "Posição e localização espacial", strand: "GE", faixa: "F0", prereqs: [] },

@@ -124,15 +124,35 @@ export function gVis_TakeApart(lvl: number): Question {
   };
 }
 
+/**
+ * A N1.09 — *"contagem até 20 e a partir de qualquer número"*.
+ *
+ * ⚠️ **Ainda é legado**, e ainda pede leitura. Mas o escopo estava absurdo: o
+ * início era sorteado entre 10 e 89, então uma criança de faixa **F0** — quatro
+ * anos, que ainda não lê — recebia *"conte a partir do 87"* e três listas de
+ * números até 119 para escolher.
+ *
+ * O `GRAFO_DE_CONHECIMENTO_SAGA.md` escreve as micros desta competência: contar
+ * objetos de 10 a 15, de 10 a 20, *"continue: 8, 9, __, __"* e a regressiva de
+ * 10 a 0. Nada passa de vinte.
+ *
+ * Este conserto é de ESCOPO, não de forma: a competência continua sem ficha no
+ * cânone, e é isso que a pendência registra. Mas um nó de F0 servindo números
+ * até 119 é um defeito por si só, e ele some numa linha.
+ */
 export function gVis_Sequence(lvl: number): Question {
-  const start = Math.floor(Math.random() * 80) + 10;
+  // Até 20, como as micros do grafo dizem. O teto do início deixa espaço para
+  // os três números seguintes caberem dentro do vinte.
+  const start = Math.floor(Math.random() * 9) + 8;
   return {
     kind: "plain",
     prompt: `Conte a partir do ${start}. Quais números vêm depois?`,
     audioPrompt: "Quais números vêm depois?",
     options: [
       { label: `${start+1}, ${start+2}, ${start+3}`, value: "right" },
-      { label: `${start+10}, ${start+20}, ${start+30}`, value: "wrong1" },
+      // O distrator do salto de dez sairia de 20 no escopo novo; o de pular de
+      // dois em dois mora dentro dele e é o erro real desta idade.
+      { label: `${start+2}, ${start+4}, ${start+6}`, value: "wrong1" },
       { label: `${start+1}, ${start+3}, ${start+5}`, value: "wrong2" },
     ].sort(() => Math.random() - 0.5),
     answer: "right",

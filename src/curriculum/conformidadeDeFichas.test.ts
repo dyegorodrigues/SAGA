@@ -30,6 +30,16 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { ALL_MATH_TRACKS } from "./motores/curriculum";
 import { COMPOSER_CANARIES } from "./motores/composerCanary";
+import { JARDIM_FICHAS, JOURNEY_FICHAS } from "./fichas";
+
+/**
+ * As fichas de verdade.
+ *
+ * `AllFichas` mistura `FichaCompetencia` com `Track` — as quatro trilhas Sensei
+ * do Dojo entram lá como trilha, sem `micros`. Iterar aquilo aqui rebenta com
+ * TypeError em vez de reprovar a regra, que é pior que não ter regra.
+ */
+const FICHAS = [...JOURNEY_FICHAS, ...JARDIM_FICHAS];
 
 const RAIZ = join(__dirname, "..", "..");
 const PASTA_FICHAS = join(RAIZ, "AI_Studio_Lab/pedagogia/fichas");
@@ -56,7 +66,11 @@ function exigenciasDasFichas(): Exigencia[] {
   for (const arquivo of readdirSync(PASTA_FICHAS).filter(a => a.endsWith(".md"))) {
     let fichaAtual = "?";
     for (const linha of readFileSync(join(PASTA_FICHAS, arquivo), "utf8").split("\n")) {
-      const titulo = linha.match(/^#\s*FICHA\s+(F\d+)/i);
+      // `JD1`…`JD5` também são fichas do cânone. Lendo só `F\d+`, o título
+      // delas não casava e o relatório atribuía a competência à ficha ANTERIOR:
+      // o N1.03 aparecia como "F27". Auditor que erra o nome do que auditou é
+      // pior que auditor ausente — o número parecia certo.
+      const titulo = linha.match(/^#\s*FICHA\s+((?:F|JD)\d+)/i);
       if (titulo) fichaAtual = titulo[1];
       // `N1.01` e `GM.03` convivem: o dígito do meio é opcional. Sem o `?`,
       // GE/GM/AL/PE inteiras sumiam da auditoria em silêncio.
@@ -160,7 +174,64 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   deslocamento: ["MaterialDourado"],
   pareamento: ["DragGroup"],
   touchcount: ["TouchCount"],
+  fileira: ["EmojiRow"],
+  classificacao: ["DragGroup"],
+  audiochoice: ["AudioChoice"],
 };
+
+/**
+ * O MODO que a ficha nomeia, traduzido para o que o runtime chama.
+ *
+ * ### O defeito que isto corrige
+ *
+ * A tabela `PRIMITIVA_DO_KIND` traduz `kind → primitiva`, sem modo. Então a
+ * conferência comparava `EmojiRow#flash` (o que a JD1 pede) com `EmojiRow` (o
+ * que ela conseguia ver) e **contava como divergente uma competência correta**.
+ * Depois da ativação do bloco F0, cinco das 35 "divergências" eram isso: N1.01,
+ * N1.02, N1.03, N1.08 e AL.02 servem exatamente o modo que a ficha manda.
+ *
+ * Um auditor que acusa quem está certo é pior que um auditor ausente: ele
+ * esconde os erros de verdade no meio do barulho, e treina quem lê a ignorar a
+ * lista. Aqui o runtime **declara** o modo — `uiProps.modo` — e a comparação
+ * passa a ser a que importa.
+ *
+ * A tabela é escrita à mão, como a das primitivas, e pela mesma razão: se a
+ * ficha e o runtime discordarem do nome do modo, é a discordância que se quer
+ * ver, não uma normalização que a esconde.
+ */
+const MODO_DO_RUNTIME: Record<string, string> = {
+  ritmico: "rítmico",
+  toque: "toque",
+  flash: "flash",
+  "flash-mao": "flash, skin mão",
+  padrao: "padrão",
+  parear: "parear",
+  "caixas/laços": "caixas/laços",
+};
+
+/**
+ * A primitiva que uma questão entrega, COM o modo quando ele existe.
+ *
+ * `pareamento` não carrega `modo` no spec porque só tem um: a F07 §1 diz
+ * `DragGroup (modo parear)` e o palco não faz outra coisa. Declarado aqui em
+ * vez de inventado no spec — o componente não precisa de um campo que nunca
+ * varia só para satisfazer um auditor.
+ */
+function primitivasDaQuestao(q: { kind: string; uiProps?: unknown }): string[] {
+  const bases = PRIMITIVA_DO_KIND[q.kind] ?? [];
+  const modoBruto = q.kind === "pareamento"
+    ? "parear"
+    : q.kind === "classificacao"
+      ? "caixas/laços"
+      : (q.uiProps as { modo?: string } | undefined)?.modo;
+  const modo = modoBruto ? MODO_DO_RUNTIME[modoBruto] : undefined;
+  // O modo qualifica a primeira primitiva — a que o palco é. Um palco composto
+  // (`story-bars` = StoryPanel + SingaporeBars) não tem modo declarado, e
+  // espalhar o modo por todas mentiria sobre as outras.
+  return modo && bases.length
+    ? [`${bases[0]}#${modo}`, ...bases.slice(1)]
+    : bases;
+}
 
 /** Como cada competência é servida hoje. */
 function comoEServida(id: string): "padrao-ouro" | "legado" | "vazio" {
@@ -259,20 +330,28 @@ describe("conformidade entre as fichas e o que o app serve", () => {
     for (const id of TODAS) {
       if (!porCompetencia.has(id) || comoEServida(id) === "vazio") continue;
       const track: any = (ALL_MATH_TRACKS as any[]).find(t => t.id === id);
-      let kinds: string[];
+      let questoes: { kind: string; uiProps?: unknown }[];
       try {
-        // Cinco níveis: uma competência pode trocar de primitiva na escada.
-        kinds = [...new Set([1, 2, 3, 4, 5].map(n => String(track.gen(n).kind)))];
+        // Cinco níveis: uma competência pode trocar de primitiva NA ESCADA, e
+        // também de modo — o N1.08 vira `fileira` no 1-2 e `tenframe` no 3-5.
+        questoes = [1, 2, 3, 4, 5].map(n => track.gen(n));
       } catch {
         naoAmostrados.push(id);
         continue;
       }
+      const kinds = [...new Set(questoes.map(q => String(q.kind)))];
       const desconhecidos = kinds.filter(k => !(k in PRIMITIVA_DO_KIND));
       if (desconhecidos.length) {
         naoAmostrados.push(`${id} (kind sem tradução: ${desconhecidos.join(", ")})`);
         continue;
       }
-      const entregues = new Set(kinds.flatMap(k => PRIMITIVA_DO_KIND[k]));
+      // A entrega inclui a forma SEM modo: uma ficha que pede `TenFrame` puro
+      // continua satisfeita por `TenFrame#flash` — o modo é um detalhe a mais,
+      // não uma primitiva diferente. O contrário é que não vale.
+      const entregues = new Set(questoes.flatMap(q => {
+        const comModo = primitivasDaQuestao(q);
+        return [...comModo, ...comModo.map(p => p.split("#")[0])];
+      }));
       const pedidas = primitivasExigidas(id);
       const faltou = pedidas.filter(p => !entregues.has(p));
       if (faltou.length) {
@@ -346,6 +425,50 @@ describe("conformidade entre as fichas e o que o app serve", () => {
 
     console.log(`\n=== ESTREIAS NA RAIZ (${raizes.length}) ===`);
     console.log(raizes.join("\n"));
+  });
+
+  it("micros de fichas DIFERENTES não compartilham a mesma voz — pendência P5", () => {
+    // `FichaCompetencia` tem UMA voz, e várias competências vêm de DUAS fichas
+    // do cânone: N1.08 de F02 + JD2, N1.04 de F01 + F03, N1.11 de F28 + JD3.
+    // As §7 delas podem se contradizer — o explain da F02 manda "continue
+    // contando" e a JD2 proíbe em negrito dizer "conte" na tela dela.
+    //
+    // Este é o portão: quando uma micro declara de que ficha veio, duas fontes
+    // distintas não podem falar com a mesma boca.
+    for (const ficha of FICHAS) {
+      const porFonte = new Map<string, string[]>();
+      for (const micro of ficha.micros) {
+        if (!micro.fonte) continue;
+        const voz = String((micro.params as Record<string, unknown>).explain ?? ficha.explain ?? "");
+        porFonte.set(micro.fonte, [...(porFonte.get(micro.fonte) ?? []), voz]);
+      }
+      if (porFonte.size < 2) continue;
+      const vozes = [...porFonte.entries()].map(([fonte, vs]) => [fonte, vs[0]] as const);
+      const distintas = new Set(vozes.map(([, v]) => v));
+      expect(
+        distintas.size,
+        `${ficha.id}: fichas ${vozes.map(([f]) => f).join(" + ")} falam com a mesma voz.\n`
+        + `Declare o explain da micro em params.explain — ver P5 em schema.ts.`,
+      ).toBe(vozes.length);
+    }
+  });
+
+  it("imprime as competências de DUAS fichas que ainda têm uma voz só", () => {
+    // Levantamento, não portão: a maioria das competências antigas nunca
+    // declarou `fonte`, e falhar aqui pararia o projeto. O portão acima cobre
+    // quem já declarou.
+    const pendentes: string[] = [];
+    for (const [id, fichas] of porCompetencia) {
+      const nomes = [...new Set(fichas.map(f => f.ficha))];
+      if (nomes.length < 2) continue;
+      const runtime = FICHAS.find(f => f.id === id);
+      if (!runtime) continue;
+      if (runtime.micros.every(m => m.fonte)) continue;
+      pendentes.push(`${id}\tfichas ${nomes.join(" + ")}\tmicros sem fonte declarada`);
+    }
+    console.log(`\n=== DUAS FICHAS, UMA VOZ (${pendentes.length}) ===`);
+    console.log("Cada uma pode estar servindo a §7 da ficha errada. Ver P5.");
+    console.log(pendentes.join("\n"));
   });
 
   it("imprime o quadro completo", () => {

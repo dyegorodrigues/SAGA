@@ -56,6 +56,18 @@ import { TEMAS, construirPareamentoSpec } from "./procedimentos/pareamentoContra
 import { cenasDoNivel as pareamentoCenasDoNivel, desfechoDe } from "./procedimentos/pareamentoProcedure";
 import { construirTouchCountSpec } from "./procedimentos/touchCountContract";
 import { ModoDeContagem } from "./procedimentos/touchCountProcedure";
+import { EmojiRowSpec, chaveDaPeca, construirEmojiRowSpec } from "./procedimentos/emojiRowContract";
+import { MisconceptionTag } from "../constants/misconceptions";
+import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProcedure";
+import { construirClassificacaoSpec } from "./procedimentos/classificacaoContract";
+import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
+import { construirProducaoSpec } from "./procedimentos/producaoContract";
+import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
+import { construirFormaSpec } from "./procedimentos/formaContract";
+import { construirGrandezaSpec } from "./procedimentos/grandezaContract";
+import { construirMolduraSpec } from "./procedimentos/tenFrameContract";
+import { ModoDaMoldura } from "./procedimentos/tenFrameProcedure";
+import { soaParecido } from "./procedimentos/audioChoiceProcedure";
 import { contasDoNivel as areaContasDoNivel } from "./procedimentos/areaProcedure";
 import { construirDeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import {
@@ -132,6 +144,64 @@ function numericOptions(answer: number, min: number, max: number) {
   return values
     .map(value => ({ label: String(value), value }))
     .sort(() => Math.random() - 0.5);
+}
+
+/**
+ * A hipótese que uma alternativa da fileira carrega — §6 das fichas JD1, JD2 e F52.
+ *
+ * Fica aqui, e não em `tagNumericDistractors`, porque duas das três tags **não
+ * são regras sobre o valor**: `CHUTE_SEGURO` fala da POSIÇÃO na tela e
+ * `COPIA_ULTIMO` fala da peça anterior à lacuna. O parser de `"n+1"` não tem
+ * como expressá-las, e forçá-las ali produziria tag errada em silêncio.
+ *
+ * A ordem é a armadilha §6.8: do mais específico ao mais genérico. Com
+ * `OFF_BY_ONE` na frente, ele engoliria `CHUTE_SEGURO` toda vez que a
+ * alternativa central caísse a um do alvo.
+ */
+function tagDaAlternativa(
+  spec: EmojiRowSpec,
+  valor: number | string,
+): string | undefined {
+  if (valor === spec.resposta) return undefined;
+
+  if (spec.modo === "padrao") {
+    // Delegado ao procedimento: a regra de diagnóstico mora num lugar só. Com a
+    // cópia aqui, o `SO_UM_ATRIBUTO` do crescente alternado existiria no
+    // procedimento e nunca chegaria à alternativa — tag testada e nunca emitida.
+    if (!spec.sequencia) return undefined;
+    return diagnosticarPadrao({
+      resposta: String(valor),
+      correta: String(spec.resposta),
+      anterior: chaveDaPeca(spec.sequencia.anterior),
+      unidade: spec.sequencia.unidade,
+    });
+  }
+
+  if (valor === spec.central) return MisconceptionTag.CHUTE_SEGURO;
+  if (typeof valor === "number" && typeof spec.resposta === "number"
+    && Math.abs(valor - spec.resposta) === 1) {
+    return MisconceptionTag.OFF_BY_ONE;
+  }
+  return undefined;
+}
+
+/**
+ * A hipótese que uma alternativa do ouvir-e-escolher carrega — §6 da F05.
+ *
+ * Fica aqui pelo mesmo motivo do `tagDaAlternativa` da fileira: `NAO_ESCUTOU`
+ * fala da POSIÇÃO na tela e `CONFUSAO_FONOLOGICA` fala do SOM. O parser de
+ * `"n+1"` não expressa nenhuma das duas.
+ *
+ * A ordem importa: o par fonológico vem antes do vizinho numérico, porque 6 e 7
+ * são as duas coisas ao mesmo tempo — e a aula de quem não distinguiu o som não
+ * é a mesma de quem não reconheceu o símbolo.
+ */
+function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
 }
 
 function tagNumericDistractors(
@@ -699,6 +769,189 @@ export class Composer {
         break;
       }
 
+      case "fileira": {
+        // Fichas JD1 (N1.03, olhômetro), JD2 (N1.08, mão relâmpago) e F52
+        // (AL.02, padrões) — os três modos da escada do `EmojiRow`.
+        //
+        // A ficha diz o MODO, igual ao `touchcount`, e pelo mesmo motivo:
+        // deduzir pelo id da competência funcionaria com três nós e apagaria em
+        // silêncio o dia em que um quarto usasse a primitiva. Faltando o modo,
+        // isto QUEBRA — barulho na hora certa vale mais que uma tela plausível
+        // e errada, que foi como o canhão da F27 desenhou peixinhos.
+        const MODOS: ModoDaFileira[] = ["plain", "flash", "flash-mao", "padrao"];
+        if (!MODOS.includes(params.modo as ModoDaFileira)) {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva fileira exige params.modo em `
+            + `${JSON.stringify(MODOS)} — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+        const modo = params.modo as ModoDaFileira;
+        const spec = construirEmojiRowSpec(modo, lvl, Math.random);
+
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
+
+        // As alternativas saem NA ORDEM DO SPEC, sem embaralhar. No relance a
+        // ordem é numérica e a do meio é a que a tag `CHUTE_SEGURO` observa:
+        // embaralhar aqui apagaria o diagnóstico que a §6 das duas fichas pede.
+        options = spec.alternativas.map(a => {
+          const tag = tagDaAlternativa(spec, a.valor);
+          return {
+            value: a.valor,
+            label: a.rotulo,
+            ...(tag ? { misconception: tag, tag } : {}),
+          };
+        });
+        break;
+      }
+
+      case "audiochoice": {
+        // Ficha F05 (N1.06). A pergunta é o SOM: o alvo não aparece escrito em
+        // lugar nenhum além das alternativas. É a única competência do app que
+        // não depende de leitura, e o gerador antigo a resolvia lendo — ele
+        // imprimia "🔊 TRÊS" na tela.
+        const spec = construirAudioChoiceSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        // As alternativas saem NA ORDEM DO SPEC. Embaralhar aqui destruiria a
+        // tag `NAO_ESCUTOU` da §6, que é uma hipótese sobre a POSIÇÃO.
+        options = spec.alternativas.map(v => ({
+          value: v,
+          label: String(v),
+          ...(tagDaEscuta(spec, v) ? { misconception: tagDaEscuta(spec, v)!, tag: tagDaEscuta(spec, v)! } : {}),
+        }));
+        break;
+      }
+
+      case "classificacao": {
+        // Ficha F51 (AL.01). Ficha de PRODUÇÃO: a criança separa, não escolhe.
+        // A única escolha é o nível 5 — "por que estas estão juntas?" —, cujas
+        // alternativas são CRITÉRIOS, nunca peças.
+        const spec = construirClassificacaoSpec(lvl, Math.random);
+        uiProps = spec;
+
+        if (spec.forma === "descobrir") {
+          answer = spec.resposta!;
+          options = spec.alternativas!.map(a => ({ value: a.valor, label: a.rotulo }));
+          evaluate = candidate => candidate === answer;
+        } else {
+          // Nos níveis 1 a 4 não há alternativa: quem julga é o palco, que
+          // recusa a peça no laço errado (§4, "empurrada de volta") e só
+          // termina quando tudo está no lugar. Fabricar alternativas aqui
+          // devolveria a múltipla escolha que esta ficha existe para tirar do
+          // caminho — e foi exatamente ela que a AL.01 servia até agora.
+          //
+          // O que o Radar recebe não vem do valor: vem da AÇÃO, lida em
+          // `answerPolicy` a partir das tentativas recusadas.
+          answer = "separado";
+          options = undefined;
+          evaluate = candidate => candidate === "separado" || candidate === true;
+        }
+        promptOverride = spec.enunciado;
+        break;
+      }
+
+      case "shapecanvas": {
+        // Duas fichas nomeiam o `ShapeCanvas`, em modos diferentes:
+        //   F47 (GE.01) — modo CENA: um referencial e dois objetos
+        //   F48 (GE.02) — modo FORMAS: 3 a 4 figuras em contêineres idênticos
+        //
+        // A ficha diz o modo; o Composer não adivinha pelo id da competência.
+        // Adivinhar funcionaria hoje, com duas fichas, e apagaria em silêncio o
+        // dia em que uma terceira usar a primitiva. Faltando o modo, isto
+        // QUEBRA — é a mesma regra do `touchcount`, e ela existe porque um
+        // `?? padrão` já fez o canhão de balões desenhar peixinhos.
+        if (params.modo !== "cena" && params.modo !== "formas") {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva shapecanvas exige params.modo `
+            + `"cena" ou "formas" — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+
+        if (params.modo === "formas") {
+          // A resposta é a FIGURA que ela toca. O gerador antigo dava dois
+          // emojis como alternativas — e emoji não gira, então a única coisa
+          // que esta ficha ensina não tinha como ser exercitada.
+          const spec = construirFormaSpec(lvl, Math.random);
+          answer = spec.resposta;
+          uiProps = spec;
+          evaluate = candidate => String(candidate) === String(answer);
+          promptOverride = spec.enunciado;
+          options = undefined;
+          break;
+        }
+
+        // Modo cena. A resposta é o objeto que a criança toca — não existe
+        // alternativa. O gerador antigo fabricava as palavras "Em cima" e
+        // "Embaixo" como botões, e era isso que transformava a primeira
+        // geometria do currículo num exercício de leitura.
+        const spec = construirPosicaoSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => candidate === answer;
+        promptOverride = spec.enunciado;
+        options = undefined;
+        break;
+      }
+
+      case "moldura": {
+        // Três fichas, uma moldura: F02 (N1.08, "quantas você vê?"), JD3
+        // (N1.11, "quantos faltam?") e JD5 (N1.10, "quantos escondidos?").
+        //
+        // A ficha diz o MODO; o Composer não adivinha pelo id. Faltando o modo,
+        // isto QUEBRA — a mesma regra do `touchcount` e do `shapecanvas`, e ela
+        // existe porque um `?? padrão` já fez o canhão desenhar peixinhos.
+        if (params.modo !== "contar" && params.modo !== "faltam" && params.modo !== "escondidos") {
+          throw new Error(
+            `${ficha.id}/${micro.id}: primitiva moldura exige params.modo `
+            + `"contar", "faltam" ou "escondidos" — recebido ${JSON.stringify(params.modo)}.`,
+          );
+        }
+        const spec = construirMolduraSpec(params.modo as ModoDaMoldura, lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        // As alternativas moram no palco: o diagnóstico depende do que a CENA
+        // mostrava (quantas cheias, se o vazio estava disperso, quantas a tampa
+        // cobriu), e isso não cabe no valor de uma alternativa da barra.
+        options = undefined;
+        break;
+      }
+
+      case "grandeza": {
+        // Ficha F49 (GM.01). A resposta é QUAL objeto — não uma palavra, e não
+        // uma alternativa. O nó não tinha gerador nenhum: caía no fallback.
+        const spec = construirGrandezaSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        options = undefined;
+        break;
+      }
+
+      case "touchplace": {
+        // Ficha F04 (N1.13). Ficha de PRODUÇÃO, e a mais literal delas: a
+        // resposta é a quantidade que a criança FEZ aparecer. Não há o que
+        // escolher — o número já foi dado pelo enunciado.
+        const spec = construirProducaoSpec(lvl, Math.random);
+        answer = spec.resposta;
+        uiProps = spec;
+        // O valor que chega aqui é quantos objetos ficaram na cena.
+        evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        // `undefined`, não `[]`: um array vazio é truthy e passa pelos
+        // `if (q.options)` do app como se houvesse alternativas. Teclado nesta
+        // tela devolveria a múltipla escolha que a ficha existe para tirar.
+        options = undefined;
+        break;
+      }
+
       case "area": {
         // As contas do nível já vêm filtradas pelo valor diagnóstico: o
         // procedimento é dono da regra, o Composer só sorteia. Sortear aqui e
@@ -817,8 +1070,13 @@ export class Composer {
     }
 
     return {
-      howto: ficha.howto,
-      explain: ficha.explain,
+      // A micro pode sobrescrever a fala quando a competência é servida por
+      // mais de uma ficha e as §7 delas se contradizem — é o caso do N1.08
+      // (F02 manda "continue contando"; JD2 proíbe dizer "conte").
+      howto: params.howto ?? ficha.howto,
+      explain: params.explain ?? ficha.explain,
+      // P13: a condição da §9 viaja na questão até o motor de maestria.
+      ...(micro.dominio?.exige ? { exigeEvidencia: micro.dominio.exige.evidencia } : {}),
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
         ? ficha.niveis[lvl].rt_alvo! / 1000
         : undefined,

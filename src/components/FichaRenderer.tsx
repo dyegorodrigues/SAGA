@@ -27,6 +27,14 @@ import { DeslocamentoStage } from './primitives/DeslocamentoStage';
 import { AreaStage } from './primitives/AreaStage';
 import { PareamentoStage } from './primitives/PareamentoStage';
 import { TouchCount } from './primitives/TouchCount';
+import { EmojiRowStage } from './primitives/EmojiRowStage';
+import { ClassificacaoStage } from './primitives/ClassificacaoStage';
+import { TouchPlaceStage } from './primitives/TouchPlaceStage';
+import { CenaDePosicaoStage } from './primitives/CenaDePosicaoStage';
+import { FormaStage } from './primitives/FormaStage';
+import { GrandezaStage } from './primitives/GrandezaStage';
+import { MolduraStage } from './primitives/MolduraStage';
+import { AudioChoiceStage } from './primitives/AudioChoiceStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
 
 interface FichaRendererProps {
@@ -86,6 +94,26 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <PareamentoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'touchcount':
       return <TouchCount spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'audiochoice':
+      return <AudioChoiceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'classificacao':
+      return <ClassificacaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'touchplace':
+      return <TouchPlaceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    // O `ShapeCanvas` estava importado aqui e **sem `case` nenhum**: a
+    // primitiva que a F47 e a F48 nomeiam caía no `default`, que desenha
+    // "Ficha não implementada". Meio-órfã — importada, nunca alcançável.
+    case 'shapecanvas':
+      // Duas fichas, dois palcos. O spec da F48 traz `opcoes`; o da F47, não.
+      return (uiProps as { opcoes?: unknown }).opcoes
+        ? <FormaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />
+        : <CenaDePosicaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'moldura':
+      return <MolduraStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'grandeza':
+      return <GrandezaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'fileira':
+      return <EmojiRowStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'array':
       return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
     case 'tenframe':

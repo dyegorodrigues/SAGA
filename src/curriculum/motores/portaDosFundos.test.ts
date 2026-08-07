@@ -180,23 +180,38 @@ describe("o rollback devolve a tela anterior — e é observável", () => {
     }
   });
 
-  it("tela nova nasce DESLIGADA: implementação e ativação são PRs distintos", () => {
-    // A regra, e o motivo dela: uma tela que a criança nunca viu não vai a ela
-    // no mesmo commit que a escreveu. Quem entra aqui é todo nó cuja FICHA foi
-    // reescrita — N1.01 (pareamento, F07), N1.04 (contar tocando, F01) e N1.02
-    // (canhão, F27), que nasce agora.
+  it("toda ficha registrada pode ser DESLIGADA e volta ao legado — o intervalo existe", () => {
+    // ### O que este teste dizia antes, e por que estava errado
     //
-    // Os demais continuam ativos porque suas fichas não mudaram: para eles, a
-    // ativação só regularizou um estado que já existia em produção, sem trocar
-    // uma tela sequer.
-    const DESLIGADOS = ["N1.01", "N1.02", "N1.04"];
-    for (const id of DESLIGADOS) {
-      expect(COMPOSER_CANARIES.has(id), `${id} não deveria estar ativo`).toBe(false);
-      expect(hasComposerFicha(id), `${id} deveria estar registrado`).toBe(true);
-      expect(trilhaDe(id).generatorSource, id).toBe("legacy");
-    }
-    for (const id of REGULARIZADOS.filter(i => !DESLIGADOS.includes(i))) {
-      expect(COMPOSER_CANARIES.has(id), `${id} deveria seguir ativo`).toBe(true);
+    // Ele fixava uma LISTA — `["N1.01","N1.02","N1.03","N1.04","N1.08"]` — de
+    // nós que deviam estar desligados. A lista quebrou no dia em que eles foram
+    // ativados, que é o trabalho CERTO acontecendo. É a armadilha do Padrão
+    // Ouro §2-bis: *"este teste quebra quando eu faço o trabalho certo?"* — se
+    // sim, ele mede inventário e precisa virar regra.
+    //
+    // Pior: consertar a lista a cada ativação treina a mão a silenciar o teste
+    // sem pensar, e no dia em que ele quebrar por um motivo real ela já vai
+    // estar automatizada.
+    //
+    // ### A regra que ele passa a medir
+    //
+    // A disciplina dos dois PRs não é uma lista de ids: é **existir o
+    // intervalo**. Toda ficha registrada tem de poder ser desligada, cair no
+    // gerador anterior e voltar — sem rebuild, valendo na próxima questão.
+    // Enquanto isso for verdade, qualquer tela nova pode nascer desligada; e um
+    // nó que não consegue voltar é um nó sem rollback, que é o defeito §6.7.
+    for (const id of REGULARIZADOS) {
+      expect(hasComposerFicha(id), `${id} sem ficha registrada`).toBe(true);
+
+      rollbackComposerCanary(id);
+      expect(COMPOSER_CANARIES.has(id), `${id} continuou ativo após rollback`).toBe(false);
+      expect(trilhaDe(id).generatorSource, `${id} desligado`).toBe("legacy");
+      // E o legado precisa ser tela de verdade: uma emergência que cai em
+      // placeholder não socorre ninguém.
+      expect(trilhaDe(id).contentStatus, `${id} desligado`).not.toBe("fallback");
+
+      COMPOSER_CANARIES.add(id);
+      expect(trilhaDe(id).generatorSource, `${id} religado`).toBe("composer");
     }
   });
 

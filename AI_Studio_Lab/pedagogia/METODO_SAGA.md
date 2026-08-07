@@ -105,7 +105,7 @@ Cada opção errada é um erro documentado, com uma etiqueta. **O currículo tem
 
 ## O grafo, não a série
 
-O currículo não é organizado por ano escolar. É um **grafo de 88 competências** ligadas por pré-requisitos reais.
+O currículo não é organizado por ano escolar. É um **grafo de 89 competências** ligadas por pré-requisitos reais.
 
 **A idade nunca decide.** O que decide é: *os pré-requisitos estão firmes?*
 
@@ -132,7 +132,7 @@ O roteiro cinematográfico é o que diferencia: ele especifica **o que acontece,
 
 > *Ao tocar: três coisas simultâneas — o objeto ganha cor (200ms), cresce e volta (scale 1.0→1.3→1.0, 250ms), e o numeral salta acima dele. A voz fala o número no mesmo instante do salto.*
 
-**São 92 fichas cobrindo as 88 competências.**
+**São 92 fichas cobrindo as 89 competências.**
 
 ## O domínio é multidimensional
 
@@ -208,7 +208,7 @@ A mesma balança volta. Agora um dos pratos tem um saco fechado. Para descobrir 
 
 | | |
 |---|---|
-| Competências mapeadas | **88** |
+| Competências mapeadas | **89** |
 | Fichas completas | **90** |
 | Faixas de desenvolvimento | 5 (dos 4 aos 12 anos) |
 | Etiquetas de diagnóstico | **251** |

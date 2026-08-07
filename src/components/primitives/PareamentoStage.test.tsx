@@ -23,10 +23,15 @@ describe("PareamentoStage — a tela de N1.01", () => {
     }
   });
 
-  it("mostra o enunciado com a fala para quem não lê", () => {
+  it("NÃO imprime o enunciado: quem o desenha é o app, acima do palco", () => {
+    // Este teste dizia o contrário e travava um defeito no lugar. O
+    // `GameLoop.tsx` já desenha `q.prompt` numa caixa acima do renderizador:
+    // o palco imprimindo o próprio punha a pergunta DUAS vezes na tela.
+    // Ninguém viu porque a sonda montava o palco sem o enquadramento do app —
+    // é o §6.32, e é o print errado da RETOMADA §7.4.
     const s = spec(1);
-    render(<PareamentoStage spec={s} />);
-    expect(screen.getByLabelText(s.falado)).toBeTruthy();
+    const { container } = render(<PareamentoStage spec={s} />);
+    expect(container.textContent ?? "").not.toContain(s.enunciado);
   });
 
   it("um toque coloca UM; o segundo toque devolve — nunca empilha", () => {

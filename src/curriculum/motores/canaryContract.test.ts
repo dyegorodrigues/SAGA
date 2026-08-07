@@ -16,6 +16,10 @@ import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { AL_01 } from "../fichas/jornada/AL.01";
+import { AL_02 } from "../fichas/jornada/AL.02";
+import { N1_04 } from "../fichas/jornada/N1.04";
+import { N1_02 } from "../fichas/jornada/N1.02";
+import { N1_01 } from "../fichas/jornada/N1.01";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
@@ -64,6 +68,15 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.08": N1_08,
   "N1.10": N1_10,
   "AL.01": AL_01,
+
+  // A ativação do bloco F0: as quatro que passaram o intervalo inteiro
+  // desligadas, escritas nos passos 0 a 2 e olhadas print a print.
+  //   N1.01 pareamento (F07) · N1.02 canhão (F27)
+  //   N1.04 contar tocando (F01) · AL.02 padrões (F52)
+  "N1.01": N1_01,
+  "N1.02": N1_02,
+  "N1.04": N1_04,
+  "AL.02": AL_02,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];

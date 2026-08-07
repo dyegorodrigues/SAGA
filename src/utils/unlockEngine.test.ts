@@ -5,12 +5,18 @@ import {
   resolveGraphNodeId,
 } from "../curriculum/motores/unlockEngine";
 import { ALL_MATH_TRACKS } from "../curriculum/motores/curriculum";
+import { GrafoSaga } from "./grafoSaga";
 
 describe("unlockEngine", () => {
   it("exposes every canonical math node exactly once in the Journey", () => {
+    // A REGRA é "todo nó canônico aparece exatamente uma vez" — o número 88 era
+    // inventário, não especificação (§2-bis do Padrão Ouro). Preso, ele reprova
+    // o dia em que uma competência entra no cânone, que é justamente quando o
+    // teste deveria continuar verde: ele existe para pegar nó DUPLICADO ou
+    // PERDIDO, não para congelar o tamanho do currículo.
     const ids = ALL_MATH_TRACKS.map((track) => track.graphId);
-    expect(ids).toHaveLength(88);
-    expect(new Set(ids).size).toBe(88);
+    expect(ids).toHaveLength(GrafoSaga.nodes.length);
+    expect(new Set(ids).size).toBe(GrafoSaga.nodes.length);
   });
 
   it("opens root nodes (no prereqs) when no progress exists", () => {

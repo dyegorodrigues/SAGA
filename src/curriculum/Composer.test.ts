@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Composer } from "./Composer";
+import { MisconceptionTag } from "../constants/misconceptions";
 import { N1_01 } from "./fichas/jornada/N1.01";
 import { N1_03 } from "./fichas/jornada/N1.03";
+import { N1_08 } from "./fichas/jornada/N1.08";
 import { N1_04 } from "./fichas/jornada/N1.04";
 import { JOURNEY_FICHAS } from "./fichas";
 import { N3_09 } from "./fichas/jornada/N3.09";
@@ -10,16 +12,18 @@ import { N4_02 } from "./fichas/jornada/N4.02";
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
-    // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. A N1.03
-    // demonstra sozinha — o micro "a" declara `emojirow`, e o nível 5 manda
-    // `scattered`. Se o Composer olhasse o micro, viria emojirow aqui.
-    const scattered = Composer.generate(N1_03, 5, "a");
-    expect(scattered.kind).toBe("scattered");
-    expect(scattered.n).toBeTypeOf("number");
-    expect(scattered.uiProps.ordered).toBe(false);
-
-    const flash = Composer.generate(N1_03, 1, "a");
-    expect(flash.kind).toBe("emojirow");
+    // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. Quem
+    // demonstra hoje é o N1.08, servido por DUAS fichas: a JD2 (mão relâmpago,
+    // `fileira`) nos níveis 1-2 e a F02 (moldura de dez) nos 3-5. Se o Composer
+    // olhasse o micro, os cinco níveis viriam iguais.
+    //
+    // As primitivas vêm DA FICHA, não escritas aqui: o nome delas é inventário
+    // e já mudou uma vez (`tenframe` → `moldura`, quando a F02 ganhou as cinco
+    // casas dos níveis 1-2). O que é especificação é o nível mandar (§2-bis).
+    for (const lvl of [1, 2, 3, 4, 5]) {
+      expect(Composer.generate(N1_08, lvl).kind, `nível ${lvl}`).toBe(N1_08.niveis![lvl].primitiva);
+    }
+    expect(N1_08.niveis![1].primitiva).not.toBe(N1_08.niveis![3].primitiva);
   });
 
   it("N1.04 é `touchcount` nos CINCO níveis — a ficha F01 não tem outra primitiva", () => {
@@ -35,27 +39,54 @@ describe("Composer de fichas", () => {
   });
 
   it("normalizes legacy tutorial speech into the runtime contract", () => {
-    const question = Composer.generate(N1_03, 1, "a");
-    expect(question.tutorial?.[0]?.say).toBe(
-      "Preste atenção, eles vão sumir rapidinho!",
-    );
+    // A coreografia da JD1 §8, transcrita: o `fala` da ficha vira `say` no
+    // runtime, e o `show` chega ao palco.
+    const question = Composer.generate(N1_03, 1);
+    expect(question.tutorial?.[0]?.say).toBe("Prepare o olho!");
+    expect(question.tutorial?.[0]?.show).toEqual({ fixarOlhar: true });
   });
 
   it("converts the level response-time target from milliseconds to seconds", () => {
-    expect(Composer.generate(N1_03, 5, "a").rt_max_s).toBe(1.5);
+    expect(Composer.generate(N1_03, 5).rt_max_s).toBe(1.5);
   });
 
   it("attaches canonical misconception tags only to matching numeric distractors", () => {
-    const question = Composer.generate(N1_03, 5, "a");
-    const wrongOptions = question.options?.filter(option => option.value !== question.answer) || [];
-    const mappedOffByOne = wrongOptions.filter(option =>
-      typeof option.value === "number" && Math.abs(option.value - question.answer) === 1
-    );
+    // ⚠️ Derivado, não fixo. Este teste prendia-se ao N1.08 nível 3, e quebrou
+    // quando aquele nível passou a desenhar as próprias alternativas no palco:
+    // sem `options`, não havia distrator para conferir. Qual ficha põe números
+    // na barra é INVENTÁRIO e muda a cada primitiva nova; a especificação é
+    // "onde o Composer emite alternativa numérica, o vizinho n±1 leva a tag da
+    // ficha, e a certa não leva nenhuma" (§2-bis).
+    const comBanco = JOURNEY_FICHAS
+      .flatMap(ficha => [1, 2, 3, 4, 5].map(lvl => ({ ficha, q: Composer.generate(ficha, lvl), lvl })))
+      .filter(({ ficha, q }) => typeof q.answer === "number"
+        && ficha.distratores?.some(d => /^n\s*[+-]\s*\d+$/.test(d.regra))
+        && (q.options ?? []).some(o => typeof o.value === "number"));
 
-    expect(wrongOptions.length).toBeGreaterThan(0);
-    expect(mappedOffByOne.length).toBeGreaterThan(0);
-    expect(mappedOffByOne.every(option => option.misconception === "OFF_BY_ONE")).toBe(true);
-    expect(question.options?.find(option => option.value === question.answer)?.misconception).toBeUndefined();
+    expect(comBanco.length).toBeGreaterThan(0);
+    let conferidos = 0;
+    for (const { ficha, q, lvl } of comBanco) {
+      // O que a ficha promete: valor → tag, montado da mesma regra que o
+      // Composer lê.
+      const prometido = new Map<number, string>();
+      for (const d of ficha.distratores ?? []) {
+        const m = d.regra.trim().match(/^n\s*([+-])\s*(\d+)$/);
+        if (m) prometido.set((q.answer as number) + Number(m[2]) * (m[1] === "+" ? 1 : -1), d.tag);
+      }
+      for (const o of q.options ?? []) {
+        if (typeof o.value !== "number" || o.value === q.answer) continue;
+        const tag = prometido.get(o.value);
+        if (tag === undefined) continue;
+        expect(o.misconception, `${ficha.id} L${lvl} valor ${o.value}`).toBe(tag);
+        conferidos += 1;
+      }
+      expect(q.options?.find(o => o.value === q.answer)?.misconception, `${ficha.id} L${lvl}`)
+        .toBeUndefined();
+    }
+    // E a tag canônica do vizinho continua sendo o `OFF_BY_ONE` em alguma ficha.
+    expect(conferidos).toBeGreaterThan(0);
+    expect(JOURNEY_FICHAS.some(f => f.distratores?.some(d =>
+      /^n\s*[+-]\s*1$/.test(d.regra) && d.tag === MisconceptionTag.OFF_BY_ONE))).toBe(true);
   });
 
   it("generates valid answers across every registered Journey ficha and level", () => {
@@ -91,12 +122,16 @@ describe("Composer de fichas", () => {
   });
 
   it("fails explicitly instead of returning an invalid question for an unknown builder", () => {
+    // A regra é "primitiva sem builder QUEBRA"; o nome usado aqui era só o
+    // exemplo — e era `shapecanvas`, que passou a ter builder quando a F47
+    // chegou. Um nome impossível por construção mantém a regra viva sem
+    // reprovar o dia em que a primitiva de exemplo for implementada (§2-bis).
     const invalid = {
       ...N1_01,
-      niveis: { 1: { primitiva: "shapecanvas" as const } },
+      niveis: { 1: { primitiva: "primitiva-que-nao-existe" as never } },
     };
     expect(() => Composer.generate(invalid, 1, "a")).toThrow(
-      "Primitiva shapecanvas ainda não possui builder",
+      "Primitiva primitiva-que-nao-existe ainda não possui builder",
     );
   });
 
@@ -109,8 +144,8 @@ describe("Composer de fichas", () => {
       }],
     };
 
-    expect(() => Composer.generate(malformed, 1, "a")).toThrow(
-      "Parâmetro n_min inválido em N1.03/a",
+    expect(() => Composer.generate(malformed, 1, "estreia")).toThrow(
+      "Parâmetro n_min inválido em N1.03/estreia",
     );
   });
 

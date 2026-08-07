@@ -37,6 +37,40 @@ const BASE = `http://localhost:${PORTA}/sonda/`;
 const CHROME = process.env.SONDA_CHROME
   || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const SALVAR_FOTOS = process.argv.includes("--fotos");
+
+/**
+ * O laço de trabalho, ao lado do portão.
+ *
+ * - `npm run sonda` → 54 cenas × 8 sementes. É o PORTÃO, e continua igual.
+ * - `npm run sonda -- N1.03` → só as cenas do N1.03.
+ * - `SONDA_SEMENTES=1 npm run sonda -- N1.03` → uma semente. Segundos.
+ *
+ * Isto existe porque o instrumento virou gargalo: onze minutos por conserto
+ * empurra quem está construindo a rodar o portão só no fim — e aí os defeitos
+ * chegam todos juntos, que é o oposto do que a sonda foi feita para evitar.
+ * O portão continua sendo as oito sementes; o que mudou é poder olhar antes.
+ */
+const FILTRO = process.argv.slice(2).find(a => !a.startsWith("--")) ?? "";
+const SEMENTES = process.env.SONDA_SEMENTES ?? "";
+
+/**
+ * ⚠️ A largura da medição — e por que ela deixou de ser uma só.
+ *
+ * A sonda mediu 390px desde o primeiro dia, porque 390 é o aparelho do projeto.
+ * Só que o app roda em qualquer tela: a tela de jogo é `max-w-3xl` (768px), e
+ * num celular pequeno de 320px a área útil do palco cai para 260px.
+ *
+ * As cenas construídas com desenho de tamanho fixo — 326px de largura — passam
+ * folgadas em 390 e **vazam 66px em 320**. Rolagem horizontal, que é o §6.16.
+ * Nenhum teste via, e a sonda também não: ela olhava exatamente a largura em
+ * que o defeito não existe.
+ *
+ * O portão passou a medir três larguras. As extras rodam com UMA semente — o
+ * vazamento por largura não depende do sorteio, depende da tela —, então o
+ * custo é pequeno perto de descobrir isto num aparelho de verdade.
+ */
+const LARGURAS = (process.env.SONDA_LARGURAS ?? "390,320,900")
+  .split(",").map(n => Number(n.trim())).filter(n => Number.isFinite(n) && n > 0);
 const PASTA_FOTOS = process.env.SONDA_FOTOS || "/tmp/sonda-saga";
 
 /**
@@ -230,39 +264,76 @@ const servidor = await subirServidor();
 const navegador = await chromium.launch({ executablePath: CHROME });
 
 let total = 0;
-try {
+
+/**
+ * Uma passada completa numa largura.
+ *
+ * A primeira largura da lista é o PORTÃO — todas as sementes. As demais rodam
+ * com uma só: vazamento por largura não depende do sorteio, depende da tela.
+ */
+async function medirNaLargura(larguraDoAparelho, sementes) {
   const pagina = await navegador.newPage({
-    viewport: { width: 390, height: 900 },
+    viewport: { width: larguraDoAparelho, height: 900 },
     deviceScaleFactor: 2,
   });
+  let achadosDaPassada = 0;
   const erros = [];
   pagina.on("pageerror", (e) => erros.push(String(e).slice(0, 160)));
 
-  await pagina.goto(BASE, { waitUntil: "networkidle" });
+  await pagina.goto(BASE + (sementes ? `?sementes=${sementes}` : ""), { waitUntil: "networkidle" });
   await pagina.waitForFunction(() => window.sonda?.total > 0, { timeout: 30000 });
   const quantas = await pagina.evaluate(() => window.sonda.total);
   const largura = await pagina.evaluate(() => document.documentElement.clientWidth);
 
   if (SALVAR_FOTOS) fs.mkdirSync(PASTA_FOTOS, { recursive: true });
 
+  // Quais tomadas visitar. Sem filtro, todas — é o portão.
+  //
+  // Com filtro, só as que interessam: `npm run sonda -- N1.03` mede uma
+  // competência em segundos em vez de onze minutos. O filtro é escolhido ANTES
+  // do laço, e não dentro dele, porque o custo da tomada é a espera de 1,5s
+  // pela tela parar — visitar para depois descartar não economizaria nada.
+  const nomes = await pagina.evaluate(() => window.sonda.nomes?.() ?? []);
+  const alvos = [];
   for (let i = 0; i < quantas; i += 1) {
+    if (FILTRO && !(nomes[i] ?? "").toLowerCase().includes(FILTRO.toLowerCase())) continue;
+    alvos.push(i);
+  }
+  if (FILTRO && alvos.length === 0) {
+    console.log(`nenhuma cena casa com "${FILTRO}". Cenas disponíveis:`);
+    console.log([...new Set(nomes.map(n => n.replace(/ \[semente .*/, "")))].map(n => "  " + n).join("\n"));
+    throw new Error(`filtro "${FILTRO}" não casou com cena nenhuma`);
+  }
+  if (FILTRO) console.log(`filtro "${FILTRO}": ${alvos.length} de ${quantas} tomadas`);
+
+  for (const i of alvos) {
+    // O vite observa a árvore INTEIRA — inclusive Markdown. Qualquer arquivo
+    // salvo enquanto a sonda roda recarrega a página, `window.sonda` deixa de
+    // existir e a corrida morre no meio com um TypeError seco. Aconteceu na
+    // tomada 45 editando um componente, e na 184 editando o PLANO em Markdown.
+    //
+    // Esperar o palco voltar transforma um crash em uma pausa. A regra humana
+    // continua valendo — não se edita nada com a sonda rodando —, mas ela não
+    // pode ser a única coisa entre onze minutos de medição e um stack trace.
+    await pagina.waitForFunction(() => typeof window.sonda?.ir === "function", { timeout: 60000 });
     await pagina.evaluate((n) => window.sonda.ir(n), i);
     // As peças entram escalonadas (0.1s por peça, até nove peças). Medir aos
     // 650ms fotografava o material no MEIO da animação: barras de alturas
     // diferentes, caixas ainda crescendo. A medida tem que ser da tela parada.
     await pagina.waitForTimeout(1500);
+    await pagina.waitForFunction(() => typeof window.sonda?.nome === "function", { timeout: 60000 });
     const nome = await pagina.evaluate(() => window.sonda.nome());
     const achados = await pagina.evaluate(medir, { largura, folga: 1, invasaoMinima: 0.25 });
 
     if (SALVAR_FOTOS) {
-      const arquivo = path.join(PASTA_FOTOS, `${String(i).padStart(2, "0")}-${nome.replace(/[^\w.]+/g, "_")}.png`);
+      const arquivo = path.join(PASTA_FOTOS, `${larguraDoAparelho}-${String(i).padStart(2, "0")}-${nome.replace(/[^\w.]+/g, "_")}.png`);
       await pagina.screenshot({ path: arquivo, fullPage: true });
     }
 
     if (achados.length === 0) {
       console.log(`  ok   ${nome}`);
     } else {
-      total += achados.length;
+      achadosDaPassada += achados.length;
       console.log(`  FALHA ${nome}`);
       for (const a of achados) {
         console.log(`        ${a.tipo}: ${a.alvo} ${a.texto ? `(${a.texto}) ` : ""}— ${a.detalhe}`);
@@ -272,7 +343,19 @@ try {
 
   if (erros.length) {
     console.log("\nerros de página:\n" + erros.slice(0, 5).map((e) => "  " + e).join("\n"));
-    total += erros.length;
+    achadosDaPassada += erros.length;
+  }
+  await pagina.close();
+  return achadosDaPassada;
+}
+
+try {
+  for (const [ordem, larguraDoAparelho] of LARGURAS.entries()) {
+    // O portão é a primeira largura, com as sementes de sempre. As outras
+    // medem a mesma cena em telas diferentes, com uma semente.
+    const sementes = ordem === 0 ? SEMENTES : "1";
+    console.log(`\n── ${larguraDoAparelho}px ${ordem === 0 ? "(portão)" : "(uma semente)"} ──`);
+    total += await medirNaLargura(larguraDoAparelho, sementes);
   }
 } finally {
   await navegador.close();

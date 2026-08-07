@@ -1,0 +1,84 @@
+/**
+ * As condições da §9 — o que cada ficha exige ter visto pelo menos uma vez.
+ *
+ * ---
+ *
+ * ### Por que existe um catálogo (pendência P13)
+ *
+ * Seis fichas do bloco F0 escrevem, na §9, uma segunda condição além da
+ * contagem de acertos. Todas dizem a mesma coisa com palavras diferentes:
+ *
+ * > *acertar não basta; é preciso ter acertado uma vez **na condição que prova
+ * > a competência**.*
+ *
+ * O nome da condição aparece em dois lugares distantes um do outro — a ficha,
+ * que a **exige**, e o procedimento, que a **emite**. Uma string solta em cada
+ * ponta é a receita para eles divergirem em silêncio: a ficha esperaria
+ * `"sem-andaime"`, o palco emitiria `"semAndaime"`, e a coroa nunca viria sem
+ * que nada acusasse. Mesma razão do catálogo de `MisconceptionTag`.
+ *
+ * ### O que NÃO entra aqui
+ *
+ * Condição garantida pela própria escada de níveis não é evidência — é
+ * consequência. A F47 pede *"cobrir pelo menos dois pares diferentes"*, e cada
+ * nível dela É um par: chegar ao nível 5 já obriga a ter passado pelos outros.
+ * Declarar isso seria pedir ao motor que verificasse o que a estrutura já
+ * garante, e todo campo que se verifica sozinho vira ruído.
+ */
+export const Evidencia = {
+  /**
+   * F01 (N1.04): um acerto no arranjo **disperso**.
+   *
+   * *"Contar em fila não prova cardinalidade — prova que ela segue um caminho."*
+   */
+  ARRANJO_DISPERSO: "arranjo-disperso",
+
+  /**
+   * F05 (N1.06): um acerto **na primeira audição**, sem repetir.
+   *
+   * *"Acertar depois de ouvir cinco vezes não prova reconhecimento."*
+   */
+  PRIMEIRA_AUDICAO: "primeira-audicao",
+
+  /**
+   * F04 (N1.13): um acerto **sem vaga fantasma**.
+   *
+   * *"Produzir com o alvo visível não prova cardinalidade produtiva."* Com as
+   * vagas na tela, preencher todas é correspondência um-a-um — outra ficha.
+   */
+  SEM_ANDAIME: "sem-andaime",
+
+  /**
+   * F48 (GE.02): um acerto com a forma **girada**.
+   *
+   * É a ficha inteira: *"sem isso, o app ensina a reconhecer desenhos, não
+   * formas"*. E é a evidência que obriga a colheita fora do nível 5 — o nível 5
+   * da F48 é o dos sólidos, onde giro não existe.
+   */
+  FORMA_GIRADA: "forma-girada",
+
+  /**
+   * F49 (GM.01): um acerto com **diferença pequena**.
+   *
+   * Acertar três diferenças gritantes mostra que ela enxerga, não que compara.
+   */
+  DIFERENCA_PEQUENA: "diferenca-pequena",
+
+  /**
+   * F02 (N1.08): um acerto com quantidade **entre 6 e 10**.
+   *
+   * É o que exige usar a estrutura das DUAS fileiras — abaixo de seis, a
+   * criança resolve na fileira de cima e a moldura de dez não é testada.
+   */
+  ESTRUTURA_DAS_DUAS_FILEIRAS: "estrutura-das-duas-fileiras",
+
+  /**
+   * JD5 (N1.10): um acerto com total **acima de cinco**.
+   *
+   * §9: *"pelo menos um acerto no nível 4+, que exige memória de trabalho
+   * real"*. Guardar três na cabeça é subitização; guardar oito é memória.
+   */
+  TOTAL_ALEM_DE_CINCO: "total-alem-de-cinco",
+} as const;
+
+export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

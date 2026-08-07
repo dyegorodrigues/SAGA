@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag, MisconceptionTagType } from "../../constants/misconceptions";
 
 /**
@@ -269,3 +270,14 @@ export const FALA_DO_REPETIDO = "Esse já contamos!";
 
 /** A pergunta do fecho, no modo `toque`. Vem depois de 800ms de silêncio. */
 export const PERGUNTA_DO_FECHO = "Quantos foram?";
+
+/**
+ * A evidência da §9 que ESTA resposta carrega (P13).
+ *
+ * F01 §9: *"pelo menos um acerto no arranjo **disperso**"* — contar em fila não
+ * prova cardinalidade, prova que ela segue um caminho.
+ */
+export function evidenciasDe(acao: AcaoDeContagem): string[] {
+  const certo = acao.marcados === acao.total && acao.resposta === acao.total;
+  return certo && acao.arranjo === "disperso" ? [Evidencia.ARRANJO_DISPERSO] : [];
+}

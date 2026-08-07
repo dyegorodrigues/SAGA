@@ -1,7 +1,7 @@
 // schema.ts
 // Definindo o contrato estrito para o Motor de Fichas (Substituindo os generators.ts hardcoded)
 
-export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis" | "visual-addition" | "scattered" | "linking-cubes" | "missing-addend-frame" | "take-apart" | "sequence" | "multiple_choice" | "sentencebuilder" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount";
+export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis" | "visual-addition" | "scattered" | "linking-cubes" | "missing-addend-frame" | "take-apart" | "sequence" | "multiple_choice" | "sentencebuilder" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza" | "moldura";
 
 export interface FichaParams {
   [key: string]: unknown;
@@ -11,11 +11,57 @@ export interface FichaDominio {
   acertos: number;
   de: number;
   sessoes: number;
+  /**
+   * A regra EXTRA da §9 — a condição sob a qual pelo menos um acerto precisa
+   * ter acontecido.
+   *
+   * ### Por que existe (pendência P13)
+   *
+   * Seis fichas do bloco F0 escrevem, na §9, uma segunda condição além da
+   * contagem de acertos:
+   *
+   * | ficha | regra extra |
+   * |---|---|
+   * | F01 (N1.04) | um acerto no arranjo **disperso** |
+   * | F05 (N1.06) | um acerto **na primeira audição** |
+   * | F04 (N1.13) | um acerto **sem vaga fantasma** |
+   * | F48 (GE.02) | um acerto com a forma **girada** |
+   * | F49 (GM.01) | um acerto com **diferença pequena** |
+   *
+   * Todas dizem a mesma coisa: *acertar não basta; é preciso ter acertado uma
+   * vez na condição que prova a competência*. Sem este campo a regra ficava
+   * escrita na ficha, testada no procedimento e **sem chegar ao motor** — a
+   * criança recebia domínio sem nunca ter feito a única questão que o prova.
+   *
+   * `evidencia` é o nome que o palco emite junto com a resposta; `descricao`
+   * existe para o painel dos pais dizer, em português, o que falta.
+   */
+  exige?: { evidencia: string; descricao: string };
 }
 
 export interface FichaMicro {
   id: string; // Ex: 'a', 'b'
   alvo: string; // O que está sendo treinado especificamente
+  /**
+   * De qual ficha do cânone esta micro veio. Ex: `"JD2"`, `"F02"`, `"F52"`.
+   *
+   * ### Por que existe (pendência P5)
+   *
+   * `FichaCompetencia` tem **uma** voz — um `howto`, um `explain` —, e isso
+   * bastava enquanto cada competência vinha de uma ficha só. Várias vêm de
+   * duas: N1.08 de F02 + JD2, N1.04 de F01 + F03, N1.11 de F28 + JD3, N1.10 de
+   * JD5. E as §7 delas podem se contradizer: o `explain` da F02 diz *"continue
+   * contando os de baixo"* e a JD2 **proíbe em negrito** dizer "conte" na tela
+   * dela, porque é o erro que a ficha combate.
+   *
+   * Sem declarar a origem, a tela da mão herda a fala da moldura e ensina o
+   * erro — e nada no código sabe que isso é um problema. Com a origem
+   * declarada, o portão de conformidade cobra: micros de fichas diferentes não
+   * compartilham voz.
+   *
+   * A voz própria entra em `params.howto` / `params.explain` / `audio_prompt`.
+   */
+  fonte?: string;
   kinds: KindType[]; // Array das mecânicas UI autorizadas
   params: FichaParams; // Parâmetros numéricos para o gerador
   dominio: FichaDominio; // Regras de domínio específicas desta micro

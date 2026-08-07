@@ -601,6 +601,54 @@ retângulo partido.
 competência que entrega primitiva diferente da que a ficha nomeia aparece na
 lista de divergentes, com nome e sobrenome.
 
+### 6.37 Percentual não é distância quando o campo não é quadrado
+O disperso do olhômetro sorteava posições em percentual e exigia 26% de
+afastamento entre centros. O campo é **330 × 146**: 26% na horizontal são 86px,
+na vertical **38px** — e o desenho tem 40. Dois objetos "afastados" ficavam um
+em cima do outro, e o teste que media em percentual aprovava.
+
+O mesmo erro, na mesma sessão, produziu um **padrão de dado esticado**: a
+diagonal do ⚄ saía com 145px na horizontal contra 78px na vertical, e a figura
+que o nível 3 existe para oferecer como andaime deixava de ser reconhecível.
+
+→ Quando a geometria é percentual e as duas dimensões diferem, **corrija o eixo
+pela proporção antes de medir** — ou dê à figura um campo quadrado.
+→ O teste mede em **pixel**, não em percentual: foi a unidade errada que fez o
+teste concordar com o bug.
+→ Irmão do §6.33: a geometria é decidida pela figura inteira, nunca herdada da
+caixa que calhou de existir.
+
+### 6.38 O instrumento de medida virou o gargalo
+A sonda era tudo-ou-nada: 54 cenas × 8 sementes × 1,5s = onze minutos. Quem está
+construindo acaba rodando só no fim, e aí os defeitos chegam todos juntos — que
+é o oposto do que a sonda existe para evitar. Construindo a escada do `EmojiRow`
+rodei o laço print→conserto→print **três vezes** com nove defeitos na mão, que é
+o §7.3 da RETOMADA repetido com outro nome.
+
+→ Todo portão caro precisa de um **modo de laço**: `npm run sonda -- "N1.03"` e
+`SONDA_SEMENTES=1` transformam onze minutos em vinte e cinco segundos.
+→ Filtro que não casa com nada **falha e lista as cenas**. Filtro silencioso
+mediria zero cenas e diria "tudo certo" — auditor vazio é pior que ausente.
+→ E o método: construir → **um** print por cena → juntar **todos** os defeitos →
+**um** lote de correções → sonda filtrada → portão inteiro **uma** vez.
+
+### 6.39 O enunciado saía duas vezes, e o enquadramento escondia
+`GameLoop.tsx` desenha `q.prompt` numa caixa **acima** do renderizador. Três
+palcos — `TouchCount`, `PareamentoStage` e a primeira versão de `EmojiRowStage`
+— imprimiam `spec.enunciado` por baixo. A pergunta saía duas vezes em N1.01,
+N1.02, N1.04.
+
+Nenhum teste viu, e **a sonda também não**: as cenas montavam o palco sem a
+caixa do enunciado do app. É o §6.32 outra vez, agora escondido pelo mesmo
+enquadramento errado que a RETOMADA §7.4 registrou — fotografar o palco solto
+em vez da área do exercício dentro do app.
+
+→ A cena da sonda desenha **tudo o que o app desenha em volta do palco**, não só
+o palco.
+→ O guarda lê o CÓDIGO-FONTE dos palcos (`enunciadoUnico.test.ts`): a tela
+renderizada não distingue "o palco imprimiu" de "o app imprimiu", e o que se
+quer proibir é o palco **saber** imprimir.
+
 ### 6.36 A causa-raiz: eu verifico a ficha, nunca a HISTÓRIA da criança
 Depois de quatro versões reprovadas do modelo de área, a pergunta certa veio de
 fora: *"esse recurso pedagógico é ensinado antes de forma mais simples, e vai

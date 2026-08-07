@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
 
@@ -32,7 +33,22 @@ import { FichaCompetencia } from "../../schema";
  * Ver `AI_Studio_Lab/codex/PLANO_DO_BLOCO_F0.md` §5.
  */
 
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  /**
+   * §9, a regra extra: *"pelo menos um acerto no arranjo **disperso**"*.
+   *
+   * Contar em fila não prova cardinalidade — prova que ela segue um caminho.
+   * Até este commit a regra estava escrita na ficha, testada no procedimento e
+   * **sem chegar ao motor** (P13).
+   */
+  exige: {
+    evidencia: Evidencia.ARRANJO_DISPERSO,
+    descricao: "Contar certo com os objetos espalhados, sem fila para seguir.",
+  },
+};
 
 /**
  * A coreografia da F01 §8, aplicada ao nível 1.

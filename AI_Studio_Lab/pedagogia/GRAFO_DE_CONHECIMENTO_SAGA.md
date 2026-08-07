@@ -55,7 +55,9 @@ Este documento substitui: `grafo_competencias.md` (legado), as listas de ilhas d
 | **GM** | Grandezas e Medidas | esmeralda | ●● | ●● | ●●● | ●● | |
 | **PE** | Probabilidade e Estatística | índigo | | ● | ● | ● | ● |
 
-**Total: 88 competências.** Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
+**Total: 89 competências.** *(88 até ago/2026; a `N1.13` nasceu quando a P12
+separou "produzir quantidade" de "contar até 20" — duas competências que
+disputavam o mesmo nó. Ver §15.8 da Bíblia.)* Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
 
 ---
 
@@ -194,12 +196,34 @@ Todo `graphId` antigo do código e todo ID dos docs legados aponta para exatamen
 **Erros típicos:** contar bolinha por bolinha ignorando a fileira cheia (a dica ataca isso: "a fileira cheia já é 5!"). *Distratores: n±1, 10−n (confusão cheios/vazios).*
 
 ### N1.09 — Contagem até 20 e a partir de qualquer número
+> ⚠️ **Não confundir com a N1.13.** A ficha F04 ("Produzir Quantidade") dizia
+> ser esta competência; não é. Quatro arestas — `N1.12`, `N2.01`, `N3.03`,
+> `AL.03` — dependem de a N1.09 significar *contar além do dez*. Produzir uma
+> quantidade ganhou nó próprio, a **N1.13**, e é o teste de saída da
+> cardinalidade (o que este documento já dizia ao listá-lo como micro (d) da
+> N1.04). Ver `codex/PLANO_DO_BLOCO_F0.md §13`.
 **Objetivo:** estender a contagem além do 10 e continuar de onde parou.
 **Pré-req:** N1.04(e), N1.02(c–d). **Kinds:** count, plain, order.
 **Micros:**
 - a) contar objetos 10–15 · b) 10–20 · c) "continue: 8, 9, __, __" · d) contagem regressiva 10→0 (foguete 🚀)
 **Erros típicos:** os teens do PT ("catorze/quatorze", "dezesseis" vs "dezessete"); travar no 10 e recomeçar.
 *Esta competência é a ponte direta para o counting on (N3.03).*
+
+### N1.13 — Produzir quantidade ("me dá N")
+**Objetivo:** transformar um número ouvido numa quantidade produzida — o inverso
+de contar. **Ficha:** F04. **Pré-req:** N1.02, N1.04. **Kinds:** touchplace.
+**Micros:** a) 1 a 3 com vagas fantasma pulsando · b) 1 a 5 com vagas visíveis ·
+c) 1 a 5 só com contorno · d) 1 a 10 **sem vaga** (o salto) · e) 1 a 10 com o
+pedido falado uma vez só.
+**Erros típicos:** parar antes; tentar passar do pedido; despejar a bandeja
+inteira; acertar com vaga e errar sem.
+**Domínio específico:** pelo menos um acerto **sem vaga fantasma** — produzir com
+o alvo visível não prova cardinalidade produtiva.
+
+> **Por que tem nó próprio:** este documento já listava *"produzir conjunto: 'me
+> dá N'"* como micro (d) da N1.04, e a intuição estava certa — produzir é o teste
+> de saída da cardinalidade. Mas a N1.04 já tem os cinco degraus da F01 e ainda
+> recebe a F03, e a F04 tem cinco próprios. Nó separado, prereq direto da N1.04.
 
 ### AL.01 — Classificação e o intruso
 **Objetivo:** agrupar por atributo (cor, forma, tamanho, categoria) e achar o que não pertence.

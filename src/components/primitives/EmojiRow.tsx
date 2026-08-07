@@ -10,10 +10,24 @@ export interface EmojiRowProps {
   highlightIndex?: number | null;
   startIndex?: number;
   state?: UIState;
-  
+
+  /**
+   * Onde cada objeto fica, em percentual da área — quando o arranjo não é fila.
+   *
+   * A JD1 §5 pede três arranjos: **fila**, **padrão de dado** e **disperso**.
+   * Desenhar os dois últimos num componente à parte faria a criança ver dois
+   * desenhos diferentes para a mesma coisa, que é o defeito do Padrão Ouro
+   * §6.31-bis. Com as posições vindo de fora, é o **mesmo** componente, o mesmo
+   * glifo e o mesmo tamanho nos três arranjos: só o lugar muda.
+   *
+   * As posições nascem no contrato, nunca aqui: sorteio dentro do render muda a
+   * cena a cada quadro e a sonda de layout deixa de ser portão (§6.31).
+   */
+  pontos?: { x: number; y: number }[];
+
   // Flash Mode (N1.03)
   flashDurationMs?: number;
-  
+
   // Touch Count Mode (N1.04)
   interactiveCount?: boolean;
   disabled?: boolean;
@@ -22,13 +36,14 @@ export interface EmojiRowProps {
   onItemTouch?: (count: number) => void;
 }
 
-export function EmojiRow({ 
-  emoji, 
-  n, 
+export function EmojiRow({
+  emoji,
+  n,
   small,
-  startIndex = 1, 
+  startIndex = 1,
   highlightIndex = null,
   state = 'ocioso',
+  pontos,
   flashDurationMs,
   interactiveCount,
   onItemTouch,
@@ -36,7 +51,7 @@ export function EmojiRow({
   crossedOut,
   promptDone = true
 }: EmojiRowProps) {
-  
+
   const [phase, setPhase] = useState<'waiting' | 'flashing' | 'done'>(
     !promptDone && flashDurationMs ? 'waiting' : (flashDurationMs ? 'flashing' : 'done')
   );
@@ -79,9 +94,13 @@ export function EmojiRow({
   };
 
   return (
-    <div 
-      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-16 relative py-6 ${tokens.estado[state]}`} 
-      style={{ maxWidth: small ? 150 : "100%", minHeight: '80px' }}
+    <div
+      className={pontos
+        // Com posições, a caixa é o palco: os objetos se colocam nela, e o
+        // tamanho dela é decidido por quem a monta.
+        ? `relative h-full w-full ${tokens.estado[state]}`
+        : `flex flex-wrap items-center justify-center gap-x-4 gap-y-16 relative py-6 ${tokens.estado[state]}`}
+      style={pontos ? undefined : { maxWidth: small ? 150 : "100%", minHeight: '80px' }}
     >
       <AnimatePresence mode="popLayout">
         { (phase === 'flashing' || !flashDurationMs) ? (
@@ -102,10 +121,18 @@ export function EmojiRow({
                 }}
                 exit={{ scale: 0, opacity: 0 }}
                 onClick={() => handleTouch(i)}
-                className={`relative inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''}`}
+                className={`${pontos ? 'absolute' : 'relative'} inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''}`}
                 style={{
                   zIndex: isHighlighted ? 20 : 1,
                   fontSize: small ? '24px' : tokens.tamanho.base,
+                  // `translate` e não `transform`: o motion é dono do
+                  // `transform` (é por lá que passa o `scale`), e escrever os
+                  // dois faz um apagar o outro — o objeto ia parar no canto.
+                  ...(pontos?.[i] ? {
+                    left: `${pontos[i].x}%`,
+                    top: `${pontos[i].y}%`,
+                    translate: '-50% -50%',
+                  } : {}),
                 }}
               >
                 {/* Ping animation for the next item to touch */}

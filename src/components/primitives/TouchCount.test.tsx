@@ -280,7 +280,9 @@ describe("o modo rítmico — ficha F27: quem dispara é o CANHÃO", () => {
     const rastros = [...container.querySelectorAll("button")]
       .filter(b => (b.getAttribute("aria-label") ?? "").includes("este já estourei"));
     expect(rastros).toHaveLength(s.jaFeitos);
-    expect(container.textContent).toContain(`Continue de ${s.jaFeitos}`);
+    // O enunciado não é mais impresso pelo palco (o app o desenha acima):
+    // a âncora do counting-on se verifica no spec e no rastro dos estourados.
+    expect(s.enunciado).toContain(`Continue de ${s.jaFeitos}`);
 
     // O já-estourado deixa RASTRO: sumir sem marca transformaria a âncora num
     // buraco, e um buraco não conta nada.

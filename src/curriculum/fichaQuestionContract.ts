@@ -9,6 +9,14 @@ import { DeslocamentoSpec } from "./procedimentos/deslocamentoContract";
 import { AreaSpec } from "./procedimentos/areaContract";
 import { PareamentoSpec } from "./procedimentos/pareamentoContract";
 import { TouchCountSpec } from "./procedimentos/touchCountContract";
+import { EmojiRowSpec } from "./procedimentos/emojiRowContract";
+import { ClassificacaoSpec } from "./procedimentos/classificacaoContract";
+import { AudioChoiceSpec } from "./procedimentos/audioChoiceContract";
+import { ProducaoSpec } from "./procedimentos/producaoContract";
+import { PosicaoSpec } from "./procedimentos/posicaoContract";
+import { FormaSpec } from "./procedimentos/formaContract";
+import { GrandezaSpec } from "./procedimentos/grandezaContract";
+import { MolduraSpec } from "./procedimentos/tenFrameContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -42,6 +50,14 @@ export type FichaUiProps =
   | AreaSpec
   | PareamentoSpec
   | TouchCountSpec
+  | EmojiRowSpec
+  | ClassificacaoSpec
+  | AudioChoiceSpec
+  | ProducaoSpec
+  | PosicaoSpec
+  | FormaSpec
+  | GrandezaSpec
+  | MolduraSpec
   | { text: string };
 
 interface BalanceItem {
@@ -103,6 +119,22 @@ export interface ComposerParams {
   answer?: FichaAnswer;
   options?: Option[];
   audio_prompt?: string;
+  /**
+   * O `howto` e o `explain` desta micro, quando eles não podem ser os da ficha.
+   *
+   * ### Por que precisou existir
+   *
+   * `FichaCompetencia` tem **um** `explain` por competência, e isso bastava
+   * enquanto cada competência vinha de uma ficha só. O N1.08 vem de **duas** —
+   * F02 (moldura de dez) e JD2 (mão relâmpago) — e as duas escrevem vetos
+   * opostos na §7: o explain da F02 diz *"continue contando os de baixo"*, e a
+   * JD2 proíbe em negrito dizer "conte" na tela dela, porque é justamente o erro
+   * que a ficha combate.
+   *
+   * Sem o override, a tela da mão herdaria a fala da moldura e ensinaria o erro.
+   */
+  howto?: string;
+  explain?: string;
   tutorial?: unknown;
 }
 
@@ -123,7 +155,7 @@ const BOOLEAN_KEYS = [
 // `modo: "ritmico"`, a chave não estava nesta lista, e o canhão de balões saiu
 // como peixinhos na tela. Quem acrescentar um parâmetro à interface e esquecer
 // desta lista repete o mesmo — por isso existe o teste que compara as duas.
-const STRING_KEYS = ["interactive", "big", "audio_prompt", "modo"] as const;
+const STRING_KEYS = ["interactive", "big", "audio_prompt", "modo", "howto", "explain"] as const;
 
 export function parseComposerParams(input: FichaParams, context: string): ComposerParams {
   const parsed: ComposerParams = {};

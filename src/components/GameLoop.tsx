@@ -7,7 +7,7 @@ import {
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
-import { isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
+import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
@@ -493,6 +493,9 @@ export function GameLoop({
       durationMs,
       targetRtMs: targetRtSeconds !== undefined ? targetRtSeconds * 1000 : undefined,
       helpUsed: helpUsedRef.current,
+      // P13: o que ESTA resposta demonstrou, e o que a ficha exige ter visto.
+      evidencias: right ? evidenciasDaResposta(answerMeta) : undefined,
+      exigeEvidencia: q.exigeEvidencia,
       isReview: q.review === true,
       practiceDay: new Date().toISOString().slice(0, 10),
       previousPracticeDay: prog.lastDay,

@@ -73,7 +73,7 @@ O Sensei não é uma quarta função: é a **apresentação** do que o Motor Ada
 
 `Domínio → Strand → Competência → Microcompetência → Experiência → Sessão`
 
-- **IDs novos:** `STRAND.NN` e `STRAND.NNx` para micros (`N3.07b`). Esquema completo, tabela de migração dos IDs velhos e as 88 competências: `GRAFO_DE_CONHECIMENTO_SAGA.md`. **IDs antigos (C0001, C_LOG2…) ficam proibidos em código novo** — só aparecem na tabela de migração.
+- **IDs novos:** `STRAND.NN` e `STRAND.NNx` para micros (`N3.07b`). Esquema completo, tabela de migração dos IDs velhos e as 89 competências: `GRAFO_DE_CONHECIMENTO_SAGA.md`. **IDs antigos (C0001, C_LOG2…) ficam proibidos em código novo** — só aparecem na tabela de migração.
 - **Experiência** = um tipo de encontro com a competência: `tutor` (microtutoria), `guiada`, `autonoma`, `dojo`, `revisao`, `historia`, `chefao`. A mesma competência gera experiências diferentes conforme o nível.
 - **Track (código)** passa a ser: *a materialização de UMA competência* — nunca mais um saco de 3 competências espremidas em 5 níveis (o defeito do "Contar" atual, corrigido na migração).
 
@@ -1011,7 +1011,28 @@ Qualquer adição só é considerada concluída quando:
 | `N7.04` Porcentagem | ❌ rejeitada | `N6.03` porcentagem |
 | `PE.05` Probabilidade e chance | ❌ rejeitada | `PE.03` + `PE.04` |
 
-**Saldo: 84 + 4 = 88 competências.** Este é o número. Qualquer artefato que diga outro está errado.
+**Saldo: 84 + 4 = 88 competências.** *(Este era o número até a retificação de ago/2026 logo abaixo — ver P12.)*
+
+#### Retificação de ago/2026 — o grafo fecha em **89**
+
+A ficha **F04** ("Produzir Quantidade") declarava na §1 dela ser a `N1.09`. Não
+é. Quatro arestas do grafo — `N1.12`, `N2.01`, `N3.03` e `AL.03` — dependem de a
+`N1.09` significar *"contar até 20 e a partir de qualquer número"*, e todo o
+material didático já a descrevia assim. Nenhuma delas precisa de *"me dá cinco"*;
+todas precisam de contar além do dez.
+
+São **duas competências reais**, e o próprio grafo já dizia isso ao listar
+*"produzir conjunto: me dá N"* como micro (d) da `N1.04`. Dar a `N1.09` para a
+F04 faria as quatro arestas mentirem em silêncio.
+
+Cada uma ganhou seu nó: a `N1.09` continua sendo a contagem, e a F04 passou a ser
+a **`N1.13` — Produzir quantidade** (F0, pré-req `N1.02` e `N1.04`).
+
+> **Saldo: 88 + 1 = 89 competências.** Este é o número. Nenhuma ficha foi
+> removida, nenhuma foi renumerada, e nenhuma aresta existente mudou de
+> significado — o grafo **ganhou** um nó que já estava descrito no cânone sem ter
+> casa. Registro completo em `codex/PLANO_DO_BLOCO_F0.md §13.1` (P12).
+
 
 #### Candidatas em lista de espera *(não são competências — não criar sem passar pelo §15.3)*
 

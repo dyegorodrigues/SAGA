@@ -115,6 +115,12 @@ Sem número nenhum na tela. Três potinhos, três peixinhos nadando. Tutor: *"Ca
 
 ### Nível 2 — ver grupos dentro de grupos (N1.08, N1.09)
 - **Caixa Mágica (N1.08):** subitização conceitual — 6 aparece como 3+3, 7 como 5+2 (sub-base 5: uma mão cheia + dois). A criança vê a estrutura interna dos números. Este é o berço direto dos amigos dos números.
+- **Produzir quantidade (N1.13):** *"me dá 5"* — a criança **faz aparecer** a
+  quantidade pedida, em vez de ler quantos são. 🧒 *Erro:* contar 5 perfeitamente
+  e não conseguir separar 5 — é comum, e é o teste real da cardinalidade: quem
+  entendeu que "cinco" é uma quantidade consegue produzi-la. Ficha F04.
+  *(Competência criada em ago/2026 ao separar dois conceitos que dividiam o mesmo
+  número de nó — ver `codex/PLANO_DO_BLOCO_F0.md §13`.)*
 - **Contar de qualquer ponto (N1.09):** "comece do 7 e conte até 12"; contar pra trás de 10 até 0 (o foguete decolando). Pré-requisito motor do counting-on da adição.
 
 ### Nível 3 — a arquitetura parte-todo (N1.10, N1.11, N1.12)
@@ -880,11 +886,13 @@ Quando o gerador de uma competência precisa de um visual, ele usa O MESMO objet
 
 # ✅ FECHO — O QUE ESTE MANUAL GARANTE
 
-Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada CPA nível a nível com a fala do tutor e a mecânica de interação, a simulação dos erros e limites reais da criança em cada degrau (🧒), os distratores canônicos que os geradores DEVEM usar, os microtutoriais nomeados com estrutura Eu faço → Fazemos juntos → Você faz, e as regras de implementação inegociáveis. As três lacunas apontadas na tua análise original (Decimais/Porcentagem, Dados, Método de Barras) estão construídas. A fundação dos 4 anos (N1/N2) ganhou didática própria. Os Inteiros (N7), o ramo do espaço (mapas, ângulos, coordenadas), o perímetro e os múltiplos/primos ganharam cobertura própria — **nenhuma das 88 competências do Grafo ficou sem casa didática.**
+Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada CPA nível a nível com a fala do tutor e a mecânica de interação, a simulação dos erros e limites reais da criança em cada degrau (🧒), os distratores canônicos que os geradores DEVEM usar, os microtutoriais nomeados com estrutura Eu faço → Fazemos juntos → Você faz, e as regras de implementação inegociáveis. As três lacunas apontadas na tua análise original (Decimais/Porcentagem, Dados, Método de Barras) estão construídas. A fundação dos 4 anos (N1/N2) ganhou didática própria. Os Inteiros (N7), o ramo do espaço (mapas, ângulos, coordenadas), o perímetro e os múltiplos/primos ganharam cobertura própria — **nenhuma das 89 competências do Grafo ficou sem casa didática** — 89 de 89.
 
 **Divisão de papéis definitiva:** o **Grafo** é a estrutura (o quê, em que ordem, com quais pré-requisitos e distratores) · o **Manual** é a alma (como se ensina, o que se fala, o que a criança sente e erra) · a **Bíblia** é o comportamento do sistema (motores, sessão, adaptatividade, regras duras) · o **Dojo** (doc próprio) é a academia de fluência · o **YAML** é o grafo executável. Cinco peças, uma linguagem: os IDs.
 
 *Changelog: v2.0 (jul/2026) — detalhamento completo de todos os assuntos no padrão da divisão; novas didáticas: Fundação N1/N2, Decimais/Porcentagem/Proporção, Inteiros (N7), Dados/Probabilidade, Método de Barras; seção A Criança Real (limites de desenvolvimento); mapa de confluências.*
+*v2.4 (ago/2026) — O grafo passa a **89 competências**: a `N1.13` (produzir quantidade) nasceu quando a P12 separou a ficha F04 da `N1.09`, que continua sendo a contagem até 20. A F04 nunca teve casa própria — ela reivindicava um nó cujas quatro arestas dependiam do outro significado. Nenhuma competência foi removida ou renumerada; a cobertura didática continua completa. Ver §15.8 da Bíblia.*
+
 *v2.3 (ago/2026) — Retificação de contagem: o grafo é de **88 competências**, não 84 (o fecho dizia 84 por herança da v1.0; ver §15.8 da Bíblia para o registro das 11 candidatas, 4 absorvidas e 7 rejeitadas por duplicação). Nenhuma alteração didática: a cobertura continua completa, 88 de 88 competências com casa didática.*
 
 *v2.1 (jul/2026) — Contrato de Ensino: modelo de erro reformulado para duas camadas (resposta imediata leve que preserva o fluxo + remediação profunda por padrão, no momento certo). Regra-mãe "o fluxo é sagrado". Os E1/E2/E3 por assunto passam a descrever o CONTEÚDO de cada nível; o QUANDO é governado centralmente. Andaime de ensino distinguido de resposta a erro.*

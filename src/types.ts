@@ -57,6 +57,30 @@ export interface AnswerMeta {
    * Sem este campo, o Radar não teria como distinguir "pôs dois no mesmo" de
    * "deixou um sem" — que pedem aulas diferentes.
    */
+  /** A leitura do ouvir-e-escolher (F05): o que ouviu e quantas vezes. */
+  audiochoice?: unknown;
+  /** A leitura da classificação (F51): onde cada peça foi parar. */
+  classificacao?: unknown;
+  /** A leitura da contagem (F01/F27): quantos marcou, em que arranjo. */
+  touchcount?: unknown;
+  /** A leitura da produção (F04): quantos colocou, e quantas vezes tentou passar. */
+  touchplace?: unknown;
+  /** A leitura da posição (F47): onde estava o que ela tocou. */
+  posicao?: unknown;
+  /** A leitura da forma (F48): o que ela tocou, e se a certa estava girada. */
+  forma?: unknown;
+  /** A leitura da grandeza (F49): o que ela tocou, e se o chão já existia. */
+  grandeza?: unknown;
+  /** A leitura da moldura (F02/JD3/JD5): o que a cena mostrava quando ela decidiu. */
+  moldura?: unknown;
+  /**
+   * As condições que ESTA resposta satisfez — a §9 de cada ficha (P13).
+   *
+   * Ex.: `["sem-andaime"]` quando a criança produziu a quantidade certa sem
+   * vaga fantasma na tela. Quem sabe disso é o palco, e só ele: nem o valor da
+   * resposta nem o nível bastam.
+   */
+  evidencias?: string[];
   pareamento?: {
     porReceptor: number[];
     naBandeja: number;
@@ -130,6 +154,13 @@ export interface Question {
   explain?: string;
   /** instrução extra de COMO fazer, falada junto do enunciado em exercícios novos */
   howto?: string;
+  /**
+   * A condição da §9 que esta competência exige ter visto ao menos uma vez (P13).
+   *
+   * Vem de `micro.dominio.exige.evidencia`. Viaja na questão porque é o
+   * GameLoop quem monta a tentativa de maestria, e ele não conhece a ficha.
+   */
+  exigeEvidencia?: string;
   /** expressão revelada SÓ ao acertar (ex.: esconde a palavra, mostra "CA + SA = CASA 🏠" depois) */
   bigCompleted?: string;
   /** opções ganham botão 🔊 para a criança OUVIR cada uma e escolher por som (método fônico) */
@@ -210,10 +241,36 @@ export interface MasteryEvidence {
   schemaVersion: 1;
   comprehensionStreak: number;
   independenceStreak: number;
+  /**
+   * Quantas respostas seguidas vieram dentro do `rt_alvo`.
+   *
+   * ⚠️ **Não coroa mais.** Ela gatilhava a coroa até este commit, e isso é o
+   * §5.1-bis violado no coração do motor: *"nenhuma ficha usa tempo como
+   * critério de domínio conceitual; o `rt_alvo` existe para alimentar a trilha
+   * FD do Dojo — não para reprovar na Jornada."*
+   *
+   * O efeito era pior que teórico: sem `rt_alvo` declarado, `fluencyStreak`
+   * ficava em zero para sempre e a criança **nunca** era coroada. Com ele, uma
+   * criança que entende tudo e responde devagar também não era.
+   *
+   * Continua sendo medida porque é telemetria útil (e é o que a trilha do Dojo
+   * consome). Quem coroa agora é `evidenciaDaFicha`.
+   */
   fluencyStreak: number;
   retentionPasses: number;
   candidateDay?: string;
   crownedBy?: "legacy" | "multidimensional";
+  /**
+   * A criança já acertou uma vez **na condição que a ficha diz que prova a
+   * competência**? (P13)
+   *
+   * É a §9 de cada ficha: "um acerto no disperso", "um na primeira audição",
+   * "um sem vaga fantasma", "um com a forma girada", "um com diferença
+   * pequena". Ausente numa ficha que não declara nada — e aí não bloqueia.
+   */
+  evidenciaDaFicha?: boolean;
+  /** As condições já observadas em acertos desta competência. Histórico, não streak. */
+  evidenciasVistas?: string[];
 }
 
 export interface FactStrength {

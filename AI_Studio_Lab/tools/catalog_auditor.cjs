@@ -10,7 +10,10 @@ const sorted = (items) => [...items].sort((a, b) => a.localeCompare(b));
 
 const failures = [];
 const warnings = [];
-const EXPECTED_COMPETENCIES = 88;
+// 88 até ago/2026. A P12 separou "produzir quantidade" (F04) de "contar até
+// 20": duas competências disputavam a N1.09, e quatro arestas do grafo
+// dependiam do segundo significado. A F04 ganhou a N1.13. Ver §15.8 da Bíblia.
+const EXPECTED_COMPETENCIES = 89;
 const EXPECTED_FLUENCY_TRACKS = 13;
 const EXPECTED_AUTHORED_FICHAS = 92;
 const REJECTED_DUPLICATE_IDS = ["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"];
@@ -222,9 +225,29 @@ const journeyFichasMissingRt = journeyFichaIds.filter((id) => !journeyFichasWith
 check(journeyFichasMissingRt.length === 0, `fichas sem rt_alvo positivo no nível 5: ${journeyFichasMissingRt.join(", ")}`);
 
 const fichaIndex = read("src/curriculum/fichas/index.ts");
+
+/**
+ * Resolve um especificador de import como o Node e o TypeScript resolvem.
+ *
+ * ⚠️ Isto lia SEMPRE `<especificador>.ts`. Um import de diretório —
+ * `from './dojo/jardim'`, que resolve para `dojo/jardim/index.ts` — fazia o
+ * auditor abrir um arquivo inexistente e **derrubar o processo inteiro** com
+ * ENOENT, no meio da varredura, sem dizer qual invariante falhou.
+ *
+ * O import é legal nas duas linguagens; quem estava errado era a ferramenta. E
+ * um portão que morre por não saber ler o código que ele existe para auditar
+ * não protege nada: ele só transforma trabalho válido em CI vermelho.
+ */
+function resolverModulo(base, especificador) {
+  const semExtensao = path.join(base, especificador);
+  const candidatos = [`${semExtensao}.ts`, `${semExtensao}.tsx`,
+    path.join(semExtensao, "index.ts"), path.join(semExtensao, "index.tsx")];
+  return candidatos.find((c) => fs.existsSync(path.join(ROOT, c))) ?? candidatos[0];
+}
+
 const importedFichaFiles = new Map(
   [...fichaIndex.matchAll(/import\s+\{\s*([A-Za-z0-9_]+)\s*\}\s+from\s+["'](.+?)["']/g)]
-    .map((match) => [match[1], path.join("src/curriculum/fichas", `${match[2]}.ts`)])
+    .map((match) => [match[1], resolverModulo("src/curriculum/fichas", match[2])])
 );
 const allFichasBlock = fichaIndex.match(/export const AllFichas\s*=\s*\[([\s\S]*?)\]/);
 const registeredSymbols = allFichasBlock
@@ -241,13 +264,13 @@ const registeredJourneyFichaIds = registeredFichaIds.filter((id) => yamlIdSet.ha
 const unregisteredFichaIds = fichaIds.filter((id) => !registeredFichaIds.includes(id));
 
 const declaredCountSources = [
-  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 88 competências:/],
-  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 88 competências\.\*\*/],
-  ["Manual", "AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md", /88 de 88 competências/],
-  ["Método", "AI_Studio_Lab/pedagogia/METODO_SAGA.md", /grafo de 88 competências/],
+  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 89 competências:/],
+  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 89 competências\.\*\*/],
+  ["Manual", "AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md", /89 de 89/],
+  ["Método", "AI_Studio_Lab/pedagogia/METODO_SAGA.md", /grafo de 89 competências/],
 ];
 for (const [label, file, pattern] of declaredCountSources) {
-  check(pattern.test(read(file)), `${label} não declara o invariante canônico de 88 competências`);
+  check(pattern.test(read(file)), `${label} não declara o invariante canônico de ${EXPECTED_COMPETENCIES} competências`);
 }
 
 const authoredFichaFiles = listFiles("AI_Studio_Lab/pedagogia/fichas", ".md");

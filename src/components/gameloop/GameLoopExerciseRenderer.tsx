@@ -11,6 +11,14 @@ import { DeslocamentoStage } from "../primitives/DeslocamentoStage";
 import { AreaStage } from "../primitives/AreaStage";
 import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
+import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
+import { ClassificacaoStage } from "../primitives/ClassificacaoStage";
+import { AudioChoiceStage } from "../primitives/AudioChoiceStage";
+import { TouchPlaceStage } from "../primitives/TouchPlaceStage";
+import { CenaDePosicaoStage } from "../primitives/CenaDePosicaoStage";
+import { FormaStage } from "../primitives/FormaStage";
+import { GrandezaStage } from "../primitives/GrandezaStage";
+import { MolduraStage, FaseDaMoldura } from "../primitives/MolduraStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
 import {
@@ -60,6 +68,13 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "area",
   "pareamento",
   "touchcount",
+  "fileira",
+  "classificacao",
+  "audiochoice",
+  "touchplace",
+  "shapecanvas",
+  "grandeza",
+  "moldura",
 ]);
 
 interface Props {
@@ -90,6 +105,18 @@ interface Props {
   hiddenOpts: any[];
   armedOpt: any;
   setArmedOpt: (v: any) => void;
+  /**
+   * Prende a fase de um palco que tem roteiro no tempo. **Só a sonda passa.**
+   *
+   * A tela da `fileira` percorre cinco fases em quatro segundos (§4 das fichas
+   * JD1 e JD2). A sonda mede aos 1500ms: sem prender, ela fotografaria uma fase
+   * diferente a cada execução, e uma sonda que muda de resposta não é portão
+   * (§6.31). Irmão do `preenchidos` do `TouchCount`, um nível acima porque o
+   * enquadramento certo é o do app inteiro, não o do palco solto (RETOMADA §7.4).
+   *
+   * A criança nunca recebe isto: o GameLoop não passa a prop.
+   */
+  faseDaCena?: FaseDaFileira | FaseDaMoldura;
 }
 
 export function GameLoopExerciseRenderer({
@@ -98,7 +125,7 @@ export function GameLoopExerciseRenderer({
   sel, totalQFor, track,
   aulaSuggest, guidedNarr, playAulinha,
   setShowClockTutorial, sound, peekAgain, setJourneyDone, orderTaps,
-  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt
+  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt, faseDaCena
 
 }: Props) {
   return (
@@ -131,6 +158,104 @@ export function GameLoopExerciseRenderer({
             // mesmo instante do ato, e a competência do N1.02 é ORAL.
             falar={sound ? (t) => speak(t) : undefined}
             onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "touchcount", touchcount: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "fileira" && q.uiProps && (
+          <EmojiRowStage
+            spec={q.uiProps as never}
+            // §4 das três fichas manda a voz falar na revelação — e na JD2 a
+            // fala É a aula ("uma mão cheia e dois — sete!").
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor) => handlePick(valor)}
+            disabled={status !== null}
+            fase={faseDaCena as FaseDaFileira | undefined}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "classificacao" && q.uiProps && (
+          <ClassificacaoStage
+            spec={q.uiProps as never}
+            // §4: a voz confirma o "fora" e repete o critério no erro suave.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "classificacao", classificacao: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "audiochoice" && q.uiProps && (
+          <AudioChoiceStage
+            spec={q.uiProps as never}
+            // §4: a voz confirma no acerto e REPETE o número no erro — ela
+            // nunca diz "errou". O feedback é a informação que faltava.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, leitura) => handlePick(valor, undefined, { source: "audiochoice", audiochoice: leitura } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {/* A moldura serve TRÊS fichas (F02, JD3, JD5). Quem distingue é o
+            `modo` do spec, e ele vem do `params` da ficha — não há campo
+            adivinhado aqui. A fase é presa só pela sonda: a JD3 percorre cinco
+            estados em três segundos e o flash é o conteúdo da ficha. */}
+        {q.kind === "moldura" && q.uiProps && (
+          <MolduraStage
+            spec={q.uiProps as never}
+            // §4 da JD5: a contagem em voz alta na abertura é OBRIGATÓRIA — sem
+            // ela a criança não constrói o total na memória e o exercício vira
+            // adivinhação.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "moldura", moldura: acao } as never)}
+            disabled={status !== null}
+            fase={faseDaCena as FaseDaMoldura | undefined}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "grandeza" && q.uiProps && (
+          <GrandezaStage
+            spec={q.uiProps as never}
+            // §4: a voz enfatiza o atributo e, no erro, nomeia o que a linha
+            // tracejada está mostrando — ela não diz "errou".
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "grandeza", grandeza: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {/* O `shapecanvas` serve DUAS fichas. Quem distingue é o spec: o da
+            F48 traz `opcoes`, o da F47 traz `referencial`. Ler o spec em vez
+            de guardar um campo "modo" evita duas fontes para a mesma verdade. */}
+        {q.kind === "shapecanvas" && q.uiProps && "opcoes" in q.uiProps && (
+          <FormaStage
+            spec={q.uiProps as never}
+            // §4: a voz CONTA OS LADOS no acerto e no erro — é a propriedade
+            // que sobrevive ao giro, e portanto a resposta ao "por quê".
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "shapecanvas", forma: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "shapecanvas" && q.uiProps && !("opcoes" in q.uiProps) && (
+          <CenaDePosicaoStage
+            spec={q.uiProps as never}
+            // §4: no erro a voz DESCREVE onde o objeto está — "esse está em
+            // cima, eu pedi embaixo". O erro vira aula de vocabulário.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "shapecanvas", posicao: acao } as never)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
+        {q.kind === "touchplace" && q.uiProps && (
+          <TouchPlaceStage
+            spec={q.uiProps as never}
+            // §4: a voz CONTA a cada encaixe — "uma..." — e conta tudo no
+            // fecho. É a contagem no ato que liga a palavra à quantidade; sem
+            // ela a tela vira um quebra-cabeça de encaixar formas.
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "touchplace", touchplace: acao } as never)}
             disabled={status !== null}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />

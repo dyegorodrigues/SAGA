@@ -1,4 +1,14 @@
 import { diagnosticar as diagnosticarPareamento } from "../../curriculum/procedimentos/pareamentoProcedure";
+import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "../../curriculum/procedimentos/classificacaoProcedure";
+import { AcaoDeProducao, diagnosticar as diagnosticarProducao } from "../../curriculum/procedimentos/producaoProcedure";
+import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curriculum/procedimentos/posicaoProcedure";
+import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum/procedimentos/formaProcedure";
+import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza, evidenciasDe as evidenciasDaGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
+import { AcaoDeContagem, evidenciasDe as evidenciasDaContagem } from "../../curriculum/procedimentos/touchCountProcedure";
+import { AcaoDaMoldura, diagnosticar as diagnosticarMoldura, evidenciasDe as evidenciasDaMoldura } from "../../curriculum/procedimentos/tenFrameProcedure";
+import { RespostaOuvida, evidenciasDe as evidenciasDaEscuta } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from "../../curriculum/procedimentos/producaoProcedure";
+import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
 
@@ -37,6 +47,56 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
+  // Ficha F51 (AL.01): não há alternativa que carregue a hipótese — o erro está
+  // no que a criança TENTOU fazer com as peças. E as tentativas são a única
+  // fonte: o erro é empurrado de volta (§4), então o estado final está sempre
+  // certo e `TUDO_CABE` — o alvo da ficha — nunca apareceria no repouso.
+  if (meta?.classificacao) {
+    const daAcao = diagnosticarClassificacao(meta.classificacao as AcaoDeClassificacao);
+    if (daAcao) return daAcao;
+  }
+
+  // Ficha F04 (N1.13): mesma família. O que ela produziu é a resposta, e o que
+  // ela TENTOU produzir é o diagnóstico — nos níveis com vaga o excedente é
+  // empurrado de volta (§4), então o estado final está sempre certo e
+  // `NAO_MONITORA_ALVO` nunca apareceria no repouso.
+  if (meta?.touchplace) {
+    const daAcao = diagnosticarProducao(meta.touchplace as AcaoDeProducao);
+    if (daAcao) return daAcao;
+  }
+
+  // Ficha F47 (GE.01): a hipótese depende de ONDE estava o que ela tocou, e de
+  // ter tocado o próprio referencial — nada disso cabe num valor de alternativa.
+  if (meta?.posicao) {
+    const daAcao = diagnosticarPosicao(meta.posicao as AcaoDePosicao);
+    if (daAcao) return daAcao;
+  }
+
+  // Ficha F48 (GE.02): a hipótese depende de a certa estar GIRADA e a escolhida
+  // estar em pé — a assinatura do alvo da ficha. Nenhum valor de alternativa
+  // carrega isso.
+  if (meta?.forma) {
+    const daAcao = diagnosticarForma(meta.forma as AcaoDeForma);
+    if (daAcao) return daAcao;
+  }
+
+  // Ficha F49 (GM.01): a hipótese depende de ela ter decidido ANTES de a linha
+  // do chão existir, e de qual objeto vence no outro atributo. Nenhum valor de
+  // alternativa carrega isso.
+  if (meta?.grandeza) {
+    const daAcao = diagnosticarGrandeza(meta.grandeza as AcaoDeGrandeza);
+    if (daAcao) return daAcao;
+  }
+
+  // Fichas F02, JD3 e JD5: a hipótese depende do que a CENA mostrava — quantas
+  // casas estavam cheias, se o vazio estava disperso, quantas a tampa cobriu.
+  // "Responder o cheio" e "responder o visível" são o mesmo gesto com
+  // significados opostos, e só o spec os separa.
+  if (meta?.moldura) {
+    const daAcao = diagnosticarMoldura(meta.moldura as AcaoDaMoldura);
+    if (daAcao) return daAcao;
+  }
+
   const pickedOption = q.options?.find(option => option.value === value);
   return pickedOption?.misconception
     ? pickedOption.tag || pickedOption.misconception
@@ -62,7 +122,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
  * nunca passavam pelo renderizador do app. Foi um print no enquadramento real
  * que mostrou. É o §6.32 de novo, e desta vez em duas competências.
  */
-export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount"]);
+export const PALCOS_QUE_RESPONDEM = new Set(["pareamento", "touchcount", "fileira", "classificacao", "audiochoice", "touchplace", "shapecanvas", "grandeza", "moldura"]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
   return Boolean(q.options)
@@ -71,4 +131,29 @@ export function shouldRenderQuestionOptions(q: Question): boolean {
     && q.kind !== "drag-group"
     && q.kind !== "array"
     && !PALCOS_QUE_RESPONDEM.has(q.kind as string);
+}
+
+/**
+ * As condições da §9 que ESTA resposta satisfez (P13).
+ *
+ * Espelha `misconceptionForAnswer`, e pela mesma razão: quem sabe se a criança
+ * acertou **na primeira audição** ou **sem vaga fantasma** é o palco, não o
+ * valor da resposta. A diferença é o sinal — o diagnóstico lê o erro, a
+ * evidência lê o acerto.
+ *
+ * Sem esta função, a `FichaDominio.exige` seria uma declaração que nada
+ * verifica: a criança receberia a coroa sem nunca ter feito a questão que a §9
+ * diz que prova a competência.
+ */
+export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
+  if (!meta) return [];
+  const achadas: string[] = [];
+  if (meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
+  if (meta.audiochoice) achadas.push(...evidenciasDaEscuta(meta.audiochoice as RespostaOuvida));
+  if (meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));
+  if (meta.forma) achadas.push(...evidenciasDaForma(meta.forma as AcaoF));
+  if (meta.grandeza) achadas.push(...evidenciasDaGrandeza(meta.grandeza as AcaoDeGrandeza));
+  if (meta.moldura) achadas.push(...evidenciasDaMoldura(meta.moldura as AcaoDaMoldura));
+  if (meta.evidencias) achadas.push(...meta.evidencias);
+  return [...new Set(achadas)];
 }
