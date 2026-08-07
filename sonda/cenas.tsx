@@ -381,7 +381,7 @@ export const CENAS: Cena[] = [
   },
   // GM.01 — maior, menor, mais alto (F49), implementada e NÃO ativada. Não há
   // cena de rollback: o nó não tinha gerador nenhum.
-  ...[1, 3, 4, 5].map(lvl => ({
+  ...[1, 2, 3, 4, 5].map(lvl => ({
     nome: `GM.01 comparar grandeza (nível ${lvl})`,
     render: (s: number) => <ExercicioDaFicha ficha={GM_01} lvl={lvl} semente={s} />,
   })),
@@ -389,6 +389,18 @@ export const CENAS: Cena[] = [
     nome: "GM.01 micro-aula: os dois estão no chão",
     render: (s: number) => (
       <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarLinhaBase: true }} />
+    ),
+  },
+  {
+    nome: "GM.01 micro-aula: veja qual sobe mais",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GM_01} lvl={3} semente={s} mostrar={{ subirLinhaTracejada: true }} />
+    ),
+  },
+  {
+    nome: "GM.01 micro-aula: este é mais alto",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarMaior: true }} />
     ),
   },
   // ---- A moldura de dez: três fichas, uma primitiva ------------------------

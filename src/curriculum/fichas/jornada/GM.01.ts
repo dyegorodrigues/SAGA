@@ -55,7 +55,7 @@ import { FichaCompetencia } from "../../schema";
  * | 2 | comprido/curto | clara |
  * | 3 | **diferença pequena** | exige comparar com cuidado |
  * | 4 | **objetos diferentes** | ignora o tipo |
- * | 5 | **ordenar três** | seriação |
+ * | 5 | **ordenar três cópias do mesmo objeto** | seriação sem pista de identidade |
  */
 
 const dominio = {
@@ -112,7 +112,11 @@ export const GM_01: FichaCompetencia = {
       fonte: "F49",
       alvo: "comprido/curto: o mesmo critério, outro eixo",
       kinds: ["grandeza"],
-      params: { audio_prompt: FALAS.howto },
+      params: {
+        audio_prompt: FALAS.howtoDoAtributo("comprimento"),
+        howto: FALAS.howtoDoAtributo("comprimento"),
+        explain: FALAS.explainDoAtributo("comprimento"),
+      },
       dominio,
     },
     {
@@ -143,8 +147,8 @@ export const GM_01: FichaCompetencia = {
       alvo: "ordenar três — comparações encadeadas, um marco cognitivo próprio",
       kinds: ["grandeza"],
       params: {
-        howto: "Toque em ordem: primeiro o maior, depois o do meio, depois o menor.",
-        explain: "Compare de dois em dois. Ache o maior de todos, depois o maior do que sobrou.",
+        howto: FALAS.howtoDoAtributo("tamanho"),
+        explain: FALAS.explainDoAtributo("tamanho"),
       },
       dominio,
     },

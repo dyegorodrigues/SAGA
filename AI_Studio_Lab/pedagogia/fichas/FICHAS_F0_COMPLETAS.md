@@ -1628,6 +1628,8 @@ Qual objeto esta EMBAIXO da mesa?
 
 **⚠️ A regra pedagógica que quase todo material erra:** as **bases precisam estar alinhadas na mesma linha horizontal**. Comparar altura com objetos flutuando em posições diferentes ensina errado — é o equivalente visual de comparar quantidade pelo espaço ocupado.
 
+**A mesma regra vale girada em 90° para comprimento:** os dois objetos começam na **mesma linha vertical**. Comparar “comprido/curto” com pontos de partida diferentes é uma comparação injusta pelo mesmo motivo. A referência muda de eixo; o princípio pedagógico não muda.
+
 **Por que trava:** a criança julga pelo que "parece maior" sem critério. Um objeto mais próximo ou mais colorido parece maior.
 
 ## 3. Estrutura da tela
@@ -1647,7 +1649,7 @@ Qual dinossauro e MAIS ALTO?
 ## 4. Roteiro cinematográfico
 | Momento | O que acontece | Tempo |
 |---|---|---|
-| **Abertura** | uma **linha de chão** se desenha atravessando os dois contêineres. Os objetos "pousam" nela. | 1,2s |
+| **Abertura** | a **referência comum** se desenha: linha de chão na altura; linha de início no comprimento. Os objetos pousam/encostam nela. | 1,2s |
 | **Instrução** | a voz fala, enfatizando o atributo (**mais alto**) | 1,3s |
 | **Ajuda: a régua fantasma** *(nível 3+)* | uma linha horizontal tracejada **sobe do chão até o topo do menor** — mostra visualmente a diferença | 1,5s |
 | **Acerto** | o objeto maior **cresce ligeiramente** e uma seta vertical mede sua altura | 1,8s |
@@ -1661,7 +1663,7 @@ Qual dinossauro e MAIS ALTO?
 | 2 | comprido/curto | clara |
 | 3 | **diferença pequena** | exige comparar com cuidado |
 | 4 | **objetos diferentes** (comparar altura de coisas distintas) | ignora o tipo |
-| 5 | **ordenar três ou mais** por tamanho | seriação |
+| 5 | **ordenar três ou mais** por tamanho | seriação — mesma identidade visual, escalada proporcionalmente |
 
 **O nível 5 é seriação** — ordenar três objetos exige comparações encadeadas, e é um marco cognitivo próprio.
 

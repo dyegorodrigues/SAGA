@@ -61,7 +61,8 @@ export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
     || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
-    || (isFormaQuestion(q) && meta?.forma !== undefined);
+    || (isFormaQuestion(q) && meta?.forma !== undefined)
+    || (q.kind === "grandeza" && meta?.grandeza !== undefined);
 }
 
 /** Os mesmos palcos também possuem a voz e o fecho definidos pela própria ficha. */
@@ -69,7 +70,8 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
     || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
-    || (isFormaQuestion(q) && meta?.forma !== undefined);
+    || (isFormaQuestion(q) && meta?.forma !== undefined)
+    || (q.kind === "grandeza" && meta?.grandeza !== undefined);
 }
 
 /**
@@ -84,6 +86,10 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
   if (isFormaQuestion(q) && meta?.forma !== undefined) {
     // F48 §4: 2,2s de giro/contagem + 1,5s de fecho numerado.
     return 3700;
+  }
+  if (q.kind === "grandeza" && meta?.grandeza !== undefined) {
+    // F49 §4: 1,8s de medida + 1,5s de fecho comparativo.
+    return 3300;
   }
   // F05 e F04 já fecham seus roteiros dentro desta janela histórica.
   return 1500;
