@@ -1,168 +1,270 @@
 import React from "react";
 import { motion } from "motion/react";
-import { FiguraDesenhada, FiguraDesenhavel } from "./ShapeCanvas";
 import { PalcoEscalado } from "./PalcoEscalado";
-import {
-  FormaSpec,
-  LADO_DO_CONTEINER,
-  LARGURA_DE_PROJETO,
-  VAO,
-} from "../../curriculum/procedimentos/formaContract";
-import {
-  AcaoDeForma,
-  FALAS,
-  Forma,
-  LADOS,
-  NOME,
-} from "../../curriculum/procedimentos/formaProcedure";
+import { FiguraDesenhada } from "./ShapeCanvas";
+import { FormaSpec, LADO_DO_CONTEINER, OpcaoDeForma, VAO } from "../../curriculum/procedimentos/formaContract";
+import { AcaoDeForma, descricaoDeLados, FALAS, Forma, NOME } from "../../curriculum/procedimentos/formaProcedure";
 
-/**
- * `FormaStage` — a tela de GE.02, ficha F48.
- *
- * ---
- *
- * ### O giro de 360° no acerto é a lição, não a comemoração
- *
- * §4: *"a forma escolhida **gira lentamente 360°**, mostrando que continua sendo
- * a mesma em qualquer posição. Os lados são contados com destaque."*
- *
- * > *"Ver a forma girar e continuar sendo triângulo é o que ensina invariância."*
- *
- * É por isso que a volta é **inteira e lenta**: meia volta mostraria a forma
- * numa posição nova, não a mesma forma passando por todas.
- *
- * ### Os contêineres são idênticos, e isso é regra de conteúdo
- *
- * §3. Contêiner maior para a forma certa deixaria a criança acertar sem olhar a
- * forma — e olhar a forma é a competência inteira. O que varia no nível 3 é o
- * **desenho** dentro da caixa; a caixa, nunca.
- */
+const DURACAO_ERRO = 2500;
+const DURACAO_ACERTO = 2200;
+
+type Fase = "idle" | "erro" | "acerto" | "fecho";
 
 interface Props {
   spec: FormaSpec;
   onAnswer?: (valor: string, acao: AcaoDeForma) => void;
   disabled?: boolean;
-  /** A voz do app. §4: ela conta os lados no acerto e no erro. */
   falar?: (texto: string) => void;
-  /** O passo da micro-aula (§8). */
   mostrar?: {
-    /** §8: "Procuramos o triângulo." */
     destacarTodas?: boolean;
-    /** §8: "Ele tem três lados." */
-    contarLados?: number;
-    /** §8: "Mesmo virado, é triângulo!" */
-    girarForma?: number;
+    /** Demonstra semanticamente A FORMA CERTA da questão atual. */
+    contarLadosAlvo?: boolean;
+    /** Gira somente A FORMA CERTA da questão atual. */
+    girarAlvo?: boolean;
   } | null;
 }
 
+const MARCADORES: Record<Forma, Array<{ left: string; top: string }>> = {
+  circulo: [],
+  triangulo: [
+    { left: "50%", top: "6%" },
+    { left: "8%", top: "88%" },
+    { left: "92%", top: "88%" },
+  ],
+  quadrado: [
+    { left: "50%", top: "6%" },
+    { left: "94%", top: "50%" },
+    { left: "50%", top: "94%" },
+    { left: "6%", top: "50%" },
+  ],
+  retangulo: [
+    { left: "50%", top: "6%" },
+    { left: "94%", top: "50%" },
+    { left: "50%", top: "94%" },
+    { left: "6%", top: "50%" },
+  ],
+};
+
+function MarcadoresDeLados({ forma, giro: _giro }: { forma: Forma; giro: number }) {
+  if (forma === "circulo") {
+    return (
+      <span
+        data-forma-side-zero
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 px-2 py-1 text-[11px] font-black text-blue-700 shadow"
+      >
+        0 lados
+      </span>
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      data-forma-side-markers
+      className="pointer-events-none absolute inset-0"
+      style={{ zIndex: 60 }}
+    >
+      {MARCADORES[forma].map((p, i) => (
+        <span
+          key={i}
+          data-forma-side-marker
+          className="absolute flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-blue-600 text-[10px] font-black text-white shadow"
+          style={{ ...p, zIndex: 70 }}
+        >
+          {i + 1}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function MiniForma({ opcao }: { opcao: OpcaoDeForma }) {
+  return (
+    <div className="relative flex h-[76px] w-[92px] items-center justify-center rounded-xl border-2 border-slate-200 bg-white">
+      <FiguraDesenhada
+        figura={opcao.figura}
+        giro={opcao.giro}
+        tamanho={Math.min(54, opcao.tamanho)}
+        cor={opcao.cor}
+        objeto={opcao.objeto}
+      />
+    </div>
+  );
+}
+
+function ComparacaoDoErro({ escolhida, certa }: { escolhida: OpcaoDeForma; certa: OpcaoDeForma }) {
+  return (
+    <div
+      data-forma-comparison
+      aria-live="polite"
+      className="flex w-full items-stretch justify-center gap-2 rounded-2xl border-2 border-amber-200 bg-amber-50/90 p-2"
+    >
+      {[{ titulo: "Você tocou", opcao: escolhida }, { titulo: "Compare com", opcao: certa }].map(({ titulo, opcao }) => (
+        <div key={titulo} className="flex min-w-0 flex-1 flex-col items-center gap-1 text-center">
+          <span className="text-[11px] font-black text-slate-500">{titulo}</span>
+          <MiniForma opcao={opcao} />
+          <span className="text-[12px] font-black text-slate-700">{descricaoDeLados(opcao.figura)}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
+  const [fase, setFase] = React.useState<Fase>("idle");
   const [escolhida, setEscolhida] = React.useState<number | null>(null);
+  const [entradaSeq, setEntradaSeq] = React.useState(0);
+  const timers = React.useRef<number[]>([]);
+
+  const limparTimers = React.useCallback(() => {
+    timers.current.forEach(id => window.clearTimeout(id));
+    timers.current = [];
+  }, []);
+
+  const agendar = React.useCallback((fn: () => void, ms: number) => {
+    const id = window.setTimeout(fn, ms);
+    timers.current.push(id);
+  }, []);
+
+  React.useEffect(() => {
+    limparTimers();
+    setFase("idle");
+    setEscolhida(null);
+    setEntradaSeq(n => n + 1);
+    return limparTimers;
+  }, [spec, limparTimers]);
 
   const emAula = mostrar != null && Object.keys(mostrar).length > 0;
-  const respondeu = escolhida !== null;
-  const travado = disabled || respondeu || emAula;
+  const travado = Boolean(disabled) || fase !== "idle" || emAula;
+  const corretaIdx = spec.opcoes.findIndex(o => o.figura === spec.resposta);
+  const escolhidaOpcao = escolhida == null ? null : spec.opcoes[escolhida];
+  const corretaOpcao = spec.opcoes[corretaIdx];
 
-  const porLinha = spec.opcoes.length >= 4 ? 2 : spec.opcoes.length;
+  function acaoDa(opcao: OpcaoDeForma): AcaoDeForma {
+    return {
+      pedida: spec.alvo,
+      escolhida: opcao.figura,
+      pedidaGirada: spec.alvoGirado,
+      escolhidaEmPe: opcao.giro === 0,
+    };
+  }
 
-  function escolher(i: number) {
+  function responder(i: number) {
     if (travado) return;
     const opcao = spec.opcoes[i];
+    const certo = opcao.figura === spec.resposta;
     setEscolhida(i);
 
-    const certa = spec.opcoes.find(o => o.figura === spec.resposta)!;
-    falar?.(opcao.figura === spec.resposta
-      ? (spec.solidos
-        ? FALAS.acertoSolido(spec.resposta as never)
-        : FALAS.acerto(spec.resposta as Forma))
-      : (spec.solidos
-        ? FALAS.erroDeSolido(opcao.figura as never, spec.resposta as never)
-        : FALAS.erroSuave(opcao.figura as Forma, spec.resposta as Forma)));
+    if (!certo) {
+      setFase("erro");
+      falar?.(FALAS.erroSuave(opcao.figura, spec.resposta));
+      onAnswer?.(opcao.figura, acaoDa(opcao));
+      agendar(() => {
+        setEscolhida(null);
+        setFase("idle");
+      }, DURACAO_ERRO);
+      return;
+    }
 
-    onAnswer?.(String(opcao.figura), {
-      pedida: spec.resposta,
-      escolhida: opcao.figura,
-      pedidaGirada: certa.giro !== 0,
-      escolhidaEmPe: opcao.giro === 0,
-    });
+    setFase("acerto");
+    falar?.(FALAS.acerto(opcao.figura));
+    // Publica antes do cinema: RT mede decisão, não os 2,2s de animação.
+    onAnswer?.(opcao.figura, acaoDa(opcao));
+    agendar(() => setFase("fecho"), DURACAO_ACERTO);
   }
+
+  const colunas = spec.opcoes.length === 4 ? 2 : spec.opcoes.length;
 
   return (
     <PalcoEscalado>
-    <div className="flex flex-col items-center gap-3 select-none" style={{ width: LARGURA_DE_PROJETO }}>
-      <div
-        role="group"
-        aria-label="As formas"
-        className="grid"
-        style={{ gridTemplateColumns: `repeat(${porLinha}, ${LADO_DO_CONTEINER}px)`, gap: VAO }}
-      >
-        {spec.opcoes.map((o, i) => {
-          const certa = o.figura === spec.resposta;
-          const escolhi = escolhida === i;
-          const emFoco = emAula && (mostrar?.destacarTodas === true || mostrar?.girarForma !== undefined);
-          return (
-            <motion.button
-              key={`${o.figura}-${i}`}
-              type="button"
-              disabled={travado}
-              onClick={() => escolher(i)}
-              aria-label={NOME[o.figura]}
-              className="flex items-center justify-center rounded-2xl"
-              style={{
-                // §3: contêineres IDÊNTICOS. O tamanho não é pista.
-                width: LADO_DO_CONTEINER,
-                height: LADO_DO_CONTEINER,
-                backgroundColor: "#F8FAFC",
-                border: `3px solid ${respondeu && certa ? "#16A34A" : "#C7D7F0"}`,
-                overflow: "hidden",
-              }}
-              // §4, acerto: a forma escolhida gira 360° e continua a mesma.
-              // A volta é INTEIRA: meia volta mostraria uma posição nova, não a
-              // mesma forma passando por todas elas.
-              animate={{
-                rotate: (respondeu && escolhi && certa) || (emAula && mostrar?.girarForma) ? 360 : 0,
-                scale: escolhi && !certa ? [1, 0.94, 1] : 1,
-                opacity: respondeu && !certa && !escolhi ? 0.45 : 1,
-              }}
-              transition={{ duration: (respondeu && escolhi && certa) || emAula ? 2.2 : 0.4, ease: "easeInOut" }}
-            >
-              <FiguraDesenhada
-                figura={o.figura as FiguraDesenhavel}
-                giro={o.giro}
-                tamanho={o.tamanho}
-                cor={o.cor}
-                objeto={o.objeto}
-              />
-              {/* §4, fecho: "a forma correta com os lados numerados". Só depois
-                  da resposta — antes, o número de lados É o gabarito. */}
-              {respondeu && certa && !spec.solidos && (
-                <span
-                  aria-hidden
-                  className="absolute rounded-lg px-1.5"
-                  style={{
-                    marginTop: LADO_DO_CONTEINER - 26,
-                    fontSize: 12,
-                    fontWeight: 800,
-                    color: "#15803D",
-                    backgroundColor: "rgba(255,255,255,0.94)",
-                  }}
-                >
-                  {LADOS[spec.resposta as Forma] === 0
-                    ? "nenhum lado"
-                    : `${LADOS[spec.resposta as Forma]} lados`}
-                </span>
-              )}
-            </motion.button>
-          );
-        })}
-      </div>
+      <div className="flex flex-col items-center gap-3 select-none">
+        <div
+          role="group"
+          aria-label="As formas"
+          className="grid justify-center"
+          style={{ gridTemplateColumns: `repeat(${colunas}, ${LADO_DO_CONTEINER}px)`, gap: VAO }}
+        >
+          {spec.opcoes.map((o, i) => {
+            const certa = i === corretaIdx;
+            const selecionada = i === escolhida;
+            const erroEscolhido = fase === "erro" && selecionada && !certa;
+            const mostrarCertaNoErro = fase === "erro" && certa;
+            const sucesso = (fase === "acerto" || fase === "fecho") && certa;
+            const tutorialTodas = emAula && mostrar?.destacarTodas;
+            const tutorialAlvo = emAula && certa && (mostrar?.contarLadosAlvo || mostrar?.girarAlvo);
+            const rodando = (fase === "acerto" && certa) || Boolean(emAula && certa && mostrar?.girarAlvo);
+            const mostraLados = sucesso || Boolean(emAula && certa && mostrar?.contarLadosAlvo);
 
-      {/* §8: "Ele tem três lados." — o passo da micro-aula que conta os lados. */}
-      {emAula && mostrar?.contarLados !== undefined && (
-        <p className="text-center text-[15px] font-bold" style={{ color: "#2563EB" }}>
-          {mostrar.contarLados} lados
-        </p>
-      )}
-    </div>
+            let opacity = 1;
+            if (fase === "erro" && !erroEscolhido && !mostrarCertaNoErro) opacity = 0.28;
+            if (fase === "fecho" && !certa) opacity = 0;
+            if (emAula && (mostrar?.contarLadosAlvo || mostrar?.girarAlvo) && !certa) opacity = 0.28;
+
+            const borderColor = erroEscolhido
+              ? "#F97316"
+              : (mostrarCertaNoErro || sucesso)
+                ? "#16A34A"
+                : tutorialAlvo
+                  ? "#2563EB"
+                  : tutorialTodas
+                    ? "#60A5FA"
+                    : "#C7D7F0";
+
+            return (
+              <motion.button
+                key={`${entradaSeq}-${o.figura}-${i}`}
+                type="button"
+                data-forma-figura={o.figura}
+                data-forma-representacao={o.objeto ? "real" : "pura"}
+                data-forma-spinning={rodando ? "true" : undefined}
+                data-forma-close={fase === "fecho" && certa ? "true" : undefined}
+                disabled={travado}
+                onClick={() => responder(i)}
+                aria-label={NOME[o.figura]}
+                className="relative flex items-center justify-center overflow-visible rounded-2xl"
+                style={{
+                  width: LADO_DO_CONTEINER,
+                  height: LADO_DO_CONTEINER,
+                  backgroundColor: tutorialTodas || tutorialAlvo ? "rgba(37,99,235,0.08)" : "#F8FAFC",
+                  border: `${tutorialAlvo ? 4 : 3}px solid ${borderColor}`,
+                  boxShadow: tutorialAlvo ? "0 0 0 5px rgba(37,99,235,0.10)" : "none",
+                  padding: 0,
+                  zIndex: mostraLados ? 20 : undefined,
+                }}
+                initial={{ opacity: 0, scale: 0.82, rotate: i % 2 === 0 ? -8 : 8 }}
+                animate={{
+                  opacity,
+                  scale: sucesso ? 1.08 : (tutorialAlvo ? [1, 1.06, 1] : 1),
+                  rotate: rodando ? 360 : 0,
+                  x: erroEscolhido ? [0, -6, 6, 0] : 0,
+                }}
+                transition={rodando
+                  ? { duration: fase === "acerto" ? 2.2 : 1.6, ease: "easeInOut" }
+                  : erroEscolhido
+                    ? { duration: 0.4 }
+                    : { duration: 0.55, delay: i * 0.14 }}
+              >
+                <FiguraDesenhada
+                  figura={o.figura}
+                  giro={o.giro}
+                  tamanho={o.tamanho}
+                  cor={o.cor}
+                  objeto={o.objeto}
+                />
+                {mostraLados && <MarcadoresDeLados forma={o.figura} giro={o.giro} />}
+                {fase === "fecho" && certa && (
+                  <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-white px-2 py-1 text-[12px] font-black text-blue-800 shadow">
+                    {descricaoDeLados(o.figura)}
+                  </span>
+                )}
+              </motion.button>
+            );
+          })}
+        </div>
+
+        {fase === "erro" && escolhidaOpcao && corretaOpcao && (
+          <ComparacaoDoErro escolhida={escolhidaOpcao} certa={corretaOpcao} />
+        )}
+      </div>
     </PalcoEscalado>
   );
 }

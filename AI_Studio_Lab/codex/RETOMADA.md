@@ -388,3 +388,10 @@ verificado em 7/ago/2026. Apagar qualquer uma perde trabalho.
 - N1.06 segue fora de COMPOSER_CANARIES; ativacao somente em PR separado.
 - Auditoria F04/N1.13 ja achou: falta arrasto real, mao fantasma incompleta, reset de spec ausente, corrida no autofecho, conflito de retry e DEPENDE_DE_ANDAIME sem consumidor longitudinal.
 - PRIMITIVAS_SAGA.md esta atrasado para AudioChoice/TouchPlace; nao usar esse inventario como verdade de runtime.
+
+
+### Checkpoint Codex — F48/GE.02: fronteira 2D→3D explicitada
+
+A auditoria sistêmica da F48 encontrou uma contradição entre artefatos canônicos: a ficha punha sólidos no nível 5 de `GE.02`, enquanto `curriculum/GE.yaml` define `GE.02` como **formas planas básicas** e `GE.04` como **sólidos geométricos**; a F59 confirma que cubo/esfera/cilindro pertencem à GE.04. A ficha foi retificada de forma explícita: o nível 5 agora mistura representações planas já aprendidas (pura + objeto do mundo, giro, cor e tamanho), testando transferência sem introduzir vocabulário 3D.
+
+A mesma auditoria encontrou problemas independentes no palco: erro sem retry autoral, abertura cinematográfica ausente, comparação de erro incompleta, coreografia fixa em “triângulo” apesar de alvo sorteado, `destacarTodas` inerte, contagem de lados apenas textual e giro aplicado a todas as opções. A correção mantém `ShapeCanvas` compartilhado com F47 sem misturar as duas semânticas: `AnswerMeta.forma` identifica a autoria da F48; `AnswerMeta.posicao` continua identificando a F47.

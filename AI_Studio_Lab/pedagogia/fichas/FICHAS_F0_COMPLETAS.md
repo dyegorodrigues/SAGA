@@ -1591,21 +1591,23 @@ Qual objeto esta EMBAIXO da mesa?
 | 2 | formas **giradas** |
 | 3 | formas de tamanhos e cores diferentes |
 | 4 | **no mundo real** (roda = círculo, janela = retângulo) |
-| 5 | **formas 3D** (cubo, esfera, cilindro) |
+| 5 | **mistura de representações planas** — formas puras e formas dentro de objetos, com giro, cor e tamanho já conhecidos |
+
+> **Retificação GE.02 × GE.04 — ago/2026.** A versão anterior colocava cubo, esfera e cilindro no nível 5. O grafo, porém, define `GE.02` como **formas planas básicas** e reserva `GE.04`/F59 para **sólidos geométricos**. Manter os sólidos aqui duplicava a competência sucessora e saltava a fronteira do grafo. O nível 5 passa a testar transferência/invariância combinando apenas representações 2D já ensinadas; os sólidos permanecem integralmente em GE.04.
 
 ## 6. Diagnóstico
 `SO_ORIENTACAO_PADRAO` (não reconhece girado — **o alvo**) · `CONFUNDE_QUADRADO_RETANGULO` · `IGNORA_LADOS` (escolhe pela aparência geral)
 
 ## 7. Falas
-**howto:** *"Conte os lados. O triângulo sempre tem três, esteja em qualquer posição."*
+**howto:** *"Olhe o contorno. Se houver lados, conte; mesmo virada, a forma continua a mesma."*
 **explain:** *"Não olhe a posição. Conte quantos lados a forma tem."*
 
 ## 8. Coreografia (nível 2)
 ```
 [
-  { fala: "Procuramos o triângulo.",  mostra: { destacarTodas: true },   sync: "junto" },
-  { fala: "Ele tem três lados.",      mostra: { contarLados: 3 },        sync: "junto" },
-  { fala: "Mesmo virado, é triângulo!", mostra: { girarForma: 360 },     sync: "depois" }
+  { fala: "Procure a forma que eu pedi.", mostra: { destacarTodas: true },      sync: "junto" },
+  { fala: "Conte os lados da forma certa.", mostra: { contarLadosAlvo: true }, sync: "junto" },
+  { fala: "Mesmo virada, ela continua sendo a mesma forma!", mostra: { girarAlvo: true }, sync: "depois" }
 ]
 ```
 

@@ -368,10 +368,16 @@ export const CENAS: Cena[] = [
     render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={lvl} semente={s} />,
   })),
   {
-    nome: "GE.02 micro-aula: mesmo virado é triângulo",
-    render: (s: number) => (
-      <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarForma: 360 }} />
-    ),
+    nome: "GE.02 micro-aula: procurar a forma",
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ destacarTodas: true }} />,
+  },
+  {
+    nome: "GE.02 micro-aula: contar os lados do alvo",
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ contarLadosAlvo: true }} />,
+  },
+  {
+    nome: "GE.02 micro-aula: girar somente o alvo",
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarAlvo: true }} />,
   },
   // GM.01 — maior, menor, mais alto (F49), implementada e NÃO ativada. Não há
   // cena de rollback: o nó não tinha gerador nenhum.

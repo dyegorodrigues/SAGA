@@ -31,6 +31,26 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
 }
 
 /**
+ * `shapecanvas` é uma família visual, não uma competência. A discriminação
+ * segue exatamente a mesma fronteira do renderer: F48 possui `opcoes`; F47
+ * possui `referencial`. Isso impede meta incorreto de sequestrar outra ficha.
+ */
+function isFormaQuestion(q: Question): boolean {
+  return q.kind === "shapecanvas"
+    && q.uiProps != null
+    && typeof q.uiProps === "object"
+    && "opcoes" in q.uiProps;
+}
+
+function isPosicaoQuestion(q: Question): boolean {
+  return q.kind === "shapecanvas"
+    && q.uiProps != null
+    && typeof q.uiProps === "object"
+    && "referencial" in q.uiProps
+    && !("opcoes" in q.uiProps);
+}
+
+/**
  * Palcos que a ficha torna donos do próprio erro suave/retry.
  *
  * O meta específico é obrigatório: `shapecanvas` serve F47 e F48; apenas uma
@@ -40,14 +60,16 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
-    || (q.kind === "shapecanvas" && meta?.posicao !== undefined);
+    || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
+    || (isFormaQuestion(q) && meta?.forma !== undefined);
 }
 
 /** Os mesmos palcos também possuem a voz e o fecho definidos pela própria ficha. */
 export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
-    || (q.kind === "shapecanvas" && meta?.posicao !== undefined);
+    || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
+    || (isFormaQuestion(q) && meta?.forma !== undefined);
 }
 
 /**
@@ -55,9 +77,13 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
  * O RT já foi capturado antes desta janela — cinema nunca vira latência cognitiva.
  */
 export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
-  if (q.kind === "shapecanvas" && meta?.posicao !== undefined) {
+  if (isPosicaoQuestion(q) && meta?.posicao !== undefined) {
     // F47 §4: 1,8s de relação/seta + 1,5s de fecho rotulado.
     return 3300;
+  }
+  if (isFormaQuestion(q) && meta?.forma !== undefined) {
+    // F48 §4: 2,2s de giro/contagem + 1,5s de fecho numerado.
+    return 3700;
   }
   // F05 e F04 já fecham seus roteiros dentro desta janela histórica.
   return 1500;
