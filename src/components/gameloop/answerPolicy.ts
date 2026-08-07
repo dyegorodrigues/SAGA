@@ -15,21 +15,11 @@ import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from ".
 import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { AnswerMeta, Question } from "../../types";
+import { bundleMisconceptions } from "./misconceptionBundle";
 
-/** Uma tentativa pode carregar mais de uma hipótese sem virar duas tentativas. */
-export type MisconceptionResult = string | string[] | undefined;
 type ProducaoComHistorico = AcaoDeProducao & { diagnosticosLongitudinais?: string[] };
 
-function unirHipoteses(...tags: Array<string | undefined>): MisconceptionResult {
-  const unicas = [...new Set(tags.filter((tag): tag is string => Boolean(tag)))];
-  if (unicas.length === 0) return undefined;
-  return unicas.length === 1 ? unicas[0] : unicas;
-}
-
-/**
- * §8.3-bis: o erro veio do dedo, não da cabeça?
- * Só responde `true` quando houve gesto (`manipulacao`).
- */
+/** §8.3-bis: o erro veio do dedo, não da cabeça? */
 export function isMotorSlip(meta?: AnswerMeta): boolean {
   return meta?.manipulacao !== undefined && classificarErro(meta.manipulacao) === "motor";
 }
@@ -43,7 +33,6 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
 /**
  * F04 e F05 possuem o próprio ciclo de erro. O GameLoop registra a tentativa,
  * mas não acrescenta `Ops`, não esconde opção e não aplica terceira tentativa.
- * Exigimos o meta específico: o kind sozinho não sequestra um uso futuro.
  */
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
@@ -56,10 +45,13 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
     || (q.kind === "touchplace" && meta?.touchplace !== undefined);
 }
 
-export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): MisconceptionResult {
+/**
+ * Contrato público permanece `string | undefined`. Quando uma tentativa prova
+ * mais de uma hipótese, o bundle interno é desfeito por questionDiagnostics.
+ */
+export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
 
-  // F05/N1.06: a hipótese depende do histórico temporal da audição/tentativa.
   if (meta?.audiochoice) {
     return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
   }
@@ -79,15 +71,15 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
   }
 
   /**
-   * F04/N1.13 pode provar DUAS coisas na mesma tentativa: por exemplo, parar
-   * antes (`PRODUCAO_INCOMPLETA`) e, pelo histórico da missão, também provar
-   * `DEPENDE_DE_ANDAIME`. O array preserva as duas sem inventar outra resposta.
+   * F04 pode provar na mesma tentativa uma hipótese imediata e a longitudinal
+   * `DEPENDE_DE_ANDAIME`. O bundle mantém uma tentativa e preserva as duas tags.
    */
   if (meta?.touchplace) {
     const acao = meta.touchplace as ProducaoComHistorico;
-    const imediata = diagnosticarProducao(acao);
-    const todas = [imediata, ...(acao.diagnosticosLongitudinais ?? [])];
-    const unidas = unirHipoteses(...todas);
+    const unidas = bundleMisconceptions([
+      diagnosticarProducao(acao),
+      ...(acao.diagnosticosLongitudinais ?? []),
+    ]);
     if (unidas) return unidas;
   }
 
@@ -117,7 +109,6 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     : meta?.misconception;
 }
 
-/** Palcos que coletam a resposta dentro da própria cena. */
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
   "touchplace", "shapecanvas", "grandeza", "moldura",
