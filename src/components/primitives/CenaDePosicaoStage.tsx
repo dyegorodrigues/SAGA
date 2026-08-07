@@ -138,9 +138,13 @@ export function CenaDePosicaoStage({ spec, onAnswer, disabled, falar, mostrar }:
     if (travado) return;
     if (onde === null) {
       setTocouReferencial(true);
+      setFeedbackErro(true);
       falar?.(FALAS.erroDoReferencial(spec.referencial.nome, spec.pedida));
       onAnswer?.("referencial", acao(null));
-      agendar(() => setTocouReferencial(false), DURACAO_ERRO);
+      agendar(() => {
+        setTocouReferencial(false);
+        setFeedbackErro(false);
+      }, DURACAO_ERRO);
       return;
     }
     if (onde === spec.pedida) confirmarAcerto(onde);

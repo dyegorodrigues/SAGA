@@ -7,7 +7,9 @@ import {
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
+import { QuestionPrompt } from "./gameloop/QuestionPrompt";
 import {
+  authorialFeedbackHoldMs,
   evidenciasDaResposta,
   isMotorSlip,
   isRetryableAnswer,
@@ -711,7 +713,7 @@ export function GameLoop({
     } else if (val !== "__timeout__") {
       // F05 §4 fecha a associação som-símbolo em 1,5s; os demais mantêm a
       // janela de segurança histórica de 10s.
-      const espera = feedbackAutoral ? 1500 : 10000;
+      const espera = feedbackAutoral ? authorialFeedbackHoldMs(q, answerMeta) : 10000;
       setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);
     }
   };
@@ -982,7 +984,7 @@ export function GameLoop({
             color: status === "right" ? C.mintDark : status === "wrong" ? C.melonDark : C.ink,
           }}
         >
-          {status ? msg : q.prompt}
+          {status ? msg : <QuestionPrompt q={q} />}
         </div>
 
         
