@@ -17,26 +17,27 @@ export const createQuestionDiagnostics = (): QuestionDiagnostics => ({
 });
 
 /**
- * Registra uma resposta/tentativa observável.
+ * Registra UMA tentativa observável e todas as hipóteses que ela sustenta.
  *
- * Uma hipótese pode estar embutida numa ação que TERMINA correta: F51/F04
- * acumulam tentativas dentro da primitiva. Descartá-la por `isCorrect` apagava
- * o histórico que o Radar precisa enxergar.
+ * F04 pode produzir simultaneamente uma hipótese imediata (ex.: parou antes) e
+ * uma longitudinal (`DEPENDE_DE_ANDAIME`). Isso não são dois toques — portanto
+ * o contador sobe uma vez e as duas tags entram no mesmo conjunto.
  */
 export function recordQuestionAttempt(
   diagnostics: QuestionDiagnostics,
   isCorrect: boolean,
-  misconception?: string,
+  misconception?: string | string[],
 ): void {
   diagnostics.attemptCount += 1;
   diagnostics.hadError ||= !isCorrect;
-  if (misconception) diagnostics.misconceptionTags.add(misconception);
+  if (Array.isArray(misconception)) {
+    misconception.forEach(tag => tag && diagnostics.misconceptionTags.add(tag));
+  } else if (misconception) {
+    diagnostics.misconceptionTags.add(misconception);
+  }
 }
 
-/**
- * Acrescenta uma hipótese derivada de HISTÓRICO sem fingir que houve outro
- * toque. Ex.: F04 `DEPENDE_DE_ANDAIME` compara questões com e sem vaga.
- */
+/** Mantida para hipóteses de histórico produzidas por outros motores. */
 export function recordQuestionHypothesis(
   diagnostics: QuestionDiagnostics,
   misconception?: string,
