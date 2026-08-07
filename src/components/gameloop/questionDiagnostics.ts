@@ -1,3 +1,5 @@
+import { unbundleMisconceptions } from "./misconceptionBundle";
+
 export interface QuestionDiagnostics {
   attemptCount: number;
   hadError: boolean;
@@ -17,24 +19,19 @@ export const createQuestionDiagnostics = (): QuestionDiagnostics => ({
 });
 
 /**
- * Registra UMA tentativa observável e todas as hipóteses que ela sustenta.
- *
- * F04 pode produzir simultaneamente uma hipótese imediata (ex.: parou antes) e
- * uma longitudinal (`DEPENDE_DE_ANDAIME`). Isso não são dois toques — portanto
- * o contador sobe uma vez e as duas tags entram no mesmo conjunto.
+ * Registra UMA tentativa observável. O contrato vindo de answerPolicy continua
+ * string; se ela embute várias hipóteses, o bundle é aberto aqui sem inflar o
+ * contador de tentativas.
  */
 export function recordQuestionAttempt(
   diagnostics: QuestionDiagnostics,
   isCorrect: boolean,
-  misconception?: string | string[],
+  misconception?: string,
 ): void {
   diagnostics.attemptCount += 1;
   diagnostics.hadError ||= !isCorrect;
-  if (Array.isArray(misconception)) {
-    misconception.forEach(tag => tag && diagnostics.misconceptionTags.add(tag));
-  } else if (misconception) {
-    diagnostics.misconceptionTags.add(misconception);
-  }
+  unbundleMisconceptions(misconception)
+    .forEach(tag => diagnostics.misconceptionTags.add(tag));
 }
 
 /** Mantida para hipóteses de histórico produzidas por outros motores. */
