@@ -18,6 +18,7 @@ function objeto(container: HTMLElement, posicao: string) {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
   document.querySelectorAll("[data-position-drag-ghost]").forEach(x => x.remove());
 });
 
@@ -80,15 +81,13 @@ describe("F47 — contrato temporal e motor da cena de posição", () => {
   it("nível 5 tem arrasto Pointer real com ghost em portal e solta na relação pedida", () => {
     const s = spec(5);
     const onAnswer = vi.fn();
-    const { container } = render(<CenaDePosicaoStage spec={s} onAnswer={onAnswer} />);
-    const campo = container.querySelector<HTMLElement>("[data-position-field]")!;
-    expect(campo).toBeTruthy();
-    vi.spyOn(campo, "getBoundingClientRect").mockReturnValue({
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
       x: 20, y: 30, left: 20, top: 30,
       width: LARGURA_DA_CENA, height: ALTURA_DA_CENA,
       right: 20 + LARGURA_DA_CENA, bottom: 30 + ALTURA_DA_CENA,
       toJSON: () => ({}),
     } as DOMRect);
+    render(<CenaDePosicaoStage spec={s} onAnswer={onAnswer} />);
 
     const tray = screen.getByLabelText("Pegar o objeto");
     const destino = s.alvoDaProducao!.destinoCerto;
