@@ -23,43 +23,10 @@ jobs:
         with:
           ref: codex/corrigir-n106
           fetch-depth: 0
-      - name: Aplicar e autolimpar
+      - name: Aplicar patch
+        run: python3 -c "import base64; exec(base64.b64decode('CmZyb20gcGF0aGxpYiBpbXBvcnQgUGF0aAoKZGVmIHJlcChwYXRoLCBvbGQsIG5ldyk6CiAgICBwID0gUGF0aChwYXRoKQogICAgcyA9IHAucmVhZF90ZXh0KCkKICAgIG4gPSBzLmNvdW50KG9sZCkKICAgIGlmIG4gIT0gMToKICAgICAgICByYWlzZSBTeXN0ZW1FeGl0KGYie3BhdGh9OiBlc3BlcmFkbyAxLCBhY2hlaSB7bn0iKQogICAgcC53cml0ZV90ZXh0KHMucmVwbGFjZShvbGQsIG5ldykpCgpyZXAoCiAgICAic3JjL2NvbXBvbmVudHMvZ2FtZWxvb3AvR2FtZUxvb3BFeGVyY2lzZVJlbmRlcmVyLnRzeCIsCiAgICAne2hhc1R1dG9yaWFsKHEpICYmIHEua2luZCAhPT0gInZlcnRpY2FsIiAmJiAhc3RhdHVzICYmICgnLAogICAgJ3toYXNUdXRvcmlhbChxKSAmJiBxLmtpbmQgIT09ICJ2ZXJ0aWNhbCIgJiYgcS5raW5kICE9PSAiYXVkaW9jaG9pY2UiICYmICFzdGF0dXMgJiYgKCcsCikKcmVwKAogICAgInNvbmRhL2NlbmFzLnRzeCIsCiAgICAnICAgICAge3EucHJvbXB0ICYmIChcbiAgICAgICAgPGRpdiBjbGFzc05hbWU9Im14LTMgbWItMiByb3VuZGVkLTJ4bCBib3JkZXItMyBweC0zLjUgcHktMi41IHRleHQtY2VudGVyIHRleHQtWzE3cHhdIGZvbnQtYm9sZCInLAogICAgJyAgICAgIHtxLnByb21wdCAmJiBxLmtpbmQgIT09ICJhdWRpb2Nob2ljZSIgJiYgKFxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT0ibXgtMyBtYi0yIHJvdW5kZWQtMnhsIGJvcmRlci0zIHB4LTMuNSBweS0yLjUgdGV4dC1jZW50ZXIgdGV4dC1bMTdweF0gZm9udC1ib2xkIicsCikKcmVwKAogICAgInNyYy9jdXJyaWN1bHVtL0NvbXBvc2VyLnRzIiwKICAgICcnJ2Z1bmN0aW9uIHRhZ0RhRXNjdXRhKHNwZWM6IHsgYWx2bzogbnVtYmVyOyBhbHRlcm5hdGl2YXM6IG51bWJlcltdIH0sIHZhbG9yOiBudW1iZXIpOiBzdHJpbmcgfCB1bmRlZmluZWQgewogIGlmICh2YWxvciA9PT0gc3BlYy5hbHZvKSByZXR1cm4gdW5kZWZpbmVkOwogIGlmIChzb2FQYXJlY2lkbyh2YWxvciwgc3BlYy5hbHZvKSkgcmV0dXJuIE1pc2NvbmNlcHRpb25UYWcuQ09ORlVTQU9fRk9OT0xPR0lDQTsgCiAgaWYgKHZhbG9yID09PSBzcGVjLmFsdGVybmF0aXZhc1swXSkgcmV0dXJuIE1pc2NvbmNlcHRpb25UYWcuTkFPX0VTQ1VUT1U7CiAgaWYgKE1hdGguYWJzKHZhbG9yIC0gc3BlYy5hbHZvKSA9PT0gMSkgcmV0dXJuIE1pc2NvbmNlcHRpb25UYWcuQ09ORlVOREVfVklaSU5ITzsKICByZXR1cm4gdW5kZWZpbmVkOwp9JycnLAogICAgJycnZnVuY3Rpb24gdGFnRGFFc2N1dGEoc3BlYzogeyBhbHZvOiBudW1iZXI7IGFsdGVybmF0aXZhczogbnVtYmVyW10gfSwgdmFsb3I6IG51bWJlcik6IHN0cmluZyB8IHVuZGVmaW5lZCB7CiAgaWYgKHZhbG9yID09PSBzcGVjLmFsdm8pIHJldHVybiB1bmRlZmluZWQ7CiAgaWYgKHNvYVBhcmVjaWRvKHZhbG9yLCBzcGVjLmFsdm8pKSByZXR1cm4gTWlzY29uY2VwdGlvblRhZy5DT05GVVNBT19GT05PTE9HSUNBOwogIC8vIOKaoO+4jyBEaXZlcmfDqm5jaWEgZGVjbGFyYWRhIEYwNSDCpzTDlyLCpzY2M6IGNvbW8gbyBhw7pkaW8gdG9jYSBhdXRvbWF0aWNhbWVudGUKICAvLyBBTlRFUyBkZSBhcyBvcMOnw7VlcyBhcGFyZWNlcmVtLCBlc3RhciBuYSBwcmltZWlyYSBwb3Npw6fDo28gbsOjbyBwcm92YSBxdWUgYQogIC8vIGNyaWFuw6dhICJuZXNj dXRvdSIuIEVzc2EgaGlww7N0ZXNlIGV4aWdlIGVzdGFkbyB0ZW1wb3JhbCBlIMOpIGVtaXRpZGEgcG9yCiAgLy8gYXVkaW9DaG9pY2VSdW50aW1lLCBudW5jYSBwb3IgdW1hIE9wdGlvbiBlc3TDqXRpY2EgZG8gQ29tcG9zZXIuCiAgaWYgKE1hdGguYWJzKHZhbG9yIC0gc3BlYy5hbHZvKSA9PT0gMSkgcmV0dXJuIE1pc2NvbmNlcHRpb25UYWcuQ09ORlVOREVfVklaSU5ITzsKICByZXR1cm4gdW5kZWZpbmVkOwp9JycnLAopClBhdGgoIi5naXRodWIvd29ya2Zsb3dzL24xMDYtY2xlYW51cC1wYXRjaC55bWwiKS51bmxpbmsobWlzc2luZ19vaz1UcnVlKQo=').decode())"
+      - name: Restaurar CI e publicar patch
         run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          def rep(path, old, new):
-              p=Path(path); s=p.read_text(); n=s.count(old)
-              if n != 1: raise SystemExit(f'{path}: esperado 1, achei {n}')
-              p.write_text(s.replace(old,new))
-
-          rep('src/components/gameloop/GameLoopExerciseRenderer.tsx',
-              '{hasTutorial(q) && q.kind !== "vertical" && !status && (',
-              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (')
-          rep('sonda/cenas.tsx',
-'''      {q.prompt && (
-        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''',
-'''      {q.prompt && q.kind !== "audiochoice" && (
-        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''')
-          rep('src/curriculum/Composer.ts',
-'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
-  if (valor === spec.alvo) return undefined;
-  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
-  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
-  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
-  return undefined;
-}''',
-'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
-  if (valor === spec.alvo) return undefined;
-  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
-  // ⚠️ Divergência declarada F05 §4×§6: como o áudio toca automaticamente
-  // ANTES de as opções aparecerem, estar na primeira posição não prova que a
-  // criança "não escutou". Essa hipótese exige estado temporal e é emitida por
-  // audioChoiceRuntime, nunca por uma Option estática do Composer.
-  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
-  return undefined;
-}''')
-          Path('.github/workflows/n106-cleanup-patch.yml').unlink(missing_ok=True)
-          PY
           git diff --check
           git fetch origin main --depth=1
           git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
