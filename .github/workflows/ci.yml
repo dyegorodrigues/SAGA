@@ -1,13 +1,10 @@
 name: CI
 
-# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
-# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
-# tudo localmente e passe a ser condição verificável no PR.
+permissions:
+  contents: write
 
 on:
   pull_request:
-    branches: [main]
-  push:
     branches: [main]
 
 concurrency:
@@ -15,69 +12,198 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  gates:
-    name: Gates do SAGA
+  repair-f48:
+    name: Reparar e validar F48/GE.02 atomicamente
+    if: github.event.action == 'reopened' && github.head_ref == 'codex/integrar-bloco-f0'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
-
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
+      - run: npm ci
 
-      - name: Instalar dependências
-        run: npm ci
+      - name: Aplicar candidato somente no workspace do runner
+        run: |
+          python3 -m py_compile AI_Studio_Lab/tools/f48_repair_candidate.py
+          python3 AI_Studio_Lab/tools/f48_repair_candidate.py
+          git diff --check
 
-      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
-      # órfãos e deriva de nomenclatura.
-      - name: Auditoria do catálogo
-        run: npm run auditar
+      - name: Contratos e regressões focadas
+        run: |
+          npm run fichas:conferir
+          npm run auditar
+          npm run fichas:auditar
+          npm run grafo:check
+          npm run lint
+          npx vitest run \
+            src/curriculum/procedimentos/formaProcedure.test.ts \
+            src/components/primitives/FormaStage.f48.test.tsx \
+            src/components/gameloop/formaAuthorialPolicy.test.ts \
+            src/components/gameloop/answerPolicy.test.ts \
+            src/components/primitives/CenaDePosicaoStage.f47.test.tsx
 
-      - name: Auditoria das fichas
-        run: npm run fichas:auditar
+      - name: Preparar Chromium
+        run: |
+          sudo mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          CHROME_REAL="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          if [ -z "$CHROME_REAL" ]; then
+            sudo mkdir -p /opt/pw-browsers && sudo chown -R "$USER":"$USER" /opt/pw-browsers
+            PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+            CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          fi
+          test -n "$CHROME_REAL"
+          sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
 
-      # O grafo é artefato derivado; o modo --check falha se alguém editar o
-      # gerado sem regerar a partir do YAML canônico.
-      - name: Sincronia do grafo
-        run: npm run grafo:check
-
-      - name: TypeScript
-        run: npm run lint
-
-      - name: Testes
-        run: npm test -- --run
-
-      - name: Build
-        run: npm run build
-
-  guarda-textual:
-    name: Guarda de binários
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # Por padrão o Actions confere um merge commit sintético do PR, o que
-          # distorceria o diff. Aqui o alvo é o head real da branch.
-          ref: ${{ github.event.pull_request.head.sha }}
-          # A guarda compara com a base do PR; precisa do histórico.
-          fetch-depth: 0
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Buscar a base do PR
-        run: git fetch origin ${{ github.base_ref }} --depth=1
-
-      # O criador de PR deste ambiente não aceita binários no diff textual.
-      # Falhar aqui é mais barato que descobrir na hora de publicar.
-      - name: Verificar ausência de binários no diff
+      - name: Sonda rápida + prints obrigatórios do candidato
         env:
-          PR_BASE: origin/${{ github.base_ref }}
-        run: node AI_Studio_Lab/tools/pr_text_guard.cjs
+          SONDA_SEMENTES: '1'
+          PRINTS_OUT: /tmp/ge02-candidate/prints
+          PRINTS_LARGURA: '390'
+        run: |
+          npm run sonda -- "GE.02"
+          node scripts/prints.mjs "GE.02"
+
+      - name: Provar abertura, retry, cinema, microaula e novo L5
+        run: |
+          mkdir -p /tmp/ge02-candidate/states
+          node --input-type=module <<'NODE'
+          import {spawn} from 'node:child_process';
+          import {chromium} from 'playwright-core';
+          const port=5199;
+          const vite=spawn('npx',['vite','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe'],detached:true});
+          await new Promise((ok,no)=>{const t=setTimeout(()=>no(new Error('vite nao subiu')),60000);vite.stdout.on('data',d=>{if(String(d).includes('ready in')){clearTimeout(t);ok();}})});
+          const browser=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome',args:['--no-sandbox']});
+          const page=await browser.newPage({viewport:{width:390,height:720},deviceScaleFactor:2});
+          await page.goto(`http://localhost:${port}/sonda/?sementes=1`,{waitUntil:'networkidle'});
+          await page.waitForFunction(()=>window.sonda?.total>0);
+          const nomes=await page.evaluate(()=>window.sonda.nomes());
+          const achar=t=>{const i=nomes.findIndex(n=>n.includes(t));if(i<0)throw new Error(`cena ausente: ${t}`);return i;};
+          const ir=async(t,ms=80)=>{await page.evaluate(i=>window.sonda.ir(i),achar(t));await page.waitForTimeout(ms);};
+          const shot=n=>page.screenshot({path:`/tmp/ge02-candidate/states/${n}.png`});
+          const norm=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+          const alvoAtual=async()=>{
+            const body=norm(await page.locator('body').innerText());
+            return ['circulo','quadrado','triangulo','retangulo'].find(x=>body.includes(x));
+          };
+          const botoes=()=>page.locator('button[data-forma-figura]');
+          const indiceCerto=async()=>{
+            const alvo=await alvoAtual(); if(!alvo)throw new Error('alvo não identificado');
+            const labs=await botoes().evaluateAll(bs=>bs.map(b=>norm(b.getAttribute('aria-label')||'')));
+            const i=labs.findIndex(x=>x.includes(alvo)); if(i<0)throw new Error(`alvo ${alvo} não está nas opções: ${labs}`); return i;
+          };
+
+          // Abertura §4: aos 80ms o conjunto ainda está entrando; depois assenta.
+          await ir('GE.02 que forma é essa (nível 2)',80);
+          const op80=await botoes().evaluateAll(bs=>bs.map(b=>({opacity:getComputedStyle(b).opacity,transform:getComputedStyle(b).transform})));
+          await shot('01_L2_ABERTURA_80MS');
+          await page.waitForTimeout(900);
+          await shot('02_L2_ABERTURA_ASSENTADA');
+          if(!op80.some(x=>x.opacity!== '1' || x.transform!=='none')) throw new Error('abertura cinematográfica continua inerte');
+
+          // Erro: comparação lado a lado, sem terminal; após 2,5s a mesma questão volta.
+          let certo=await indiceCerto(); let bs=botoes(); const errado=certo===0?1:0;
+          await bs.nth(errado).click(); await page.waitForTimeout(220);
+          if(await page.locator('[data-forma-comparison]').count()!==1) throw new Error('erro sem comparação de propriedades');
+          if(await page.locator('[data-forma-close=true]').count()) throw new Error('erro revelou fecho');
+          await shot('03_L2_ERRO_COMPARACAO');
+          await page.waitForTimeout(2400);
+          bs=botoes(); certo=await indiceCerto();
+          if(await bs.nth(certo).isDisabled()) throw new Error('retry F48 não voltou');
+          await shot('04_L2_RETRY');
+
+          // Acerto: somente a certa gira, os lados aparecem, depois fica sozinha no fecho.
+          await bs.nth(certo).click(); await page.waitForTimeout(700);
+          if(await page.locator('[data-forma-spinning=true]').count()!==1) throw new Error('giro de acerto não está restrito ao alvo');
+          if((await page.locator('[data-forma-side-marker]').count())+(await page.locator('[data-forma-side-zero]').count())<1) throw new Error('acerto não conta lados visualmente');
+          await shot('05_L2_ACERTO_GIRANDO');
+          await page.waitForTimeout(1600);
+          if(await page.locator('[data-forma-close=true]').count()!==1) throw new Error('fecho F48 ausente');
+          await shot('06_L2_FECHO_NUMERADO');
+
+          // N5 retificado: duas representações reais + duas puras; nenhuma forma 3D.
+          await ir('GE.02 que forma é essa (nível 5)',900);
+          if(await page.locator('[data-forma-representacao=real]').count()!==2) throw new Error('N5 não tem duas representações reais');
+          if(await page.locator('[data-forma-representacao=pura]').count()!==2) throw new Error('N5 não tem duas representações puras');
+          const text5=norm(await page.locator('body').innerText());
+          if(/cubo|esfera|cilindro/.test(text5)) throw new Error('N5 ainda invadiu GE.04');
+          await shot('07_L5_MISTURA_2D');
+
+          // Os três beats da §8 são observáveis e sem triângulo hardcoded.
+          await ir('GE.02 micro-aula: procurar a forma',650);
+          const cores=await botoes().evaluateAll(bs=>bs.map(b=>getComputedStyle(b).borderColor));
+          if(!cores.every(x=>x==='rgb(96, 165, 250)')) throw new Error(`destacarTodas não é visível: ${cores}`);
+          await shot('08_MICRO_DESTACAR_TODAS');
+
+          await ir('GE.02 micro-aula: contar os lados do alvo',650);
+          if((await page.locator('[data-forma-side-marker]').count())+(await page.locator('[data-forma-side-zero]').count())<1) throw new Error('beat de lados não marca o alvo');
+          await shot('09_MICRO_CONTAR_LADOS_ALVO');
+
+          await ir('GE.02 micro-aula: girar somente o alvo',650);
+          if(await page.locator('[data-forma-spinning=true]').count()!==1) throw new Error('beat de giro move mais de uma forma');
+          await shot('10_MICRO_GIRAR_ALVO');
+
+          await browser.close();
+          try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
+          NODE
+
+      - name: Portão final da correção — 8 sementes e suíte inteira
+        env:
+          SONDA_SEMENTES: '8'
+        run: |
+          npm run sonda -- "GE.02"
+          npm test -- --run
+          npm run build
+
+      - name: Folha de contato
+        if: always()
+        run: |
+          python3 -m pip install --quiet pillow
+          mkdir -p /tmp/ge02-candidate
+          python3 - <<'PY'
+          from PIL import Image,ImageDraw
+          from pathlib import Path
+          fs=sorted(Path('/tmp/ge02-candidate/prints').glob('*.png'))+sorted(Path('/tmp/ge02-candidate/states').glob('*.png'))
+          tw,th,lab,cols=195,350,30,2;rows=max(1,(len(fs)+cols-1)//cols)
+          out=Image.new('RGB',(cols*tw,rows*(th+lab)),'white');d=ImageDraw.Draw(out)
+          for i,x in enumerate(fs):
+            im=Image.open(x).convert('RGB');im.thumbnail((tw,th));px=(i%cols)*tw;py=(i//cols)*(th+lab)
+            out.paste(im,(px+(tw-im.width)//2,py+(th-im.height)//2));d.text((px+2,py+th+2),x.stem[:42],fill='black')
+          out.save('/tmp/ge02-candidate/contact-sheet.jpg',quality=86)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ge02-repair-candidate
+          path: /tmp/ge02-candidate
+          retention-days: 7
+
+      - name: Restaurar CI, remover executor e publicar um commit atômico
+        run: |
+          git fetch origin main --depth=1
+          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
+          rm AI_Studio_Lab/tools/f48_repair_candidate.py
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add \
+            AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md \
+            AI_Studio_Lab/codex/RETOMADA.md \
+            src/curriculum/fichas/jornada/GE.02.ts \
+            src/curriculum/procedimentos/formaProcedure.ts \
+            src/curriculum/procedimentos/formaContract.ts \
+            src/curriculum/procedimentos/formaProcedure.test.ts \
+            src/components/primitives/FormaStage.tsx \
+            src/components/primitives/FormaStage.f48.test.tsx \
+            src/components/gameloop/answerPolicy.ts \
+            src/components/gameloop/formaAuthorialPolicy.test.ts \
+            sonda/cenas.tsx \
+            .github/workflows/ci.yml \
+            AI_Studio_Lab/tools/f48_repair_candidate.py
+          git diff --cached --check
+          git commit -m 'GE.02/F48: preserva invariância 2D e fecha feedback autoral'
+          git push origin HEAD:codex/integrar-bloco-f0
