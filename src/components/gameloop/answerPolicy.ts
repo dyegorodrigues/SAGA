@@ -31,18 +31,36 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
 }
 
 /**
- * F04 e F05 possuem o próprio ciclo de erro. O GameLoop registra a tentativa,
- * mas não acrescenta `Ops`, não esconde opção e não aplica terceira tentativa.
+ * Palcos que a ficha torna donos do próprio erro suave/retry.
+ *
+ * O meta específico é obrigatório: `shapecanvas` serve F47 e F48; apenas uma
+ * leitura `posicao` prova que estamos no fluxo F47. O GameLoop continua dono do
+ * Radar/progresso, mas não fala “Ops” nem aplica a terceira tentativa genérica.
  */
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
-    || (q.kind === "touchplace" && meta?.touchplace !== undefined);
+    || (q.kind === "touchplace" && meta?.touchplace !== undefined)
+    || (q.kind === "shapecanvas" && meta?.posicao !== undefined);
 }
 
-/** Ambos os palcos também possuem a voz/fecho da própria ficha. */
+/** Os mesmos palcos também possuem a voz e o fecho definidos pela própria ficha. */
 export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
-    || (q.kind === "touchplace" && meta?.touchplace !== undefined);
+    || (q.kind === "touchplace" && meta?.touchplace !== undefined)
+    || (q.kind === "shapecanvas" && meta?.posicao !== undefined);
+}
+
+/**
+ * Por quanto tempo o GameLoop preserva o palco DEPOIS do gesto correto.
+ * O RT já foi capturado antes desta janela — cinema nunca vira latência cognitiva.
+ */
+export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
+  if (q.kind === "shapecanvas" && meta?.posicao !== undefined) {
+    // F47 §4: 1,8s de relação/seta + 1,5s de fecho rotulado.
+    return 3300;
+  }
+  // F05 e F04 já fecham seus roteiros dentro desta janela histórica.
+  return 1500;
 }
 
 /**
