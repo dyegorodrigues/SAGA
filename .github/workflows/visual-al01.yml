@@ -27,6 +27,11 @@ jobs:
           sudo mkdir -p /opt/pw-browsers
           sudo chown -R "$USER":"$USER" /opt/pw-browsers
           PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright-core install --with-deps chromium
+          CHROME_REAL="$(find /opt/pw-browsers -type f -name chrome | head -n 1)"
+          test -n "$CHROME_REAL"
+          mkdir -p /opt/pw-browsers/chromium-1194/chrome-linux
+          ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
+          /opt/pw-browsers/chromium-1194/chrome-linux/chrome --version
 
       - name: Rodar sonda filtrada de AL.01
         run: npm run sonda -- "AL.01"
@@ -41,7 +46,7 @@ jobs:
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
-          from PIL import Image, ImageOps, ImageDraw
+          from PIL import Image, ImageDraw
           from pathlib import Path
           import base64, io
 
