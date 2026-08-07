@@ -37,4 +37,28 @@ if s.count(old) != 1:
 s = s.replace(old, new, 1)
 p.write_text(s, encoding='utf-8')
 
-print('catalog/conformidade auditors retified for 90/GM.12')
+# ---------------------------------------------------------------------------
+# Contrato do mapa autoral: agora são 26 primitivas declaradas e Recipientes
+# precisa aparecer explicitamente como AUSENTE até a implementação F50. O teste
+# não pode congelar a contagem anterior nem deixar a dívida desaparecer.
+# ---------------------------------------------------------------------------
+p = Path('src/curriculum/fichaRuntimeMap.test.ts')
+s = p.read_text(encoding='utf-8')
+old = '''  it("mantém as 25 primitivas declaradas explicitamente mapeadas", () => {'''
+new = '''  it("mantém as 26 primitivas declaradas explicitamente mapeadas", () => {'''
+if s.count(old) != 1:
+    raise SystemExit('fichaRuntimeMap: título com 25 primitivas mudou')
+s = s.replace(old, new, 1)
+old = '''    expect(output).toContain("Primitivas declaradas: 25");'''
+new = '''    expect(output).toContain("Primitivas declaradas: 26");'''
+if s.count(old) != 1:
+    raise SystemExit('fichaRuntimeMap: assert de 25 primitivas mudou')
+s = s.replace(old, new, 1)
+anchor = '''    expect(output).toContain("Moedas: renderer-sem-builder");\n    expect(output).toContain("Regua: ausente");'''
+replacement = '''    expect(output).toContain("Moedas: renderer-sem-builder");\n    expect(output).toContain("Recipientes: ausente");\n    expect(output).toContain("Regua: ausente");'''
+if s.count(anchor) != 1:
+    raise SystemExit('fichaRuntimeMap: âncora Moedas/Regua mudou')
+s = s.replace(anchor, replacement, 1)
+p.write_text(s, encoding='utf-8')
+
+print('catalog/conformidade/runtime-map auditors retified for 90/GM.12')
