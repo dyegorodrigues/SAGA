@@ -54,7 +54,14 @@ const FICHA_RUNTIME_MAP = [
     rendererKinds: ["emojirow"],
     note: "Alias autoral semântico: EmojiRow já oferece contagem por toque e áudio.",
   },
-  { primitive: "TouchPlace", kinds: ["touch-place"], componentFiles: [component("TouchPlace")], builderKinds: [], rendererKinds: [] },
+  {
+    primitive: "TouchPlace",
+    kinds: ["touchplace"],
+    componentFiles: [component("TouchPlace"), component("TouchPlaceStage")],
+    builderKinds: ["touchplace"],
+    rendererKinds: ["touchplace"],
+    note: "F04/N1.13: produção de quantidade; Stage possui gesto, feedback e retry autoral, GameLoop registra progresso/Radar.",
+  },
   { primitive: "VisualAddition", kinds: ["visual-addition", "subvis"], componentFiles: [component("VisualAddition")], builderKinds: [], rendererKinds: ["visual-addition"] },
   { primitive: "plain", kinds: ["plain"], componentFiles: [], builtin: true, builderKinds: ["plain"], rendererKinds: ["plain"] },
 ];
