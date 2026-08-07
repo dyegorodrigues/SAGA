@@ -1,254 +1,83 @@
-name: Reconcile F05 into F0 integration
+name: CI
+
+# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
+# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
+# tudo localmente e passe a ser condição verificável no PR.
 
 on:
   pull_request:
-    branches: [codex/integrar-bloco-f0]
+    branches: [main]
+  push:
+    branches: [main]
 
-permissions:
-  contents: write
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  reconcile:
-    name: Reconciliar F05 e F04
-    if: github.head_ref == 'codex/reconciliar-f05-f04' && github.actor != 'github-actions[bot]'
+  gates:
+    name: Gates do SAGA
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
+      # órfãos e deriva de nomenclatura.
+      - name: Auditoria do catálogo
+        run: npm run auditar
+
+      - name: Auditoria das fichas
+        run: npm run fichas:auditar
+
+      # O grafo é artefato derivado; o modo --check falha se alguém editar o
+      # gerado sem regerar a partir do YAML canônico.
+      - name: Sincronia do grafo
+        run: npm run grafo:check
+
+      - name: TypeScript
+        run: npm run lint
+
+      - name: Testes
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+  guarda-textual:
+    name: Guarda de binários
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: codex/reconciliar-f05-f04
+          # Por padrão o Actions confere um merge commit sintético do PR, o que
+          # distorceria o diff. Aqui o alvo é o head real da branch.
+          ref: ${{ github.event.pull_request.head.sha }}
+          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
-      - name: Buscar checkpoint F05 e base cumulativa
-        run: |
-          git fetch origin codex/corrigir-n106 codex/integrar-bloco-f0 --depth=100
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-      - name: Mesclar e limitar a superfície de conflito
-        run: |
-          set +e
-          git merge --no-commit --no-ff cc2469ec3c650a6ef9c466781645ec63c17dbc22
-          MERGE_RC=$?
-          set -e
-          if [ "$MERGE_RC" -eq 0 ]; then
-            echo 'F05 não gerou conflito; ainda aplicaremos a unificação de política.'
-          fi
-          git diff --name-only --diff-filter=U | sort > /tmp/conflicts.txt
-          cat /tmp/conflicts.txt
-          python3 - <<'PY'
-          from pathlib import Path
-          got = {x for x in Path('/tmp/conflicts.txt').read_text().splitlines() if x}
-          allowed = {
-              'src/components/GameLoop.tsx',
-              'src/components/gameloop/questionDiagnostics.ts',
-              'src/components/gameloop/questionDiagnostics.test.ts',
-          }
-          unexpected = got - allowed
-          if unexpected:
-              raise SystemExit(f'Conflitos inesperados: {sorted(unexpected)}')
-          PY
-          if grep -qx 'src/components/GameLoop.tsx' /tmp/conflicts.txt; then
-            git checkout --theirs src/components/GameLoop.tsx
-          fi
-          if grep -qx 'src/components/gameloop/questionDiagnostics.ts' /tmp/conflicts.txt; then
-            git checkout --ours src/components/gameloop/questionDiagnostics.ts
-          fi
-          if grep -qx 'src/components/gameloop/questionDiagnostics.test.ts' /tmp/conflicts.txt; then
-            git checkout --ours src/components/gameloop/questionDiagnostics.test.ts
-          fi
-          git add -A
-      - name: Reaplicar semântica F04 sobre a base F05
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
 
-          def rep(path, old, new):
-              p = Path(path)
-              s = p.read_text()
-              n = s.count(old)
-              if n != 1:
-                  raise SystemExit(f'{path}: esperado 1, achei {n}: {old[:100]!r}')
-              p.write_text(s.replace(old, new))
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
 
-          # 1) GameLoop: diagnóstico fica em answerPolicy; autoria de UX fica em
-          # authorialStagePolicy, compartilhada por F04 e F05.
-          rep(
-              'src/components/GameLoop.tsx',
-              '''import {
-  evidenciasDaResposta,
-  isMotorSlip,
-  isRetryableAnswer,
-  misconceptionForAnswer,
-  ownsAuthorialFeedback,
-  ownsAuthorialRetry,
-} from "./gameloop/answerPolicy";
-import {
-  createQuestionDiagnostics,
-  recordQuestionAttempt,
-  summarizeQuestionDiagnostics,
-} from "./gameloop/questionDiagnostics";''',
-              '''import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
-import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./gameloop/authorialStagePolicy";
-import { AcaoDeProducao, dependeDeAndaime } from "../curriculum/procedimentos/producaoProcedure";
-import { MisconceptionTag } from "../constants/misconceptions";
-import {
-  createQuestionDiagnostics,
-  recordQuestionAttempt,
-  recordQuestionHypothesis,
-  summarizeQuestionDiagnostics,
-} from "./gameloop/questionDiagnostics";''',
-          )
-          rep(
-              'src/components/GameLoop.tsx',
-              '  const questionDiagnosticsRef = useRef(createQuestionDiagnostics());\n',
-              '  const questionDiagnosticsRef = useRef(createQuestionDiagnostics());\n  // F04: histórico apenas da missão. Não vira campo persistente no save.\n  const producaoHistoricoRef = useRef<AcaoDeProducao[]>([]);\n',
-          )
-          rep(
-              'src/components/GameLoop.tsx',
-              '''  useEffect(() => {
-    applyTheme(kid.theme);
-    pickVoice();
-  }, [kid.theme]);
+      - name: Buscar a base do PR
+        run: git fetch origin ${{ github.base_ref }} --depth=1
 
-  // reset do sequenciamento''',
-              '''  useEffect(() => {
-    applyTheme(kid.theme);
-    pickVoice();
-  }, [kid.theme]);
-
-  useEffect(() => {
-    producaoHistoricoRef.current = [];
-  }, [track.id]);
-
-  // reset do sequenciamento''',
-          )
-          rep(
-              'src/components/GameLoop.tsx',
-              '''    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
-    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
-    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
-
-    // Palco autoral: registra a tentativa no Radar, mas mantém o ciclo de erro''',
-              '''    const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
-    recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
-    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
-
-    // F04 §6: DEPENDE_DE_ANDAIME é comparação ENTRE questões. Os warmups
-    // fornecem observação com vagas antes do degrau sem andaime.
-    if (answerMeta?.touchplace) {
-      const acao = answerMeta.touchplace as AcaoDeProducao;
-      producaoHistoricoRef.current.push(acao);
-      if (dependeDeAndaime(producaoHistoricoRef.current)) {
-        recordQuestionHypothesis(questionDiagnosticsRef.current, MisconceptionTag.DEPENDE_DE_ANDAIME);
-      }
-    }
-
-    // Palco autoral: registra a tentativa no Radar, mas mantém o ciclo de erro''',
-          )
-          rep(
-              'src/components/GameLoop.tsx',
-              '''      // F05 §4 fecha a associação som-símbolo em 1,5s; os demais mantêm a
-      // janela de segurança histórica de 10s.
-      const espera = feedbackAutoral ? 1500 : 10000;''',
-              '''      // Cada palco autoral fecha no tempo da própria ficha: F05 mantém a
-      // associação som-símbolo por 1,5s; F04 já fez sua fala/fecho antes de
-      // publicar a resposta terminal, então 400ms bastam para a transição.
-      const espera = q.kind === "audiochoice" ? 1500 : feedbackAutoral ? 400 : 10000;''',
-          )
-
-          # 2) Uma única política autoral para palcos que possuem feedback/retry.
-          Path('src/components/gameloop/authorialStagePolicy.ts').write_text('''import { AnswerMeta, Question } from "../../types";
-
-/**
- * Palcos cuja ficha lhes dá autoria do erro suave, retry e fala de fecho.
- * O GameLoop continua dono do progresso/Radar, mas não fala por cima nem aplica
- * a terceira tentativa genérica. A presença do meta específico é obrigatória:
- * o kind sozinho não sequestra um uso futuro da mesma primitiva.
- */
-export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
-  return (q.kind === "touchplace" && meta?.touchplace !== undefined)
-    || (q.kind === "audiochoice" && meta?.audiochoice !== undefined);
-}
-
-export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
-  return (q.kind === "touchplace" && meta?.touchplace !== undefined)
-    || (q.kind === "audiochoice" && meta?.audiochoice !== undefined);
-}
-''')
-          Path('src/components/gameloop/authorialStagePolicy.test.ts').write_text('''import { describe, expect, it } from "vitest";
-import { Question } from "../../types";
-import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./authorialStagePolicy";
-
-const touchplace: Question = { kind: "touchplace", prompt: "Coloque 3", answer: 3, uiProps: {} };
-const audiochoice: Question = { kind: "audiochoice", prompt: "Escute", answer: 3, uiProps: {} };
-
-describe("autoria de feedback/retry dos palcos", () => {
-  it("F04/TouchPlace possui o próprio erro suave e retry", () => {
-    const meta = { touchplace: { colocados: 2, alvo: 3, bandeja: 5, recusas: 0, comAndaime: false } };
-    expect(ownsAuthorialRetry(touchplace, meta)).toBe(true);
-    expect(ownsAuthorialFeedback(touchplace, meta)).toBe(true);
-  });
-
-  it("F05/AudioChoice possui o próprio ciclo temporal e voz", () => {
-    const meta = { audiochoice: { alvo: 3, alternativas: [2, 3, 4], resposta: 2, repeticoes: 0, tentativa: 1, primeiraAudicaoConcluida: true } };
-    expect(ownsAuthorialRetry(audiochoice, meta)).toBe(true);
-    expect(ownsAuthorialFeedback(audiochoice, meta)).toBe(true);
-  });
-
-  it("kind sem leitura autoral não sequestra feedback genérico", () => {
-    expect(ownsAuthorialRetry(touchplace)).toBe(false);
-    expect(ownsAuthorialFeedback(audiochoice)).toBe(false);
-  });
-
-  it("não sequestra outras primitivas", () => {
-    const outra: Question = { kind: "plain", prompt: "?", answer: 3 };
-    expect(ownsAuthorialRetry(outra, { touchplace: {} })).toBe(false);
-    expect(ownsAuthorialFeedback(outra, { audiochoice: {} })).toBe(false);
-  });
-});
-''')
-
-          # 3) answerPolicy fica responsável apenas por diagnóstico/evidência.
-          p = Path('src/components/gameloop/answerPolicy.ts')
-          s = p.read_text()
-          old = '''/**
- * F05 §4: o próprio palco possui o ciclo erro → repetir som → tentar de novo.
- * O GameLoop só registra a tentativa; não acrescenta "Ops", não esconde opção
- * e não transforma a terceira tentativa em erro terminal.
- */
-export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
-  return q.kind === "audiochoice" && meta?.audiochoice !== undefined;
-}
-
-/** F05 também possui voz/fecho autorais; o GameLoop não fala por cima. */
-export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
-  return q.kind === "audiochoice" && meta?.audiochoice !== undefined;
-}
-
-'''
-          if s.count(old) != 1:
-              raise SystemExit(f'answerPolicy: bloco autoral esperado 1, achei {s.count(old)}')
-          p.write_text(s.replace(old, ''))
-
-          p = Path('src/components/gameloop/answerPolicy.f05.test.ts')
-          s = p.read_text()
-          old = '''import {
-  evidenciasDaResposta,
-  misconceptionForAnswer,
-  ownsAuthorialFeedback,
-  ownsAuthorialRetry,
-} from "./answerPolicy";'''
-          new = '''import { evidenciasDaResposta, misconceptionForAnswer } from "./answerPolicy";
-import { ownsAuthorialFeedback, ownsAuthorialRetry } from "./authorialStagePolicy";'''
-          if s.count(old) != 1:
-              raise SystemExit(f'answerPolicy.f05.test: import esperado 1, achei {s.count(old)}')
-          p.write_text(s.replace(old, new))
-          PY
-          git add -A
-          git diff --check
-      - name: Fechar merge F05 e remover executor temporário
-        run: |
-          git commit -m 'merge: reconcilia checkpoint N1.06/F05 com F04'
-          git show origin/codex/integrar-bloco-f0:.github/workflows/ci.yml > .github/workflows/ci.yml
-          git add .github/workflows/ci.yml
-          git commit -m 'chore: restaura CI após reconciliação F05'
-          git push origin HEAD:codex/reconciliar-f05-f04
+      # O criador de PR deste ambiente não aceita binários no diff textual.
+      # Falhar aqui é mais barato que descobrir na hora de publicar.
+      - name: Verificar ausência de binários no diff
+        env:
+          PR_BASE: origin/${{ github.base_ref }}
+        run: node AI_Studio_Lab/tools/pr_text_guard.cjs
