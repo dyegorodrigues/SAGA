@@ -1,3 +1,4 @@
+// Divergência temporal F05 fechada e validada no gate visual 31188061774.
 import { describe, expect, it } from "vitest";
 import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
