@@ -4,17 +4,81 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 concurrency:
   group: visual-n106-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  patch-final:
+    if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n106
+      - name: Limpar fronteira autoral F05
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          def rep(path, old, new):
+              p=Path(path); s=p.read_text(); n=s.count(old)
+              if n != 1: raise SystemExit(f'{path}: esperado 1, achei {n}')
+              p.write_text(s.replace(old,new))
+
+          rep('src/components/gameloop/GameLoopExerciseRenderer.tsx',
+              '{hasTutorial(q) && q.kind !== "vertical" && !status && (',
+              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (')
+
+          rep('sonda/cenas.tsx',
+'''      {q.prompt && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''',
+'''      {q.prompt && q.kind !== "audiochoice" && (
+        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''')
+
+          rep('src/curriculum/Composer.ts',
+'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
+}''',
+'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
+  if (valor === spec.alvo) return undefined;
+  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
+  // ⚠️ Divergência declarada F05 §4×§6: como o áudio toca automaticamente
+  // ANTES de as opções aparecerem, estar na primeira posição não prova que a
+  // criança "não escutou". Essa hipótese exige estado temporal e é emitida por
+  // audioChoiceRuntime, nunca por uma Option estática do Composer.
+  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
+  return undefined;
+}''')
+
+          for efemera in ['.github/workflows/n106-cleanup-patch.yml']:
+              Path(efemera).unlink(missing_ok=True)
+          PY
+          git diff --check
+      - name: Commitar patch na branch
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: limpa a tela autoral e o diagnóstico estático F05'
+          git push origin HEAD:codex/corrigir-n106
+
   visual:
     if: github.head_ref == 'codex/corrigir-n106'
+    needs: patch-final
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n106
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -36,7 +100,7 @@ jobs:
         env:
           SONDA_SEMENTES: '1'
         run: npm run sonda -- "N1.06"
-      - name: Capturar todas as cenas N1.06 sem percorrer o catálogo
+      - name: Capturar cenas e estados temporais N1.06
         run: |
           rm -rf /tmp/n106 && mkdir -p /tmp/n106
           node --input-type=module <<'NODE'
@@ -63,6 +127,47 @@ jobs:
             await page.waitForTimeout(1500);
             await page.screenshot({path:`/tmp/n106/${String(k+1).padStart(2,'0')}_${safe(nome)}.png`});
           }
+
+          // Prova temporal da §4 no nível 1: abertura → convite → erro → retry → fecho.
+          const alvoNivel1 = alvos.find(x=>x.nome.includes('ouvir e escolher (nível 1)'));
+          if (!alvoNivel1) throw new Error('cena nível 1 não encontrada');
+          await page.evaluate(idx=>window.sonda.ir(idx), alvoNivel1.i);
+          await page.waitForTimeout(100);
+          await page.screenshot({path:'/tmp/n106/90_F05_ABERTURA_100ms.png'});
+          await page.waitForTimeout(1250);
+          await page.screenshot({path:'/tmp/n106/91_F05_CONVITE_1350ms.png'});
+
+          const opcoes = page.locator('[role="group"][aria-label="Números"] button');
+          const n = await opcoes.count();
+          if (n < 2) throw new Error('opções não apareceram após primeira audição');
+          const labels = [];
+          for (let i=0;i<n;i++) labels.push(Number((await opcoes.nth(i).innerText()).trim()));
+          // Pela cena não conhecemos o alvo diretamente; escolhemos uma opção e,
+          // se virar fecho, reiniciamos e escolhemos outra para obter o estado de erro.
+          await opcoes.first().click();
+          await page.waitForTimeout(120);
+          if (await page.locator('[data-fecho-audiochoice]').count()) {
+            await page.evaluate(idx=>window.sonda.ir(idx), alvoNivel1.i);
+            await page.waitForTimeout(1350);
+            await page.locator('[role="group"][aria-label="Números"] button').nth(1).click();
+            await page.waitForTimeout(120);
+          }
+          if (await page.locator('[data-fecho-audiochoice]').count()) throw new Error('não consegui produzir estado de erro');
+          await page.screenshot({path:'/tmp/n106/92_F05_ERRO_SUAVE.png'});
+          await page.waitForTimeout(1850);
+          await page.screenshot({path:'/tmp/n106/93_F05_RETRY.png'});
+
+          const retry = page.locator('[role="group"][aria-label="Números"] button');
+          let fechou=false;
+          for (let i=0;i<await retry.count();i++) {
+            await retry.nth(i).click();
+            await page.waitForTimeout(100);
+            if (await page.locator('[data-fecho-audiochoice]').count()) { fechou=true; break; }
+            await page.waitForTimeout(1850);
+          }
+          if (!fechou) throw new Error('não consegui produzir fecho correto');
+          await page.screenshot({path:'/tmp/n106/94_F05_FECHO.png'});
+
           await browser.close();
           try { process.kill(-vite.pid,'SIGKILL'); } catch { vite.kill('SIGKILL'); }
           NODE
