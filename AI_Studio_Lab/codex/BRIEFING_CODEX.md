@@ -29,47 +29,31 @@ npm run fichas:conferir && npm run sonda && npx vitest run && npx tsc --noEmit
 ```
 
 Estado esperado hoje: **9/9 · 1170 tomadas sem vazamento · 1908 testes · tsc
-limpo**. Se algo estiver vermelho **antes** de você tocar em qualquer coisa,
+limpo**. O CI da `main` roda ainda `auditar`, `fichas:auditar`, `grafo:check` e
+`build` — rode-os também antes de abrir PR, porque os quatro portões locais não
+os cobrem (foi assim que o invariante de 89 competências escapou). Se algo estiver vermelho **antes** de você tocar em qualquer coisa,
 pare e registre — não conserte às cegas.
 
 ---
 
 ## 1. Branch
 
-**Sim: branch nova, sempre.** De onde ela sai depende de o autor já ter mesclado
-o trabalho anterior. Confira antes de criar:
+**Branch nova, saindo de `main`.** Todo o trabalho anterior já está mesclado
+(PR #24), e a branch que o produziu foi apagada — não procure por ela.
 
 ```bash
 git fetch origin
-git log --oneline origin/main -3
-```
-
-**Caso A — o passo 3 já está em `main`** (você vê ali o commit
-*"Passo 3: a moldura de dez"*). É o caso preferido:
-
-```bash
 git checkout -b codex/<nome-curto-do-trabalho> origin/main
 ```
-
-**Caso B — `main` ainda não recebeu** (o commit não aparece). Saia da branch do
-Claude, que é onde o trabalho está:
-
-```bash
-git checkout -b codex/<nome-curto> origin/claude/install-superpowers-repo-bst25i-hrg5jr
-```
-
-No caso B, quando o autor mesclar aquela branch, traga `main` para a sua antes
-de abrir o PR (`git merge origin/main`) — assim o seu PR mostra só o **seu**
-diff, e não os 23 commits do passo anterior de novo.
-
-**Nunca empurre para `claude/install-superpowers-repo-bst25i-hrg5jr`.** Aquela
-branch é de outro agente e será retomada; dois agentes escrevendo nela produzem
-conflito que ninguém consegue desfazer com segurança.
 
 Um trabalho, uma branch, um PR. Commits pequenos, mensagem dizendo **por quê**,
 não o quê — o diff já diz o quê.
 
----
+⚠️ **Duas branches no remoto NÃO são suas e não podem ser tocadas nem
+apagadas:** `agent/creature-engine-tamagotchi` (35 commits, ~4.000 linhas do
+Creature Lab) e `codex/criar-branch-para-creature-engine-tamagotchi` (3 commits,
+guardas de binário PMD). Nenhuma das duas está na `main`, e são independentes
+entre si. São outro assunto, com outro dono.
 
 ## 2. As cinco regras que não se negociam
 
@@ -176,7 +160,7 @@ observação e estão prontos:
 |----|-------|------------------------------|
 | `AL.01` | F51, separar por atributo | o intruso de múltipla escolha |
 | `N1.06` | F05, ouvir e escolher | o número **escrito** na tela |
-| `N1.13` | F04, produzir quantidade | nada — o nó é novo |
+| `N1.13` | F04, produzir quantidade | nada — o nó é novo (P12) |
 | `GE.01` | F47, onde está? | a resposta em **palavras** |
 | `GE.02` | F48, que forma é essa? | dois emojis, que **não giram** |
 | `GM.01` | F49, maior/menor/mais alto | nada — o nó não tinha gerador |

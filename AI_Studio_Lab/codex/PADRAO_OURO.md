@@ -189,8 +189,11 @@ mudar aquilo — é esse o serviço dele.
 
 - `[...doNivel(1)]` é `["join"]` → é a tabela da ficha, transcrita. Mudou? A
   pedagogia mudou, e isso precisa de decisão humana.
-- 88 competências, 92 fichas → invariante do cânone (Bíblia §15.8). Um 89º nó
-  aparecendo sem passar pelo cânone é exatamente o que se quer barrar.
+- 89 competências, 92 fichas → invariante do cânone (Bíblia §15.8). Um 90º nó
+  aparecendo sem passar pelo cânone é exatamente o que se quer barrar. *(Eram 88
+  até ago/2026: a P12 separou "produzir quantidade" de "contar até 20" — duas
+  competências disputavam a `N1.09`, e o nó novo passou pelo cânone, que é o
+  caminho que esta regra existe para exigir.)*
 - "a resposta certa aparece uma vez" → regra, expressa como número.
 
 **Derive a lista quando ela é um INVENTÁRIO** — algo que cresce com trabalho

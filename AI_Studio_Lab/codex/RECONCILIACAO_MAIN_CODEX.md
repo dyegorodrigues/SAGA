@@ -1,5 +1,12 @@
 # Reconciliação segura entre `main` e Codex
 
+> ## 📁 ATA HISTÓRICA — encerrada em ago/2026
+>
+> Registro de uma reconciliação **concluída**. As branches e PRs citados abaixo
+> (`reconcile/main-codex`, `codex/…-fovec6`, PRs #1 a #3) não existem mais.
+> Mantido como ata: é o registro de como dois históricos que adicionaram os
+> mesmos 16 arquivos foram reconciliados sem perder trabalho.
+
 **Data:** 2 de agosto de 2026
 **Branch:** `reconcile/main-codex`
 
