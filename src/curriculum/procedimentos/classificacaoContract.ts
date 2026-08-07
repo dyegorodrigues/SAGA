@@ -41,7 +41,7 @@ export interface ClassificacaoSpec {
   nivel: number;
   forma: FormaDoNivel;
   enunciado: string;
-  /** O falado é igual ao escrito. */
+  /** O falado é igual ao escrito, salvo a instrução contextual do palco. */
   falado: string;
   pecas: Peca[];
   lacos: LacoSpec[];
@@ -200,6 +200,42 @@ export function criteriosDoNivel(nivel: number, sorteio: () => number): Criterio
   return [criterioDe(atributo, sorteio)];
 }
 
+/**
+ * Escolhe o critério da PRIMEIRA classificação do nível 3 olhando as próprias
+ * peças que a criança vai receber.
+ *
+ * O código anterior sorteava qualquer valor de outro atributo e só guardava o
+ * resultado em `criterioAnterior`. Duas falhas ficavam escondidas:
+ *
+ * 1. a tela nunca executava a primeira classificação — isso é responsabilidade
+ *    do palco e é corrigido lá;
+ * 2. mesmo que executasse, o critério anterior podia classificar **todas** ou
+ *    **nenhuma** das peças, transformando o primeiro ato em mover tudo para um
+ *    único lugar. Isso não prepara reclassificação nenhuma.
+ *
+ * Aqui o primeiro critério precisa ter pelo menos uma peça dentro e uma fora.
+ * Também usa outro atributo, como manda a ideia de "reler o mesmo conjunto".
+ */
+function criterioAnteriorValido(pecas: Peca[], atual: Criterio, sorteio: () => number): Criterio {
+  const candidatos: Criterio[] = (["cor", "forma", "tamanho"] as Atributo[])
+    .filter(a => a !== atual.atributo)
+    .flatMap(atributo => valoresDe(atributo).map(valor => ({ atributo, valor } as Criterio)))
+    .filter(c => {
+      const dentro = pecas.filter(p => satisfaz(p, c)).length;
+      return dentro > 0 && dentro < pecas.length;
+    });
+
+  if (candidatos.length > 0) {
+    return candidatos[Math.floor(sorteio() * candidatos.length) % candidatos.length];
+  }
+
+  // Escape praticamente inalcançável: preserva "outro atributo" mesmo numa
+  // cena patológica. O palco continua funcional; o teste de contrato torna uma
+  // regressão recorrente visível em vez de silenciosa.
+  const outro = (["cor", "forma", "tamanho"] as Atributo[]).find(a => a !== atual.atributo)!;
+  return criterioDe(outro, sorteio);
+}
+
 /* ------------------------------------------------------------------ *
  *  O spec
  * ------------------------------------------------------------------ */
@@ -229,12 +265,12 @@ export function construirClassificacaoSpec(
   };
 
   if (forma === "reclassificar") {
-    // §4: o rótulo muda, as peças são as mesmas. O critério anterior precisa
-    // ser de OUTRO atributo, senão "reclassificar" vira "trocar de cor" e o
-    // degrau não exige reler o conjunto.
-    const outros = (["cor", "forma", "tamanho"] as Atributo[])
-      .filter(a => a !== criterios[0].atributo);
-    base.criterioAnterior = criterioDe(outros[Math.floor(sorteio() * outros.length) % outros.length], sorteio);
+    // A tabela §5 é inequívoca: o nível 3 é "critério mudou — reclassificar as
+    // mesmas peças". A linha cinematográfica da §4 escreve "nível 4+", mas o
+    // próprio nível 4 da tabela é INTERSEÇÃO. Esta implementação segue a escada
+    // explícita §5 e registra a contradição em vez de silenciosamente apagar um
+    // dos dois degraus.
+    base.criterioAnterior = criterioAnteriorValido(pecas, criterios[0], sorteio);
   }
 
   if (forma === "descobrir") {
