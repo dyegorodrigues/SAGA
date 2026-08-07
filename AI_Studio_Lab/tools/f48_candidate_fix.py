@@ -4,8 +4,8 @@ ROOT = Path('.')
 
 # Este script roda DEPOIS de f48_repair_candidate.py, ainda só no workspace do
 # runner. Ele corrige descobertas dos portões antes de qualquer publicação:
-# sintaxe do YAML no teste, discriminação forte F47/F48 e stacking visual dos
-# marcadores de lados em rotações específicas.
+# sintaxe do YAML no teste, discriminação forte F47/F48 e a leitura visual dos
+# lados em rotações específicas.
 
 # 1) Teste do grafo: curriculum/GE.yaml é mapa `GE.02:`, não lista `id: GE.02`.
 p = ROOT / 'src/curriculum/procedimentos/formaProcedure.test.ts'
@@ -54,23 +54,41 @@ if s.count(old) != 1:
 s = s.replace(old, new, 1)
 p.write_text(s, encoding='utf-8')
 
-# 4) Chromium/8 sementes: em certas rotações os números dos lados estavam
-# geometricamente no lugar, mas perdiam o pixel para outro stacking context do
-# desenho/sibling. Os números são a camada didática do beat, portanto ficam
-# explicitamente acima da figura e o botão-alvo sobe acima dos irmãos enquanto
-# os marcadores estão visíveis.
+# 4) Chromium/8 sementes encontrou rótulos de lados cobertos em giros extremos.
+# A primeira tentativa de elevar stacking-context não bastou: o problema era a
+# própria numeração girar junto com a figura. Pedagogicamente, a leitura mais
+# forte é o oposto: A FIGURA gira, mas a CONTAGEM permanece estável. Os badges
+# ficam na periferia segura do contêiner e não rodam; a criança vê 1-2-3/4 em
+# qualquer orientação sem o desenho esconder os números.
 p = ROOT / 'src/components/primitives/FormaStage.tsx'
 s = p.read_text(encoding='utf-8')
-old = 'className="pointer-events-none absolute inset-0"\n      style={{ transform: `rotate(${giro}deg)`, transformOrigin: "center" }}'
-new = 'className="pointer-events-none absolute inset-0 z-30"\n      style={{ transform: `rotate(${giro}deg)`, transformOrigin: "center" }}'
-if s.count(old) != 1:
+old_positions = '''const MARCADORES: Record<Forma, Array<{ left: string; top: string }>> = {\n  circulo: [],\n  triangulo: [\n    { left: "50%", top: "8%" },\n    { left: "18%", top: "70%" },\n    { left: "82%", top: "70%" },\n  ],\n  quadrado: [\n    { left: "50%", top: "9%" },\n    { left: "88%", top: "50%" },\n    { left: "50%", top: "88%" },\n    { left: "12%", top: "50%" },\n  ],\n  retangulo: [\n    { left: "50%", top: "18%" },\n    { left: "88%", top: "50%" },\n    { left: "50%", top: "82%" },\n    { left: "12%", top: "50%" },\n  ],\n};'''
+new_positions = '''const MARCADORES: Record<Forma, Array<{ left: string; top: string }>> = {\n  circulo: [],\n  triangulo: [\n    { left: "50%", top: "6%" },\n    { left: "8%", top: "88%" },\n    { left: "92%", top: "88%" },\n  ],\n  quadrado: [\n    { left: "50%", top: "6%" },\n    { left: "94%", top: "50%" },\n    { left: "50%", top: "94%" },\n    { left: "6%", top: "50%" },\n  ],\n  retangulo: [\n    { left: "50%", top: "6%" },\n    { left: "94%", top: "50%" },\n    { left: "50%", top: "94%" },\n    { left: "6%", top: "50%" },\n  ],\n};'''
+if s.count(old_positions) != 1:
+    raise SystemExit('FormaStage: mapa de marcadores mudou')
+s = s.replace(old_positions, new_positions, 1)
+old_layer = '''      className="pointer-events-none absolute inset-0"\n      style={{ transform: `rotate(${giro}deg)`, transformOrigin: "center" }}'''
+new_layer = '''      className="pointer-events-none absolute inset-0"\n      style={{ zIndex: 60 }}'''
+if s.count(old_layer) != 1:
     raise SystemExit('FormaStage: camada de marcadores mudou')
-s = s.replace(old, new, 1)
-old2 = 'padding: 0,\n                }}'
-new2 = 'padding: 0,\n                  zIndex: mostraLados ? 20 : undefined,\n                }}'
-if s.count(old2) != 1:
+s = s.replace(old_layer, new_layer, 1)
+old_badge = '''          className="absolute flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-blue-600 text-[10px] font-black text-white shadow"\n          style={p}'''
+new_badge = '''          className="absolute flex h-5 w-5 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-white bg-blue-600 text-[10px] font-black text-white shadow"\n          style={{ ...p, zIndex: 70 }}'''
+if s.count(old_badge) != 1:
+    raise SystemExit('FormaStage: badge de marcador mudou')
+s = s.replace(old_badge, new_badge, 1)
+old_style = 'padding: 0,\n                }}'
+new_style = 'padding: 0,\n                  zIndex: mostraLados ? 20 : undefined,\n                }}'
+if s.count(old_style) != 1:
     raise SystemExit('FormaStage: style do botão mudou')
-s = s.replace(old2, new2, 1)
+s = s.replace(old_style, new_style, 1)
+# O parâmetro de giro continua no contrato do componente porque a figura usa o
+# mesmo dado; a camada de números deliberadamente não usa o giro.
+s = s.replace(
+    'function MarcadoresDeLados({ forma, giro }: { forma: Forma; giro: number }) {',
+    'function MarcadoresDeLados({ forma, giro: _giro }: { forma: Forma; giro: number }) {',
+    1,
+)
 p.write_text(s, encoding='utf-8')
 
 print('F48 candidate fixes applied')
