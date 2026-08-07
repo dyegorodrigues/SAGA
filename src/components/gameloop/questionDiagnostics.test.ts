@@ -2,11 +2,12 @@ import { describe, expect, it } from "vitest";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
+  recordQuestionHypothesis,
   summarizeQuestionDiagnostics,
 } from "./questionDiagnostics";
 
 describe("question diagnostics", () => {
-  it("consolidates attempts and recovery without duplicating a misconception", () => {
+  it("consolida tentativas e recuperação sem duplicar hipótese", () => {
     const diagnostics = createQuestionDiagnostics();
     recordQuestionAttempt(diagnostics, false, "off-by-one");
     recordQuestionAttempt(diagnostics, false, "off-by-one");
@@ -19,7 +20,30 @@ describe("question diagnostics", () => {
     });
   });
 
-  it("does not report recovery when the terminal answer is wrong", () => {
+  it("preserva hipótese embutida numa ação terminal correta", () => {
+    const diagnostics = createQuestionDiagnostics();
+    recordQuestionAttempt(diagnostics, true, "nao-monitora-alvo");
+
+    expect(summarizeQuestionDiagnostics(diagnostics, true)).toEqual({
+      attemptCount: 1,
+      recoveredAfterError: false,
+      misconceptionTags: ["nao-monitora-alvo"],
+    });
+  });
+
+  it("hipótese longitudinal não inventa uma nova tentativa", () => {
+    const diagnostics = createQuestionDiagnostics();
+    recordQuestionAttempt(diagnostics, false, "producao-incompleta");
+    recordQuestionHypothesis(diagnostics, "depende-de-andaime");
+
+    expect(summarizeQuestionDiagnostics(diagnostics, false)).toEqual({
+      attemptCount: 1,
+      recoveredAfterError: false,
+      misconceptionTags: ["producao-incompleta", "depende-de-andaime"],
+    });
+  });
+
+  it("não reporta recuperação quando a resposta terminal é errada", () => {
     const diagnostics = createQuestionDiagnostics();
     recordQuestionAttempt(diagnostics, false);
 
@@ -30,7 +54,7 @@ describe("question diagnostics", () => {
     });
   });
 
-  it("keeps distinct misconception hypotheses from the same question", () => {
+  it("mantém hipóteses distintas da mesma questão", () => {
     const diagnostics = createQuestionDiagnostics();
     recordQuestionAttempt(diagnostics, false, "off-by-one");
     recordQuestionAttempt(diagnostics, false, "inverte-coluna");
