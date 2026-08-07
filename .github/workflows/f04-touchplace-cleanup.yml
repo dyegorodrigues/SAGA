@@ -1,0 +1,87 @@
+name: Clean F04 drag warnings
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.head_ref == 'codex/corrigir-n113' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n113
+          fetch-depth: 0
+      - name: Remover setState cruzado e animacao invalida
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/components/primitives/TouchPlace.tsx')
+          s = p.read_text()
+          old = '''  function moverArrasto(e: React.PointerEvent<HTMLButtonElement>) {
+    setArrasto(atual => {
+      if (!atual || atual.pointerId !== e.pointerId) return atual;
+      const distancia = Math.hypot(e.clientX - atual.inicioX, e.clientY - atual.inicioY);
+      const virouArrasto = atual.ativo || distancia >= LIMIAR_DE_ARRASTO;
+      if (virouArrasto && !atual.ativo) {
+        onPegar();
+        suprimirClick.current = true;
+      }
+
+      const r = campo.current?.getBoundingClientRect();
+      if (virouArrasto && r && r.width && r.height) {
+        const p = pontoLogico(r, e.clientX, e.clientY);
+        setHalo(ancoraEmHalo(ancoras, ocupadas, p));
+      } else {
+        setHalo(-1);
+      }
+      return { ...atual, x: e.clientX, y: e.clientY, ativo: virouArrasto };
+    });
+  }'''
+          new = '''  function moverArrasto(e: React.PointerEvent<HTMLButtonElement>) {
+    const atual = arrasto;
+    if (!atual || atual.pointerId !== e.pointerId) return;
+
+    const distancia = Math.hypot(e.clientX - atual.inicioX, e.clientY - atual.inicioY);
+    const virouArrasto = atual.ativo || distancia >= LIMIAR_DE_ARRASTO;
+
+    // Efeitos no Stage ficam FORA do updater de estado deste componente. Chamar
+    // onPegar() dentro de setArrasto(prev => ...) fazia React atualizar o pai
+    // enquanto TouchPlace ainda calculava o próprio estado.
+    if (virouArrasto && !atual.ativo) {
+      onPegar();
+      suprimirClick.current = true;
+    }
+
+    const r = campo.current?.getBoundingClientRect();
+    if (virouArrasto && r && r.width && r.height) {
+      const p = pontoLogico(r, e.clientX, e.clientY);
+      setHalo(ancoraEmHalo(ancoras, ocupadas, p));
+    } else {
+      setHalo(-1);
+    }
+    setArrasto({ ...atual, x: e.clientX, y: e.clientY, ativo: virouArrasto });
+  }'''
+          if s.count(old) != 1:
+              raise SystemExit(f'moverArrasto esperado 1, achei {s.count(old)}')
+          s = s.replace(old, new)
+          old_shadow = 'boxShadow: arrasto?.ativo && !comAndaime ? `0 0 0 5px ${tema.vaga}55` : "none",'
+          new_shadow = 'boxShadow: arrasto?.ativo && !comAndaime ? `0 0 0 5px ${tema.vaga}55` : "0 0 0 0px rgba(0,0,0,0)",'
+          if s.count(old_shadow) != 1:
+              raise SystemExit(f'boxShadow esperado 1, achei {s.count(old_shadow)}')
+          s = s.replace(old_shadow, new_shadow)
+          p.write_text(s)
+          Path('.github/workflows/f04-touchplace-cleanup.yml').unlink()
+          PY
+          git diff --check
+      - name: Commitar limpeza
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: elimina warnings do arrasto F04'
+          git push origin HEAD:codex/corrigir-n113
