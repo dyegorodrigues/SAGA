@@ -38,14 +38,27 @@ const page = await browser.newPage({
 await page.goto(BASE, { waitUntil: "networkidle" });
 await page.waitForFunction(() => window.sonda?.total > 0, { timeout: 30000 });
 
-const total = await page.evaluate(() => window.sonda.total);
+// A página da sonda expõe TODOS os nomes de tomada de uma vez. Filtramos antes
+// de renderizar, porque cada visita custa animação + espera. E o nome inclui a
+// semente: para INSPEÇÃO humana queremos uma imagem por CENA, não oito cópias
+// quase iguais do mesmo estado. A sonda continua medindo todas as sementes; o
+// print é a lupa humana, não o portão estatístico.
+const nomes = await page.evaluate(() => window.sonda.nomes());
+const vistos = new Set();
+const alvos = [];
+for (let i = 0; i < nomes.length; i += 1) {
+  const nomeCompleto = nomes[i];
+  if (filtro && !nomeCompleto.includes(filtro)) continue;
+  const nomeDaCena = nomeCompleto.replace(/ \[semente .*/, "");
+  if (vistos.has(nomeDaCena)) continue;
+  vistos.add(nomeDaCena);
+  alvos.push({ indice: i, nome: nomeDaCena });
+}
+
 const feitos = [];
-for (let i = 0; i < total; i += 1) {
-  await page.evaluate(n => window.sonda.ir(n), i);
+for (const { indice, nome } of alvos) {
+  await page.evaluate(n => window.sonda.ir(n), indice);
   await page.waitForTimeout(320);
-  const nome = await page.evaluate(() => window.sonda.nome());
-  if (filtro && !nome.includes(filtro)) continue;
-  if (feitos.some(f => f.nome === nome)) continue; // uma semente por cena
   const arq = `${OUT}/${nome.replace(/[^\w.]+/g, "_")}.png`;
   await page.screenshot({ path: arq });
   feitos.push({ nome, arq });
