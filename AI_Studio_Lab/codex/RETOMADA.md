@@ -42,7 +42,7 @@ Ver `PADRAO_OURO.md §6.36`.
 
 ```bash
 npm run fichas:conferir   # o que a FICHA manda × o que o app SERVE
-npm run sonda             # tela quebrada que o jsdom não vê (~430 tomadas, ~11 min)
+npm run sonda             # tela quebrada que o jsdom não vê (~1170 tomadas, ~15 min)
 npx vitest run            # o resto
 npx tsc --noEmit          # o Vitest NÃO faz typecheck
 ```
@@ -51,7 +51,9 @@ npx tsc --noEmit          # o Vitest NÃO faz typecheck
 
 ### O laço de trabalho, que NÃO é o portão
 
-A sonda inteira leva onze minutos. Rodá-la a cada conserto transforma o
+A sonda inteira passa de dez minutos, e o número de tomadas **cresce a cada
+competência construída** — 430 quando esta seção foi escrita, 1170 hoje. Rodá-la
+a cada conserto transforma o
 instrumento de medida em gargalo — e foi o que aconteceu construindo a escada
 do `EmojiRow`: três ciclos de print→conserto→print com nove defeitos na mão.
 
