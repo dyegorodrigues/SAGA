@@ -1,0 +1,100 @@
+name: Sync N1.06 prompt boundary
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/corrigir-n106
+          fetch-depth: 0
+      - name: Aplicar fronteira Stage → Renderer → GameLoop → sonda
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def rep(path, old, new):
+              p = Path(path)
+              s = p.read_text()
+              n = s.count(old)
+              if n != 1:
+                  raise SystemExit(f"{path}: esperado 1, achei {n}: {old[:80]!r}")
+              p.write_text(s.replace(old, new))
+
+          # Renderer: transporta apenas o evento temporal. Não conhece a regra
+          # pedagógica além de encaminhar o sinal do palco para a casca.
+          rep(
+              'src/components/gameloop/GameLoopExerciseRenderer.tsx',
+              '  setArmedOpt: (v: any) => void;\n  /**',
+              '  setArmedOpt: (v: any) => void;\n  /** F05: a primeira audição terminou; a casca pode revelar q.prompt. */\n  onFirstAuditionComplete?: () => void;\n  /**',
+          )
+          rep(
+              'src/components/gameloop/GameLoopExerciseRenderer.tsx',
+              '  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt, faseDaCena\n',
+              '  handleOrderTap, orderShake, hiddenOpts, armedOpt, setArmedOpt,\n  onFirstAuditionComplete, faseDaCena\n',
+          )
+          rep(
+              'src/components/gameloop/GameLoopExerciseRenderer.tsx',
+              '            disabled={status !== null}\n            mostrar={typeof tutShow === "object" ? tutShow : null}\n          />\n        )}\n        {/* A moldura serve TRÊS fichas',
+              '            disabled={status !== null}\n            onPrimeiraAudicaoConcluida={onFirstAuditionComplete}\n            mostrar={typeof tutShow === "object" ? tutShow : null}\n          />\n        )}\n        {/* A moldura serve TRÊS fichas',
+          )
+
+          # GameLoop: uma única autoria do enunciado. F05 apenas muda QUANDO a
+          # casca o revela; não muda QUEM é responsável por desenhá-lo.
+          rep(
+              'src/components/GameLoop.tsx',
+              '  const [promptDone, setPromptDone] = useState(!sound);\n',
+              '  const [promptDone, setPromptDone] = useState(!sound);\n  const [audioChoicePromptVisible, setAudioChoicePromptVisible] = useState(false);\n',
+          )
+          rep(
+              'src/components/GameLoop.tsx',
+              '    setJourneyDone(false);\n    stopAulaTimers();\n',
+              '    setJourneyDone(false);\n    setAudioChoicePromptVisible(false);\n    stopAulaTimers();\n',
+          )
+          rep(
+              'src/components/GameLoop.tsx',
+              '        \n      </div>\n\n      {q.kind !== "audiochoice" && q.review && !status && (',
+              '        \n      </div>\n\n      {q.kind === "audiochoice" && audioChoicePromptVisible && !status && (\n        <div\n          data-audiochoice-prompt\n          className="mb-3 flex-shrink-0 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"\n          style={{ borderColor: C.line, color: C.ink, background: C.card, fontFamily: FONT }}\n        >\n          {q.prompt}\n        </div>\n      )}\n\n      {q.kind !== "audiochoice" && q.review && !status && (',
+          )
+          rep(
+              'src/components/GameLoop.tsx',
+              'orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}\n      />',
+              'orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}\n        onFirstAuditionComplete={() => setAudioChoicePromptVisible(true)}\n      />',
+          )
+
+          # Sonda: espelha a mesma casca do app. O q é memoizado para o evento
+          # de revelação não recriar a spec e reiniciar a audição em loop.
+          rep(
+              'sonda/cenas.tsx',
+              '  const q = comSemente(semente, () => Composer.generate(ficha, lvl));\n  return (',
+              '  const q = React.useMemo(\n    () => comSemente(semente, () => Composer.generate(ficha, lvl)),\n    [ficha, lvl, semente],\n  );\n  const [audioPromptVisible, setAudioPromptVisible] = React.useState(false);\n  React.useEffect(() => setAudioPromptVisible(false), [ficha.id, lvl, semente]);\n  return (',
+          )
+          rep(
+              'sonda/cenas.tsx',
+              '{q.prompt && q.kind !== "audiochoice" && (',
+              '{q.prompt && (q.kind !== "audiochoice" || audioPromptVisible) && (',
+          )
+          rep(
+              'sonda/cenas.tsx',
+              '      faseDaCena={fase}\n    />',
+              '      faseDaCena={fase}\n      onFirstAuditionComplete={() => setAudioPromptVisible(true)}\n    />',
+          )
+
+          Path('.github/workflows/n106-prompt-boundary-sync.yml').unlink()
+          PY
+          git diff --check
+      - name: Commitar na branch N1.06
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'refactor: sincroniza enunciado F05 pela casca do GameLoop'
+          git push origin HEAD:codex/corrigir-n106
