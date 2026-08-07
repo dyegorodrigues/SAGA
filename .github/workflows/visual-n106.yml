@@ -12,67 +12,58 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  patch-final:
+  patch-f05:
     if: github.head_ref == 'codex/corrigir-n106' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: codex/corrigir-n106
-      - name: Limpar fronteira autoral F05
+          fetch-depth: 0
+      - name: Aplicar patch e limpar executores antigos
         run: |
           python3 - <<'PY'
           from pathlib import Path
-          def rep(path, old, new):
-              p=Path(path); s=p.read_text(); n=s.count(old)
-              if n != 1: raise SystemExit(f'{path}: esperado 1, achei {n}')
-              p.write_text(s.replace(old,new))
 
-          rep('src/components/gameloop/GameLoopExerciseRenderer.tsx',
+          def replace_once(path, old, new):
+              p = Path(path)
+              s = p.read_text()
+              n = s.count(old)
+              if n != 1:
+                  raise SystemExit(f"{path}: esperado 1, achei {n}: {old[:70]}")
+              p.write_text(s.replace(old, new))
+
+          replace_once(
+              "src/components/gameloop/GameLoopExerciseRenderer.tsx",
               '{hasTutorial(q) && q.kind !== "vertical" && !status && (',
-              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (')
+              '{hasTutorial(q) && q.kind !== "vertical" && q.kind !== "audiochoice" && !status && (',
+          )
 
-          rep('sonda/cenas.tsx',
-'''      {q.prompt && (
-        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''',
-'''      {q.prompt && q.kind !== "audiochoice" && (
-        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"''')
+          replace_once(
+              "sonda/cenas.tsx",
+              '      {q.prompt && (\n        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"',
+              '      {q.prompt && q.kind !== "audiochoice" && (\n        <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"',
+          )
 
-          rep('src/curriculum/Composer.ts',
-'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
-  if (valor === spec.alvo) return undefined;
-  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
-  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;
-  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
-  return undefined;
-}''',
-'''function tagDaEscuta(spec: { alvo: number; alternativas: number[] }, valor: number): string | undefined {
-  if (valor === spec.alvo) return undefined;
-  if (soaParecido(valor, spec.alvo)) return MisconceptionTag.CONFUSAO_FONOLOGICA;
-  // ⚠️ Divergência declarada F05 §4×§6: como o áudio toca automaticamente
-  // ANTES de as opções aparecerem, estar na primeira posição não prova que a
-  // criança "não escutou". Essa hipótese exige estado temporal e é emitida por
-  // audioChoiceRuntime, nunca por uma Option estática do Composer.
-  if (Math.abs(valor - spec.alvo) === 1) return MisconceptionTag.CONFUNDE_VIZINHO;
-  return undefined;
-}''')
-
-          for efemera in ['.github/workflows/n106-cleanup-patch.yml']:
-              Path(efemera).unlink(missing_ok=True)
+          replace_once(
+              "src/curriculum/Composer.ts",
+              '  if (valor === spec.alternativas[0]) return MisconceptionTag.NAO_ESCUTOU;\n',
+              '  // ⚠️ Divergência declarada F05 §4×§6: autoplay termina antes das opções.\n'
+              '  // Primeira posição não prova NAO_ESCUTOU; só o runtime conhece esse tempo.\n',
+          )
+          Path(".github/workflows/n106-cleanup-patch.yml").unlink(missing_ok=True)
           PY
           git diff --check
-      - name: Commitar patch na branch
-        run: |
-          if git diff --quiet; then exit 0; fi
+          git fetch origin main --depth=1
+          git show origin/main:.github/workflows/ci.yml > .github/workflows/ci.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git commit -m 'fix: limpa a tela autoral e o diagnóstico estático F05'
+          git commit -m 'fix: fecha a fronteira autoral F05'
           git push origin HEAD:codex/corrigir-n106
 
   visual:
     if: github.head_ref == 'codex/corrigir-n106'
-    needs: patch-final
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -100,76 +91,92 @@ jobs:
         env:
           SONDA_SEMENTES: '1'
         run: npm run sonda -- "N1.06"
-      - name: Capturar cenas e estados temporais N1.06
+      - name: Capturar cenas e estados temporais
         run: |
           rm -rf /tmp/n106 && mkdir -p /tmp/n106
           node --input-type=module <<'NODE'
           import { spawn } from 'node:child_process';
           import { chromium } from 'playwright-core';
           const porta = 5198;
-          const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], { stdio: ['ignore','pipe','pipe'], detached: true });
-          await new Promise((ok,no) => {
-            const t=setTimeout(()=>no(new Error('vite não subiu')),60000);
-            vite.stdout.on('data',d=>{ if(String(d).includes('ready in')){clearTimeout(t);ok();} });
+          const vite = spawn('npx', ['vite', '--port', String(porta), '--strictPort'], {
+            stdio: ['ignore', 'pipe', 'pipe'], detached: true,
           });
-          const browser = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome', args:['--no-sandbox'] });
-          const page = await browser.newPage({ viewport:{width:390,height:640}, deviceScaleFactor:2 });
-          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`, {waitUntil:'networkidle'});
-          await page.waitForFunction(()=>window.sonda?.total>0);
-          const nomes = await page.evaluate(()=>window.sonda.nomes());
-          const alvos = nomes.map((nome,i)=>({nome,i})).filter(x=>x.nome.includes('N1.06'));
-          console.log('CENAS_N106=' + JSON.stringify(alvos.map(x=>x.nome)));
-          if(!alvos.length) throw new Error('nenhuma cena N1.06 encontrada');
-          const safe = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,90);
-          for (let k=0;k<alvos.length;k++) {
-            const {nome,i}=alvos[k];
-            await page.evaluate(idx=>window.sonda.ir(idx), i);
+          await new Promise((ok, no) => {
+            const t = setTimeout(() => no(new Error('vite não subiu')), 60000);
+            vite.stdout.on('data', d => {
+              if (String(d).includes('ready in')) { clearTimeout(t); ok(); }
+            });
+          });
+          const browser = await chromium.launch({
+            executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
+            args: ['--no-sandbox'],
+          });
+          const page = await browser.newPage({ viewport: { width: 390, height: 640 }, deviceScaleFactor: 2 });
+          await page.goto(`http://localhost:${porta}/sonda/?sementes=1`, { waitUntil: 'networkidle' });
+          await page.waitForFunction(() => window.sonda?.total > 0);
+          const nomes = await page.evaluate(() => window.sonda.nomes());
+          const cenas = nomes.map((nome, i) => ({ nome, i })).filter(x => x.nome.includes('N1.06'));
+          console.log('CENAS_N106=' + JSON.stringify(cenas.map(x => x.nome)));
+          if (!cenas.length) throw new Error('nenhuma cena N1.06 encontrada');
+          const safe = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9_-]+/g, '_').slice(0, 90);
+          for (let k = 0; k < cenas.length; k++) {
+            await page.evaluate(i => window.sonda.ir(i), cenas[k].i);
             await page.waitForTimeout(1500);
-            await page.screenshot({path:`/tmp/n106/${String(k+1).padStart(2,'0')}_${safe(nome)}.png`});
+            await page.screenshot({ path: `/tmp/n106/${String(k + 1).padStart(2, '0')}_${safe(cenas[k].nome)}.png` });
           }
 
-          // Prova temporal da §4 no nível 1: abertura → convite → erro → retry → fecho.
-          const alvoNivel1 = alvos.find(x=>x.nome.includes('ouvir e escolher (nível 1)'));
-          if (!alvoNivel1) throw new Error('cena nível 1 não encontrada');
-          await page.evaluate(idx=>window.sonda.ir(idx), alvoNivel1.i);
+          const nivel1 = cenas.find(x => x.nome.includes('ouvir e escolher (nível 1)'));
+          if (!nivel1) throw new Error('nível 1 não encontrado');
+          await page.evaluate(i => window.sonda.ir(i), nivel1.i);
           await page.waitForTimeout(100);
-          await page.screenshot({path:'/tmp/n106/90_F05_ABERTURA_100ms.png'});
+          await page.screenshot({ path: '/tmp/n106/90_F05_ABERTURA_100ms.png' });
+          if (await page.locator('[data-enunciado-audiochoice]').count()) throw new Error('enunciado apareceu cedo');
+          if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('opções apareceram cedo');
+
           await page.waitForTimeout(1250);
-          await page.screenshot({path:'/tmp/n106/91_F05_CONVITE_1350ms.png'});
+          await page.screenshot({ path: '/tmp/n106/91_F05_CONVITE_1350ms.png' });
+          if (!(await page.locator('[data-enunciado-audiochoice]').count())) throw new Error('enunciado não apareceu após audição');
+          if (!(await page.locator('[role="group"][aria-label="Números"]').count())) throw new Error('opções não apareceram após audição');
+          if (await page.getByText('👉 Como faz? 🫵', { exact: true }).count()) throw new Error('controle genérico invadiu a F05');
 
-          const opcoes = page.locator('[role="group"][aria-label="Números"] button');
-          const n = await opcoes.count();
-          if (n < 2) throw new Error('opções não apareceram após primeira audição');
-          const labels = [];
-          for (let i=0;i<n;i++) labels.push(Number((await opcoes.nth(i).innerText()).trim()));
-          // Pela cena não conhecemos o alvo diretamente; escolhemos uma opção e,
-          // se virar fecho, reiniciamos e escolhemos outra para obter o estado de erro.
-          await opcoes.first().click();
-          await page.waitForTimeout(120);
-          if (await page.locator('[data-fecho-audiochoice]').count()) {
-            await page.evaluate(idx=>window.sonda.ir(idx), alvoNivel1.i);
-            await page.waitForTimeout(1350);
-            await page.locator('[role="group"][aria-label="Números"] button').nth(1).click();
-            await page.waitForTimeout(120);
+          async function produzirErro() {
+            const opcoes = page.locator('[role="group"][aria-label="Números"] button');
+            const total = await opcoes.count();
+            for (let i = 0; i < total; i++) {
+              await opcoes.nth(i).click();
+              await page.waitForTimeout(120);
+              if (!(await page.locator('[data-fecho-audiochoice]').count())) return true;
+              await page.evaluate(idx => window.sonda.ir(idx), nivel1.i);
+              await page.waitForTimeout(1350);
+            }
+            return false;
           }
-          if (await page.locator('[data-fecho-audiochoice]').count()) throw new Error('não consegui produzir estado de erro');
-          await page.screenshot({path:'/tmp/n106/92_F05_ERRO_SUAVE.png'});
-          await page.waitForTimeout(1850);
-          await page.screenshot({path:'/tmp/n106/93_F05_RETRY.png'});
+          if (!(await produzirErro())) throw new Error('não consegui produzir erro suave');
+          await page.screenshot({ path: '/tmp/n106/92_F05_ERRO_SUAVE.png' });
+          if ((await page.locator('[data-fecho-audiochoice]').count())) throw new Error('erro revelou o fecho');
+          if ((await page.locator('button[aria-label="Escutar o número"]:disabled').count())) throw new Error('erro travou o replay');
 
-          const retry = page.locator('[role="group"][aria-label="Números"] button');
-          let fechou=false;
-          for (let i=0;i<await retry.count();i++) {
-            await retry.nth(i).click();
-            await page.waitForTimeout(100);
-            if (await page.locator('[data-fecho-audiochoice]').count()) { fechou=true; break; }
-            await page.waitForTimeout(1850);
+          await page.waitForTimeout(1850);
+          await page.screenshot({ path: '/tmp/n106/93_F05_RETRY.png' });
+          let fechou = false;
+          for (let tentativa = 0; tentativa < 4 && !fechou; tentativa++) {
+            const opts = page.locator('[role="group"][aria-label="Números"] button');
+            const total = await opts.count();
+            for (let i = 0; i < total && !fechou; i++) {
+              if (await opts.nth(i).isDisabled()) continue;
+              await opts.nth(i).click();
+              await page.waitForTimeout(120);
+              fechou = (await page.locator('[data-fecho-audiochoice]').count()) > 0;
+              if (!fechou) await page.waitForTimeout(1850);
+            }
           }
           if (!fechou) throw new Error('não consegui produzir fecho correto');
-          await page.screenshot({path:'/tmp/n106/94_F05_FECHO.png'});
+          await page.screenshot({ path: '/tmp/n106/94_F05_FECHO.png' });
+          if (await page.locator('[data-enunciado-audiochoice]').count()) throw new Error('fecho manteve enunciado');
+          if (await page.locator('[role="group"][aria-label="Números"]').count()) throw new Error('fecho manteve opções');
 
           await browser.close();
-          try { process.kill(-vite.pid,'SIGKILL'); } catch { vite.kill('SIGKILL'); }
+          try { process.kill(-vite.pid, 'SIGKILL'); } catch { vite.kill('SIGKILL'); }
           NODE
       - name: Folha de contato
         run: |
@@ -177,16 +184,20 @@ jobs:
           python3 - <<'PY'
           from PIL import Image, ImageDraw
           from pathlib import Path
-          files=sorted(Path('/tmp/n106').glob('*.png'))
-          tw,th,label=195,320,30
-          cols=2; rows=(len(files)+1)//2
-          out=Image.new('RGB',(cols*tw,rows*(th+label)),'white'); d=ImageDraw.Draw(out)
-          for i,p in enumerate(files):
-            im=Image.open(p).convert('RGB'); im.thumbnail((tw,th))
-            x=(i%2)*tw; y=(i//2)*(th+label)
-            out.paste(im,(x+(tw-im.width)//2,y+(th-im.height)//2))
-            d.text((x+3,y+th+3),p.stem[:42],fill='black')
-          out.save('/tmp/n106/contact-sheet.jpg',quality=82)
+          files = sorted(Path('/tmp/n106').glob('*.png'))
+          tw, th, label = 195, 320, 30
+          cols = 2
+          rows = (len(files) + 1) // 2
+          out = Image.new('RGB', (cols * tw, rows * (th + label)), 'white')
+          draw = ImageDraw.Draw(out)
+          for i, p in enumerate(files):
+              im = Image.open(p).convert('RGB')
+              im.thumbnail((tw, th))
+              x = (i % 2) * tw
+              y = (i // 2) * (th + label)
+              out.paste(im, (x + (tw - im.width) // 2, y + (th - im.height) // 2))
+              draw.text((x + 3, y + th + 3), p.stem[:42], fill='black')
+          out.save('/tmp/n106/contact-sheet.jpg', quality=82)
           PY
       - uses: actions/upload-artifact@v4
         with:
