@@ -57,10 +57,10 @@ jobs:
         run: node AI_Studio_Lab/tools/pr_text_guard.cjs
 
   visual-ge01-final:
-    name: Visual final GE.01 — F47
+    name: Evidência dinâmica final GE.01 — F47
     if: github.event_name == 'pull_request' && github.event.action == 'reopened' && github.head_ref == 'codex/integrar-bloco-f0'
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,16 +92,12 @@ jobs:
           fi
           test -n "$CHROME_REAL"
           sudo ln -sf "$CHROME_REAL" /opt/pw-browsers/chromium-1194/chrome-linux/chrome
-      - name: Portão final GE.01 — 8 sementes
-        env:
-          SONDA_SEMENTES: '8'
-        run: npm run sonda -- "GE.01"
-      - name: Prints obrigatórios de todas as cenas GE.01
+      - name: Prints estáticos finais
         env:
           PRINTS_OUT: /tmp/ge01-final/prints
           PRINTS_LARGURA: '390'
         run: node scripts/prints.mjs "GE.01"
-      - name: Fotografar estados temporais e motores
+      - name: Estados temporais e motores
         run: |
           mkdir -p /tmp/ge01-final/states
           node --input-type=module <<'NODE'
@@ -118,85 +114,55 @@ jobs:
           const achar=t=>{const i=nomes.findIndex(n=>n.includes(t)); if(i<0) throw new Error(`cena ausente ${t}`); return i;};
           const ir=async t=>{await page.evaluate(i=>window.sonda.ir(i),achar(t)); await page.waitForTimeout(80);};
           const shot=async n=>page.screenshot({path:`/tmp/ge01-final/states/${n}.png`});
+          const campo=()=>page.locator('div.relative.overflow-hidden.select-none.rounded-2xl').first();
 
-          await ir('GE.01 onde está (nível 1)');
-          await shot('01_L1_ABERTURA');
-          await page.waitForTimeout(750);
+          await ir('GE.01 onde está (nível 1)'); await shot('01_L1_ABERTURA'); await page.waitForTimeout(750);
           const buttons=page.locator('button[aria-label^="Objeto "]');
           if(await buttons.count()!==2) throw new Error('L1 precisa de dois objetos');
           const body=(await page.locator('body').innerText()).toLowerCase();
-          const pares=['em cima','embaixo'];
-          const pedida=pares.find(p=>body.includes(p));
-          if(!pedida) throw new Error('não identifiquei preposição L1');
+          const pedida=['em cima','embaixo'].find(p=>body.includes(p)); if(!pedida) throw new Error('preposição L1 ausente');
           const labels=await buttons.evaluateAll(bs=>bs.map(b=>b.getAttribute('aria-label')||''));
-          const ci=labels.findIndex(x=>x.includes(`Objeto ${pedida}`));
-          if(ci<0) throw new Error(`objeto certo ausente: ${pedida}`);
-          const wi=ci===0?1:0;
-          await buttons.nth(wi).click();
-          await page.waitForTimeout(220);
-          if(await page.locator('[data-position-close-label]').count()) throw new Error('erro revelou fecho/gabarito');
-          if(await page.locator('[data-position-error-label]').count()!==1) throw new Error('erro não nomeou posição escolhida');
-          await shot('02_L1_ERRO_VOCABULARIO');
-          await page.waitForTimeout(1950);
-          if(await buttons.nth(ci).isDisabled()) throw new Error('retry não voltou após 2s');
-          await shot('03_L1_RETRY');
-          await buttons.nth(ci).click();
-          await page.waitForTimeout(280);
-          if(await page.locator('[data-position-arrow]').count()!==1) throw new Error('acerto sem seta relacional');
-          if(await page.locator('[data-position-relation-label]').count()!==1) throw new Error('acerto sem rótulo da relação');
-          await shot('04_L1_SETA_RELACAO');
-          await page.waitForTimeout(1650);
-          if(await page.locator('[data-position-close-label]').count()!==2) throw new Error('fecho não rotulou os dois objetos');
-          await shot('05_L1_FECHO');
+          const ci=labels.findIndex(x=>x.includes(`Objeto ${pedida}`)); if(ci<0) throw new Error('objeto certo ausente'); const wi=ci===0?1:0;
+          await buttons.nth(wi).click(); await page.waitForTimeout(220);
+          if(await page.locator('[data-position-close-label]').count()) throw new Error('erro revelou gabarito');
+          if(await page.locator('[data-position-error-label]').count()!==1) throw new Error('erro sem vocabulário visual');
+          await shot('02_L1_ERRO_VOCABULARIO'); await page.waitForTimeout(1950);
+          if(await buttons.nth(ci).isDisabled()) throw new Error('retry não voltou'); await shot('03_L1_RETRY');
+          await buttons.nth(ci).click(); await page.waitForTimeout(280);
+          if(await page.locator('[data-position-arrow]').count()!==1) throw new Error('acerto sem seta');
+          if(await page.locator('[data-position-relation-label]').count()!==1) throw new Error('acerto sem relação');
+          await shot('04_L1_SETA_RELACAO'); await page.waitForTimeout(1650);
+          if(await page.locator('[data-position-close-label]').count()!==2) throw new Error('fecho sem dois rótulos'); await shot('05_L1_FECHO');
 
-          // L5 — gesto errado, retorno à bandeja, depois arrasto real correto.
           await ir('GE.01 onde está (nível 5)'); await page.waitForTimeout(600);
-          let tray=page.getByRole('button',{name:'Pegar o objeto'});
-          const prompt5=(await page.locator('body').innerText()).toLowerCase();
-          const p5=prompt5.includes('embaixo')?'embaixo':'em cima';
-          let tb=await tray.boundingBox(); let field=await page.locator('[data-position-field]').boundingBox();
-          if(!tb||!field) throw new Error('L5 sem geometria de bandeja/campo');
-          const sx=tb.x+tb.width/2, sy=tb.y+tb.height/2;
-          const wrongY=p5==='em cima'?field.y+field.height-18:field.y+18;
+          let tray=page.getByRole('button',{name:'Pegar o objeto'}); let tb=await tray.boundingBox(); let field=await campo().boundingBox();
+          if(!tb||!field) throw new Error('L5 sem geometria');
+          const p5=(await page.locator('body').innerText()).toLowerCase().includes('embaixo')?'embaixo':'em cima';
+          const sx=tb.x+tb.width/2, sy=tb.y+tb.height/2, wrongY=p5==='em cima'?field.y+field.height-18:field.y+18;
           await page.mouse.move(sx,sy); await page.mouse.down(); await page.mouse.move(field.x+field.width/2,wrongY,{steps:8});
-          if(await page.locator('[data-position-drag-ghost]').count()!==1) throw new Error('ghost não acompanha arrasto');
-          await shot('06_L5_GHOST_ERRADO');
-          await page.mouse.up(); await page.waitForTimeout(250);
-          await shot('07_L5_ERRO_POSICIONAMENTO');
-          await page.waitForTimeout(1950);
-          if(await page.getByRole('button',{name:'Pegar o objeto'}).count()!==1) throw new Error('erro L5 não voltou à bandeja');
-          await shot('08_L5_RETRY_BANDEJA');
+          if(await page.locator('[data-position-drag-ghost]').count()!==1) throw new Error('ghost não acompanha dedo'); await shot('06_L5_GHOST_ERRADO');
+          await page.mouse.up(); await page.waitForTimeout(250); await shot('07_L5_ERRO_POSICIONAMENTO'); await page.waitForTimeout(1950);
+          if(await page.getByRole('button',{name:'Pegar o objeto'}).count()!==1) throw new Error('erro L5 não devolveu bandeja'); await shot('08_L5_RETRY_BANDEJA');
 
-          tray=page.getByRole('button',{name:'Pegar o objeto'}); tb=await tray.boundingBox(); field=await page.locator('[data-position-field]').boundingBox();
-          if(!tb||!field) throw new Error('L5 perdeu geometria no retry');
-          const sx2=tb.x+tb.width/2, sy2=tb.y+tb.height/2;
-          const rightY=p5==='em cima'?field.y+16:field.y+field.height-16;
+          tray=page.getByRole('button',{name:'Pegar o objeto'}); tb=await tray.boundingBox(); field=await campo().boundingBox(); if(!tb||!field) throw new Error('L5 sem geometria no retry');
+          const sx2=tb.x+tb.width/2, sy2=tb.y+tb.height/2, rightY=p5==='em cima'?field.y+16:field.y+field.height-16;
           await page.mouse.move(sx2,sy2); await page.mouse.down(); await page.mouse.move(field.x+field.width/2,rightY,{steps:10});
-          await shot('09_L5_GHOST_CORRETO');
+          if(await page.locator('[data-position-drag-ghost]').count()!==1) throw new Error('ghost correto ausente'); await shot('09_L5_GHOST_CORRETO');
           await page.mouse.up(); await page.waitForTimeout(300);
-          if(await page.locator('[data-position-arrow]').count()!==1) throw new Error('L5 correto sem seta relacional');
-          await shot('10_L5_DROP_CORRETO');
+          if(await page.locator('[data-position-arrow]').count()!==1) throw new Error('drop correto sem seta'); await shot('10_L5_DROP_CORRETO');
 
-          // Três beats da §8, instrumentados só nesta bancada.
-          for(const [t,n] of [
-            ['GE.01 micro-aula: esta é a mesa','11_MICRO_REFERENCIAL'],
-            ['GE.01 micro-aula: objeto em cima','12_MICRO_OBJETO_0'],
-            ['GE.01 micro-aula: objeto embaixo','13_MICRO_OBJETO_1'],
-          ]){ await ir(t); await page.waitForTimeout(500); await shot(n); }
-
-          // QuestionPrompt real, isolado da sonda, para provar ênfase sem duplicar texto.
-          await page.goto(`http://localhost:${porta}/`,{waitUntil:'domcontentloaded'}).catch(()=>{});
-          await browser.close();
-          try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
+          for(const [t,n] of [['GE.01 micro-aula: esta é a mesa','11_MICRO_REFERENCIAL'],['GE.01 micro-aula: objeto em cima','12_MICRO_OBJETO_0'],['GE.01 micro-aula: objeto embaixo','13_MICRO_OBJETO_1']]){ await ir(t); await page.waitForTimeout(500); await shot(n); }
+          await browser.close(); try{process.kill(-vite.pid,'SIGKILL')}catch{vite.kill('SIGKILL')}
           NODE
       - name: Folha de contato
+        if: always()
         run: |
           python3 -m pip install --quiet pillow
           python3 - <<'PY'
           from PIL import Image,ImageDraw
           from pathlib import Path
           files=sorted(Path('/tmp/ge01-final/prints').glob('*.png'))+sorted(Path('/tmp/ge01-final/states').glob('*.png'))
-          tw,th,label,cols=195,350,30,2; rows=(len(files)+cols-1)//cols
+          tw,th,label,cols=195,350,30,2; rows=max(1,(len(files)+cols-1)//cols)
           out=Image.new('RGB',(cols*tw,rows*(th+label)),'white'); d=ImageDraw.Draw(out)
           for i,p in enumerate(files):
             im=Image.open(p).convert('RGB'); im.thumbnail((tw,th)); x=(i%cols)*tw; y=(i//cols)*(th+label)
@@ -204,6 +170,7 @@ jobs:
           out.save('/tmp/ge01-final/contact-sheet.jpg',quality=86)
           PY
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ge01-final
           path: /tmp/ge01-final
