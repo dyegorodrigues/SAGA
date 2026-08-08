@@ -144,3 +144,15 @@ node_modules/body-parser
     express@"^4.21.2" from the root project
 ```
 
+
+
+## Remediação mínima validada
+
+Nenhuma range declarada em `package.json` precisou mudar. O lockfile foi atualizado dentro das ranges existentes.
+
+- `js-yaml` → `5.2.3`;
+- `nanoid` → `3.3.18`;
+- `postcss` → `8.5.26`;
+- `body-parser` → `1.20.6`;
+
+Após reinstalação limpa com `npm ci`, `npm audit --audit-level=low` e `npm audit --omit=dev --audit-level=low` retornaram zero vulnerabilidades. A mesma árvore atravessou TypeScript, suíte completa e build antes da publicação.
