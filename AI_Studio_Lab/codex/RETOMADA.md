@@ -1,69 +1,82 @@
 # Retomada — comece por aqui
 
-> **VIGENTE a partir de 8/ago/2026, pós-P20.**  
-> A conversa pode desaparecer; o repositório não.
+> **VIGENTE em 8/ago/2026 — P21.A concluída.**
 
-## 1. Não comece pelo histórico
+## 1. Leia só isto antes de editar
 
-A primeira leitura de qualquer sessão nova é:
+1. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
+2. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
+3. [`MAPA_MESTRE_POS_P20.md`](./MAPA_MESTRE_POS_P20.md) para a estratégia das fases grandes.
 
-1. [`MAPA_MESTRE_POS_P20.md`](./MAPA_MESTRE_POS_P20.md)
-2. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
-3. [`BRIEFING_CODEX.md`](./BRIEFING_CODEX.md)
-
-`ROTEIRO_ATE_O_FIM.md` e `PLANO_DO_BLOCO_F0.md` preservam análise histórica importante, mas vários números, canários e “próximos passos” foram superados por P17/P8/P19/P20. **Não executar a fila antiga sem recalcular o runtime.**
+Os roadmaps de 5/ago são **históricos**. Não use contagens ou “próximo passo” deles como fila atual.
 
 ## 2. Git
 
 - repo: `dyegorodrigues/SAGA`;
-- branch única desta linha: `codex/integrar-bloco-f0`;
+- branch desta linha: `codex/integrar-bloco-f0`;
 - `main` protegida: `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
 - PR #29: draft/no-merge;
-- Creature Engine: fora deste fluxo;
-- nenhuma branch auxiliar;
-- workflow/script temporário precisa se apagar.
+- Creature Engine: não tocar;
+- não criar branch auxiliar;
+- bancada temporária se apaga no próprio lote.
 
-## 3. Estado fechado
+## 3. Blocos já fechados
 
-- **P17:** N1.10/N1.11 e ponte perceptual→simbólica;
-- **P8:** Jardim real, automático e separado da Jornada;
-- **P18:** KindType autoral sem promessa falsa;
-- **P19:** migrador único + npm audit zerado;
-- **P20:** save local/sync isolados por Firebase UID.
+- P17 — N1.10/N1.11 e ponte perceptual→simbólica;
+- P8 — Jardim real e automaticidade separada da Jornada;
+- P18 — `KindType` sem promessa autoral falsa;
+- P19 — migrador único + dependências auditadas/zeradas;
+- P20 — identidade do save local/cloud por Firebase UID.
 
-Detalhes estão nas decisões `DECISAO_P*.md`.
+Não reabrir sem falha objetiva.
 
-## 4. Próxima tarefa
+## 4. P21.A — inventário já executado
 
-> **P21 — reconciliar as fontes de verdade e recalcular o backlog atual.**
+Relatório:
 
-Não construir outro bloco curricular antes disso.
+`AUDITORIA_P21_FONTES_DE_VERDADE.md`
 
-P21 deve recalcular, do código:
+Achados derivados do runtime:
 
-- número real de competências;
-- ficha autoral por nó;
-- active / registered / legacy / fallback;
-- catálogo de primitivas executáveis;
-- divergências ficha×runtime;
-- dívida confirmada versus histórica já fechada.
+- grafo: **90/90** YAML↔JSON;
+- cânone Markdown: **92 fichas / 88 competências em 90**;
+- sem ficha Markdown: **N1.09, GM.02**;
+- fichas TS de Jornada: **29**;
+- registradas no Composer: **24**;
+- canários ativos: **22**;
+- registradas/inativas: **N4.09, GM.12**;
+- `JOURNEY_FICHAS` administrativo está atrás do disco e deixa 10 fichas fora;
+- `ficha_catalog_auditor` ainda usa expectativa histórica de 88 e não falha pela cobertura faltante;
+- mapa de primitivas também contém classificações que precisam ser reconciliadas com builders/Stages atuais.
 
-Depois atualizar o `MAPA_MESTRE_POS_P20.md` com os números atuais e marcar os roadmaps históricos como superados onde necessário.
+## 5. PRÓXIMA TAREFA EXATA — P21.1
 
-## 5. Depois da P21
+**Corrigir governança, não pedagogia ainda.**
 
-Ordem deliberada:
+1. sincronizar `AllFichas/JOURNEY_FICHAS` com as 29 fichas TS existentes;
+2. adicionar teste disco↔registry;
+3. tornar a cobertura do auditor derivada do grafo;
+4. manter N1.09/GM.02 como lacunas explícitas temporárias — nunca silenciosas;
+5. separar no auditor: legacy / Composer registrado / Composer ativo / fallback real;
+6. limpar comentários antigos de N1.10/N1.11 no `composerCanary.ts`;
+7. depois fazer P21.2: reconciliar `FICHA_RUNTIME_MAP` com builder→kind→renderer real.
 
-1. revalidar N4.09, GM.12, JD4 e antiga dívida de coreografia;
-2. auditoria dos **motores adaptativos/meta-algoritmos**;
-3. correções dos motores;
-4. **mega auditoria de engenharia pedagógica** — grafo, fichas, primitivas e trajetória completa da criança;
-5. auditoria integrada do Dojo (JD/FD/PD);
-6. release hardening técnico/pedagógico/visual.
+Documento de decisão:
 
-O roteiro detalhado está no mapa mestre.
+`DECISAO_P21_FONTES_DE_VERDADE.md`
 
-## 6. Portões
+## 6. Depois de P21
+
+- P22: decidir pedagogicamente N1.09, GM.02, JD4, N4.09 e GM.12;
+- auditoria longitudinal dos motores adaptativos/meta-algoritmos;
+- correções dos motores;
+- mega auditoria de engenharia pedagógica;
+- auditoria integrada JD/FD/PD;
+- release hardening.
+
+Detalhes: `MAPA_MESTRE_POS_P20.md`.
+
+## 7. Portões
 
 ```bash
 npm run auditar
@@ -77,10 +90,4 @@ npm run pr:check
 git diff --check
 ```
 
-Tela alterada também exige sonda e prints reais.
-
-## 7. Regra que vale acima de todas
-
-> **Existir não é estar certo.**
-
-Teste verde não prova pedagogia. Ficha boa não prova que o motor a serve na hora certa. Tela bonita não prova que a criança já conhece a linguagem visual. Documento antigo não vence runtime atual.
+> **Existir não é estar certo. Ausência explícita pode ser dívida; ausência silenciosa é falha de governança.**
