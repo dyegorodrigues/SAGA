@@ -12,6 +12,13 @@ def replace_once(path: str, old: str, new: str) -> None:
 
 # 1) NumberBond: a resposta e numerica e vive nos botoes externos. O circulo
 #    com '?' NAO pode anunciar clique se clicar nele nao responde a questao.
+#    O componente ja aceita interactivePart opcional; o contrato do Composer
+#    estava mais estreito que a propria UI e e alinhado aqui.
+replace_once(
+    "src/curriculum/fichaQuestionContract.ts",
+    '  | { whole: number | "?"; part1: number | "?"; part2: number | "?"; interactivePart: "whole" | "part1" | "part2" }\n',
+    '  | { whole: number | "?"; part1: number | "?"; part2: number | "?"; interactivePart?: "whole" | "part1" | "part2" }\n',
+)
 replace_once(
     "src/curriculum/Composer.ts",
     "uiProps = { whole: '?', part1, part2, interactivePart: 'whole' };",
