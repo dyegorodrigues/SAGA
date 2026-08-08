@@ -12,8 +12,6 @@ def replace_once(path: str, old: str, new: str) -> None:
 
 
 if "--post" not in sys.argv:
-    # O p17_apply original foi escrito antes de vermos o comentário multilinha
-    # real. Troca a âncora pela propriedade e preserva o comentário da JD3.
     p = Path("AI_Studio_Lab/tools/p17_apply.py")
     s = p.read_text()
     old_anchor = "    '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\\n',"
@@ -36,9 +34,6 @@ if "--post" not in sys.argv:
     print("fixups pre-patch preparados")
     raise SystemExit(0)
 
-# A partir daqui só existem ajustes pós-patch.
-# A F28 tem diagnóstico semântico próprio nos builders; não deixar o catálogo
-# genérico n+/-1 recategorizar REPETE_A_PARTE/RESPONDE_O_TODO.
 replace_once(
     "src/curriculum/fichas/jornada/N1.11.ts",
     '''  distratores: [
@@ -48,8 +43,6 @@ replace_once(
     "  distratores: [],",
 )
 
-# Retenção multidimensional: a segunda sessão amadurece como a primeira;
-# uma única questão dois dias depois não pode satisfazer 3/3.
 replace_once(
     "src/curriculum/motores/progressEngine.test.ts",
     '''    const retained = applyJourneyAnswer(current, true, false, {
@@ -84,5 +77,13 @@ replace_once(
     expect(retained.progress.dom).toBe(true);
     expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
     expect(retained.transition).toEqual({ type: "multidimensional-crown" });''',
+)
+
+# Diagnóstico temporário do único teste ainda vermelho. A mensagem de asserção
+# imprime as opções concretas da amostra que perdeu a tag.
+replace_once(
+    "src/curriculum/fichas/jornada/parteTodoProgressao.test.ts",
+    '''      expect(tags.has(MisconceptionTag.RESPONDE_O_TODO)).toBe(true);''',
+    '''      expect(tags.has(MisconceptionTag.RESPONDE_O_TODO), JSON.stringify(q.options)).toBe(true);''',
 )
 print("fixups pós-patch aplicados")
