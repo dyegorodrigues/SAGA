@@ -823,10 +823,6 @@ export default function App() {
             onMixed={() => {
             setScreen({ name: "game", kid: screen.kid, track: "mista" });
           }}
-          onDojo={() => {
-            setScreen({ name: "game", kid: screen.kid, track: "dojo" });
-          }}
-
             onAula={() => setScreen({ name: "game", kid: screen.kid, track: "aula" })}
             onRescue={(rescue) => setScreen({
               name: "game",
@@ -838,7 +834,6 @@ export default function App() {
               } : undefined,
             })}
             onMatricula={() => setScreen({ name: "game", kid: screen.kid, track: "matricula" })}
-            mixedDoneToday={kidById(screen.kid!).lastMixedDay === localDay()}
             tracks={getTracksForKid(kidById(screen.kid!))}
             onUpdateKid={(updatedKid, coinsToSpend = 0) => {
               const kidId = screen.kid!;
