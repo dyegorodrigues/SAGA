@@ -91,6 +91,7 @@ jobs:
           npx tsc --noEmit
           npx vitest run src/curriculum/procedimentos/medidasProcedure.test.ts src/curriculum/procedimentos/medidasContract.test.ts src/curriculum/evidenciaDaFicha.test.ts src/curriculum/conformidadeDeFichas.test.ts src/curriculum/fichaRuntimeMap.test.ts
           npm test -- --run
+          npx playwright install --with-deps chromium
           npm run sonda -- "GM.12"
           npm run build
 
