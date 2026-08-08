@@ -7,6 +7,7 @@
  *
  * Uso:
  *   node scripts/prints.mjs "N1.04"
+ *   PRINTS_WAIT_MS=2500 node scripts/prints.mjs "GE.01"
  *   PRINTS_CLICK='[data-recipientes-verify]' PRINTS_SUFFIX='_verificado' \
  *     node scripts/prints.mjs "GM.12 F50 massa/capacidade (nível 3)"
  */
@@ -18,6 +19,7 @@ const PORTA = 5198;
 const BASE = `http://localhost:${PORTA}/sonda/`;
 const OUT = process.env.PRINTS_OUT ?? "/tmp/prints";
 const filtro = process.argv[2] ?? "";
+const WAIT_MS = Number(process.env.PRINTS_WAIT_MS ?? 320);
 const CLICK_SELECTOR = process.env.PRINTS_CLICK ?? "";
 const CLICK_WAIT_MS = Number(process.env.PRINTS_CLICK_WAIT_MS ?? 1100);
 const SUFFIX = process.env.PRINTS_SUFFIX ?? (CLICK_SELECTOR ? "_apos_interacao" : "");
@@ -70,7 +72,12 @@ for (let i = 0; i < nomes.length; i += 1) {
 const feitos = [];
 for (const { indice, nome } of alvos) {
   await page.evaluate(n => window.sonda.ir(n), indice);
-  await page.waitForTimeout(320);
+
+  // Algumas cenas têm abertura temporal/autoplay. Fotografar sempre em 320 ms
+  // fez N1.06, GE.01 e GM.01 parecerem incompletas quando, na verdade, estavam
+  // no meio da coreografia. O wait configurável permite inspecionar o ESTADO
+  // que a criança realmente recebe depois da abertura sem mudar a sonda.
+  await page.waitForTimeout(WAIT_MS);
 
   // Estados intermediários eram um ponto cego do QA: a tela inicial podia estar
   // impecável e o feedback que ENSINA ficar quebrado. A opção é genérica para
