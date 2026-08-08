@@ -1,0 +1,77 @@
+name: Fix AL01 evidence v2
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  fix:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Reaplicar evidência e atualizar o contrato da §9
+        run: |
+          git show ecb8106ba8654fab872ebfe3e713417a9ca54ff3:.github/workflows/fix-al01-evidence.yml > /tmp/al01-source.yml
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import YAML from 'yaml';
+          const source = YAML.parse(fs.readFileSync('/tmp/al01-source.yml', 'utf8'));
+          const step = source.jobs.fix.steps.find(s => s.name === 'Ligar a prova do não pertence ponta a ponta');
+          if (!step?.run) throw new Error('script AL.01 original não encontrado');
+          fs.writeFileSync('/tmp/al01-evidence.sh', step.run, { mode: 0o700 });
+          NODE
+          bash /tmp/al01-evidence.sh
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/curriculum/procedimentos/classificacaoProcedure.test.ts')
+          s = p.read_text(encoding='utf-8')
+          old = '''  it("3 de 3 em 2 sessões, em toda micro", () => {\n    for (const m of AL_01.micros) {\n      expect(m.dominio, m.id).toEqual({ acertos: 3, de: 3, sessoes: 2 });\n    }\n  });'''
+          new = '''  it("3 de 3 em 2 sessões, com prova do NÃO PERTENCE em toda micro", () => {\n    for (const m of AL_01.micros) {\n      expect(m.dominio, m.id).toMatchObject({ acertos: 3, de: 3, sessoes: 2 });\n      expect(m.dominio.exige, m.id).toEqual({\n        evidencia: Evidencia.NAO_PERTENCE,\n        descricao: "Deixar corretamente fora pelo menos uma peça que não pertence ao grupo.",\n      });\n    }\n  });'''
+          if old not in s:
+              raise SystemExit('teste antigo de domínio da F51 não encontrado')
+          s = s.replace(old, new, 1)
+          imp = 'import { MisconceptionTag } from "../../constants/misconceptions";'
+          if 'constants/evidencias' not in s:
+              if imp not in s:
+                  raise SystemExit('âncora de import do teste F51 não encontrada')
+              s = s.replace(imp, 'import { Evidencia } from "../../constants/evidencias";\n' + imp, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Provar domínio da F51 e regressão geral
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run src/curriculum/procedimentos/classificacaoProcedure.test.ts src/curriculum/evidenciaDaFicha.test.ts src/curriculum/conformidadeDeFichas.test.ts src/components/primitives/ClassificacaoStage.f51.test.tsx
+          npm test -- --run
+          npm run build
+
+      - name: Publicar correção e remover bancadas
+        run: |
+          rm -f .github/workflows/fix-al01-evidence.yml .github/workflows/fix-al01-evidence-v2.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src .github/workflows/fix-al01-evidence.yml .github/workflows/fix-al01-evidence-v2.yml
+          git diff --cached --check
+          git commit -m 'AL.01: domínio passa a exigir prova real do não pertence'
+          git push origin HEAD:codex/integrar-bloco-f0
