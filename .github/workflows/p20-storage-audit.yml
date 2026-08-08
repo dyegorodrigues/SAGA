@@ -1,0 +1,97 @@
+name: P20 - auditoria storage local x nuvem
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Inventariar arquivos e consumidores
+        run: |
+          git ls-files | grep -Ei '(^|/)(storage|sync|service.?worker|firebase|cloud)' > /tmp/files.txt || true
+          find src public -type f 2>/dev/null | sort | grep -Ei '(storage|sync|service.?worker|firebase|cloud)' > /tmp/find.txt || true
+          grep -R -n -E 'reconcileStateByRevision|loadStateFromCloud|saveStateToCloud|SAVE_REQUEST|revision|saveStateToLocal|loadStateFromLocal' src public 2>/dev/null > /tmp/refs.txt || true
+      - name: Rastrear resolução TypeScript do import storageSync
+        run: |
+          npx tsc --noEmit --traceResolution > /tmp/trace.txt 2>&1 || true
+          grep -n -C 5 -E 'storageSync|services/storage' /tmp/trace.txt > /tmp/storage-trace.txt || true
+      - name: Capturar implementações relevantes
+        run: |
+          mkdir -p /tmp/p20-files
+          while IFS= read -r f; do
+            [ -f "$f" ] || continue
+            case "$f" in
+              src/*|public/*)
+                safe=$(printf '%s' "$f" | tr '/ ' '__')
+                cp "$f" "/tmp/p20-files/$safe.txt"
+                ;;
+            esac
+          done < <(cat /tmp/files.txt /tmp/find.txt | sort -u)
+      - name: Gerar relatório P20
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = require('path');
+          const read = p => fs.existsSync(p) ? fs.readFileSync(p,'utf8').trim() : '';
+          const files = [...new Set((read('/tmp/files.txt')+'\n'+read('/tmp/find.txt')).split(/\n/).map(s=>s.trim()).filter(Boolean))].sort();
+          const refs = read('/tmp/refs.txt');
+          const trace = read('/tmp/storage-trace.txt');
+          const implDir = '/tmp/p20-files';
+          const implementations = fs.existsSync(implDir) ? fs.readdirSync(implDir).sort().map(name => {
+            const original = files.find(f => f.replace(/[\/ ]/g,'_')+'.txt' === name) || name.replace(/_/g,'/');
+            return { name: original, body: fs.readFileSync(path.join(implDir,name),'utf8') };
+          }) : [];
+
+          let md = '# Auditoria P20 — persistência local × nuvem\n\n';
+          md += '**Data:** 8/ago/2026  \n**Branch:** `codex/integrar-bloco-f0`  \n**Estado:** diagnóstico read-only; nenhuma regra de persistência foi alterada.\n\n';
+          md += '## 1. Inventário real do checkout\n\n';
+          md += 'O inventário abaixo vem de `git ls-files` + `find`, não do índice de busca do conector.\n\n```text\n'+(files.join('\n')||'(nenhum match)')+'\n```\n\n';
+          md += '## 2. Resolução TypeScript de `./services/storageSync`\n\n```text\n'+(trace||'(trace não encontrou storageSync)')+'\n```\n\n';
+          md += '## 3. Referências a load/save/reconcile/revision/SAVE_REQUEST\n\n```text\n'+(refs||'(nenhuma referência)')+'\n```\n\n';
+          md += '## 4. Implementações relacionadas\n\n';
+          for (const item of implementations) {
+            if (item.body.length > 40000) {
+              md += `### \`${item.name}\`\n\nArquivo com ${item.body.length} caracteres; omitido do corpo por tamanho.\n\n`;
+              continue;
+            }
+            md += `### \`${item.name}\`\n\n\`\`\`text\n${item.body}\n\`\`\`\n\n`;
+          }
+          md += '## 5. Perguntas que a análise seguinte deve fechar\n\n';
+          md += '- Qual payload vence quando `revision` é maior?\n';
+          md += '- O que acontece em empate de revisão com payload divergente?\n';
+          md += '- A reconciliação é campo-a-campo ou objeto inteiro?\n';
+          md += '- `dojoTracks`, `customTracks`, inventário, progresso, moedas, álbum e log viajam juntos?\n';
+          md += '- A migração ocorre antes de escolher o vencedor?\n';
+          md += '- O service worker pode reaplicar payload stale/equal revision?\n';
+          md += '- Existe proteção offline→online e teste de conflito?\n';
+          md += '- Qual é a unidade de atomicidade e quem incrementa `revision`?\n';
+          fs.writeFileSync('AI_Studio_Lab/codex/AUDITORIA_P20_STORAGE_SYNC.md', md);
+          NODE
+      - name: Provar que a auditoria não quebrou o checkout
+        run: |
+          npx tsc --noEmit
+          git diff --check
+      - name: Publicar relatório e limpar workflow
+        run: |
+          rm .github/workflows/p20-storage-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add AI_Studio_Lab/codex/AUDITORIA_P20_STORAGE_SYNC.md .github/workflows/p20-storage-audit.yml
+          git commit -m 'P20: registra inventario do sync local e nuvem'
+          git push origin HEAD:codex/integrar-bloco-f0
