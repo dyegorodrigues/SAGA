@@ -26,7 +26,7 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Corrigir ancora conhecida da bancada
+      - name: Corrigir ancoras conhecidas da bancada
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -35,8 +35,13 @@ jobs:
           antigo = "    '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\\n',"
           novo = "    '  /**\\n   * Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam.\\n',"
           if s.count(antigo) != 1:
-              raise SystemExit(f'ancora da bancada inesperada: {s.count(antigo)}')
-          p.write_text(s.replace(antigo, novo))
+              raise SystemExit(f'ancora da tag inesperada: {s.count(antigo)}')
+          s = s.replace(antigo, novo)
+          alvo = '    5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum" },'
+          troca = '    5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum", rt_alvo: 8000 },'
+          if s.count(alvo) != 1:
+              raise SystemExit(f'ancora rt N1.10 inesperada: {s.count(alvo)}')
+          p.write_text(s.replace(alvo, troca))
           PY
 
       - name: Aplicar arquitetura P17
