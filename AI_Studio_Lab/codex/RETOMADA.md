@@ -1,14 +1,14 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 8/ago/2026 — P21.1 concluída; próxima tarefa exata: P21.2.**
+> **VIGENTE em 8/ago/2026 — P21 concluída (P21.A + P21.1 + P21.2); próxima tarefa exata: P22, audit-first.**
 
 ## 1. Leia só isto antes de editar
 
 1. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
 2. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
-3. [`AUDITORIA_P21_FONTES_DE_VERDADE.md`](./AUDITORIA_P21_FONTES_DE_VERDADE.md) — baseline histórico read-only da P21.A; não confundir os números pré-P21.1 com o estado atual.
+3. [`AUDITORIA_P21_FONTES_DE_VERDADE.md`](./AUDITORIA_P21_FONTES_DE_VERDADE.md) — baseline histórico read-only da P21.A; não confundir números pré-P21.1/P21.2 com o estado atual.
 4. [`MAPA_MESTRE_POS_P20.md`](./MAPA_MESTRE_POS_P20.md) para a estratégia das fases grandes.
-5. [`REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md`](./REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md) para o registro textual completo da resposta ao autor que definiu P21.1, P21.2, P22, auditoria dos motores, mega auditoria pedagógica, auditoria JD/FD/PD e release hardening.
+5. [`REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md`](./REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md) para o registro textual completo da resposta ao autor que definiu P21, P22, auditoria dos motores, mega auditoria pedagógica, auditoria JD/FD/PD e release hardening.
 
 Os roadmaps de 5/ago são **históricos**. Não use contagens ou “próximo passo” deles como fila atual.
 
@@ -29,17 +29,18 @@ Os roadmaps de 5/ago são **históricos**. Não use contagens ou “próximo pas
 - P18 — `KindType` sem promessa autoral falsa;
 - P19 — migrador único + dependências auditadas/zeradas;
 - P20 — identidade do save local/cloud por Firebase UID;
-- **P21.1 — governança de registries, cobertura e proveniência.**
+- **P21.1 — governança de registries, cobertura e proveniência**;
+- **P21.2 — reconciliação do mapa autoral de primitivas com builder→kind→renderer real**.
 
 Não reabrir sem falha objetiva.
 
-## 4. P21.A — baseline histórico já executado
+## 4. P21.A — baseline histórico
 
 Relatório:
 
 `AUDITORIA_P21_FONTES_DE_VERDADE.md`
 
-A P21.A encontrou, antes das correções de governança:
+Antes das correções, a P21.A encontrou:
 
 - grafo: **90/90** YAML↔JSON;
 - cânone Markdown: **92 fichas / 88 competências em 90**;
@@ -48,37 +49,62 @@ A P21.A encontrou, antes das correções de governança:
 - registradas no Composer: **24**;
 - canários ativos: **22**;
 - registradas/inativas: **N4.09, GM.12**;
-- `JOURNEY_FICHAS` administrativo atrasado em **19/29**;
+- `JOURNEY_FICHAS` administrativo em **19/29**;
 - auditor autoral com expectativa histórica de 88;
 - auditor agregado confundindo legado, Composer e fallback;
-- mapa de primitivas com classificações ainda a reconciliar.
+- mapa de primitivas com falsos negativos/aliases não explicitados.
 
 ## 5. P21.1 — CONCLUÍDA
 
-Gate transacional final: **run `31275660948` = success**.
+Gate final: **run `31275660948` = success**.  
+Bancada auto-removida: `ae28aacb2d1071489b53bec004568ea7edde6748`.
 
-A bancada temporária se auto-removeu no commit `ae28aacb2d1071489b53bec004568ea7edde6748`.
-
-Estado comprovado pelo gate:
+Estado:
 
 - `JOURNEY_FICHAS`: **29/29 fichas TS de Jornada**;
 - `AllFichas`: **29/29 fichas de Jornada expostas**, além do Dojo;
 - teste permanente disco↔registry: `src/curriculum/fichas/journeyRegistry.test.ts`;
-- fichas autorais Markdown: **92**, cobrindo **88/90** competências;
-- lacunas canônicas temporárias e justificadas: **N1.09 e GM.02**;
-- qualquer nova competência sem ficha e sem exceção explícita quebra `fichas:auditar`;
+- Markdown: **92 fichas / 88 de 90 competências**;
+- lacunas canônicas explícitas: **N1.09 e GM.02**;
 - gerador legado explícito: **42/90**;
 - Composer registrado: **24/90**;
 - Composer ativo: **22/90**;
-- Composer registrado e inativo: **2/90 — N4.09, GM.12**;
+- registrado/inativo: **N4.09, GM.12**;
 - servido sem placeholder (`legado ∪ Composer ativo`): **49/90**;
-- fallback real sem conteúdo servido: **41/90**;
-- comentários obsoletos de N1.10/N1.11 em `composerCanary.ts` corrigidos sem mudar runtime.
+- fallback real: **41/90**.
 
-Validação final:
+## 6. P21.2 — CONCLUÍDA
 
+Gate final: **run `31276118716` = success**.  
+Bancada auto-removida: `e7206a5afe6c002c1daf4fe8ff86e822f09c0e8b`.
+
+A P21.2 auditou ficha autoral → ficha TS/fonte → case do Composer → `kind` final → renderer/Stage e corrigiu somente falsos negativos/aliases comprovados.
+
+### Realizações autorais explicitadas
+
+- `DragGroup` → `draggroup` direto ou especializações `pareamento` / `classificacao`;
+- `EmojiRow` → `emojirow` direto ou `fileira` / `moldura` por ficha-fonte;
+- `Grupo` → `grandeza/GrandezaStage` em F49/GM.01; o `Grupo.tsx` genérico não é apresentado como dispatch canônico;
+- `StoryPanel` → builder `storypanel` → normalização final `story-bars` → `StoryBarsStage` em F20/N3.10;
+- `TenFrame` → `tenframe` direto ou `moldura` / `bond` / `plain` conforme a ficha/micro.
+
+### Estado real do mapa após reconciliação
+
+26 primitivas:
+
+- **20 `executável`**;
+- **4 `renderer-sem-builder`**: `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`;
+- **1 `componente-isolado`**: `Quadrado100`;
+- **1 `ausente`**: `Regua`.
+
+Essas seis entradas continuam dívida explícita. P21.2 **não construiu runtime por tabela** e **não promoveu ficha**.
+
+Teste permanente: `src/curriculum/fichaRuntimeMap.test.ts` trava aliases comprovados e exige que as lacunas reais continuem visíveis.
+
+Validação P21.2:
+
+- `npm run fichas:auditar`: aprovado — **92 fichas / 88 de 90 / 26 primitivas**;
 - `npm run auditar`: aprovado;
-- `npm run fichas:auditar`: aprovado, **88/90** com N1.09/GM.02 explícitas;
 - `npm run fichas:conferir`: **9/9**;
 - `npm run grafo:check`: aprovado;
 - `npx tsc --noEmit`: aprovado;
@@ -87,33 +113,31 @@ Validação final:
 - `npm run pr:check`: aprovado;
 - `git diff --check`: aprovado.
 
-## 6. PRÓXIMA TAREFA EXATA — P21.2
+## 7. PRÓXIMA TAREFA EXATA — P22, AUDIT-FIRST
 
-**Reconciliar o mapa de primitivas com o runtime real. Não construir peças por tabela. Não promover ficha.**
+**Decidir deliberadamente as dívidas curriculares; não preencher buracos por contagem e não promover canário sem prova.**
 
-Para cada entrada de `FICHA_RUNTIME_MAP`:
+Itens já delimitados:
 
-1. provar a ficha consumidora;
-2. provar builder real no Composer/runtime;
-3. provar `kind` final emitido;
-4. provar renderer/Stage real;
-5. distinguir alias legítimo de lacuna real;
-6. corrigir somente falso negativo/falso positivo do mapa;
-7. implementar primitiva apenas se a cadeia real provar ausência necessária.
+1. **N1.09** — nó do grafo sem ficha Markdown;
+2. **GM.02** — Tempo cotidiano sem ficha Markdown;
+3. **JD4 ↔ N1.07** — reconciliar cânone, catálogo `JARDIM`, ficha/serviço real e papel de automaticidade;
+4. **N4.09** — ficha Composer registrada, porém inativa;
+5. **GM.12** — ficha Composer registrada, porém inativa por observação deliberada.
 
-Baseline atual do mapa, ainda não tratado pela P21.2:
+Para cada item P22, antes de editar:
 
-- 26 primitivas;
-- 18 `executável`;
-- 4 `renderer-sem-builder`;
-- 3 `componente-isolado`;
-- 1 `ausente`;
-- `Regua` é a lacuna ausente mais inequívoca;
-- `Moedas`, `StoryPanel`, `Grupo`, `Quadrado100`, `SingaporeBars`, `LinkingCubes` e `VisualAddition` exigem reconciliação, não implementação automática.
+1. provar estado no cânone Markdown/grafo;
+2. provar estado TS/runtime e proveniência atual;
+3. provar pré-requisitos e papel pedagógico longitudinal;
+4. provar impacto em Jornada vs Jardim/fluência;
+5. registrar decisão explícita;
+6. só então implementar/ativar, com testes e gate.
 
-## 7. Depois de P21
+A saída de `fichas:conferir` continua sendo diagnóstico importante: existem competências legadas/vazias e divergências de tela conhecidas; não tratar a lista como autorização para migrar tudo de uma vez.
 
-- P22: decidir pedagogicamente N1.09, GM.02, JD4, N4.09 e GM.12;
+## 8. Depois de P22
+
 - auditoria longitudinal dos motores adaptativos/meta-algoritmos;
 - correções dos motores;
 - mega auditoria de engenharia pedagógica;
@@ -122,7 +146,7 @@ Baseline atual do mapa, ainda não tratado pela P21.2:
 
 Detalhes: `MAPA_MESTRE_POS_P20.md` e `REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md`.
 
-## 8. Portões
+## 9. Portões
 
 ```bash
 npm run auditar
