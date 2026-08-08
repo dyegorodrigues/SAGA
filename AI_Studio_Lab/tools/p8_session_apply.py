@@ -14,10 +14,16 @@ def replace_once(path: str, old: str, new: str) -> None:
 def regex_once(path: str, pattern: str, replacement: str) -> None:
     p = Path(path)
     text = p.read_text()
-    out, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
-    if count != 1:
-        raise SystemExit(f"{path}: regex esperado 1x, encontrado {count}x")
-    p.write_text(out)
+    compiled = re.compile(pattern, flags=re.S)
+    match = compiled.search(text)
+    if not match:
+        raise SystemExit(f"{path}: regex esperado 1x, encontrado 0x")
+    if compiled.search(text, match.end()):
+        raise SystemExit(f"{path}: regex encontrou mais de 1 bloco")
+    # NÃO entregar replacement ao re.sub: sequências como \1 são interpretadas
+    # como backreference e já injetaram um caractere de controle em TypeScript.
+    rendered = replacement.replace("\\1", match.group(1) if match.lastindex else "")
+    p.write_text(text[:match.start()] + rendered + text[match.end():])
 
 
 # ---------------------------------------------------------------------------
@@ -211,8 +217,6 @@ describe("P8 — adapter de sessão do Jardim", () => {
 });
 ''')
 
-# Engine: preserve uma ocorrência por QUESTÃO para o Radar poder reconhecer o
-# mesmo padrão em duas questões do round. Não Set/global-dedupe.
 replace_once(
     "src/curriculum/motores/jardimEngine.ts",
     '''  const misconceptions = [...new Set(
@@ -238,10 +242,6 @@ replace_once(
   });''',
 )
 
-# ---------------------------------------------------------------------------
-# 2) GameLoop ganha um modo EXPLÍCITO de progressão. A casca, voz, retry e
-#    renderização são compartilhados; o motor de Jornada deixa de ser chamado.
-# ---------------------------------------------------------------------------
 replace_once(
     "src/components/GameLoop.tsx",
     'import { AnswerMeta, Kid, Track, Question, Progress } from "../types";',
@@ -358,7 +358,6 @@ new_progress = '''    const durationMs = Math.min(30000, Math.max(0, Date.now() 
         misconceptionTags: diagnostics.misconceptionTags,
       }));
       gardenDurationRef.current += durationMs;
-      // Projeção efêmera: o nível do round fica congelado. Nunca é persistida.
       p = {
         ...prog,
         lvl: gardenState.currentStep,
@@ -372,7 +371,6 @@ new_progress = '''    const durationMs = Math.min(30000, Math.max(0, Date.now() 
         durationMs,
         targetRtMs: targetRtSeconds !== undefined ? targetRtSeconds * 1000 : undefined,
         helpUsed: helpUsedRef.current,
-        // P13: o que ESTA resposta demonstrou, e o que a ficha exige ter visto.
         evidencias: right ? evidenciasDaResposta(answerMeta) : undefined,
         exigeEvidencia: q.exigeEvidencia,
         gateEvidenceBeforeAdvance: q.gateEvidenceBeforeAdvance,
@@ -393,7 +391,6 @@ new_progress = '''    const durationMs = Math.min(30000, Math.max(0, Date.now() 
     }'''
 replace_once("src/components/GameLoop.tsx", old_progress, new_progress)
 
-# Banco e Leitner pertencem à Jornada; o Jardim tem round próprio e Radar via mãe.
 regex_once(
     "src/components/GameLoop.tsx",
     r'''    // AI smart review: mastering a missed question after 2 hits\n(.*?)\n    // ⭐ XP vitalício e Nivelamento por Velocidade \(Dojo\)''',
@@ -413,15 +410,10 @@ replace_once(
     '''    let starGain = 0;
     if (right) {
       if (gardenMode) {
-        // Recompensa gentil; RT decide automaticidade no motor, não estrelas.
         starGain = 1;
       } else if (q.kind === "rapid-fire" || track.id.startsWith("dojo")) {''',
 )
-replace_once(
-    "src/components/GameLoop.tsx",
-    '''    const rescueRecovered = !!rescue && (''',
-    '''    const rescueRecovered = !gardenMode && !!rescue && (''',
-)
+replace_once("src/components/GameLoop.tsx", '    const rescueRecovered = !!rescue && (', '    const rescueRecovered = !gardenMode && !!rescue && (')
 replace_once(
     "src/components/GameLoop.tsx",
     '''    p.lastDay = new Date().toISOString().slice(0, 10);
@@ -444,14 +436,8 @@ replace_once(
     }
 ''',
     '''    if (gardenMode && isLast) {
-      if (!gardenState || !onGardenRound) {
-        throw new Error(`Sessao do Jardim ${track.id} terminou sem callback.`);
-      }
-      const result = applyJardimRound(
-        gardenState,
-        gardenAttemptsRef.current,
-        new Date().toISOString().slice(0, 10),
-      );
+      if (!gardenState || !onGardenRound) throw new Error(`Sessao do Jardim ${track.id} terminou sem callback.`);
+      const result = applyJardimRound(gardenState, gardenAttemptsRef.current, new Date().toISOString().slice(0, 10));
       onGardenRound(result, {
         rewardedCorrect: nextOk,
         measuredCorrect: gardenAttemptsRef.current.filter(a => a.right).length,
@@ -492,20 +478,10 @@ replace_once(
     setQ(drawQuestion(track, prog, restartLevel, gardenMode || exactLvl));''',
 )
 
-# ---------------------------------------------------------------------------
-# 3) App: resolve JD* explicitamente, salva em dojoTracks e grava Radar na MÃE.
-#    O round é a unidade atômica: missão incompleta não altera faixa do Jardim.
-# ---------------------------------------------------------------------------
-replace_once(
-    "src/App.tsx",
-    'import { State, Kid, Track, Progress } from "./types";',
-    'import { State, Kid, Track, Progress } from "./types";',
-)
 replace_once(
     "src/App.tsx",
     'import { migrateLegacyCrown } from "./curriculum/motores/progressEngine";\n',
     '''import { migrateLegacyCrown } from "./curriculum/motores/progressEngine";
-import { JARDIM } from "./curriculum/fichas/dojo/jardim";
 import {
   jardimProgressProjection,
   jardimTrack,
@@ -530,8 +506,6 @@ replace_once(
   for (const k of m.kids) {
     if (!m.dojoTracks[k.id]) m.dojoTracks[k.id] = {};''',
 )
-
-# Novo commit de round do Jardim, imediatamente antes do factory reset.
 replace_once(
     "src/App.tsx",
     '''  const handleFactoryReset = () => {''',
@@ -557,18 +531,9 @@ replace_once(
         m: (last.m || 0) + 1,
       };
     } else {
-      lg.push({
-        d: today,
-        ok: summary.measuredCorrect,
-        tot: summary.total,
-        stars: summary.stars,
-        t: summary.durationMs,
-        m: 1,
-      });
+      lg.push({ d: today, ok: summary.measuredCorrect, tot: summary.total, stars: summary.stars, t: summary.durationMs, m: 1 });
     }
 
-    // O Jardim ensina/mede automaticidade, mas erros cognitivos continuam
-    // pertencendo à competência-mãe no Radar. JD* nunca ganha Progress próprio.
     const kidProgress = { ...(state.progress[kidId] || {}) };
     const mother = kidProgress[motherId] ? { ...kidProgress[motherId] } : getProg(kidId, motherId);
     for (const tag of result.misconceptions) trackMisconception(mother, tag);
@@ -578,9 +543,6 @@ replace_once(
       ...((state.dojoTracks || {})[kidId] || {}),
       [trailId]: result.state,
     };
-
-    // Recompensa é gentil e não altera a métrica do round: recuperar uma
-    // resposta após dica ainda rende a moedinha, mas não infla precisão.
     const coinGain = summary.rewardedCorrect + 3 + (doneBefore === 0 ? 5 : 0);
     const freeFood = doneBefore === 0 ? 1 : 0;
 
@@ -590,10 +552,7 @@ replace_once(
         ? state.kids.map(k => k.id === kidId ? { ...k, petFood: (k.petFood || 0) + 1 } : k)
         : state.kids,
       progress: { ...state.progress, [kidId]: kidProgress },
-      dojoTracks: {
-        ...(state.dojoTracks || {}),
-        [kidId]: kidDojo,
-      },
+      dojoTracks: { ...(state.dojoTracks || {}), [kidId]: kidDojo },
       coins: { ...state.coins, [kidId]: coinsOf(kidId) + coinGain },
       log: { ...state.log, [kidId]: lg.slice(-366) },
     }, true);
@@ -601,8 +560,6 @@ replace_once(
 
   const handleFactoryReset = () => {''',
 )
-
-# Delete/add/reset precisam incluir o novo estado, senão reset parcial ressuscita faixa.
 replace_once(
     "src/App.tsx",
     '''    const updatedCoins = { ...state.coins };
@@ -617,14 +574,7 @@ replace_once(
 
     const updatedAlbum = { ...state.album };''',
 )
-replace_once(
-    "src/App.tsx",
-    '''      progress: updatedProgress,
-      coins: updatedCoins,''',
-    '''      progress: updatedProgress,
-      dojoTracks: updatedDojoTracks,
-      coins: updatedCoins,''',
-)
+replace_once("src/App.tsx", '      progress: updatedProgress,\n      coins: updatedCoins,', '      progress: updatedProgress,\n      dojoTracks: updatedDojoTracks,\n      coins: updatedCoins,')
 replace_once(
     "src/App.tsx",
     '''      progress: { ...state.progress, [newKid.id]: {} },
@@ -643,8 +593,6 @@ replace_once(
               log: { ...state.log, [id]: [] },
             })}''',
 )
-
-# Router do game: Jardim é resolvido ANTES de procurar ALL_MATH_TRACKS.
 old_game = '''          const gameTrack =
             screen.track === "mista" || screen.track === "mixed"
               ? mixedTrack!
@@ -677,7 +625,6 @@ new_game = '''          const jardimConfig = jardimTrilhaPorId(screen.track);
               : (() => {
     let found = getTracksForKid(kidObj).find((t) => t.id === screen.track);'''
 replace_once("src/App.tsx", old_game, new_game)
-
 replace_once(
     "src/App.tsx",
     '''              prog0={screen.rescue
@@ -709,17 +656,5 @@ replace_once(
                 : undefined}
               onExit={() => setScreen({ name: "home", kid: screen.kid })}''',
 )
-
-# Garantia estática: nada de import morto da lista inteira aqui.
-replace_once(
-    "src/App.tsx",
-    '''import { JARDIM } from "./curriculum/fichas/dojo/jardim";
-''',
-    '''import "./curriculum/fichas/dojo/jardim";
-''',
-)
-# O import side-effect acima é desnecessário; remove de vez mantendo o módulo
-# carregado via jardimSession. Esta segunda troca deixa a árvore limpa.
-replace_once("src/App.tsx", 'import "./curriculum/fichas/dojo/jardim";\n', '')
 
 print("P8 sessão patch preparado")
