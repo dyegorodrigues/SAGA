@@ -45,6 +45,25 @@ jobs:
               raise SystemExit('bloco original de review nao localizado')
           p.write_text(s.replace('\x01', m.group(1)))
           PY
+      - name: Declarar a porta autoral exclusiva do Jardim
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('src/curriculum/motores/portaDosFundos.test.ts')
+          s = p.read_text()
+          old = '''  "src/curriculum/motores/composerCanary.ts":
+    "é A ponte: o único caminho de produção da ficha até a tela",
+  "src/components/admin/SandboxModal.tsx":'''
+          new = '''  "src/curriculum/motores/composerCanary.ts":
+    "é A ponte dos nós da Jornada: canário e rollback escolhem a ficha do DAG",
+  "src/curriculum/motores/jardimSession.ts":
+    "é a ponte deliberada das fichas JD de automaticidade: JD não é nó do DAG " +
+    "nem substitui gerador legado, por isso não participa de COMPOSER_CANARIES",
+  "src/components/admin/SandboxModal.tsx":'''
+          if s.count(old) != 1:
+              raise SystemExit(f'ancora PORTAS_LEGITIMAS esperada 1x, encontrada {s.count(old)}x')
+          p.write_text(s.replace(old, new))
+          PY
       - name: Verificar contratos
         run: |
           git diff --check
@@ -52,8 +71,9 @@ jobs:
           npm run fichas:auditar
           npm run grafo:check
           npx tsc --noEmit
-      - name: Testes focais P8
-        run: npx vitest run src/curriculum/motores/jardimEngine.test.ts src/curriculum/motores/jardimSession.test.ts src/curriculum/fichas/dojo/jardim/jardim.test.ts
+      - name: Testes focais P8 e porta dos fundos
+        run: |
+          npx vitest run src/curriculum/motores/jardimEngine.test.ts src/curriculum/motores/jardimSession.test.ts src/curriculum/fichas/dojo/jardim/jardim.test.ts src/curriculum/motores/portaDosFundos.test.ts
       - name: Suite completa e build
         run: |
           npm test -- --run
