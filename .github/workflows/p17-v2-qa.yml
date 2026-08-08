@@ -1,0 +1,83 @@
+name: P17 v2 - retirada real de andaime
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar P17 v2
+        run: python AI_Studio_Lab/tools/p17_v2_apply.py
+
+      - name: Diff textual
+        run: git diff --check
+
+      - name: Auditorias e TypeScript
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run grafo:check
+          npm run lint
+
+      - name: Testes focais P17
+        run: npx vitest run src/curriculum/fichas/jornada/parteTodoProgressao.test.ts src/curriculum/motores/progressEngine.test.ts src/curriculum/procedimentos/tenFrameProcedure.test.ts src/components/primitives/MolduraStage.test.tsx
+
+      - name: Suíte completa
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+      - name: Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: Sonda N1.10 e Jardim JD5
+        env:
+          SONDA_SEMENTES: '1,7,42'
+        run: |
+          npm run sonda -- N1.10
+          npm run sonda -- "JD5 Jardim"
+
+      - name: Prints comparáveis
+        run: |
+          mkdir -p /tmp/p17v2/320 /tmp/p17v2/390 /tmp/p17v2/900
+          for W in 320 390 900; do
+            PRINTS_OUT="/tmp/p17v2/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=2800 node scripts/prints.mjs "N1.10"
+            PRINTS_OUT="/tmp/p17v2/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=2800 node scripts/prints.mjs "JD5 Jardim"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p17-v2-retirada-andaime-${{ github.sha }}
+          path: /tmp/p17v2
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publicar lote e limpar bancada
+        run: |
+          rm AI_Studio_Lab/tools/p17_v2_apply.py .github/workflows/p17-v2-qa.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'P17: exige retirada real de andaime antes do bond'
+          git push origin HEAD:codex/integrar-bloco-f0
