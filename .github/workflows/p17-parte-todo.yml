@@ -67,7 +67,9 @@ jobs:
           old = '''  distratores: [
             { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
             { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
-          ],'''.replace('          ', '  ')
+          ],'''
+          # O arquivo tem 4 espacos nos itens; normaliza a literal para o formato real.
+          old = old.replace('            {', '    {').replace('          ],', '  ],')
           if s.count(old) != 1:
               raise SystemExit(f'distratores N1.11 inesperados: {s.count(old)}')
           p.write_text(s.replace(old, '  distratores: [],'))
@@ -77,29 +79,6 @@ jobs:
           p = Path('src/curriculum/motores/progressEngine.test.ts')
           s = p.read_text()
           old = '''    const retained = applyJourneyAnswer(current, true, false, {
-            ...attempt,
-            isReview: true,
-            practiceDay: "2026-07-03",
-            previousPracticeDay: "2026-07-01",
-          });
-          expect(retained.progress.dom).toBe(true);
-          expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
-          expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''.replace('          ', '    ')
-          new = '''    let retained = applyJourneyAnswer(current, true, false, {
-              ...attempt,
-              isReview: true,
-              practiceDay: "2026-07-03",
-              previousPracticeDay: "2026-07-01",
-            });
-            expect(retained.progress.dom).not.toBe(true);
-            retained = applyJourneyAnswer(retained.progress, true, false, {
-              ...attempt,
-              isReview: true,
-              practiceDay: "2026-07-03",
-              previousPracticeDay: "2026-07-01",
-            });
-            expect(retained.progress.dom).not.toBe(true);
-            retained = applyJourneyAnswer(retained.progress, true, false, {
               ...attempt,
               isReview: true,
               practiceDay: "2026-07-03",
@@ -107,7 +86,31 @@ jobs:
             });
             expect(retained.progress.dom).toBe(true);
             expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
-            expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''.replace('            ', '    ')
+            expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''
+          old = old.replace('              ', '      ').replace('            });', '    });').replace('            expect', '    expect')
+          new = '''    let retained = applyJourneyAnswer(current, true, false, {
+      ...attempt,
+      isReview: true,
+      practiceDay: "2026-07-03",
+      previousPracticeDay: "2026-07-01",
+    });
+    expect(retained.progress.dom).not.toBe(true);
+    retained = applyJourneyAnswer(retained.progress, true, false, {
+      ...attempt,
+      isReview: true,
+      practiceDay: "2026-07-03",
+      previousPracticeDay: "2026-07-01",
+    });
+    expect(retained.progress.dom).not.toBe(true);
+    retained = applyJourneyAnswer(retained.progress, true, false, {
+      ...attempt,
+      isReview: true,
+      practiceDay: "2026-07-03",
+      previousPracticeDay: "2026-07-01",
+    });
+    expect(retained.progress.dom).toBe(true);
+    expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
+    expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''
           if s.count(old) != 1:
               raise SystemExit(f'teste legado de retencao inesperado: {s.count(old)}')
           p.write_text(s.replace(old, new))
