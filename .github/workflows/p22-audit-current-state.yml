@@ -1,0 +1,80 @@
+name: P22 - audit current state
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Matriz P22
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const read = p => fs.readFileSync(p, 'utf8');
+          const curriculum = read('src/curriculum/motores/curriculum.ts');
+          const composer = read('src/curriculum/motores/composerCanary.ts');
+          const active = read('src/curriculum/motores/composerCanaryIds.ts');
+          const fichaIndex = read('src/curriculum/fichas/index.ts');
+          const jardim = read('src/curriculum/fichas/dojo/jardim/index.ts');
+          const ids = ['N1.09','GM.02','N4.09','GM.12'];
+          console.log('P22 — ESTADO EXECUTÁVEL ATUAL');
+          for (const id of ids) {
+            const symbol = id.replace('.', '_');
+            console.log(`\n[${id}]`);
+            console.log(`legacy=${new RegExp(`"${id}"\\s*:`).test(curriculum)}`);
+            console.log(`composerRegistered=${new RegExp(`"${id}"\\s*:`).test(composer)}`);
+            console.log(`composerActive=${active.includes(`"${id}"`)}`);
+            console.log(`journeyRegistry=${fichaIndex.includes(symbol)}`);
+            console.log(`tsFicha=${fs.existsSync(`src/curriculum/fichas/jornada/${id}.ts`)}`);
+          }
+          console.log('\n[JD4]');
+          console.log(`jardimDeclared=${/export const JD4\b/.test(jardim)}`);
+          console.log(`jardimCatalog=${/\{\s*ficha:\s*JD4\b/.test(jardim)}`);
+          console.log(`n1_07Active=${active.includes('"N1.07"')}`);
+          console.log(`n1_07Legacy=${/"N1\.07"\s*:/.test(curriculum)}`);
+          console.log(`n1_07Composer=${/"N1\.07"\s*:/.test(composer)}`);
+          NODE
+      - name: Testes que citam os itens P22
+        run: |
+          grep -RIlE 'N4\.09|N4_09|GM\.12|GM_12|N1\.07|N1_07|JD4|N1\.09|GM\.02' src --include='*.test.ts' --include='*.test.tsx' | sort || true
+      - name: Sonda N4.09 atual
+        env:
+          SONDA_CHROME: /usr/bin/google-chrome
+        run: npm run sonda -- N4.09
+      - name: Sonda GM.12 atual
+        env:
+          SONDA_CHROME: /usr/bin/google-chrome
+        run: npm run sonda -- GM.12
+      - name: Portoes read-only relevantes
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+      - name: Limpar bancada temporaria
+        if: always()
+        run: |
+          rm .github/workflows/p22-audit-current-state.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: remove bancada temporaria P22 audit'
+          git push origin HEAD:codex/integrar-bloco-f0
