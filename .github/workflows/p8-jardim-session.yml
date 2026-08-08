@@ -24,6 +24,27 @@ jobs:
       - run: npm ci
       - name: Aplicar sessao P8
         run: python AI_Studio_Lab/tools/p8_session_apply.py
+      - name: Restaurar bloco de review sem backreference
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          p = Path('src/components/GameLoop.tsx')
+          s = p.read_text()
+          if s.count('\x01') != 1:
+              raise SystemExit(f'marcador de captura esperado 1x, encontrado {s.count(chr(1))}x')
+          original = subprocess.check_output(
+              ['git', 'show', 'HEAD:src/components/GameLoop.tsx'], text=True
+          )
+          pattern = re.compile(
+              r'    // AI smart review: mastering a missed question after 2 hits\n(.*?)\n    // ⭐ XP vitalício e Nivelamento por Velocidade \(Dojo\)',
+              re.S,
+          )
+          m = pattern.search(original)
+          if not m:
+              raise SystemExit('bloco original de review nao localizado')
+          p.write_text(s.replace('\x01', m.group(1)))
+          PY
       - name: Verificar contratos
         run: |
           git diff --check
