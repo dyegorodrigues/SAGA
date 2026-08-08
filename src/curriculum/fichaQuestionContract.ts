@@ -35,7 +35,7 @@ export type FichaUiProps =
   | EmojiCollectionProps
   | { start: number; end: number; interactive: true; startPos: number; showJumps: { from: number; to: number }[] }
   | { n: number; flashDurationMs?: number; moldura: number }
-  | { whole: number | "?"; part1: number | "?"; part2: number | "?"; interactivePart: "whole" | "part1" | "part2" }
+  | { whole: number | "?"; part1: number | "?"; part2: number | "?"; interactivePart?: "whole" | "part1" | "part2" }
   | { sourceCount: number; destCount: number; sourceEmoji: string; destEmoji: string }
   | { dezenas: number; unidades: number }
   | { initialHours: number; initialMinutes: number; interactive: false }

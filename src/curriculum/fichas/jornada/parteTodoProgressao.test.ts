@@ -21,6 +21,7 @@ describe("P17 — uma competencia, multiplas representacoes", () => {
     expect(l5.kind).toBe("bond");
     expect((l5.uiProps as any).whole).toBeGreaterThanOrEqual(4);
     expect([(l5.uiProps as any).part1, (l5.uiProps as any).part2]).toContain("?");
+    expect(l5.uiProps).not.toHaveProperty("interactivePart");
     expect(l5.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
   });
 
@@ -34,6 +35,7 @@ describe("P17 — uma competencia, multiplas representacoes", () => {
     const simbolo = Composer.generate(N1_11, 4);
     expect(bond.kind).toBe("bond");
     expect((bond.uiProps as any).whole).toBe(10);
+    expect(bond.uiProps).not.toHaveProperty("interactivePart");
     expect(simbolo.kind).toBe("plain");
     expect((simbolo.uiProps as any).text).toMatch(/\+ □ = 10/);
     expect(simbolo.masteryRule).toEqual({ acertos: 4, de: 4, sessoes: 3 });

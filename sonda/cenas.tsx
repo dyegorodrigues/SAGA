@@ -46,6 +46,7 @@ import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
 import { GM_12 } from "../src/curriculum/fichas/jornada/GM.12";
 import { N1_10 } from "../src/curriculum/fichas/jornada/N1.10";
 import { N1_11 } from "../src/curriculum/fichas/jornada/N1.11";
+import { JD3, JD5 } from "../src/curriculum/fichas/dojo/jardim";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 import { FaseDaMoldura } from "../src/components/primitives/MolduraStage";
 
@@ -437,53 +438,71 @@ export const CENAS: Cena[] = [
       <ExercicioDaFicha ficha={N1_08} lvl={3} semente={s} mostrar={{ moldura: { vazia: true } }} />
     ),
   },
-  // N1.11 (JD3) — a moldura relâmpago. Competência que NÃO tinha ficha nenhuma;
-  // implementada e NÃO ativada. O estado `vazio` é a ficha inteira: são os 300ms
-  // em que só a moldura vazia fica na tela, e é o que a criança leva para a
-  // resposta.
+  // N1.11 — uma competência, duas fontes. A Jornada instala a percepção com
+  // JD3 e depois TRANSFERE para F28: moldura -> number bond -> símbolo. A escada
+  // perceptual completa continua no Jardim, e também é fotografada aqui.
   { nome: "N1.11 rollback: amigos do 10 legados (nível 2)", render: (s) => <Exercicio id="N1.11" lvl={2} semente={s} /> },
-  ...[1, 3, 5].flatMap(lvl => ([
+  ...[1, 2].flatMap(lvl => ([
     {
-      nome: `N1.11 moldura relâmpago mostrando (nível ${lvl})`,
+      nome: `N1.11 JD3 mostrando (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={lvl} semente={s} fase="mostrando" />,
     },
     {
-      nome: `N1.11 moldura relâmpago pergunta (nível ${lvl})`,
+      nome: `N1.11 JD3 pergunta (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={lvl} semente={s} fase="perguntando" />,
     },
   ])),
   {
-    nome: "N1.11 o vazio sozinho (os 300ms que são a ficha)",
+    nome: "N1.11 JD3 vazio sozinho (nível 2)",
     render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={2} semente={s} fase="vazio" />,
   },
   {
-    nome: "N1.11 regressiva: três pulsos sem número",
-    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={1} semente={s} fase="regressiva" />,
+    nome: "N1.11 F28 number bond (nível 3)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={3} semente={s} />,
   },
   {
-    nome: "N1.11 revelação do erro: as vazias piscando em bloco",
-    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={4} semente={s} fase="revelando" />,
+    nome: "N1.11 F28 símbolo (nível 4)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={4} semente={s} />,
   },
   {
-    nome: "N1.11 micro-aula: as que faltavam se preenchem",
-    render: (s: number) => (
-      <ExercicioDaFicha ficha={N1_11} lvl={1} semente={s} mostrar={{ preencherFaltantes: 2 }} />
-    ),
+    nome: "N1.11 F28 símbolo automático (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={5} semente={s} />,
   },
-  // N1.10 (JD5) — ver e imaginar. Estava ATIVA servindo o `bond` simbólico; a
-  // ficha foi reescrita e o nó saiu dos canários, então o rollback é o bond, e
-  // ele também é medido: tela de emergência quebrada não socorre.
-  { nome: "N1.10 rollback: o number bond simbólico (nível 2)", render: (s) => <Exercicio id="N1.10" lvl={2} semente={s} /> },
-  ...[1, 4, 5].flatMap(lvl => ([
+  {
+    nome: "JD3 Jardim topo mostrando (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD3} lvl={5} semente={s} fase="mostrando" />,
+  },
+  {
+    nome: "JD3 Jardim topo pergunta (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD3} lvl={5} semente={s} fase="perguntando" />,
+  },
+
+  // N1.10 — a JD5 instala a relação parte-todo na cabeça; só depois o L5 dá
+  // nome/forma à mesma relação com o NumberBond. O Jardim guarda a JD5 inteira,
+  // inclusive o topo sem moldura, sem criar outro nó no DAG.
+  { nome: "N1.10 rollback: parte-todo legado (nível 2)", render: (s) => <Exercicio id="N1.10" lvl={2} semente={s} /> },
+  ...[1, 4].flatMap(lvl => ([
     {
-      nome: `N1.10 ver e imaginar antes da tampa (nível ${lvl})`,
+      nome: `N1.10 JD5 antes da tampa (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={lvl} semente={s} fase="mostrando" />,
     },
     {
-      nome: `N1.10 ver e imaginar com a tampa (nível ${lvl})`,
+      nome: `N1.10 JD5 com a tampa (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={lvl} semente={s} fase="perguntando" />,
     },
   ])),
+  {
+    nome: "N1.10 formalização NumberBond (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={5} semente={s} />,
+  },
+  {
+    nome: "JD5 Jardim topo sem moldura mostrando (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD5} lvl={5} semente={s} fase="mostrando" />,
+  },
+  {
+    nome: "JD5 Jardim topo sem moldura pergunta (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD5} lvl={5} semente={s} fase="perguntando" />,
+  },
   {
     nome: "N1.10 micro-aula: vou esconder um",
     render: (s: number) => (

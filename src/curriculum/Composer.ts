@@ -352,7 +352,7 @@ export class Composer {
         const part2 = whole - part1;
 
         if (params.interactive === "whole") {
-          uiProps = { whole: '?', part1, part2, interactivePart: 'whole' };
+          uiProps = { whole: '?', part1, part2 };
           evaluate = (ans) => ans === whole;
           answer = whole;
           options = numericOptions(whole, Math.max(1, whole - 2), whole + 2);
@@ -363,7 +363,6 @@ export class Composer {
             whole,
             part1: hide1 ? '?' : part1,
             part2: hide1 ? part2 : '?',
-            interactivePart: hide1 ? 'part1' : 'part2',
           };
           evaluate = (ans) => ans === (hide1 ? part1 : part2);
           answer = hide1 ? part1 : part2;
