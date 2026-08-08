@@ -1,0 +1,105 @@
+name: Implement F50 GM12 v3
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  implement:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Reconstituir F50 e completar contratos
+        run: |
+          git show 310cace12e2345644c1b8a9f2ec2fac4543f8a2f:.github/workflows/impl-gm12-f50.yml > /tmp/f50-source.yml
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import YAML from 'yaml';
+          const source = YAML.parse(fs.readFileSync('/tmp/f50-source.yml', 'utf8'));
+          const wanted = new Map([
+            ['Construir procedimento, contrato e palcos da F50', '/tmp/f50-build.sh'],
+            ['Ligar F50 ao Composer, renderer, Radar e auditorias', '/tmp/f50-wire.sh'],
+          ]);
+          for (const step of source.jobs.implement.steps) {
+            const out = wanted.get(step.name);
+            if (out) fs.writeFileSync(out, step.run, { mode: 0o700 });
+          }
+          for (const out of wanted.values()) {
+            if (!fs.existsSync(out)) throw new Error(`script não extraído: ${out}`);
+          }
+          NODE
+          bash /tmp/f50-build.sh
+          bash /tmp/f50-wire.sh
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          # Fronteira tipada do Composer.
+          p = Path('src/curriculum/fichaQuestionContract.ts')
+          s = p.read_text(encoding='utf-8')
+          anchor = 'import { MolduraSpec } from "./procedimentos/tenFrameContract";'
+          if 'medidasContract' not in s:
+              if anchor not in s: raise SystemExit('âncora de import do FichaUiProps ausente')
+              s = s.replace(anchor, anchor + '\nimport { MedidasSpec } from "./procedimentos/medidasContract";', 1)
+          anchor_union = '  | GrandezaSpec\n  | MolduraSpec'
+          if '  | MedidasSpec' not in s:
+              if anchor_union not in s: raise SystemExit('âncora da união FichaUiProps ausente')
+              s = s.replace(anchor_union, '  | GrandezaSpec\n  | MedidasSpec\n  | MolduraSpec', 1)
+          p.write_text(s, encoding='utf-8')
+
+          # P13: toda evidência exigida precisa de um emissor provado.
+          p = Path('src/curriculum/evidenciaDaFicha.test.ts')
+          s = p.read_text(encoding='utf-8')
+          imp = 'import { evidenciasDe as daMoldura } from "./procedimentos/tenFrameProcedure";'
+          if 'daMedida' not in s:
+              if imp not in s: raise SystemExit('âncora dos emissores P13 ausente')
+              s = s.replace(imp, imp + '\nimport { evidenciasDe as daMedida } from "./procedimentos/medidasProcedure";', 1)
+          emitter_anchor = '''  {\n    nome: "F02 (moldura) — acerto com seis ou mais, usando as duas fileiras",'''
+          if 'F50 (medidas)' not in s:
+              if emitter_anchor not in s: raise SystemExit('âncora para emissor F50 ausente')
+              emitter = '''  {\n    nome: "F50 (medidas) — acerto em caso contraintuitivo",\n    evidencia: Evidencia.CASO_CONTRAINTUITIVO,\n    emitir: () => daMedida({\n      modo: "peso", escolhido: 0, certo: 0, ordemCerta: [0, 1], ordemVisual: [1, 0],\n      contraintuitivo: true, formatosDiferentes: false, verificou: true, maiorVisual: 1,\n    }),\n  },\n'''
+              s = s.replace(emitter_anchor, emitter + emitter_anchor, 1)
+          wrong_anchor = '''    expect(daGrandeza({\n      escolhido: 1, certo: 0, vencedorDoOutroAtributo: 1, diferencaPequena: true, antesDoChao: false,\n    })).toEqual([]);'''
+          if 'modo: "peso", escolhido: 1, certo: 0' not in s:
+              if wrong_anchor not in s: raise SystemExit('âncora de evidência-no-erro ausente')
+              s = s.replace(wrong_anchor, wrong_anchor + '''\n    expect(daMedida({\n      modo: "peso", escolhido: 1, certo: 0, ordemCerta: [0, 1], ordemVisual: [1, 0],\n      contraintuitivo: true, formatosDiferentes: false, verificou: true, maiorVisual: 1,\n    })).toEqual([]);''', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Provar F50 ponta a ponta
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run src/curriculum/procedimentos/medidasProcedure.test.ts src/curriculum/procedimentos/medidasContract.test.ts src/curriculum/evidenciaDaFicha.test.ts src/curriculum/conformidadeDeFichas.test.ts src/curriculum/fichaRuntimeMap.test.ts
+          npm test -- --run
+          npm run sonda -- "GM.12"
+          npm run build
+
+      - name: Publicar implementação e limpar bancadas
+        run: |
+          rm -f .github/workflows/impl-gm12-f50-v3.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src AI_Studio_Lab/tools/ficha_runtime_map.cjs sonda/cenas.tsx .github/workflows/impl-gm12-f50-v3.yml
+          git diff --cached --check
+          git commit -m 'GM.12 pela F50: massa e capacidade sem deixar o tamanho responder'
+          git push origin HEAD:codex/integrar-bloco-f0
