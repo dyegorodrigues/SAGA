@@ -1,0 +1,96 @@
+name: P17 - QA visual parte-todo
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  qa:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Aplicar correção de interação e sonda
+        run: python AI_Studio_Lab/tools/p17_visual_apply.py
+
+      - name: Verificar diff
+        run: git diff --check
+
+      - name: Auditorias e TypeScript
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run grafo:check
+          npm run lint
+
+      - name: Testes focais P17
+        run: npx vitest run src/curriculum/fichas/jornada/parteTodoProgressao.test.ts src/curriculum/fichas/dojo/jardim/jardim.test.ts src/components/primitives/MolduraStage.test.tsx
+
+      - name: Suíte completa
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+      - name: Instalar Chromium compatível
+        run: npx playwright install chromium --with-deps
+
+      - name: Sonda real N1.10
+        env:
+          SONDA_SEMENTES: '1'
+        run: npm run sonda -- N1.10
+
+      - name: Sonda real N1.11
+        env:
+          SONDA_SEMENTES: '1'
+        run: npm run sonda -- N1.11
+
+      - name: Sonda real Jardim P17
+        env:
+          SONDA_SEMENTES: '1'
+        run: |
+          npm run sonda -- "JD3 Jardim"
+          npm run sonda -- "JD5 Jardim"
+
+      - name: Capturar prints 320 390 900
+        run: |
+          mkdir -p /tmp/p17-prints
+          for W in 320 390 900; do
+            mkdir -p "/tmp/p17-prints/$W"
+            PRINTS_OUT="/tmp/p17-prints/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=2800 node scripts/prints.mjs "N1.10"
+            PRINTS_OUT="/tmp/p17-prints/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=2800 node scripts/prints.mjs "N1.11"
+            PRINTS_OUT="/tmp/p17-prints/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=2800 node scripts/prints.mjs "JD3 Jardim"
+            PRINTS_OUT="/tmp/p17-prints/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=2800 node scripts/prints.mjs "JD5 Jardim"
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p17-parte-todo-visual-${{ github.sha }}
+          path: /tmp/p17-prints
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Publicar lote aprovado e limpar bancada
+        run: |
+          rm AI_Studio_Lab/tools/p17_visual_apply.py .github/workflows/p17-visual-qa.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'P17: fecha QA de interação e sonda parte-todo'
+          git push origin HEAD:codex/integrar-bloco-f0
