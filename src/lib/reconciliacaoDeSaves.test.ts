@@ -89,8 +89,8 @@ describe("carimbo", () => {
     // nuvem, e a abertura seguinte acusaria conflito a cada gravação
     // bem-sucedida.
     expect(corpo.match(/carimbar\(/g) ?? []).toHaveLength(1);
-    expect(corpo).toContain('setStorage("mk-state-v1", JSON.stringify(carimbado))');
-    expect(corpo, "a nuvem recebe o MESMO estado carimbado").toContain("nuvem.agendar(carimbado)");
+    expect(corpo).toContain("setStorage(stateKeyForUid(uid), JSON.stringify(carimbado))");
+    expect(corpo, "a nuvem recebe o MESMO estado carimbado e o mesmo dono").toContain("nuvem.agendar(carimbado, uid)");
   });
 
   it("o aparelho grava sempre; só a nuvem passa pelo amortecedor", () => {
@@ -111,16 +111,17 @@ describe("carimbo", () => {
 describe("a abertura real do App, e não só a função pura", () => {
   const app = readFileSync(resolve(__dirname, "../App.tsx"), "utf8");
 
-  it("lê o armazenamento local mesmo quando a nuvem respondeu", () => {
+  it("lê cloud, local escopado e legado antes do bootstrap decidir", () => {
     const posNuvem = app.indexOf("await loadStateFromCloud()");
-    const posEscolha = app.indexOf("escolherSaveMaisRecente(cloudState, localState)");
-    const posLocal = app.indexOf('getStorage("mk-state-v1")', posNuvem);
+    const posScoped = app.indexOf("getStorage(stateKeyForUid(uid))");
+    const posLegacy = app.indexOf("getStorage(LEGACY_STATE_KEY)");
+    const posResolve = app.indexOf("resolveBootstrapState({");
 
     expect(posNuvem).toBeGreaterThan(-1);
-    expect(posLocal).toBeGreaterThan(posNuvem);
-    // A leitura local não pode estar dentro de um `if (!loadedState)`: era
-    // exatamente essa guarda que fazia a nuvem vencer incondicionalmente.
-    expect(posEscolha).toBeGreaterThan(posLocal);
-    expect(app.slice(posNuvem, posEscolha)).not.toMatch(/if\s*\(\s*!loadedState\s*\)/);
+    expect(posScoped).toBeGreaterThan(-1);
+    expect(posLegacy).toBeGreaterThan(-1);
+    expect(posResolve).toBeGreaterThan(posNuvem);
+    expect(posResolve).toBeGreaterThan(posScoped);
+    expect(posResolve).toBeGreaterThan(posLegacy);
   });
 });

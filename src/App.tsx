@@ -41,7 +41,9 @@ import { buildDojoTrack } from "./utils/dojoMode";
 import { buildAulaTrack } from "./curriculum/motores/composer";
 import { buildMatriculaTrack, seedFromResults } from "./utils/matricula";
 import { saveStateToCloud, loadStateFromCloud, getCurrentUserEmail, logoutUser, auth } from "./lib/firebase";
-import { carimbar, escolherSaveMaisRecente } from "./lib/reconciliacaoDeSaves";
+import { carimbar } from "./lib/reconciliacaoDeSaves";
+import { resolveBootstrapState } from "./lib/bootstrapState";
+import { LEGACY_STATE_KEY, LEGACY_STATE_OWNER_KEY, stateKeyForUid } from "./lib/storageIdentity";
 import { criarSincronizador } from "./lib/sincronizadorDeNuvem";
 import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
@@ -50,7 +52,7 @@ import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
 import { MascotEnvironment } from "./engine/mascot-v2/MascotEnvironment";
 import { shellRootClass } from "./components/layout/shellLayout";
-import { defaultState, localDay, migrate } from "./utils/migrator";
+import { CURRENT_SCHEMA_VERSION, defaultState, localDay, migrate } from "./utils/migrator";
 
 /* ============================================================
    MATEMÁGICA IA — Matemática Adaptativa & Tutoria Inteligente (PT-BR)
@@ -60,7 +62,7 @@ import { defaultState, localDay, migrate } from "./utils/migrator";
  * Único para o app inteiro, e fora do componente de propósito: um sincronizador
  * criado a cada render não coalesceria nada.
  */
-const nuvem = criarSincronizador({ gravar: saveStateToCloud });
+const nuvem = criarSincronizador<string>({ gravar: saveStateToCloud });
 
 const calcStreak = (log: any[]) => {
   if (!log || !log.length) return 0;
@@ -177,6 +179,7 @@ export default function App() {
     return false;
   });
   const [showAdmin, setShowAdmin] = useState(false);
+  const authUidRef = useRef<string | null>(auth.currentUser?.uid ?? null);
 
   // Reset URL hash on boot so page refreshes always load the normal App state
   useEffect(() => {
@@ -263,6 +266,11 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const nextUid = user?.uid ?? null;
+      if (authUidRef.current && authUidRef.current !== nextUid) {
+        nuvem.cancelarPendencia();
+      }
+      authUidRef.current = nextUid;
       if (user) {
         const email = user.email || user.displayName || (user.isAnonymous ? "visitante" : "Conta Conectada");
         setUserEmail(email);
@@ -276,66 +284,49 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    // If they aren't logged in AND aren't in visitor mode, route them to login!
-    if (!userEmail && !visitorMode) {
+    const user = auth.currentUser;
+    // Produção entra sempre por Firebase (Google ou anônimo). E2E pode manter
+    // o shell local sem identidade cloud; ele não participa da reconciliação.
+    if (!user) {
       setScreen({ name: "login" });
-      (async () => {
-        let loadedState: State | null = null;
-        try {
-          const raw = await getStorage("mk-state-v1");
-          if (raw) loadedState = JSON.parse(raw);
-        } catch (e) {}
-        setState(loadedState ? migrate(loadedState) : defaultState());
-      })();
+      if (E2E && visitorMode) {
+        void (async () => {
+          const raw = await getStorage(LEGACY_STATE_KEY);
+          setState(raw ? migrate(JSON.parse(raw)) : defaultState());
+          setScreen({ name: "pick" });
+        })();
+      }
       return;
     }
 
     let active = true;
-    (async () => {
-      // Os dois lados são lidos SEMPRE, e só depois comparados. A nuvem não
-      // vence por ser nuvem: vence o carimbo mais recente. Sem isto, uma sessão
-      // gravada apenas no aparelho (Firestore sem cache persistente, cache
-      // despejado, escrita que nunca subiu) era substituída pelo save antigo da
-      // nuvem na abertura seguinte, em silêncio.
-      let cloudState: State | null = null;
-      if (userEmail) {
-        try {
-          cloudState = await loadStateFromCloud();
-        } catch (err) {
-          console.warn("Could not load state from Cloud Firestore, trying local storage fallback", err);
-        }
-      }
+    const uid = user.uid;
+    void (async () => {
+      let cloudRaw: State | null = null;
+      try { cloudRaw = await loadStateFromCloud(); }
+      catch (err) { console.warn("Could not load state from Cloud Firestore, trying local storage fallback", err); }
 
-      let localState: State | null = null;
-      try {
-        const raw = await getStorage("mk-state-v1");
-        if (raw) {
-          localState = JSON.parse(raw);
-        }
-      } catch (e) {
-        console.error("Erro ao carregar dados salvos locais:", e);
-      }
+      const [scopedRaw, legacyRaw, legacyOwnerUid] = await Promise.all([
+        getStorage(stateKeyForUid(uid)),
+        getStorage(LEGACY_STATE_KEY),
+        getStorage(LEGACY_STATE_OWNER_KEY),
+      ]);
 
-      const escolha = escolherSaveMaisRecente(cloudState, localState);
-      if (escolha.houveConflito) {
-        console.log(`[Saves] Nuvem e aparelho divergiam; venceu o mais recente: ${escolha.origem}.`);
-      }
-      const loadedState: State | null = escolha.estado;
+      const bootstrap = resolveBootstrapState({
+        uid, scopedLocalRaw: scopedRaw, legacyLocalRaw: legacyRaw, legacyOwnerUid,
+        cloudRaw, migrate, fresh: defaultState, currentSchemaVersion: CURRENT_SCHEMA_VERSION,
+      });
+      if (!active || auth.currentUser?.uid !== uid) return;
 
-      if (!active) return;
-
-      if (loadedState && loadedState.kids && loadedState.kids.length && loadedState.kids[0].name) {
-        setState(migrate(loadedState));
-        setScreen({ name: "pick" });
-      } else {
-        setState(loadedState ? migrate(loadedState) : defaultState());
-        setScreen({ name: "setup" });
-      }
+      const loaded = bootstrap.state;
+      setState(loaded);
+      await setStorage(stateKeyForUid(uid), JSON.stringify(loaded));
+      if (bootstrap.claimLegacy) await setStorage(LEGACY_STATE_OWNER_KEY, uid);
+      if (bootstrap.shouldUploadCloud) nuvem.agendar(loaded, uid);
+      setScreen(loaded.kids.length ? { name: "pick" } : { name: "setup" });
     })();
 
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [userEmail, visitorMode]);
 
   useEffect(() => {
@@ -351,24 +342,17 @@ export default function App() {
    * o outro aparelho já enxergue a mudança.
    */
   const persist = (s: State, imediato = false) => {
-    // O MESMO carimbo vai para os dois destinos, senão a comparação da abertura
-    // acusaria conflito a cada gravação bem-sucedida.
     const carimbado = carimbar(s);
     setState(carimbado);
-
-    // O aparelho grava SEMPRE, a cada questão: é o save que a criança usa, e é
-    // ele que vence na reconciliação por ser o mais recente.
-    (async () => {
-      try {
-        await setStorage("mk-state-v1", JSON.stringify(carimbado));
-      } catch (e) {
-        console.error("Não consegui gravar o progresso local:", e);
-      }
-    })();
-
-    // A nuvem é cópia de segurança e pode esperar. Reescrever o save inteiro a
-    // cada questão subia ~1,2 MB por missão para mudar meia dúzia de números.
-    nuvem.agendar(carimbado);
+    const uid = auth.currentUser?.uid;
+    if (!uid) {
+      if (E2E) void setStorage(LEGACY_STATE_KEY, JSON.stringify(carimbado));
+      return;
+    }
+    void setStorage(stateKeyForUid(uid), JSON.stringify(carimbado)).catch((e) => {
+      console.error("Não consegui gravar o progresso local:", e);
+    });
+    nuvem.agendar(carimbado, uid);
     if (imediato) void nuvem.descarregar();
   };
 
@@ -618,16 +602,9 @@ export default function App() {
     persist(newState, true);
   };
 
-  const handleLoginSuccess = (email: string, cloudState: State | null) => {
+  const handleLoginSuccess = (email: string) => {
+    // Identidade muda aqui; estado é instalado exclusivamente pelo bootstrap.
     setUserEmail(email);
-    if (cloudState) {
-      persist(migrate(cloudState), true);
-    } else {
-      // If there's no cloud state for this new user, start completely fresh with a clean slate!
-      const fresh = defaultState();
-      persist(fresh, true);
-      setScreen({ name: "setup" });
-    }
   };
 
   const handleContinueAsVisitor = () => {
@@ -637,8 +614,10 @@ export default function App() {
     setVisitorMode(true);
   };
 
-  const handleLogout = () => {
-    logoutUser();
+  const handleLogout = async () => {
+    // O último save sobe enquanto o UID antigo ainda é o usuário atual.
+    await nuvem.descarregar();
+    await logoutUser();
     setUserEmail(null);
     setVisitorMode(false);
     if (typeof window !== "undefined" && window.localStorage) {
@@ -686,11 +665,8 @@ export default function App() {
             userEmail={userEmail}
             onLogout={handleLogout}
             onTriggerLogin={() => {
-              setUserEmail(null);
-              setVisitorMode(false);
-              if (typeof window !== "undefined" && window.localStorage) {
-                window.localStorage.removeItem("mk-visitor-mode");
-              }
+              // Mantém o Firebase anônimo vivo: login Google poderá LINKAR o
+              // mesmo UID e preservar o save local/cloud dessa família.
               setScreen({ name: "login" });
             }}
             onTriggerAdmin={() => setScreen({ name: "admin" })}
