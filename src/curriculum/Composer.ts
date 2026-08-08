@@ -1050,7 +1050,7 @@ export class Composer {
             .slice(0, 4)
             .sort(() => Math.random() - 0.5);
           evaluate = ans => Number(ans) === answer;
-          promptOverride = `${parte} mais quanto da dez?`;
+          promptOverride = `${parte} mais quanto dá dez?`;
         } else if (typeof params.dezenas_max === "number") {
           const dezenas = randomInt(1, params.dezenas_max);
           const unidades = randomInt(0, params.unidades_max || 9);
