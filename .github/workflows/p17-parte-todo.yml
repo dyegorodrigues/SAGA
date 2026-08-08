@@ -26,6 +26,19 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
+      - name: Corrigir ancora conhecida da bancada
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('AI_Studio_Lab/tools/p17_apply.py')
+          s = p.read_text()
+          antigo = "    '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\\n',"
+          novo = "    '  /**\\n   * Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam.\\n',"
+          if s.count(antigo) != 1:
+              raise SystemExit(f'ancora da bancada inesperada: {s.count(antigo)}')
+          p.write_text(s.replace(antigo, novo))
+          PY
+
       - name: Aplicar arquitetura P17
         run: python AI_Studio_Lab/tools/p17_apply.py
 
