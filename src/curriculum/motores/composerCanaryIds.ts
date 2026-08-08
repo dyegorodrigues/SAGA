@@ -29,6 +29,7 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "GE.01",
   "GE.02",
   "GM.01",
+  "GM.12",
 
   // Bloco F0 promovido anteriormente.
   "N1.01",
