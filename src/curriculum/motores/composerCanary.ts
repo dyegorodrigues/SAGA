@@ -56,9 +56,9 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.03": N1_03,
   "N1.04": N1_04,
 
-  // N1.06 nunca teve ficha em runtime, e o gerador dela ESCREVIA o número por
-  // extenso na tela ("🔊 TRÊS"): a única competência do app que existe para não
-  // depender de leitura era resolvida lendo. Registrada aqui e NÃO ativada.
+  // N1.06/F05 — o legado escreve o número por extenso; a ficha autoral exige
+  // ouvir sem depender de leitura. Registrada aqui; a ativação fica no conjunto
+  // de canários abaixo e preserva `gN1_06` como rollback.
   "N1.06": N1_06,
   "N1.07": N1_07,
   "N1.08": N1_08,
@@ -113,6 +113,9 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
 export const COMPOSER_CANARIES = new Set<string>([
   "N3.09", "N3.10", "N4.03", "N4.04", "N4.07", "N4.06", "N4.08",
   "N1.07",
+  // N1.06/F05 — promovida após autoplay/retry/evidência fechados, prompt
+  // pós-audição coerente e QA visual estável em 320/390/900.
+  "N1.06",
 
   // A N1.10 SAIU daqui: a ficha dela foi reescrita de `bond` (diagrama
   // parte-todo, com números escritos) para a JD5 de verdade — a tampa que cobre
