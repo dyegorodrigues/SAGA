@@ -1,0 +1,59 @@
+name: P8 - QA visual do Jardim
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  visual:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Aplicar cenas permanentes P8
+        run: python AI_Studio_Lab/tools/p8_visual_apply.py
+      - name: Verificar contrato e teste da aba
+        run: |
+          git diff --check
+          npx tsc --noEmit
+          npx vitest run src/components/home/DojoTab.test.tsx src/curriculum/motores/jardimEngine.test.ts src/curriculum/motores/jardimSession.test.ts
+          npm run build
+      - name: Instalar Chromium
+        run: npx playwright install chromium --with-deps
+      - name: Sonda real do Garden
+        env:
+          SONDA_SEMENTES: '1'
+        run: npm run sonda -- "P8 Jardim home"
+      - name: Capturar 320 390 900
+        run: |
+          mkdir -p /tmp/p8-garden
+          for W in 320 390 900; do
+            mkdir -p "/tmp/p8-garden/$W"
+            PRINTS_OUT="/tmp/p8-garden/$W" PRINTS_LARGURA="$W" PRINTS_WAIT_MS=400 node scripts/prints.mjs "P8 Jardim home"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p8-jardim-visual-${{ github.sha }}
+          path: /tmp/p8-garden
+          if-no-files-found: error
+          retention-days: 7
+      - name: Publicar cenas aprovadas e limpar bancada
+        run: |
+          rm AI_Studio_Lab/tools/p8_visual_apply.py .github/workflows/p8-jardim-visual.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'P8: adiciona sonda permanente da home do Jardim'
+          git push origin HEAD:codex/integrar-bloco-f0
