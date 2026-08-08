@@ -32,11 +32,21 @@ jobs:
           from pathlib import Path
           p = Path('AI_Studio_Lab/tools/p17_apply.py')
           s = p.read_text()
+
+          # Insere as tags imediatamente antes da propriedade RESPONDE_O_CHEIO.
+          # Assim o comentario multilinha original da JD3 fica intocado.
           antigo = "    '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\\n',"
-          novo = "    '  /**\\n   * Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam.\\n',"
+          novo = "    '  RESPONDE_O_CHEIO: \\\"responde-o-cheio\\\",\\n',"
           if s.count(antigo) != 1:
-              raise SystemExit(f'ancora da tag inesperada: {s.count(antigo)}')
+              raise SystemExit(f'ancora antiga da tag inesperada: {s.count(antigo)}')
           s = s.replace(antigo, novo)
+
+          cauda_antiga = '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\n\'\'\','
+          cauda_nova = '  RESPONDE_O_CHEIO: "responde-o-cheio",\n\'\'\','
+          if s.count(cauda_antiga) != 1:
+              raise SystemExit(f'cauda da tag inesperada: {s.count(cauda_antiga)}')
+          s = s.replace(cauda_antiga, cauda_nova)
+
           alvo = '    5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum" },'
           troca = '    5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum", rt_alvo: 8000 },'
           if s.count(alvo) != 1:
