@@ -7,6 +7,7 @@
 1. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
 2. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
 3. [`MAPA_MESTRE_POS_P20.md`](./MAPA_MESTRE_POS_P20.md) para a estratégia das fases grandes.
+4. [`REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md`](./REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md) para o registro textual completo da resposta ao autor que definiu P21.1, P21.2, P22, auditoria dos motores, mega auditoria pedagógica, auditoria JD/FD/PD e release hardening.
 
 Os roadmaps de 5/ago são **históricos**. Não use contagens ou “próximo passo” deles como fila atual.
 
@@ -74,7 +75,7 @@ Documento de decisão:
 - auditoria integrada JD/FD/PD;
 - release hardening.
 
-Detalhes: `MAPA_MESTRE_POS_P20.md`.
+Detalhes: `MAPA_MESTRE_POS_P20.md` e `REGISTRO_LITERAL_RESPOSTA_POS_P20_P21.md`.
 
 ## 7. Portões
 
