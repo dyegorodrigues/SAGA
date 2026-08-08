@@ -50,6 +50,7 @@ import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
 import { MascotEnvironment } from "./engine/mascot-v2/MascotEnvironment";
 import { shellRootClass } from "./components/layout/shellLayout";
+import { defaultState, localDay, migrate } from "./utils/migrator";
 
 /* ============================================================
    MATEMÁGICA IA — Matemática Adaptativa & Tutoria Inteligente (PT-BR)
@@ -60,118 +61,6 @@ import { shellRootClass } from "./components/layout/shellLayout";
  * criado a cada render não coalesceria nada.
  */
 const nuvem = criarSincronizador({ gravar: saveStateToCloud });
-
-const getDefaultPetName = (theme: string) => {
-  const names: Record<string, string> = {
-    classico: "Mago",
-    homem_aranha: "Teioso",
-    batman: "Morceguinho",
-    elsa: "Floquinho",
-    pikachu: "Faísca",
-    heroi: "Super-Pet",
-    futebol: "Golzinho",
-    musica: "Batuque",
-    dino: "Dininho",
-    pantera_negra: "Panterinha",
-    thor: "Trovenho",
-    goku: "Gokuzinho",
-    homem_ferro_pixel: "Retro-Tin",
-    homem_aranha_pixel: "Retro-Teia",
-    hulk_pixel: "Retro-Hulk",
-    trex: "T-Rex God",
-  };
-  return names[theme] || "Bichinho";
-};
-
-const defaultState = (): State => ({
-  schemaVersion: 1,
-  kids: [],
-  progress: {},
-  dojoTracks: {},
-  coins: {},
-  album: {},
-  log: {},
-  sound: true,
-  customTracks: [],
-});
-
-function migrate(s: any): State {
-  if (!s || s.schemaVersion !== 1) {
-    console.warn("Versão antiga ou sem schemaVersion detectada. Reset limpo aplicado (Fase 1).");
-    return defaultState();
-  }
-  const m = { ...s };
-  const today = localDay();
-  m.kids = (m.kids || []).map((k: any) => {
-    const updated = {
-      theme: "classico",
-      age: k.grade === "pre" ? 4 : 6,
-      petEnergy: k.petEnergy != null ? k.petEnergy : 80,
-      petFood: k.petFood != null ? k.petFood : 3,
-      ...k,
-    };
-    if (!updated.petName) {
-      updated.petName = getDefaultPetName(updated.theme);
-    }
-    // Decaimento gentil da energia: 25 por dia parado, mínimo 0.
-    // Barra vazia = pet sonolento (boceja). NUNCA adoece, morre ou regride.
-    const lastDay = updated.petDay || today;
-    const days = Math.max(
-      0,
-      Math.round((new Date(today).getTime() - new Date(lastDay).getTime()) / 86400000)
-    );
-    if (days > 0) {
-      updated.petEnergy = Math.max(0, (updated.petEnergy ?? 80) - 25 * days);
-    }
-    updated.petDay = today;
-    return updated;
-  });
-  m.coins = m.coins || {};
-  m.album = m.album || {};
-  m.log = m.log || {};
-  m.progress = m.progress || {};
-  m.dojoTracks = m.dojoTracks || {};
-  m.customTracks = m.customTracks || [];
-
-  for (const k of m.kids) {
-    if (!m.dojoTracks[k.id]) m.dojoTracks[k.id] = {};
-    const prog = { ...(m.progress[k.id] || {}) };
-    // Migração da economia dupla: moedinhas iniciais = saldo gastável antigo
-    // (wallet) ou, em saves muito antigos, o total de estrelas acumulado.
-    if (m.coins[k.id] == null) {
-      m.coins[k.id] =
-        (m.wallet && m.wallet[k.id] != null)
-          ? m.wallet[k.id]
-          : Object.values(prog).reduce((t: number, x: any) => t + (x.stars || 0), 0);
-    }
-    if (!m.album[k.id]) m.album[k.id] = [];
-    if (!m.log[k.id]) m.log[k.id] = [];
-    for (const tid of Object.keys(prog)) {
-      if (!prog[tid].bank) {
-        prog[tid] = { ...prog[tid], bank: [], mast: prog[tid].mast || 0 };
-      }
-      // Bolinhas conquistadas: saves antigos herdam o nível atual como o máximo já alcançado
-      if (prog[tid].maxLvl == null) {
-        prog[tid] = { ...prog[tid], maxLvl: prog[tid].lvl || 1, dom: prog[tid].dom || false };
-      }
-      // Coroas já conquistadas nunca são revogadas. Elas recebem proveniência
-      // explícita para não serem confundidas com o novo domínio multidimensional.
-      if (prog[tid].dom && !prog[tid].masteryEvidence) {
-        prog[tid] = migrateLegacyCrown(prog[tid]);
-      }
-    }
-    m.progress[k.id] = prog;
-  }
-  if (m.sound == null) m.sound = true;
-  return m as State;
-}
-
-const localDay = (dt = new Date()) =>
-  dt.getFullYear() +
-  "-" +
-  String(dt.getMonth() + 1).padStart(2, "0") +
-  "-" +
-  String(dt.getDate()).padStart(2, "0");
 
 const calcStreak = (log: any[]) => {
   if (!log || !log.length) return 0;
