@@ -1,0 +1,99 @@
+name: Cleanup absorbed branches
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  cleanup:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+
+      - name: Provar que os refs históricos foram absorvidos
+        run: |
+          git fetch origin --prune
+          test "$(git rev-parse origin/main)" = "68fad4c575e28959b2ca4776e9a541d6828b63f3"
+          test "$(git rev-parse origin/codex/corrigir-n106)" = "cc2469ec3c650a6ef9c466781645ec63c17dbc22"
+          test "$(git rev-parse origin/codex/reconciliar-f05-f04)" = "93a7e47353cad1047a05f96c67508f28d128360e"
+          git merge-base --is-ancestor origin/codex/ativar-al01 HEAD
+          git merge-base --is-ancestor origin/codex/corrigir-n113 HEAD
+          git merge-base --is-ancestor 343cec82aec9106a3381f7309f823687529b5d2f HEAD
+          git show-ref --verify --quiet refs/remotes/origin/agent/creature-engine-tamagotchi
+          git show-ref --verify --quiet refs/remotes/origin/codex/criar-branch-para-creature-engine-tamagotchi
+
+      - name: Apagar somente os quatro refs históricos absorvidos
+        run: |
+          git push origin --delete \
+            codex/ativar-al01 \
+            codex/corrigir-n106 \
+            codex/corrigir-n113 \
+            codex/reconciliar-f05-f04
+          git fetch origin --prune
+          for ref in \
+            origin/codex/ativar-al01 \
+            origin/codex/corrigir-n106 \
+            origin/codex/corrigir-n113 \
+            origin/codex/reconciliar-f05-f04; do
+            if git show-ref --verify --quiet "refs/remotes/$ref"; then
+              echo "ref histórico ainda existe: $ref" >&2
+              exit 1
+            fi
+          done
+          git show-ref --verify --quiet refs/remotes/origin/main
+          git show-ref --verify --quiet refs/remotes/origin/codex/integrar-bloco-f0
+          git show-ref --verify --quiet refs/remotes/origin/agent/creature-engine-tamagotchi
+          git show-ref --verify --quiet refs/remotes/origin/codex/criar-branch-para-creature-engine-tamagotchi
+
+      - name: Registrar a higiene no handoff e briefing
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('AI_Studio_Lab/codex/HANDOFF_CONTINUIDADE_IA.md')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+            'A conversa anterior deixou várias branches, mas elas não representam trabalhos\nindependentes que ainda precisem ser reaplicados.',
+            'A conversa anterior deixou várias branches auxiliares. Depois de provar a absorção\ndo conteúdo, os quatro refs históricos foram **apagados do remoto em 8/ago/2026**;\nos PRs/commits continuam preservando a genealogia e as decisões.'
+          )
+          s = s.replace('- `codex/ativar-al01` — **checkpoint histórico/ancestral**. A correção de AL.01\n  foi absorvida pela linha cumulativa; não continuar por ela.', '- `codex/ativar-al01` — ref remoto **removido**; checkpoint preservado pelo histórico/PR.')
+          s = s.replace('- `codex/corrigir-n106` — correção histórica de N1.06/F05, reconciliada e\n  absorvida semanticamente na cumulativa.', '- `codex/corrigir-n106` — ref remoto **removido** após reconciliação semântica F05/F04 (PR #32).')
+          s = s.replace('- `codex/corrigir-n113` — correção de N1.13/F04, absorvida na cumulativa.', '- `codex/corrigir-n113` — ref remoto **removido**; conteúdo já ancestral da cumulativa.')
+          s = s.replace('- `codex/reconciliar-f05-f04` — reconciliação F05/F04 absorvida pela cumulativa.', '- `codex/reconciliar-f05-f04` — ref remoto **removido**; PR #32 já mesclada na cumulativa.')
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('AI_Studio_Lab/codex/BRIEFING_CODEX.md')
+          s = p.read_text(encoding='utf-8')
+          replacements = {
+            '| `codex/ativar-al01` | checkpoint absorvido | histórico; seguro para apagar o ref quando houver ferramenta de delete |': '| `codex/ativar-al01` | ref removido em 8/ago | histórico preservado por commits/PR |',
+            '| `codex/corrigir-n106` | histórico reconciliado por squash/PR #32 | não reaplicar; seguro para apagar o ref após conferir o registro do PR #32 |': '| `codex/corrigir-n106` | ref removido em 8/ago | F05 preservada pela reconciliação PR #32 |',
+            '| `codex/corrigir-n113` | ancestral absorvido | histórico; seguro para apagar o ref quando houver ferramenta de delete |': '| `codex/corrigir-n113` | ref removido em 8/ago | histórico preservado por commits/PR |',
+            '| `codex/reconciliar-f05-f04` | reconciliação squash-merged na cumulativa | histórico; seguro para apagar o ref |': '| `codex/reconciliar-f05-f04` | ref removido em 8/ago | PR #32 permanece como registro da reconciliação |',
+          }
+          for old, new in replacements.items():
+            if old not in s:
+              raise SystemExit(f'linha de branch não encontrada no briefing: {old}')
+            s = s.replace(old, new, 1)
+          s = s.replace('3. Quando a ferramenta permitir exclusão de refs, apagar apenas as quatro\n   branches históricas absorvidas listadas no §0. As duas do Creature Engine\n   ficam preservadas.', '3. Os quatro refs históricos deste fluxo **já foram removidos**. Não recriá-los.\n   As duas branches do Creature Engine ficam preservadas.')
+          p.write_text(s, encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Publicar registro e remover bancada
+        run: |
+          rm .github/workflows/cleanup-absorbed-branches.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add AI_Studio_Lab/codex/HANDOFF_CONTINUIDADE_IA.md AI_Studio_Lab/codex/BRIEFING_CODEX.md .github/workflows/cleanup-absorbed-branches.yml
+          git diff --cached --check
+          git commit -m 'higiene: remove refs históricos já absorvidos na branch cumulativa'
+          git push origin HEAD:codex/integrar-bloco-f0
