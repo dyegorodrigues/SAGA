@@ -1,0 +1,70 @@
+name: Close GM12 contract v2
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  close:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Reaplicar fechamento sem whitespace residual
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import YAML from 'yaml';
+          const source = YAML.parse(fs.readFileSync('.github/workflows/close-gm12-contract.yml', 'utf8'));
+          const nomes = [
+            'Ligar tutorial e falas específicas da F50',
+            'Sincronizar cânone e inventário executável',
+          ];
+          nomes.forEach((nome, i) => {
+            const step = source.jobs.close.steps.find(s => s.name === nome);
+            if (!step?.run) throw new Error(`etapa ausente: ${nome}`);
+            // O primeiro ciclo foi barrado apenas por dois espaços Markdown no
+            // fim de linha. O repositório usa git diff --check como portão, então
+            // retiramos whitespace terminal do SCRIPT antes de reaplicá-lo.
+            const clean = step.run.split('\n').map(l => l.trimEnd()).join('\n');
+            fs.writeFileSync(`/tmp/gm12-close-${i}.sh`, clean, { mode: 0o700 });
+          });
+          NODE
+          bash /tmp/gm12-close-0.sh
+          bash /tmp/gm12-close-1.sh
+          git diff --check
+
+      - name: Provar fechamento da F50
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run src/curriculum/fichas/jornada/GM.12.test.ts src/curriculum/procedimentos/medidasContract.test.ts src/curriculum/procedimentos/medidasProcedure.test.ts src/curriculum/fichaRuntimeMap.test.ts
+          npm test -- --run
+          npm run build
+
+      - name: Publicar fechamento e remover bancadas
+        run: |
+          rm .github/workflows/close-gm12-contract.yml .github/workflows/close-gm12-contract-v2.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src AI_Studio_Lab .github/workflows/close-gm12-contract.yml .github/workflows/close-gm12-contract-v2.yml
+          git diff --cached --check
+          git commit -m 'GM.12: fecha tutorial, falas e cânone da F50 validada'
+          git push origin HEAD:codex/integrar-bloco-f0
