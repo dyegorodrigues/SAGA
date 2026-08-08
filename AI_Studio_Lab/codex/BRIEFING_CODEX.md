@@ -32,10 +32,10 @@ Repositório: `dyegorodrigues/SAGA`.
 |---|---|---|
 | `main` | base protegida desta linha | **não tocar** |
 | `codex/integrar-bloco-f0` | linha cumulativa vigente | **continuar aqui** |
-| `codex/ativar-al01` | checkpoint absorvido | histórico; seguro para apagar o ref quando houver ferramenta de delete |
-| `codex/corrigir-n113` | ancestral absorvido | histórico; seguro para apagar o ref quando houver ferramenta de delete |
-| `codex/corrigir-n106` | histórico reconciliado por squash/PR #32 | não reaplicar; seguro para apagar o ref após conferir o registro do PR #32 |
-| `codex/reconciliar-f05-f04` | reconciliação squash-merged na cumulativa | histórico; seguro para apagar o ref |
+| `codex/ativar-al01` | ref removido em 8/ago | histórico preservado por commits/PR |
+| `codex/corrigir-n113` | ref removido em 8/ago | histórico preservado por commits/PR |
+| `codex/corrigir-n106` | ref removido em 8/ago | F05 preservada pela reconciliação PR #32 |
+| `codex/reconciliar-f05-f04` | ref removido em 8/ago | PR #32 permanece como registro da reconciliação |
 | `agent/creature-engine-tamagotchi` | trabalho independente não presente na main | **não apagar / não tocar neste fluxo** |
 | `codex/criar-branch-para-creature-engine-tamagotchi` | trabalho independente PMD | **não apagar / não tocar neste fluxo** |
 
@@ -134,9 +134,8 @@ dívida de runtime; `PRIMITIVAS_PENDENTES` ficou em `Moedas` e `Regua`.
 
 1. Manter somente a PR #29 aberta neste fluxo.
 2. Não criar novas branches auxiliares para tarefas ordinárias.
-3. Quando a ferramenta permitir exclusão de refs, apagar apenas as quatro
-   branches históricas absorvidas listadas no §0. As duas do Creature Engine
-   ficam preservadas.
+3. Os quatro refs históricos deste fluxo **já foram removidos**. Não recriá-los.
+   As duas branches do Creature Engine ficam preservadas.
 4. Todo lote relevante atualiza `HANDOFF_CONTINUIDADE_IA.md` antes de terminar.
 5. Bancadas de GitHub Actions devem ser **descartáveis**: criar → executar →
    publicar artefato/resultado → apagar o próprio workflow.

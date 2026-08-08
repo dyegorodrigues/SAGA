@@ -22,15 +22,14 @@ PRs e conteúdo antes de mexer.
 
 ## 2. Reconciliação das branches da Tarefa 2 — AL.01
 
-A conversa anterior deixou várias branches, mas elas não representam trabalhos
-independentes que ainda precisem ser reaplicados.
+A conversa anterior deixou várias branches auxiliares. Depois de provar a absorção
+do conteúdo, os quatro refs históricos foram **apagados do remoto em 8/ago/2026**;
+os PRs/commits continuam preservando a genealogia e as decisões.
 
-- `codex/ativar-al01` — **checkpoint histórico/ancestral**. A correção de AL.01
-  foi absorvida pela linha cumulativa; não continuar por ela.
-- `codex/corrigir-n106` — correção histórica de N1.06/F05, reconciliada e
-  absorvida semanticamente na cumulativa.
-- `codex/corrigir-n113` — correção de N1.13/F04, absorvida na cumulativa.
-- `codex/reconciliar-f05-f04` — reconciliação F05/F04 absorvida pela cumulativa.
+- `codex/ativar-al01` — ref remoto **removido**; checkpoint preservado pelo histórico/PR.
+- `codex/corrigir-n106` — ref remoto **removido** após reconciliação semântica F05/F04 (PR #32).
+- `codex/corrigir-n113` — ref remoto **removido**; conteúdo já ancestral da cumulativa.
+- `codex/reconciliar-f05-f04` — ref remoto **removido**; PR #32 já mesclada na cumulativa.
 - `codex/integrar-bloco-f0` — **única linha atual de continuidade deste bloco**.
 
 Não cherry-pickar mecanicamente commits dessas branches antigas: isso pode
