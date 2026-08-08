@@ -1,0 +1,58 @@
+name: P22.1 - GM.12 promotion gate
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  gate:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Contrato e ficha GM.12
+        run: |
+          npx vitest run src/curriculum/fichas/jornada/GM.12.test.ts src/curriculum/motores/canaryContract.test.ts
+          npm run auditar | tee /tmp/p22-1-audit.txt
+          grep -F 'Composer ativo: 23/90' /tmp/p22-1-audit.txt
+          grep -F 'Composer registrado e inativo: 1/90' /tmp/p22-1-audit.txt
+          grep -F 'Servido sem placeholder (legado ∪ Composer ativo): 50/90' /tmp/p22-1-audit.txt
+          grep -F 'Fallback real sem conteúdo servido: 40/90' /tmp/p22-1-audit.txt
+          grep -F '[COMPOSER REGISTRADO E INATIVO]' /tmp/p22-1-audit.txt
+          grep -F 'N4.09' /tmp/p22-1-audit.txt
+      - name: Sonda GM.12 promovida
+        env:
+          SONDA_CHROME: /usr/bin/google-chrome
+        run: npm run sonda -- GM.12
+      - name: Portoes completos
+        run: |
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npm test -- --run
+          npm run build
+          npm run pr:check
+          git diff --check e2ee44d1d79d910ebbfcb3411d5f65c836616a47..HEAD
+      - name: Limpar bancada temporaria
+        if: always()
+        run: |
+          rm .github/workflows/p22-1-gm12-gate.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: remove bancada temporaria P22.1 GM.12'
+          git push origin HEAD:codex/integrar-bloco-f0
