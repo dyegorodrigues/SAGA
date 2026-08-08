@@ -1,120 +1,119 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 8/ago/2026 após P17 + P8 Jardim.**
+> **VIGENTE em 8/ago/2026 após P17 + P8 + P19.**
 >
-> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md). Este briefing é a versão executiva: estado, próxima fila e definição de pronto.
+> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md). Depois leia `DECISAO_P17_N110.md`, `DECISAO_P8_JARDIM.md` e `DECISAO_P19_ESTADO_E_DEPENDENCIAS.md`.
 
 ## 0. Estado que não deve ser redescoberto
 
 - Repo: `dyegorodrigues/SAGA`.
 - Trabalho: **`codex/integrar-bloco-f0`**.
 - `main`: `68fad4c575e28959b2ca4776e9a541d6828b63f3` — **não tocar**.
-- PR #29: draft, base `main`, somente comparação/CI, nunca auto-merge.
+- Cumulativa: última comparação **266 commits à frente / 0 atrás**.
+- PR #29: open + draft, base `main`, só comparação/CI, nunca auto-merge.
 - Creature Engine: fora deste fluxo.
-- Remoto: main + cumulativa + duas branches do Creature Engine.
+- Não criar branches auxiliares.
 
-## 1. P17 está fechada
+## 1. P17 — fechada
 
-Documento: `DECISAO_P17_N110.md`.
-
-- `N1.10`: JD5 → retirada real de moldura → NumberBond; `SEM_MOLDURA` é gate antes de L5.
+- `N1.10`: JD5 → retirada real de moldura → NumberBond; `SEM_MOLDURA` gate antes de L5.
 - `N1.11`: JD3 → F28 NumberBond → `n + □ = 10`.
-- N1.10/N1.11 estão ativos e revalidados em CI normal separada.
-- representações diferentes da mesma competência não viram nós paralelos.
-- `MasteryRule` agora executa `acertos/de/sessoes` da ficha.
+- N1.10/N1.11 ativos e revalidados em CI normal separada.
+- `MasteryRule` executa `acertos/de/sessoes` da ficha.
 
-## 2. P8 está fechada
+## 2. P8 — fechada
 
-Documento: `DECISAO_P8_JARDIM.md`.
+Jardim real:
 
-O Garden antigo era uma lista CRA de trilhas da Jornada. Agora consome o catálogo canônico:
+- JD1 → N1.03
+- JD2 → N1.08
+- JD3 → N1.11
+- JD5 → N1.10
 
-- JD1 → N1.03;
-- JD2 → N1.08;
-- JD3 → N1.11;
-- JD5 → N1.10.
+Regras:
 
-### Regras permanentes
-
-- JD não entra no DAG;
-- unlock deriva da mãe no nível 3/domínio;
-- estado fica em `state.dojoTracks`, nunca `state.progress[JD*]`;
-- GameLoop em modo Garden não chama `applyJourneyAnswer`;
-- round atual = 8 itens (contrato aceita 6–10);
-- dois rounds ≥80% precisão **e** ≥80% fluência → avança;
-- dois rounds <60% → recua treino sem retirar conquista;
-- acerto lento não é erro conceitual;
+- JD fora do DAG;
+- unlock pela mãe já ter conquistado nível 3 ou domínio;
+- estado em `dojoTracks`, nunca `progress[JD*]`;
+- GameLoop Garden não chama `applyJourneyAnswer`;
+- round atual 8 itens;
+- 2 rounds ≥80% precisão **e** ≥80% fluência → avança;
+- 2 rounds <60% → recua treino sem retirar conquista;
+- lentidão não é misconception;
 - primeira resposta cognitiva mede automaticidade;
-- erros reais alimentam Radar da mãe;
-- sem seletor manual de nível no Garden.
+- erros reais vão para Radar da mãe;
+- sem level picker no Garden.
 
-### QA
+QA permanente passou 320/390/900; o shell visual atual não é arte premium final.
 
-- teste permanente de DojoTab cobre unlock, stats, currentStep/highestStep e ausência do Garden CRA;
-- sonda permanente: bloqueado / parcial / avançado;
-- primeiro QA falhou contraste e o componente foi corrigido;
-- depois passou 320/390/900;
-- PNGs 320 inspecionados manualmente;
-- UI funcional validada, arte premium final continua dívida separada.
+## 3. P19 — fechada
 
-Commits-chave:
+### Migrador
 
-- motor puro: `5b22e6d4594db68c3f86414dccd18c40faf49619`;
-- cânone Dojo v1.5: `3ec25a4007c0e79b89bafcb7887bf270000ca545`;
-- QA visual: `21ab21e6c4d7465f66a37136dc15b68970c1f795`;
-- remoção do caminho CRA morto: `37a03a8bbf9d33221b8a3c75c7f8b847fdffbf97`.
+`src/utils/migrator.ts` é agora a **única** fonte de migração; App importa `migrate/defaultState/localDay`.
 
-JD4 continua fora e não deve ser inventada nesta linha.
+Commit funcional: `86ecea6b932ee174f81f9b2914d3ffade9088798`.
 
-## 3. Canários F0 ativos/revalidados
+Testes cobrem save v1, `dojoTracks`, wallet/estrelas, coroa legada, pet, defaults, não-mutação e proibição de migrador duplicado no App.
 
-- `AL.01`
-- `N1.06`
-- `N1.13`
-- `GE.01`
-- `GE.02`
-- `GM.01`
-- `N1.10`
-- `N1.11`
+### Dependências
 
-Lista única: `src/curriculum/motores/composerCanaryIds.ts`.
+Relatório: `AUDITORIA_P19_DEPENDENCIAS.md`.
+
+Lockfile remediado sem alterar ranges do `package.json`:
+
+- js-yaml 5.2.3
+- nanoid 3.3.18
+- postcss 8.5.26
+- body-parser 1.20.6
+
+Commit: `bd17e42d55eae3bbff1afd08f137ea001f76b91e`.
+
+Após reinstalação limpa:
+
+- audit completo = **0**;
+- audit produção = **0**;
+- TS/suíte/build/auditorias = verdes.
+
+Decisão: `DECISAO_P19_ESTADO_E_DEPENDENCIAS.md`.
+
+## 4. Canários ativos/revalidados desta retomada
+
+`AL.01`, `N1.06`, `N1.13`, `GE.01`, `GE.02`, `GM.01`, `N1.10`, `N1.11`.
+
+Única lista declarativa: `src/curriculum/motores/composerCanaryIds.ts`.
 
 Promoção futura = **um id por commit**.
 
-## 4. GM.12 continua desligada
+## 5. GM.12 continua desligada
 
-F50/GM.12 está implementada e visualmente revisada, mas permanece em observação e fora dos canários.
+F50/GM.12 está implementada e visualmente revisada, mas em observação.
 
 **Não promover por momentum.**
 
-## 5. Próxima frente — integridade de estado/migração/dependências
+## 6. Próxima frente — P20 / sync local × nuvem
 
-### 5.1 Migração/estado
+### Começar audit-only
 
-Suspeita a provar:
+App importa `loadStateFromCloud`, `reconcileStateByRevision` e `saveStateToCloud` de `./services/storageSync`, mas o conector não localizou diretamente esse path enquanto TS/build continuam verdes.
 
-- `App.tsx` tem função local `migrate`;
-- `src/utils/migrator.ts` existe como outro migrador;
-- busca inicial não encontrou consumidor ativo do utilitário.
+Não concluir nada por 404 do conector. Primeiro inventariar o checkout real.
 
-Auditar antes de editar:
+Responder:
 
-1. todos os imports/consumidores;
-2. diferenças entre os dois migradores;
-3. compatibilidade de `dojoTracks` com saves antigos;
-4. add/delete/reset de criança;
-5. testes de migração existentes;
-6. se a duplicação pode divergir silenciosamente.
+1. qual arquivo real resolve o import;
+2. consumidores e rotas de load/save/reconcile;
+3. precedência por `revision` e regra de empate;
+4. se todos os campos do State viajam juntos;
+5. migração antes/depois da reconciliação;
+6. offline/reconexão;
+7. service worker / `SAVE_REQUEST`;
+8. risco de payload stale/equal revision apagar campo novo;
+9. testes existentes/ausentes.
 
-Não apagar por aparência de código morto.
+Só depois decidir patch.
 
-### 5.2 Dependências
-
-`npm ci` vem reportando vulnerabilidades. Rodar `npm audit`, identificar pacote/cadeia/impacto/versão corrigida e só então decidir.
-
-**Nunca `npm audit fix` cegamente.**
-
-## 6. Portões
+## 7. Portões
 
 ```bash
 npm run auditar
@@ -128,33 +127,16 @@ npm run pr:check
 git diff --check
 ```
 
-Tela afetada também exige sonda/prints.
+## 8. Não fazer
 
-## 7. Regras não negociáveis
-
-- não tocar na `main`;
+- não tocar `main`;
 - não tocar Creature Engine;
-- não reabrir P17/P8 sem falha objetiva;
-- não criar currículo paralelo;
-- não criar `progress[JD*]`;
-- não transformar lentidão em misconception;
-- não reintroduzir Garden CRA;
+- não reabrir P17/P8/P19 sem falha objetiva;
+- não criar currículo paralelo nem `progress[JD*]`;
 - não promover GM.12 no embalo;
-- não apagar migrador sem provar consumidores;
-- não atualizar dependência automaticamente sem análise;
+- não alterar sync antes da auditoria P20;
+- não usar `npm audit fix` cegamente;
 - não tratar sonda como arte final;
-- não deixar workflow temporário órfão.
-
-## 8. Definição de pronto
-
-- [ ] commit na cumulativa;
-- [ ] `main` imóvel;
-- [ ] nenhuma branch extra;
-- [ ] nenhum workflow/script temporário órfão;
-- [ ] auditorias/TS/testes/build verdes;
-- [ ] sonda/prints quando há tela;
-- [ ] handoff/PR atualizados quando o estado muda;
-- [ ] PR #29 draft/não mesclada;
-- [ ] nova conversa retoma sem reler o chat.
+- não deixar workflow/script temporário órfão.
 
 **Existir não é estar certo. Divergência pode ser corrigida; divergência silenciosa não.**
