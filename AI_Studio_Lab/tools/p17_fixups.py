@@ -167,7 +167,6 @@ p.write_text(s)
 
 # ---------------------------------------------------------------------------
 # 4. Jardim agora é polimórfico: JD1/JD2 usam fileira, JD3/JD5 usam moldura.
-#    O teste deve validar a primitiva declarada e a resposta executável.
 # ---------------------------------------------------------------------------
 p = Path("src/curriculum/fichas/dojo/jardim/jardim.test.ts")
 s = p.read_text()
@@ -208,7 +207,7 @@ new_test = '''  it("cada trilha gera questão executável nos CINCO níveis, na 
     const jd3 = Composer.generate(JD3, 5).uiProps as MolduraSpec;
     const jd5 = Composer.generate(JD5, 5).uiProps as MolduraSpec;
     expect(jd3.disperso).toBe(true);
-    expect(jd5.molduraVisivel).toBe(false);
+    expect(jd5.semMoldura).toBe(true);
   });'''
 if s.count(old_test) != 1:
     raise SystemExit(f"jardim.test: teste-base {s.count(old_test)}x")
