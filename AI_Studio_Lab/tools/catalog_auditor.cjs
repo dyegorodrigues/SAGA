@@ -276,7 +276,10 @@ function fichaIdForSymbol(symbol) {
 }
 
 function symbolsFromArray(block) {
-  return block ? block.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [] : [];
+  const codeOnly = (block || "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/.*$/gm, "");
+  return codeOnly.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
 }
 
 const journeyRegistryBlock = fichaIndex.match(/export const JOURNEY_FICHAS\s*=\s*\[([\s\S]*?)\];/);
@@ -313,6 +316,10 @@ for (const symbol of registeredSymbols) {
 const registeredJourneyFichaIds = registeredFichaIds.filter((id) => yamlIdSet.has(id));
 const unregisteredFichaIds = fichaIds.filter((id) => !registeredFichaIds.includes(id));
 const journeyMissingFromAllFichas = journeyRegistryIds.filter((id) => !registeredJourneyFichaIds.includes(id));
+check(
+  new Set(registeredJourneyFichaIds).size === registeredJourneyFichaIds.length,
+  "AllFichas expõe fichas de Jornada duplicadas"
+);
 check(
   journeyMissingFromAllFichas.length === 0,
   `JOURNEY_FICHAS não está integralmente exposta em AllFichas: ${journeyMissingFromAllFichas.join(", ")}`
