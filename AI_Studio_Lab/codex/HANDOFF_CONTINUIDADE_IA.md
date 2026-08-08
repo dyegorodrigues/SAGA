@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 8/ago/2026. Checkpoint: P21.1 concluída; próximo passo P21.2.**
+> **VIGENTE — 8/ago/2026. Checkpoint: P21 concluída; próximo passo P22 audit-first.**
 
 ## Regra de ouro
 
@@ -18,7 +18,7 @@
 
 1. [`RETOMADA.md`](./RETOMADA.md)
 2. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
-3. [`AUDITORIA_P21_FONTES_DE_VERDADE.md`](./AUDITORIA_P21_FONTES_DE_VERDADE.md) — baseline P21.A, anterior às correções P21.1.
+3. [`AUDITORIA_P21_FONTES_DE_VERDADE.md`](./AUDITORIA_P21_FONTES_DE_VERDADE.md) — baseline P21.A, anterior às correções P21.1/P21.2.
 4. [`MAPA_MESTRE_POS_P20.md`](./MAPA_MESTRE_POS_P20.md)
 5. decisão P específica se for tocar naquele bloco.
 
@@ -32,18 +32,13 @@
 - **P19:** migrador único; npm audit completo/produção = 0 após remediação conservadora.
 - **P20:** save local por Firebase UID + bootstrap único + sync com UID de origem + link anônimo→Google.
 - **P21.1:** registries, cobertura autoral e proveniência executável reconciliados.
+- **P21.2:** mapa autoral de primitivas reconciliado com builder→kind→renderer real.
 
-P20 commit funcional:
-
-`f45509ca73739d93fe32986c9cf7bcc5aaf6337a`
-
-Gate transacional P20 run `31273869346`: **success** em testes focais, auditores, suíte inteira e build. O run `action_required` do commit auto-publicado tinha zero jobs e não representa falha de código.
-
-## P21.A — inventário histórico concluído
+## P21.A — inventário histórico
 
 Run `31274280464`: **success**; workflow/script temporários auto-removidos.
 
-A P21.A identificou:
+Baseline pré-correção:
 
 - 90 nós YAML / 90 JSON;
 - 92 fichas Markdown cobrindo 88/90 competências;
@@ -52,83 +47,92 @@ A P21.A identificou:
 - 24 registradas no Composer;
 - 22 canários ativos;
 - registradas/inativas: **N4.09, GM.12**;
-- TS existentes fora do registro Composer: **AL.05, GM.04, N2.01, N3.11, N4.02** — classificar intenção antes de qualquer promoção;
-- `JOURNEY_FICHAS` administrativo estava em 19/29;
-- fiscais de cobertura/proveniência estavam semanticamente atrasados;
-- mapa de primitivas tem 26 entradas e precisa reconciliar falsos negativos/positivos com o runtime real.
+- TS fora do Composer: **AL.05, GM.04, N2.01, N3.11, N4.02**;
+- `JOURNEY_FICHAS` estava em 19/29;
+- fiscais de cobertura/proveniência e mapa de primitivas estavam semanticamente atrasados.
 
 ## P21.1 — concluída
 
-Gate final `31275660948`: **success**.
+Gate `31275660948`: **success**.  
+Limpeza: `ae28aacb2d1071489b53bec004568ea7edde6748`.
 
-Bancada temporária removida no próprio run; commit de limpeza:
+Estado:
 
-`ae28aacb2d1071489b53bec004568ea7edde6748`
+- `JOURNEY_FICHAS`: **29/29**;
+- Jornada em `AllFichas`: **29/29**;
+- `journeyRegistry.test.ts`: disco↔registry permanente;
+- Markdown: **92 fichas / 88 de 90**;
+- lacunas explícitas: **N1.09, GM.02**;
+- legado explícito: **42/90**;
+- Composer registrado: **24/90**;
+- Composer ativo: **22/90**;
+- registrado/inativo: **N4.09, GM.12**;
+- servido sem placeholder: **49/90**;
+- fallback real: **41/90**.
 
-Mudanças de governança:
+## P21.2 — concluída
 
-1. `JOURNEY_FICHAS` sincronizado com **29/29** fichas TS de Jornada;
-2. `AllFichas` expõe as **29/29** fichas de Jornada e as fichas do Dojo;
-3. teste `journeyRegistry.test.ts` prova disco↔registry dinamicamente;
-4. `ficha_catalog_auditor.cjs` deriva cobertura do grafo;
-5. **N1.09 e GM.02** são as únicas exceções canônicas explícitas/justificadas;
-6. novo nó sem ficha + sem exceção quebra o fiscal; exceção resolvida que ficar stale também quebra;
-7. `catalog_auditor.cjs` separa proveniência real:
-   - legado explícito **42/90**;
-   - Composer registrado **24/90**;
-   - Composer ativo **22/90**;
-   - registrado/inativo **2/90** — N4.09, GM.12;
-   - servido sem placeholder **49/90**;
-   - fallback real **41/90**;
-8. comentários antigos de N1.10/N1.11 em `composerCanary.ts` foram atualizados sem mudança de runtime.
+Gate `31276118716`: **success**.  
+Workflow temporário auto-removido no commit `e7206a5afe6c002c1daf4fe8ff86e822f09c0e8b`.
 
-Validação final:
+A investigação não tomou a tabela como verdade. Ela cruzou ficha autoral, ficha TS/fonte, `Composer.ts`, normalização do `kind` e renderers.
 
-- `npm run auditar`: verde;
-- `npm run fichas:auditar`: verde, **92 fichas / 88 de 90**, com as duas lacunas explícitas;
-- `npm run fichas:conferir`: **9/9**;
-- `npm run grafo:check`: verde;
-- TypeScript: verde;
-- suíte completa: **125 arquivos / 2.132 testes**;
-- build: verde;
-- `pr:check`: verde;
-- `git diff --check`: verde.
+Aliases/substituições comprovados e agora explícitos em `FICHA_RUNTIME_MAP`:
 
-## Próximo passo exato — P21.2
+- `DragGroup` → `draggroup` / `pareamento` / `classificacao`;
+- `EmojiRow` → `emojirow` / `fileira` / `moldura`;
+- `Grupo` → `grandeza` em F49/GM.01;
+- `StoryPanel` → builder `storypanel` → final `story-bars` → `StoryBarsStage`;
+- `TenFrame` → `tenframe` / `moldura` / `bond` / `plain` conforme fonte/micro.
 
-**Reconciliar `FICHA_RUNTIME_MAP` com builder→kind→renderer real.**
+Mapa final da P21:
 
-Não construir primitiva nova e não promover ficha apenas porque o mapa diz “incompleta”. Para cada entrada:
+- 26 primitivas;
+- **20 executáveis**;
+- **4 renderer-sem-builder**: `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`;
+- **1 componente-isolado**: `Quadrado100`;
+- **1 ausente**: `Regua`.
 
-1. localizar ficha(s) consumidora(s);
-2. localizar builder real;
-3. registrar o `kind` efetivamente emitido;
-4. localizar renderer/Stage que consome esse kind;
-5. identificar aliases e dispatch indireto;
-6. corrigir falsos negativos/positivos do mapa;
-7. só implementar uma peça se a cadeia real provar lacuna necessária.
+As seis entradas incompletas continuam dívida explícita; nenhuma foi implementada por tabela e nenhuma ficha foi promovida.
 
-Baseline atual do mapa:
+Contrato permanente: `src/curriculum/fichaRuntimeMap.test.ts`.
 
-- 26 entradas;
-- 18 `executável`;
-- 4 `renderer-sem-builder`;
-- 3 `componente-isolado`;
-- 1 `ausente`;
-- `Regua` segue como ausência mais inequívoca;
-- `Moedas`, `StoryPanel`, `Grupo`, `Quadrado100`, `SingaporeBars`, `LinkingCubes` e `VisualAddition` precisam primeiro de reconciliação.
+Gate final P21.2 aprovou:
 
-## Depois de P21
+- `fichas:auditar` — 92 fichas, 88/90, 26 primitivas;
+- `auditar`;
+- `fichas:conferir` — **9/9**;
+- `grafo:check`;
+- TypeScript;
+- suíte completa — **125 arquivos / 2.132 testes**;
+- build;
+- `pr:check`;
+- `git diff --check`.
 
-### P22 — decisões curriculares deliberadas
+## Próximo passo exato — P22 audit-first
 
-- N1.09;
-- GM.02;
-- JD4 e relação com N1.07;
-- N4.09;
-- GM.12.
+P22 é decisão curricular deliberada. Não preencher buracos por contagem e não ativar Composer só porque existe ficha.
 
-Não preencher buracos por tabela: cada item entra com cânone, pedagogia, runtime e QA.
+Itens delimitados:
+
+1. **N1.09** — nó do grafo sem ficha Markdown;
+2. **GM.02** — Tempo cotidiano sem ficha Markdown;
+3. **JD4 ↔ N1.07** — reconciliar cânone, catálogo do Jardim, runtime e papel de automaticidade;
+4. **N4.09** — ficha Composer registrada/inativa;
+5. **GM.12** — ficha Composer registrada/inativa por observação deliberada.
+
+Para cada item:
+
+1. provar cânone/grafo;
+2. provar TS/runtime/proveniência;
+3. provar pré-requisitos e progressão longitudinal;
+4. separar compreensão da Jornada de fluência/Jardim;
+5. registrar decisão;
+6. só depois editar/ativar com testes e gate.
+
+O diagnóstico `fichas:conferir` ainda mostra legado, vazio e divergências de tela conhecidas; não tratar isso como fila cega de migração.
+
+## Depois de P22
 
 ### Auditoria dos motores adaptativos
 
