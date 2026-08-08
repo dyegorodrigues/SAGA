@@ -1,8 +1,8 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 8/ago/2026 após P17 v2 e revalidação de N1.10/N1.11.**
+> **VIGENTE em 8/ago/2026 após P17 + P8 Jardim.**
 >
-> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md). Este briefing é a versão executiva: regras, sequência e definição de pronto.
+> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md). Este briefing é a versão executiva: estado, próxima fila e definição de pronto.
 
 ## 0. Estado que não deve ser redescoberto
 
@@ -11,31 +11,62 @@
 - `main`: `68fad4c575e28959b2ca4776e9a541d6828b63f3` — **não tocar**.
 - PR #29: draft, base `main`, somente comparação/CI, nunca auto-merge.
 - Creature Engine: fora deste fluxo.
-- Remoto limpo: main + cumulativa + duas branches do Creature Engine.
+- Remoto: main + cumulativa + duas branches do Creature Engine.
 
 ## 1. P17 está fechada
 
 Documento: `DECISAO_P17_N110.md`.
 
-### N1.10
+- `N1.10`: JD5 → retirada real de moldura → NumberBond; `SEM_MOLDURA` é gate antes de L5.
+- `N1.11`: JD3 → F28 NumberBond → `n + □ = 10`.
+- N1.10/N1.11 estão ativos e revalidados em CI normal separada.
+- representações diferentes da mesma competência não viram nós paralelos.
+- `MasteryRule` agora executa `acertos/de/sessoes` da ficha.
 
-`JD5 → retirada real de andaime → NumberBond`
+## 2. P8 está fechada
 
-O L4 alterna moldura e objetos realmente soltos. `SEM_MOLDURA` é gate obrigatório antes de L5. `TOTAL_ALEM_DE_CINCO` continua evidência independente de domínio.
+Documento: `DECISAO_P8_JARDIM.md`.
 
-Revalidação: `37595c73795b45c9e16075749bae51690c5d77ac` — CI normal verde.
+O Garden antigo era uma lista CRA de trilhas da Jornada. Agora consome o catálogo canônico:
 
-### N1.11
+- JD1 → N1.03;
+- JD2 → N1.08;
+- JD3 → N1.11;
+- JD5 → N1.10.
 
-`JD3 → F28 NumberBond → n + □ = 10`
+### Regras permanentes
 
-Revalidação sobre N1.10 ativa: `ab5b3b613a3226076b1d967a48cc99ba6c8b50c9` — CI normal verde.
+- JD não entra no DAG;
+- unlock deriva da mãe no nível 3/domínio;
+- estado fica em `state.dojoTracks`, nunca `state.progress[JD*]`;
+- GameLoop em modo Garden não chama `applyJourneyAnswer`;
+- round atual = 8 itens (contrato aceita 6–10);
+- dois rounds ≥80% precisão **e** ≥80% fluência → avança;
+- dois rounds <60% → recua treino sem retirar conquista;
+- acerto lento não é erro conceitual;
+- primeira resposta cognitiva mede automaticidade;
+- erros reais alimentam Radar da mãe;
+- sem seletor manual de nível no Garden.
 
-### Regra estrutural
+### QA
 
-Não criar nós por representação. JD3/JD5 completas vivem no Jardim como treino de automaticidade e não entram no DAG.
+- teste permanente de DojoTab cobre unlock, stats, currentStep/highestStep e ausência do Garden CRA;
+- sonda permanente: bloqueado / parcial / avançado;
+- primeiro QA falhou contraste e o componente foi corrigido;
+- depois passou 320/390/900;
+- PNGs 320 inspecionados manualmente;
+- UI funcional validada, arte premium final continua dívida separada.
 
-## 2. Canários F0 ativos/revalidados nesta retomada
+Commits-chave:
+
+- motor puro: `5b22e6d4594db68c3f86414dccd18c40faf49619`;
+- cânone Dojo v1.5: `3ec25a4007c0e79b89bafcb7887bf270000ca545`;
+- QA visual: `21ab21e6c4d7465f66a37136dc15b68970c1f795`;
+- remoção do caminho CRA morto: `37a03a8bbf9d33221b8a3c75c7f8b847fdffbf97`.
+
+JD4 continua fora e não deve ser inventada nesta linha.
+
+## 3. Canários F0 ativos/revalidados
 
 - `AL.01`
 - `N1.06`
@@ -46,58 +77,42 @@ Não criar nós por representação. JD3/JD5 completas vivem no Jardim como trei
 - `N1.10`
 - `N1.11`
 
-Ativação declarativa: `src/curriculum/motores/composerCanaryIds.ts`.
+Lista única: `src/curriculum/motores/composerCanaryIds.ts`.
 
-**Promoção futura = um id por commit.**
+Promoção futura = **um id por commit**.
 
-## 3. GM.12 continua desligada
+## 4. GM.12 continua desligada
 
-F50/GM.12 está implementada, visualmente revisada e registrada, mas continua fora dos canários por decisão deliberada de observação.
+F50/GM.12 está implementada e visualmente revisada, mas permanece em observação e fora dos canários.
 
-Não promover no embalo.
+**Não promover por momentum.**
 
-## 4. Próxima frente obrigatória — P8 / Jardim do Dojo
+## 5. Próxima frente — integridade de estado/migração/dependências
 
-### O bug estrutural atual
+### 5.1 Migração/estado
 
-`DojoTab.tsx` chama um modo de **Dojo Garden**, porém esse modo não usa `JARDIM`. Ele lista `ALL_MATH_TRACKS` com estrelas como revisão CRA genérica.
+Suspeita a provar:
 
-As trilhas reais já existem:
+- `App.tsx` tem função local `migrate`;
+- `src/utils/migrator.ts` existe como outro migrador;
+- busca inicial não encontrou consumidor ativo do utilitário.
 
-- JD1 → N1.03;
-- JD2 → N1.08;
-- JD3 → N1.11;
-- JD5 → N1.10;
-- todas destravam no nível 3 da mãe.
+Auditar antes de editar:
 
-JD4 continua fora: não inventar nessa tarefa.
+1. todos os imports/consumidores;
+2. diferenças entre os dois migradores;
+3. compatibilidade de `dojoTracks` com saves antigos;
+4. add/delete/reset de criança;
+5. testes de migração existentes;
+6. se a duplicação pode divergir silenciosamente.
 
-### Não conectar JD* diretamente ao GameLoop
+Não apagar por aparência de código morto.
 
-O GameLoop atual sempre usa `applyJourneyAnswer`, que é uma escada de **compreensão conceitual**. Jardim mede **automaticidade**.
+### 5.2 Dependências
 
-Além disso, bônus de velocidade hoje só existe para `rapid-fire` ou ids iniciados por `dojo`.
+`npm ci` vem reportando vulnerabilidades. Rodar `npm audit`, identificar pacote/cadeia/impacto/versão corrigida e só então decidir.
 
-Portanto a ordem correta é:
-
-1. especificar o estado e o motor do Jardim;
-2. derivar unlock da mãe sem criar nó no grafo;
-3. progressão baseada em precisão + fluência/RT, não na coroa da Jornada;
-4. salvar estado separado da competência-mãe;
-5. manter Radar/telemetria sem chamar lentidão de misconception;
-6. criar adapter `Track`/sessão somente depois;
-7. substituir o Garden genérico da UI;
-8. QA em 320/390/900 e teste de save/unlock.
-
-## 5. QA visual — não confundir instrumento com produto
-
-ZIP de sonda pode conter:
-
-- `rollback` = versão legada intencional;
-- fases intermediárias da coreografia;
-- representação nova.
-
-Sonda/layout aprovado **não significa** UI/arte final aprovada. O shell visual antigo e manipulativos básicos continuam dívida de produto, separada da validade pedagógica.
+**Nunca `npm audit fix` cegamente.**
 
 ## 6. Portões
 
@@ -113,38 +128,33 @@ npm run pr:check
 git diff --check
 ```
 
-Tela:
+Tela afetada também exige sonda/prints.
 
-```bash
-npm run sonda -- "<ID>"
-PRINTS_LARGURA=320 PRINTS_WAIT_MS=... node scripts/prints.mjs "<ID>"
-```
-
-## 7. Regras que não se negociam
+## 7. Regras não negociáveis
 
 - não tocar na `main`;
-- não tocar nas branches do Creature Engine;
-- ficha inteira é contrato (§3–§9);
-- resposta errada não emite evidência;
-- não editar teste para esconder defeito de código;
+- não tocar Creature Engine;
+- não reabrir P17/P8 sem falha objetiva;
 - não criar currículo paralelo;
-- representação nova não apaga representação anterior necessária;
-- troca de linguagem exige ponte observável;
-- não bypassar `SEM_MOLDURA`;
-- não conectar JD* ao motor da Jornada sem P8;
-- não deixar workflow temporário órfão;
-- não tratar sonda como direção visual final.
+- não criar `progress[JD*]`;
+- não transformar lentidão em misconception;
+- não reintroduzir Garden CRA;
+- não promover GM.12 no embalo;
+- não apagar migrador sem provar consumidores;
+- não atualizar dependência automaticamente sem análise;
+- não tratar sonda como arte final;
+- não deixar workflow temporário órfão.
 
-## 8. Definição de pronto de um lote
+## 8. Definição de pronto
 
 - [ ] commit na cumulativa;
 - [ ] `main` imóvel;
 - [ ] nenhuma branch extra;
-- [ ] nenhum workflow temporário órfão;
-- [ ] auditorias/grafo/TypeScript/testes/build verdes;
-- [ ] sonda/prints se há tela;
-- [ ] handoff atualizado se o estado mudou;
-- [ ] PR #29 continua draft/não mesclada;
-- [ ] nova conversa consegue retomar sem reler esta conversa.
+- [ ] nenhum workflow/script temporário órfão;
+- [ ] auditorias/TS/testes/build verdes;
+- [ ] sonda/prints quando há tela;
+- [ ] handoff/PR atualizados quando o estado muda;
+- [ ] PR #29 draft/não mesclada;
+- [ ] nova conversa retoma sem reler o chat.
 
 **Existir não é estar certo. Divergência pode ser corrigida; divergência silenciosa não.**
