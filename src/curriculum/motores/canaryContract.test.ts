@@ -15,6 +15,7 @@ import { N1_03 } from "../fichas/jornada/N1.03";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_10 } from "../fichas/jornada/N1.10";
+import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { N1_04 } from "../fichas/jornada/N1.04";
@@ -73,6 +74,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.07": N1_07,
   "N1.08": N1_08,
   "N1.10": N1_10,
+  "N1.11": N1_11,
   "AL.01": AL_01,
 
   // A ativação do bloco F0: as quatro que passaram o intervalo inteiro

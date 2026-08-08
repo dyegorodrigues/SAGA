@@ -71,7 +71,21 @@ describe("progressEngine", () => {
       candidateDay: "2026-07-01",
     });
 
-    const retained = applyJourneyAnswer(current, true, false, {
+    let retained = applyJourneyAnswer(current, true, false, {
+      ...attempt,
+      isReview: true,
+      practiceDay: "2026-07-03",
+      previousPracticeDay: "2026-07-01",
+    });
+    expect(retained.progress.dom).not.toBe(true);
+    retained = applyJourneyAnswer(retained.progress, true, false, {
+      ...attempt,
+      isReview: true,
+      practiceDay: "2026-07-03",
+      previousPracticeDay: "2026-07-01",
+    });
+    expect(retained.progress.dom).not.toBe(true);
+    retained = applyJourneyAnswer(retained.progress, true, false, {
       ...attempt,
       isReview: true,
       practiceDay: "2026-07-03",
@@ -210,5 +224,61 @@ describe("P13 — a coroa passa a exigir a evidência que a ficha declara", () =
     const p = tresAcertos("sem-andaime");
     expect(faltaParaCoroa(p.masteryEvidence, "Produzir sem as vagas fantasma."))
       .toBe("Produzir sem as vagas fantasma.");
+  });
+});
+
+
+describe("§9 executavel — acertos/de em sessoes reais", () => {
+  const base: Progress = {
+    lvl: 5, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0, maxLvl: 5,
+  };
+
+  const tentativa = (day: string, rule = { acertos: 3, de: 3, sessoes: 2 }): MasteryAttempt => ({
+    durationMs: 5000, helpUsed: false, isReview: false, practiceDay: day, masteryRule: rule,
+  });
+
+  function responder(p: Progress, day: string, respostas: boolean[], rule: { acertos: number; de: number; sessoes: number }) {
+    let atual = p;
+    for (const right of respostas) {
+      atual = applyJourneyAnswer({ ...atual, lvl: 5 }, right, false, tentativa(day, rule)).progress;
+    }
+    return atual;
+  }
+
+  it("4/5 aceita uma falha na janela sem virar quatro seguidas", () => {
+    const rule = { acertos: 4, de: 5, sessoes: 2 };
+    const p = responder(base, "2026-08-01", [true, false, true, true, true], rule);
+    expect(p.masteryEvidence?.passedSessionDays).toEqual(["2026-08-01"]);
+    expect(p.dom).toBeFalsy();
+  });
+
+  it("4/4 nao fecha a sessao depois de apenas tres", () => {
+    const rule = { acertos: 4, de: 4, sessoes: 3 };
+    let p = responder(base, "2026-08-01", [true, true, true], rule);
+    expect(p.masteryEvidence?.passedSessionDays ?? []).toHaveLength(0);
+    p = responder(p, "2026-08-01", [true], rule);
+    expect(p.masteryEvidence?.passedSessionDays).toEqual(["2026-08-01"]);
+  });
+
+  it("tres sessoes exigem tres sessoes maduras e espacadas", () => {
+    const rule = { acertos: 4, de: 4, sessoes: 3 };
+    let p = responder(base, "2026-08-01", [true, true, true, true], rule);
+    p = responder(p, "2026-08-03", [true, true, true, true], rule);
+    expect(p.dom).toBeFalsy();
+    expect(p.masteryEvidence?.passedSessionDays).toEqual(["2026-08-01", "2026-08-03"]);
+    p = responder(p, "2026-08-05", [true, true, true, true], rule);
+    expect(p.dom).toBe(true);
+    expect(p.masteryEvidence?.passedSessionDays).toEqual(["2026-08-01", "2026-08-03", "2026-08-05"]);
+  });
+
+  it("default 3/3/2 continua funcionando para questao sem regra", () => {
+    let p = base;
+    const attempt = { durationMs: 5000, helpUsed: false, isReview: false, practiceDay: "2026-08-01" };
+    for (let i = 0; i < 3; i += 1) p = applyJourneyAnswer({ ...p, lvl: 5 }, true, false, attempt).progress;
+    expect(p.masteryEvidence?.passedSessionDays).toEqual(["2026-08-01"]);
+    for (let i = 0; i < 3; i += 1) {
+      p = applyJourneyAnswer({ ...p, lvl: 5 }, true, false, { ...attempt, practiceDay: "2026-08-03", isReview: true }).progress;
+    }
+    expect(p.dom).toBe(true);
   });
 });

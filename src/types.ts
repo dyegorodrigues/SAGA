@@ -98,6 +98,15 @@ export interface AnswerMeta {
   manipulacao?: EventoManipulacao;
 }
 
+export interface MasteryRule {
+  /** Quantos acertos a ficha exige dentro da janela da sessao. */
+  acertos: number;
+  /** Tamanho da janela de tentativas da sessao. */
+  de: number;
+  /** Quantas sessoes maduras e espacadas a ficha exige. */
+  sessoes: number;
+}
+
 export interface Question {
   rt_max_s?: number;
   /** A fala que introduz o exercício (narração principal) */
@@ -161,6 +170,8 @@ export interface Question {
    * GameLoop quem monta a tentativa de maestria, e ele não conhece a ficha.
    */
   exigeEvidencia?: string;
+  /** Regra de dominio da micro que gerou esta questao. */
+  masteryRule?: MasteryRule;
   /** expressão revelada SÓ ao acertar (ex.: esconde a palavra, mostra "CA + SA = CASA 🏠" depois) */
   bigCompleted?: string;
   /** opções ganham botão 🔊 para a criança OUVIR cada uma e escolher por som (método fônico) */
@@ -271,6 +282,14 @@ export interface MasteryEvidence {
   evidenciaDaFicha?: boolean;
   /** As condições já observadas em acertos desta competência. Histórico, não streak. */
   evidenciasVistas?: string[];
+  /** Regra de dominio que governa a sessao de maestria atual. */
+  masteryRule?: MasteryRule;
+  /** Janela acerto/erro no L5 dentro da sessao corrente. */
+  comprehensionWindow?: boolean[];
+  /** Dia da sessao de maestria corrente. */
+  sessionDay?: string;
+  /** Dias em que a sessao cumpriu acertos/de, independencia e evidencia. */
+  passedSessionDays?: string[];
 }
 
 export interface FactStrength {

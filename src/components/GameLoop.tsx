@@ -512,6 +512,7 @@ export function GameLoop({
       // P13: o que ESTA resposta demonstrou, e o que a ficha exige ter visto.
       evidencias: right ? evidenciasDaResposta(answerMeta) : undefined,
       exigeEvidencia: q.exigeEvidencia,
+      masteryRule: q.masteryRule,
       isReview: q.review === true,
       practiceDay: new Date().toISOString().slice(0, 10),
       previousPracticeDay: prog.lastDay,

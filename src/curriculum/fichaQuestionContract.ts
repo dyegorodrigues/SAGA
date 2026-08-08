@@ -86,12 +86,16 @@ export interface ComposerParams {
   jump_size?: number;
   moldura?: number;
   soma_max?: number;
+  whole_fixed?: number;
+  whole_min?: number;
   interactive?: string;
   tem_sobra?: boolean;
   dezenas_max?: number;
   unidades_max?: number;
   apenas_horas_exatas?: boolean;
   interativo?: boolean;
+  /** Forma abstrata da F28: n + caixa = 10. */
+  complemento_dez?: boolean;
   minutos_step?: number;
   peso_alvo_min?: number;
   peso_alvo_max?: number;
@@ -144,12 +148,12 @@ type Tutorial = Question["tutorial"];
 
 const NUMBER_KEYS = [
   "n_min", "n_max", "flash_ms", "start", "end", "jump_size", "moldura",
-  "soma_max", "dezenas_max", "unidades_max", "minutos_step",
+  "soma_max", "whole_fixed", "whole_min", "dezenas_max", "unidades_max", "minutos_step",
   "peso_alvo_min", "peso_alvo_max", "top_min", "top_max", "bottom_min",
   "bottom_max", "operand_step", "result_max", "rows_min", "rows_max", "cols_min", "cols_max",
 ] as const;
 const BOOLEAN_KEYS = [
-  "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo",
+  "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo", "complemento_dez",
   "require_regroup", "require_double_regroup", "forbid_regroup", "show_place_value", "show_regroup", "show_algorithm",
   "allow_rotate", "require_rotate", "area_mode", "show_equation",
 ] as const;

@@ -306,6 +306,15 @@ export const MisconceptionTag = {
    * exatamente o que o olho pede"*. O olho é treinado para contar o que está
    * lá; contar o que não está é uma inversão perceptual.
    */
+  /** Parte-todo/amigos do 10: repetiu a parte que ja estava dada. */
+  REPETE_A_PARTE: "repete-a-parte",
+
+  /**
+   * Amigos do 10: funciona em material/diagrama, mas ainda nao transferiu para
+   * a sentenca simbolica. E diagnostico longitudinal, nunca de um clique so.
+   */
+  SO_FUNCIONA_VISUAL: "so-funciona-visual",
+
   RESPONDE_O_CHEIO: "responde-o-cheio",
 
   /** Moldura relâmpago: erra quando faltam mais de 5 — não usa a fileira como unidade */

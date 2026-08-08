@@ -343,28 +343,52 @@ export class Composer {
         
       case "bond": {
         const maxSum = params.soma_max || 10;
-        const whole = Math.floor(Math.random() * (maxSum - 2)) + 2;
-        const part1 = Math.floor(Math.random() * (whole - 1)) + 1;
+        const minWhole = Math.max(2, Math.min(params.whole_min || 2, maxSum));
+        const whole = params.whole_fixed ?? randomInt(minWhole, maxSum);
+        if (!Number.isInteger(whole) || whole < 2 || whole > maxSum) {
+          throw new Error(`Todo invalido no NumberBond de ${ficha.id}/${micro.id}.`);
+        }
+        const part1 = randomInt(1, whole - 1);
         const part2 = whole - part1;
-        
+
         if (params.interactive === "whole") {
           uiProps = { whole: '?', part1, part2, interactivePart: 'whole' };
           evaluate = (ans) => ans === whole;
           answer = whole;
+          options = numericOptions(whole, Math.max(1, whole - 2), whole + 2);
         } else {
           const hide1 = Math.random() > 0.5;
-          uiProps = { whole, part1: hide1 ? '?' : part1, part2: hide1 ? part2 : '?', interactivePart: hide1 ? 'part1' : 'part2' };
+          const visible = hide1 ? part2 : part1;
+          uiProps = {
+            whole,
+            part1: hide1 ? '?' : part1,
+            part2: hide1 ? part2 : '?',
+            interactivePart: hide1 ? 'part1' : 'part2',
+          };
           evaluate = (ans) => ans === (hide1 ? part1 : part2);
           answer = hide1 ? part1 : part2;
+
+          const candidatos: Option[] = [
+            { label: String(answer), value: answer },
+            ...(visible !== answer ? [{
+              label: String(visible), value: visible,
+              misconception: MisconceptionTag.REPETE_A_PARTE,
+            }] : []),
+            ...(whole !== answer && whole !== visible ? [{
+              label: String(whole), value: whole,
+              misconception: MisconceptionTag.RESPONDE_O_TODO,
+            }] : []),
+            { label: String(Number(answer) + 1), value: Number(answer) + 1, misconception: MisconceptionTag.OFF_BY_ONE },
+            ...(Number(answer) > 1 ? [{
+              label: String(Number(answer) - 1), value: Number(answer) - 1,
+              misconception: MisconceptionTag.OFF_BY_ONE,
+            }] : []),
+          ];
+          options = candidatos
+            .filter((opcao, indice) => candidatos.findIndex(item => String(item.value) === String(opcao.value)) === indice)
+            .slice(0, 4)
+            .sort(() => Math.random() - 0.5);
         }
-        
-        // Options for number bonds
-        options = [];
-        const wrong1 = answer + 1;
-        const wrong2 = Math.max(1, answer - 1);
-        options.push({ label: String(answer), value: answer });
-        options.push({ label: String(wrong1), value: wrong1 });
-        if(wrong2 !== answer && wrong2 !== wrong1) options.push({ label: String(wrong2), value: wrong2 });
         break;
       }
       
@@ -995,7 +1019,30 @@ export class Composer {
       }
 
       case "plain": {
-        if (typeof params.dezenas_max === "number") {
+        if (params.complemento_dez) {
+          const parte = randomInt(1, 9);
+          answer = 10 - parte;
+          uiProps = { text: `${parte} + □ = 10` };
+          const candidatos: Option[] = [
+            { label: String(answer), value: answer },
+            ...(parte !== answer ? [{
+              label: String(parte), value: parte,
+              misconception: MisconceptionTag.REPETE_A_PARTE,
+            }] : []),
+            { label: "10", value: 10, misconception: MisconceptionTag.RESPONDE_O_TODO },
+            { label: String(Number(answer) + 1), value: Number(answer) + 1, misconception: MisconceptionTag.OFF_BY_ONE },
+            ...(Number(answer) > 1 ? [{
+              label: String(Number(answer) - 1), value: Number(answer) - 1,
+              misconception: MisconceptionTag.OFF_BY_ONE,
+            }] : []),
+          ];
+          options = candidatos
+            .filter((opcao, indice) => candidatos.findIndex(item => String(item.value) === String(opcao.value)) === indice)
+            .slice(0, 4)
+            .sort(() => Math.random() - 0.5);
+          evaluate = ans => Number(ans) === answer;
+          promptOverride = `${parte} mais quanto da dez?`;
+        } else if (typeof params.dezenas_max === "number") {
           const dezenas = randomInt(1, params.dezenas_max);
           const unidades = randomInt(0, params.unidades_max || 9);
           answer = dezenas * 10 + unidades;
@@ -1093,6 +1140,13 @@ export class Composer {
       explain: params.explain ?? ficha.explain,
       // P13: a condição da §9 viaja na questão até o motor de maestria.
       ...(micro.dominio?.exige ? { exigeEvidencia: micro.dominio.exige.evidencia } : {}),
+      ...(micro.dominio ? {
+        masteryRule: {
+          acertos: micro.dominio.acertos,
+          de: micro.dominio.de,
+          sessoes: micro.dominio.sessoes,
+        },
+      } : {}),
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo
         ? ficha.niveis[lvl].rt_alvo! / 1000
         : undefined,
