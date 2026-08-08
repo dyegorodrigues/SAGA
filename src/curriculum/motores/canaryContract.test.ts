@@ -1,9 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Composer } from "../Composer";
 import { geradorLegadoDe, getTrackById } from "./curriculum";
 import { applyJourneyAnswer } from "./progressEngine";
 import { trackMisconception } from "./radarEngine";
-import { COMPOSER_CANARIES, rollbackComposerCanary, enableComposerCanary } from "./composerCanary";
+import {
+  COMPOSER_CANARIES,
+  rollbackComposerCanary,
+  enableComposerCanary,
+  generateRegisteredFichaQuestion,
+} from "./composerCanary";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
@@ -15,6 +19,7 @@ import { N4_09 } from "../fichas/jornada/N4.09";
 import { N1_03 } from "../fichas/jornada/N1.03";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
+import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
@@ -40,8 +45,8 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  * diferentes é dívida silenciosa: o mais fraco só aparece quando quebra.
  *
  * A suíte **enumera `COMPOSER_CANARIES`** em vez de listar nós à mão. Promover
- * um nó novo sem registrar seu legado e sua ficha aqui falha imediatamente, de
- * modo que o padrão não depende de alguém lembrar de aplicá-lo.
+ * um nó novo sem registrar sua ficha aqui falha imediatamente, de modo que o
+ * padrão não depende de alguém lembrar de aplicá-lo.
  */
 
 /**
@@ -56,8 +61,9 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  * - **Estreia** — o nó caía no placeholder "Em construção!". Paridade não quer
  *   dizer nada; o que importa é que ele deixou de ser um placeholder.
  *
- * Os 46 nós ainda em fallback são todos estreias. O contrato original só previa
- * substituição porque os dois primeiros canários por acaso eram desse tipo.
+ * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
+ * porta que `selectGenerator` usa em produção. Assim builders procedimentais
+ * especializados (como N1.09) não ganham um caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
@@ -75,6 +81,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.03": N1_03,
   "N1.07": N1_07,
   "N1.08": N1_08,
+  "N1.09": N1_09,
   "N1.10": N1_10,
   "N1.11": N1_11,
   "AL.01": AL_01,
@@ -118,9 +125,9 @@ describe("contrato do canário do Composer", () => {
   });
 
   describe.each(CANARIOS)("%s", id => {
-    const ficha = REGISTRO[id];
     const legado = geradorLegadoDe(id);
     const ehEstreia = legado === undefined;
+    const gerarAutoral = (lvl: number): Question => generateRegisteredFichaQuestion(id, lvl);
 
     it("é servido pelo Composer com proveniência observável", () => {
       expect(getTrackById(id)?.generatorSource).toBe("composer");
@@ -140,7 +147,7 @@ describe("contrato do canário do Composer", () => {
     it("a ficha autoral produz questão utilizável nos cinco níveis", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 20; i += 1) {
-          const autoral = Composer.generate(ficha, lvl);
+          const autoral = gerarAutoral(lvl);
           expect(autoral.evaluate?.(autoral.answer), `${id} autoral L${lvl}`).toBe(true);
           expect(autoral.isFallback, `${id} L${lvl} devolveu placeholder`).toBeFalsy();
 
@@ -209,7 +216,7 @@ describe("contrato do canário do Composer", () => {
 
     it("telemetria: a resposta certa não gera diagnóstico", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
-        const q = Composer.generate(ficha, lvl);
+        const q = gerarAutoral(lvl);
         expect(misconceptionForAnswer(q, q.answer), `${id} L${lvl}`).toBeUndefined();
       }
     });
@@ -218,7 +225,7 @@ describe("contrato do canário do Composer", () => {
       const progresso = progressoInicial();
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 10; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           const errada = (q.options ?? []).find(o => o.value !== q.answer && o.misconception);
           if (!errada) continue;
           const tag = misconceptionForAnswer(q, errada.value);
@@ -230,7 +237,7 @@ describe("contrato do canário do Composer", () => {
 
     it("Jornada: a questão traz tudo que o GameLoop exige", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
-        const q = Composer.generate(ficha, lvl);
+        const q = gerarAutoral(lvl);
         expect(q.kind, `${id} L${lvl}`).toBeTruthy();
         expect(q.uiProps, `${id} L${lvl}`).toBeDefined();
         expect(q.prompt, `${id} L${lvl}`).toBeTruthy();
@@ -241,7 +248,7 @@ describe("contrato do canário do Composer", () => {
     it("erro: a resposta correta aparece exatamente uma vez quando há alternativas", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           if (!q.options?.length) continue;
           const certas = q.options.filter(o => o.value === q.answer);
           expect(certas, `${id} L${lvl}`).toHaveLength(1);
@@ -256,7 +263,7 @@ describe("contrato do canário do Composer", () => {
       // presente e futuro, em vez de ficar só na ficha que errou.
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 40; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           if (!q.options) continue;
 
           // Teclado não é leque de alternativas. O cânone §9.1 fixa "3 a 4
@@ -287,7 +294,7 @@ describe("contrato do canário do Composer", () => {
     it("erro: nenhuma alternativa numérica é negativa", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           for (const o of q.options ?? []) {
             if (typeof o.value !== "number") continue;
             expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(0);
@@ -298,7 +305,7 @@ describe("contrato do canário do Composer", () => {
 
     it("erro: 500 amostras sem laço infinito nem exceção", () => {
       expect(() => {
-        for (let i = 0; i < 500; i += 1) Composer.generate(ficha, (i % 5) + 1);
+        for (let i = 0; i < 500; i += 1) gerarAutoral((i % 5) + 1);
       }).not.toThrow();
     });
   });
