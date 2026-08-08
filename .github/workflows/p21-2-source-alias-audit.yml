@@ -1,0 +1,109 @@
+name: P21.2 - source alias audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - name: Matriz ficha-fonte para runtime
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const { FICHA_RUNTIME_MAP } = require('./AI_Studio_Lab/tools/ficha_runtime_map.cjs');
+          const root = process.cwd();
+          const read = p => fs.readFileSync(path.join(root, p), 'utf8');
+          const strip = s => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+
+          const authored = new Map();
+          const mdDir = path.join(root, 'AI_Studio_Lab/pedagogia/fichas');
+          for (const file of fs.readdirSync(mdDir).filter(f => f.endsWith('.md'))) {
+            const src = fs.readFileSync(path.join(mdDir, file), 'utf8');
+            const hs = [...src.matchAll(/^# FICHA\s+(\S+)\s+—\s+(.+)$/gm)];
+            hs.forEach((h, i) => {
+              const body = src.slice(h.index, hs[i + 1]?.index ?? src.length);
+              const competence = body.match(/^\*\*Competência:\*\*\s+((?:N[1-7]|AL|GE|GM|PE)\.\d{2})\b/m)?.[1];
+              const identity = body.match(/^\*\*Competência:\*\*.*?\*\*Primitiva:\*\*\s+(.+?)(?:\s+·|$)/m)?.[1] ?? '';
+              for (const primitive of [...identity.matchAll(/`([^`]+)`/g)].map(m => m[1])) {
+                if (!authored.has(primitive)) authored.set(primitive, []);
+                authored.get(primitive).push({ ficha: h[1], competence });
+              }
+            });
+          }
+
+          const kindsByFonte = new Map();
+          const tsDir = path.join(root, 'src/curriculum/fichas/jornada');
+          for (const file of fs.readdirSync(tsDir).filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts'))) {
+            const src = strip(fs.readFileSync(path.join(tsDir, file), 'utf8'));
+            const competence = src.match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2})["']/)?.[1];
+            for (const segment of src.split(/\bfonte:\s*/).slice(1)) {
+              const fonte = segment.match(/^["']([^"']+)["']/)?.[1];
+              const kindsRaw = segment.match(/\bkinds:\s*\[([^\]]*)\]/)?.[1];
+              if (!fonte || !kindsRaw) continue;
+              const kinds = [...kindsRaw.matchAll(/["']([^"']+)["']/g)].map(m => m[1]);
+              for (const token of fonte.split(/\s*\+\s*/)) {
+                const ficha = token.trim();
+                if (!kindsByFonte.has(ficha)) kindsByFonte.set(ficha, []);
+                kindsByFonte.get(ficha).push({ competence, kinds, file });
+              }
+            }
+          }
+
+          const composer = read('src/curriculum/Composer.ts');
+          const composerCases = new Set([...composer.matchAll(/case\s+["']([^"']+)["']\s*:/g)].map(m => m[1]));
+          const fRenderer = read('src/components/FichaRenderer.tsx');
+          const gRenderer = read('src/components/gameloop/GameLoopExerciseRenderer.tsx');
+          const rendererKinds = new Set([
+            ...[...fRenderer.matchAll(/case\s+["']([^"']+)["']\s*:/g)].map(m => m[1]),
+            ...[...gRenderer.matchAll(/q\.kind\s*===\s*["']([^"']+)["']/g)].map(m => m[1]),
+          ]);
+          const finalKind = k => k === 'arraygrid' ? 'array' : k === 'storypanel' ? 'story-bars' : k === 'intruso_math' ? 'plain' : k;
+          const mapByPrimitive = new Map(FICHA_RUNTIME_MAP.map(e => [e.primitive, e]));
+
+          console.log('P21.2 — MATRIZ FICHA AUTORAL/FONTE → RUNTIME');
+          for (const primitive of [...authored.keys()].sort()) {
+            const uses = authored.get(primitive);
+            const exact = [];
+            for (const use of uses) {
+              for (const row of kindsByFonte.get(use.ficha) || []) {
+                if (row.competence === use.competence) exact.push({ ficha: use.ficha, ...row });
+              }
+            }
+            const runtimeKinds = [...new Set(exact.flatMap(r => r.kinds))];
+            const executable = runtimeKinds
+              .filter(k => composerCases.has(k) && rendererKinds.has(finalKind(k)))
+              .map(k => `${k}->${finalKind(k)}`);
+            const entry = mapByPrimitive.get(primitive);
+            const addBuilder = executable.map(x => x.split('->')[0]).filter(k => !(entry?.builderKinds || []).includes(k));
+            const addRenderer = executable.map(x => x.split('->')[1]).filter(k => !(entry?.rendererKinds || []).includes(k));
+            console.log(`\n[${primitive}]`);
+            console.log(`fontes=${uses.map(u => `${u.ficha}:${u.competence}`).join(', ')}`);
+            console.log(`runtimeExato=${exact.map(r => `${r.ficha}:${r.competence}=>${r.kinds.join('+')}`).join(', ') || '—'}`);
+            console.log(`executaveis=${executable.join(', ') || '—'}`);
+            console.log(`map.builder=${entry?.builderKinds.join(', ') || '—'}`);
+            console.log(`map.renderer=${entry?.rendererKinds.join(', ') || '—'}`);
+            if (addBuilder.length || addRenderer.length) console.log(`DRIFT addBuilder=[${addBuilder.join(', ')}] addRenderer=[${addRenderer.join(', ')}]`);
+          }
+          NODE
+      - name: Limpar bancada temporaria
+        if: always()
+        run: |
+          rm .github/workflows/p21-2-source-alias-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: remove bancada temporaria P21.2 source audit'
+          git push origin HEAD:codex/integrar-bloco-f0
