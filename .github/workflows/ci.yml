@@ -81,3 +81,384 @@ jobs:
         env:
           PR_BASE: origin/${{ github.base_ref }}
         run: node AI_Studio_Lab/tools/pr_text_guard.cjs
+
+  p22-3a-n107:
+    name: P22.3A — completar Jornada N1.07
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Aplicar patch cirúrgico N1.07
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          composer_path = Path('src/curriculum/Composer.ts')
+          composer = composer_path.read_text()
+
+          old_numberline = '''        case "numberline": {
+          const start = requireNumber(params.start, `start em ${micro.id}`);
+          const end = requireNumber(params.end, `end em ${micro.id}`);
+          const jump = requireNumber(params.jump_size, `jump_size em ${micro.id}`);
+          if (end <= start || jump <= 0 || jump > end - start) {
+            throw new Error(`Intervalo inválido para numberline em ${micro.id}.`);
+          }
+          const current = randomInt(start, end - jump);
+          const next = current + jump;
+          const options = numericOptions(next, [current, next + jump, current - jump], start, end, {
+            preferredCount: 3,
+            diagnoses: [
+              { tag: MisconceptionTag.OFF_BY_ONE, when: value => value === next + jump },
+              { tag: MisconceptionTag.DIRECAO_ERRADA, when: value => value === current - jump },
+            ],
+          });
+          return {
+            ...base,
+            kind: "numberline",
+            prompt: "Para onde o sapinho deve pular?",
+            big: String(current),
+            nlStart: start,
+            nlEnd: end,
+            nlStartPos: current,
+            uiProps: { ...params, start, end, startPos: current, showJumps: [{ from: current, to: next }] },
+            options: tagNumericDistractors(options, next, ficha.distratores),
+            answer: next,
+            evaluate: ans => Number(ans) === next,
+          };
+        }
+'''
+
+          new_numberline = '''        case "numberline": {
+          const start = requireNumber(params.start, `start em ${micro.id}`);
+          const end = requireNumber(params.end, `end em ${micro.id}`);
+          const jump = requireNumber(params.jump_size, `jump_size em ${micro.id}`);
+          if (end <= start || jump <= 0 || jump > end - start) {
+            throw new Error(`Intervalo inválido para numberline em ${micro.id}.`);
+          }
+
+          // P22.3A — N1.07 usa a mesma reta para ensinar as duas direções.
+          // O modo default continua sucessor, preservando fichas antigas.
+          const modo = params.modo === "antecessor" ? "antecessor" : "sucessor";
+          const current = modo === "antecessor"
+            ? randomInt(start + jump, end)
+            : randomInt(start, end - jump);
+          const target = modo === "antecessor" ? current - jump : current + jump;
+          const candidates = modo === "antecessor"
+            ? [current, current + jump, current - (2 * jump)]
+            : [current, current + (2 * jump), current - jump];
+          const options = numericOptions(target, candidates, start, end, {
+            preferredCount: 3,
+            diagnoses: modo === "antecessor"
+              ? [
+                  { tag: MisconceptionTag.OFF_BY_ONE, when: value => value === current },
+                  { tag: MisconceptionTag.DIRECAO_ERRADA, when: value => value === current + jump },
+                ]
+              : [
+                  { tag: MisconceptionTag.OFF_BY_ONE, when: value => value === current },
+                  { tag: MisconceptionTag.DIRECAO_ERRADA, when: value => value === current - jump },
+                ],
+          });
+          const prompt = params.audio_prompt
+            ?? (modo === "antecessor" ? "Qual número vem antes?" : "Qual número vem depois?");
+          return {
+            ...base,
+            kind: "numberline",
+            prompt,
+            big: modo === "antecessor" ? `? → ${current}` : `${current} → ?`,
+            nlStart: start,
+            nlEnd: end,
+            nlStartPos: current,
+            uiProps: { ...params, start, end, startPos: current, showJumps: [{ from: current, to: target }] },
+            options,
+            answer: target,
+            evaluate: ans => Number(ans) === target,
+            howto: modo === "antecessor"
+              ? "Na reta, volte um passo para achar o número que vem antes."
+              : "Na reta, avance um passo para achar o número que vem depois.",
+            explain: modo === "antecessor"
+              ? "O antecessor é o vizinho imediatamente à esquerda."
+              : "O sucessor é o vizinho imediatamente à direita.",
+          };
+        }
+'''
+          if old_numberline not in composer:
+            raise SystemExit('âncora numberline não encontrada')
+          composer = composer.replace(old_numberline, new_numberline, 1)
+
+          plain_anchor = '''        case "plain": {
+          const fixedAnswer = params.answer;
+'''
+          plain_insert = '''        case "plain": {
+          // P22.3A — modos conceituais de N1.07 depois da retirada da reta.
+          // São opt-in por `modo`; o `plain` genérico permanece intocado.
+          if (params.modo === "antecessor" || params.modo === "sucessor") {
+            const start = requireNumber(params.start, `start em ${micro.id}`);
+            const end = requireNumber(params.end, `end em ${micro.id}`);
+            if (end <= start) throw new Error(`Intervalo inválido para vizinhança em ${micro.id}.`);
+            const antecessor = params.modo === "antecessor";
+            const current = antecessor ? randomInt(start + 1, end) : randomInt(start, end - 1);
+            const answer = antecessor ? current - 1 : current + 1;
+            const options = numericOptions(
+              answer,
+              antecessor ? [current, current + 1, current - 2] : [current, current + 2, current - 1],
+              start,
+              end,
+              {
+                preferredCount: 3,
+                diagnoses: antecessor
+                  ? [
+                      { tag: MisconceptionTag.OFF_BY_ONE, when: value => value === current },
+                      { tag: MisconceptionTag.DIRECAO_ERRADA, when: value => value === current + 1 },
+                    ]
+                  : [
+                      { tag: MisconceptionTag.OFF_BY_ONE, when: value => value === current },
+                      { tag: MisconceptionTag.DIRECAO_ERRADA, when: value => value === current - 1 },
+                    ],
+              },
+            );
+            const prompt = params.audio_prompt
+              ?? (antecessor ? "Qual número vem antes?" : "Qual número vem depois?");
+            const big = antecessor ? `? → ${current}` : `${current} → ?`;
+            return {
+              ...base,
+              kind: "plain",
+              prompt,
+              big,
+              options,
+              answer,
+              uiProps: { ...params, text: big },
+              evaluate: ans => Number(ans) === answer,
+              howto: antecessor
+                ? "Pense na contagem ao contrário: qual vizinho vem antes?"
+                : "Pense na contagem para frente: qual vizinho vem depois?",
+              explain: antecessor
+                ? "O antecessor é sempre um a menos."
+                : "O sucessor é sempre um a mais.",
+            };
+          }
+
+          if (params.modo === "ordenacao") {
+            const start = requireNumber(params.start, `start em ${micro.id}`);
+            const end = requireNumber(params.end, `end em ${micro.id}`);
+            if (end - start < 3) throw new Error(`Intervalo curto demais para ordenação em ${micro.id}.`);
+            const count = Math.random() < 0.5 ? 3 : 4;
+            const first = randomInt(start, end - count + 1);
+            const ascending = Array.from({ length: count }, (_, index) => first + index);
+            const correct = ascending.join(" → ");
+            const reversed = [...ascending].reverse();
+            const swapped = [...ascending];
+            [swapped[0], swapped[1]] = [swapped[1], swapped[0]];
+            const rotated = [...ascending.slice(1), ascending[0]];
+            const uniqueSequences = Array.from(new Set([ascending, reversed, swapped, rotated]
+              .map(sequence => sequence.join(" → "))));
+            const options = shuffleOptions(uniqueSequences.slice(0, 4).map(sequence => ({
+              label: sequence,
+              value: sequence,
+              ...(sequence === correct ? {} : { misconception: MisconceptionTag.ORDEM_ERRADA }),
+            })));
+            const cards = shuffleOptions(ascending.map(value => ({ label: String(value), value })))
+              .map(option => option.value);
+            return {
+              ...base,
+              kind: "plain",
+              prompt: params.audio_prompt ?? "Coloque os números do menor para o maior.",
+              big: cards.join("   "),
+              options,
+              answer: correct,
+              uiProps: { ...params, text: cards.join("   "), cards },
+              evaluate: ans => String(ans) === correct,
+              howto: "Comece pelo menor e siga a ordem da contagem.",
+              explain: "Ordenar é colocar os números na mesma ordem em que aparecem quando contamos.",
+            };
+          }
+
+          const fixedAnswer = params.answer;
+'''
+          if plain_anchor not in composer:
+            raise SystemExit('âncora plain não encontrada')
+          composer = composer.replace(plain_anchor, plain_insert, 1)
+          composer_path.write_text(composer)
+
+          Path('src/curriculum/fichas/jornada/N1.07.ts').write_text('''import { FichaCompetencia } from "../../schema";
+
+/**
+ * N1.07 — ordem, sucessor e antecessor até 10.
+ * Jornada ensina/observa o conceito completo; JD4 automatiza depois.
+ */
+export const N1_07: FichaCompetencia = {
+  id: "N1.07",
+  nome: "Ordem, sucessor e antecessor até 10",
+  strand: "N1",
+  faixa: "F0",
+  prereqs: ["N1.02", "N1.06"],
+  bncc: "EF01MA01",
+  howto: "Use a ordem da contagem para descobrir quem vem antes, quem vem depois e como colocar os números em sequência.",
+  explain: "Cada número tem vizinhos fixos: o antecessor vem imediatamente antes e o sucessor imediatamente depois.",
+  niveis: {
+    1: { primitiva: "numberline", micro: "a", andaime: "mao_fantasma" },
+    2: { primitiva: "numberline", micro: "b", andaime: "alto" },
+    3: { primitiva: "numberline", micro: "c", andaime: "medio" },
+    4: { primitiva: "plain", micro: "d", andaime: "minimo" },
+    5: { primitiva: "plain", micro: "e", rt_alvo: 3000 },
+  },
+  micros: [
+    { id: "a", fonte: "JD4", alvo: "identificar o sucessor até 5 com apoio da reta", kinds: ["numberline"], params: { modo: "sucessor", start: 1, end: 5, jump_size: 1, audio_prompt: "Qual número vem depois?", tutorial: [{ fala: "Na reta, dê um passinho para a direita." }] }, dominio: { acertos: 3, de: 3, sessoes: 2 } },
+    { id: "b", fonte: "JD4", alvo: "identificar o sucessor até 10 com apoio reduzido", kinds: ["numberline"], params: { modo: "sucessor", start: 1, end: 10, jump_size: 1, audio_prompt: "Qual número vem depois?" }, dominio: { acertos: 3, de: 3, sessoes: 2 } },
+    { id: "c", fonte: "JD4", alvo: "identificar o antecessor até 5 com apoio da reta", kinds: ["numberline"], params: { modo: "antecessor", start: 1, end: 5, jump_size: 1, audio_prompt: "Qual número vem antes?", tutorial: [{ fala: "Agora volte um passinho para a esquerda." }] }, dominio: { acertos: 3, de: 3, sessoes: 2 } },
+    { id: "d", fonte: "JD4", alvo: "identificar o antecessor até 10 sem depender da reta", kinds: ["plain"], params: { modo: "antecessor", start: 1, end: 10, audio_prompt: "Qual número vem antes?" }, dominio: { acertos: 3, de: 3, sessoes: 2 } },
+    { id: "e", fonte: "GRAFO_N1.07", alvo: "ordenar de 3 a 4 numerais consecutivos em ordem crescente", kinds: ["plain"], params: { modo: "ordenacao", start: 1, end: 10, audio_prompt: "Coloque os números do menor para o maior." }, dominio: { acertos: 4, de: 5, sessoes: 2 } },
+  ],
+  erros_tipicos: [
+    { id: "direcao_invertida", descricao: "Confunde antes e depois e se move para o lado oposto na sequência." },
+    { id: "repete_estimulo", descricao: "Repete o número apresentado em vez de escolher seu vizinho." },
+    { id: "ordem_errada", descricao: "Reconhece os numerais isolados, mas não os organiza na sequência crescente." },
+  ],
+};
+''')
+
+          Path('src/curriculum/fichas/jornada/N1.07.test.ts').write_text('''import { describe, expect, it } from "vitest";
+import { Composer } from "../../Composer";
+import { misconceptionForAnswer } from "../../../components/gameloop/answerPolicy";
+import { N1_07 } from "./N1.07";
+
+function amostrar(level: number, vezes = 120) {
+  return Array.from({ length: vezes }, () => Composer.generate(N1_07, level));
+}
+
+describe("N1.07 — ordem, sucessor e antecessor", () => {
+  it("usa os pré-requisitos canônicos do grafo", () => expect(N1_07.prereqs).toEqual(["N1.02", "N1.06"]));
+
+  it("serve cinco micros válidos, um por nível", () => {
+    expect(N1_07.micros.map(m => m.id)).toEqual(["a", "b", "c", "d", "e"]);
+    for (let level = 1; level <= 5; level += 1) {
+      const q = Composer.generate(N1_07, level);
+      expect(q.isFallback).toBeFalsy();
+      expect(q.evaluate?.(q.answer)).toBe(true);
+      expect(q.options?.filter(o => String(o.value) === String(q.answer))).toHaveLength(1);
+    }
+  });
+
+  it("níveis 1 e 2 observam sucessor dentro do escopo", () => {
+    for (const level of [1, 2]) {
+      const max = level === 1 ? 5 : 10;
+      for (const q of amostrar(level)) {
+        expect(q.kind).toBe("numberline");
+        expect(Number(q.answer)).toBe(Number(q.nlStartPos) + 1);
+        expect(Number(q.answer)).toBeLessThanOrEqual(max);
+      }
+    }
+  });
+
+  it("nível 3 observa antecessor com a reta até 5", () => {
+    for (const q of amostrar(3)) {
+      expect(q.kind).toBe("numberline");
+      expect(Number(q.answer)).toBe(Number(q.nlStartPos) - 1);
+      expect(Number(q.answer)).toBeGreaterThanOrEqual(1);
+      expect(Number(q.nlStartPos)).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it("nível 4 observa antecessor sem depender da reta", () => {
+    for (const q of amostrar(4)) {
+      expect(q.kind).toBe("plain");
+      expect(q.nlStartPos).toBeUndefined();
+      const atual = Number(String(q.big).split("→").at(-1)?.trim());
+      expect(Number(q.answer)).toBe(atual - 1);
+      expect(Number(q.answer)).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("nível 5 ordena 3–4 numerais e diagnostica somente erros", () => {
+    for (const q of amostrar(5, 160)) {
+      expect(q.kind).toBe("plain");
+      const resposta = String(q.answer);
+      const numeros = resposta.split("→").map(v => Number(v.trim()));
+      expect([3, 4]).toContain(numeros.length);
+      expect(numeros).toEqual([...numeros].sort((a, b) => a - b));
+      expect(new Set(numeros).size).toBe(numeros.length);
+      expect(misconceptionForAnswer(q, q.answer)).toBeUndefined();
+      for (const option of q.options ?? []) {
+        if (String(option.value) === resposta) continue;
+        expect(option.misconception).toBe("ORDEM_ERRADA");
+      }
+    }
+  });
+
+  it("mantém alternativas entre 2 e 4 e nunca oferece número negativo", () => {
+    for (let level = 1; level <= 5; level += 1) {
+      for (const q of amostrar(level)) {
+        expect(q.options?.length ?? 0).toBeGreaterThanOrEqual(2);
+        expect(q.options?.length ?? 0).toBeLessThanOrEqual(4);
+        for (const option of q.options ?? []) if (typeof option.value === "number") expect(option.value).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+});
+''')
+
+          canon_path = Path('AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md')
+          canon = canon_path.read_text()
+          old_identity = '**Competência:** N1.07 (sucessor e antecessor) · **Primitiva:** `AudioChoice` + `NumberLine` · **Faixa:** F0 · **Também é trilha do Dojo (JD4)**'
+          new_identity = '**Competência:** N1.07 (ordem, sucessor e antecessor) · **Primitiva:** `AudioChoice` + `NumberLine` + `plain` · **Faixa:** F0 · **Também é trilha do Dojo (JD4)**'
+          if old_identity not in canon: raise SystemExit('identidade JD4 não encontrada')
+          canon = canon.replace(old_identity, new_identity, 1)
+          foundation = '**O que a criança aprende:** que cada número tem um **próximo fixo** — e que "próximo" significa "mais um".\n'
+          addition = foundation + '\n**Escopo da Jornada N1.07:** o grafo canônico é mais amplo que a trilha de fluência JD4: além de sucessor/antecessor, a Jornada observa **ordenar 3–4 numerais em ordem crescente**. JD4 continua focada em automaticidade da vizinhança numérica; não substitui essa compreensão.\n'
+          if foundation not in canon: raise SystemExit('fundamento JD4 não encontrado')
+          canon_path.write_text(canon.replace(foundation, addition, 1))
+          PY
+
+      - name: Contratos focais N1.07
+        run: |
+          npx vitest run src/curriculum/fichas/jornada/N1.07.test.ts src/curriculum/motores/canaryContract.test.ts
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+
+      - name: Sonda N1.07
+        env:
+          SONDA_CHROME: /usr/bin/google-chrome
+        run: npm run sonda -- N1.07
+
+      - name: Portões completos
+        run: |
+          npm run auditar
+          npm test -- --run
+          npm run build
+          npm run pr:check
+          git diff --check e2ee44d1d79d910ebbfcb3411d5f65c836616a47..HEAD
+
+      - name: Publicar se verde; descartar se vermelho
+        if: always()
+        run: |
+          STATUS='${{ job.status }}'
+          if [ "$STATUS" != 'success' ]; then
+            git reset --hard HEAD
+          fi
+          git show HEAD^:.github/workflows/ci.yml > .github/workflows/ci.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          if [ "$STATUS" = 'success' ]; then
+            git commit -m 'P22.3A: completa Jornada N1.07'
+          else
+            git commit -m 'chore: restaura CI apos falha P22.3A'
+          fi
+          git push origin HEAD:codex/integrar-bloco-f0
