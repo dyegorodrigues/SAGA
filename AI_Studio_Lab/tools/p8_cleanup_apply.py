@@ -13,11 +13,12 @@ def replace_once(path: str, old: str, new: str) -> None:
 
 # KidHome: apaga a superfície do Garden CRA antigo. O Garden real vive em
 # DojoTab/JARDIM e não usa LevelPicker nem SUBJECTS para descobrir trilhas.
+# `C` permanece: o cabeçalho global ainda usa C.ink.
 p = Path("src/components/KidHomeScreen.tsx")
 s = p.read_text()
 s = s.replace(
     'import { C, FONT, CoinChip, LevelDots, sfx, FRESH, TOTAL_STICKERS, THEMES, Mascote } from "./Mascot";',
-    'import { FONT, CoinChip, sfx, THEMES } from "./Mascot";',
+    'import { C, FONT, CoinChip, sfx, THEMES } from "./Mascot";',
 )
 s = s.replace(
     'import { MascotEvolutionCard, getKidLifetimeStars, getMascotStage } from "./MascotEvolution";',
