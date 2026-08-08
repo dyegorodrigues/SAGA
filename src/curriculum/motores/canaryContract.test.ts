@@ -11,6 +11,7 @@ import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
+import { N4_09 } from "../fichas/jornada/N4.09";
 import { N1_03 } from "../fichas/jornada/N1.03";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
@@ -66,6 +67,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.07": N4_07,
   "N4.06": N4_06,
   "N4.08": N4_08,
+  "N4.09": N4_09,
 
   // Bloco F0. Estes seis já eram servidos por ficha em produção, mas por fora
   // do mecanismo — chamavam `Composer.generate` de dentro do gerador legado.
