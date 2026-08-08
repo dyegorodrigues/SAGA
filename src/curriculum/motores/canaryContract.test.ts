@@ -19,6 +19,11 @@ import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { N1_04 } from "../fichas/jornada/N1.04";
 import { N1_06 } from "../fichas/jornada/N1.06";
+import { N1_13 } from "../fichas/jornada/N1.13";
+import { GE_01 } from "../fichas/jornada/GE.01";
+import { GE_02 } from "../fichas/jornada/GE.02";
+import { GM_01 } from "../fichas/jornada/GM.01";
+import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_01 } from "../fichas/jornada/N1.01";
 import { Progress, Question } from "../../types";
@@ -78,6 +83,16 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.02": N1_02,
   "N1.04": N1_04,
   "N1.06": N1_06,
+
+  // Candidatos F0 já implementados e registrados ANTES da promoção. Registrar
+  // aqui não ativa nada; a única chave de produção continua sendo
+  // `COMPOSER_CANARIES`. Isto deixa cada promoção futura reduzida a um id.
+  "N1.13": N1_13,
+  "GE.01": GE_01,
+  "GE.02": GE_02,
+  "GM.01": GM_01,
+  "GM.12": GM_12,
+
   "AL.02": AL_02,
 };
 
