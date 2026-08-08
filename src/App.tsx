@@ -22,6 +22,15 @@ import { getKidLifetimeStars, getMascotStage } from "./components/MascotEvolutio
 import { tracksForGrade, SUBJECTS } from "./subjects";
 import { ALL_MATH_TRACKS } from "./curriculum/motores/curriculum";
 import { migrateLegacyCrown } from "./curriculum/motores/progressEngine";
+import {
+  jardimProgressProjection,
+  jardimTrack,
+  jardimTrilhaPorId,
+  resolveJardimState,
+  type JardimMissionSummary,
+} from "./curriculum/motores/jardimSession";
+import type { JardimRoundResult } from "./curriculum/motores/jardimEngine";
+import { trackMisconception } from "./curriculum/motores/radarEngine";
 import { buildMixedTrack } from "./curriculum/motores/mixedChallenge";
 import { dojo_add } from "./curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "./curriculum/fichas/dojo/sensei/dojo_sub";
@@ -121,9 +130,11 @@ function migrate(s: any): State {
   m.album = m.album || {};
   m.log = m.log || {};
   m.progress = m.progress || {};
+  m.dojoTracks = m.dojoTracks || {};
   m.customTracks = m.customTracks || [];
 
   for (const k of m.kids) {
+    if (!m.dojoTracks[k.id]) m.dojoTracks[k.id] = {};
     const prog = { ...(m.progress[k.id] || {}) };
     // Migração da economia dupla: moedinhas iniciais = saldo gastável antigo
     // (wallet) ou, em saves muito antigos, o total de estrelas acumulado.
@@ -615,6 +626,55 @@ export default function App() {
     missionDone);
   };
 
+  const commitJardimRound = (
+    kidId: string,
+    trailId: string,
+    motherId: string,
+    result: JardimRoundResult,
+    summary: JardimMissionSummary,
+  ) => {
+    const today = localDay();
+    const lg = [...logOf(kidId)];
+    const last = lg[lg.length - 1];
+    const doneBefore = last && last.d === today ? last.m || 0 : 0;
+
+    if (last && last.d === today) {
+      lg[lg.length - 1] = {
+        ...last,
+        ok: last.ok + summary.measuredCorrect,
+        tot: last.tot + summary.total,
+        stars: last.stars + summary.stars,
+        t: (last.t || 0) + summary.durationMs,
+        m: (last.m || 0) + 1,
+      };
+    } else {
+      lg.push({ d: today, ok: summary.measuredCorrect, tot: summary.total, stars: summary.stars, t: summary.durationMs, m: 1 });
+    }
+
+    const kidProgress = { ...(state.progress[kidId] || {}) };
+    const mother = kidProgress[motherId] ? { ...kidProgress[motherId] } : getProg(kidId, motherId);
+    for (const tag of result.misconceptions) trackMisconception(mother, tag);
+    kidProgress[motherId] = mother;
+
+    const kidDojo = {
+      ...((state.dojoTracks || {})[kidId] || {}),
+      [trailId]: result.state,
+    };
+    const coinGain = summary.rewardedCorrect + 3 + (doneBefore === 0 ? 5 : 0);
+    const freeFood = doneBefore === 0 ? 1 : 0;
+
+    persist({
+      ...state,
+      kids: freeFood
+        ? state.kids.map(k => k.id === kidId ? { ...k, petFood: (k.petFood || 0) + 1 } : k)
+        : state.kids,
+      progress: { ...state.progress, [kidId]: kidProgress },
+      dojoTracks: { ...(state.dojoTracks || {}), [kidId]: kidDojo },
+      coins: { ...state.coins, [kidId]: coinsOf(kidId) + coinGain },
+      log: { ...state.log, [kidId]: lg.slice(-366) },
+    }, true);
+  };
+
   const handleFactoryReset = () => {
     const freshState = defaultState();
     persist(freshState, true);
@@ -630,6 +690,9 @@ export default function App() {
     const updatedCoins = { ...state.coins };
     delete updatedCoins[kidId];
 
+    const updatedDojoTracks = { ...(state.dojoTracks || {}) };
+    delete updatedDojoTracks[kidId];
+
     const updatedAlbum = { ...state.album };
     delete updatedAlbum[kidId];
 
@@ -640,6 +703,7 @@ export default function App() {
       ...state,
       kids: updatedKids,
       progress: updatedProgress,
+      dojoTracks: updatedDojoTracks,
       coins: updatedCoins,
       album: updatedAlbum,
       log: updatedLog,
@@ -657,6 +721,7 @@ export default function App() {
       ...state,
       kids: [...state.kids, newKid],
       progress: { ...state.progress, [newKid.id]: {} },
+      dojoTracks: { ...(state.dojoTracks || {}), [newKid.id]: {} },
       coins: { ...state.coins, [newKid.id]: 0 },
       album: { ...state.album, [newKid.id]: [] },
       log: { ...state.log, [newKid.id]: [] },
@@ -801,8 +866,17 @@ export default function App() {
           const kidObj = kidById(screen.kid!);
           const kidStars = getKidLifetimeStars(kidObj.id, state);
           const kidStage = getMascotStage(kidStars).stage;
-          const gameTrack =
-            screen.track === "mista" || screen.track === "mixed"
+          const jardimConfig = jardimTrilhaPorId(screen.track);
+          const jardimState = jardimConfig
+            ? resolveJardimState(
+                jardimConfig,
+                (state.progress[kidObj.id] || {})[jardimConfig.mae],
+                ((state.dojoTracks || {})[kidObj.id] || {})[jardimConfig.ficha.id],
+              )
+            : null;
+          const gameTrack = jardimConfig
+            ? jardimTrack(jardimConfig)
+            : screen.track === "mista" || screen.track === "mixed"
               ? mixedTrack!
               : screen.track === "aula"
               ? aulaTrack!
@@ -829,16 +903,23 @@ export default function App() {
             <GameLoop
               kid={kidObj}
               track={activeTrack}
-              prog0={screen.rescue
-                ? { ...getProg(screen.kid!, screen.track!), streak: 0 }
-                : screen.lvl
-                  ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl }
-                  : getProg(screen.kid!, screen.track!)}
-              exactLvl={!!screen.rescue || !!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // sequências puras: sem banco/aquecimento por cima
-              rescue={screen.rescue}
+              prog0={jardimState
+                ? jardimProgressProjection(jardimState)
+                : screen.rescue
+                  ? { ...getProg(screen.kid!, screen.track!), streak: 0 }
+                  : screen.lvl
+                    ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl }
+                    : getProg(screen.kid!, screen.track!)}
+              exactLvl={!!jardimState || !!screen.rescue || !!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // sequências puras: sem banco/aquecimento por cima
+              rescue={jardimState ? undefined : screen.rescue}
+              progressionMode={jardimState ? "garden" : "journey"}
+              gardenState={jardimState || undefined}
               sound={sound}
               onToggleSound={toggleSound}
               onCommit={(p, right, gain, ms, missionDone) => commitProg(screen.kid!, screen.track!, p, right, gain, ms, missionDone)}
+              onGardenRound={jardimConfig ? (result, summary) =>
+                commitJardimRound(screen.kid!, jardimConfig.ficha.id, jardimConfig.mae, result, summary)
+                : undefined}
               onExit={() => setScreen({ name: "home", kid: screen.kid })}
               onAlbum={() => setScreen({ name: "album", kid: screen.kid })}
               stage={kidStage}
@@ -871,7 +952,12 @@ export default function App() {
             sound={sound}
             onToggleSound={toggleSound}
             onUpdateKids={(kids) => persist({ ...state, kids })}
-            onResetKid={(id) => persist({ ...state, progress: { ...state.progress, [id]: {} }, log: { ...state.log, [id]: [] } })}
+            onResetKid={(id) => persist({
+              ...state,
+              progress: { ...state.progress, [id]: {} },
+              dojoTracks: { ...(state.dojoTracks || {}), [id]: {} },
+              log: { ...state.log, [id]: [] },
+            })}
             onDeleteKid={handleDeleteKid}
             onAddKid={handleAddKid}
             onFactoryReset={handleFactoryReset}

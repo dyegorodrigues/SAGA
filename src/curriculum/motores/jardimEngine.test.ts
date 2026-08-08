@@ -80,10 +80,10 @@ describe("P8 — motor puro do Jardim do Dojo", () => {
     expect(result.state.lastDay).toBe("2026-08-08");
   });
 
-  it("só agrega misconception de resposta errada", () => {
+  it("preserva uma ocorrência por questão errada para o Radar detectar padrão", () => {
     const attempts = round(8, 3);
     const result = applyJardimRound(freshJardimTrackState(true), attempts);
-    expect(result.misconceptions).toEqual(["ERRO_CONCEITUAL"]);
+    expect(result.misconceptions).toEqual(["ERRO_CONCEITUAL", "ERRO_CONCEITUAL"]);
     expect(result.misconceptions).not.toContain("LENTO_DEDOS");
   });
 

@@ -162,9 +162,9 @@ export function applyJardimRound(
     ...(practiceDay ? { lastDay: practiceDay } : {}),
   };
 
-  const misconceptions = [...new Set(
-    attempts.filter(a => !a.right && a.misconception).map(a => a.misconception as string),
-  )];
+  const misconceptions = attempts
+    .filter(a => !a.right && a.misconception)
+    .map(a => a.misconception as string);
 
   return { state, accuracy, fluentAccuracy, avgCorrectRtMs, outcome, misconceptions };
 }
