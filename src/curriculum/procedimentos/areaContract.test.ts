@@ -34,6 +34,26 @@ describe("a tela nunca entrega a resposta", () => {
   });
 });
 
+describe("diagnóstico pertence ao erro, nunca ao acerto", () => {
+  it("a alternativa correta não carrega tag diagnóstica", () => {
+    for (const { c, n } of AMOSTRA) {
+      const spec = construirAreaSpec(c, n);
+      const correta = spec.alternativas.find(a => a.valor === spec.resposta);
+      expect(correta, `${c.a}×${c.b} nível ${n}: gabarito ausente`).toBeDefined();
+      expect(correta?.tag, `${c.a}×${c.b} nível ${n}: acerto virou diagnóstico`).toBeUndefined();
+    }
+  });
+
+  it("distratores continuam carregando hipótese diagnóstica", () => {
+    for (const { c, n } of AMOSTRA) {
+      const spec = construirAreaSpec(c, n);
+      for (const alternativa of spec.alternativas.filter(a => a.valor !== spec.resposta)) {
+        expect(alternativa.tag, `${c.a}×${c.b} nível ${n}: distrator sem hipótese`).toBeTruthy();
+      }
+    }
+  });
+});
+
 describe("o algoritmo espelha o retângulo", () => {
   it("as parcelas somam o produto, sempre", () => {
     for (const { c, n } of AMOSTRA) {
