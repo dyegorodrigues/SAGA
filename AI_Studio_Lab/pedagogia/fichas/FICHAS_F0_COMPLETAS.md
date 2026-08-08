@@ -805,7 +805,7 @@ Aperte e escute. Que numero voce ouviu?
 
 ## 7. Falas
 
-**audioPrompt:** *"Aperte e escute. Que número você ouviu?"*
+**audioPrompt (após a primeira audição automática):** *"Que número você ouviu?"*
 **howto:** *"Aperte o botão azul. Escute bem. Depois toque no número que você ouviu."*
 **explain:** *"Aperte de novo e escute com atenção. Eu vou falar devagar."*
 
