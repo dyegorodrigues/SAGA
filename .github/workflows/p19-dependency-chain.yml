@@ -1,0 +1,51 @@
+name: P19 - cadeia das dependencias vulneraveis
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  explain:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Explicar cadeias
+        run: |
+          for P in js-yaml nanoid postcss body-parser; do
+            echo "===== $P =====" > "/tmp/$P.txt"
+            npm explain "$P" >> "/tmp/$P.txt" 2>&1 || true
+          done
+      - name: Acrescentar cadeia ao relatorio
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'AI_Studio_Lab/codex/AUDITORIA_P19_DEPENDENCIAS.md';
+          let md = fs.readFileSync(path, 'utf8');
+          md += '\n\n## Cadeia instalada (`npm explain`)\n\n';
+          for (const name of ['js-yaml','nanoid','postcss','body-parser']) {
+            const txt = fs.readFileSync(`/tmp/${name}.txt`, 'utf8').trim();
+            md += `### \`${name}\`\n\n\`\`\`text\n${txt}\n\`\`\`\n\n`;
+          }
+          fs.writeFileSync(path, md);
+          NODE
+      - name: Publicar cadeia e limpar workflow
+        run: |
+          rm .github/workflows/p19-dependency-chain.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'P19: registra cadeia das dependencias vulneraveis'
+          git push origin HEAD:codex/integrar-bloco-f0
