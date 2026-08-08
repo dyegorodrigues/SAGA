@@ -4,6 +4,8 @@ export interface ItemDeMedida {
   id: string;
   emoji: string;
   nome: string;
+  /** Marca não verbal que acompanha o recipiente antes/depois do despejo. */
+  marcador?: string;
   /** Grandeza verdadeira; sem unidade visível em F0. */
   valor: number;
   /** Tamanho aparente do objeto/recipiente — pode deliberadamente enganar. */
@@ -68,23 +70,27 @@ function pesoDoNivel(nivel: number): ItemDeMedida[] {
 
 function capacidadeDoNivel(nivel: number): ItemDeMedida[] {
   if (nivel === 2) {
+    // Mesma forma, tamanhos diferentes, ambos CHEIOS: agora a pergunta mede
+    // capacidade (quanto cabe), não a quantidade de líquido já servida.
     return [
-      { id: "copo-a", emoji: "🥛", nome: "copo", valor: 0.38, tamanhoVisual: 1, largura: 1, altura: 1, preenchimento: 0.38 },
-      { id: "copo-b", emoji: "🥛", nome: "copo", valor: 0.72, tamanhoVisual: 1, largura: 1, altura: 1, preenchimento: 0.72 },
+      { id: "copo-a", emoji: "🥛", nome: "copo menor", marcador: "●", valor: 0.38, tamanhoVisual: 0.78, largura: 0.78, altura: 0.78, preenchimento: 1 },
+      { id: "copo-b", emoji: "🥛", nome: "copo maior", marcador: "▲", valor: 0.72, tamanhoVisual: 1.12, largura: 1.12, altura: 1.12, preenchimento: 1 },
     ];
   }
   if (nivel === 3) {
-    // O estreito parece MAIS cheio, mas contém MENOS. É a armadilha da §2/§5.
+    // Ambos estão cheios. O alto/fino chama a atenção pela ALTURA, mas sua
+    // capacidade é menor; despejar no mesmo recipiente neutraliza o formato.
     return [
-      { id: "alto-fino", emoji: "🧪", nome: "copo alto e fino", valor: 0.46, tamanhoVisual: 1.12, largura: 0.62, altura: 1.22, preenchimento: 0.78 },
-      { id: "baixo-largo", emoji: "🥣", nome: "copo baixo e largo", valor: 0.72, tamanhoVisual: 1.28, largura: 1.30, altura: 0.82, preenchimento: 0.56 },
+      { id: "alto-fino", emoji: "🧪", nome: "recipiente alto e fino", marcador: "●", valor: 0.46, tamanhoVisual: 1.12, largura: 0.62, altura: 1.22, preenchimento: 1 },
+      { id: "baixo-largo", emoji: "🥣", nome: "recipiente baixo e largo", marcador: "▲", valor: 0.72, tamanhoVisual: 1.28, largura: 1.30, altura: 0.82, preenchimento: 1 },
     ];
   }
-  // L5: três recipientes, e ordenar por altura aparente do líquido dá a ordem errada.
+  // L5: três recipientes CHEIOS. A ordem pela altura externa é diferente
+  // da ordem pela capacidade — a criança precisa recorrer à referência comum.
   return [
-    { id: "fino", emoji: "🧪", nome: "recipiente fino", valor: 0.38, tamanhoVisual: 0.78, largura: 0.50, altura: 1.22, preenchimento: 0.80 },
-    { id: "largo", emoji: "🥣", nome: "recipiente largo", valor: 0.58, tamanhoVisual: 1.32, largura: 1.30, altura: 0.82, preenchimento: 0.47 },
-    { id: "medio", emoji: "🥛", nome: "recipiente médio", valor: 0.78, tamanhoVisual: 1.02, largura: 1.24, altura: 1.00, preenchimento: 0.63 },
+    { id: "fino", emoji: "🧪", nome: "recipiente fino", marcador: "●", valor: 0.38, tamanhoVisual: 0.78, largura: 0.50, altura: 1.22, preenchimento: 1 },
+    { id: "largo", emoji: "🥣", nome: "recipiente largo", marcador: "▲", valor: 0.58, tamanhoVisual: 1.32, largura: 1.30, altura: 0.82, preenchimento: 1 },
+    { id: "medio", emoji: "🥛", nome: "recipiente médio", marcador: "■", valor: 0.78, tamanhoVisual: 1.02, largura: 1.24, altura: 1.00, preenchimento: 1 },
   ];
 }
 
@@ -101,7 +107,9 @@ export function construirMedidasSpec(nivelBruto: number, sorteio: () => number):
   const itens = embaralhar(base, sorteio);
   const ordemCerta = ordenar(itens, i => i.valor);
   const valorVisual = (i: ItemDeMedida) => modo === "capacidade"
-    ? (i.preenchimento ?? 0)
+    // Em capacidade todos começam cheios: a armadilha visual é ALTURA/TAMANHO
+    // do recipiente, nunca "quanto líquido alguém já colocou".
+    ? (i.altura ?? i.tamanhoVisual)
     : i.tamanhoVisual;
   const ordemVisual = ordenar(itens, valorVisual);
   const maiorVisual = ordemVisual[0];

@@ -20,6 +20,17 @@ function dimensoes(item: ItemDeMedida, compacto: boolean) {
   };
 }
 
+function Marca({ item }: { item: ItemDeMedida }) {
+  return (
+    <span
+      aria-hidden
+      className="flex h-8 min-w-8 items-center justify-center rounded-full border-2 border-slate-300 bg-white px-1 text-lg font-black text-slate-800 shadow-sm"
+    >
+      {item.marcador ?? item.emoji}
+    </span>
+  );
+}
+
 export function Recipientes({ itens, verificado, disabled, ordem = [], onChoose, onVerify }: Props) {
   const max = Math.max(...itens.map(i => i.valor));
   const compacto = itens.length >= 3;
@@ -47,11 +58,11 @@ export function Recipientes({ itens, verificado, disabled, ordem = [], onChoose,
                   <motion.span
                     className="absolute inset-x-0 bottom-0 block bg-sky-400/80"
                     initial={false}
-                    animate={{ height: `${Math.round((item.preenchimento ?? 0.5) * 100)}%` }}
+                    animate={{ height: `${Math.round((item.preenchimento ?? 1) * 100)}%` }}
                     transition={{ duration: 0.7 }}
                   />
                 </span>
-                <span aria-hidden className="absolute -right-2 -top-4 text-2xl">{item.emoji}</span>
+                <span className="absolute -right-3 -top-4"><Marca item={item} /></span>
               </span>
               {posto >= 0 && (
                 <span className="absolute right-0 top-0 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white shadow">
@@ -70,16 +81,17 @@ export function Recipientes({ itens, verificado, disabled, ordem = [], onChoose,
           className="min-h-[54px] rounded-2xl border-2 border-blue-500 bg-blue-50 px-5 py-2 text-base font-black text-blue-800 shadow-sm focus-visible:outline-4 focus-visible:outline-blue-500"
           onClick={onVerify}
           disabled={disabled}
-          aria-label="Despejar para o mesmo recipiente e comparar"
+          aria-label="Despejar para recipientes iguais e comparar"
         >
-          🫗 Despejar para comparar
+          🫗 Despejar e comparar
         </button>
       )}
 
       {verificado && (
         <motion.div
           data-recipientes-standard
-          className="flex min-h-[116px] w-full items-end justify-center gap-4 rounded-2xl border-2 border-sky-200 bg-sky-50/70 px-4 py-3"
+          aria-label="As quantidades foram despejadas em recipientes iguais"
+          className="flex min-h-[122px] w-full items-end justify-center gap-4 rounded-2xl border-2 border-sky-200 bg-sky-50/70 px-4 py-3"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -93,7 +105,7 @@ export function Recipientes({ itens, verificado, disabled, ordem = [], onChoose,
                   transition={{ duration: 0.8, delay: i * 0.12 }}
                 />
               </div>
-              <span aria-hidden className="text-xl">{item.emoji}</span>
+              <Marca item={item} />
             </div>
           ))}
         </motion.div>

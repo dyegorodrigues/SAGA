@@ -23,14 +23,27 @@ function RotuloPeso({ emoji, escala }: { emoji: string; escala: number }) {
   return <span aria-hidden className="block leading-none" style={{ fontSize: `${Math.round(31 * escala)}px` }}>{emoji}</span>;
 }
 
-function ReferenciaDePeso({ valor }: { valor: number }) {
-  const angulo = Math.max(-12, Math.min(12, (valor - 5) * 3));
+function ComparadorDePeso({ emoji, escala, valor }: { emoji: string; escala: number; valor: number }) {
+  // L5 reaproveita a linguagem visual dos níveis 1/4: cada objeto é pesado
+  // contra a MESMA referência neutra. Não há número nem unidade na tela.
+  const referencia = 5;
+  const angulo = Math.max(-12, Math.min(12, (referencia - valor) * 3.5));
   return (
-    <span className="relative mt-1 block h-7 w-16" aria-hidden>
-      <span className="absolute bottom-1 left-1/2 h-5 w-[3px] -translate-x-1/2 bg-slate-400" />
-      <span className="absolute left-1/2 top-2 h-[3px] w-14 -translate-x-1/2 rounded bg-slate-500" style={{ transform: `translateX(-50%) rotate(${angulo}deg)` }} />
-      <span className="absolute left-1 top-4 h-2 w-4 rounded-b-full border-2 border-slate-400" />
-      <span className="absolute right-1 top-4 h-2 w-4 rounded-b-full border-2 border-slate-400" />
+    <span className="relative mx-auto mt-1 block h-[78px] w-[92px]" aria-hidden data-peso-referencia-comum>
+      <span className="absolute bottom-1 left-1/2 h-8 w-[4px] -translate-x-1/2 rounded bg-slate-400" />
+      <span className="absolute bottom-0 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[10px] border-b-[18px] border-x-transparent border-b-slate-300" />
+      <motion.span
+        className="absolute left-1/2 top-8 block h-[4px] w-[82px] -translate-x-1/2 rounded bg-slate-600"
+        initial={false}
+        animate={{ rotate: angulo }}
+        transition={{ type: "spring", stiffness: 140, damping: 14 }}
+        style={{ transformOrigin: "50% 50%" }}
+      >
+        <span className="absolute -left-1 -top-8 flex h-8 min-w-8 items-center justify-center rounded-lg border-2 border-slate-300 bg-white shadow-sm" style={{ fontSize: `${Math.round(20 * escala)}px` }}>{emoji}</span>
+        <span className="absolute -right-1 -top-8 flex h-8 w-8 items-center justify-center rounded-lg border-2 border-slate-400 bg-slate-200 text-base shadow-sm">◆</span>
+        <span className="absolute -left-2 top-2 h-3 w-10 rounded-b-full border-x-2 border-b-2 border-slate-400" />
+        <span className="absolute -right-2 top-2 h-3 w-10 rounded-b-full border-x-2 border-b-2 border-slate-400" />
+      </motion.span>
     </span>
   );
 }
@@ -159,12 +172,11 @@ export function MedidasStage({ spec, onAnswer, disabled, falar, mostrar }: Props
                 <button
                   key={item.id}
                   type="button"
-                  className="relative min-h-[132px] rounded-2xl border-2 border-slate-200 bg-white p-2 shadow-sm focus-visible:outline-4 focus-visible:outline-blue-500"
+                  className="relative min-h-[126px] rounded-2xl border-2 border-slate-200 bg-white p-2 shadow-sm focus-visible:outline-4 focus-visible:outline-blue-500"
                   onClick={() => escolher(i)} disabled={travado || posto >= 0}
                   aria-label={`${item.nome} ${i + 1}`}
                 >
-                  <span aria-hidden className="block leading-none" style={{ fontSize: `${Math.round(44 * item.tamanhoVisual)}px` }}>{item.emoji}</span>
-                  <ReferenciaDePeso valor={item.valor} />
+                  <ComparadorDePeso emoji={item.emoji} escala={item.tamanhoVisual} valor={item.valor} />
                   {posto >= 0 && <span className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white">{posto + 1}</span>}
                 </button>
               );
