@@ -1,0 +1,374 @@
+name: P22.3A transactional publication
+
+on:
+  push:
+    branches:
+      - codex/integrar-bloco-f0
+    paths:
+      - .github/workflows/p22-3a-transaction.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Aplicar P22.3A permanente no workspace
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          root = Path('.')
+          composer_path = root / 'src/curriculum/Composer.ts'
+          ficha_path = root / 'src/curriculum/fichas/jornada/N1.07.ts'
+          test_path = root / 'src/curriculum/fichas/jornada/N1.07.test.ts'
+          canon_path = root / 'AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md'
+
+          def replace_once(text: str, old: str, new: str, label: str) -> str:
+              if old not in text:
+                  raise SystemExit(f'P22.3A: ancora ausente: {label}')
+              return text.replace(old, new, 1)
+
+          composer = composer_path.read_text()
+          old_numberline = '''      case "numberline": {
+        const start = params.start || 0;
+        const end = params.end || 10;
+        const jump = params.jump_size || 1;
+        const current = randomInt(start, end - jump);
+        const next = current + jump;
+        
+        uiProps = {
+          start,
+          end,
+          interactive: true,
+          startPos: current, showJumps: [{from: current, to: next}]
+        };
+        evaluate = (ans) => ans === next;
+        answer = next;
+        big = String(current);
+        options = numericOptions(answer, start, end);
+        break;
+      }
+'''
+          new_numberline = '''      case "numberline": {
+        const start = params.start ?? 0;
+        const end = params.end ?? 10;
+        const jump = params.jump_size ?? 1;
+        if (!Number.isInteger(start) || !Number.isInteger(end) || !Number.isInteger(jump) || jump == 0 || start >= end) {
+          throw new Error(`Intervalo/salto invalido na reta de ${ficha.id}/${micro.id}.`);
+        }
+        const currentMin = jump > 0 ? start : start - jump;
+        const currentMax = jump > 0 ? end - jump : end;
+        if (currentMin > currentMax) {
+          throw new Error(`Salto ${jump} nao cabe na reta ${start}..${end} de ${ficha.id}/${micro.id}.`);
+        }
+        const current = randomInt(currentMin, currentMax);
+        const next = current + jump;
+
+        uiProps = {
+          start,
+          end,
+          interactive: true,
+          startPos: current,
+          showJumps: [{ from: current, to: next }],
+        };
+        evaluate = ans => Number(ans) === next;
+        answer = next;
+        big = String(current);
+        options = numericOptions(answer, start, end);
+        break;
+      }
+'''
+          composer = replace_once(composer, old_numberline, new_numberline, 'numberline bidirecional')
+
+          plain_anchor = '''      case "plain": {
+        if (params.complemento_dez) {'''
+          ordering = '''      case "plain": {
+        // P22.3A — modo opt-in de ordenacao para a Jornada N1.07.
+        // O plain generico permanece igual para todas as outras fichas.
+        if (params.modo === "ordering") {
+          const start = params.start ?? 1;
+          const end = params.end ?? 10;
+          if (!Number.isInteger(start) || !Number.isInteger(end) || end - start + 1 < 4) {
+            throw new Error(`Intervalo invalido para ordenacao em ${ficha.id}/${micro.id}.`);
+          }
+          const count = randomInt(3, 4);
+          const first = randomInt(start, end - count + 1);
+          const ascending = Array.from({ length: count }, (_, index) => first + index);
+          const correct = ascending.join(" → ");
+          const reversed = [...ascending].reverse();
+          const swapped = [...ascending];
+          [swapped[0], swapped[1]] = [swapped[1], swapped[0]];
+          const rotated = [...ascending.slice(1), ascending[0]];
+          const sequences = Array.from(new Set([ascending, reversed, swapped, rotated].map(sequence => sequence.join(" → "))));
+          const cards = [...ascending].sort(() => Math.random() - 0.5);
+          answer = correct;
+          big = cards.join("   ");
+          uiProps = { text: big, cards };
+          options = sequences.map(sequence => ({
+            label: sequence,
+            value: sequence,
+            ...(sequence === correct ? {} : { misconception: MisconceptionTag.ORDEM_ERRADA }),
+          })).sort(() => Math.random() - 0.5);
+          evaluate = ans => String(ans) === correct;
+          promptOverride = String(params.audio_prompt ?? "Coloque os numeros do menor para o maior.");
+        } else if (params.complemento_dez) {'''
+          composer = replace_once(composer, plain_anchor, ordering, 'plain ordering')
+
+          old_jump = '''        } else if (typeof params.start === "number" && typeof params.end === "number") {
+          const jump = params.jump_size || 1;
+          const current = randomInt(params.start, params.end - jump);
+          answer = current + jump;
+          big = String(current);
+          uiProps = { text: String(current) };
+          options = numericOptions(answer, params.start, params.end);
+          evaluate = (ans) => ans === answer;
+          promptOverride = "Qual número vem depois?";
+'''
+          new_jump = '''        } else if (typeof params.start === "number" && typeof params.end === "number") {
+          const jump = params.jump_size ?? 1;
+          if (!Number.isInteger(jump) || jump === 0 || params.start >= params.end) {
+            throw new Error(`Intervalo/salto invalido no plain de ${ficha.id}/${micro.id}.`);
+          }
+          const currentMin = jump > 0 ? params.start : params.start - jump;
+          const currentMax = jump > 0 ? params.end - jump : params.end;
+          if (currentMin > currentMax) {
+            throw new Error(`Salto ${jump} nao cabe no intervalo ${params.start}..${params.end} de ${ficha.id}/${micro.id}.`);
+          }
+          const current = randomInt(currentMin, currentMax);
+          answer = current + jump;
+          big = String(current);
+          uiProps = { text: String(current) };
+          options = numericOptions(answer, params.start, params.end);
+          evaluate = ans => Number(ans) === answer;
+          promptOverride = jump < 0 ? "Qual número vem antes?" : "Qual número vem depois?";
+'''
+          composer = replace_once(composer, old_jump, new_jump, 'plain salto bidirecional')
+          composer_path.write_text(composer)
+
+          ficha_path.write_text('''import { FichaCompetencia } from "../../schema";
+
+/**
+ * N1.07 — ordem, sucessor e antecessor ate 10.
+ *
+ * A Jornada observa a compreensao completa. JD4, quando registrado, treina
+ * automaticidade depois e nunca concede dominio conceitual desta competencia.
+ */
+export const N1_07: FichaCompetencia = {
+  id: "N1.07",
+  nome: "Ordem, sucessor e antecessor até 10",
+  strand: "N1",
+  faixa: "F0",
+  prereqs: ["N1.02", "N1.06"],
+  bncc: "EF01MA01",
+
+  howto: "Use a ordem da contagem para descobrir quem vem antes, quem vem depois e como colocar os números em sequência.",
+  explain: "O antecessor vem imediatamente antes; o sucessor vem imediatamente depois.",
+  distratores: [],
+
+  niveis: {
+    1: { primitiva: "numberline", micro: "a", andaime: "mao_fantasma" },
+    2: { primitiva: "numberline", micro: "b", andaime: "alto" },
+    3: { primitiva: "plain", micro: "c", andaime: "medio" },
+    4: { primitiva: "plain", micro: "d", andaime: "minimo" },
+    5: { primitiva: "plain", micro: "e", rt_alvo: 3000 },
+  },
+
+  micros: [
+    { id: "a", fonte: "GRAFO_N1.07", alvo: "identificar o sucessor até 5 com apoio da reta", kinds: ["numberline"], params: { start: 1, end: 5, jump_size: 1, audio_prompt: "Qual número vem depois?" }, dominio: { acertos: 4, de: 5, sessoes: 2 } },
+    { id: "b", fonte: "GRAFO_N1.07", alvo: "identificar o sucessor até 10 com apoio reduzido", kinds: ["numberline"], params: { start: 1, end: 10, jump_size: 1, audio_prompt: "Qual número vem depois?" }, dominio: { acertos: 4, de: 5, sessoes: 2 } },
+    { id: "c", fonte: "GRAFO_N1.07", alvo: "identificar o antecessor até 5", kinds: ["plain"], params: { start: 1, end: 5, jump_size: -1, audio_prompt: "Qual número vem antes?" }, dominio: { acertos: 4, de: 5, sessoes: 2 } },
+    { id: "d", fonte: "GRAFO_N1.07", alvo: "identificar o antecessor até 10", kinds: ["plain"], params: { start: 1, end: 10, jump_size: -1, audio_prompt: "Qual número vem antes?" }, dominio: { acertos: 4, de: 5, sessoes: 2 } },
+    { id: "e", fonte: "GRAFO_N1.07", alvo: "ordenar 3 a 4 numerais consecutivos em ordem crescente", kinds: ["plain"], params: { modo: "ordering", start: 1, end: 10, audio_prompt: "Coloque os números do menor para o maior." }, dominio: { acertos: 4, de: 5, sessoes: 2 } },
+  ],
+
+  erros_tipicos: [
+    { id: "direcao_invertida", descricao: "Confunde antes e depois e se move para o lado oposto na sequência." },
+    { id: "repete_estimulo", descricao: "Repete o número apresentado em vez de escolher seu vizinho." },
+    { id: "ordem_errada", descricao: "Reconhece os numerais isolados, mas não os organiza na sequência crescente." },
+  ],
+};
+''')
+
+          test_path.write_text('''import { describe, expect, it } from "vitest";
+import { Composer } from "../../Composer";
+import { misconceptionForAnswer } from "../../../components/gameloop/answerPolicy";
+import { MisconceptionTag } from "../../../constants/misconceptions";
+import { N1_07 } from "./N1.07";
+
+const sample = (level: number, n = 100) => Array.from({ length: n }, () => Composer.generate(N1_07, level));
+
+describe("N1.07 — ordem, sucessor e antecessor", () => {
+  it("segue faixa e prerequisitos canonicos", () => {
+    expect(N1_07.faixa).toBe("F0");
+    expect(N1_07.prereqs).toEqual(["N1.02", "N1.06"]);
+    expect(N1_07.micros.map(m => m.id)).toEqual(["a", "b", "c", "d", "e"]);
+  });
+
+  it("L1-L2 observam sucessor dentro do escopo", () => {
+    for (const level of [1, 2]) for (const q of sample(level)) {
+      const spec = q.uiProps as { startPos: number; showJumps: Array<{ from: number; to: number }> };
+      expect(q.kind).toBe("numberline");
+      expect(Number(q.answer)).toBe(spec.startPos + 1);
+      expect(spec.showJumps).toEqual([{ from: spec.startPos, to: Number(q.answer) }]);
+      expect(q.evaluate?.(q.answer)).toBe(true);
+    }
+  });
+
+  it("L3-L4 observam antecessor sem escapar do intervalo", () => {
+    for (const level of [3, 4]) for (const q of sample(level)) {
+      expect(q.kind).toBe("plain");
+      expect(q.prompt.toLowerCase()).toContain("antes");
+      expect(Number(q.answer)).toBe(Number(q.big) - 1);
+      expect(Number(q.answer)).toBeGreaterThanOrEqual(1);
+      expect(q.evaluate?.(q.answer)).toBe(true);
+    }
+  });
+
+  it("L5 ordena 3-4 numerais e diagnostica apenas distratores", () => {
+    for (const q of sample(5, 180)) {
+      const correct = String(q.answer);
+      const numbers = correct.split("→").map(value => Number(value.trim()));
+      expect([3, 4]).toContain(numbers.length);
+      expect(numbers).toEqual([...numbers].sort((a, b) => a - b));
+      expect(new Set(numbers).size).toBe(numbers.length);
+      expect(q.options).toHaveLength(4);
+      expect(q.options?.filter(option => String(option.value) === correct)).toHaveLength(1);
+      expect(misconceptionForAnswer(q, q.answer)).toBeUndefined();
+      for (const option of q.options ?? []) {
+        if (String(option.value) !== correct) expect(option.misconception).toBe(MisconceptionTag.ORDEM_ERRADA);
+      }
+    }
+  });
+
+  it("todos os niveis mantem gabarito selecionavel e acerto sem misconception", () => {
+    for (let level = 1; level <= 5; level += 1) for (const q of sample(level, 40)) {
+      expect(q.options?.map(option => String(option.value))).toContain(String(q.answer));
+      expect(q.evaluate?.(q.answer)).toBe(true);
+      expect(misconceptionForAnswer(q, q.answer)).toBeUndefined();
+    }
+  });
+});
+''')
+
+          canon = canon_path.read_text()
+          canon = replace_once(
+              canon,
+              '**Competência:** N1.07 (sucessor e antecessor) · **Primitiva:** `AudioChoice` + `NumberLine` · **Faixa:** F0 · **Também é trilha do Dojo (JD4)**',
+              '**Competência:** N1.07 (ordem, sucessor e antecessor) · **Primitiva:** `NumberLine` + `plain` · **Faixa:** F0 · **JD4 é a trilha posterior de automaticidade**',
+              'identidade N1.07/JD4',
+          )
+          foundation = '**O que a criança aprende:** que cada número tem um **próximo fixo** — e que "próximo" significa "mais um".\n'
+          canon = replace_once(
+              canon,
+              foundation,
+              foundation + '\n**Escopo da Jornada N1.07:** a competência canônica inclui **sucessor, antecessor e ordenação de 3–4 numerais**. A Jornada precisa observar os três componentes. JD4 automatiza a vizinhança numérica depois; ela não substitui compreensão nem concede domínio da Jornada.\n',
+              'escopo conceitual N1.07',
+          )
+          domain = '## 9. Domínio\n`{ acertos: 3, de: 3, sessoes: 2 }` — e **regra extra**: os acertos precisam ser **sem recitar** (medido pelo tempo de resposta: abaixo de 4 segundos indica acesso direto, acima indica contagem).'
+          domain_new = '## 9. Domínio / automaticidade\nNa **Jornada N1.07**, domínio conceitual exige evidência de sucessor, antecessor e ordenação e **nunca depende de velocidade**. No **JD4**, `{ acertos: 3, de: 3, sessoes: 2 }` e o tempo podem descrever automaticidade/fluência, sem coroar a competência-mãe.'
+          canon = replace_once(canon, domain, domain_new, 'dominio vs automaticidade N1.07/JD4')
+          canon_path.write_text(canon)
+          PY
+
+      - name: Gates focais P22.3A
+        run: |
+          npx vitest run src/curriculum/fichas/jornada/N1.07.test.ts src/curriculum/motores/canaryContract.test.ts
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          SONDA_CHROME=/usr/bin/google-chrome npm run sonda -- "N1.07"
+          git diff --check
+
+      - name: Gates completos
+        run: |
+          npm test -- --run
+          npm run build
+          npm run pr:check
+          git diff --check
+
+      - name: Atualizar checkpoint para P22.3B
+        shell: bash
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+
+          def must(text: str, old: str, new: str, label: str) -> str:
+              if old not in text:
+                  raise SystemExit(f'P22.3A checkpoint: ancora ausente: {label}')
+              return text.replace(old, new, 1)
+
+          r = Path('AI_Studio_Lab/codex/RETOMADA.md')
+          text = r.read_text()
+          text = must(text,
+              'P22.1/GM.12 e P22.2/N4.09 concluídas; próxima tarefa exata: P22.3A/N1.07.',
+              'P22.1/GM.12, P22.2/N4.09 e P22.3A/N1.07 concluídas; próxima tarefa exata: P22.3B/JD4.',
+              'cabecalho RETOMADA')
+          text = must(text,
+              '- **P22.2 — N4.09 promovida como estreia Composer e telemetria de área corrigida**.',
+              '- **P22.2 — N4.09 promovida como estreia Composer e telemetria de área corrigida**.\n- **P22.3A — Jornada N1.07 completada: sucessor, antecessor, ordenação e prereqs canônicos**.',
+              'fechados RETOMADA')
+          text = must(text, '## 7. PRÓXIMA TAREFA EXATA — P22.3A N1.07', '## 7. P22.3A — N1.07 CONCLUÍDA', 'secao RETOMADA')
+          text += '\n\n## PRÓXIMA TAREFA EXATA — P22.3B JD4\n\nRegistrar JD4 no Jardim **somente como automaticidade de N1.07**. Preservar `dojoTracks` separado da Jornada; `rt_alvo` é metadado de fluência e nunca domínio conceitual. Validar cinco níveis, telemetria, sonda e gates antes de abrir N1.09.\n'
+          r.write_text(text)
+
+          h = Path('AI_Studio_Lab/codex/HANDOFF_CONTINUIDADE_IA.md')
+          text = h.read_text()
+          text = must(text,
+              '> **VIGENTE — 8/ago/2026. P21 concluída; P22.1 e P22.2 concluídas; próximo passo P22.3A/N1.07.**',
+              '> **VIGENTE — 8/ago/2026. P21 concluída; P22.1, P22.2 e P22.3A concluídas; próximo passo P22.3B/JD4.**',
+              'cabecalho HANDOFF')
+          text = must(text,
+              '- P22.2 — N4.09 promovida e telemetria de área corrigida.',
+              '- P22.2 — N4.09 promovida e telemetria de área corrigida.\n- P22.3A — N1.07 alinhada ao grafo: sucessor, antecessor, ordenação e prereqs `N1.02 + N1.06`.',
+              'fechados HANDOFF')
+          text = must(text, '## Próximo passo — P22.3A N1.07', '## P22.3A — N1.07 concluída', 'secao HANDOFF')
+          text += '\n\n## Próximo passo — P22.3B JD4\n\nImplementar JD4 como fluência/automaticidade posterior de N1.07, com estado separado da Jornada. Não usar velocidade para conceder domínio conceitual.\n'
+          h.write_text(text)
+
+          d = Path('AI_Studio_Lab/codex/DECISAO_P22_DIVIDAS_CURRICULARES.md')
+          text = d.read_text()
+          text = must(text, 'P22.1 e P22.2 estão concluídas. P22.3A é o próximo lote.', 'P22.1, P22.2 e P22.3A estão concluídas. P22.3B/JD4 é o próximo lote.', 'estado DECISAO')
+          text = must(text, '## 6. P22.3A — próxima execução', '## 6. P22.3A — CONCLUÍDA', 'secao DECISAO')
+          text += '\n\n## Checkpoint P22.3A — 8/ago/2026\n\nN1.07 agora corresponde ao grafo: faixa F0, prereqs `N1.02 + N1.06`, sucessor até 5/10, antecessor até 5/10 e ordenação de 3–4 numerais. O Composer ganhou apenas um modo opt-in `plain` para ordenação e o salto genérico passou a respeitar direção negativa sem escapar do intervalo. O rollback legado permanece congelado. Há teste permanente `N1.07.test.ts`; acerto não gera misconception. Próximo lote: P22.3B/JD4 como automaticidade separada.\n'
+          d.write_text(text)
+          PY
+          npm run pr:check
+          git diff --check
+
+      - name: Publicar e auto-remover a bancada
+        shell: bash
+        run: |
+          rm -f .github/workflows/p22-3a-transaction.yml
+          git config user.name "saga-ci-bot"
+          git config user.email "saga-ci-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "P22.3A: completa N1.07 canônica"
+          git push origin HEAD:codex/integrar-bloco-f0
+
+      - name: Limpar bancada se algum gate falhar
+        if: failure()
+        shell: bash
+        run: |
+          git reset --hard "$GITHUB_SHA"
+          rm -f .github/workflows/p22-3a-transaction.yml
+          git config user.name "saga-ci-bot"
+          git config user.email "saga-ci-bot@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: remove bancada P22.3A apos falha" || true
+          git push origin HEAD:codex/integrar-bloco-f0 || true
