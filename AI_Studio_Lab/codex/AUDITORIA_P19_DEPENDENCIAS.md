@@ -62,3 +62,85 @@
 ## Próxima decisão
 
 Para cada HIGH/CRITICAL: confirmar advisory atual e versão segura em fonte oficial; verificar se é dev-only ou runtime; simular a menor atualização possível; executar TypeScript, suíte completa e build; se tocar browser/runtime visual, executar sonda.
+
+
+## Cadeia instalada (`npm explain`)
+
+### `js-yaml`
+
+```text
+===== js-yaml =====
+js-yaml@5.2.1 dev
+node_modules/js-yaml
+  dev js-yaml@"^5.2.1" from the root project
+```
+
+### `nanoid`
+
+```text
+===== nanoid =====
+nanoid@3.3.15
+node_modules/nanoid
+  nanoid@"^3.3.12" from postcss@8.5.16
+  node_modules/postcss
+    peer postcss@"^8.1.0" from autoprefixer@10.5.2
+    node_modules/autoprefixer
+      dev autoprefixer@"^10.4.21" from the root project
+    postcss@"^8.5.3" from vite@6.4.3
+    node_modules/vite
+      dev vite@"^6.2.3" from the root project
+      peer vite@"^5.2.0 || ^6 || ^7 || ^8" from @tailwindcss/vite@4.3.2
+      node_modules/@tailwindcss/vite
+        @tailwindcss/vite@"^4.1.14" from the root project
+      peer vite@"^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0" from @vitejs/plugin-react@5.2.0
+      node_modules/@vitejs/plugin-react
+        @vitejs/plugin-react@"^5.0.4" from the root project
+      peerOptional vite@"^6.0.0 || ^7.0.0 || ^8.0.0" from @vitest/mocker@4.1.10
+      node_modules/@vitest/mocker
+        @vitest/mocker@"4.1.10" from vitest@4.1.10
+        node_modules/vitest
+          dev vitest@"^4.1.10" from the root project
+      vite@"^6.0.0 || ^7.0.0 || ^8.0.0" from vitest@4.1.10
+      node_modules/vitest
+        dev vitest@"^4.1.10" from the root project
+```
+
+### `postcss`
+
+```text
+===== postcss =====
+postcss@8.5.16
+node_modules/postcss
+  peer postcss@"^8.1.0" from autoprefixer@10.5.2
+  node_modules/autoprefixer
+    dev autoprefixer@"^10.4.21" from the root project
+  postcss@"^8.5.3" from vite@6.4.3
+  node_modules/vite
+    dev vite@"^6.2.3" from the root project
+    peer vite@"^5.2.0 || ^6 || ^7 || ^8" from @tailwindcss/vite@4.3.2
+    node_modules/@tailwindcss/vite
+      @tailwindcss/vite@"^4.1.14" from the root project
+    peer vite@"^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0" from @vitejs/plugin-react@5.2.0
+    node_modules/@vitejs/plugin-react
+      @vitejs/plugin-react@"^5.0.4" from the root project
+    peerOptional vite@"^6.0.0 || ^7.0.0 || ^8.0.0" from @vitest/mocker@4.1.10
+    node_modules/@vitest/mocker
+      @vitest/mocker@"4.1.10" from vitest@4.1.10
+      node_modules/vitest
+        dev vitest@"^4.1.10" from the root project
+    vite@"^6.0.0 || ^7.0.0 || ^8.0.0" from vitest@4.1.10
+    node_modules/vitest
+      dev vitest@"^4.1.10" from the root project
+```
+
+### `body-parser`
+
+```text
+===== body-parser =====
+body-parser@1.20.5
+node_modules/body-parser
+  body-parser@"~1.20.5" from express@4.22.2
+  node_modules/express
+    express@"^4.21.2" from the root project
+```
+
