@@ -1,0 +1,83 @@
+name: Promote N106 canary
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  promote:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Registrar N1.06 no contrato e promover somente ela
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('src/curriculum/motores/canaryContract.test.ts')
+          s = p.read_text(encoding='utf-8')
+          imp = 'import { N1_04 } from "../fichas/jornada/N1.04";'
+          if 'jornada/N1.06' not in s:
+            if imp not in s: raise SystemExit('âncora import N1.04 ausente')
+            s = s.replace(imp, imp + '\nimport { N1_06 } from "../fichas/jornada/N1.06";', 1)
+          reg = '  "N1.04": N1_04,\n  "AL.02": AL_02,'
+          if '  "N1.06": N1_06,' not in s:
+            if reg not in s: raise SystemExit('âncora registro N1.04/AL.02 ausente')
+            s = s.replace(reg, '  "N1.04": N1_04,\n  "N1.06": N1_06,\n  "AL.02": AL_02,', 1)
+          p.write_text(s, encoding='utf-8')
+
+          p = Path('src/curriculum/motores/composerCanary.ts')
+          s = p.read_text(encoding='utf-8')
+          old = '''  // N1.06 nunca teve ficha em runtime, e o gerador dela ESCREVIA o número por\n  // extenso na tela ("🔊 TRÊS"): a única competência do app que existe para não\n  // depender de leitura era resolvida lendo. Registrada aqui e NÃO ativada.\n  "N1.06": N1_06,'''
+          new = '''  // N1.06/F05 — o legado escreve o número por extenso; a ficha autoral exige\n  // ouvir sem depender de leitura. Registrada aqui; a ativação fica no conjunto\n  // de canários abaixo e preserva `gN1_06` como rollback.\n  "N1.06": N1_06,'''
+          if old not in s: raise SystemExit('bloco registro N1.06 antigo ausente')
+          s = s.replace(old, new, 1)
+          anchor = '  "N1.07",\n'
+          add = '''  // N1.06/F05 — promovida após autoplay/retry/evidência fechados, prompt\n  // pós-audição coerente e QA visual estável em 320/390/900.\n  "N1.06",\n'''
+          if '  "N1.06",\n' not in s.split('export const COMPOSER_CANARIES',1)[1]:
+            if anchor not in s: raise SystemExit('âncora N1.07 do conjunto ausente')
+            s = s.replace(anchor, anchor + add, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Provar a promoção N1.06
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run \
+            src/curriculum/motores/canaryContract.test.ts \
+            src/curriculum/motores/implementacaoSemAtivacao.test.ts \
+            src/curriculum/procedimentos/audioChoiceProcedure.test.ts \
+            src/components/primitives/AudioChoiceStage.f05.test.tsx \
+            src/curriculum/evidenciaDaFicha.test.ts
+          npm test -- --run
+          npm run build
+
+      - name: Publicar promoção e apagar bancada
+        run: |
+          rm .github/workflows/promote-n106-canary.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src/curriculum/motores/composerCanary.ts src/curriculum/motores/canaryContract.test.ts .github/workflows/promote-n106-canary.yml
+          git diff --cached --check
+          git commit -m 'canário N1.06: F05 substitui o número escrito legado com rollback'
+          git push origin HEAD:codex/integrar-bloco-f0
