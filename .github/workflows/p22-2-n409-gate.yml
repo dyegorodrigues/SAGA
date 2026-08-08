@@ -1,0 +1,13 @@
+# Marcador temporário de publicação P22.3A.
+# O job histórico P22.2 remove este arquivo no cleanup do mesmo lote.
+name: P22.3A publication marker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  marker:
+    if: ${{ false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo marker
