@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { Composer } from "../../Composer";
+import { generateRegisteredFichaQuestion } from "../../motores/composerCanary";
 import { misconceptionForAnswer } from "../../../components/gameloop/answerPolicy";
 import { N1_09 } from "./N1.09";
 
 const sample = (level: number, count = 100) =>
-  Array.from({ length: count }, () => Composer.generate(N1_09, level));
+  Array.from({ length: count }, () => generateRegisteredFichaQuestion("N1.09", level));
 
 describe("P22.4 — N1.09 contagem flexível até 20", () => {
   it("preserva o cânone e os prerequisitos", () => {
@@ -26,7 +26,7 @@ describe("P22.4 — N1.09 contagem flexível até 20", () => {
     }
   });
 
-  it("L3 começa em N interno e oferece a continuação correta", () => {
+  it("L3 começa em N interno e exige três passos corretos", () => {
     for (const q of sample(3, 140)) {
       const start = Number(String(q.big).split("→")[0].trim());
       const expected = [start + 1, start + 2, start + 3].join(" · ");
@@ -38,7 +38,7 @@ describe("P22.4 — N1.09 contagem flexível até 20", () => {
     }
   });
 
-  it("L4 faz regressiva simples e alcança zero quando o início permite", () => {
+  it("L4 faz regressiva de três passos e alcança zero", () => {
     let viuZero = false;
     for (const q of sample(4, 220)) {
       const start = Number(String(q.big).split("→")[0].trim());
