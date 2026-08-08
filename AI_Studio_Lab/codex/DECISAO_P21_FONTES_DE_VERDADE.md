@@ -2,17 +2,20 @@
 
 **Data:** 8/ago/2026  
 **Branch:** `codex/integrar-bloco-f0`  
-**Relatório:** `AUDITORIA_P21_FONTES_DE_VERDADE.md`
+**Baseline histórico:** `AUDITORIA_P21_FONTES_DE_VERDADE.md`
 
 ## Estado
 
-A fase **P21.A — inventário read-only** está concluída.
+A fase **P21.A — inventário read-only** e a fase **P21.1 — governança de registries/auditores** estão concluídas.
 
-Workflow `P21 - fontes de verdade`, run `31274280464`: inventário, captura dos fiscais, TypeScript, publicação e limpeza = **success**.
+- P21.A: run `31274280464` = **success**;
+- P21.1 final: run `31275660948` = **success**;
+- bancada temporária P21.1 removida no próprio run, commit `ae28aacb2d1071489b53bec004568ea7edde6748`;
+- `main` não foi alterada;
+- nenhuma promoção de ficha foi feita pela P21.1;
+- nenhuma decisão pedagógica de P22 foi antecipada.
 
-Nenhum currículo/runtime foi alterado por essa varredura.
-
-A próxima execução é **P21.1 — corrigir governança/registries/auditores**, sem inventar conteúdo pedagógico ainda.
+A próxima execução é **P21.2 — reconciliar `FICHA_RUNTIME_MAP` com builder→kind→renderer real**.
 
 ## 1. Números derivados atuais
 
@@ -26,118 +29,159 @@ A próxima execução é **P21.1 — corrigir governança/registries/auditores**
 
 - 92 fichas em 5 blocos;
 - 88 competências únicas cobertas em 90;
-- lacunas canônicas explícitas: **N1.09 e GM.02**.
+- lacunas canônicas temporárias explícitas: **N1.09 e GM.02**.
 
-Essas duas não devem ser “consertadas por contagem”. Exigem decisão pedagógica/ficha própria ou decisão documentada de por que não devem ter ficha.
+A P21.1 mudou a governança: o auditor deriva o universo do grafo. Qualquer nova competência sem ficha e sem exceção explícita quebra o fiscal; exceção que fique stale depois de a lacuna ser resolvida também quebra.
 
-### Jornada TS / Composer
+### Jornada TS / catálogos / Composer
 
 - 29 fichas TS de Jornada no disco;
-- 24 registradas em `COMPOSER_FICHAS`;
+- `JOURNEY_FICHAS`: **29/29**;
+- Jornada exposta em `AllFichas`: **29/29**;
+- fichas de Dojo no disco/registradas: **4/4**;
+- fichas do disco fora de `AllFichas`: **0**;
+- 24 fichas registradas em `COMPOSER_FICHAS`;
 - 22 canários ativos;
 - registradas e inativas: **N4.09, GM.12**;
 - fichas TS ainda fora do registro Composer: **AL.05, GM.04, N2.01, N3.11, N4.02**.
 
-Estar fora do Composer não significa automaticamente bug: várias podem continuar servidas pelo legado. A P21.1 deve classificar intenção e não promover nada por tabela.
+Estar no catálogo administrativo não ativa produção. Estar fora do Composer não implica bug nem autoriza promoção automática.
 
-## 2. Divergência `AllFichas/JOURNEY_FICHAS`
+## 2. Decisão P21.1 sobre `AllFichas/JOURNEY_FICHAS` — realizada
 
-O auditor atual encontrou 29 fichas TS de Jornada, mas `JOURNEY_FICHAS` registra 19.
+A P21.A encontrou 29 fichas TS de Jornada e apenas 19 em `JOURNEY_FICHAS`, deixando dez autorias invisíveis para a bancada administrativa.
 
-Fichas no disco fora de `AllFichas` segundo o auditor atual:
+A P21.1:
 
-- GE.01;
-- GE.02;
-- GM.01;
-- N1.11;
-- N4.03;
-- N4.04;
-- N4.06;
-- N4.07;
-- N4.08;
-- N4.09.
+- sincronizou `JOURNEY_FICHAS` com as 29 fichas existentes;
+- fez `AllFichas` expor integralmente `JOURNEY_FICHAS`;
+- adicionou `src/curriculum/fichas/journeyRegistry.test.ts`;
+- o teste compara dinamicamente IDs no disco com o registry, sem hardcode de “29”;
+- duplicação, omissão ou entrada sem correspondente no disco passa a quebrar o gate.
 
-Isso é dívida real de governança porque `SandboxModal` usa `JOURNEY_FICHAS.find(...)` para localizar a ficha autoral. Logo, um registro atrasado pode tornar a bancada administrativa cega para autoria que já existe.
+**Regra:** catálogo administrativo e ativação de Composer são conceitos separados.
 
-### Decisão P21.1
+## 3. Decisão P21.1 sobre cobertura autoral — realizada
 
-- completar o registro de fichas existentes;
-- criar teste disco↔registry para impedir nova deriva;
-- **não** usar isso como ativação em produção: registro de catálogo e canário continuam conceitos distintos.
+Antes, `ficha_catalog_auditor.cjs` tratava 88 como expectativa histórica. Agora:
 
-## 3. Auditor autoral hardcoded
+1. o denominador vem do grafo atual;
+2. **N1.09** e **GM.02** ficam em mapa explícito de exceções com justificativa;
+3. novo nó sem ficha e sem exceção quebra o fiscal;
+4. exceção apontando para nó inexistente quebra;
+5. exceção resolvida que permanecer no mapa quebra;
+6. justificativa vazia/insuficiente quebra.
 
-`ficha_catalog_auditor.cjs` ainda declara:
+Estado atual comprovado:
 
-- `EXPECTED_FICHAS = 92`;
-- `EXPECTED_COMPETENCIES = 88`.
+- **92 fichas**;
+- **88/90 competências cobertas**;
+- exatamente **2 lacunas explícitas**: N1.09 e GM.02.
 
-O grafo atual tem 90 nós e o auditor calcula os dois ausentes, mas não transforma a cobertura faltante em falha. Por isso termina verde dizendo “88 competências cobertas”.
+Essas duas permanecem para P22 e não devem ser “consertadas por contagem”.
 
-### Decisão P21.1
+## 4. Decisão P21.1 sobre proveniência — realizada
 
-Trocar a lógica de “88 é o mundo” por:
+O auditor agregado deixou de usar o binário histórico “explícito/fallback” como se descrevesse o runtime inteiro.
 
-1. contagem derivada do grafo;
-2. lacunas canônicas precisam estar em lista explícita e justificada enquanto existirem;
-3. qualquer novo nó sem ficha e sem exceção explícita quebra o fiscal;
-4. quando N1.09/GM.02 forem resolvidas, a exceção deve ser removida no mesmo lote.
+Estado atual derivado:
 
-## 4. Auditor agregado também mistura conceitos
+- gerador legado explícito: **42/90**;
+- Composer registrado: **24/90**;
+- Composer ativo: **22/90**;
+- Composer registrado e inativo: **2/90 — N4.09, GM.12**;
+- servido sem placeholder (`legado ∪ Composer ativo`): **49/90**;
+- fallback real sem conteúdo servido: **41/90**.
 
-O `catalog_auditor.cjs` atual informa 42/90 “geradores explícitos” e lista 48 fallbacks. Porém a lista inclui IDs que hoje estão ativos pelo Composer, como N1.13 e GM.01.
+O fallback real é calculado por **sem gerador legado explícito && sem Composer ativo**. Uma ficha apenas registrada, mas inativa, não é contada como conteúdo servido.
 
-Isso indica que a métrica está olhando uma fonte histórica/estática diferente da proveniência efetiva do `composerCanary`.
+O auditor também verifica:
 
-### Decisão P21.1
+- canário ativo precisa estar registrado;
+- IDs de Composer precisam existir no grafo;
+- duplicações nos registries quebram o fiscal.
 
-Separar no relatório:
+## 5. Comentários N1.10/N1.11 — corrigidos
 
-- gerador legado explícito;
-- ficha Composer registrada;
-- canário Composer ativo;
-- fallback real sem conteúdo;
-- ficha existente fora do catálogo administrativo.
+Os comentários históricos em `composerCanary.ts` foram atualizados para refletir o estado pós-P17:
 
-Um único rótulo “explícito/fallback” não pode esconder essas quatro situações.
+- N1.10/N1.11 são fichas correntes já promovidas;
+- ativação declarativa continua em `composerCanaryIds.ts`;
+- estado mutável/rollback continua em `COMPOSER_CANARIES`.
 
-## 5. Primitivas — inventário inicial
+Nenhuma lógica de runtime foi alterada nesse ajuste.
 
-Mapa atual: 26 entradas.
+## 6. Gate final P21.1
 
-- 18 classificadas executáveis;
-- 4 renderer-sem-builder;
-- 3 componente-isolado;
-- 1 ausente.
+Run `31275660948`: **success**.
+
+Validações executadas:
+
+```text
+npm run auditar
+npm run fichas:auditar
+npm run fichas:conferir
+npm run grafo:check
+npx tsc --noEmit
+npm test -- --run
+npm run build
+npm run pr:check
+git diff --check e2ee44d1d79d910ebbfcb3411d5f65c836616a47..HEAD
+```
+
+Asserts adicionais do gate exigiram explicitamente:
+
+- `JOURNEY_FICHAS: 29/90`;
+- Jornada em `AllFichas: 29/90`;
+- Composer registrado: `24/90`;
+- Composer ativo: `22/90`;
+- fallback real: `41/90`.
+
+Resultados:
+
+- `fichas:conferir`: **9/9**;
+- suíte completa: **125 arquivos / 2.132 testes**, todos aprovados;
+- build: aprovado;
+- text guard: aprovado;
+- diff check: aprovado.
+
+## 7. P21.2 — próxima sequência exata
+
+O mapa atual contém **26 primitivas** e ainda é um inventário que pode ter falso negativo/falso positivo.
+
+Baseline reportado:
+
+- 18 `executável`;
+- 4 `renderer-sem-builder`;
+- 3 `componente-isolado`;
+- 1 `ausente`.
 
 Marcadas como não plenamente executáveis no mapa atual:
 
-- Grupo;
-- LinkingCubes;
-- Moedas;
-- Quadrado100;
-- Regua;
-- SingaporeBars;
-- StoryPanel;
-- VisualAddition.
+- `Grupo`;
+- `LinkingCubes`;
+- `Moedas`;
+- `Quadrado100`;
+- `Regua`;
+- `SingaporeBars`;
+- `StoryPanel`;
+- `VisualAddition`.
 
-**Cuidado:** P21 encontrou que alguns rótulos do mapa podem estar atrasados em relação ao runtime real. Exemplo: N3.10 está ativo no Composer e possui builder `storypanel`, enquanto o mapa ainda classifica `StoryPanel` como componente-isolado. Portanto a lista acima é backlog de **reconciliação**, não oito componentes que devem ser construídos cegamente.
+**Isso não é uma lista para construir oito componentes.** P21.A já mostrou que classificações podem estar atrasadas em relação ao runtime; `StoryPanel`, por exemplo, participa de N3.10 ativo no Composer.
 
-### Decisão P21.1/P21.2
+Para cada primitiva na P21.2:
 
-Para cada primitiva:
+1. provar ficha(s) consumidora(s);
+2. provar builder real;
+3. provar `kind` final emitido;
+4. provar renderer/Stage real;
+5. identificar aliases/dispatch indireto;
+6. corrigir somente falso negativo/falso positivo do `FICHA_RUNTIME_MAP`;
+7. implementar peça apenas se a cadeia real provar ausência necessária.
 
-1. provar builder real;
-2. provar kind final emitido;
-3. provar renderer/Stage real;
-4. provar ficha consumidora;
-5. só então corrigir mapa ou implementar peça ausente.
+`Regua` permanece a ausência mais inequívoca. `Moedas` possui renderização conhecida, mas builder/contrato deve ser classificado antes de qualquer implementação.
 
-`Regua` continua a lacuna ausente mais inequívoca. `Moedas` possui renderização existente, mas contrato/builder ainda precisa ser classificado. Não construir por impulso.
-
-## 6. Dívidas pedagógicas confirmadas versus revalidar
-
-### Confirmadas
+## 8. Dívidas pedagógicas confirmadas — deixar para P22
 
 - N1.09 sem ficha Markdown;
 - GM.02 sem ficha Markdown;
@@ -145,40 +189,9 @@ Para cada primitiva:
 - N4.09 registrada e não ativa;
 - GM.12 registrada e não ativa por observação deliberada.
 
-### Revalidar antes de chamar de dívida
-
-- antiga lista de coreografia N3.10/N4.03/N4.04/N4.06/N4.07/N4.08;
-- status real de Grupo/StoryPanel/SingaporeBars etc.;
-- antigo P4 flaky;
-- qualquer número histórico de “legado/vazio”.
-
-## 7. Próxima sequência exata
-
-### P21.1 — governança
-
-1. sincronizar `AllFichas/JOURNEY_FICHAS` com as 29 fichas de Jornada existentes;
-2. adicionar teste de completude do registry;
-3. tornar o auditor de ficha derivado do grafo com exceções explícitas para N1.09/GM.02;
-4. separar proveniência legacy/composer-active/composer-registered/fallback no auditor agregado;
-5. corrigir comentários antigos de N1.10/N1.11 no `composerCanary.ts`.
-
-### P21.2 — mapa de primitivas
-
-Auditar aliases/Stages/builders e corrigir somente falsos negativos/positivos do `FICHA_RUNTIME_MAP`.
-
-### P22 — lacunas curriculares deliberadas
-
-Só depois da governança limpa, decidir pedagogicamente:
-
-- N1.09;
-- GM.02;
-- JD4;
-- N4.09;
-- GM.12.
-
 P22 deve ser audit-first, não “preencher buraco porque a tabela ficou vermelha”.
 
-## 8. Depois de P22
+## 9. Depois de P22
 
 Seguir `MAPA_MESTRE_POS_P20.md`:
 
@@ -188,4 +201,4 @@ Seguir `MAPA_MESTRE_POS_P20.md`:
 4. auditoria integrada do Dojo;
 5. release hardening.
 
-**P21 muda a regra de governança: ausência explícita é aceitável temporariamente; ausência silenciosa não é.**
+**P21 fixa a regra de governança: ausência explícita é aceitável temporariamente; ausência silenciosa não é.**
