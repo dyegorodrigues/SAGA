@@ -1,0 +1,144 @@
+name: Close GM12 contract
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  close:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Ligar tutorial e falas específicas da F50
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/curriculum/fichas/jornada/GM.12.ts')
+          s = p.read_text(encoding='utf-8')
+          anchor = '''const dominio = {\n  acertos: 3,'''
+          prefix = '''/**\n * A F50 estreia DUAS referências físicas. O tutorial acontece apenas no\n * primeiro degrau de cada linguagem: balança no L1 e despejo no L2. Depois a\n * criança precisa usar a referência sem a aula repetir a resposta.\n */\nconst tutorialPeso = [\n  { fala: "Vamos pesar. A balança mostra o que os olhos não mostram." },\n  { fala: "Veja qual lado desce. Esse lado está mais pesado.", show: { destacarCerto: true } },\n];\n\nconst tutorialCapacidade = [\n  { fala: "Os recipientes estão cheios. Queremos descobrir em qual cabe mais." },\n  { fala: "Despeje em recipientes iguais. Agora dá para comparar sem o formato enganar.", show: { verificar: true } },\n];\n\n'''
+          if 'const tutorialPeso' not in s:
+              if anchor not in s: raise SystemExit('âncora do domínio GM.12 ausente')
+              s = s.replace(anchor, prefix + anchor, 1)
+
+          old = '''  micros: [\n    { id: "peso_obvio", fonte: "F50", alvo: "ler qual prato desce numa diferença óbvia", kinds: ["medidas"], params: {}, dominio },\n    { id: "capacidade_mesmo_formato", fonte: "F50", alvo: "comparar capacidade sem a variável formato", kinds: ["medidas"], params: {}, dominio },\n    { id: "capacidade_formatos", fonte: "F50", alvo: "conservar capacidade quando a altura do líquido engana", kinds: ["medidas"], params: {}, dominio },\n    { id: "peso_contraintuitivo", fonte: "F50", alvo: "aceitar que o menor pode ser mais pesado", kinds: ["medidas"], params: {}, dominio },\n    { id: "seriacao", fonte: "F50", alvo: "ordenar três por peso ou capacidade usando referência comum", kinds: ["medidas"], params: {}, dominio },\n  ],'''
+          new = '''  micros: [\n    {\n      id: "peso_obvio", fonte: "F50",\n      alvo: "ler qual prato desce numa diferença óbvia", kinds: ["medidas"],\n      params: {\n        howto: "Olhe a balança. O lado que desce é o mais pesado.",\n        explain: "O tamanho pode enganar. Compare pelo que a balança faz.",\n        tutorial: tutorialPeso,\n      },\n      dominio,\n    },\n    {\n      id: "capacidade_mesmo_formato", fonte: "F50",\n      alvo: "comparar capacidade sem a variável formato", kinds: ["medidas"],\n      params: {\n        howto: "Os dois estão cheios. Em qual recipiente cabe mais?",\n        explain: "Despeje em recipientes iguais e compare as quantidades.",\n        tutorial: tutorialCapacidade,\n      },\n      dominio,\n    },\n    {\n      id: "capacidade_formatos", fonte: "F50",\n      alvo: "conservar capacidade quando a altura do recipiente engana", kinds: ["medidas"],\n      params: {\n        howto: "Os dois estão cheios. Não decida só pela altura do recipiente.",\n        explain: "O formato engana. Despeje em recipientes iguais para comparar o que cada um comporta.",\n      },\n      dominio,\n    },\n    {\n      id: "peso_contraintuitivo", fonte: "F50",\n      alvo: "aceitar que o menor pode ser mais pesado", kinds: ["medidas"],\n      params: {\n        howto: "Não escolha pelo tamanho. Veja qual lado da balança desce.",\n        explain: "Um objeto pequeno pode pesar mais. A balança é a referência.",\n      },\n      dominio,\n    },\n    {\n      id: "seriacao", fonte: "F50",\n      alvo: "ordenar três por peso ou capacidade usando referência comum", kinds: ["medidas"],\n      params: {}, dominio,\n    },\n  ],'''
+          if old not in s: raise SystemExit('micros GM.12 antigas não encontradas')
+          p.write_text(s.replace(old, new, 1), encoding='utf-8')
+          PY
+
+          cat > src/curriculum/fichas/jornada/GM.12.test.ts <<'EOF'
+          import { describe, expect, it } from "vitest";
+          import { Composer } from "../../Composer";
+          import { GM_12 } from "./GM.12";
+
+          describe("GM.12/F50 — contrato de voz e tutorial por linguagem", () => {
+            it("L1 ensina a balança antes de exigir a leitura do prato", () => {
+              const q = Composer.generate(GM_12, 1);
+              expect(q.kind).toBe("medidas");
+              expect(q.howto).toContain("balança");
+              expect(q.explain).toContain("balança");
+              expect(q.tutorial?.length).toBeGreaterThanOrEqual(2);
+              expect(q.tutorial?.some(p => (p.show as { destacarCerto?: boolean } | undefined)?.destacarCerto)).toBe(true);
+            });
+
+            it("L2 ensina capacidade e dispara a verificação por recipientes iguais", () => {
+              const q = Composer.generate(GM_12, 2);
+              expect(q.kind).toBe("medidas");
+              expect(q.howto).toContain("cheios");
+              expect(q.explain).toContain("recipientes iguais");
+              expect(q.tutorial?.some(p => (p.show as { verificar?: boolean } | undefined)?.verificar)).toBe(true);
+              expect((q.uiProps as { modo?: string }).modo).toBe("capacidade");
+            });
+
+            it("L3 não herda fala de balança diante de recipientes", () => {
+              const q = Composer.generate(GM_12, 3);
+              expect(q.howto).not.toContain("balança");
+              expect(q.explain).toContain("formato");
+            });
+          });
+          EOF
+
+      - name: Sincronizar cânone e inventário executável
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace(
+            '**Modo capacidade:** dois recipientes de formatos diferentes, com líquido, e um botão de "despejar" para comparar.',
+            '**Modo capacidade:** recipientes **cheios até a borda** e um botão de "despejar" para comparar. No nível 2 eles têm a mesma forma e tamanhos diferentes; no nível 3+ os formatos também mudam.'
+          )
+          s = s.replace(
+            '| **Abertura (capacidade)** | dois recipientes de formatos diferentes com a mesma cor de líquido | 1,2s |',
+            '| **Abertura (capacidade)** | os recipientes-fonte aparecem **cheios até a borda**. Em L2 têm a mesma forma; em L3 a altura/formato vira a armadilha | 1,2s |'
+          )
+          s = s.replace(
+            '| **A verificação** | botão "despejar": o líquido de um **é transferido para um recipiente-padrão transparente **sem marcações numéricas****, depois o outro. As alturas ficam comparáveis. | 2,5s |',
+            '| **A verificação** | botão "despejar": a quantidade que **cabia até a borda** em cada fonte é transferida para recipientes-padrão **iguais**, transparentes e sem marcações numéricas. As alturas passam a representar a comparação sob a mesma referência. | 2,5s |'
+          )
+          s = s.replace(
+            '**O despejo no recipiente-padrão é o que ensina.** Em F0 esse recipiente NÃO tem números nem unidade: ele só coloca as duas quantidades sob a mesma referência. Graduação em mL/L pertence a GM.05. Comparar formatos diferentes é impossível; comparar no mesmo recipiente é trivial.',
+            '**O despejo no recipiente-padrão é o que ensina.** Em F0 esse recipiente NÃO tem números nem unidade: ele só coloca as duas capacidades sob a mesma referência. **A pergunta é quanto CABE, por isso os recipientes-fonte começam cheios até a borda**; comparar recipientes parcialmente cheios mediria a quantidade de líquido presente, não a capacidade. Graduação em mL/L pertence a GM.05.'
+          )
+          s = s.replace('| 2 | capacidade, recipientes de mesmo formato |', '| 2 | capacidade, **mesmo formato, tamanhos diferentes e ambos cheios** |')
+          s = s.replace('| 3 | **capacidade com formatos diferentes** (a armadilha) |', '| 3 | **capacidade com formatos diferentes, ambos cheios** (altura externa é a armadilha) |')
+          old_voice = '''## 7. Falas\n**howto:** *"Coloque na balança. O lado que descer é o mais pesado."*\n**explain:** *"O tamanho engana. Use a balança para descobrir."*\n\n## 8. Coreografia\n```\n[\n  { fala: "Vamos pesar.",             mostra: { colocarNaBalanca: true },  sync: "junto" },\n  { fala: "Olha, este lado desceu.",  mostra: { destacarPratoBaixo: true },sync: "junto" },\n  { fala: "Ele é mais pesado!",       mostra: { destacarObjeto: 0 },       sync: "depois" }\n]\n```'''
+          new_voice = '''## 7. Falas\n**Peso — howto:** *"Olhe a balança. O lado que desce é o mais pesado."*  \n**Peso — explain:** *"O tamanho pode enganar. Compare pelo que a balança faz."*  \n**Capacidade — howto:** *"Os recipientes estão cheios. Em qual cabe mais?"*  \n**Capacidade — explain:** *"O formato pode enganar. Despeje em recipientes iguais e compare as quantidades."*\n\n## 8. Coreografia\n**Primeiro contato com peso (nível 1):**\n```\n[\n  { fala: "Vamos pesar. A balança mostra o que os olhos não mostram." },\n  { fala: "Veja qual lado desce. Esse lado está mais pesado.", mostra: { destacarCerto: true } }\n]\n```\n\n**Primeiro contato com capacidade (nível 2):**\n```\n[\n  { fala: "Os recipientes estão cheios. Queremos descobrir em qual cabe mais." },\n  { fala: "Despeje em recipientes iguais. Agora dá para comparar sem o formato enganar.", mostra: { verificar: true } }\n]\n```'''
+          if old_voice not in s: raise SystemExit('§7/§8 antigas da F50 não encontradas')
+          p.write_text(s.replace(old_voice, new_voice, 1), encoding='utf-8')
+
+          p = Path('AI_Studio_Lab/pedagogia/PRIMITIVAS_SAGA.md')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('**Versão 1.2 · Agosto 2026', '**Versão 1.3 · Agosto 2026', 1)
+          s = s.replace('usa **25 primitivas mapeadas**', 'usa **26 primitivas mapeadas**', 1)
+          s = s.replace('| **Executável** | **17** |', '| **Executável** | **18** |', 1)
+          s = s.replace('## 2.1 🟢 Executáveis — 17', '## 2.1 🟢 Executáveis — 18', 1)
+          bal = '| `Balanca` | `balanca` | igualdade |'
+          rec = '| `Recipientes` | `medidas` | **F50/GM.12**; capacidade sem unidade: fontes cheias → despejo → recipientes iguais de referência |'
+          if rec not in s:
+              if bal not in s: raise SystemExit('linha Balanca não encontrada no inventário')
+              s = s.replace(bal, bal + '\n' + rec, 1)
+          old_change = '*Changelog: v1.2 (ago/2026) — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace`'
+          new_change = '*Changelog: v1.3 (ago/2026) — adiciona `Recipientes` como a 26ª primitiva mapeada e 18ª executável após F50/GM.12 validada em Chromium e por inspeção visual; mantém unidades padronizadas fora de F0. v1.2 — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace`'
+          if old_change not in s: raise SystemExit('changelog v1.2 não encontrado')
+          p.write_text(s.replace(old_change, new_change, 1), encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Provar fechamento da F50
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run src/curriculum/fichas/jornada/GM.12.test.ts src/curriculum/procedimentos/medidasContract.test.ts src/curriculum/procedimentos/medidasProcedure.test.ts src/curriculum/fichaRuntimeMap.test.ts
+          npm test -- --run
+          npm run build
+
+      - name: Publicar fechamento e remover bancada
+        run: |
+          rm .github/workflows/close-gm12-contract.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src AI_Studio_Lab .github/workflows/close-gm12-contract.yml
+          git diff --cached --check
+          git commit -m 'GM.12: fecha tutorial, falas e cânone da F50 validada'
+          git push origin HEAD:codex/integrar-bloco-f0
