@@ -12,9 +12,8 @@ const RENDERER_PATHS = [
   path.join(ROOT, "src/components/FichaRenderer.tsx"),
   path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
 ];
-const EXPECTED_FICHAS = 92;
+const EXPECTED_FICHAS = 93;
 const EXPLICIT_MISSING_FICHA_EXCEPTIONS = new Map([
-  ["N1.09", "P21/P22: nó do grafo ainda sem ficha Markdown; decisão pedagógica deliberada pendente."],
   ["GM.02", "P21/P22: Tempo cotidiano ainda sem ficha Markdown; decisão pedagógica deliberada pendente."],
 ]);
 const REJECTED_IDS = new Set(["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"]);
