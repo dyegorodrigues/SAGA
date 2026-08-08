@@ -25,8 +25,14 @@ await new Promise((ok, no) => {
   vite.stdout.on("data", d => { if (String(d).includes("ready in")) { clearTimeout(t); ok(); } });
 });
 
+// Nunca congele a revisão do navegador neste script. `playwright-core` sabe qual
+// Chromium é compatível com a versão instalada; um caminho fixo virou uma
+// armadilha silenciosa quando o projeto avançou da revisão 1194 para a 1234.
+// `PRINTS_CHROME` continua disponível para uma bancada que precise apontar para
+// um executável específico sem alterar o repositório.
+const CHROME = process.env.PRINTS_CHROME || chromium.executablePath();
 const browser = await chromium.launch({
-  executablePath: "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+  executablePath: CHROME,
   args: ["--no-sandbox"],
 });
 const page = await browser.newPage({
