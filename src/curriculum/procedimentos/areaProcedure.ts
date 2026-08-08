@@ -46,7 +46,7 @@ export const A_MAX = 29;
  * Parte um número em dezenas e unidades.
  *
  * É o corte do retângulo. `13` vira `[10, 3]` — e é **10**, não **1**: partir
- * pelo algarismo em vez de pelo valor é exatamente o erro `CORTE_ERRADO`.
+ * pelo algarismo em vez do valor é exatamente o erro `CORTE_ERRADO`.
  */
 export function partir(n: number): [number, number] {
   const dezenas = Math.floor(n / 10) * 10;
@@ -196,6 +196,18 @@ export interface Distrator {
   tag: MisconceptionTagType;
 }
 
+/**
+ * Alternativa apresentada na questão.
+ *
+ * A resposta correta NÃO recebe tag diagnóstica. Tags pertencem exclusivamente
+ * a erros interpretáveis pelo Radar; usar um sentinela "correta" fazia o acerto
+ * de N4.09 virar uma misconception quando a ficha entrava no contrato global.
+ */
+export interface AlternativaArea {
+  valor: number;
+  tag?: MisconceptionTagType;
+}
+
 /** Multiplicou a região grande e parou: não somou as partes. */
 export function parcelaUnica(c: Conta): number {
   const rs = regioes(c);
@@ -262,8 +274,8 @@ export function ehPergunavelComDiagnostico(c: Conta): boolean {
 }
 
 /** As alternativas na tela, no teto de 3–4 do cânone §9.1. */
-export function alternativas(c: Conta): Distrator[] {
-  const certo: Distrator = { valor: resolver(c), tag: "correta" as MisconceptionTagType };
+export function alternativas(c: Conta): AlternativaArea[] {
+  const certo: AlternativaArea = { valor: resolver(c) };
   const outras = distratores(c).slice(0, 3);
   return [certo, ...outras];
 }
