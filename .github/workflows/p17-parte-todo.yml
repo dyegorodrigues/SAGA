@@ -33,8 +33,6 @@ jobs:
           p = Path('AI_Studio_Lab/tools/p17_apply.py')
           s = p.read_text()
 
-          # Insere as tags imediatamente antes da propriedade RESPONDE_O_CHEIO.
-          # Assim o comentario multilinha original da JD3 fica intocado.
           antigo = "    '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\\n',"
           novo = "    '  RESPONDE_O_CHEIO: \\\"responde-o-cheio\\\",\\n',"
           if s.count(antigo) != 1:
@@ -56,6 +54,64 @@ jobs:
 
       - name: Aplicar arquitetura P17
         run: python AI_Studio_Lab/tools/p17_apply.py
+
+      - name: Alinhar regressao de dominio e diagnostico
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          # A F28 usa diagnostico semantico criado pelos builders. O catalogo
+          # generico n+/-1 nao deve renomear REPETE_A_PARTE/RESPONDE_O_TODO.
+          p = Path('src/curriculum/fichas/jornada/N1.11.ts')
+          s = p.read_text()
+          old = '''  distratores: [
+            { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
+            { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
+          ],'''.replace('          ', '  ')
+          if s.count(old) != 1:
+              raise SystemExit(f'distratores N1.11 inesperados: {s.count(old)}')
+          p.write_text(s.replace(old, '  distratores: [],'))
+
+          # A regra antiga aceitava UMA resposta de revisao. Com dominio por
+          # sessao, a segunda sessao precisa amadurecer como a primeira.
+          p = Path('src/curriculum/motores/progressEngine.test.ts')
+          s = p.read_text()
+          old = '''    const retained = applyJourneyAnswer(current, true, false, {
+            ...attempt,
+            isReview: true,
+            practiceDay: "2026-07-03",
+            previousPracticeDay: "2026-07-01",
+          });
+          expect(retained.progress.dom).toBe(true);
+          expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
+          expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''.replace('          ', '    ')
+          new = '''    let retained = applyJourneyAnswer(current, true, false, {
+              ...attempt,
+              isReview: true,
+              practiceDay: "2026-07-03",
+              previousPracticeDay: "2026-07-01",
+            });
+            expect(retained.progress.dom).not.toBe(true);
+            retained = applyJourneyAnswer(retained.progress, true, false, {
+              ...attempt,
+              isReview: true,
+              practiceDay: "2026-07-03",
+              previousPracticeDay: "2026-07-01",
+            });
+            expect(retained.progress.dom).not.toBe(true);
+            retained = applyJourneyAnswer(retained.progress, true, false, {
+              ...attempt,
+              isReview: true,
+              practiceDay: "2026-07-03",
+              previousPracticeDay: "2026-07-01",
+            });
+            expect(retained.progress.dom).toBe(true);
+            expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
+            expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''.replace('            ', '    ')
+          if s.count(old) != 1:
+              raise SystemExit(f'teste legado de retencao inesperado: {s.count(old)}')
+          p.write_text(s.replace(old, new))
+          PY
 
       - name: Verificar diff textual
         run: git diff --check
