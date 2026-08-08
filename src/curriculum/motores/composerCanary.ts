@@ -63,10 +63,9 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.07": N1_07,
   "N1.08": N1_08,
 
-  // N1.13 — a F04, "produzir quantidade". O nó é NOVO: a ficha reivindicava a
-  // N1.09, mas quatro arestas do grafo dependem da N1.09 significar "contar até
-  // 20". São duas competências reais; cada uma ganhou seu nó (P12, §13 do
-  // plano). Registrada aqui e NÃO ativada.
+  // N1.13/F04 — "produzir quantidade" ganhou nó próprio porque N1.09 precisa
+  // continuar significando "contar até 20" para quatro arestas do grafo. É uma
+  // estreia: sem canário volta ao fallback, não a um gerador legado inventado.
   "N1.13": N1_13,
   // N1.10 foi REESCRITA: servia `bond` (o diagrama parte-todo, simbólico) nos
   // cinco níveis, e a JD5 pede a tampa deslizando sobre o grupo — a operação
@@ -116,6 +115,11 @@ export const COMPOSER_CANARIES = new Set<string>([
   // N1.06/F05 — promovida após autoplay/retry/evidência fechados, prompt
   // pós-audição coerente e QA visual estável em 320/390/900.
   "N1.06",
+
+  // N1.13/F04 — terceira promoção desta retomada. É estreia verdadeira: antes
+  // deste id o nó cai no fallback; o contrato de canário prova rollback para o
+  // placeholder, cinco níveis, saves, Radar e geração repetida sem exceção.
+  "N1.13",
 
   // A N1.10 SAIU daqui: a ficha dela foi reescrita de `bond` (diagrama
   // parte-todo, com números escritos) para a JD5 de verdade — a tampa que cobre
