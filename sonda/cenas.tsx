@@ -46,7 +46,7 @@ import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
 import { GM_12 } from "../src/curriculum/fichas/jornada/GM.12";
 import { N1_10 } from "../src/curriculum/fichas/jornada/N1.10";
 import { N1_11 } from "../src/curriculum/fichas/jornada/N1.11";
-import { JD3, JD5 } from "../src/curriculum/fichas/dojo/jardim";
+import { JD3, JD4, JD5 } from "../src/curriculum/fichas/dojo/jardim";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 import { FaseDaMoldura } from "../src/components/primitives/MolduraStage";
 import { DojoTab } from "../src/components/home/DojoTab";
@@ -207,6 +207,7 @@ function JardimProbe({ modo }: { modo: "locked" | "partial" | "advanced" }) {
     "N1.03": progressoP8(3, 5),
     "N1.08": progressoP8(4, 5),
     "N1.11": progressoP8(3, 3),
+    "N1.07": progressoP8(3, 4),
     "N1.10": progressoP8(3, 4),
   };
 
@@ -231,6 +232,10 @@ function JardimProbe({ modo }: { modo: "locked" | "partial" | "advanced" }) {
     JD3: {
       unlocked: true, mastered: false, family: "JD", currentStep: 2, highestStep: 2,
       goodRounds: 0, weakRounds: 0, rounds: 4, attempts: 32, correct: 26,
+    },
+    JD4: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 4, highestStep: 4,
+      goodRounds: 1, weakRounds: 0, rounds: 6, attempts: 48, correct: 41,
     },
     JD5: {
       unlocked: true, mastered: true, family: "JD", currentStep: 3, highestStep: 5,
@@ -265,9 +270,13 @@ export const CENAS: Cena[] = [
     render: () => <JardimProbe modo="partial" />,
   },
   {
-    nome: "P8 Jardim home — progresso avancado e reflexos",
+    nome: "P22.3B JD4 Jardim home — cinco trilhas e progresso avançado",
     render: () => <JardimProbe modo="advanced" />,
   },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `P22.3B JD4 exercício (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={JD4} lvl={lvl} semente={s} />,
+  })),
   ...[1, 2, 3, 4, 5].map(lvl => ({
     nome: `GM.12 F50 massa/capacidade (nível ${lvl})`,
     render: (s: number) => <ExercicioDaFicha ficha={GM_12} lvl={lvl} semente={s} />,

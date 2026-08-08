@@ -42,11 +42,12 @@ function renderGarden(
 }
 
 describe("P8 — DojoTab consome o Jardim real", () => {
-  it("mostra exatamente as quatro trilhas JD implementadas, não a lista CRA da Jornada", () => {
+  it("mostra exatamente as cinco trilhas JD implementadas, não a lista CRA da Jornada", () => {
     renderGarden();
     expect(screen.getByText("Olhômetro Relâmpago")).toBeTruthy();
     expect(screen.getByText("Mão Relâmpago")).toBeTruthy();
     expect(screen.getByText("Moldura Relâmpago")).toBeTruthy();
+    expect(screen.getByText("O Passo Seguinte")).toBeTruthy();
     expect(screen.getByText("Ver e Imaginar")).toBeTruthy();
     expect(screen.queryByText(/Treinos Específicos \(CRA\)/)).toBeNull();
     expect(screen.queryByText(/Alfabetização e Quantificação/)).toBeNull();
@@ -111,7 +112,7 @@ describe("P8 — DojoTab consome o Jardim real", () => {
     );
     expect(screen.getByText("4")).toBeTruthy();
     expect(screen.getByText("75%")).toBeTruthy();
-    expect(screen.getByText("1/4")).toBeTruthy();
+    expect(screen.getByText("1/5")).toBeTruthy();
   });
 
   it("mastered aparece como conquista e não força o currentStep a voltar ao topo", () => {

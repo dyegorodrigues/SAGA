@@ -42,6 +42,11 @@ const GARDEN_COPY: Record<string, GardenCopy> = {
     description: "Veja o vazio que falta para completar dez.",
     mother: "amigos do 10",
   },
+  JD4: {
+    title: "O Passo Seguinte",
+    description: "Responda o vizinho do número sem voltar a contar desde o um.",
+    mother: "ordem, antes e depois",
+  },
   JD5: {
     title: "Ver e Imaginar",
     description: "Guarde o todo na cabeça e descubra a parte escondida.",
@@ -131,7 +136,7 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
             </span>
           </div>
           <p className="text-xs text-slate-500 font-bold mb-4 pl-1 leading-relaxed">
-            Treinos curtos para o olho e a imagem mental. O tempo é medido em silêncio — você só precisa pensar e brincar.
+            Treinos curtos para transformar o que você já entendeu em reflexo. O tempo é medido em silêncio — você só precisa pensar e brincar.
           </p>
 
           <div className="grid grid-cols-1 gap-3.5">

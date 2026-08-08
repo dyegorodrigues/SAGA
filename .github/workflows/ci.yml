@@ -10,10 +10,6 @@ on:
   push:
     branches: [main]
 
-# Temporário P22.3B: o publicador restaura o CI estável no mesmo lote.
-permissions:
-  contents: write
-
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -22,7 +18,7 @@ jobs:
   gates:
     name: Gates do SAGA
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -35,22 +31,18 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
+      # órfãos e deriva de nomenclatura.
       - name: Auditoria do catálogo
         run: npm run auditar
 
       - name: Auditoria das fichas
         run: npm run fichas:auditar
 
+      # O grafo é artefato derivado; o modo --check falha se alguém editar o
+      # gerado sem regerar a partir do YAML canônico.
       - name: Sincronia do grafo
         run: npm run grafo:check
-
-      - name: Aplicar patch focal P22.3B no head real
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
-        run: |
-          git fetch origin codex/integrar-bloco-f0
-          git checkout -B codex/integrar-bloco-f0 origin/codex/integrar-bloco-f0
-          node AI_Studio_Lab/codex/p22_3b_apply.cjs apply
-          node AI_Studio_Lab/codex/p22_3b_fix.cjs
 
       - name: TypeScript
         run: npm run lint
@@ -61,16 +53,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Sonda real JD4
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
-        env:
-          SONDA_CHROME: /usr/bin/google-chrome
-        run: npm run sonda -- "JD4"
-
-      - name: Publicar P22.3B e auto-remover bancada
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
-        run: node AI_Studio_Lab/codex/p22_3b_apply.cjs publish
-
   guarda-textual:
     name: Guarda de binários
     runs-on: ubuntu-latest
@@ -80,7 +62,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Por padrão o Actions confere um merge commit sintético do PR, o que
+          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
+          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -90,6 +75,8 @@ jobs:
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
 
+      # O criador de PR deste ambiente não aceita binários no diff textual.
+      # Falhar aqui é mais barato que descobrir na hora de publicar.
       - name: Verificar ausência de binários no diff
         env:
           PR_BASE: origin/${{ github.base_ref }}

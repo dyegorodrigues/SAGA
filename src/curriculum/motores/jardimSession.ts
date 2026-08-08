@@ -13,6 +13,7 @@ const VISUAL: Record<string, { icon: string; color: string; dark: string }> = {
   JD1: { icon: "👀", color: "#D1FAE5", dark: "#059669" },
   JD2: { icon: "🖐️", color: "#DBEAFE", dark: "#2563EB" },
   JD3: { icon: "🔟", color: "#EDE9FE", dark: "#7C3AED" },
+  JD4: { icon: "👣", color: "#FCE7F3", dark: "#DB2777" },
   JD5: { icon: "🧠", color: "#FEF3C7", dark: "#D97706" },
 };
 

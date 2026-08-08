@@ -192,6 +192,79 @@ export const JD3: FichaCompetencia = {
   ],
 };
 
+/**
+ * JD4 — O Passo Seguinte. Mãe: N1.07.
+ *
+ * Exceção de transição dentro do Jardim: a camada é majoritariamente
+ * pré-simbólica, mas JD4 começa oralmente e consolida a vizinhança numérica já
+ * compreendida na Jornada. Não ensina contagem de 2 em 2 e não usa N1.09 como
+ * segunda mãe; essas ideias permanecem conteúdo curricular separado.
+ */
+export const JD4: FichaCompetencia = {
+  id: "JD4",
+  nome: "Jardim · O Passo Seguinte",
+  strand: "JD",
+  faixa: "F0",
+  prereqs: ["N1.07"],
+  howto: "Escute ou veja o número e responda o vizinho sem voltar a contar desde o um.",
+  explain: "O sucessor é o vizinho da direita; o antecessor é o vizinho da esquerda.",
+  distratores: [],
+  niveis: {
+    1: { primitiva: "numberline", micro: "sucessor5", rt_alvo: 4000 },
+    2: { primitiva: "numberline", micro: "sucessor10", rt_alvo: 3750 },
+    3: { primitiva: "plain", micro: "sucessor20", rt_alvo: 3500 },
+    4: { primitiva: "plain", micro: "antecessor10", rt_alvo: 3250 },
+    5: { primitiva: "plain", micro: "alternado20", rt_alvo: 3000 },
+  },
+  micros: [
+    {
+      id: "sucessor5",
+      fonte: "JD4",
+      alvo: "recuperar o sucessor até 5 com a reta ainda disponível",
+      kinds: ["numberline"],
+      params: { start: 1, end: 5, jump_size: 1, audio_prompt: "Qual número vem depois?" },
+      dominio,
+    },
+    {
+      id: "sucessor10",
+      fonte: "JD4",
+      alvo: "recuperar o sucessor até 10 com apoio reduzido",
+      kinds: ["numberline"],
+      params: { start: 1, end: 10, jump_size: 1, audio_prompt: "Qual número vem depois?" },
+      dominio,
+    },
+    {
+      id: "sucessor20",
+      fonte: "JD4",
+      alvo: "recuperar o sucessor até 20 sem reta",
+      kinds: ["plain"],
+      params: { start: 1, end: 20, jump_size: 1, audio_prompt: "Qual número vem depois?" },
+      dominio,
+    },
+    {
+      id: "antecessor10",
+      fonte: "JD4",
+      alvo: "recuperar o antecessor até 10 sem recitar a sequência inteira",
+      kinds: ["plain"],
+      params: { start: 1, end: 10, jump_size: -1, audio_prompt: "Qual número vem antes?" },
+      dominio,
+    },
+    {
+      id: "alternado20",
+      fonte: "JD4",
+      alvo: "alternar sucessor e antecessor até 20 com acesso direto",
+      kinds: ["plain"],
+      params: { modo: "neighbor_alternating", start: 1, end: 20 },
+      dominio,
+    },
+  ],
+  erros_tipicos: [
+    { id: "RECITA_TUDO", descricao: "Volta ao um e recita a sequência antes de responder." },
+    { id: "INVERTE_DIRECAO", descricao: "Confunde antes e depois." },
+    { id: "SO_VAI_PRA_FRENTE", descricao: "Sucessor está automático, mas o antecessor ainda trava." },
+  ],
+};
+
 /** JD5 completa: a Jornada formaliza no L5; o Jardim preserva o L5 sem moldura. */
 export const JD5: FichaCompetencia = {
   id: "JD5",
@@ -227,14 +300,12 @@ export const JD5: FichaCompetencia = {
   ],
 };
 
-/**
- * Todas as trilhas cujo manipulativo ja existe. JD4 continua fora: e outra divida
- * e nao deve entrar de carona na P17.
- */
+/** Todas as cinco trilhas canônicas do Jardim. */
 export const JARDIM: TrilhaDoJardim[] = [
   { ficha: JD1, mae: "N1.03", destravaNoNivel: 3 },
   { ficha: JD2, mae: "N1.08", destravaNoNivel: 3 },
   { ficha: JD3, mae: "N1.11", destravaNoNivel: 3 },
+  { ficha: JD4, mae: "N1.07", destravaNoNivel: 3 },
   { ficha: JD5, mae: "N1.10", destravaNoNivel: 3 },
 ];
 

@@ -1037,8 +1037,25 @@ export class Composer {
       }
 
       case "plain": {
-        // P22.3A: ordenação é opt-in; nenhuma outra ficha plain muda de semântica.
-        if (params.modo === "ordering") {
+        // P22.3B: alternância de vizinhos é opt-in para JD4. Ela mede fluência
+        // de um conceito já aprendido; não cria uma nova competência da Jornada.
+        if (params.modo === "neighbor_alternating") {
+          const start = params.start ?? 1;
+          const end = params.end ?? 20;
+          if (!Number.isInteger(start) || !Number.isInteger(end) || start >= end) {
+            throw new Error(`Intervalo inválido para vizinhos em ${ficha.id}/${micro.id}.`);
+          }
+          const jump = Math.random() < 0.5 ? 1 : -1;
+          const currentMin = jump > 0 ? start : start - jump;
+          const currentMax = jump > 0 ? end - jump : end;
+          const current = randomInt(currentMin, currentMax);
+          answer = current + jump;
+          big = String(current);
+          uiProps = { text: String(current) };
+          options = numericOptions(Number(answer), start, end);
+          evaluate = ans => Number(ans) === answer;
+          promptOverride = jump < 0 ? "Qual número vem antes?" : "Qual número vem depois?";
+        } else if (params.modo === "ordering") {
           const start = params.start ?? 1;
           const end = params.end ?? 10;
           if (!Number.isInteger(start) || !Number.isInteger(end) || end - start + 1 < 4) {

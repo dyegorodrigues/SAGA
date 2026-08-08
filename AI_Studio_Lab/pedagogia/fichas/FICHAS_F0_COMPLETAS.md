@@ -883,7 +883,7 @@ Escute e diga o que vem DEPOIS.
 |---|---|---|---|
 | **1** | sucessor | sim, com marcador | até 5 |
 | **2** | sucessor | sim | até 10 |
-| **3** | sucessor | **não** | até 10 |
+| **3** | sucessor | **não** | até 20 |
 | **4** | **antecessor** ("o que vem antes") | não | até 10 |
 | **5** | alternando os dois, mais rápido | não | até 20 |
 
@@ -900,9 +900,9 @@ Escute e diga o que vem DEPOIS.
 
 ## 7. Falas
 
-**audioPrompt:** *"Escute e diga o que vem depois."*
-**howto:** *"Pense na sequência. Depois do cinco vem sempre o mesmo número."*
-**explain:** *"Olhe a reta: o próximo é o vizinho da direita, um passinho à frente."*
+**audioPrompt:** *"Escute e responda o vizinho pedido."*
+**howto:** *"Pense na sequência sem voltar ao um. Depois e antes têm vizinhos fixos."*
+**explain:** *"Na reta, o sucessor é o vizinho da direita e o antecessor é o vizinho da esquerda."*
 
 ## 8. Coreografia (nível 1)
 
