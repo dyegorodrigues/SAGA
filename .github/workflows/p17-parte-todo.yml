@@ -26,95 +26,14 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Corrigir ancoras conhecidas da bancada
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          p = Path('AI_Studio_Lab/tools/p17_apply.py')
-          s = p.read_text()
-
-          antigo = "    '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\\n',"
-          novo = "    '  RESPONDE_O_CHEIO: \\\"responde-o-cheio\\\",\\n',"
-          if s.count(antigo) != 1:
-              raise SystemExit(f'ancora antiga da tag inesperada: {s.count(antigo)}')
-          s = s.replace(antigo, novo)
-
-          cauda_antiga = '  /** Moldura relâmpago: disse quantas fichas HÁ, não quantas faltam. */\n\'\'\','
-          cauda_nova = '  RESPONDE_O_CHEIO: "responde-o-cheio",\n\'\'\','
-          if s.count(cauda_antiga) != 1:
-              raise SystemExit(f'cauda da tag inesperada: {s.count(cauda_antiga)}')
-          s = s.replace(cauda_antiga, cauda_nova)
-
-          alvo = '    5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum" },'
-          troca = '    5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum", rt_alvo: 8000 },'
-          if s.count(alvo) != 1:
-              raise SystemExit(f'ancora rt N1.10 inesperada: {s.count(alvo)}')
-          p.write_text(s.replace(alvo, troca))
-          PY
+      - name: Preparar patch
+        run: python AI_Studio_Lab/tools/p17_fixups.py
 
       - name: Aplicar arquitetura P17
         run: python AI_Studio_Lab/tools/p17_apply.py
 
-      - name: Alinhar regressao de dominio e diagnostico
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          # A F28 usa diagnostico semantico criado pelos builders. O catalogo
-          # generico n+/-1 nao deve renomear REPETE_A_PARTE/RESPONDE_O_TODO.
-          p = Path('src/curriculum/fichas/jornada/N1.11.ts')
-          s = p.read_text()
-          old = '''  distratores: [
-            { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
-            { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
-          ],'''
-          # O arquivo tem 4 espacos nos itens; normaliza a literal para o formato real.
-          old = old.replace('            {', '    {').replace('          ],', '  ],')
-          if s.count(old) != 1:
-              raise SystemExit(f'distratores N1.11 inesperados: {s.count(old)}')
-          p.write_text(s.replace(old, '  distratores: [],'))
-
-          # A regra antiga aceitava UMA resposta de revisao. Com dominio por
-          # sessao, a segunda sessao precisa amadurecer como a primeira.
-          p = Path('src/curriculum/motores/progressEngine.test.ts')
-          s = p.read_text()
-          old = '''    const retained = applyJourneyAnswer(current, true, false, {
-              ...attempt,
-              isReview: true,
-              practiceDay: "2026-07-03",
-              previousPracticeDay: "2026-07-01",
-            });
-            expect(retained.progress.dom).toBe(true);
-            expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
-            expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''
-          old = old.replace('              ', '      ').replace('            });', '    });').replace('            expect', '    expect')
-          new = '''    let retained = applyJourneyAnswer(current, true, false, {
-      ...attempt,
-      isReview: true,
-      practiceDay: "2026-07-03",
-      previousPracticeDay: "2026-07-01",
-    });
-    expect(retained.progress.dom).not.toBe(true);
-    retained = applyJourneyAnswer(retained.progress, true, false, {
-      ...attempt,
-      isReview: true,
-      practiceDay: "2026-07-03",
-      previousPracticeDay: "2026-07-01",
-    });
-    expect(retained.progress.dom).not.toBe(true);
-    retained = applyJourneyAnswer(retained.progress, true, false, {
-      ...attempt,
-      isReview: true,
-      practiceDay: "2026-07-03",
-      previousPracticeDay: "2026-07-01",
-    });
-    expect(retained.progress.dom).toBe(true);
-    expect(retained.progress.masteryEvidence?.crownedBy).toBe("multidimensional");
-    expect(retained.transition).toEqual({ type: "multidimensional-crown" });'''
-          if s.count(old) != 1:
-              raise SystemExit(f'teste legado de retencao inesperado: {s.count(old)}')
-          p.write_text(s.replace(old, new))
-          PY
+      - name: Aplicar fixups pos-patch
+        run: python AI_Studio_Lab/tools/p17_fixups.py --post
 
       - name: Verificar diff textual
         run: git diff --check
@@ -142,7 +61,7 @@ jobs:
 
       - name: Publicar lote aprovado
         run: |
-          rm AI_Studio_Lab/tools/p17_apply.py .github/workflows/p17-parte-todo.yml
+          rm AI_Studio_Lab/tools/p17_apply.py AI_Studio_Lab/tools/p17_fixups.py .github/workflows/p17-parte-todo.yml
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
