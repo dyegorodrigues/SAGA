@@ -242,7 +242,13 @@ export function KidHomeScreen({
           <JourneyTab kid={kid} prog={prog} tracks={tracks} unlockStatus={unlockStatus} onTrack={setPickerTrack} />
         )}
         {activeShellTab === "dojo" && (
-          <DojoTab prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} onMixed={onMixed} renderTrackCard={renderTrackCard} onTrack={setPickerTrack} onOpenPicker={setPickerTrack} />
+          <DojoTab
+            prog={prog}
+            dojoTracks={(state.dojoTracks || {})[kid.id] || {}}
+            onGardenTrack={(track, currentStep) => onTrackLvl(track, currentStep)}
+            onMixed={onMixed}
+            onOpenPicker={setPickerTrack}
+          />
         )}
         {activeShellTab === "oficina" && (
           <OficinaTab aulaPlan={aulaPlan} onTrack={onRescue} />
