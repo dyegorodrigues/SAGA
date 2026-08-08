@@ -1,16 +1,15 @@
 name: P21.1 - governance gate
 
 on:
-  push:
-    branches:
-      - codex/integrar-bloco-f0
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   gate:
-    if: github.ref == 'refs/heads/codex/integrar-bloco-f0'
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -33,7 +32,7 @@ jobs:
           npm test -- --run
           npm run build
           npm run pr:check
-          git diff --check HEAD~5..HEAD
+          git diff --check e2ee44d1d79d910ebbfcb3411d5f65c836616a47..HEAD
       - name: Limpar bancada temporaria
         if: always()
         run: |
