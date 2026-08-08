@@ -1,78 +1,174 @@
-# Handoff de continuidade — estado após a correção do canário
+# Handoff de continuidade — branch cumulativa SAGA
 
-> ## ⛔ SUPERADO EM 7/AGO/2026 — leia a [`RETOMADA.md`](./RETOMADA.md)
+> **ATUALIZADO EM 8/AGO/2026. Este é o estado operacional vigente.**
 >
-> **Este arquivo descreve o repositório de 3/ago e não vale mais como estado.**
-> A afirmação *"N3.09 segue como único canário"* estava certa naquele dia e hoje
-> são **treze** canários ativos; o "Lote D não implementado" também foi
-> ultrapassado pelo bloco F0.
->
-> Fica no repositório porque o **raciocínio** dele continua válido — em especial
-> por que não republicar um commit local antigo sobre uma base superada. Mas
-> nenhum número aqui deve ser usado para decidir nada.
+> A `RETOMADA.md` continua importante como histórico técnico e pedagógico, mas
+> contém seções antigas preservadas por contexto. Para decidir **branch, head,
+> estado da F50 e próximo passo**, use este handoff e confirme o Git remoto.
 
-## Base e publicação
+## 1. Regra de ouro
 
-- Base desta atualização: `origin/main = 3c9acbd` (`Revise AGENTS.md with new SAGA guidelines`).
-- Os Lotes A, B e C estão na `main`. O PR #19 foi mesclado; o Lote C
-  (F98/N4.02 e ArrayGrid autoral) está incorporado, não mais "sendo salvo".
-- O Lote D **não foi implementado**. Não publicar `e03f187` diretamente: aquele
-  commit local antigo partia de `b56f5a6` e reapresentaria uma base superada.
-- `gN4_02` e `gN3_10` permanecem em produção. N3.09 segue como único canário.
+- Repositório: `dyegorodrigues/SAGA`.
+- `main` **não deve ser alterada nem mesclada** durante esta linha de trabalho.
+- Base imutável observada nesta retomada: `main = 68fad4c575e28959b2ca4776e9a541d6828b63f3`.
+- Branch cumulativa de continuidade: **`codex/integrar-bloco-f0`**.
+- PR de comparação/CI: **#29**, aberta como **draft**, base `main`, sem merge e sem auto-merge.
+- As branches do Creature Engine estão fora deste fluxo e não devem ser tocadas:
+  - `agent/creature-engine-tamagotchi`
+  - `codex/criar-branch-para-creature-engine-tamagotchi`
 
-## Ponto exato de parada
+Nunca escolha a branch pelo nome que parece mais recente. Compare genealogia,
+PRs e conteúdo antes de mexer.
 
-O mecanismo de canário do Composer foi corrigido e comprovado pelo caminho de
-produção. O Lote D continua **não iniciado**: nenhum `StoryPanel`, nenhum
-`SingaporeBars` estendido e nenhuma ficha N3.10 autoral foram criados.
+## 2. Reconciliação das branches da Tarefa 2 — AL.01
 
-## Correções recentes que mudam o plano
+A conversa anterior deixou várias branches, mas elas não representam trabalhos
+independentes que ainda precisem ser reaplicados.
 
-### Canário do Composer — corrigido
+- `codex/ativar-al01` — **checkpoint histórico/ancestral**. A correção de AL.01
+  foi absorvida pela linha cumulativa; não continuar por ela.
+- `codex/corrigir-n106` — correção histórica de N1.06/F05, reconciliada e
+  absorvida semanticamente na cumulativa.
+- `codex/corrigir-n113` — correção de N1.13/F04, absorvida na cumulativa.
+- `codex/reconciliar-f05-f04` — reconciliação F05/F04 absorvida pela cumulativa.
+- `codex/integrar-bloco-f0` — **única linha atual de continuidade deste bloco**.
 
-O rollback documentado no Lote B não funcionava em produção, apesar de o teste
-passar. `CURRICULUM` congelava a decisão na carga do módulo, e o curriculum só
-consultava a ponte para `N3.09` e `N3.11`; qualquer outro id no conjunto de
-canários era ignorado em silêncio.
+Não cherry-pickar mecanicamente commits dessas branches antigas: isso pode
+reintroduzir versões anteriores de arquivos já reconciliados.
 
-`verticalMigration.ts` foi substituído por `composerCanary.ts`:
+## 3. O que aconteceu quando a conversa travou
 
-- a origem do gerador é resolvida a cada questão, não na carga do módulo;
-- `generatorSource` é getter e acompanha o rollback;
-- não existe lista de ids privilegiados no curriculum;
-- `enableComposerCanary` recusa nó sem ficha registrada;
-- há testes de regressão que provam rollback e ativação via `getTrackById`.
+Não houve perda substantiva de código já publicado. O travamento aconteceu no
+meio da retificação P15/F50 e deixou um **estado de higiene/CI incompleto**:
 
-Consequência para o Andar 4: promover N3.10 a canário agora exige apenas registrar
-a ficha em `COMPOSER_FICHAS` e ativar o id — sem editar `curriculum.ts`.
+1. a retificação curricular F50→GM.12 já estava salva;
+2. o grafo já estava em 90 nós;
+3. `Recipientes` já havia sido declarada no inventário;
+4. dois fiscais ainda esperavam o estado anterior (25 primitivas e ausência de
+   `Recipientes` na dívida explícita);
+5. sobrou uma bancada temporária que tentou reaplicar um reparo já aplicado.
 
-### Lote D — arquitetura corrigida
+A retomada removeu as bancadas órfãs, confirmou os guardas corretos e restaurou
+um checkpoint limpo. Antes de continuar a F50, a CI original ficou verde no
+commit `859966703c616ae79e5f25ad35762d8364404430`.
 
-A ficha canônica **F20** define `StoryPanel` como primitiva **principal** de N3.10.
-O `SingaporeBars` existente representa apenas `A + B = total` e precisa ser
-estendido para separar, comparar, completar e incógnita variável. O passo antigo
-"ligar SingaporeBars ao builder" produziria uma ficha pedagogicamente incorreta e
-foi substituído no `PLANO_MESTRE_SAGA.md`.
+## 4. F50 / GM.12 — IMPLEMENTADA, NÃO ATIVADA
 
-## Ordem segura de retomada
+Commit de implementação:
 
-1. Criar branch inédita da `origin/main` atualizada.
-2. Tipar `StorySpec` e `SingaporeBarSpec` e escrever o procedimento puro das quatro
-   estruturas, com testes, antes de qualquer componente visual.
-3. Implementar `StoryPanel` como primitiva principal e estender `SingaporeBars`.
-4. Compor as duas em uma única tela: uma pergunta, uma ação dominante.
-5. Exercitar `join`, `separate`, `compare` e `complete` no Sandbox, com incógnita
-   variável no nível 5.
-6. Validar acessibilidade, áudio, viewport infantil e paridade.
-7. Encerrar o lote com `gN3_10` ainda em produção; o canário pertence a outro PR.
+`62879473aa55a55d7b92c2b8441136eb20a3b724`
 
-## Roteiro completo
+Mensagem: `GM.12 pela F50: massa e capacidade sem deixar a aparência responder`.
 
-O roteiro por andares, o sistema de design, o motor de mascotes, as regras de
-animação e o pipeline de áudio/TTS estão em
-[`ROTEIRO_DE_CONSTRUCAO_ANDARES.md`](./ROTEIRO_DE_CONSTRUCAO_ANDARES.md).
+### Matriz curricular vigente
 
-## Validação reproduzível completa
+`GM.01 comparação direta visível` → **`GM.12 massa e capacidade: comparação e conservação`** → `GM.05 medidas padronizadas`
+
+- grafo: **90 nós únicos**;
+- `GM.12`: F0, pré-requisito `[GM.01]`;
+- `GM.05`: depende de `[GM.12, N2.02]`;
+- `GM.02` continua sendo **Tempo cotidiano**;
+- F50 pertence a `GM.12`;
+- F50 trabalha **sem unidades padronizadas**; cm/m, g/kg, L pertencem depois a GM.05.
+
+### Runtime construído
+
+- `medidasProcedure.ts` — procedimento puro, diagnóstico e evidência;
+- `medidasContract.ts` — escada L1–L5 e casos contraintuitivos;
+- `Recipientes.tsx` — comparação/conservação de capacidade com despejo para
+  recipientes de referência iguais;
+- `MedidasStage.tsx` — compõe `Balanca` e `Recipientes`, retry/feedback autoral e
+  seriação;
+- `GM.12.ts` — ficha runtime da F50;
+- Composer/renderers/Radar/evidência/mapa runtime/sonda ligados ao novo kind
+  `medidas`;
+- a sonda deixou de congelar um caminho antigo de Chromium e agora usa
+  `chromium.executablePath()` da versão instalada de `playwright-core`.
+
+### Escada pedagógica
+
+1. peso óbvio — pena × pedra;
+2. capacidade com recipientes de mesmo formato;
+3. conservação com formatos diferentes — alto/fino pode parecer mais cheio e
+   conter menos;
+4. peso contraintuitivo — objeto pequeno pode ser mais pesado;
+5. seriação de três por peso ou capacidade.
+
+Diagnósticos: `JULGA_PELO_TAMANHO`, `CONFUNDE_PESO_VOLUME`, `IGNORA_FORMATO`.
+Domínio exige 3/3 em duas sessões e pelo menos um acerto no caso
+`CASO_CONTRAINTUITIVO`. Resposta errada não emite essa evidência.
+
+## 5. Regra de ativação preservada
+
+`GM.12` está em `COMPOSER_FICHAS`, mas **não** está em `COMPOSER_CANARIES`.
+Portanto a implementação está disponível para teste e inspeção sem chegar à
+criança em produção.
+
+O mesmo princípio vale para as correções ainda em observação da linha cumulativa
+(AL.01, N1.06, N1.13, GE.01, GE.02, GM.01 etc.): implementação e promoção são
+etapas distintas.
+
+## 6. Evidência de qualidade do lote F50
+
+A bancada transacional só publicou o commit depois de passar:
+
+- `npm run auditar`;
+- `npm run fichas:auditar`;
+- `npm run fichas:conferir`;
+- `npm run grafo:check`;
+- `npx tsc --noEmit`;
+- testes focalizados da F50 e do fiscal de evidência;
+- suíte completa: **1971/1971 testes**;
+- `npm run sonda -- "GM.12"` em Chromium real, com as cinco cenas e as larguras
+  da sonda;
+- `npm run build`.
+
+Depois da publicação, a **CI normal da PR #29** foi disparada novamente no head
+`62879473...` e passou integralmente no run **31253027123**:
+
+- guarda de binários ✅
+- auditoria do catálogo ✅
+- auditoria das fichas ✅
+- grafo ✅
+- TypeScript ✅
+- testes ✅
+- build ✅
+
+## 7. Dívida explícita atual
+
+Com `Recipientes` implementada, `PRIMITIVAS_PENDENTES` não deve mais listá-la.
+As primitivas ainda ausentes nesse fiscal são **`Moedas` e `Regua`**.
+
+Não confundir dívida declarada com autorização para usar fallback genérico.
+Quando uma ficha depender dessas primitivas, construir a primitiva antes de
+promover a competência.
+
+## 8. Próximo passo seguro
+
+Antes de qualquer novo código:
+
+```bash
+git fetch origin
+git checkout codex/integrar-bloco-f0
+git pull --ff-only origin codex/integrar-bloco-f0
+git rev-parse HEAD
+git rev-parse origin/main
+```
+
+O head técnico esperado antes deste handoff documental é `62879473...`; se o
+head for posterior, leia os commits posteriores antes de agir.
+
+Próxima linha de trabalho:
+
+1. inspecionar visualmente/por prints a F50 quando houver artefatos de captura
+   disponíveis, além da sonda já verde;
+2. continuar os saneamentos comprovados do bloco sem ativar telas no mesmo lote;
+3. tratar promoções/canários **separadamente, um nó por vez**, somente após o
+   intervalo de observação e revisão;
+4. manter a PR #29 como janela de comparação/CI, **não como pedido de merge na
+   `main`**.
+
+## 9. Portões mínimos antes de publicar qualquer lote
 
 ```bash
 npm run auditar
@@ -83,8 +179,9 @@ npm test -- --run
 npm run build
 npm run pr:check
 git diff --check
-git status --short --branch
-git rev-parse HEAD
-git rev-parse origin/main
-git merge-base HEAD origin/main
 ```
+
+Para mudança perceptível pela criança, adicionar sonda/prints da cena afetada.
+
+**Existir não é estar certo. Divergência pode ser corrigida; divergência
+silenciosa não.**
