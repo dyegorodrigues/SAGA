@@ -829,11 +829,13 @@ Aperte e escute. Que numero voce ouviu?
 *O sucessor: a semente de toda a adição.*
 
 ## 1. Identidade
-**Competência:** N1.07 (sucessor e antecessor) · **Primitiva:** `AudioChoice` + `NumberLine` · **Faixa:** F0 · **Também é trilha do Dojo (JD4)**
+**Competência:** N1.07 (ordem, sucessor e antecessor) · **Primitiva:** `NumberLine` + `plain` · **Faixa:** F0 · **JD4 é a trilha posterior de automaticidade**
 
 ## 2. Fundamento
 
 **O que a criança aprende:** que cada número tem um **próximo fixo** — e que "próximo" significa "mais um".
+
+**Escopo da Jornada N1.07:** a competência canônica inclui **sucessor, antecessor e ordenação de 3–4 numerais**. A Jornada observa os três componentes. JD4 automatiza a vizinhança numérica depois; não substitui compreensão nem concede domínio da Jornada.
 
 **Por que trava:** a criança recita a sequência inteira para descobrir o que vem depois do 6. Ela precisa "correr" do 1 até chegar lá. Enquanto o sucessor não for **acesso direto**, somar será sempre contar tudo de novo.
 
@@ -913,8 +915,8 @@ Escute e diga o que vem DEPOIS.
 ]
 ```
 
-## 9. Domínio
-`{ acertos: 3, de: 3, sessoes: 2 }` — e **regra extra**: os acertos precisam ser **sem recitar** (medido pelo tempo de resposta: abaixo de 4 segundos indica acesso direto, acima indica contagem).
+## 9. Domínio / automaticidade
+Na **Jornada N1.07**, domínio conceitual exige evidência de sucessor, antecessor e ordenação e **nunca depende de velocidade**. No **JD4**, `{ acertos: 3, de: 3, sessoes: 2 }` e o tempo descrevem automaticidade/fluência, sem coroar a competência-mãe.
 
 ---
 ---

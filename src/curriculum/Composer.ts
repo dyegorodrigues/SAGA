@@ -299,19 +299,28 @@ export class Composer {
       }
         
       case "numberline": {
-        const start = params.start || 0;
-        const end = params.end || 10;
-        const jump = params.jump_size || 1;
-        const current = randomInt(start, end - jump);
+        const start = params.start ?? 0;
+        const end = params.end ?? 10;
+        const jump = params.jump_size ?? 1;
+        if (!Number.isInteger(start) || !Number.isInteger(end) || !Number.isInteger(jump) || jump === 0 || start >= end) {
+          throw new Error(`Intervalo/salto inválido na reta de ${ficha.id}/${micro.id}.`);
+        }
+        const currentMin = jump > 0 ? start : start - jump;
+        const currentMax = jump > 0 ? end - jump : end;
+        if (currentMin > currentMax) {
+          throw new Error(`Salto ${jump} não cabe na reta ${start}..${end} de ${ficha.id}/${micro.id}.`);
+        }
+        const current = randomInt(currentMin, currentMax);
         const next = current + jump;
-        
+
         uiProps = {
           start,
           end,
           interactive: true,
-          startPos: current, showJumps: [{from: current, to: next}]
+          startPos: current,
+          showJumps: [{ from: current, to: next }],
         };
-        evaluate = (ans) => ans === next;
+        evaluate = ans => Number(ans) === next;
         answer = next;
         big = String(current);
         options = numericOptions(answer, start, end);
@@ -1028,7 +1037,36 @@ export class Composer {
       }
 
       case "plain": {
-        if (params.complemento_dez) {
+        // P22.3A: ordenação é opt-in; nenhuma outra ficha plain muda de semântica.
+        if (params.modo === "ordering") {
+          const start = params.start ?? 1;
+          const end = params.end ?? 10;
+          if (!Number.isInteger(start) || !Number.isInteger(end) || end - start + 1 < 4) {
+            throw new Error(`Intervalo inválido para ordenação em ${ficha.id}/${micro.id}.`);
+          }
+          const count = randomInt(3, 4);
+          const first = randomInt(start, end - count + 1);
+          const ascending = Array.from({ length: count }, (_, index) => first + index);
+          const correct = ascending.join(" → ");
+          const reversed = [...ascending].reverse();
+          const swapped = [...ascending];
+          [swapped[0], swapped[1]] = [swapped[1], swapped[0]];
+          const rotated = [...ascending.slice(1), ascending[0]];
+          const sequences = Array.from(new Set(
+            [ascending, reversed, swapped, rotated].map(sequence => sequence.join(" → ")),
+          ));
+          const shuffled = [...ascending].sort(() => Math.random() - 0.5);
+          answer = correct;
+          big = shuffled.join("   ");
+          uiProps = { text: big };
+          options = sequences.map(sequence => ({
+            label: sequence,
+            value: sequence,
+            ...(sequence === correct ? {} : { misconception: MisconceptionTag.ORDEM_ERRADA }),
+          })).sort(() => Math.random() - 0.5);
+          evaluate = ans => String(ans) === correct;
+          promptOverride = String(params.audio_prompt ?? "Coloque os números do menor para o maior.");
+        } else if (params.complemento_dez) {
           const parte = randomInt(1, 9);
           answer = 10 - parte;
           uiProps = { text: `${parte} + □ = 10` };
@@ -1082,14 +1120,22 @@ export class Composer {
           evaluate = (ans) => ans === answer;
           promptOverride = "Quanto falta para ficar igual?";
         } else if (typeof params.start === "number" && typeof params.end === "number") {
-          const jump = params.jump_size || 1;
-          const current = randomInt(params.start, params.end - jump);
+          const jump = params.jump_size ?? 1;
+          if (!Number.isInteger(jump) || jump === 0 || params.start >= params.end) {
+            throw new Error(`Intervalo/salto inválido no plain de ${ficha.id}/${micro.id}.`);
+          }
+          const currentMin = jump > 0 ? params.start : params.start - jump;
+          const currentMax = jump > 0 ? params.end - jump : params.end;
+          if (currentMin > currentMax) {
+            throw new Error(`Salto ${jump} não cabe no intervalo ${params.start}..${params.end} de ${ficha.id}/${micro.id}.`);
+          }
+          const current = randomInt(currentMin, currentMax);
           answer = current + jump;
           big = String(current);
           uiProps = { text: String(current) };
           options = numericOptions(answer, params.start, params.end);
-          evaluate = (ans) => ans === answer;
-          promptOverride = "Qual número vem depois?";
+          evaluate = ans => Number(ans) === answer;
+          promptOverride = jump < 0 ? "Qual número vem antes?" : "Qual número vem depois?";
         } else if (typeof params.n_min === "number" && typeof params.n_max === "number") {
           answer = randomInt(params.n_min, params.n_max);
           const shown = Array.from({ length: Math.max(1, answer - 1) }, (_, index) => index + 1);
