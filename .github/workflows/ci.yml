@@ -50,6 +50,7 @@ jobs:
           git fetch origin codex/integrar-bloco-f0
           git checkout -B codex/integrar-bloco-f0 origin/codex/integrar-bloco-f0
           node AI_Studio_Lab/codex/p22_3b_apply.cjs apply
+          node AI_Studio_Lab/codex/p22_3b_fix.cjs
 
       - name: TypeScript
         run: npm run lint
