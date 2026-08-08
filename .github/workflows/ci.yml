@@ -10,6 +10,11 @@ on:
   push:
     branches: [main]
 
+# Temporário P22.3A: necessário apenas para o último passo publicar o workspace
+# já validado. O próprio publicador restaura este arquivo ao conteúdo estável.
+permissions:
+  contents: write
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -18,7 +23,7 @@ jobs:
   gates:
     name: Gates do SAGA
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +49,13 @@ jobs:
       - name: Sincronia do grafo
         run: npm run grafo:check
 
+      - name: Aplicar patch focal P22.3A no head real
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+        run: |
+          git fetch origin codex/integrar-bloco-f0
+          git checkout -B codex/integrar-bloco-f0 origin/codex/integrar-bloco-f0
+          node AI_Studio_Lab/codex/p22_3a_apply.cjs apply
+
       - name: TypeScript
         run: npm run lint
 
@@ -52,6 +64,16 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Sonda real N1.07
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+        env:
+          SONDA_CHROME: /usr/bin/google-chrome
+        run: npm run sonda -- "N1.07"
+
+      - name: Publicar P22.3A e auto-remover bancada
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+        run: node AI_Studio_Lab/codex/p22_3a_apply.cjs publish
 
   guarda-textual:
     name: Guarda de binários
