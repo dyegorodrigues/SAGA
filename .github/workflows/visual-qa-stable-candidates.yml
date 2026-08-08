@@ -1,0 +1,57 @@
+name: Visual QA stable candidates
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  capture:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Instalar Chromium compatível
+        run: node node_modules/playwright-core/cli.js install --with-deps chromium
+
+      - name: Capturar após a abertura temporal
+        run: |
+          rm -rf /tmp/stable-candidates
+          for largura in 320 390 900; do
+            for filtro in 'N1.06' 'GE.01' 'GM.01'; do
+              PRINTS_LARGURA="$largura" \
+              PRINTS_WAIT_MS=2800 \
+              PRINTS_OUT="/tmp/stable-candidates/$largura" \
+              node scripts/prints.mjs "$filtro"
+            done
+          done
+          find /tmp/stable-candidates -type f -name '*.png' | sort
+
+      - name: Publicar artefato estável
+        uses: actions/upload-artifact@v4
+        with:
+          name: stable-promotion-candidates
+          path: /tmp/stable-candidates
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Apagar bancada
+        run: |
+          rm .github/workflows/visual-qa-stable-candidates.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add .github/workflows/visual-qa-stable-candidates.yml
+          git commit -m 'higiene: remove bancada de QA estável dos candidatos'
+          git push origin HEAD:codex/integrar-bloco-f0
