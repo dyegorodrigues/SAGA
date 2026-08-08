@@ -1,5 +1,5 @@
 import { diagnosticar as diagnosticarPareamento } from "../../curriculum/procedimentos/pareamentoProcedure";
-import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao } from "../../curriculum/procedimentos/classificacaoProcedure";
+import { AcaoDeClassificacao, diagnosticar as diagnosticarClassificacao, evidenciasDe as evidenciasDaClassificacao } from "../../curriculum/procedimentos/classificacaoProcedure";
 import { AcaoDeProducao, diagnosticar as diagnosticarProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDePosicao, diagnosticar as diagnosticarPosicao } from "../../curriculum/procedimentos/posicaoProcedure";
 import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum/procedimentos/formaProcedure";
@@ -183,6 +183,7 @@ export function shouldRenderQuestionOptions(q: Question): boolean {
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
   if (!meta) return [];
   const achadas: string[] = [];
+  if (meta.classificacao) achadas.push(...evidenciasDaClassificacao(meta.classificacao as AcaoDeClassificacao));
   if (meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
   if (meta.audiochoice) achadas.push(...evidenciasAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime));
   if (meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));

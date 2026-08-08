@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/classificacaoProcedure";
 import { FichaCompetencia } from "../../schema";
@@ -53,7 +54,15 @@ import { FichaCompetencia } from "../../schema";
  */
 
 /** §9: 3 de 3 em 2 sessões — **incluindo uma peça corretamente deixada fora**. */
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  exige: {
+    evidencia: Evidencia.NAO_PERTENCE,
+    descricao: "Deixar corretamente fora pelo menos uma peça que não pertence ao grupo.",
+  },
+};
 
 /**
  * §8, transcrita.
