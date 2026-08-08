@@ -1706,7 +1706,7 @@ Qual dinossauro e MAIS ALTO?
 
 ## 3. Estrutura da tela
 **Modo peso:** balança de dois pratos com os objetos.
-**Modo capacidade:** dois recipientes de formatos diferentes, com líquido, e um botão de "despejar" para comparar.
+**Modo capacidade:** recipientes **cheios até a borda** e um botão de "despejar" para comparar. No nível 2 eles têm a mesma forma e tamanhos diferentes; no nível 3+ os formatos também mudam.
 
 ## 4. Roteiro cinematográfico
 | Momento | O que acontece | Tempo |
@@ -1714,18 +1714,18 @@ Qual dinossauro e MAIS ALTO?
 | **Abertura (peso)** | a balança entra vazia. Os objetos caem nos pratos, e ela **pende** com física realista | 1,5s |
 | **Instrução** | a voz fala. O prato mais baixo pulsa | 1,3s |
 | **Acerto** | o objeto certo brilha, e a balança **oscila e estabiliza** mostrando claramente o desnível | 1,8s |
-| **Abertura (capacidade)** | dois recipientes de formatos diferentes com a mesma cor de líquido | 1,2s |
-| **A verificação** | botão "despejar": o líquido de um **é transferido para um recipiente-padrão transparente **sem marcações numéricas****, depois o outro. As alturas ficam comparáveis. | 2,5s |
+| **Abertura (capacidade)** | os recipientes-fonte aparecem **cheios até a borda**. Em L2 têm a mesma forma; em L3 a altura/formato vira a armadilha | 1,2s |
+| **A verificação** | botão "despejar": a quantidade que **cabia até a borda** em cada fonte é transferida para recipientes-padrão **iguais**, transparentes e sem marcações numéricas. As alturas passam a representar a comparação sob a mesma referência. | 2,5s |
 | **Erro suave** | o despejo acontece automaticamente, mostrando a verdade | 2,5s |
 
-**O despejo no recipiente-padrão é o que ensina.** Em F0 esse recipiente NÃO tem números nem unidade: ele só coloca as duas quantidades sob a mesma referência. Graduação em mL/L pertence a GM.05. Comparar formatos diferentes é impossível; comparar no mesmo recipiente é trivial.
+**O despejo no recipiente-padrão é o que ensina.** Em F0 esse recipiente NÃO tem números nem unidade: ele só coloca as duas capacidades sob a mesma referência. **A pergunta é quanto CABE, por isso os recipientes-fonte começam cheios até a borda**; comparar recipientes parcialmente cheios mediria a quantidade de líquido presente, não a capacidade. Graduação em mL/L pertence a GM.05.
 
 ## 5. Os 5 níveis
 | Nível | Conteúdo |
 |---|---|
 | 1 | peso, diferença óbvia (pena vs pedra) |
-| 2 | capacidade, recipientes de mesmo formato |
-| 3 | **capacidade com formatos diferentes** (a armadilha) |
+| 2 | capacidade, **mesmo formato, tamanhos diferentes e ambos cheios** |
+| 3 | **capacidade com formatos diferentes, ambos cheios** (altura externa é a armadilha) |
 | 4 | **peso contraintuitivo** (objeto pequeno mais pesado) |
 | 5 | ordenar três por peso ou capacidade |
 
@@ -1733,15 +1733,25 @@ Qual dinossauro e MAIS ALTO?
 `JULGA_PELO_TAMANHO` (**o erro central**) · `CONFUNDE_PESO_VOLUME` · `IGNORA_FORMATO`
 
 ## 7. Falas
-**howto:** *"Coloque na balança. O lado que descer é o mais pesado."*
-**explain:** *"O tamanho engana. Use a balança para descobrir."*
+**Peso — howto:** *"Olhe a balança. O lado que desce é o mais pesado."*
+**Peso — explain:** *"O tamanho pode enganar. Compare pelo que a balança faz."*
+**Capacidade — howto:** *"Os recipientes estão cheios. Em qual cabe mais?"*
+**Capacidade — explain:** *"O formato pode enganar. Despeje em recipientes iguais e compare as quantidades."*
 
 ## 8. Coreografia
+**Primeiro contato com peso (nível 1):**
 ```
 [
-  { fala: "Vamos pesar.",             mostra: { colocarNaBalanca: true },  sync: "junto" },
-  { fala: "Olha, este lado desceu.",  mostra: { destacarPratoBaixo: true },sync: "junto" },
-  { fala: "Ele é mais pesado!",       mostra: { destacarObjeto: 0 },       sync: "depois" }
+  { fala: "Vamos pesar. A balança mostra o que os olhos não mostram." },
+  { fala: "Veja qual lado desce. Esse lado está mais pesado.", mostra: { destacarCerto: true } }
+]
+```
+
+**Primeiro contato com capacidade (nível 2):**
+```
+[
+  { fala: "Os recipientes estão cheios. Queremos descobrir em qual cabe mais." },
+  { fala: "Despeje em recipientes iguais. Agora dá para comparar sem o formato enganar.", mostra: { verificar: true } }
 ]
 ```
 

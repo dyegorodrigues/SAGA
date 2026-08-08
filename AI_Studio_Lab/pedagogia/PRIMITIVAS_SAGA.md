@@ -1,5 +1,5 @@
 # 🧱 INVENTÁRIO DE PRIMITIVAS SAGA
-**Versão 1.2 · Agosto 2026 · estado medido da cadeia ficha → Composer → renderer**
+**Versão 1.3 · Agosto 2026 · estado medido da cadeia ficha → Composer → renderer**
 
 > **Fonte executável de verdade:** `AI_Studio_Lab/tools/ficha_runtime_map.cjs`.
 > Este documento explica o mapa; não substitui o mapa. O auditor
@@ -11,12 +11,12 @@
 
 # §1. O RESULTADO QUE IMPORTA
 
-O catálogo autoral F0–F4 usa **25 primitivas mapeadas**. No estado atual da branch
+O catálogo autoral F0–F4 usa **26 primitivas mapeadas**. No estado atual da branch
 cumulativa:
 
 | Estado comprovado | Total | O que significa |
 |---|---:|---|
-| **Executável** | **17** | ficha pode chegar a builder e renderer reais |
+| **Executável** | **18** | ficha pode chegar a builder e renderer reais |
 | **Renderer sem builder** | **4** | app sabe desenhar, Composer ainda não produz o contrato |
 | **Componente isolado** | **3** | componente existe, mas ainda não forma cadeia executável |
 | **Ausente** | **1** | não existe cadeia nem componente suficiente |
@@ -29,13 +29,14 @@ várias que antes constavam como “faltando ligar” **já foram ligadas**.
 
 # §2. MAPA AUTORAL → RUNTIME
 
-## 2.1 🟢 Executáveis — 17
+## 2.1 🟢 Executáveis — 18
 
 | Primitiva autoral | Dispatch/runtime | Observação |
 |---|---|---|
 | `ArrayGrid` | `arraygrid` → `array` | arranjos/área |
 | `AudioChoice` | `audiochoice` | **F05/N1.06**; autoplay, retry e feedback temporal autoral |
 | `Balanca` | `balanca` | igualdade |
+| `Recipientes` | `medidas` | **F50/GM.12**; capacidade sem unidade: fontes cheias → despejo → recipientes iguais de referência |
 | `DragGroup` | `draggroup` | agrupamento por arrasto |
 | `EmojiRow` | `emojirow` | contagem/subitização |
 | `InteractiveNumberLine` | `numberline` | reta interativa |
@@ -159,7 +160,7 @@ Isso transforma este inventário de memória humana em contrato verificável.
 
 ---
 
-*Changelog: v1.2 (ago/2026) — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace`
+*Changelog: v1.3 (ago/2026) — adiciona `Recipientes` como a 26ª primitiva mapeada e 18ª executável após F50/GM.12 validada em Chromium e por inspeção visual; mantém unidades padronizadas fora de F0. v1.2 — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace`
 e `ShapeCanvas` com o runtime real; corrige os totais do mapa autoral para
 17 executáveis / 4 renderer-sem-builder / 3 isoladas / 1 ausente; adiciona guarda
 reversa no auditor. v1.1 — introduziu o mapa autoral→runtime auditável e resolveu
