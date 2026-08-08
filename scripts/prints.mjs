@@ -5,7 +5,10 @@
  * em vez de montar um segundo harness. Duas montagens divergiriam, e aí o print
  * mostraria uma tela que a sonda não mediu.
  *
- * Uso: node scripts/prints.mjs "N1.04"   (filtra pelo nome da cena)
+ * Uso:
+ *   node scripts/prints.mjs "N1.04"
+ *   PRINTS_CLICK='[data-recipientes-verify]' PRINTS_SUFFIX='_verificado' \
+ *     node scripts/prints.mjs "GM.12 F50 massa/capacidade (nível 3)"
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -15,6 +18,9 @@ const PORTA = 5198;
 const BASE = `http://localhost:${PORTA}/sonda/`;
 const OUT = process.env.PRINTS_OUT ?? "/tmp/prints";
 const filtro = process.argv[2] ?? "";
+const CLICK_SELECTOR = process.env.PRINTS_CLICK ?? "";
+const CLICK_WAIT_MS = Number(process.env.PRINTS_CLICK_WAIT_MS ?? 1100);
+const SUFFIX = process.env.PRINTS_SUFFIX ?? (CLICK_SELECTOR ? "_apos_interacao" : "");
 fs.mkdirSync(OUT, { recursive: true });
 
 const vite = spawn("npx", ["vite", "--port", String(PORTA), "--strictPort"], {
@@ -65,10 +71,25 @@ const feitos = [];
 for (const { indice, nome } of alvos) {
   await page.evaluate(n => window.sonda.ir(n), indice);
   await page.waitForTimeout(320);
-  const arq = `${OUT}/${nome.replace(/[^\w.]+/g, "_")}.png`;
+
+  // Estados intermediários eram um ponto cego do QA: a tela inicial podia estar
+  // impecável e o feedback que ENSINA ficar quebrado. A opção é genérica para
+  // qualquer palco: se o seletor existir e estiver visível, clica antes do print.
+  let interagiu = false;
+  if (CLICK_SELECTOR) {
+    const alvo = page.locator(CLICK_SELECTOR).first();
+    if (await alvo.count() && await alvo.isVisible()) {
+      await alvo.click();
+      await page.waitForTimeout(CLICK_WAIT_MS);
+      interagiu = true;
+    }
+  }
+
+  const sufixo = interagiu ? SUFFIX : "";
+  const arq = `${OUT}/${nome.replace(/[^\w.]+/g, "_")}${sufixo}.png`;
   await page.screenshot({ path: arq });
-  feitos.push({ nome, arq });
-  console.log("print", arq);
+  feitos.push({ nome, arq, interagiu });
+  console.log("print", arq, interagiu ? `(clicou ${CLICK_SELECTOR})` : "");
 }
 await browser.close();
 try { process.kill(-vite.pid, "SIGKILL"); } catch { vite.kill("SIGKILL"); }
