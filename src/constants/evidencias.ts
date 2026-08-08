@@ -5,7 +5,7 @@
  *
  * ### Por que existe um catálogo (pendência P13)
  *
- * Seis fichas do bloco F0 escrevem, na §9, uma segunda condição além da
+ * Algumas fichas do bloco F0 escrevem, na §9, uma segunda condição além da
  * contagem de acertos. Todas dizem a mesma coisa com palavras diferentes:
  *
  * > *acertar não basta; é preciso ter acertado uma vez **na condição que prova
@@ -26,6 +26,13 @@
  * garante, e todo campo que se verifica sozinho vira ruído.
  */
 export const Evidencia = {
+  /**
+   * F51 (AL.01): uma peça que não satisfaz o critério foi **corretamente deixada
+   * fora**. Este é o coração da ficha: "não pertence" é uma decisão certa, não
+   * ausência de resposta.
+   */
+  NAO_PERTENCE: "nao-pertence",
+
   /**
    * F01 (N1.04): um acerto no arranjo **disperso**.
    *
