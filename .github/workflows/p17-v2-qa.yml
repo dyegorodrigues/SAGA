@@ -26,6 +26,19 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
+      - name: Corrigir âncora conhecida da bancada
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('AI_Studio_Lab/tools/p17_v2_apply.py')
+          s = p.read_text()
+          old = 'anchor = \'\'\'  it("a JD5 levanta a tampa na revelação", () => {\'\'\''
+          new = 'anchor = \'\'\'  it("⚠️ a tampa LEVANTA na revelação, mesmo quando ela errou", () => {\'\'\''
+          if s.count(old) != 1:
+              raise SystemExit(f'âncora inesperada: {s.count(old)}')
+          p.write_text(s.replace(old, new))
+          PY
+
       - name: Aplicar P17 v2
         run: python AI_Studio_Lab/tools/p17_v2_apply.py
 
