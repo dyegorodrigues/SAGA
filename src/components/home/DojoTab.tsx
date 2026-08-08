@@ -108,14 +108,14 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
       <div className="flex bg-slate-100 rounded-xl p-1 mb-6 border-2 border-slate-200">
         <button
           onClick={() => { sfx.tick(); setMode("garden"); }}
-          className={`flex-1 py-2 rounded-lg font-black text-sm transition-all ${mode === "garden" ? "bg-white shadow-sm text-green-700" : "text-slate-400 hover:text-slate-600"}`}
+          className={`flex-1 py-2 rounded-lg font-black text-sm transition-all ${mode === "garden" ? "bg-white shadow-sm text-green-700" : "text-slate-600 hover:text-slate-800"}`}
           style={{ fontFamily: FONT }}
         >
           🪴 Jardim
         </button>
         <button
           onClick={() => { sfx.tick(); setMode("sensei"); }}
-          className={`flex-1 py-2 rounded-lg font-black text-sm transition-all ${mode === "sensei" ? "bg-white shadow-sm text-purple-700" : "text-slate-400 hover:text-slate-600"}`}
+          className={`flex-1 py-2 rounded-lg font-black text-sm transition-all ${mode === "sensei" ? "bg-white shadow-sm text-purple-700" : "text-slate-600 hover:text-slate-800"}`}
           style={{ fontFamily: FONT }}
         >
           🦊 Dojo Sensei
@@ -206,11 +206,11 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
                           </div>
                           <div className="mt-2 flex items-center justify-between gap-2 text-[11px] font-bold">
                             <span className="text-slate-500">Treino: {state.currentStep}/5</span>
-                            <span className="text-slate-400">Melhor: {state.highestStep}/5</span>
+                            <span className="text-slate-600">Melhor: {state.highestStep}/5</span>
                           </div>
                         </>
                       ) : (
-                        <div className="mt-3 text-[11px] font-bold text-slate-500 bg-slate-100 rounded-xl px-3 py-2">
+                        <div className="mt-3 text-[11px] font-bold text-slate-700 bg-slate-100 rounded-xl px-3 py-2">
                           Continue em {copy.mother}. Abre quando a base chegar ao nível 3.
                         </div>
                       )}
@@ -316,7 +316,7 @@ function StatBox({ value, label }: { value: React.ReactNode; label: string }) {
   return (
     <div className="bg-white border-2 border-slate-100 rounded-2xl p-3 text-center shadow-sm h-full">
       <div className="text-xl font-black text-slate-800" style={{ fontFamily: FONT }}>{value}</div>
-      <div className="text-[9px] font-bold text-slate-400 uppercase tracking-wide leading-tight mt-1">{label}</div>
+      <div className="text-[9px] font-bold text-slate-600 uppercase tracking-wide leading-tight mt-1">{label}</div>
     </div>
   );
 }
