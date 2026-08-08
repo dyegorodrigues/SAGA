@@ -1,5 +1,6 @@
 import { FichaCompetencia } from "../schema";
 import { Option, Question } from "../../types";
+import { MisconceptionTag } from "../../constants/misconceptions";
 
 const EMOJIS = ["🍎", "🥕", "🐟", "⭐", "🚗", "⚽"];
 
@@ -11,16 +12,41 @@ function numericOptions(answer: number, min: number, max: number): Option[] {
   const values = [answer, answer - 1, answer + 1, answer - 2, answer + 2]
     .filter(value => value >= min && value <= max);
   return [...new Set(values)].slice(0, 4)
-    .map(value => ({ label: String(value), value }))
+    .map(value => ({
+      label: String(value),
+      value,
+      ...(value !== answer && Math.abs(value - answer) === 1
+        ? { misconception: MisconceptionTag.OFF_BY_ONE }
+        : {}),
+    }))
     .sort(() => Math.random() - 0.5);
 }
 
-function sequenceOptions(correct: number[], distractors: number[][]): Option[] {
+function sequenceOptions(
+  correct: number[],
+  distractors: Array<{ sequence: number[]; misconception?: string }>,
+): Option[] {
   const correctValue = correct.join(" · ");
-  return Array.from(new Set([correct, ...distractors].map(sequence => sequence.join(" · "))))
-    .map(value => ({ label: value, value }))
-    .sort(() => Math.random() - 0.5)
-    .map(option => option.value === correctValue ? option : { ...option, misconception: "SEQUENCE_BREAK" });
+  const candidates = [
+    { value: correctValue },
+    ...distractors.map(({ sequence, misconception }) => ({
+      value: sequence.join(" · "),
+      misconception,
+    })),
+  ];
+  const seen = new Set<string>();
+  return candidates
+    .filter(candidate => {
+      if (seen.has(candidate.value)) return false;
+      seen.add(candidate.value);
+      return true;
+    })
+    .map(candidate => ({
+      label: candidate.value,
+      value: candidate.value,
+      ...(candidate.misconception ? { misconception: candidate.misconception } : {}),
+    }))
+    .sort(() => Math.random() - 0.5);
 }
 
 function base(ficha: FichaCompetencia, level: number) {
@@ -68,9 +94,17 @@ function continueFromN(ficha: FichaCompetencia, level: number): Question {
     uiProps: { text: `${start} → …` },
     answer,
     options: sequenceOptions(correct, [
-      [start, start + 1, start + 2],
-      [1, 2, 3],
-      [start + 1, start + 3, start + 2],
+      {
+        sequence: [start, start + 1, start + 2],
+        misconception: MisconceptionTag.OFF_BY_ONE,
+      },
+      {
+        sequence: [1, 2, 3],
+        misconception: MisconceptionTag.NAO_CONTA_A_PARTIR_DE,
+      },
+      // Ordem quebrada sem hipótese causal segura: registra apenas o erro,
+      // sem fabricar diagnóstico no Radar.
+      { sequence: [start + 1, start + 3, start + 2] },
     ]),
     evaluate: candidate => String(candidate) === answer,
   };
@@ -89,9 +123,15 @@ function countdown(ficha: FichaCompetencia, level: number): Question {
     uiProps: { text: `${start} → …` },
     answer,
     options: sequenceOptions(correct, [
-      [start, start - 1, start - 2],
-      [start + 1, start + 2, start + 3],
-      [start - 1, start - 3, start - 2],
+      {
+        sequence: [start, start - 1, start - 2],
+        misconception: MisconceptionTag.OFF_BY_ONE,
+      },
+      {
+        sequence: [start + 1, start + 2, start + 3],
+        misconception: MisconceptionTag.DIRECAO_ERRADA,
+      },
+      { sequence: [start - 1, start - 3, start - 2] },
     ]),
     evaluate: candidate => String(candidate) === answer,
   };
