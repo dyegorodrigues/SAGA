@@ -1,186 +1,260 @@
-# Handoff de continuidade — branch cumulativa SAGA
+# Handoff de continuidade — SAGA / branch cumulativa
 
-> **ATUALIZADO EM 8/AGO/2026. Este é o estado operacional vigente.**
+> **VIGENTE — 8/ago/2026, após a promoção de GM.01.**
 >
-> A `RETOMADA.md` continua importante como histórico técnico e pedagógico, mas
-> contém seções antigas preservadas por contexto. Para decidir **branch, head,
-> estado da F50 e próximo passo**, use este handoff e confirme o Git remoto.
+> Este é o ponto de entrada operacional de qualquer nova sessão. O repositório é
+> a fonte de verdade; `RETOMADA.md` preserva método e história, mas contém trechos
+> antigos. Antes de editar, confirme o remoto e leia commits posteriores ao
+> checkpoint funcional abaixo.
 
 ## 1. Regra de ouro
 
 - Repositório: `dyegorodrigues/SAGA`.
-- `main` **não deve ser alterada nem mesclada** durante esta linha de trabalho.
-- Base imutável observada nesta retomada: `main = 68fad4c575e28959b2ca4776e9a541d6828b63f3`.
-- Branch cumulativa de continuidade: **`codex/integrar-bloco-f0`**.
-- PR de comparação/CI: **#29**, aberta como **draft**, base `main`, sem merge e sem auto-merge.
-- As branches do Creature Engine estão fora deste fluxo e não devem ser tocadas:
-  - `agent/creature-engine-tamagotchi`
-  - `codex/criar-branch-para-creature-engine-tamagotchi`
+- **Não mover, mesclar ou trabalhar na `main`.**
+- `main` verificada: `68fad4c575e28959b2ca4776e9a541d6828b63f3`.
+- Linha de trabalho: **`codex/integrar-bloco-f0`**.
+- PR #29: **draft**, base `main`, apenas comparação/CI; não mesclar e não ativar auto-merge.
+- Checkpoint funcional desta sessão: **`cb868e77facfc02bf4ea412971393fdc1fbcb8e1`** — promoção GM.01.
+- A branch estava nesse checkpoint **190 commits à frente e 0 atrás da `main`**.
+- Commits posteriores ao checkpoint funcional podem ser apenas documentação/handoff; leia-os antes de agir.
 
-Nunca escolha a branch pelo nome que parece mais recente. Compare genealogia,
-PRs e conteúdo antes de mexer.
+### Branches remotas — estado limpo
 
-## 2. Reconciliação das branches da Tarefa 2 — AL.01
+Há exatamente quatro:
 
-A conversa anterior deixou várias branches auxiliares. Depois de provar a absorção
-do conteúdo, os quatro refs históricos foram **apagados do remoto em 8/ago/2026**;
-os PRs/commits continuam preservando a genealogia e as decisões.
+1. `main`
+2. `codex/integrar-bloco-f0`
+3. `agent/creature-engine-tamagotchi`
+4. `codex/criar-branch-para-creature-engine-tamagotchi`
 
-- `codex/ativar-al01` — ref remoto **removido**; checkpoint preservado pelo histórico/PR.
-- `codex/corrigir-n106` — ref remoto **removido** após reconciliação semântica F05/F04 (PR #32).
-- `codex/corrigir-n113` — ref remoto **removido**; conteúdo já ancestral da cumulativa.
-- `codex/reconciliar-f05-f04` — ref remoto **removido**; PR #32 já mesclada na cumulativa.
-- `codex/integrar-bloco-f0` — **única linha atual de continuidade deste bloco**.
+As duas últimas pertencem ao Creature Engine e **não podem ser tocadas neste fluxo**.
 
-Não cherry-pickar mecanicamente commits dessas branches antigas: isso pode
-reintroduzir versões anteriores de arquivos já reconciliados.
+Os refs históricos criados nesta linha (`ativar-al01`, `corrigir-n106`, `corrigir-n113`, `reconciliar-f05-f04`) foram removidos do remoto depois de provar absorção/reconciliação. PRs e commits preservam o histórico.
 
-## 3. O que aconteceu quando a conversa travou
+---
 
-Não houve perda substantiva de código já publicado. O travamento aconteceu no
-meio da retificação P15/F50 e deixou um **estado de higiene/CI incompleto**:
+## 2. O que foi fechado nesta retomada
 
-1. a retificação curricular F50→GM.12 já estava salva;
-2. o grafo já estava em 90 nós;
-3. `Recipientes` já havia sido declarada no inventário;
-4. dois fiscais ainda esperavam o estado anterior (25 primitivas e ausência de
-   `Recipientes` na dívida explícita);
-5. sobrou uma bancada temporária que tentou reaplicar um reparo já aplicado.
+### 2.1 F50 / GM.12 — IMPLEMENTADA E FECHADA, MAS NÃO PROMOVIDA
 
-A retomada removeu as bancadas órfãs, confirmou os guardas corretos e restaurou
-um checkpoint limpo. Antes de continuar a F50, a CI original ficou verde no
-commit `859966703c616ae79e5f25ad35762d8364404430`.
+Matriz vigente:
 
-## 4. F50 / GM.12 — IMPLEMENTADA, NÃO ATIVADA
+`GM.01 comparação direta visível` → **`GM.12 massa/capacidade: comparação e conservação`** → `GM.05 medidas padronizadas`
 
-Commit de implementação:
+- grafo: 90 nós;
+- `GM.02` continua sendo Tempo cotidiano;
+- `GM.12` está registrada em `COMPOSER_FICHAS` e **fora** da lista de canários;
+- `Recipientes` é executável; dívida de primitivas ficou em `Moedas` e `Regua`;
+- F50 trabalha sem unidades; g/kg, L/mL e cm/m pertencem depois a GM.05.
 
-`62879473aa55a55d7b92c2b8441136eb20a3b724`
+Correções visuais/pedagógicas feitas após olhar screenshots reais:
 
-Mensagem: `GM.12 pela F50: massa e capacidade sem deixar a aparência responder`.
+- capacidade passou a perguntar **quanto cabe**, com recipientes-fonte cheios até a borda;
+- L2: mesma forma, tamanhos diferentes;
+- L3: formatos diferentes, ambos cheios — altura externa vira armadilha;
+- verificação despeja em recipientes-padrão iguais, preservando marcas de origem;
+- L5 peso usa o **mesmo objeto-referência** para todos, em vez de mini-balanças abstratas;
+- tutorial/falas separados para peso e capacidade;
+- estados inicial e pós-despejo inspecionados em Chromium em 320/390/900.
 
-### Matriz curricular vigente
+Commits-chave:
 
-`GM.01 comparação direta visível` → **`GM.12 massa e capacidade: comparação e conservação`** → `GM.05 medidas padronizadas`
+- `62879473...` implementação inicial;
+- `91abcf85...` capacidade cheia + referência comum de peso;
+- `3ddb3ed5...` tutorial, falas e cânone sincronizados.
 
-- grafo: **90 nós únicos**;
-- `GM.12`: F0, pré-requisito `[GM.01]`;
-- `GM.05`: depende de `[GM.12, N2.02]`;
-- `GM.02` continua sendo **Tempo cotidiano**;
-- F50 pertence a `GM.12`;
-- F50 trabalha **sem unidades padronizadas**; cm/m, g/kg, L pertencem depois a GM.05.
+**Não promover GM.12 no embalo.** Ela acabou de sofrer correções profundas e fica em observação até nova revisão deliberada.
 
-### Runtime construído
+### 2.2 QA visual virou instrumento reutilizável
 
-- `medidasProcedure.ts` — procedimento puro, diagnóstico e evidência;
-- `medidasContract.ts` — escada L1–L5 e casos contraintuitivos;
-- `Recipientes.tsx` — comparação/conservação de capacidade com despejo para
-  recipientes de referência iguais;
-- `MedidasStage.tsx` — compõe `Balanca` e `Recipientes`, retry/feedback autoral e
-  seriação;
-- `GM.12.ts` — ficha runtime da F50;
-- Composer/renderers/Radar/evidência/mapa runtime/sonda ligados ao novo kind
-  `medidas`;
-- a sonda deixou de congelar um caminho antigo de Chromium e agora usa
-  `chromium.executablePath()` da versão instalada de `playwright-core`.
+`scripts/prints.mjs` agora:
 
-### Escada pedagógica
+- usa `chromium.executablePath()`;
+- aceita `PRINTS_LARGURA`;
+- aceita `PRINTS_WAIT_MS` para fotografar depois de abertura/autoplay;
+- aceita `PRINTS_CLICK`, `PRINTS_CLICK_WAIT_MS` e `PRINTS_SUFFIX` para estados pós-interação.
 
-1. peso óbvio — pena × pedra;
-2. capacidade com recipientes de mesmo formato;
-3. conservação com formatos diferentes — alto/fino pode parecer mais cheio e
-   conter menos;
-4. peso contraintuitivo — objeto pequeno pode ser mais pesado;
-5. seriação de três por peso ou capacidade.
+Isto fechou um ponto cego importante: sonda mede layout, mas não julga pedagogia nem garante que o screenshot foi feito no estado certo.
 
-Diagnósticos: `JULGA_PELO_TAMANHO`, `CONFUNDE_PESO_VOLUME`, `IGNORA_FORMATO`.
-Domínio exige 3/3 em duas sessões e pelo menos um acerto no caso
-`CASO_CONTRAINTUITIVO`. Resposta errada não emite essa evidência.
+### 2.3 P18 — FECHADA
 
-## 5. Regra de ativação preservada
+Arquivo de decisão: `DECISAO_P18_KINDTYPE.md`.
+Auditoria: `AUDITORIA_P18_KINDS.md`.
 
-`GM.12` está em `COMPOSER_FICHAS`, mas **não** está em `COMPOSER_CANARIES`.
-Portanto a implementação está disponível para teste e inspeção sem chegar à
-criança em produção.
+Nove nomes estavam em `KindType` sem builder. Auditoria AST provou que **0/9** eram declarados por fichas TypeScript autorais atuais.
 
-O mesmo princípio vale para as correções ainda em observação da linha cumulativa
-(AL.01, N1.06, N1.13, GE.01, GE.02, GM.01 etc.): implementação e promoção são
-etapas distintas.
+Tratamento:
 
-## 6. Evidência de qualidade do lote F50
+- futuros canônicos: `linking-cubes`, `singaporebars`, `visual-addition` — voltam ao tipo somente junto de contrato+builder+renderer+teste;
+- legado: `multiple_choice`, `sequence`, `subvis`, `take-apart` — continuam válidos como `Question.kind` string;
+- órfãos: `missing-addend-frame`, `sentencebuilder` — não reservam API autoral.
 
-A bancada transacional só publicou o commit depois de passar:
+Novo invariante: **todo `KindType` tem builder; zero exceções.**
 
-- `npm run auditar`;
-- `npm run fichas:auditar`;
-- `npm run fichas:conferir`;
-- `npm run grafo:check`;
-- `npx tsc --noEmit`;
-- testes focalizados da F50 e do fiscal de evidência;
-- suíte completa: **1971/1971 testes**;
-- `npm run sonda -- "GM.12"` em Chromium real, com as cinco cenas e as larguras
-  da sonda;
-- `npm run build`.
+### 2.4 AL.01 / F51 — §9 corrigida e PROMOVIDA
 
-Depois da publicação, a **CI normal da PR #29** foi disparada novamente no head
-`62879473...` e passou integralmente no run **31253027123**:
+Defeito encontrado antes da promoção: a ficha exigia "uma peça corretamente deixada fora", mas o runtime não exigia nem colhia essa prova.
 
-- guarda de binários ✅
-- auditoria do catálogo ✅
-- auditoria das fichas ✅
-- grafo ✅
-- TypeScript ✅
-- testes ✅
-- build ✅
+Correção:
 
-## 7. Dívida explícita atual
+- `Evidencia.NAO_PERTENCE`;
+- `classificacaoProcedure.evidenciasDe`;
+- domínio exige a evidência;
+- `answerPolicy` coleta;
+- fiscal global prova emissão e prova negativa.
 
-Com `Recipientes` implementada, `PRIMITIVAS_PENDENTES` não deve mais listá-la.
-As primitivas ainda ausentes nesse fiscal são **`Moedas` e `Regua`**.
+Promoção:
+`72483db7759bfe69a45ff47c4ae95906cb777b49`
 
-Não confundir dívida declarada com autorização para usar fallback genérico.
-Quando uma ficha depender dessas primitivas, construir a primitiva antes de
-promover a competência.
+Rollback: `legadoAL_01` — intruso de múltipla escolha.
 
-## 8. Próximo passo seguro
+### 2.5 N1.06 / F05 — prompt corrigido e PROMOVIDA
 
-Antes de qualquer novo código:
+Defeito visual/semântico encontrado: depois do autoplay, a tela ainda dizia "Aperte e escute".
 
-```bash
-git fetch origin
-git checkout codex/integrar-bloco-f0
-git pull --ff-only origin codex/integrar-bloco-f0
-git rev-parse HEAD
-git rev-parse origin/main
-```
+Agora:
 
-O head técnico esperado antes deste handoff documental é `62879473...`; se o
-head for posterior, leia os commits posteriores antes de agir.
+- micro-aula ensina a apertar/repetir;
+- questão normal pós-autoplay pergunta apenas **"Que número você ouviu?"**;
+- screenshot pós-audição revisado.
 
-Próxima linha de trabalho:
+Correção: `58fa73f840ee0470ebf0accd34b1f1d00b8d993e`.
+Promoção: `d3c2b7d46d6e1f5bc748ae555b66e840d2e45167`.
+Rollback: `gN1_06`, que continua escrevendo o número por extenso.
 
-1. inspecionar visualmente/por prints a F50 quando houver artefatos de captura
-   disponíveis, além da sonda já verde;
-2. continuar os saneamentos comprovados do bloco sem ativar telas no mesmo lote;
-3. tratar promoções/canários **separadamente, um nó por vez**, somente após o
-   intervalo de observação e revisão;
-4. manter a PR #29 como janela de comparação/CI, **não como pedido de merge na
-   `main`**.
+### 2.6 N1.13 / F04 — PROMOVIDA
 
-## 9. Portões mínimos antes de publicar qualquer lote
+Promoção: `6a6dc16f0177a72bb8af463f7018a66abcfda2e9`.
+
+É estreia verdadeira: sem canário volta ao fallback, porque o nó foi criado para separar "produzir quantidade" de N1.09 "contar até 20".
+
+QA visual já havia confirmado níveis com e sem vaga fantasma; contrato de canário provou rollback para fallback, saves, Radar e cinco níveis.
+
+### 2.7 GE.01 / F47 — PROMOVIDA
+
+Promoção: `a9f9205f624b24134c51c6602f387dfcccf81649`.
+
+Substitui o legado que fazia geometria virar leitura em palavras. QA estável em Chromium confirmou a cena depois da abertura temporal.
+Rollback: `gGE_01`.
+
+### 2.8 GE.02 / F48 — PROMOVIDA
+
+Promoção: `3f8e10cdc7c927ec7be2a328c0ec38c5d1058421`.
+
+- fronteira 2D→3D corrigida: sólidos permanecem em GE.04;
+- L5 é transferência entre representações 2D;
+- domínio exige `FORMA_GIRADA`;
+- QA visual revisado.
+
+Rollback: `gGE_02`.
+
+### 2.9 GM.01 / F49 — PROMOVIDA
+
+Promoção/checkpoint funcional: `cb868e77facfc02bf4ea412971393fdc1fbcb8e1`.
+
+Era estreia: não havia gerador próprio e o nó caía no fallback.
+
+QA estável confirmou:
+
+- altura sob base comum;
+- comprimento no eixo horizontal, partindo do mesmo marco;
+- diferença pequena;
+- objetos diferentes;
+- seriação.
+
+Domínio já exige `DIFERENCA_PEQUENA`. Rollback volta ao fallback genérico.
+
+---
+
+## 3. Arquitetura de promoção simplificada
+
+Foi criado:
+
+`src/curriculum/motores/composerCanaryIds.ts`
+
+Ele é a **única lista declarativa de ids ativos**. `composerCanary.ts` mantém mecanismo, fichas registradas e rollback; promoção agora deve ser um diff de uma linha no arquivo de ids.
+
+Isso reduz o risco de misturar alteração estrutural com promoção.
+
+Canários adicionados nesta retomada, em ordem:
+
+1. `AL.01`
+2. `N1.06`
+3. `N1.13`
+4. `GE.01`
+5. `GE.02`
+6. `GM.01`
+
+Cada SHA atravessou CI normal com auditorias, grafo, TypeScript, suíte completa, build e guarda de binários.
+
+---
+
+## 4. Próxima fila — ordem deliberada
+
+### A. NÃO promover GM.12 ainda
+
+Manter em observação. Só promover em lote futuro depois de nova leitura do checkpoint e, de preferência, nova inspeção visual/uso real.
+
+### B. N1.10 e N1.11 — AUDITAR antes de qualquer promoção
+
+Não adicionar ao arquivo de ids ainda.
+
+- `N1.10`: foi reescrita do `bond` simbólico para JD5 (operação mental antes do símbolo). O rollback `gN1_10` existe; falta confirmar ficha inteira, estados visuais e o que fica faltando na forma simbólica F1 após a troca.
+- `N1.11`: há duas fichas no cânone (F28 simbólica e JD3 perceptual); a entrada runtime atual representa JD3. Confirmar fronteira entre as duas antes de promover.
+
+### C. P8 — motor do Jardim do Dojo
+
+Depois de resolver N1.10/N1.11, auditar e construir o consumidor real das trilhas JD1–JD5. As trilhas existem; o problema sistêmico é apresentá-las à criança sem criar um segundo currículo paralelo.
+
+### D. Moedas e Régua
+
+São as duas primitivas homônimas ainda ausentes no mapa runtime. Construir quando suas fichas virarem gargalo da próxima faixa; não antecipar API sem consumidor.
+
+---
+
+## 5. Portões de qualquer lote
+
+Antes de publicar código:
 
 ```bash
 npm run auditar
 npm run fichas:auditar
+npm run fichas:conferir
 npm run grafo:check
-npm run lint
+npx tsc --noEmit
 npm test -- --run
 npm run build
 npm run pr:check
 git diff --check
 ```
 
-Para mudança perceptível pela criança, adicionar sonda/prints da cena afetada.
+Tela afetada:
 
-**Existir não é estar certo. Divergência pode ser corrigida; divergência
-silenciosa não.**
+```bash
+npm run sonda -- "<ID>"
+PRINTS_WAIT_MS=<estado> node scripts/prints.mjs "<ID>"
+```
+
+Promoção:
+
+- ficha já registrada;
+- QA visual concluído;
+- §9 realmente executável;
+- fallback/legado conhecido;
+- **um id por commit** em `composerCanaryIds.ts`;
+- `canaryContract.test.ts` precisa passar inteiro.
+
+---
+
+## 6. O que NÃO fazer
+
+- não mexer na `main`;
+- não recriar as branches históricas apagadas;
+- não tocar nas duas branches do Creature Engine;
+- não promover GM.12 agora;
+- não promover N1.10/N1.11 antes da auditoria específica;
+- não reintroduzir os nove kinds P18 no `KindType` sem runtime autoral completo;
+- não confiar em teste verde como substituto de olhar a tela;
+- não deixar workflow temporário como mecanismo permanente quando a CI normal resolve o mesmo problema.
+
+**Existir não é estar certo. Divergência pode ser corrigida; divergência silenciosa não.**
