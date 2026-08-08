@@ -317,8 +317,36 @@ export interface ProcStrength {
 export interface DojoTrackState {
   unlocked: boolean;
   mastered: boolean;
+  /** Família do pilar de fluência. Ausente em saves legados. */
+  family?: "JD" | "FD" | "PD";
+  /** Degrau que o próximo treino deve servir. No Jardim: 1–5. */
+  currentStep?: number;
+  /** Maior degrau já conquistado. Nunca regride. */
+  highestStep?: number;
+  /** Rounds consecutivos que cumpriram precisão + fluência. */
+  goodRounds?: number;
+  /** Rounds consecutivos com precisão abaixo de 60%. */
+  weakRounds?: number;
+  rounds?: number;
+  attempts?: number;
+  correct?: number;
+  /** Média móvel do RT das respostas corretas; cronômetro permanece invisível. */
+  avgCorrectRtMs?: number;
+  lastDay?: string;
   facts?: Record<string, FactStrength>;
   procs?: Record<string, ProcStrength>;
+}
+
+/** Estado completo de uma trilha pré-simbólica do Jardim. */
+export interface JardimTrackState extends DojoTrackState {
+  family: "JD";
+  currentStep: number;
+  highestStep: number;
+  goodRounds: number;
+  weakRounds: number;
+  rounds: number;
+  attempts: number;
+  correct: number;
 }
 
 export interface LogEntry {
