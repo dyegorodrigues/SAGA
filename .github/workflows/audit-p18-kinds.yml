@@ -1,0 +1,154 @@
+name: Audit P18 kinds
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  audit:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Mapear promessa autoral contra runtime real
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          debt = [
+            'linking-cubes', 'missing-addend-frame', 'multiple_choice',
+            'sentencebuilder', 'sequence', 'singaporebars', 'subvis',
+            'take-apart', 'visual-addition',
+          ]
+
+          text_ext = {'.ts', '.tsx', '.js', '.jsx', '.cjs', '.mjs', '.md', '.yaml', '.yml', '.json'}
+          ignore_dirs = {'.git', 'node_modules', 'dist'}
+
+          files = []
+          for p in Path('.').rglob('*'):
+            if not p.is_file() or p.suffix not in text_ext:
+              continue
+            if any(part in ignore_dirs for part in p.parts):
+              continue
+            files.append(p)
+
+          def occurrences(kind, paths):
+            out = []
+            needle = kind.lower()
+            for p in paths:
+              try:
+                lines = p.read_text(encoding='utf-8').splitlines()
+              except UnicodeDecodeError:
+                continue
+              for n, line in enumerate(lines, 1):
+                if needle in line.lower():
+                  out.append((str(p), n, line.strip()))
+            return out
+
+          composer = Path('src/curriculum/Composer.ts').read_text(encoding='utf-8')
+          ficha_files = [p for p in files if str(p).startswith('src/curriculum/fichas/') and '.test.' not in p.name]
+          canon_files = [p for p in files if str(p).startswith('AI_Studio_Lab/pedagogia/fichas/')]
+          renderer_files = [
+            Path('src/components/FichaRenderer.tsx'),
+            Path('src/components/gameloop/GameLoopExerciseRenderer.tsx'),
+          ]
+          renderer_files = [p for p in renderer_files if p.exists()]
+          component_files = [p for p in files if str(p).startswith('src/components/')]
+          runtime_src = [p for p in files if str(p).startswith('src/')]
+
+          rows = []
+          detail = []
+          for kind in debt:
+            builder = bool(re.search(rf'case\s+["\']{re.escape(kind)}["\']\s*:', composer))
+            fichas = occurrences(kind, ficha_files)
+            canon = occurrences(kind, canon_files)
+            render = occurrences(kind, renderer_files)
+            components = occurrences(kind, component_files)
+            src_all = occurrences(kind, runtime_src)
+
+            if fichas:
+              verdict = 'DÍVIDA REAL: ficha TS declara o kind e o Composer não constrói'
+            elif canon:
+              verdict = 'CANÔNICO SEM FICHA TS: resolver a ficha antes do builder'
+            elif components or src_all:
+              verdict = 'ALIAS/LEGADO/ÓRFÃO: separar da API autoral antes de construir'
+            else:
+              verdict = 'RESÍDUO DE TIPO: candidato forte a sair do KindType'
+
+            rows.append((kind, len(fichas), len(canon), 'sim' if builder else 'não', len(render), len(components), verdict))
+            raw = occurrences(kind, files)
+            detail.append((kind, raw[:40]))
+
+          out = []
+          out += [
+            '# Auditoria P18 — KindType promete × Composer entrega',
+            '',
+            '> Gerado automaticamente no head da `codex/integrar-bloco-f0` em 8/ago/2026.',
+            '>',
+            '> Regra: um nome no `KindType` autoral não ganha builder só porque existe. Primeiro',
+            '> provamos quem o declara e qual semântica já existe. O objetivo é reduzir API falsa',
+            '> e aliases duplicados, não aumentar o número de caminhos.',
+            '',
+            '## Resumo',
+            '',
+            '| kind | fichas TS | cânone | builder | refs renderer | refs componentes | leitura |',
+            '|---|---:|---:|---|---:|---:|---|',
+          ]
+          for r in rows:
+            out.append(f'| `{r[0]}` | {r[1]} | {r[2]} | {r[3]} | {r[4]} | {r[5]} | {r[6]} |')
+
+          out += [
+            '',
+            '## Critério de decisão',
+            '',
+            '1. **Ficha TS declara** → é dívida executável real; estudar contrato e implementar/normalizar.',
+            '2. **Só cânone declara** → escrever/retificar ficha antes de tocar no Composer.',
+            '3. **Só legado/componente declara** → não transformar legado em API autoral por acidente; normalizar ou retirar o alias.',
+            '4. **Nada declara** → remover do `KindType` é preferível a fabricar um builder sem consumidor.',
+            '',
+            '## Ocorrências encontradas',
+          ]
+          for kind, occ in detail:
+            out += ['', f'### `{kind}`', '']
+            if not occ:
+              out.append('_Nenhuma ocorrência além das estruturas filtradas._')
+            else:
+              out.append('```text')
+              for path, line, text in occ:
+                out.append(f'{path}:{line}: {text[:220]}')
+              out.append('```')
+
+          Path('AI_Studio_Lab/codex/AUDITORIA_P18_KINDS.md').write_text('\n'.join(out) + '\n', encoding='utf-8')
+          PY
+          git diff --check
+          cat AI_Studio_Lab/codex/AUDITORIA_P18_KINDS.md
+
+      - name: Garantir que a auditoria não altera o contrato atual
+        run: |
+          npx vitest run src/curriculum/kindComBuilder.test.ts
+          npm run fichas:auditar
+
+      - name: Publicar auditoria e remover bancada
+        run: |
+          rm .github/workflows/audit-p18-kinds.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add AI_Studio_Lab/codex/AUDITORIA_P18_KINDS.md .github/workflows/audit-p18-kinds.yml
+          git diff --cached --check
+          git commit -m 'P18: mede quais kinds são dívida real, alias legado ou resíduo de tipo'
+          git push origin HEAD:codex/integrar-bloco-f0
