@@ -1,0 +1,104 @@
+name: P19 - auditoria de dependencias npm
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Capturar audit completo e somente producao
+        run: |
+          npm audit --json > /tmp/audit-all.json || true
+          npm audit --omit=dev --json > /tmp/audit-prod.json || true
+      - name: Gerar relatorio versionado
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const all = JSON.parse(fs.readFileSync('/tmp/audit-all.json', 'utf8'));
+          const prod = JSON.parse(fs.readFileSync('/tmp/audit-prod.json', 'utf8'));
+
+          const counts = x => x?.metadata?.vulnerabilities || {};
+          const lineCounts = x => {
+            const c = counts(x);
+            return `total=${c.total ?? 0}; critical=${c.critical ?? 0}; high=${c.high ?? 0}; moderate=${c.moderate ?? 0}; low=${c.low ?? 0}`;
+          };
+          const directVersion = name => {
+            try {
+              const pkg = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'));
+              return pkg.packages?.[`node_modules/${name}`]?.version || 'desconhecida';
+            } catch { return 'desconhecida'; }
+          };
+          const fmtVia = via => (via || []).map(v => {
+            if (typeof v === 'string') return `transitivo via \`${v}\``;
+            const url = v.url ? ` — ${v.url}` : '';
+            return `**${v.severity || 'unknown'}**: ${v.title || v.name || 'advisory'} (${v.range || 'range n/d'})${url}`;
+          });
+          const fmtFix = fix => {
+            if (fix === true) return 'sim, atualização compatível indicada pelo npm';
+            if (!fix) return 'não indicada automaticamente';
+            return `\`${fix.name || '?'}@${fix.version || '?'}\`${fix.isSemVerMajor ? ' (**major/breaking potencial**)' : ''}`;
+          };
+          const vulnerabilities = all.vulnerabilities || {};
+          const names = Object.keys(vulnerabilities).sort((a,b) => {
+            const rank = { critical:4, high:3, moderate:2, low:1, info:0 };
+            return (rank[vulnerabilities[b].severity]||0) - (rank[vulnerabilities[a].severity]||0) || a.localeCompare(b);
+          });
+          const prodNames = new Set(Object.keys(prod.vulnerabilities || {}));
+
+          let md = `# Auditoria P19 — dependências npm\n\n`;
+          md += `**Data:** 8/ago/2026  \n**Branch:** \`codex/integrar-bloco-f0\`  \n**Ação:** diagnóstico somente; **nenhum pacote foi atualizado por esta auditoria**.\n\n`;
+          md += `## Resumo\n\n- Audit completo (dev + runtime): **${lineCounts(all)}**.\n- Audit \`--omit=dev\` (árvore de produção): **${lineCounts(prod)}**.\n\n`;
+          md += `> Regra: não executar \`npm audit fix\` cegamente. Cada correção precisa ser classificada por cadeia, superfície de runtime, versão corrigida e risco de breaking change.\n\n`;
+          md += `## Vulnerabilidades reportadas\n\n`;
+          if (!names.length) md += `Nenhuma vulnerabilidade reportada.\n`;
+          for (const name of names) {
+            const v = vulnerabilities[name];
+            md += `### \`${name}\` — ${String(v.severity || '').toUpperCase()}\n\n`;
+            md += `- versão instalada no lock (quando presente): \`${directVersion(name)}\`;\n`;
+            md += `- dependência direta: **${v.isDirect ? 'sim' : 'não'}**;\n`;
+            md += `- aparece na árvore de produção: **${prodNames.has(name) ? 'sim' : 'não'}**;\n`;
+            md += `- range vulnerável agregado: \`${v.range || 'n/d'}\`;\n`;
+            md += `- nós afetados: ${(v.nodes || []).map(n => `\`${n}\``).join(', ') || 'n/d'};\n`;
+            md += `- fix automático sugerido: ${fmtFix(v.fixAvailable)}.\n`;
+            const vias = fmtVia(v.via);
+            if (vias.length) {
+              md += `- advisories/cadeia:\n`;
+              for (const item of vias) md += `  - ${item}\n`;
+            }
+            if (v.effects?.length) md += `- dependências afetadas a jusante: ${v.effects.map(x=>`\`${x}\``).join(', ')}.\n`;
+            md += `\n`;
+          }
+          md += `## Próxima decisão\n\nPara cada HIGH/CRITICAL: confirmar advisory atual e versão segura em fonte oficial; verificar se é dev-only ou runtime; simular a menor atualização possível; executar TypeScript, suíte completa e build; se tocar browser/runtime visual, executar sonda.\n`;
+          fs.writeFileSync('AI_Studio_Lab/codex/AUDITORIA_P19_DEPENDENCIAS.md', md);
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p19-npm-audit-raw-${{ github.sha }}
+          path: |
+            /tmp/audit-all.json
+            /tmp/audit-prod.json
+          retention-days: 7
+      - name: Publicar relatorio e limpar workflow
+        run: |
+          rm .github/workflows/p19-npm-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'P19: registra auditoria de dependencias npm'
+          git push origin HEAD:codex/integrar-bloco-f0
