@@ -1,17 +1,15 @@
 name: P17 - arquitetura parte-todo
 
 on:
-  push:
-    branches:
-      - codex/integrar-bloco-f0
-    paths:
-      - .github/workflows/p17-parte-todo.yml
+  pull_request:
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   resolver:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
