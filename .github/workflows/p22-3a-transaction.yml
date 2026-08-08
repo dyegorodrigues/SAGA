@@ -1,9 +1,10 @@
 name: P22.3A transactional publication
 
 on:
-  push:
+  pull_request:
     branches:
-      - codex/integrar-bloco-f0
+      - main
+    types: [synchronize]
     paths:
       - .github/workflows/p22-3a-transaction.yml
 
@@ -67,7 +68,7 @@ jobs:
         const start = params.start ?? 0;
         const end = params.end ?? 10;
         const jump = params.jump_size ?? 1;
-        if (!Number.isInteger(start) || !Number.isInteger(end) || !Number.isInteger(jump) || jump == 0 || start >= end) {
+        if (!Number.isInteger(start) || !Number.isInteger(end) || !Number.isInteger(jump) || jump === 0 || start >= end) {
           throw new Error(`Intervalo/salto invalido na reta de ${ficha.id}/${micro.id}.`);
         }
         const currentMin = jump > 0 ? start : start - jump;
