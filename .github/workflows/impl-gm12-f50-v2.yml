@@ -1,0 +1,84 @@
+name: Implement F50 GM12 v2
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  implement:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Reexecutar construção auditada e completar o contrato de tipo
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import YAML from 'yaml';
+          const source = YAML.parse(fs.readFileSync('.github/workflows/impl-gm12-f50.yml', 'utf8'));
+          const wanted = new Map([
+            ['Construir procedimento, contrato e palcos da F50', '/tmp/f50-build.sh'],
+            ['Ligar F50 ao Composer, renderer, Radar e auditorias', '/tmp/f50-wire.sh'],
+          ]);
+          for (const step of source.jobs.implement.steps) {
+            const out = wanted.get(step.name);
+            if (out) fs.writeFileSync(out, step.run, { mode: 0o700 });
+          }
+          for (const out of wanted.values()) {
+            if (!fs.existsSync(out)) throw new Error(`script não extraído: ${out}`);
+          }
+          NODE
+          bash /tmp/f50-build.sh
+          bash /tmp/f50-wire.sh
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('src/curriculum/fichaQuestionContract.ts')
+          s = p.read_text(encoding='utf-8')
+          anchor = 'import { MolduraSpec } from "./procedimentos/tenFrameContract";'
+          if 'medidasContract' not in s:
+              if anchor not in s: raise SystemExit('âncora de import do FichaUiProps ausente')
+              s = s.replace(anchor, anchor + '\nimport { MedidasSpec } from "./procedimentos/medidasContract";', 1)
+          anchor_union = '  | GrandezaSpec\n  | MolduraSpec'
+          if '  | MedidasSpec' not in s:
+              if anchor_union not in s: raise SystemExit('âncora da união FichaUiProps ausente')
+              s = s.replace(anchor_union, '  | GrandezaSpec\n  | MedidasSpec\n  | MolduraSpec', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          git diff --check
+
+      - name: Provar F50 ponta a ponta
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run src/curriculum/procedimentos/medidasProcedure.test.ts src/curriculum/procedimentos/medidasContract.test.ts src/curriculum/conformidadeDeFichas.test.ts src/curriculum/fichaRuntimeMap.test.ts
+          npm test -- --run
+          npm run sonda -- "GM.12"
+          npm run build
+
+      - name: Publicar implementação e remover bancadas
+        run: |
+          rm .github/workflows/impl-gm12-f50.yml .github/workflows/impl-gm12-f50-v2.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src AI_Studio_Lab/tools/ficha_runtime_map.cjs sonda/cenas.tsx .github/workflows/impl-gm12-f50.yml .github/workflows/impl-gm12-f50-v2.yml
+          git diff --cached --check
+          git commit -m 'GM.12 pela F50: massa e capacidade sem deixar o tamanho responder'
+          git push origin HEAD:codex/integrar-bloco-f0
