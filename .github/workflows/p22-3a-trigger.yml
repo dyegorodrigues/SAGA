@@ -1,0 +1,41 @@
+name: P22.3A - one shot trigger
+
+on:
+  push:
+    branches:
+      - codex/integrar-bloco-f0
+
+permissions:
+  contents: write
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - name: Habilitar push no gate principal e apagar este gatilho
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.github/workflows/p22-3a-n107-gate.yml')
+          s = p.read_text()
+          old = """on:\n  pull_request:\n    branches: [main]\n"""
+          new = """on:\n  push:\n    branches:\n      - codex/integrar-bloco-f0\n  pull_request:\n    branches: [main]\n"""
+          if old not in s:
+            raise SystemExit('gatilho principal inesperado')
+          s = s.replace(old, new, 1)
+          old_if = "if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'"
+          new_if = "if: github.ref == 'refs/heads/codex/integrar-bloco-f0' || github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'"
+          if old_if not in s:
+            raise SystemExit('condição principal inesperada')
+          p.write_text(s.replace(old_if, new_if, 1))
+          Path('.github/workflows/p22-3a-trigger.yml').unlink()
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'ci: dispara P22.3A N1.07'
+          git push origin HEAD:codex/integrar-bloco-f0
