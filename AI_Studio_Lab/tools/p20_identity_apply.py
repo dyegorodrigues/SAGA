@@ -3,20 +3,18 @@ from pathlib import Path
 
 def replace_once(path: str, old: str, new: str) -> None:
     p = Path(path)
-    s = p.read_text()
-    n = s.count(old)
-    if n != 1:
-        raise SystemExit(f"{path}: esperado 1x, encontrado {n}x")
-    p.write_text(s.replace(old, new))
+    text = p.read_text()
+    count = text.count(old)
+    if count != 1:
+        raise SystemExit(f"{path}: esperado 1x, encontrado {count}x")
+    p.write_text(text.replace(old, new))
 
 
 # ---------------------------------------------------------------------------
-# 1) Identidade local: uma chave por Firebase UID + migração controlada da chave
-#    global histórica. A chave legada só pode ser reivindicada uma vez.
+# 1) Identidade do save local: uma chave por Firebase UID. A chave histórica
+#    permanece apenas como ponte de migração, com dono explícito depois do uso.
 # ---------------------------------------------------------------------------
-Path("src/lib/storageIdentity.ts").write_text('''import type { State } from "../types";
-
-export const LEGACY_STATE_KEY = "mk-state-v1";
+Path("src/lib/storageIdentity.ts").write_text(r'''export const LEGACY_STATE_KEY = "mk-state-v1";
 export const LEGACY_STATE_OWNER_KEY = "mk-state-v1-legacy-owner";
 
 export function stateKeyForUid(uid: string): string {
@@ -25,15 +23,19 @@ export function stateKeyForUid(uid: string): string {
 }
 
 function kidIds(raw: unknown): Set<string> {
-  const kids = Array.isArray((raw as any)?.kids) ? (raw as any).kids : [];
+  let value = raw as any;
+  if (typeof raw === "string") {
+    try { value = JSON.parse(raw); } catch { return new Set(); }
+  }
+  const kids = Array.isArray(value?.kids) ? value.kids : [];
   return new Set(kids.map((k: any) => String(k?.id || "")).filter(Boolean));
 }
 
 /**
  * A chave histórica não tinha dono. Depois de P20 ela só pode ser oferecida a
- * um UID se ainda não foi reivindicada (ou foi pelo mesmo UID). Quando há cloud
- * e os dois saves têm perfis, exigimos ao menos um `kid.id` em comum — sinal
- * forte de que representam a mesma família, e não duas contas no mesmo tablet.
+ * um UID se ainda não foi reivindicada (ou foi pelo mesmo UID). Quando cloud e
+ * legado já têm perfis, exigimos ao menos um kid.id em comum para não misturar
+ * famílias diferentes que usaram o mesmo tablet.
  */
 export function canUseLegacyState(
   currentUid: string,
@@ -53,7 +55,7 @@ export function canUseLegacyState(
 }
 ''')
 
-Path("src/lib/bootstrapState.ts").write_text('''import type { State } from "../types";
+Path("src/lib/bootstrapState.ts").write_text(r'''import type { State } from "../types";
 import { escolherSaveMaisRecente } from "./reconciliacaoDeSaves";
 import { canUseLegacyState } from "./storageIdentity";
 
@@ -74,16 +76,28 @@ interface Args {
   cloudRaw: unknown;
   migrate: (raw: unknown) => State;
   fresh: () => State;
+  currentSchemaVersion: number;
 }
 
-/**
- * Migra CADA candidato antes de comparar. Isso evita um save de schema inválido
- * com timestamp mais novo vencer primeiro e só depois virar reset limpo,
- * apagando um candidato válido do outro lado.
- */
+function parseRaw(raw: unknown): any | null {
+  if (!raw) return null;
+  if (typeof raw !== "string") return raw;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+function migrateCandidate(raw: unknown, migrate: (raw: unknown) => State, version: number): State | null {
+  const parsed = parseRaw(raw);
+  // A política atual para schema incompatível é reset. Na RECONCILIAÇÃO ele
+  // precisa ser candidato inválido, não um save vazio capaz de vencer empate.
+  if (!parsed || parsed.schemaVersion !== version) return null;
+  return migrate(parsed);
+}
+
+/** Migra cada candidato ANTES de comparar timestamps e nunca mistura objetos. */
 export function resolveBootstrapState(args: Args): BootstrapResult {
   const {
-    uid, scopedLocalRaw, legacyLocalRaw, legacyOwnerUid, cloudRaw, migrate, fresh,
+    uid, scopedLocalRaw, legacyLocalRaw, legacyOwnerUid, cloudRaw,
+    migrate, fresh, currentSchemaVersion,
   } = args;
 
   let localRaw: unknown = scopedLocalRaw || null;
@@ -96,11 +110,11 @@ export function resolveBootstrapState(args: Args): BootstrapResult {
     claimLegacy = true;
   }
 
-  const local = localRaw ? migrate(localRaw) : null;
-  const cloud = cloudRaw ? migrate(cloudRaw) : null;
+  const local = migrateCandidate(localRaw, migrate, currentSchemaVersion);
+  const cloud = migrateCandidate(cloudRaw, migrate, currentSchemaVersion);
 
   if (!local && !cloud) {
-    return { state: fresh(), source: "fresh", claimLegacy, shouldUploadCloud: true };
+    return { state: fresh(), source: "fresh", claimLegacy, shouldUploadCloud: false };
   }
   if (local && !cloud) {
     return { state: local, source: localSource || "scoped-local", claimLegacy, shouldUploadCloud: true };
@@ -109,18 +123,25 @@ export function resolveBootstrapState(args: Args): BootstrapResult {
     return { state: cloud, source: "cloud", claimLegacy, shouldUploadCloud: false };
   }
 
-  const winner = escolherSaveMaisRecente(local, cloud);
-  const source: BootstrapSource = winner === local ? (localSource || "scoped-local") : "cloud";
+  const escolha = escolherSaveMaisRecente(cloud, local);
+  if (escolha.origem === "local") {
+    return {
+      state: escolha.estado as State,
+      source: localSource || "scoped-local",
+      claimLegacy,
+      shouldUploadCloud: true,
+    };
+  }
   return {
-    state: winner as State,
-    source,
+    state: escolha.estado as State,
+    source: "cloud",
     claimLegacy,
-    shouldUploadCloud: source !== "cloud",
+    shouldUploadCloud: false,
   };
 }
 ''')
 
-Path("src/lib/storageIdentity.test.ts").write_text('''import { describe, expect, it } from "vitest";
+Path("src/lib/storageIdentity.test.ts").write_text(r'''import { describe, expect, it } from "vitest";
 import { canUseLegacyState, stateKeyForUid } from "./storageIdentity";
 
 describe("P20 — identidade do save local", () => {
@@ -139,12 +160,12 @@ describe("P20 — identidade do save local", () => {
   it("sem dono, cloud e legado com famílias diferentes não são misturados", () => {
     expect(canUseLegacyState(
       "uid-a", null,
-      { kids: [{ id: "local-kid" }] },
+      JSON.stringify({ kids: [{ id: "local-kid" }] }),
       { kids: [{ id: "cloud-kid" }] },
     )).toBe(false);
   });
 
-  it("mesmo kid.id permite reconhecer a origem histórica como a mesma família", () => {
+  it("mesmo kid.id reconhece legado e cloud como a mesma família", () => {
     expect(canUseLegacyState(
       "uid-a", null,
       { kids: [{ id: "same" }] },
@@ -154,49 +175,39 @@ describe("P20 — identidade do save local", () => {
 });
 ''')
 
-Path("src/lib/bootstrapState.test.ts").write_text('''import { describe, expect, it } from "vitest";
+Path("src/lib/bootstrapState.test.ts").write_text(r'''import { describe, expect, it } from "vitest";
 import type { State } from "../types";
 import { resolveBootstrapState } from "./bootstrapState";
 
 const state = (name: string, updatedAt?: string, schemaVersion = 1): any => ({
   schemaVersion,
   updatedAt,
-  kids: [{ id: name, name, grade: "1" }],
+  kids: [{ id: name, name, avatar: "🦊", grade: "ano1", theme: "classico" }],
   progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true, customTracks: [],
 });
-
-const migrate = (raw: any): State => {
-  if (!raw || raw.schemaVersion !== 1) return {
-    schemaVersion: 1, kids: [], progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true, customTracks: [],
-  };
-  return { ...raw } as State;
-};
-const fresh = () => migrate(null);
+const migrate = (raw: any): State => ({ ...raw }) as State;
+const fresh = (): State => ({
+  schemaVersion: 1, kids: [], progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true, customTracks: [],
+});
+const base = { uid: "A", legacyLocalRaw: null, legacyOwnerUid: null, migrate, fresh, currentSchemaVersion: 1 };
 
 describe("P20 — bootstrap local × cloud", () => {
-  it("scoped local nunca é contaminado pela chave legada de outra sessão", () => {
+  it("scoped local ignora a chave legada ainda que ela seja mais nova", () => {
     const out = resolveBootstrapState({
-      uid: "A",
-      scopedLocalRaw: state("scoped", "2026-08-08T10:00:00.000Z"),
-      legacyLocalRaw: state("legacy", "2026-08-08T12:00:00.000Z"),
-      legacyOwnerUid: null,
+      ...base,
+      scopedLocalRaw: JSON.stringify(state("scoped", "2026-08-08T10:00:00.000Z")),
+      legacyLocalRaw: JSON.stringify(state("legacy", "2026-08-08T12:00:00.000Z")),
       cloudRaw: null,
-      migrate, fresh,
     });
     expect(out.state.kids[0].id).toBe("scoped");
     expect(out.source).toBe("scoped-local");
   });
 
-  it("migra antes de reconciliar: schema inválido mais novo não apaga save válido", () => {
-    const valid = state("valid", "2026-08-08T10:00:00.000Z");
-    const invalidNewer = state("invalid", "2026-08-08T12:00:00.000Z", 999);
+  it("schema incompatível mais novo não apaga um candidato válido", () => {
     const out = resolveBootstrapState({
-      uid: "A",
-      scopedLocalRaw: valid,
-      legacyLocalRaw: null,
-      legacyOwnerUid: null,
-      cloudRaw: invalidNewer,
-      migrate, fresh,
+      ...base,
+      scopedLocalRaw: JSON.stringify(state("valid", "2026-08-08T10:00:00.000Z")),
+      cloudRaw: state("invalid", "2026-08-08T12:00:00.000Z", 999),
     });
     expect(out.state.kids[0].id).toBe("valid");
     expect(out.source).toBe("scoped-local");
@@ -205,427 +216,333 @@ describe("P20 — bootstrap local × cloud", () => {
 
   it("cloud mais novo vence e não é regravado sem necessidade", () => {
     const out = resolveBootstrapState({
-      uid: "A",
-      scopedLocalRaw: state("same", "2026-08-08T10:00:00.000Z"),
-      legacyLocalRaw: null,
-      legacyOwnerUid: null,
+      ...base,
+      scopedLocalRaw: JSON.stringify(state("same", "2026-08-08T10:00:00.000Z")),
       cloudRaw: state("same", "2026-08-08T11:00:00.000Z"),
-      migrate, fresh,
     });
     expect(out.source).toBe("cloud");
     expect(out.shouldUploadCloud).toBe(false);
   });
 
-  it("legacy sem dono pode ser reivindicado quando é a única fonte", () => {
+  it("local mais novo vence e deve reparar a cópia cloud", () => {
     const out = resolveBootstrapState({
-      uid: "A", scopedLocalRaw: null,
-      legacyLocalRaw: state("legacy", "2026-08-08T10:00:00.000Z"), legacyOwnerUid: null,
-      cloudRaw: null, migrate, fresh,
+      ...base,
+      scopedLocalRaw: JSON.stringify(state("same", "2026-08-08T12:00:00.000Z")),
+      cloudRaw: state("same", "2026-08-08T11:00:00.000Z"),
     });
-    expect(out.source).toBe("legacy-local");
-    expect(out.claimLegacy).toBe(true);
+    expect(out.source).toBe("scoped-local");
     expect(out.shouldUploadCloud).toBe(true);
   });
 
-  it("legado de família diferente não concorre com cloud de outra conta", () => {
+  it("legado sem dono pode ser reivindicado quando é a única fonte", () => {
     const out = resolveBootstrapState({
-      uid: "B", scopedLocalRaw: null,
-      legacyLocalRaw: state("kid-A", "2026-08-08T12:00:00.000Z"), legacyOwnerUid: null,
-      cloudRaw: state("kid-B", "2026-08-08T09:00:00.000Z"), migrate, fresh,
+      ...base,
+      scopedLocalRaw: null,
+      legacyLocalRaw: JSON.stringify(state("legacy", "2026-08-08T10:00:00.000Z")),
+      cloudRaw: null,
+    });
+    expect(out.source).toBe("legacy-local");
+    expect(out.claimLegacy).toBe(true);
+  });
+
+  it("legado de outra família não concorre com cloud da conta atual", () => {
+    const out = resolveBootstrapState({
+      ...base, uid: "B", scopedLocalRaw: null,
+      legacyLocalRaw: JSON.stringify(state("kid-A", "2026-08-08T12:00:00.000Z")),
+      cloudRaw: state("kid-B", "2026-08-08T09:00:00.000Z"),
     });
     expect(out.source).toBe("cloud");
     expect(out.state.kids[0].id).toBe("kid-B");
     expect(out.claimLegacy).toBe(false);
   });
+
+  it("sem candidato válido começa fresh sem gravar vazio na nuvem", () => {
+    const out = resolveBootstrapState({ ...base, scopedLocalRaw: null, cloudRaw: null });
+    expect(out.source).toBe("fresh");
+    expect(out.shouldUploadCloud).toBe(false);
+  });
 });
 ''')
 
 # ---------------------------------------------------------------------------
-# 2) Debounce de nuvem carrega o contexto (UID) que originou o estado e pode ser
-#    cancelado numa troca de autenticação.
+# 2) O sincronizador existente mantém a API e ganha contexto de identidade.
 # ---------------------------------------------------------------------------
-Path("src/lib/sincronizadorDeNuvem.ts").write_text('''/**
- * Sincronizador leve para não gravar na nuvem a cada clique.
- *
- * P20: o trabalho guarda também o CONTEXTO (Firebase UID). Assim um estado
- * agendado pela conta A não pode ser enviado, 800 ms depois, como se tivesse
- * nascido na conta B.
- */
-export function criarSincronizador<T, C = undefined>(
-  gravar: (estado: T, contexto?: C) => Promise<void>,
-  esperaMs = 800,
-) {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  let ultimo: { estado: T; contexto?: C } | null = null;
+Path("src/lib/sincronizadorDeNuvem.ts").write_text(r'''import { State } from "../types";
 
-  async function enviarUltimo() {
-    if (!ultimo) return;
-    const trabalho = ultimo;
-    ultimo = null;
-    try {
-      await gravar(trabalho.estado, trabalho.contexto);
-    } catch (err) {
-      console.error("Falha ao sincronizar na nuvem", err);
+export interface OpcoesDoSincronizador<C = undefined> {
+  gravar: (estado: State, contexto?: C) => Promise<void>;
+  atrasoMs?: number;
+  agendar?: (fn: () => void, ms: number) => unknown;
+  cancelar?: (handle: unknown) => void;
+}
+
+export interface Sincronizador<C = undefined> {
+  agendar: (estado: State, contexto?: C) => void;
+  descarregar: () => Promise<void>;
+  cancelarPendencia: () => void;
+  temPendencia: () => boolean;
+}
+
+export const ATRASO_PADRAO_MS = 8000;
+
+export function criarSincronizador<C = undefined>(opcoes: OpcoesDoSincronizador<C>): Sincronizador<C> {
+  const atrasoMs = opcoes.atrasoMs ?? ATRASO_PADRAO_MS;
+  const agendarTimer = opcoes.agendar ?? ((fn, ms) => setTimeout(fn, ms));
+  const cancelarTimer = opcoes.cancelar ?? (h => clearTimeout(h as ReturnType<typeof setTimeout>));
+
+  let pendente: { estado: State; contexto?: C } | null = null;
+  let handle: unknown = null;
+
+  const subir = () => {
+    if (!pendente) return Promise.resolve();
+    const trabalho = pendente;
+    pendente = null;
+    return opcoes.gravar(trabalho.estado, trabalho.contexto).catch(err => {
+      console.warn("[Nuvem] Sincronização adiada:", err);
+    });
+  };
+
+  const limparTimer = () => {
+    if (handle !== null) {
+      cancelarTimer(handle);
+      handle = null;
     }
-  }
+  };
 
-  function agendar(estado: T, contexto?: C) {
-    ultimo = { estado, contexto };
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(() => {
-      timer = null;
-      void enviarUltimo();
-    }, esperaMs);
-  }
-
-  async function descarregar() {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
-    }
-    await enviarUltimo();
-  }
-
-  function cancelar() {
-    if (timer) clearTimeout(timer);
-    timer = null;
-    ultimo = null;
-  }
-
-  return { agendar, descarregar, cancelar };
+  return {
+    agendar(estado: State, contexto?: C) {
+      pendente = { estado, contexto };
+      limparTimer();
+      handle = agendarTimer(() => {
+        handle = null;
+        void subir();
+      }, atrasoMs);
+    },
+    descarregar() {
+      limparTimer();
+      return subir();
+    },
+    cancelarPendencia() {
+      limparTimer();
+      pendente = null;
+    },
+    temPendencia() {
+      return pendente !== null;
+    },
+  };
 }
 ''')
 
-Path("src/lib/sincronizadorDeNuvem.test.ts").write_text('''import { beforeEach, describe, expect, it, vi } from "vitest";
-import { criarSincronizador } from "./sincronizadorDeNuvem";
+Path("src/lib/sincronizadorDeNuvem.test.ts").write_text(r'''import { describe, expect, it, vi } from "vitest";
+import { State } from "../types";
+import { ATRASO_PADRAO_MS, criarSincronizador } from "./sincronizadorDeNuvem";
 
-describe("sincronizador de nuvem", () => {
-  beforeEach(() => vi.useFakeTimers());
+const save = (marca: string): State => ({
+  schemaVersion: 1, updatedAt: marca,
+  kids: [], progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true,
+});
 
-  it("agrupa várias alterações e envia só a última", async () => {
-    const gravar = vi.fn(async () => undefined);
-    const sync = criarSincronizador(gravar, 100);
-    sync.agendar({ revision: 1 });
-    sync.agendar({ revision: 2 });
-    sync.agendar({ revision: 3 });
+function relogio() {
+  let proximo = 1;
+  const tarefas = new Map<number, { fn: () => void; quando: number }>();
+  let agora = 0;
+  return {
+    agendar: (fn: () => void, ms: number) => {
+      const id = proximo++;
+      tarefas.set(id, { fn, quando: agora + ms });
+      return id;
+    },
+    cancelar: (h: unknown) => { tarefas.delete(h as number); },
+    avancar(ms: number) {
+      agora += ms;
+      for (const [id, t] of [...tarefas]) if (t.quando <= agora) { tarefas.delete(id); t.fn(); }
+    },
+    pendentes: () => tarefas.size,
+  };
+}
+
+describe("amortecedor de gravações na nuvem", () => {
+  it("dez questões viram uma gravação, com o estado final", async () => {
+    const gravar = vi.fn().mockResolvedValue(undefined);
+    const t = relogio();
+    const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    for (let i = 1; i <= 10; i++) s.agendar(save(`q${i}`));
     expect(gravar).not.toHaveBeenCalled();
-    await vi.advanceTimersByTimeAsync(100);
+    t.avancar(ATRASO_PADRAO_MS);
+    await Promise.resolve();
     expect(gravar).toHaveBeenCalledTimes(1);
-    expect(gravar).toHaveBeenCalledWith({ revision: 3 }, undefined);
+    expect(gravar.mock.calls[0][0].updatedAt).toBe("q10");
   });
 
   it("mantém o UID junto do estado que venceu o debounce", async () => {
-    const gravar = vi.fn(async () => undefined);
-    const sync = criarSincronizador<{ v: number }, string>(gravar, 100);
-    sync.agendar({ v: 1 }, "uid-a");
-    sync.agendar({ v: 2 }, "uid-b");
-    await vi.advanceTimersByTimeAsync(100);
-    expect(gravar).toHaveBeenCalledWith({ v: 2 }, "uid-b");
+    const gravar = vi.fn().mockResolvedValue(undefined);
+    const t = relogio();
+    const s = criarSincronizador<string>({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("a"), "uid-a");
+    s.agendar(save("b"), "uid-b");
+    t.avancar(ATRASO_PADRAO_MS);
+    await Promise.resolve();
+    expect(gravar).toHaveBeenCalledWith(expect.objectContaining({ updatedAt: "b" }), "uid-b");
   });
 
-  it("cancelar numa troca de conta elimina trabalho pendente", async () => {
-    const gravar = vi.fn(async () => undefined);
-    const sync = criarSincronizador<{ v: number }, string>(gravar, 100);
-    sync.agendar({ v: 1 }, "uid-a");
-    sync.cancelar();
-    await vi.advanceTimersByTimeAsync(200);
+  it("cancelarPendencia numa troca de conta elimina trabalho antigo", async () => {
+    const gravar = vi.fn().mockResolvedValue(undefined);
+    const t = relogio();
+    const s = criarSincronizador<string>({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("a"), "uid-a");
+    s.cancelarPendencia();
+    t.avancar(ATRASO_PADRAO_MS * 2);
+    await Promise.resolve();
     expect(gravar).not.toHaveBeenCalled();
+    expect(s.temPendencia()).toBe(false);
   });
 
-  it("descarregar força o envio pendente", async () => {
-    const gravar = vi.fn(async () => undefined);
-    const sync = criarSincronizador(gravar, 1000);
-    sync.agendar({ revision: 9 });
-    await sync.descarregar();
-    expect(gravar).toHaveBeenCalledWith({ revision: 9 }, undefined);
+  it("descarregar sobe na hora e mantém contexto", async () => {
+    const gravar = vi.fn().mockResolvedValue(undefined);
+    const t = relogio();
+    const s = criarSincronizador<string>({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("fim"), "uid-a");
+    await s.descarregar();
+    expect(gravar).toHaveBeenCalledWith(expect.objectContaining({ updatedAt: "fim" }), "uid-a");
+    expect(t.pendentes()).toBe(0);
+  });
+
+  it("falha de rede não derruba a aula e o estado seguinte ainda sobe", async () => {
+    const gravar = vi.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValue(undefined);
+    const t = relogio();
+    const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("tentativa-1"));
+    await expect(s.descarregar()).resolves.toBeUndefined();
+    s.agendar(save("tentativa-2"));
+    await s.descarregar();
+    expect(gravar).toHaveBeenCalledTimes(2);
   });
 });
 ''')
 
 # ---------------------------------------------------------------------------
-# 3) Firebase: save opcionalmente vinculado ao UID esperado; Google LINKA a
-#    conta anônima em vez de substituir o usuário silenciosamente.
+# 3) Firebase: o trabalho cloud carrega o UID de origem; Google linka a conta
+#    anônima para preservar o UID e o documento já usado por ela.
 # ---------------------------------------------------------------------------
 replace_once(
     "src/lib/firebase.ts",
-    '''export async function saveStateToCloud(state: State): Promise<void> {
-  const user = auth.currentUser;
-  if (!user) return;
-''',
-    '''export async function saveStateToCloud(state: State, expectedUid?: string): Promise<void> {
-  const user = auth.currentUser;
-  if (!user) return;
-  if (expectedUid && user.uid !== expectedUid) {
-    console.warn(`Sync descartado: estado de ${expectedUid} não pertence ao usuário atual ${user.uid}.`);
-    return;
-  }
-''',
+    '''export async function saveStateToCloud(state: State): Promise<void> {\n  const userId = getDeviceUserId();\n  if (userId === "usr_anonymous_device") return;\n''',
+    '''export async function saveStateToCloud(state: State, expectedUid?: string): Promise<void> {\n  const user = auth.currentUser;\n  if (!user) return;\n  if (expectedUid && user.uid !== expectedUid) {\n    console.warn(`[Firestore] Sync descartado: estado de ${expectedUid} não pertence ao usuário atual ${user.uid}.`);\n    return;\n  }\n  const userId = `usr_cloud_${user.uid}`;\n''',
 )
 replace_once(
     "src/lib/firebase.ts",
-    '''    const wasAnonymous = auth.currentUser?.isAnonymous;
-    const result = await signInWithPopup(auth, provider);
-    const email = result.user.email || "usuario@google.com";
-    localStorage.setItem("mk-user-email", email);
-    localStorage.setItem("mk-cloud-uid", result.user.uid);
-
-    // If user was anonymous, Firebase automatically links the anonymous account
-    // with Google when using signInWithPopup, preserving the same UID and data
-    if (wasAnonymous && result.user.isAnonymous) {
-      console.log("Anonymous account successfully upgraded to Google");
-    }
-''',
-    '''    const anonymous = auth.currentUser?.isAnonymous ? auth.currentUser : null;
-    // `signInWithPopup` substitui o usuário anônimo; `linkWithPopup` preserva o
-    // UID e, portanto, o mesmo documento cloud + chave local por UID.
-    const result = anonymous
-      ? await linkWithPopup(anonymous, provider)
-      : await signInWithPopup(auth, provider);
-    const email = result.user.email || "usuario@google.com";
-    localStorage.setItem("mk-user-email", email);
-    localStorage.setItem("mk-cloud-uid", result.user.uid);
-''',
+    '''    const result = await signInWithPopup(auth, googleProvider);\n    const user = result.user;\n''',
+    '''    const anonymous = auth.currentUser?.isAnonymous ? auth.currentUser : null;\n    const result = anonymous\n      ? await linkWithPopup(anonymous, googleProvider)\n      : await signInWithPopup(auth, googleProvider);\n    const user = result.user;\n''',
+)
+replace_once(
+    "src/lib/firebase.ts",
+    '''export function logoutUser(): void {\n  try {\n    if (auth) {\n      signOut(auth).catch((err) => console.warn("Firebase Auth signOut failed:", err));\n    }\n''',
+    '''export async function logoutUser(): Promise<void> {\n  try {\n    if (auth) {\n      await signOut(auth);\n    }\n''',
 )
 
 # ---------------------------------------------------------------------------
-# 4) LoginScreen: callback não transporta/instala estado. O bootstrap do App é o
-#    único dono da reconciliação.
+# 4) LoginScreen só sinaliza identidade. O App é o único dono do bootstrap.
 # ---------------------------------------------------------------------------
 replace_once(
     "src/components/LoginScreen.tsx",
-    '''  onLoginSuccess: (email: string, cloudState: State | null) => void;
-  onContinueAsVisitor: (cloudState: State | null) => void;''',
-    '''  onLoginSuccess: (email: string) => void;
-  onContinueAsVisitor: (cloudState: State | null) => void;''',
+    '''  onLoginSuccess: (email: string, cloudState: any) => void;''',
+    '''  onLoginSuccess: (email: string) => void;''',
 )
 replace_once(
     "src/components/LoginScreen.tsx",
-    '''      const { email, state } = await loginWithGoogle();
-      onLoginSuccess(email, state);''',
-    '''      const { email } = await loginWithGoogle();
-      onLoginSuccess(email);''',
+    '''      const { email, state } = await loginWithGoogle();''',
+    '''      const { email } = await loginWithGoogle();''',
 )
 replace_once(
     "src/components/LoginScreen.tsx",
-    '''      const { email, state } = await loginAnonymously();
-      onLoginSuccess(email, state);''',
-    '''      const { email } = await loginAnonymously();
-      onLoginSuccess(email);''',
+    '''      onLoginSuccess(email, state);''',
+    '''      onLoginSuccess(email);''',
 )
+replace_once(
+    "src/components/LoginScreen.tsx",
+    '''      const { email, state } = await loginAnonymously();''',
+    '''      const { email } = await loginAnonymously();''',
+)
+# segunda ocorrência do callback anônimo
+p = Path("src/components/LoginScreen.tsx")
+text = p.read_text()
+if text.count('      onLoginSuccess(email, state);') != 1:
+    raise SystemExit(f"LoginScreen: callback anônimo esperado 1x, encontrado {text.count('      onLoginSuccess(email, state);')}x")
+p.write_text(text.replace('      onLoginSuccess(email, state);', '      onLoginSuccess(email);'))
 
 # ---------------------------------------------------------------------------
-# 5) App: bootstrap único por UID, migração antes da reconciliação, persist local
-#    escopado, debounce vinculado ao UID, logout descarrega antes de sair.
+# 5) App: bootstrap único por UID, local escopado e flush seguro na troca.
 # ---------------------------------------------------------------------------
 p = Path("src/App.tsx")
 s = p.read_text()
+replace_import = 'import { carimbar, escolherSaveMaisRecente } from "./lib/reconciliacaoDeSaves";\n'
+if s.count(replace_import) != 1:
+    raise SystemExit("App: import reconciliacao inesperado")
 s = s.replace(
-    'import { escolherSaveMaisRecente } from "./lib/reconciliacaoDeSaves";\n',
-    'import { resolveBootstrapState } from "./lib/bootstrapState";\nimport { LEGACY_STATE_KEY, LEGACY_STATE_OWNER_KEY, stateKeyForUid } from "./lib/storageIdentity";\n',
+    replace_import,
+    'import { carimbar } from "./lib/reconciliacaoDeSaves";\nimport { resolveBootstrapState } from "./lib/bootstrapState";\nimport { LEGACY_STATE_KEY, LEGACY_STATE_OWNER_KEY, stateKeyForUid } from "./lib/storageIdentity";\n',
 )
 s = s.replace(
-    '''const nuvem = criarSincronizador<State>((estado) => saveStateToCloud(estado), 800);''',
-    '''const nuvem = criarSincronizador<State, string>((estado, uid) => saveStateToCloud(estado, uid), 800);''',
+    'import { defaultState, localDay, migrate } from "./utils/migrator";',
+    'import { CURRENT_SCHEMA_VERSION, defaultState, localDay, migrate } from "./utils/migrator";',
+)
+s = s.replace(
+    'const nuvem = criarSincronizador({ gravar: saveStateToCloud });',
+    'const nuvem = criarSincronizador<string>({ gravar: saveStateToCloud });',
 )
 
-# Auth listener: cancela trabalho pendente quando a identidade realmente muda.
-old_listener = '''    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserEmail(user.email || "visitante");
-        setVisitorMode(user.isAnonymous);
-      } else {
-        setUserEmail(null);
-        setVisitorMode(false);
-      }
-      setAuthLoading(false);
-    });'''
-new_listener = '''    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      // Um debounce criado sob outro usuário nunca atravessa a fronteira de auth.
-      nuvem.cancelar();
-      if (user) {
-        setUserEmail(user.email || "visitante");
-        setVisitorMode(user.isAnonymous);
-      } else {
-        setUserEmail(null);
-        setVisitorMode(false);
-      }
-      setAuthLoading(false);
-    });'''
+anchor = '  const [showAdmin, setShowAdmin] = useState(false);\n'
+if s.count(anchor) != 1:
+    raise SystemExit("App: ancora showAdmin inesperada")
+s = s.replace(anchor, anchor + '  const authUidRef = useRef<string | null>(auth.currentUser?.uid ?? null);\n')
+
+old_listener = '''  useEffect(() => {\n    const unsubscribe = onAuthStateChanged(auth, (user) => {\n      if (user) {\n        const email = user.email || user.displayName || (user.isAnonymous ? "visitante" : "Conta Conectada");\n        setUserEmail(email);\n        setVisitorMode(user.isAnonymous);\n      } else {\n        setUserEmail(null);\n        if (!E2E) setVisitorMode(false);\n      }\n    });\n    return () => unsubscribe();\n  }, []);\n'''
+new_listener = '''  useEffect(() => {\n    const unsubscribe = onAuthStateChanged(auth, (user) => {\n      const nextUid = user?.uid ?? null;\n      if (authUidRef.current && authUidRef.current !== nextUid) {\n        nuvem.cancelarPendencia();\n      }\n      authUidRef.current = nextUid;\n      if (user) {\n        const email = user.email || user.displayName || (user.isAnonymous ? "visitante" : "Conta Conectada");\n        setUserEmail(email);\n        setVisitorMode(user.isAnonymous);\n      } else {\n        setUserEmail(null);\n        if (!E2E) setVisitorMode(false);\n      }\n    });\n    return () => unsubscribe();\n  }, []);\n'''
 if s.count(old_listener) != 1:
-    raise SystemExit(f"App: listener auth esperado 1x, encontrado {s.count(old_listener)}x")
+    raise SystemExit(f"App: listener esperado 1x, encontrado {s.count(old_listener)}x")
 s = s.replace(old_listener, new_listener)
 
-old_effect = '''  useEffect(() => {
-    if (authLoading) return;
-    let cancelled = false;
+start = s.index('  useEffect(() => {\n    // If they aren\'t logged in AND aren\'t in visitor mode, route them to login!')
+end_marker = '  useEffect(() => {\n    if (state) {\n      setSoundOn(state.sound !== false);\n    }\n  }, [state]);'
+end = s.index(end_marker, start)
+old_bootstrap = s[start:end]
+new_bootstrap = '''  useEffect(() => {\n    const user = auth.currentUser;\n    // Produção entra sempre por Firebase (Google ou anônimo). E2E pode manter\n    // o shell local sem identidade cloud; ele não participa da reconciliação.\n    if (!user) {\n      setScreen({ name: "login" });\n      if (E2E && visitorMode) {\n        void (async () => {\n          const raw = await getStorage(LEGACY_STATE_KEY);\n          setState(raw ? migrate(JSON.parse(raw)) : defaultState());\n          setScreen({ name: "pick" });\n        })();\n      }\n      return;\n    }\n\n    let active = true;\n    const uid = user.uid;\n    void (async () => {\n      let cloudRaw: State | null = null;\n      try { cloudRaw = await loadStateFromCloud(); }\n      catch (err) { console.warn("Could not load state from Cloud Firestore, trying local storage fallback", err); }\n\n      const [scopedRaw, legacyRaw, legacyOwnerUid] = await Promise.all([\n        getStorage(stateKeyForUid(uid)),\n        getStorage(LEGACY_STATE_KEY),\n        getStorage(LEGACY_STATE_OWNER_KEY),\n      ]);\n\n      const bootstrap = resolveBootstrapState({\n        uid, scopedLocalRaw: scopedRaw, legacyLocalRaw: legacyRaw, legacyOwnerUid,\n        cloudRaw, migrate, fresh: defaultState, currentSchemaVersion: CURRENT_SCHEMA_VERSION,\n      });\n      if (!active || auth.currentUser?.uid !== uid) return;\n\n      const loaded = bootstrap.state;\n      setState(loaded);\n      await setStorage(stateKeyForUid(uid), JSON.stringify(loaded));\n      if (bootstrap.claimLegacy) await setStorage(LEGACY_STATE_OWNER_KEY, uid);\n      if (bootstrap.shouldUploadCloud) nuvem.agendar(loaded, uid);\n      setScreen(loaded.kids.length ? { name: "pick" } : { name: "setup" });\n    })();\n\n    return () => { active = false; };\n  }, [userEmail, visitorMode]);\n\n'''
+s = s.replace(old_bootstrap, new_bootstrap)
 
-    async function carregar() {
-      // usuário ainda não entrou: fica no login, mas carrega estado local para
-      // não perder dados caso ele opte pelo modo visitante em seguida.
-      if (!userEmail && !visitorMode) {
-        setScreen({ name: "login" });
-        const local = await getStorage("mk-state-v1");
-        if (!cancelled && local) setState(migrate(local));
-        return;
-      }
-
-      const [localRaw, cloudRaw] = await Promise.all([
-        getStorage("mk-state-v1"),
-        userEmail ? loadStateFromCloud() : Promise.resolve(null),
-      ]);
-      const escolhido = escolherSaveMaisRecente(localRaw as any, cloudRaw as any);
-      const loaded = migrate(escolhido || defaultState());
-      if (cancelled) return;
-
-      setState(loaded);
-      stateRef.current = loaded;
-      await setStorage("mk-state-v1", loaded);
-      if (loaded.kids.length === 0) setScreen({ name: "setup" });
-      else setScreen({ name: "pick" });
-    }
-
-    void carregar();
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, userEmail, visitorMode]);'''
-new_effect = '''  useEffect(() => {
-    if (authLoading) return;
-    let cancelled = false;
-
-    async function carregar() {
-      const currentUser = auth.currentUser;
-      if (!currentUser || (!userEmail && !visitorMode)) {
-        setState(defaultState());
-        stateRef.current = defaultState();
-        setScreen({ name: "login" });
-        return;
-      }
-
-      const uid = currentUser.uid;
-      const scopedKey = stateKeyForUid(uid);
-      const [scopedRaw, legacyRaw, cloudRaw] = await Promise.all([
-        getStorage(scopedKey),
-        getStorage(LEGACY_STATE_KEY),
-        loadStateFromCloud(),
-      ]);
-      const legacyOwner = localStorage.getItem(LEGACY_STATE_OWNER_KEY);
-      const bootstrap = resolveBootstrapState({
-        uid,
-        scopedLocalRaw: scopedRaw,
-        legacyLocalRaw: legacyRaw,
-        legacyOwnerUid: legacyOwner,
-        cloudRaw,
-        migrate,
-        fresh: defaultState,
-      });
-      if (cancelled || auth.currentUser?.uid !== uid) return;
-
-      const loaded = bootstrap.state;
-      setState(loaded);
-      stateRef.current = loaded;
-      await setStorage(scopedKey, loaded);
-      if (bootstrap.claimLegacy) localStorage.setItem(LEGACY_STATE_OWNER_KEY, uid);
-      if (bootstrap.shouldUploadCloud) nuvem.agendar(loaded, uid);
-
-      if (loaded.kids.length === 0) setScreen({ name: "setup" });
-      else setScreen({ name: "pick" });
-    }
-
-    void carregar();
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, userEmail, visitorMode]);'''
-if s.count(old_effect) != 1:
-    raise SystemExit(f"App: efeito bootstrap esperado 1x, encontrado {s.count(old_effect)}x")
-s = s.replace(old_effect, new_effect)
-
-old_persist = '''  const persist = (s: State, cloud = false) => {
-    const carimbado = carimbar(s);
-    setState(carimbado);
-    stateRef.current = carimbado;
-    setStorage("mk-state-v1", carimbado).catch(console.error);
-    if (cloud) nuvem.agendar(carimbado);
-  };'''
-new_persist = '''  const persist = (s: State, cloud = false) => {
-    const carimbado = carimbar(s);
-    setState(carimbado);
-    stateRef.current = carimbado;
-    const uid = auth.currentUser?.uid;
-    if (!uid) {
-      console.warn("Persistência ignorada sem usuário Firebase ativo.");
-      return;
-    }
-    setStorage(stateKeyForUid(uid), carimbado).catch(console.error);
-    if (cloud) nuvem.agendar(carimbado, uid);
-  };'''
+old_persist = '''  const persist = (s: State, imediato = false) => {\n    // O MESMO carimbo vai para os dois destinos, senão a comparação da abertura\n    // acusaria conflito a cada gravação bem-sucedida.\n    const carimbado = carimbar(s);\n    setState(carimbado);\n\n    // O aparelho grava SEMPRE, a cada questão: é o save que a criança usa, e é\n    // ele que vence na reconciliação por ser o mais recente.\n    (async () => {\n      try {\n        await setStorage("mk-state-v1", JSON.stringify(carimbado));\n      } catch (e) {\n        console.error("Não consegui gravar o progresso local:", e);\n      }\n    })();\n\n    // A nuvem é cópia de segurança e pode esperar. Reescrever o save inteiro a\n    // cada questão subia ~1,2 MB por missão para mudar meia dúzia de números.\n    nuvem.agendar(carimbado);\n    if (imediato) void nuvem.descarregar();\n  };'''
+new_persist = '''  const persist = (s: State, imediato = false) => {\n    const carimbado = carimbar(s);\n    setState(carimbado);\n    const uid = auth.currentUser?.uid;\n    if (!uid) {\n      if (E2E) void setStorage(LEGACY_STATE_KEY, JSON.stringify(carimbado));\n      return;\n    }\n    void setStorage(stateKeyForUid(uid), JSON.stringify(carimbado)).catch((e) => {\n      console.error("Não consegui gravar o progresso local:", e);\n    });\n    nuvem.agendar(carimbado, uid);\n    if (imediato) void nuvem.descarregar();\n  };'''
 if s.count(old_persist) != 1:
     raise SystemExit(f"App: persist esperado 1x, encontrado {s.count(old_persist)}x")
 s = s.replace(old_persist, new_persist)
 
-old_login = '''  const handleLoginSuccess = (email: string, cloudState: State | null) => {
-    setUserEmail(email);
-    setVisitorMode(email === "visitante");
-    const loaded = cloudState ? migrate(cloudState) : defaultState();
-    persist(loaded, true);
-    if (loaded.kids.length === 0) setScreen({ name: "setup" });
-    else setScreen({ name: "pick" });
-  };'''
-new_login = '''  const handleLoginSuccess = (email: string) => {
-    // Autenticação escolhe a identidade; o efeito de bootstrap é o ÚNICO lugar
-    // que carrega/migra/reconcilia estado. Nunca instalar default aqui.
-    setUserEmail(email);
-  };'''
+old_login = '''  const handleLoginSuccess = (email: string, cloudState: State | null) => {\n    setUserEmail(email);\n    if (cloudState) {\n      persist(migrate(cloudState), true);\n    } else {\n      // If there's no cloud state for this new user, start completely fresh with a clean slate!\n      const fresh = defaultState();\n      persist(fresh, true);\n      setScreen({ name: "setup" });\n    }\n  };'''
+new_login = '''  const handleLoginSuccess = (email: string) => {\n    // Identidade muda aqui; estado é instalado exclusivamente pelo bootstrap.\n    setUserEmail(email);\n  };'''
 if s.count(old_login) != 1:
     raise SystemExit(f"App: handleLoginSuccess esperado 1x, encontrado {s.count(old_login)}x")
 s = s.replace(old_login, new_login)
 
-old_trigger = '''          onTriggerLogin={() => {
-            setUserEmail(null);
-            setVisitorMode(false);
-            setScreen({ name: "login" });
-          }}'''
-new_trigger = '''          onTriggerLogin={() => {
-            // Mantém o usuário anônimo vivo para `linkWithPopup` preservar UID
-            // e progresso ao tocar “Salvar Nuvem”.
-            setScreen({ name: "login" });
-          }}'''
+old_logout = '''  const handleLogout = () => {\n    logoutUser();\n    setUserEmail(null);\n    setVisitorMode(false);\n    if (typeof window !== "undefined" && window.localStorage) {\n      window.localStorage.removeItem("mk-visitor-mode");\n    }\n    setState(defaultState());\n    setScreen({ name: "login" });\n  };'''
+new_logout = '''  const handleLogout = async () => {\n    // O último save sobe enquanto o UID antigo ainda é o usuário atual.\n    await nuvem.descarregar();\n    await logoutUser();\n    setUserEmail(null);\n    setVisitorMode(false);\n    if (typeof window !== "undefined" && window.localStorage) {\n      window.localStorage.removeItem("mk-visitor-mode");\n    }\n    setState(defaultState());\n    setScreen({ name: "login" });\n  };'''
+if s.count(old_logout) != 1:
+    raise SystemExit(f"App: logout esperado 1x, encontrado {s.count(old_logout)}x")
+s = s.replace(old_logout, new_logout)
+
+old_trigger = '''            onTriggerLogin={() => {\n              setUserEmail(null);\n              setVisitorMode(false);\n              if (typeof window !== "undefined" && window.localStorage) {\n                window.localStorage.removeItem("mk-visitor-mode");\n              }\n              setScreen({ name: "login" });\n            }}'''
+new_trigger = '''            onTriggerLogin={() => {\n              // Mantém o Firebase anônimo vivo: login Google poderá LINKAR o\n              // mesmo UID e preservar o save local/cloud dessa família.\n              setScreen({ name: "login" });\n            }}'''
 if s.count(old_trigger) != 1:
     raise SystemExit(f"App: onTriggerLogin esperado 1x, encontrado {s.count(old_trigger)}x")
 s = s.replace(old_trigger, new_trigger)
-
-old_logout = '''          onLogout={() => {
-            logoutUser();
-            setUserEmail(null);
-            setVisitorMode(false);
-            setScreen({ name: "login" });
-          }}'''
-new_logout = '''          onLogout={async () => {
-            // Faz o último flush enquanto o UID antigo ainda é o usuário atual.
-            await nuvem.descarregar();
-            await logoutUser();
-            setUserEmail(null);
-            setVisitorMode(false);
-            const fresh = defaultState();
-            setState(fresh);
-            stateRef.current = fresh;
-            setScreen({ name: "login" });
-          }}'''
-if s.count(old_logout) != 1:
-    raise SystemExit(f"App: onLogout esperado 1x, encontrado {s.count(old_logout)}x")
-s = s.replace(old_logout, new_logout)
 p.write_text(s)
 
 # ---------------------------------------------------------------------------
-# 6) Guardas estáticos: bloqueiam retorno das duas falhas mais perigosas.
+# 6) Guardas estáticos contra regressão da identidade do save.
 # ---------------------------------------------------------------------------
-Path("src/lib/storageIsolationContract.test.ts").write_text('''import { readFileSync } from "node:fs";
+Path("src/lib/storageIsolationContract.test.ts").write_text(r'''import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 describe("P20 — contrato de isolamento de conta", () => {
-  it("App não volta a persistir no mk-state-v1 global", () => {
+  it("App não volta a persistir produção na chave global", () => {
     const app = readFileSync(join(process.cwd(), "src/App.tsx"), "utf8");
     expect(app).toContain("stateKeyForUid(uid)");
     expect(app).not.toMatch(/setStorage\(\s*["']mk-state-v1["']/);
@@ -639,16 +556,22 @@ describe("P20 — contrato de isolamento de conta", () => {
     expect(match?.[0]).not.toContain("defaultState(");
   });
 
-  it("upgrade Google usa linkWithPopup quando já existe usuário anônimo", () => {
+  it("upgrade Google usa linkWithPopup quando existe usuário anônimo", () => {
     const firebase = readFileSync(join(process.cwd(), "src/lib/firebase.ts"), "utf8");
-    expect(firebase).toMatch(/anonymous[\s\S]*?linkWithPopup\(anonymous, provider\)/);
+    expect(firebase).toMatch(/anonymous[\s\S]*?linkWithPopup\(anonymous, googleProvider\)/);
   });
 
   it("save cloud verifica o UID que originou o trabalho", () => {
     const firebase = readFileSync(join(process.cwd(), "src/lib/firebase.ts"), "utf8");
     expect(firebase).toContain("expectedUid && user.uid !== expectedUid");
   });
+
+  it("troca de auth cancela apenas o trabalho do UID anterior", () => {
+    const app = readFileSync(join(process.cwd(), "src/App.tsx"), "utf8");
+    expect(app).toContain("authUidRef.current !== nextUid");
+    expect(app).toContain("nuvem.cancelarPendencia()");
+  });
 });
 ''')
 
-print("P20 identity patch preparado")
+print("P20 identity v2 preparado para o runtime atual")
