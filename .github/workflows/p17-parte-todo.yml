@@ -1,0 +1,65 @@
+name: P17 - arquitetura parte-todo
+
+on:
+  push:
+    branches:
+      - codex/integrar-bloco-f0
+    paths:
+      - .github/workflows/p17-parte-todo.yml
+
+permissions:
+  contents: write
+
+jobs:
+  resolver:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Aplicar arquitetura P17
+        run: python AI_Studio_Lab/tools/p17_apply.py
+
+      - name: Verificar diff textual
+        run: git diff --check
+
+      - name: Auditoria do catalogo
+        run: npm run auditar
+
+      - name: Auditoria das fichas
+        run: npm run fichas:auditar
+
+      - name: Sincronia do grafo
+        run: npm run grafo:check
+
+      - name: TypeScript
+        run: npm run lint
+
+      - name: Testes focais P17
+        run: npx vitest run src/curriculum/fichas/jornada/parteTodoProgressao.test.ts src/curriculum/motores/progressEngine.test.ts
+
+      - name: Suite completa
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+      - name: Publicar lote aprovado
+        run: |
+          rm AI_Studio_Lab/tools/p17_apply.py .github/workflows/p17-parte-todo.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'P17: compoe parte-todo e dominio por sessoes'
+          git push origin HEAD:codex/integrar-bloco-f0
