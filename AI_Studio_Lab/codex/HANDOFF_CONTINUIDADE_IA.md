@@ -1,30 +1,23 @@
 # Handoff de continuidade — SAGA / branch cumulativa
 
-> **VIGENTE — 8/ago/2026, após P17 + P8 Jardim.**
+> **VIGENTE — 8/ago/2026, após P17 + P8 + P19.**
 >
-> Este é o ponto de entrada operacional de qualquer nova sessão. O repositório é a fonte de verdade. Leia este arquivo, `BRIEFING_CODEX.md`, as decisões P17/P8 e a PR #29 antes de editar.
+> Este é o ponto de entrada operacional de qualquer nova sessão. Leia este arquivo, `BRIEFING_CODEX.md`, as decisões P17/P8/P19 e a PR #29 antes de editar. O repositório é a fonte de verdade.
 
-## 1. Regra de ouro
+## 1. Regra de ouro / Git
 
-- Repositório: `dyegorodrigues/SAGA`.
-- **Não mover, mesclar nem trabalhar na `main`.**
-- `main` protegida: `68fad4c575e28959b2ca4776e9a541d6828b63f3`.
-- Linha cumulativa: **`codex/integrar-bloco-f0`**.
-- PR #29: **draft**, base `main`, somente comparação/CI; nunca mesclar nem ativar auto-merge.
-- Creature Engine continua fora deste fluxo.
+- Repo: `dyegorodrigues/SAGA`.
+- Linha única de trabalho: **`codex/integrar-bloco-f0`**.
+- `main` protegida e imóvel: `68fad4c575e28959b2ca4776e9a541d6828b63f3`.
+- Comparação mais recente: cumulativa **266 commits à frente / 0 atrás** da `main`.
+- PR #29: **open + draft**, base `main`, só comparação/CI; nunca mesclar nem ativar auto-merge.
+- Não tocar nas branches independentes do Creature Engine:
+  - `agent/creature-engine-tamagotchi`
+  - `codex/criar-branch-para-creature-engine-tamagotchi`
+- Não criar branches auxiliares para esta linha.
+- Workflows/scripts temporários devem se apagar no commit que publicam.
 
-### Branches que devem permanecer
-
-1. `main`
-2. `codex/integrar-bloco-f0`
-3. `agent/creature-engine-tamagotchi`
-4. `codex/criar-branch-para-creature-engine-tamagotchi`
-
-As duas últimas pertencem ao Creature Engine e não devem ser tocadas aqui. Os refs auxiliares históricos desta linha já foram removidos depois de provar absorção/reconciliação.
-
----
-
-## 2. P17 — parte-todo / amigos do 10 RESOLVIDA
+## 2. P17 — RESOLVIDA
 
 Documento: `DECISAO_P17_N110.md`.
 
@@ -32,125 +25,134 @@ Documento: `DECISAO_P17_N110.md`.
 
 `JD5 perceptual → retirada real da moldura → NumberBond`
 
-- L4 alterna moldura e objetos realmente soltos;
-- `SEM_MOLDURA` é gate obrigatório antes de L5;
-- `TOTAL_ALEM_DE_CINCO` continua evidência independente de domínio;
-- N1.10 revalidada com gate real em `37595c73795b45c9e16075749bae51690c5d77ac` — CI normal verde.
+- L4 alterna apoio com moldura e objetos realmente soltos;
+- `SEM_MOLDURA` é gate antes de L5;
+- `TOTAL_ALEM_DE_CINCO` é evidência independente de domínio;
+- revalidação com gate real: `37595c73795b45c9e16075749bae51690c5d77ac` — CI normal verde.
 
 ### N1.11
 
 `JD3 perceptual → F28 NumberBond → n + □ = 10`
 
-- revalidada sobre N1.10 ativa em `ab5b3b613a3226076b1d967a48cc99ba6c8b50c9` — CI normal verde;
-- microtexto corrigido para “mais quanto **dá** dez?” em `e285429745da01478f95269bf683b5a4e6cd675a`.
+- revalidada sobre N1.10 ativa: `ab5b3b613a3226076b1d967a48cc99ba6c8b50c9` — CI normal verde;
+- microtexto “mais quanto dá dez?” corrigido em `e285429745da01478f95269bf683b5a4e6cd675a`.
 
-### Regra estrutural
+### Invariantes
 
-Representações diferentes da mesma estrutura não viram nós paralelos. A Jornada faz a ponte conceitual; o Jardim preserva a automaticidade perceptual.
+- representações da mesma competência não viram nós paralelos;
+- Jornada faz a ponte conceitual;
+- Jardim preserva automaticidade perceptual;
+- `MasteryRule` executa `acertos/de/sessoes` da ficha;
+- `rt_alvo` é telemetria/fluência, não reprovação conceitual da Jornada.
 
-`MasteryRule` (`acertos/de/sessoes`) agora é executável pelo motor. `rt_alvo` permanece telemetria/fluência e não reprova compreensão na Jornada.
+## 3. P8 — JARDIM DO DOJO RESOLVIDA
 
----
+Documento: `DECISAO_P8_JARDIM.md`.
 
-## 3. P8 — Jardim do Dojo RESOLVIDA
+Catálogo implementado:
 
-Documento de decisão:
+- JD1 → N1.03
+- JD2 → N1.08
+- JD3 → N1.11
+- JD5 → N1.10
 
-`AI_Studio_Lab/codex/DECISAO_P8_JARDIM.md`
+JD4 continua dívida separada.
 
-### 3.1 O defeito original
+### Arquitetura
 
-A UI chamada “Dojo Garden” não usava `JARDIM`: mostrava genericamente trilhas da Jornada por estrelas, com seletor manual de nível e estatísticas contaminadas por `state.progress`.
-
-### 3.2 Arquitetura final
-
-JD implementadas:
-
-- JD1 → N1.03;
-- JD2 → N1.08;
-- JD3 → N1.11;
-- JD5 → N1.10.
-
-Todas abrem quando a mãe já conquistou nível 3 (`maxLvl >= 3`) ou domínio. JD4 continua dívida separada.
-
-**JD não é nó do DAG.**
-
-- Jornada = compreensão;
-- Jardim = automaticidade pré-simbólica;
-- estado do Jardim = `state.dojoTracks[kidId][JD*]`;
-- nunca criar `state.progress[kidId][JD*]`.
-
-### 3.3 Motor
-
-`jardimEngine.ts`:
-
-- rounds 6–10; runtime atual 8;
-- promoção exige precisão ≥80% **e** fluência dentro do `rt_alvo` ≥80%;
-- dois rounds bons → avança;
-- dois bons no topo → `mastered/reflexo`;
-- dois rounds <60% → recua o treino, sem retirar `highestStep`;
-- acerto lento mantém compreensão, mas não promove automaticidade;
-- lentidão nunca é `misconception`.
+- JD não entra no DAG;
+- desbloqueio deriva da competência-mãe já ter conquistado nível 3 (`maxLvl >= 3`) ou domínio;
+- estado de automaticidade vive em `state.dojoTracks[kidId][JD*]`;
+- **nunca** criar `state.progress[kidId][JD*]`;
+- GameLoop em `progressionMode="garden"` compartilha UI/voz/retry, mas não chama `applyJourneyAnswer`;
+- round atual: 8 itens (contrato 6–10);
+- 2 rounds ≥80% precisão **e** ≥80% fluência → avança;
+- 2 rounds <60% → recua `currentStep`, sem retirar `highestStep`;
+- acerto lento preserva compreensão e não vira `misconception`;
+- primeira resposta cognitiva mede automaticidade;
+- erro conceitual real alimenta Radar da mãe.
 
 Motor puro: `5b22e6d4594db68c3f86414dccd18c40faf49619`.
 
-### 3.4 Sessão / GameLoop / save
+### Cânone/UI/QA
 
-`jardimSession.ts` é a ponte explícita JD→Track.
+- `DOJO_SAGA.md` v1.5 reconciliou JD5 com N1.10/parte-todo: `3ec25a4007c0e79b89bafcb7887bf270000ca545`;
+- `DojoTab` consome `JARDIM` diretamente, sem level picker e sem estrelas como chave de unlock;
+- teste permanente cobre unlock, stats, currentStep/highestStep e ausência do Garden CRA;
+- primeira sonda reprovou contraste; componente foi corrigido, não o fiscal;
+- sonda final passou 320/390/900;
+- PNGs 320 inspecionados manualmente;
+- QA visual permanente: `21ab21e6c4d7465f66a37136dc15b68970c1f795`;
+- caminho CRA morto removido: `37a03a8bbf9d33221b8a3c75c7f8b847fdffbf97`.
 
-GameLoop ganhou `progressionMode="garden"`:
+A UI funcional/pedagógica está validada; **não é declaração de arte premium final**.
 
-- compartilha renderer/voz/retry;
-- **não chama `applyJourneyAnswer`**;
-- congela o degrau durante o round;
-- não usa banco/Leitner/coroa da Jornada;
-- aplica `applyJardimRound` apenas no final.
+## 4. P19 — ESTADO E DEPENDÊNCIAS RESOLVIDA
 
-O App salva o round atomicamente em `dojoTracks`. Erros cognitivos reais atualizam o Radar da competência-mãe; recuperar uma questão depois de erro real não transforma a primeira resposta em acerto de automaticidade.
+Documento: `DECISAO_P19_ESTADO_E_DEPENDENCIAS.md`.
+Relatório npm: `AUDITORIA_P19_DEPENDENCIAS.md`.
 
-O fiscal `portaDosFundos.test.ts` conhece `jardimSession.ts` como porta autoral explícita porque JD não substitui nó/legado do DAG. Qualquer nova porta continua quebrando o fiscal.
+### 4.1 Migrador único
 
-### 3.5 Cânone reconciliado
+O projeto tinha dois migradores divergentes:
 
-`DOJO_SAGA.md` foi elevado para v1.5 em `3ec25a4007c0e79b89bafcb7887bf270000ca545`:
+- `App.tsx` continha o migrador realmente usado;
+- `src/utils/migrator.ts` existia, mas não era consumidor ativo e era semanticamente incompleto.
 
-- JD5 passa a mãe N1.10 e parte-todo;
-- definição antiga de “chegaram mais” fica histórica e precisa de destino próprio se reaproveitada;
-- família de dados admite JD;
-- unlock e regra de rounds ficam explícitos.
+Agora existe **uma única fonte de migração** em `src/utils/migrator.ts`; o App importa `migrate`, `defaultState` e `localDay`.
 
-### 3.6 UI real e QA
+Commit funcional:
 
-`DojoTab` agora consome `JARDIM` diretamente:
+`86ecea6b932ee174f81f9b2914d3ffade9088798`
 
-- quatro cartões JD reais;
-- lock pela mãe, não por estrelas/cache;
-- sem seletor manual de nível;
-- treino atual × melhor conquista;
-- `Reflexo` pode coexistir com treino recuado;
-- estatísticas do Jardim vêm de `dojoTracks`.
+Testes permanentes provam:
 
-Teste permanente: `src/components/home/DojoTab.test.tsx`.
+- save v1 antigo;
+- `dojoTracks` presente/ausente;
+- wallet antigo e derivação por estrelas;
+- `bank`, `maxLvl`, coroas legadas;
+- defaults/pet/energia;
+- payload bruto não é mutado;
+- App não pode voltar a declarar outro `migrate/defaultState`.
 
-Sonda permanente cobre:
+Não houve bump de `schemaVersion` nem mudança deliberada do formato externo do save.
 
-1. tudo bloqueado;
-2. JD1/JD2 abertas;
-3. progresso avançado/reflexos.
+### 4.2 Dependências npm
 
-A primeira sonda falhou por contraste; o componente foi corrigido, não o fiscal. Depois passou em 320/390/900. PNGs 320 foram inspecionados manualmente.
+Auditoria separou árvore completa e `--omit=dev` e mapeou a cadeia de cada advisory.
 
-QA visual permanente: `21ab21e6c4d7465f66a37136dc15b68970c1f795`.
+Vulnerabilidades iniciais:
 
-Caminho CRA antigo/remanescentes mortos removidos em:
+- `js-yaml` 5.2.1 — HIGH, dev-only;
+- `nanoid` 3.3.15 — HIGH, via PostCSS;
+- `postcss` 8.5.16 — HIGH, build tooling Vite/Tailwind;
+- `body-parser` 1.20.5 — LOW, via Express/runtime servidor.
 
-`37a03a8bbf9d33221b8a3c75c7f8b847fdffbf97`.
+Remediação conservadora: **somente lockfile**, dentro das ranges já declaradas; nenhum `npm audit fix` e nenhum major.
 
-**A informação pedagógica/operacional está validada; a UI atual não é declaração de arte premium final.**
+Resoluções finais:
 
----
+- `js-yaml` 5.2.3
+- `nanoid` 3.3.18
+- `postcss` 8.5.26
+- `body-parser` 1.20.6
 
-## 4. Canários F0 ativos/revalidados nesta retomada
+Commit:
+
+`bd17e42d55eae3bbff1afd08f137ea001f76b91e`
+
+Provas antes de publicar:
+
+- `rm -rf node_modules && npm ci` OK;
+- audit completo = **0 vulnerabilidades**;
+- audit produção = **0 vulnerabilidades**;
+- auditorias SAGA/grafo/TS/suíte completa/build = verdes.
+
+Decisão consolidada em `5de9cb1aa5c7114aff93a8028ff0205a002d9f47`.
+
+As quatro workflows temporárias P19 foram conferidas e estão removidas no head.
+
+## 5. Canários F0 ativos/revalidados
 
 Além dos históricos:
 
@@ -169,93 +171,64 @@ Lista declarativa única:
 
 Promoção futura = **um id por commit**.
 
----
-
-## 5. F50 / GM.12 — pronta tecnicamente, ainda em observação
+## 6. GM.12 / F50 — ainda em observação
 
 Matriz:
 
-`GM.01 comparação direta visível` → **GM.12 massa/capacidade: comparação e conservação** → `GM.05 medidas padronizadas`
+`GM.01 comparação direta visível → GM.12 massa/capacidade: comparação e conservação → GM.05 medidas padronizadas`
 
-- grafo: 90 nós;
-- GM.12 registrada em `COMPOSER_FICHAS`, fora dos canários;
+- GM.12 implementada, registrada e visualmente revisada;
+- fora dos canários por decisão deliberada;
 - `Recipientes` executável;
 - pendências homônimas: `Moedas`, `Regua`;
 - F50 é pré-unidade, sem g/kg, L/mL ou cm/m.
 
-**Não promover GM.12 por momentum.** Reavaliar em lote deliberado posterior.
+**Não promover GM.12 por momentum.**
 
----
+## 7. P18 — fechada
 
-## 6. P18 — fechada
+`KindType` autoral só contém kinds com builder; zero exceções. Legado continua em `Question.kind` string.
 
-`KindType` autoral só contém kinds com builder. Zero exceções. Legado continua em `Question.kind` string.
+Documentos: `AUDITORIA_P18_KINDS.md` e `DECISAO_P18_KINDTYPE.md`.
 
-Documentos:
+## 8. Próxima frente — P20: reconciliação local × nuvem
 
-- `AUDITORIA_P18_KINDS.md`
-- `DECISAO_P18_KINDTYPE.md`
+P17/P8/P19 estão fechadas. Não reabrir sem falha objetiva.
 
----
+### Anomalia já observada
 
-## 7. QA visual — interpretação
+`App.tsx` importa:
 
-ZIP de sonda não é mockup final. Pode conter rollback, fases intermediárias e componentes novos.
+```ts
+loadStateFromCloud
+reconcileStateByRevision
+saveStateToCloud
+```
 
-- sonda/layout aprovados ≠ direção artística premium aprovada;
-- sempre ler nome/fase da cena antes de interpretar screenshot;
-- falha visual objetiva deve corrigir o componente, não afrouxar o fiscal.
+de `./services/storageSync`.
 
----
+O conector GitHub não conseguiu resolver diretamente `src/services/storageSync.ts`, `.tsx` nem o diretório `src/services`, **mas TypeScript/build passam**. Portanto não concluir “arquivo ausente” sem inventário real do checkout.
 
-## 8. Próxima frente deliberada — integridade de estado, migração e dependências
+### Auditoria P20 deve responder antes de editar persistência
 
-P17/P8 estão fechadas. Não reabrir sem falha objetiva.
+1. qual arquivo real resolve `./services/storageSync`;
+2. todos os consumidores de `loadStateFromCloud`, `saveStateToCloud`, `reconcileStateByRevision`;
+3. regra exata de precedência por `revision`;
+4. empate de revisão e payloads divergentes;
+5. se o estado inteiro viaja junto (`dojoTracks`, progress, inventory, customTracks, coins, album, log etc.);
+6. ordem correta: migração antes/depois da reconciliação;
+7. comportamento offline → reconexão;
+8. mensagens do service worker (`SAVE_REQUEST` etc.);
+9. se payload stale/equal revision pode apagar campo novo;
+10. testes existentes/ausentes para conflitos.
 
-### 8.1 Auditoria de migração/estado
+**P20 começa read-only/audit-first. Não alterar persistência antes da prova.**
 
-Há uma suspeita que precisa ser provada antes de editar:
+## 9. QA visual — regra de leitura
 
-- `src/App.tsx` possui sua própria função `migrate`;
-- `src/utils/migrator.ts` existe como outro migrador;
-- busca inicial não encontrou import ativo desse utilitário.
+ZIP de sonda pode conter rollback, fases intermediárias e representações novas. Sonda/layout aprovados ≠ direção artística premium aprovada. Falha objetiva deve corrigir componente, nunca afrouxar fiscal.
 
-Próximo passo: mapear todos os consumidores e diferenças. Só então decidir consolidar, remover ou testar. **Não apagar migrador por aparência de código morto.**
-
-Itens obrigatórios da auditoria:
-
-- `dojoTracks` em saves antigos/novos;
-- add/delete/reset de criança;
-- defaults e compatibilidade v1;
-- imports/rotas reais do migrador;
-- duplicação de regra entre App e utilitário;
-- testes de migração existentes/ausentes.
-
-### 8.2 Auditoria de dependências
-
-`npm ci` vem reportando vulnerabilidades (na última observação: 1 low, 3 high).
-
-Executar `npm audit` e identificar:
-
-- pacote exato;
-- cadeia direta/transitiva;
-- se entra em runtime ou só dev/CI;
-- versão corrigida;
-- risco de breaking change.
-
-**Não rodar `npm audit fix` cegamente.** Qualquer atualização passa pela suíte/build e, se afetar runtime visual, sonda.
-
-### 8.3 Depois disso
-
-Só então escolher entre:
-
-- correção de integridade/migração/dependência realmente necessária;
-- reavaliação deliberada de GM.12;
-- próxima faixa/primitiva quando virar gargalo real.
-
----
-
-## 9. Portões de qualquer lote
+## 10. Portões
 
 ```bash
 npm run auditar
@@ -269,27 +242,18 @@ npm run pr:check
 git diff --check
 ```
 
-Tela afetada:
+Tela afetada também exige sonda/prints reais.
 
-```bash
-npm run sonda -- "<ID>"
-PRINTS_LARGURA=320 PRINTS_WAIT_MS=<estado> node scripts/prints.mjs "<ID>"
-```
-
----
-
-## 10. O que NÃO fazer
+## 11. Não fazer
 
 - não tocar na `main`;
-- não recriar branches históricas;
-- não tocar nas branches do Creature Engine;
-- não reabrir P17/P8 sem evidência;
+- não tocar Creature Engine;
+- não reabrir P17/P8/P19 por curiosidade;
 - não criar `progress[JD*]`;
-- não transformar lentidão em erro conceitual;
-- não reintroduzir o Garden CRA genérico;
-- não promover GM.12 por conveniência;
-- não apagar migrador suspeito sem provar consumidores;
-- não aplicar correção de dependência automática sem analisar impacto;
+- não reintroduzir Garden CRA;
+- não promover GM.12 no embalo;
+- não mudar regra de sync antes da auditoria P20;
+- não usar igualdade de `revision` como desempate sem provar semântica atual;
 - não tratar sonda como arte final;
 - não deixar workflow/script temporário órfão.
 
