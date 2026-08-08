@@ -25,6 +25,35 @@ jd4Test = once(jd4Test,
 );
 fs.writeFileSync(jd4TestPath, jd4Test);
 
+const dojoTabPath = "src/components/home/DojoTab.tsx";
+let dojoTab = fs.readFileSync(dojoTabPath, "utf8");
+dojoTab = once(dojoTab,
+`  JD3: {
+    title: "Moldura Relâmpago",
+    description: "Veja o vazio que falta para completar dez.",
+    mother: "amigos do 10",
+  },
+  JD5: {`,
+`  JD3: {
+    title: "Moldura Relâmpago",
+    description: "Veja o vazio que falta para completar dez.",
+    mother: "amigos do 10",
+  },
+  JD4: {
+    title: "O Passo Seguinte",
+    description: "Responda o vizinho do número sem voltar a contar desde o um.",
+    mother: "ordem, antes e depois",
+  },
+  JD5: {`,
+  "copy específico JD4",
+);
+dojoTab = once(dojoTab,
+  'Treinos curtos para o olho e a imagem mental. O tempo é medido em silêncio — você só precisa pensar e brincar.',
+  'Treinos curtos para transformar o que você já entendeu em reflexo. O tempo é medido em silêncio — você só precisa pensar e brincar.',
+  "copy geral Jardim",
+);
+fs.writeFileSync(dojoTabPath, dojoTab);
+
 const dojoTabTestPath = "src/components/home/DojoTab.test.tsx";
 let dojoTabTest = fs.readFileSync(dojoTabTestPath, "utf8");
 dojoTabTest = once(dojoTabTest,
@@ -39,8 +68,8 @@ dojoTabTest = once(dojoTabTest,
 );
 dojoTabTest = once(dojoTabTest,
   'expect(screen.getByText("4")).toBeTruthy();\n    expect(screen.getByText("75%")).toBeTruthy();\n    expect(screen.getByText("1/4")).toBeTruthy();',
-  'expect(screen.getByText("5")).toBeTruthy();\n    expect(screen.getByText("75%")).toBeTruthy();\n    expect(screen.getByText("1/5")).toBeTruthy();',
-  "estatísticas com cinco trilhas",
+  'expect(screen.getByText("4")).toBeTruthy();\n    expect(screen.getByText("75%")).toBeTruthy();\n    expect(screen.getByText("1/5")).toBeTruthy();',
+  "estatísticas derivadas dos dojoTracks com cinco trilhas no denominador",
 );
 fs.writeFileSync(dojoTabTestPath, dojoTabTest);
 
