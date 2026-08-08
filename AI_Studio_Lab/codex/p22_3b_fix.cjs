@@ -73,5 +73,68 @@ dojoTabTest = once(dojoTabTest,
 );
 fs.writeFileSync(dojoTabTestPath, dojoTabTest);
 
+const sondaPath = "sonda/cenas.tsx";
+let sonda = fs.readFileSync(sondaPath, "utf8");
+sonda = once(
+  sonda,
+  'import { JD3, JD5 } from "../src/curriculum/fichas/dojo/jardim";',
+  'import { JD3, JD4, JD5 } from "../src/curriculum/fichas/dojo/jardim";',
+  "import JD4 na sonda",
+);
+sonda = once(
+  sonda,
+`  } : {
+    "N1.03": progressoP8(3, 5),
+    "N1.08": progressoP8(4, 5),
+    "N1.11": progressoP8(3, 3),
+    "N1.10": progressoP8(3, 4),
+  };`,
+`  } : {
+    "N1.03": progressoP8(3, 5),
+    "N1.08": progressoP8(4, 5),
+    "N1.11": progressoP8(3, 3),
+    "N1.07": progressoP8(3, 4),
+    "N1.10": progressoP8(3, 4),
+  };`,
+  "N1.07 mãe desbloqueando JD4 na cena avançada",
+);
+sonda = once(
+  sonda,
+`    JD3: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 2, highestStep: 2,
+      goodRounds: 0, weakRounds: 0, rounds: 4, attempts: 32, correct: 26,
+    },
+    JD5: {`,
+`    JD3: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 2, highestStep: 2,
+      goodRounds: 0, weakRounds: 0, rounds: 4, attempts: 32, correct: 26,
+    },
+    JD4: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 4, highestStep: 4,
+      goodRounds: 1, weakRounds: 0, rounds: 6, attempts: 48, correct: 41,
+    },
+    JD5: {`,
+  "dojoTracks JD4 na sonda",
+);
+sonda = once(
+  sonda,
+`  {
+    nome: "P8 Jardim home — progresso avancado e reflexos",
+    render: () => <JardimProbe modo="advanced" />,
+  },
+  ...[1, 2, 3, 4, 5].map(lvl => ({`,
+`  {
+    nome: "P22.3B JD4 Jardim home — cinco trilhas e progresso avançado",
+    render: () => <JardimProbe modo="advanced" />,
+  },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: \`P22.3B JD4 exercício (nível \${lvl})\`,
+    render: (s: number) => <ExercicioDaFicha ficha={JD4} lvl={lvl} semente={s} />,
+  })),
+  ...[1, 2, 3, 4, 5].map(lvl => ({`,
+  "cenas visuais JD4",
+);
+fs.writeFileSync(sondaPath, sonda);
+
 fs.rmSync(self, { force: true });
-console.log("[P22.3B/fix] invariantes ajustados e fix temporário auto-removido");
+console.log("[P22.3B/fix] invariantes, UI e sonda JD4 ajustados; fix temporário auto-removido");
