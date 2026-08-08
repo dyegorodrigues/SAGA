@@ -62,11 +62,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // F04: novo nó de produzir quantidade; desligado volta ao fallback.
   "N1.13": N1_13,
 
-  // N1.10 foi reescrita para a JD5; continua registrada, mas a promoção dessa
-  // nova semântica é decisão separada do registro.
+  // P17 fechou a ponte perceptual→parte-todo de N1.10/N1.11. Estas são as
+  // fichas correntes já promovidas; ativação/rollback continuam declarados fora
+  // deste registry, em `composerCanaryIds.ts` e `COMPOSER_CANARIES`.
   "N1.10": N1_10,
-
-  // N1.11 tem mais de uma ficha no cânone; esta entrada representa a JD3 atual.
   "N1.11": N1_11,
 
   "AL.01": AL_01,
