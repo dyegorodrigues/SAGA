@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 8/ago/2026. P21 concluída; P22.1 e P22.2 concluídas; próximo passo P22.3A/N1.07.**
+> **VIGENTE — 8/ago/2026. P21 concluída; P22.1, P22.2 e P22.3A concluídas; próximo passo P22.3B/JD4.**
 
 ## Regra de ouro
 
@@ -32,9 +32,10 @@ Roadmaps de 5/ago são históricos.
 - P21.1 — registries/cobertura/proveniência;
 - P21.2 — mapa autoral de primitivas;
 - P22.1 — GM.12 promovida;
-- P22.2 — N4.09 promovida e telemetria de área corrigida.
+- P22.2 — N4.09 promovida e telemetria de área corrigida;
+- P22.3A — N1.07 completa segundo o grafo canônico.
 
-## Estado atual
+## Estado atual após P22.3A
 
 - 90 nós canônicos;
 - 92 fichas Markdown / 88 competências cobertas;
@@ -45,63 +46,62 @@ Roadmaps de 5/ago são históricos.
 - fallback real: **39/90**;
 - primitivas: 20 executáveis, 4 renderer-sem-builder, 1 isolada, 1 ausente.
 
+N1.07 já era ativa, então P22.3A não muda contagem de proveniência; muda a fidelidade semântica do que é servido.
+
 ## P22.1 — GM.12
 
 Gate final `31276881058`: success.
 
-- estreia Composer com rollback para placeholder;
-- sonda 390/320/900 verde;
-- suíte completa: 125 arquivos / 2.145 testes;
-- cleanup: `35493c012b96aaf64e919babba47cc5f5a4171cf`.
-
 ## P22.2 — N4.09
-
-O primeiro gate `31277083778` revelou um bug real: a resposta correta carregava misconception `"correta"`.
-
-A causa foi corrigida na origem:
-
-- `areaProcedure.ts`: resposta correta sem tag;
-- `areaContract.ts`: propaga tags só de distratores;
-- `areaContract.test.ts`: prova acerto sem diagnóstico e erros com hipótese;
-- `canaryContract.test.ts`: N4.09 passou a obedecer ao contrato genérico;
-- `composerCanaryIds.ts`: N4.09 promovida.
 
 Gate final `31277213310`: success.
 
-- focal: 3 arquivos / 339 testes;
-- sonda N4.09 promovida verde;
-- full suite: **125 arquivos / 2.160 testes**;
-- auditores, TypeScript, build, `pr:check` e diff check verdes;
-- cleanup concluído; head pós-limpeza `e259ccd19d10ec00ed6e4a35e2ce24967796d4f1`;
-- PR #29 segue draft/unmerged e a `main` no SHA protegido.
+Invariante permanente: acerto de área não gera misconception; somente distratores carregam hipótese diagnóstica.
 
-## Próximo passo — P22.3A N1.07
+## P22.3A — N1.07
 
-N1.07 canônico é **Ordem, sucessor e antecessor até 10**.
+Commit permanente: `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
+Gate transacional: `31281685349`: success.
 
-Problemas já provados:
+Entregue:
 
-- ficha TS ativa cobre majoritariamente sucessor/+1;
-- falta cobertura equivalente de antecessor e ordenação;
-- prereqs da ficha TS (`N1.04 + N1.06`) divergem do grafo (`N1.02 + N1.06`).
+- faixa F0;
+- prereqs `N1.02 + N1.06`;
+- sucessor até 5 e 10;
+- antecessor até 5 e 10;
+- ordenação de 3–4 numerais;
+- salto negativo range-safe em `numberline` e `plain`;
+- `plain/ordering` opt-in;
+- teste permanente `N1.07.test.ts`;
+- acerto sem misconception e ordenação errada com `ORDEM_ERRADA`;
+- cânone autoral separando compreensão da Jornada e fluência do JD4;
+- TypeScript, suíte, build e sonda real verdes;
+- CI e arquivos temporários restaurados/removidos no mesmo lote.
 
-Sequência:
+## Próximo passo — P22.3B JD4
 
-1. reconstruir o contrato autoral N1.07 pela ficha Markdown/grafo;
-2. reconciliar prereqs;
-3. completar micros de sucessor, antecessor e ordenação;
-4. preservar canário/rollback/telemetria;
-5. validar sonda e gates completos;
-6. só então criar P22.3B/JD4 como automaticidade de N1.07.
+JD4 deve ser registrada no Jardim como **automaticidade de N1.07**, não como nova competência conceitual.
 
-Não usar JD4 para compensar ensino conceitual ausente.
+Contrato obrigatório:
+
+1. `mae: "N1.07"`;
+2. `destravaNoNivel` coerente com compreensão suficiente da mãe;
+3. progresso exclusivamente em `dojoTracks`;
+4. nunca chamar o motor de domínio da Jornada para promover N1.07;
+5. `rt_alvo` é diagnóstico de fluência, não gate de compreensão;
+6. cinco níveis: sucessor com apoio → sucessor sem apoio → antecessor → alternância;
+7. teste permanente e sonda real antes de seguir.
+
+Não registrar JD4 em `JOURNEY_FICHAS` nem criar nó no grafo.
 
 ## Depois
 
-- P22.3B — JD4;
 - P22.4 — N1.09;
 - P22.5 — GM.02;
-- auditoria dos motores adaptativos;
+- auditoria longitudinal dos motores adaptativos;
+- correções por invariantes/property tests;
+- Coverage Matrix executável;
+- fábrica curricular em ondas pedagógicas;
 - mega auditoria pedagógica;
 - auditoria JD/FD/PD;
 - release hardening.
