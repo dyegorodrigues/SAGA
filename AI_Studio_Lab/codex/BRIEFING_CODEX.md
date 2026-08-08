@@ -1,60 +1,107 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 8/ago/2026.**
+> **VIGENTE em 8/ago/2026 após GM.01.**
 >
-> Este arquivo existe para uma nova IA retomar o trabalho sem depender da conversa.
-> Antes dele havia instruções históricas que mandavam abrir branch nova da `main`
-> e colocavam a F50 em um nó curricular incorreto. Elas foram superadas.
->
-> Fonte operacional primária: [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md).
-> Fonte de método/armadilhas: [`RETOMADA.md`](./RETOMADA.md) e
-> [`PADRAO_OURO.md`](./PADRAO_OURO.md).
+> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md).
+> Este briefing é a versão executiva: regras, sequência e definição de pronto.
 
----
+## 0. Estado que não deve ser redescoberto
 
-## 0. Contexto que não pode ser redescoberto
+- Repo: `dyegorodrigues/SAGA`.
+- Trabalho: **`codex/integrar-bloco-f0`**.
+- `main`: `68fad4c575e28959b2ca4776e9a541d6828b63f3` — **não tocar**.
+- PR #29: draft, base `main`, somente comparação/CI, nunca auto-merge.
+- Checkpoint funcional: `cb868e77facfc02bf4ea412971393fdc1fbcb8e1`.
+- Nesse checkpoint: branch 190 commits à frente e 0 atrás da main.
 
-Repositório: `dyegorodrigues/SAGA`.
+### O remoto está limpo
 
-### Regra de ouro desta linha
+Só existem quatro branches:
 
-- **não alterar nem mesclar `main`**;
-- trabalhar em **`codex/integrar-bloco-f0`**;
-- PR #29 é somente janela de comparação/CI, permanece **draft** e sem auto-merge;
-- não abrir branches auxiliares para tarefas normais deste bloco;
-- commits devem ser pequenos, reversíveis e explicar a razão;
-- implementação e promoção continuam logicamente separadas, mesmo quando os
-  candidatos são ensaiados nesta branch de integração.
+- `main`
+- `codex/integrar-bloco-f0`
+- `agent/creature-engine-tamagotchi`
+- `codex/criar-branch-para-creature-engine-tamagotchi`
 
-### Branches remotas
+As duas últimas são outro módulo e não devem ser tocadas neste fluxo.
 
-| branch | estado | ação |
-|---|---|---|
-| `main` | base protegida desta linha | **não tocar** |
-| `codex/integrar-bloco-f0` | linha cumulativa vigente | **continuar aqui** |
-| `codex/ativar-al01` | ref removido em 8/ago | histórico preservado por commits/PR |
-| `codex/corrigir-n113` | ref removido em 8/ago | histórico preservado por commits/PR |
-| `codex/corrigir-n106` | ref removido em 8/ago | F05 preservada pela reconciliação PR #32 |
-| `codex/reconciliar-f05-f04` | ref removido em 8/ago | PR #32 permanece como registro da reconciliação |
-| `agent/creature-engine-tamagotchi` | trabalho independente não presente na main | **não apagar / não tocar neste fluxo** |
-| `codex/criar-branch-para-creature-engine-tamagotchi` | trabalho independente PMD | **não apagar / não tocar neste fluxo** |
+## 1. Promoções concluídas nesta retomada
 
-Os PRs auxiliares #26–#28 e #30–#33 já estão fechados; #30 e #32 foram usados
-apenas para absorção/reconciliação na cumulativa. **A única PR aberta deste fluxo
-é a #29.**
+Em ordem, cada uma com commit próprio e CI completa:
 
----
+| nó | ficha | estado anterior | promoção |
+|---|---|---|---|
+| `AL.01` | F51 classificação | intruso legado | `72483db7...` |
+| `N1.06` | F05 ouvir→símbolo | número escrito no legado | `d3c2b7d4...` |
+| `N1.13` | F04 produzir quantidade | fallback; nó novo | `6a6dc16f...` |
+| `GE.01` | F47 posição espacial | palavras/emoji no legado | `a9f9205f...` |
+| `GE.02` | F48 formas planas | pergunta fixa de emojis | `3f8e10cd...` |
+| `GM.01` | F49 grandezas visíveis | fallback | `cb868e77...` |
 
-## 1. Primeiro ritual de qualquer nova sessão
+A lista ativa agora vive em:
 
-1. Leia inteiro `HANDOFF_CONTINUIDADE_IA.md`.
-2. Confira o remoto; nunca escolha branch apenas pelo nome.
-3. Confirme que `main` ainda é ancestral da cumulativa e que a cumulativa não
-   está atrás.
-4. Leia os commits posteriores ao head citado no handoff antes de editar.
-5. Rode os portões do estado atual antes do primeiro lote de código.
+`src/curriculum/motores/composerCanaryIds.ts`
 
-Portões mínimos:
+**Promoção futura = um id por commit.** Não reescrever `composerCanary.ts` só para ativar nó.
+
+## 2. Correções importantes que precederam as promoções
+
+### AL.01
+
+A §9 dizia que domínio exigia uma peça corretamente deixada fora, mas o runtime não colhia essa prova. Agora existe `Evidencia.NAO_PERTENCE`, procedimento emissor, coleta no GameLoop e fiscal global.
+
+### N1.06
+
+Autoplay já tinha acontecido quando o prompt dizia "Aperte e escute". Agora a questão normal pergunta **"Que número você ouviu?"**; a micro-aula continua ensinando replay.
+
+### F50 / GM.12
+
+Implementação e QA fecharam massa/capacidade, inclusive prints pós-despejo. **Não promover ainda.** Ver handoff para detalhes.
+
+### P18
+
+Fechada. `KindType` só contém kinds com builder. Legado continua em `Question.kind` string. Ver `DECISAO_P18_KINDTYPE.md`.
+
+## 3. Próxima sequência obrigatória
+
+### Etapa 1 — auditar N1.10
+
+Antes de qualquer ativação:
+
+1. ler ficha runtime N1.10 e fichas canônicas associadas;
+2. comparar JD5 perceptual × `bond` simbólico legado;
+3. confirmar §3–§9, especialmente voz/tutorial/domínio;
+4. capturar os cinco níveis em 320/390/900 e estados intermediários relevantes;
+5. confirmar o que acontece com a forma simbólica F1 quando a JD5 for promovida;
+6. só então decidir corrigir, promover ou manter desligada.
+
+### Etapa 2 — auditar N1.11
+
+A competência tem duas fichas conceitualmente diferentes: JD3 perceptual e F28 como conta. Confirmar a fronteira curricular antes de ativar a entrada runtime atual.
+
+### Etapa 3 — GM.12
+
+Reabrir somente depois do intervalo de observação e de releitura do handoff. Não ativar por conveniência só porque já está pronta tecnicamente.
+
+### Etapa 4 — P8 / Jardim do Dojo
+
+Construir o consumidor real das trilhas JD1–JD5 sem criar currículo paralelo ao grafo.
+
+### Etapa 5 — próximas primitivas
+
+`Moedas` e `Regua` quando suas fichas forem gargalo real. Não antecipar API órfã.
+
+## 4. Ritual de qualquer nova sessão
+
+1. conferir branches e SHA da `main`;
+2. `compare main..codex/integrar-bloco-f0` — cumulativa não pode estar atrás;
+3. ler commits posteriores ao checkpoint do handoff;
+4. confirmar PR #29 draft/não mesclada;
+5. verificar CI do head antes do primeiro lote funcional.
+
+## 5. Portões
+
+Código:
 
 ```bash
 npm run auditar
@@ -65,179 +112,48 @@ npx tsc --noEmit
 npm test -- --run
 npm run build
 npm run pr:check
+git diff --check
 ```
 
-Para tela afetada:
+Tela:
 
 ```bash
 npm run sonda -- "<ID>"
-node scripts/prints.mjs "<ID>"
+PRINTS_LARGURA=320 PRINTS_WAIT_MS=... node scripts/prints.mjs "<ID>"
 ```
 
-A sonda e `prints.mjs` devem usar o Chromium compatível informado pelo
-`playwright-core`; **não reintroduzir caminho `/opt/.../chromium-1194` fixo**.
+Canário:
 
----
+- QA visual antes;
+- §9 realmente colhida;
+- rollback conhecido;
+- id já registrado no contrato;
+- um id por commit em `composerCanaryIds.ts`;
+- CI completa verde no SHA da promoção.
 
-## 2. Estado já fechado — não refazer
+## 6. Regras que não se negociam
 
-### AL.01 / F51
+- uma tela não introduz conteúdo novo e linguagem visual nova ao mesmo tempo;
+- ficha inteira é contrato: §3 a §9;
+- resposta errada não emite evidência;
+- palco que coleta resposta é dono da interação;
+- divergência precisa ser declarada;
+- não editar teste para esconder defeito de código;
+- não guardar workflow temporário se a CI normal basta;
+- não criar branches auxiliares para o bloco atual;
+- não tocar nas branches do Creature Engine;
+- não mexer na `main`.
 
-Correção autoral absorvida na cumulativa. Classificação real, reclassificação,
-`fica fora`, Mão Fantasma, reset e diagnóstico. Continua fora da produção nesta
-linha até promoção deliberada.
+## 7. Definição de pronto de um lote
 
-### N1.06 / F05
-
-Fluxo áudio→símbolo reconciliado semanticamente com F04/AL. Autoplay temporal,
-retry/feedback autoral, evidência e diagnóstico. O checkpoint antigo diverge na
-genealogia porque foi reconciliado por squash; isso **não significa trabalho
-perdido**.
-
-### N1.13 / F04
-
-Produzir quantidade com drag/toque, ghost, retry e diagnóstico longitudinal.
-Absorvido na cumulativa.
-
-### GE.01 / F47
-
-Posição espacial corrigida e validada.
-
-### GE.02 / F48
-
-Formas planas corrigidas; sólidos permanecem em GE.04.
-
-### GM.01 / F49
-
-Comparação direta de grandezas corrigida e validada.
-
-### GM.12 / F50
-
-**Implementada e não promovida.**
-
-Matriz curricular vigente:
-
-`GM.01 comparação direta visível` → **`GM.12 massa e capacidade: comparação e conservação`** → `GM.05 medidas padronizadas`
-
-Não voltar à decisão histórica F50→GM.02 ou F50→GM.05. A P15 foi retificada:
-`GM.02` é tempo cotidiano e `GM.05` é a etapa posterior de unidades padronizadas.
-
-A F50 já possui procedimento, contrato, `Recipientes`, `MedidasStage`, integração
-Composer/renderer/Radar/evidência e cinco níveis. `Recipientes` deixou de ser
-dívida de runtime; `PRIMITIVAS_PENDENTES` ficou em `Moedas` e `Regua`.
-
----
-
-## 3. Plano executivo atual
-
-### Fase A — higiene e observabilidade
-
-1. Manter somente a PR #29 aberta neste fluxo.
-2. Não criar novas branches auxiliares para tarefas ordinárias.
-3. Os quatro refs históricos deste fluxo **já foram removidos**. Não recriá-los.
-   As duas branches do Creature Engine ficam preservadas.
-4. Todo lote relevante atualiza `HANDOFF_CONTINUIDADE_IA.md` antes de terminar.
-5. Bancadas de GitHub Actions devem ser **descartáveis**: criar → executar →
-   publicar artefato/resultado → apagar o próprio workflow.
-
-### Fase B — fechar QA humano da F50
-
-1. Capturar GM.12 nos níveis 1–5 em 320, 390 e 900 px.
-2. Abrir e olhar os prints; sonda verde não substitui julgamento visual.
-3. Juntar todos os defeitos antes de corrigir.
-4. Se houver correção: manter GM.12 fora dos canários, rodar sonda filtrada e
-   depois portão completo.
-5. Registrar no handoff a inspeção realmente feita — não declarar print visto
-   quando só houve teste automático.
-
-### Fase C — pagar dívida sistêmica P18 sem chegar à criança
-
-O portão `kindComBuilder.test.ts` registra kinds que o schema promete e o
-Composer ainda não entrega. Não implementar os nove às cegas.
-
-Ordem de auditoria:
-
-1. **aliases/legado que já têm runtime aproveitável** — verificar se o correto é
-   conectar, normalizar ou retirar do `KindType`;
-2. **`sentencebuilder`** — componente existe, mas está órfão; primeiro descobrir
-   qual ficha realmente precisa dele e qual contrato pedagógico deve alimentá-lo;
-3. **`singaporebars`** — confrontar com o caminho vivo `singapore-bars` para não
-   criar dois nomes para a mesma semântica;
-4. `linking-cubes`, `take-apart`, `visual-addition` — embrulhar legado somente se
-   uma ficha autoral real os exigir;
-5. `multiple_choice`, `sequence`, `subvis` — candidatos a remoção do tipo se forem
-   apenas resíduos legados e nenhuma ficha canônica os nomear;
-6. `missing-addend-frame` — construir apenas a partir da ficha que o especifica;
-   hoje é dívida de primitiva, não só builder.
-
-Cada decisão deve reduzir a diferença entre **o que o tipo promete** e **o que o
-runtime realmente consegue servir**, sem aumentar APIs duplicadas.
-
-### Fase D — candidatos de promoção, um por vez
-
-Só após QA visual correspondente. Ordem inicial sugerida pelo risco/dependência:
-
-1. `AL.01`
-2. `N1.06`
-3. `N1.13`
-4. `GE.01`
-5. `GE.02`
-6. `GM.01`
-7. `GM.12` somente depois do QA visual F50 e intervalo de observação
-8. `N1.10` e `N1.11` continuam por último entre os F0 recém-escritos
-
-Para cada candidato:
-
-- print antes;
-- confirmar fallback/rollback atual;
-- um commit de promoção claramente reversível;
-- portões completos;
-- nunca misturar promoção com correção estrutural da mesma tela.
-
-A branch cumulativa pode ensaiar o estado integrado, mas nenhuma promoção deve
-chegar à `main` por acidente; a PR #29 continua sem merge.
-
-### Fase E — arquitetura maior
-
-Somente depois do bloco acima estabilizado:
-
-- **P8** — motor do Jardim do Dojo e consumo real das trilhas JD1–JD5;
-- primitives `Moedas` e `Regua` quando suas fichas forem o próximo gargalo;
-- próximas competências/andares conforme `PLANO_DO_BLOCO_F0.md` e Plano Mestre.
-
-P8 é importante, mas atravessa a jornada inteira; não deve ser usado como fuga
-para deixar dívidas menores e observáveis abertas.
-
----
-
-## 4. Regras de implementação
-
-1. **Existir não é estar certo.** Código herdado entra como suspeito.
-2. **Honrar a ficha é honrar as nove seções**, não só os cinco níveis.
-3. Divergir é permitido; divergência silenciosa não.
-4. Uma tela não introduz mais de uma novidade por vez: conteúdo novo usa
-   linguagem visual já aprendida; desenho novo usa conteúdo dominado.
-5. Palco que coleta resposta é dono da resposta; não duplicar alternativas no
-   GameLoop.
-6. Resposta errada não coroa evidência.
-7. Corrigir código para passar teste; mudar teste somente quando o teste é a
-   própria especificação e a especificação mudou conscientemente.
-8. Nenhum binário entra no diff textual desta linha.
-9. Junte defeitos e rode o portão completo uma vez no fim do lote.
-10. Não usar `main` como área de trabalho nem destino automático.
-
----
-
-## 5. Definição de pronto de qualquer lote
-
-- [ ] mudança está em `codex/integrar-bloco-f0`;
-- [ ] nenhum ref do Creature Engine foi tocado;
+- [ ] commit está na cumulativa;
 - [ ] `main` não moveu;
-- [ ] testes/TypeScript/auditorias/grafo/build verdes;
-- [ ] sonda/prints quando houver tela afetada;
+- [ ] nenhuma branch extra ficou no remoto;
 - [ ] nenhum workflow temporário ficou órfão;
-- [ ] PR #29 continua draft e sem merge;
-- [ ] `HANDOFF_CONTINUIDADE_IA.md` registra o novo head e próximo passo;
-- [ ] a próxima sessão consegue descobrir o estado sem ler esta conversa.
+- [ ] auditorias/grafo/TypeScript/testes/build verdes;
+- [ ] sonda/prints quando há tela;
+- [ ] handoff atualizado se o estado operacional mudou;
+- [ ] PR #29 continua draft e não mesclada;
+- [ ] uma nova conversa consegue retomar sem reler a conversa anterior.
 
 **Existir não é estar certo. Divergência pode ser corrigida; divergência silenciosa não.**
