@@ -34,15 +34,23 @@ if "--post" not in sys.argv:
     print("fixups pre-patch preparados")
     raise SystemExit(0)
 
-replace_once(
-    "src/curriculum/fichas/jornada/N1.11.ts",
-    '''  distratores: [
-    { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
-    { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
-  ],''',
-    "  distratores: [],",
-)
+# O Map construído de pares [valor, opção] preserva a ÚLTIMA ocorrência. Isso
+# é errado para diagnóstico: se 10 já significa RESPONDE_O_TODO e também cai
+# por coincidência em n+1, a hipótese específica deve vencer. Deduplica mantendo
+# a PRIMEIRA ocorrência. Há dois builders novos com a mesma linha (bond/plain).
+p = Path("src/curriculum/Composer.ts")
+s = p.read_text()
+old = '''options = [...new Map(candidatos.map(o => [String(o.value), o])).values()]
+            .slice(0, 4)'''
+new = '''options = candidatos
+            .filter((opcao, indice) => candidatos.findIndex(item => String(item.value) === String(opcao.value)) === indice)
+            .slice(0, 4)'''
+if s.count(old) != 2:
+    raise SystemExit(f"Composer: deduplicação esperada 2x, encontrada {s.count(old)}x")
+p.write_text(s.replace(old, new))
 
+# Retenção multidimensional: a segunda sessão amadurece como a primeira;
+# uma única questão dois dias depois não pode satisfazer 3/3.
 replace_once(
     "src/curriculum/motores/progressEngine.test.ts",
     '''    const retained = applyJourneyAnswer(current, true, false, {
@@ -79,11 +87,4 @@ replace_once(
     expect(retained.transition).toEqual({ type: "multidimensional-crown" });''',
 )
 
-# Diagnóstico temporário do único teste ainda vermelho. A mensagem de asserção
-# imprime as opções concretas da amostra que perdeu a tag.
-replace_once(
-    "src/curriculum/fichas/jornada/parteTodoProgressao.test.ts",
-    '''      expect(tags.has(MisconceptionTag.RESPONDE_O_TODO)).toBe(true);''',
-    '''      expect(tags.has(MisconceptionTag.RESPONDE_O_TODO), JSON.stringify(q.options)).toBe(true);''',
-)
 print("fixups pós-patch aplicados")
