@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { State, Kid, Track } from "../types";
 import { computeUnlockStatus } from "../curriculum/motores/unlockEngine";
-import { C, FONT, CoinChip, LevelDots, sfx, FRESH, TOTAL_STICKERS, THEMES, Mascote } from "./Mascot";
-import { MascotEvolutionCard, getKidLifetimeStars, getMascotStage } from "./MascotEvolution";
-import { LearningPath } from "./LearningPath";
+import { C, FONT, CoinChip, sfx, THEMES } from "./Mascot";
+import { getKidLifetimeStars, getMascotStage } from "./MascotEvolution";
 
 import { SenseiTab } from "./home/SenseiTab";
 import { JourneyTab } from "./home/JourneyTab";
@@ -13,7 +12,6 @@ import { PerfilTab } from "./home/PerfilTab";
 import { LevelPickerModal } from "./home/LevelPickerModal";
 import { WardrobeModal } from "./home/WardrobeModal";
 
-import { SUBJECTS } from "../subjects";
 import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
 import { isTrackUnlocked } from "../curriculum/motores/unlockEngine";
 
@@ -26,13 +24,11 @@ interface KidHomeProps {
   /** iniciar a trilha num nível escolhido a dedo (seletor 🎯) */
   onTrackLvl: (t: Track, lvl: number) => void;
   onMixed: () => void;
-  onDojo: () => void;
   /** ▶️ MINHA AULA 📚 (E2): a missão composta pelo Professor Mágico */
   onAula: () => void;
   onRescue: (rescue: RescuePlanItem) => void;
   /** 🎒 MATRÍCULA (E3): o placement disfarçado da primeira visita */
   onMatricula: () => void;
-  mixedDoneToday: boolean;
   onAlbum: () => void;
   onBack: () => void;
   tracks: Track[];
@@ -48,11 +44,9 @@ export function KidHomeScreen({
   albumCount,
   onTrackLvl,
   onMixed,
-  onDojo,
   onAula,
   onRescue,
   onMatricula,
-  mixedDoneToday,
   onAlbum,
   onBack,
   tracks,
@@ -126,73 +120,6 @@ export function KidHomeScreen({
     } : null;
   }, [tracks, prog, unlockStatus]);
 
-  // Amostra do que cada nível pergunta (gera 1 questão-exemplo por nível — memoizada
-  // para os textos não trocarem a cada render enquanto o seletor está aberto)
-  // Trilhas do editor pedagógico (não pertencem a nenhuma matéria registrada)
-  const subjectIds = new Set(SUBJECTS.flatMap((s) => (s.tracks[kid.grade] || []).map((t) => t.id)));
-  const customTracks = tracks.filter((t) => !subjectIds.has(t.id));
-
-  const renderTrackCard = (t: Track) => {
-    const p = prog[t.id] || FRESH();
-    return (
-      <button
-        key={t.id}
-        onClick={() => {
-          sfx.tick();
-          setPickerTrack(t);
-        }}
-        className="relative select-none transition-all cursor-pointer active:translate-y-1 text-center flex flex-col items-center justify-between"
-        style={{
-          background: C.card,
-          border: "none",
-          borderRadius: 24,
-          boxShadow: `0 6px 0 ${C.line}`,
-          padding: "16px 12px",
-          minHeight: 154,
-        }}
-      >
-        {/* 🎯 abre o seletor de nível (span, não button — card já é button) */}
-        <span
-          role="button"
-          aria-label={`Escolher nível de ${t.name}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            sfx.tick();
-            setPickerTrack(t);
-          }}
-          className="absolute top-1.5 right-1.5 w-8 h-8 flex items-center justify-center text-base rounded-full bg-slate-50 border-2 border-slate-100 hover:bg-slate-100 transition-all"
-        >
-          🎯
-        </span>
-        <div
-          className="flex items-center justify-center text-3xl filter drop-shadow-sm"
-          style={{
-            width: 54,
-            height: 54,
-            borderRadius: 18,
-            background: t.color,
-            boxShadow: `0 4px 0 ${t.dark}`,
-          }}
-        >
-          {t.icon}
-        </div>
-
-        <div className="mt-3">
-          <div style={{ fontFamily: FONT, fontSize: 16, fontWeight: 700, color: C.ink }}>
-            {t.name}
-          </div>
-          <div className="mt-1 flex items-center justify-center gap-1">
-            <LevelDots lvl={p.lvl} conquered={p.maxLvl} dom={p.dom} color={t.color} />
-          </div>
-        </div>
-
-        <div className="mt-2 text-xs font-bold text-amber-600 inline-flex items-center gap-1 bg-amber-50 px-2.5 py-0.5 rounded-md">
-          ⭐ {p.stars || 0} estrelas
-        </div>
-      </button>
-    );
-  };
-
   return (
     <div className="mk-pop h-screen max-h-screen flex flex-col bg-slate-50 overflow-hidden">
       {/* HEADER GLOBALS (Coin & Name) */}
@@ -242,7 +169,13 @@ export function KidHomeScreen({
           <JourneyTab kid={kid} prog={prog} tracks={tracks} unlockStatus={unlockStatus} onTrack={setPickerTrack} />
         )}
         {activeShellTab === "dojo" && (
-          <DojoTab prog={prog} unlockStatus={unlockStatus} mixedDoneToday={mixedDoneToday} onMixed={onMixed} renderTrackCard={renderTrackCard} onTrack={setPickerTrack} onOpenPicker={setPickerTrack} />
+          <DojoTab
+            prog={prog}
+            dojoTracks={(state.dojoTracks || {})[kid.id] || {}}
+            onGardenTrack={(track, currentStep) => onTrackLvl(track, currentStep)}
+            onMixed={onMixed}
+            onOpenPicker={setPickerTrack}
+          />
         )}
         {activeShellTab === "oficina" && (
           <OficinaTab aulaPlan={aulaPlan} onTrack={onRescue} />

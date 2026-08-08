@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag, MisconceptionTagType } from "../../constants/misconceptions";
 
 /**
@@ -331,6 +332,28 @@ export function classificacaoPerfeita(a: AcaoDeClassificacao): boolean {
     const noLugar = certo.length === c.onde.length && certo.every(i => c.onde.includes(i));
     return noLugar && c.tentativas.length === 0;
   });
+}
+
+/**
+ * §9 — a prova específica da F51.
+ *
+ * O palco só encerra quando todas as peças têm um destino correto, mas esta
+ * função não confia nessa propriedade implícita: se receber uma ação final
+ * inconsistente, não emite evidência. Recuperar de uma tentativa recusada não
+ * invalida a prova — a ficha exige uma peça corretamente deixada fora, não uma
+ * rodada sem erro anterior.
+ */
+export function evidenciasDe(a: AcaoDeClassificacao): string[] {
+  const rodadaCorreta = a.colocacoes.every(c => {
+    const certo = destinoCerto(c.peca, a.criterios);
+    return certo.length === c.onde.length && certo.every(i => c.onde.includes(i));
+  });
+  if (!rodadaCorreta) return [];
+
+  const decidiuNaoPertence = a.colocacoes.some(c =>
+    destinoCerto(c.peca, a.criterios).length === 0 && c.onde.length === 0,
+  );
+  return decidiuNaoPertence ? [Evidencia.NAO_PERTENCE] : [];
 }
 
 /* ------------------------------------------------------------------ *

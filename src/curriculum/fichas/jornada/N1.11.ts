@@ -2,143 +2,107 @@ import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FALAS } from "../../procedimentos/tenFrameProcedure";
 import { FichaCompetencia } from "../../schema";
 
-/**
- * JD3 — A moldura relâmpago. *O vazio como quantidade.*
- *
- * ---
- *
- * **O que a criança aprende (§2):** ver **o vazio** de uma moldura de 10 como
- * quantidade — e responder *quantos faltam* sem contar as casas vazias uma a
- * uma.
- *
- * **Por que é a ficha mais estratégica do Jardim:**
- *
- * > *"Os amigos do 10 são a estratégia-rainha do cálculo mental. Mas em F28
- * > eles nascem como **conta** — 'sete mais quanto dá dez?'. Aqui eles nascem
- * > antes disso, como **percepção de vazio**. A criança que *vê* que faltam três
- * > nunca mais precisa calcular que faltam três."*
- *
- * **Por que trava:** *"o olho humano é treinado para contar o que **está lá**.
- * Contar o que **não está** é uma inversão perceptual."*
- *
- * ---
- *
- * ### Esta competência não tinha ficha nenhuma
- *
- * A N1.11 é servida por `gN1_11` e tem **duas** fichas escritas no cânone — a
- * F28 (os amigos do 10 como conta) e esta. Nenhuma das duas existia em código.
- *
- * ### ⚠️ O que o `explain` desta ficha NÃO pode dizer
- *
- * A §7 proíbe duas frases pelo nome:
- *
- * - *"conte as casas vazias"* — devolve a criança à contagem, que é o que a
- *   ficha existe para dispensar;
- * - *"faça dez menos sete"* — a subtração é a F28/F31. Aqui é percepção.
- *
- * ### A escada da §5 — perceptual, sobe por automaticidade
- *
- * | Nível | Preenchimento | Exposição | Apoio |
- * |---|---|---|---|
- * | 1 | 8 ou 9 | 1,5s | fileira de cima completa |
- * | 2 | 6 a 9 | 1,2s | fileira de cima completa |
- * | 3 | 5 a 9 | 1,2s | a âncora do 5 **explícita** |
- * | 4 | 1 a 9 | 1,0s | sem destaque |
- * | 5 | 1 a 9 | 0,7s | vazio **disperso** |
- */
+const dominioJD3 = { acertos: 4, de: 5, sessoes: 2 };
+const dominioF28 = { acertos: 4, de: 4, sessoes: 3 };
 
-/**
- * §9: `{ acertos: 4, de: 5, sessoes: 2 }` — critério frouxo, coerente com JD1 e
- * JD2, e **sem critério de tempo** (§5.1-bis).
- *
- * Sem `exige`: a §9 desta ficha não pede condição extra, e declarar o que a
- * ficha não pede seria endurecer o cânone por conta própria. A velocidade é
- * treinada na trilha FD1 do Dojo, não aqui.
- */
-const dominio = { acertos: 4, de: 5, sessoes: 2 };
-
-/** §8, transcrita. */
-const coreografia = [
+const coreografiaJD3 = [
   { fala: "Prepare o olho!", show: { moldura: { vazia: true } } },
-  { fala: "Já!", show: { flash: { tenframe: 8, ms: 1500 } } },
+  { fala: "Ja!", show: { flash: { tenframe: 8, ms: 1500 } } },
   { fala: "Faltavam dois.", show: { preencherFaltantes: 2 } },
+];
+
+const coreografiaBond = [
+  { fala: "Agora o dez virou o todo do diagrama." },
+  { fala: "Uma parte ja esta aqui." },
+  { fala: "Qual e a outra parte que fecha dez?" },
 ];
 
 export const N1_11: FichaCompetencia = {
   id: "N1.11",
-  nome: "A moldura relâmpago (amigos do 10 como percepção)",
+  nome: "Amigos do 10: ver, estruturar e simbolizar",
   strand: "N1",
   faixa: "F1",
   prereqs: ["N1.08", "N1.10"],
   bncc: "EF01MA06",
 
-  // §2: "sobe por automaticidade, não por abstração. A forma abstrata dos
-  // amigos do 10 é a competência F28, que é outra ficha."
-  excecaoCPA: "perceptual",
+  howto: "Pense no par que fecha dez. As duas partes juntas precisam formar 10.",
+  explain: "Veja a parte que ja temos e a parte que falta: juntas formam dez.",
 
-  howto: FALAS.faltam.howto,
-  explain: FALAS.faltam.explain,
-
-  distratores: [
-    { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
-    { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
-  ],
+  distratores: [],
 
   niveis: {
-    1: { primitiva: "moldura", micro: "faltam_um_dois", andaime: "mao_fantasma" },
-    2: { primitiva: "moldura", micro: "faltam_ate_quatro", andaime: "alto" },
-    3: { primitiva: "moldura", micro: "ancora_explicita", andaime: "medio" },
-    4: { primitiva: "moldura", micro: "sem_destaque", andaime: "minimo" },
-    5: { primitiva: "moldura", micro: "vazio_disperso", andaime: "nenhum", rt_alvo: 4000 },
+    1: { primitiva: "moldura", micro: "jd3_faltam_um_dois", andaime: "mao_fantasma" },
+    2: { primitiva: "moldura", micro: "jd3_faltam_ate_quatro", andaime: "alto" },
+    3: { primitiva: "bond", micro: "f28_bond", andaime: "medio" },
+    4: { primitiva: "plain", micro: "f28_simbolo", andaime: "minimo" },
+    5: { primitiva: "plain", micro: "f28_simbolo", andaime: "nenhum", rt_alvo: 3000 },
   },
 
   micros: [
     {
-      id: "faltam_um_dois",
+      id: "jd3_faltam_um_dois",
       fonte: "JD3",
-      alvo: "ver que falta pouco — o vazio como figura pequena e óbvia",
+      alvo: "ver um vazio pequeno como quantidade, sem contar casa por casa",
       kinds: ["moldura"],
-      params: { modo: "faltam", audio_prompt: FALAS.faltam.audioPrompt, tutorial: coreografia },
-      dominio,
+      params: {
+        modo: "faltam",
+        audio_prompt: FALAS.faltam.audioPrompt,
+        howto: FALAS.faltam.howto,
+        explain: FALAS.faltam.explain,
+        tutorial: coreografiaJD3,
+      },
+      dominio: dominioJD3,
     },
     {
-      id: "faltam_ate_quatro",
+      id: "jd3_faltam_ate_quatro",
       fonte: "JD3",
-      alvo: "o buraco cresce, e continua sendo uma figura só",
+      alvo: "o vazio cresce, mas continua sendo percebido como uma parte",
       kinds: ["moldura"],
-      params: { modo: "faltam", audio_prompt: FALAS.faltam.audioPrompt },
-      dominio,
+      params: {
+        modo: "faltam",
+        audio_prompt: FALAS.faltam.audioPrompt,
+        howto: FALAS.faltam.howto,
+        explain: FALAS.faltam.explain,
+      },
+      dominio: dominioJD3,
     },
     {
-      id: "ancora_explicita",
-      fonte: "JD3",
-      alvo: "a fileira cheia como unidade: cinco não se conta, se vê",
-      kinds: ["moldura"],
-      params: { modo: "faltam", audio_prompt: FALAS.faltam.audioPrompt },
-      dominio,
+      id: "f28_bond",
+      fonte: "F28",
+      alvo: "o 10 vira o todo do number bond; a parte ausente deixa de depender da moldura",
+      kinds: ["bond"],
+      params: {
+        soma_max: 10,
+        whole_fixed: 10,
+        interactive: "part",
+        audio_prompt: "O todo e dez. Qual parte falta?",
+        howto: "O 10 e o todo. As duas partes de baixo precisam completar dez.",
+        explain: "Junte mentalmente as duas partes: o resultado precisa ser 10.",
+        tutorial: coreografiaBond,
+      },
+      dominio: dominioF28,
     },
     {
-      id: "sem_destaque",
-      fonte: "JD3",
-      alvo: "sem apoio nenhum, e mais rápido",
-      kinds: ["moldura"],
-      params: { modo: "faltam", audio_prompt: FALAS.faltam.audioPrompt },
-      dominio,
-    },
-    {
-      id: "vazio_disperso",
-      fonte: "JD3",
-      alvo: "o vazio perde a FORMA e ela precisa integrar — o degrau mais difícil",
-      kinds: ["moldura"],
-      params: { modo: "faltam", audio_prompt: FALAS.faltam.audioPrompt },
-      dominio,
+      id: "f28_simbolo",
+      fonte: "F28",
+      alvo: "transferir o amigo do 10 para a sentenca n + caixa = 10",
+      kinds: ["plain"],
+      params: {
+        complemento_dez: true,
+        audio_prompt: "Quanto falta para completar dez?",
+        howto: "Use o par que voce ja viu na moldura e no diagrama.",
+        explain: "A caixa e a parte que falta para as duas partes formarem dez.",
+      },
+      dominio: dominioF28,
     },
   ],
 
   erros_tipicos: [
-    { id: MisconceptionTag.RESPONDE_O_CHEIO, descricao: "Disse quantas fichas há, não quantas faltam: fez o que o olho pede." },
-    { id: MisconceptionTag.OFF_BY_ONE, descricao: "Tentou contar as casas vazias e perdeu o fio." },
-    { id: MisconceptionTag.DEPENDE_DE_FORMATO, descricao: "Acerta com o vazio contíguo e erra com ele espalhado: percebe a figura, não a quantidade." },
-    { id: MisconceptionTag.SEM_ANCORA_CINCO, descricao: "Erra quando faltam mais de cinco: não usa a fileira como unidade — voltar à JD2." },
+    { id: MisconceptionTag.RESPONDE_O_CHEIO, descricao: "Na moldura, disse quantas fichas ha em vez de quantas faltam." },
+    { id: MisconceptionTag.SEM_ANCORA_CINCO, descricao: "Ainda nao usa a fileira de cinco como unidade." },
+    { id: MisconceptionTag.REPETE_A_PARTE, descricao: "No diagrama/conta, repetiu a parte conhecida." },
+    { id: MisconceptionTag.RESPONDE_O_TODO, descricao: "Respondeu 10 quando a pergunta pedia o complemento." },
+    { id: MisconceptionTag.SO_FUNCIONA_VISUAL, descricao: "Acerta com representacao visual e ainda falha na sentenca simbolica." },
+    { id: MisconceptionTag.OFF_BY_ONE, descricao: "Conhece o par, mas errou por uma unidade." },
   ],
 };

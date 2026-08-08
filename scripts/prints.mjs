@@ -5,7 +5,11 @@
  * em vez de montar um segundo harness. Duas montagens divergiriam, e aí o print
  * mostraria uma tela que a sonda não mediu.
  *
- * Uso: node scripts/prints.mjs "N1.04"   (filtra pelo nome da cena)
+ * Uso:
+ *   node scripts/prints.mjs "N1.04"
+ *   PRINTS_WAIT_MS=2500 node scripts/prints.mjs "GE.01"
+ *   PRINTS_CLICK='[data-recipientes-verify]' PRINTS_SUFFIX='_verificado' \
+ *     node scripts/prints.mjs "GM.12 F50 massa/capacidade (nível 3)"
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -15,6 +19,10 @@ const PORTA = 5198;
 const BASE = `http://localhost:${PORTA}/sonda/`;
 const OUT = process.env.PRINTS_OUT ?? "/tmp/prints";
 const filtro = process.argv[2] ?? "";
+const WAIT_MS = Number(process.env.PRINTS_WAIT_MS ?? 320);
+const CLICK_SELECTOR = process.env.PRINTS_CLICK ?? "";
+const CLICK_WAIT_MS = Number(process.env.PRINTS_CLICK_WAIT_MS ?? 1100);
+const SUFFIX = process.env.PRINTS_SUFFIX ?? (CLICK_SELECTOR ? "_apos_interacao" : "");
 fs.mkdirSync(OUT, { recursive: true });
 
 const vite = spawn("npx", ["vite", "--port", String(PORTA), "--strictPort"], {
@@ -25,8 +33,14 @@ await new Promise((ok, no) => {
   vite.stdout.on("data", d => { if (String(d).includes("ready in")) { clearTimeout(t); ok(); } });
 });
 
+// Nunca congele a revisão do navegador neste script. `playwright-core` sabe qual
+// Chromium é compatível com a versão instalada; um caminho fixo virou uma
+// armadilha silenciosa quando o projeto avançou da revisão 1194 para a 1234.
+// `PRINTS_CHROME` continua disponível para uma bancada que precise apontar para
+// um executável específico sem alterar o repositório.
+const CHROME = process.env.PRINTS_CHROME || chromium.executablePath();
 const browser = await chromium.launch({
-  executablePath: "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+  executablePath: CHROME,
   args: ["--no-sandbox"],
 });
 const page = await browser.newPage({
@@ -38,18 +52,51 @@ const page = await browser.newPage({
 await page.goto(BASE, { waitUntil: "networkidle" });
 await page.waitForFunction(() => window.sonda?.total > 0, { timeout: 30000 });
 
-const total = await page.evaluate(() => window.sonda.total);
+// A página da sonda expõe TODOS os nomes de tomada de uma vez. Filtramos antes
+// de renderizar, porque cada visita custa animação + espera. E o nome inclui a
+// semente: para INSPEÇÃO humana queremos uma imagem por CENA, não oito cópias
+// quase iguais do mesmo estado. A sonda continua medindo todas as sementes; o
+// print é a lupa humana, não o portão estatístico.
+const nomes = await page.evaluate(() => window.sonda.nomes());
+const vistos = new Set();
+const alvos = [];
+for (let i = 0; i < nomes.length; i += 1) {
+  const nomeCompleto = nomes[i];
+  if (filtro && !nomeCompleto.includes(filtro)) continue;
+  const nomeDaCena = nomeCompleto.replace(/ \[semente .*/, "");
+  if (vistos.has(nomeDaCena)) continue;
+  vistos.add(nomeDaCena);
+  alvos.push({ indice: i, nome: nomeDaCena });
+}
+
 const feitos = [];
-for (let i = 0; i < total; i += 1) {
-  await page.evaluate(n => window.sonda.ir(n), i);
-  await page.waitForTimeout(320);
-  const nome = await page.evaluate(() => window.sonda.nome());
-  if (filtro && !nome.includes(filtro)) continue;
-  if (feitos.some(f => f.nome === nome)) continue; // uma semente por cena
-  const arq = `${OUT}/${nome.replace(/[^\w.]+/g, "_")}.png`;
+for (const { indice, nome } of alvos) {
+  await page.evaluate(n => window.sonda.ir(n), indice);
+
+  // Algumas cenas têm abertura temporal/autoplay. Fotografar sempre em 320 ms
+  // fez N1.06, GE.01 e GM.01 parecerem incompletas quando, na verdade, estavam
+  // no meio da coreografia. O wait configurável permite inspecionar o ESTADO
+  // que a criança realmente recebe depois da abertura sem mudar a sonda.
+  await page.waitForTimeout(WAIT_MS);
+
+  // Estados intermediários eram um ponto cego do QA: a tela inicial podia estar
+  // impecável e o feedback que ENSINA ficar quebrado. A opção é genérica para
+  // qualquer palco: se o seletor existir e estiver visível, clica antes do print.
+  let interagiu = false;
+  if (CLICK_SELECTOR) {
+    const alvo = page.locator(CLICK_SELECTOR).first();
+    if (await alvo.count() && await alvo.isVisible()) {
+      await alvo.click();
+      await page.waitForTimeout(CLICK_WAIT_MS);
+      interagiu = true;
+    }
+  }
+
+  const sufixo = interagiu ? SUFFIX : "";
+  const arq = `${OUT}/${nome.replace(/[^\w.]+/g, "_")}${sufixo}.png`;
   await page.screenshot({ path: arq });
-  feitos.push({ nome, arq });
-  console.log("print", arq);
+  feitos.push({ nome, arq, interagiu });
+  console.log("print", arq, interagiu ? `(clicou ${CLICK_SELECTOR})` : "");
 }
 await browser.close();
 try { process.kill(-vite.pid, "SIGKILL"); } catch { vite.kill("SIGKILL"); }

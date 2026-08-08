@@ -275,6 +275,17 @@ export const MisconceptionTag = {
   /** Grandezas: acerta a diferença gritante e erra a pequena — enxerga, não compara */
   SO_DIFERENCA_GRANDE: "so-diferenca-grande",
 
+  /* --- massa e capacidade (ficha F50 / GM.12) ----------------------- */
+
+  /** Massa/capacidade: julgou pela aparência mesmo quando a referência contradizia. */
+  JULGA_PELO_TAMANHO: "julga-pelo-tamanho",
+
+  /** Massa: usou volume/tamanho aparente como substituto do peso. */
+  CONFUNDE_PESO_VOLUME: "confunde-peso-volume",
+
+  /** Capacidade: comparou a altura do líquido sem neutralizar o formato do recipiente. */
+  IGNORA_FORMATO: "ignora-formato",
+
   /* --- a moldura de dez (fichas F02, JD3 e JD5) ---------------------- */
 
   /** Moldura: somou as casas vazias às cheias — não distingue ocupado de vago */
@@ -295,6 +306,15 @@ export const MisconceptionTag = {
    * exatamente o que o olho pede"*. O olho é treinado para contar o que está
    * lá; contar o que não está é uma inversão perceptual.
    */
+  /** Parte-todo/amigos do 10: repetiu a parte que ja estava dada. */
+  REPETE_A_PARTE: "repete-a-parte",
+
+  /**
+   * Amigos do 10: funciona em material/diagrama, mas ainda nao transferiu para
+   * a sentenca simbolica. E diagnostico longitudinal, nunca de um clique so.
+   */
+  SO_FUNCIONA_VISUAL: "so-funciona-visual",
+
   RESPONDE_O_CHEIO: "responde-o-cheio",
 
   /** Moldura relâmpago: erra quando faltam mais de 5 — não usa a fileira como unidade */

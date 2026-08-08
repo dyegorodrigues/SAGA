@@ -1,7 +1,7 @@
 // schema.ts
 // Definindo o contrato estrito para o Motor de Fichas (Substituindo os generators.ts hardcoded)
 
-export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "singaporebars" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "subvis" | "visual-addition" | "scattered" | "linking-cubes" | "missing-addend-frame" | "take-apart" | "sequence" | "multiple_choice" | "sentencebuilder" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza" | "moldura";
+export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "scattered" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza" | "moldura" | "medidas";
 
 export interface FichaParams {
   [key: string]: unknown;
@@ -37,6 +37,12 @@ export interface FichaDominio {
    * existe para o painel dos pais dizer, em português, o que falta.
    */
   exige?: { evidencia: string; descricao: string };
+  /**
+   * Ponte representacional: impede subir de nível enquanto uma condição desta
+   * micro ainda não foi demonstrada. Útil quando o próximo nível troca de
+   * linguagem (concreto/perceptual -> diagrama -> símbolo).
+   */
+  gateAntesDeAvancar?: { evidencia: string; descricao: string };
 }
 
 export interface FichaMicro {

@@ -101,7 +101,10 @@ export function getCurrentUserEmail(): string | null {
  */
 export async function loginWithGoogle(): Promise<{ email: string; state: State | null }> {
   try {
-    const result = await signInWithPopup(auth, googleProvider);
+    const anonymous = auth.currentUser?.isAnonymous ? auth.currentUser : null;
+    const result = anonymous
+      ? await linkWithPopup(anonymous, googleProvider)
+      : await signInWithPopup(auth, googleProvider);
     const user = result.user;
     if (user && user.email) {
       if (typeof window !== "undefined" && window.localStorage) {
@@ -164,10 +167,10 @@ export async function linkAnonymousWithGoogle(): Promise<{ email: string; state:
 /**
  * Logs out the current user, resetting the auth state.
  */
-export function logoutUser(): void {
+export async function logoutUser(): Promise<void> {
   try {
     if (auth) {
-      signOut(auth).catch((err) => console.warn("Firebase Auth signOut failed:", err));
+      await signOut(auth);
     }
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.removeItem("mk-user-email");
@@ -230,9 +233,14 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 /**
  * Saves the entire application state to Cloud Firestore.
  */
-export async function saveStateToCloud(state: State): Promise<void> {
-  const userId = getDeviceUserId();
-  if (userId === "usr_anonymous_device") return;
+export async function saveStateToCloud(state: State, expectedUid?: string): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) return;
+  if (expectedUid && user.uid !== expectedUid) {
+    console.warn(`[Firestore] Sync descartado: estado de ${expectedUid} não pertence ao usuário atual ${user.uid}.`);
+    return;
+  }
+  const userId = `usr_cloud_${user.uid}`;
 
   try {
     const docRef = doc(db, "userStates", userId);

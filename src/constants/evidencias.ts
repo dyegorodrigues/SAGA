@@ -5,7 +5,7 @@
  *
  * ### Por que existe um catálogo (pendência P13)
  *
- * Seis fichas do bloco F0 escrevem, na §9, uma segunda condição além da
+ * Algumas fichas do bloco F0 escrevem, na §9, uma segunda condição além da
  * contagem de acertos. Todas dizem a mesma coisa com palavras diferentes:
  *
  * > *acertar não basta; é preciso ter acertado uma vez **na condição que prova
@@ -26,6 +26,13 @@
  * garante, e todo campo que se verifica sozinho vira ruído.
  */
 export const Evidencia = {
+  /**
+   * F51 (AL.01): uma peça que não satisfaz o critério foi **corretamente deixada
+   * fora**. Este é o coração da ficha: "não pertence" é uma decisão certa, não
+   * ausência de resposta.
+   */
+  NAO_PERTENCE: "nao-pertence",
+
   /**
    * F01 (N1.04): um acerto no arranjo **disperso**.
    *
@@ -65,6 +72,12 @@ export const Evidencia = {
   DIFERENCA_PEQUENA: "diferenca-pequena",
 
   /**
+   * F50 (GM.12): um acerto em caso **contraintuitivo** — formato/tamanho aponta para o lado errado.
+   * A competência é conservação; sem este caso, três acertos óbvios não a provam.
+   */
+  CASO_CONTRAINTUITIVO: "caso-contraintuitivo",
+
+  /**
    * F02 (N1.08): um acerto com quantidade **entre 6 e 10**.
    *
    * É o que exige usar a estrutura das DUAS fileiras — abaixo de seis, a
@@ -79,6 +92,12 @@ export const Evidencia = {
    * real"*. Guardar três na cabeça é subitização; guardar oito é memória.
    */
   TOTAL_ALEM_DE_CINCO: "total-alem-de-cinco",
+
+  /**
+   * JD5 (N1.10): um acerto com os objetos realmente SOLTOS, sem a geometria
+   * residual da moldura. É a prova de retirada do andaime antes da notação.
+   */
+  SEM_MOLDURA: "sem-moldura",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

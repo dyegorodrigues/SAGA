@@ -88,7 +88,7 @@ export interface AnswerMeta {
   };
 
   misconception?: string;
-  source?: "vertical-column" | "array-grid";
+  source?: "vertical-column" | "array-grid" | "medidas";
   columnIndex?: number;
   /**
    * Assinatura do gesto, quando a resposta veio de manipulação (arrasto, corte,
@@ -96,6 +96,15 @@ export interface AnswerMeta {
    * sem isto, escorregão de dedo vira tag de misconception.
    */
   manipulacao?: EventoManipulacao;
+}
+
+export interface MasteryRule {
+  /** Quantos acertos a ficha exige dentro da janela da sessao. */
+  acertos: number;
+  /** Tamanho da janela de tentativas da sessao. */
+  de: number;
+  /** Quantas sessoes maduras e espacadas a ficha exige. */
+  sessoes: number;
 }
 
 export interface Question {
@@ -161,6 +170,10 @@ export interface Question {
    * GameLoop quem monta a tentativa de maestria, e ele não conhece a ficha.
    */
   exigeEvidencia?: string;
+  /** Evidência que precisa existir antes de esta micro liberar o próximo nível. */
+  gateEvidenceBeforeAdvance?: string;
+  /** Regra de dominio da micro que gerou esta questao. */
+  masteryRule?: MasteryRule;
   /** expressão revelada SÓ ao acertar (ex.: esconde a palavra, mostra "CA + SA = CASA 🏠" depois) */
   bigCompleted?: string;
   /** opções ganham botão 🔊 para a criança OUVIR cada uma e escolher por som (método fônico) */
@@ -271,6 +284,14 @@ export interface MasteryEvidence {
   evidenciaDaFicha?: boolean;
   /** As condições já observadas em acertos desta competência. Histórico, não streak. */
   evidenciasVistas?: string[];
+  /** Regra de dominio que governa a sessao de maestria atual. */
+  masteryRule?: MasteryRule;
+  /** Janela acerto/erro no L5 dentro da sessao corrente. */
+  comprehensionWindow?: boolean[];
+  /** Dia da sessao de maestria corrente. */
+  sessionDay?: string;
+  /** Dias em que a sessao cumpriu acertos/de, independencia e evidencia. */
+  passedSessionDays?: string[];
 }
 
 export interface FactStrength {
@@ -296,8 +317,36 @@ export interface ProcStrength {
 export interface DojoTrackState {
   unlocked: boolean;
   mastered: boolean;
+  /** Família do pilar de fluência. Ausente em saves legados. */
+  family?: "JD" | "FD" | "PD";
+  /** Degrau que o próximo treino deve servir. No Jardim: 1–5. */
+  currentStep?: number;
+  /** Maior degrau já conquistado. Nunca regride. */
+  highestStep?: number;
+  /** Rounds consecutivos que cumpriram precisão + fluência. */
+  goodRounds?: number;
+  /** Rounds consecutivos com precisão abaixo de 60%. */
+  weakRounds?: number;
+  rounds?: number;
+  attempts?: number;
+  correct?: number;
+  /** Média móvel do RT das respostas corretas; cronômetro permanece invisível. */
+  avgCorrectRtMs?: number;
+  lastDay?: string;
   facts?: Record<string, FactStrength>;
   procs?: Record<string, ProcStrength>;
+}
+
+/** Estado completo de uma trilha pré-simbólica do Jardim. */
+export interface JardimTrackState extends DojoTrackState {
+  family: "JD";
+  currentStep: number;
+  highestStep: number;
+  goodRounds: number;
+  weakRounds: number;
+  rounds: number;
+  attempts: number;
+  correct: number;
 }
 
 export interface LogEntry {

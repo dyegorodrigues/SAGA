@@ -4,7 +4,7 @@ import { C, FONT, sfx } from "./Mascot";
 import { Sparkles, Shield, User, Chrome } from "lucide-react";
 
 interface LoginScreenProps {
-  onLoginSuccess: (email: string, cloudState: any) => void;
+  onLoginSuccess: (email: string) => void;
   onContinueAsVisitor: () => void;
 }
 
@@ -19,13 +19,13 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
     sfx.level();
 
     try {
-      const { email, state } = await loginWithGoogle();
+      const { email } = await loginWithGoogle();
       
       if (keepConnected && typeof window !== "undefined") {
         window.localStorage.setItem("mk-keep-connected", "true");
       }
 
-      onLoginSuccess(email, state);
+      onLoginSuccess(email);
     } catch (err: any) {
       console.error(err);
       if (err.code === "auth/popup-blocked") {
@@ -46,13 +46,13 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
     sfx.level();
 
     try {
-      const { email, state } = await loginAnonymously();
+      const { email } = await loginAnonymously();
       
       if (keepConnected && typeof window !== "undefined") {
         window.localStorage.setItem("mk-keep-connected", "true");
       }
 
-      onLoginSuccess(email, state);
+      onLoginSuccess(email);
     } catch (err: any) {
       console.error(err);
       setError("Ops! Erro ao iniciar sessão anônima. Verifique sua internet ou tente entrar com o Google! 🚶");

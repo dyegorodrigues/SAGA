@@ -17,6 +17,7 @@ import { PosicaoSpec } from "./procedimentos/posicaoContract";
 import { FormaSpec } from "./procedimentos/formaContract";
 import { GrandezaSpec } from "./procedimentos/grandezaContract";
 import { MolduraSpec } from "./procedimentos/tenFrameContract";
+import { MedidasSpec } from "./procedimentos/medidasContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -34,7 +35,7 @@ export type FichaUiProps =
   | EmojiCollectionProps
   | { start: number; end: number; interactive: true; startPos: number; showJumps: { from: number; to: number }[] }
   | { n: number; flashDurationMs?: number; moldura: number }
-  | { whole: number | "?"; part1: number | "?"; part2: number | "?"; interactivePart: "whole" | "part1" | "part2" }
+  | { whole: number | "?"; part1: number | "?"; part2: number | "?"; interactivePart?: "whole" | "part1" | "part2" }
   | { sourceCount: number; destCount: number; sourceEmoji: string; destEmoji: string }
   | { dezenas: number; unidades: number }
   | { initialHours: number; initialMinutes: number; interactive: false }
@@ -57,6 +58,7 @@ export type FichaUiProps =
   | PosicaoSpec
   | FormaSpec
   | GrandezaSpec
+  | MedidasSpec
   | MolduraSpec
   | { text: string };
 
@@ -83,13 +85,21 @@ export interface ComposerParams {
   end?: number;
   jump_size?: number;
   moldura?: number;
+  /** Degrau canônico usado pela primitiva moldura, quando difere do nível da Jornada. */
+  source_level?: number;
+  /** Segundo degrau para fade de andaime dentro da mesma micro. */
+  source_level_alt?: number;
   soma_max?: number;
+  whole_fixed?: number;
+  whole_min?: number;
   interactive?: string;
   tem_sobra?: boolean;
   dezenas_max?: number;
   unidades_max?: number;
   apenas_horas_exatas?: boolean;
   interativo?: boolean;
+  /** Forma abstrata da F28: n + caixa = 10. */
+  complemento_dez?: boolean;
   minutos_step?: number;
   peso_alvo_min?: number;
   peso_alvo_max?: number;
@@ -142,12 +152,12 @@ type Tutorial = Question["tutorial"];
 
 const NUMBER_KEYS = [
   "n_min", "n_max", "flash_ms", "start", "end", "jump_size", "moldura",
-  "soma_max", "dezenas_max", "unidades_max", "minutos_step",
+  "source_level", "source_level_alt", "soma_max", "whole_fixed", "whole_min", "dezenas_max", "unidades_max", "minutos_step",
   "peso_alvo_min", "peso_alvo_max", "top_min", "top_max", "bottom_min",
   "bottom_max", "operand_step", "result_max", "rows_min", "rows_max", "cols_min", "cols_max",
 ] as const;
 const BOOLEAN_KEYS = [
-  "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo",
+  "interactive_count", "tem_sobra", "apenas_horas_exatas", "interativo", "complemento_dez",
   "require_regroup", "require_double_regroup", "forbid_regroup", "show_place_value", "show_regroup", "show_algorithm",
   "allow_rotate", "require_rotate", "area_mode", "show_equation",
 ] as const;

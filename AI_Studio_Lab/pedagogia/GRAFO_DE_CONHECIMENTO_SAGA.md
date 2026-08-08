@@ -1,7 +1,7 @@
 # 🕸️ GRAFO DE CONHECIMENTO — SAGA (Matemática 4–12 anos)
-**Versão 1.2 · Agosto 2026 · Documento-irmão da BÍBLIA DO SAGA (ler junto)**
+**Versão 1.3 · Agosto 2026 · Documento-irmão da BÍBLIA DO SAGA (ler junto)**
 
-> **v1.2 (ago/2026) — retificação de contagem.** O grafo tem **88 competências** e **13 trilhas de fluência**. A v1.1 anunciou a ampliação de 84 para 95; das 11 candidatas, 4 foram absorvidas e 7 rejeitadas por duplicarem nós existentes. O registro completo, com o nó que já cobria cada rejeitada, está na **§15.8 da Bíblia v3.1**. 84 + 4 = 88. Qualquer artefato (`.yaml`, `.json`, `.ts`) que declare outro número está desatualizado.
+> **v1.3 (ago/2026) — retificação GM.12.** O grafo tem **90 competências** e **13 trilhas de fluência**. A N1.13 já havia separado “produzir quantidade” de “contar até 20”; agora a GM.12 separa **massa/capacidade sem unidades** da GM.01 (dimensões diretamente visíveis), preservando também GM.02 (tempo cotidiano) e GM.05 (medidas padronizadas). IDs antigos permanecem estáveis; novos conceitos recebem novos IDs. O histórico 84→88 continua documentado na §15.8 da Bíblia.
 
 Este documento substitui: `grafo_competencias.md` (legado), as listas de ilhas da `BIBLE_PEDAGOGICA_UNIFICADA.md`, o `curriculo-mestre.md` e qualquer outra lista de trilhas/competências. A partir daqui, **toda competência de Matemática existe se, e somente se, estiver neste grafo.**
 
@@ -52,12 +52,10 @@ Este documento substitui: `grafo_competencias.md` (legado), as listas de ilhas d
 | **N7** | Números Inteiros (negativos) | grafite | | | | | ●● |
 | **AL** | Álgebra e Padrões | amarelo | ●● | ● | ●● | ● | ●● |
 | **GE** | Geometria e Espaço | ciano | ●● | | ●●● | ●●● | ●● |
-| **GM** | Grandezas e Medidas | esmeralda | ●● | ●● | ●●● | ●● | |
+| **GM** | Grandezas e Medidas | esmeralda | ●●● | ●● | ●●● | ●● | |
 | **PE** | Probabilidade e Estatística | índigo | | ● | ● | ● | ● |
 
-**Total: 89 competências.** *(88 até ago/2026; a `N1.13` nasceu quando a P12
-separou "produzir quantidade" de "contar até 20" — duas competências que
-disputavam o mesmo nó. Ver §15.8 da Bíblia.)* Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
+**Total: 90 competências.** *(88 no fechamento da reconciliação original; 89 após a N1.13; 90 após a GM.12.)* IDs novos são acrescentados sem renumerar os antigos. Cada ● é uma competência (uma "ilha" no mapa do app). Os mundos temáticos da SAGA correspondem às strands; a jornada do herói atravessa mundos em paralelo, nunca um corredor único.
 
 ---
 
@@ -252,10 +250,17 @@ o alvo visível não prova cardinalidade produtiva.
 **Erros típicos:** o protótipo rígido — só reconhece triângulo equilátero "em pé" (micro c ataca com rotações e triângulos finos); quadrado girado 45° vira "losango, não quadrado".
 
 ### GM.01 — Comparação direta de grandezas
-**Objetivo:** comprido/curto, alto/baixo, pesado/leve, cheio/vazio, grande/pequeno — comparando dois objetos lado a lado.
-**Pré-req:** nenhum. **Kinds:** plain, scene, balance* (balança visual para peso).
-**Micros:** a) grande/pequeno, alto/baixo · b) comprido/curto (alinhar as pontas!) · c) pesado/leve (balança inclina) · d) cheio/vazio/metade
-**Erros típicos:** comparar comprimento sem alinhar o início (o erro que a régua depois herda — GM.05); "maior" usado para tudo (a dica diferencia: mais ALTO, mais COMPRIDO…).
+**Objetivo:** comparar dimensões diretamente visíveis — grande/pequeno, alto/baixo e comprido/curto — usando uma referência justa.
+**Pré-req:** nenhum. **Kinds:** groups, scene.
+**Micros:** a) grande/pequeno, alto/baixo · b) comprido/curto com os pontos de início alinhados · c) diferença pequena · d) objetos de identidades diferentes · e) seriação de três por tamanho.
+**Erros típicos:** comparar comprimento sem alinhar o início; usar “maior” sem identificar o atributo; julgar pela dimensão errada.
+
+### GM.12 — Massa e capacidade: comparação e conservação
+**Objetivo:** comparar pesado/leve e capacidade/volume sem confiar no tamanho aparente e sem depender ainda de g/kg ou mL/L.
+**Pré-req:** GM.01. **Kinds:** balance (comparação física), containers* (despejo em recipiente comum de referência).
+**Micros:** a) peso com diferença óbvia · b) capacidade em recipientes iguais · c) capacidade em formatos diferentes, verificando por despejo · d) peso contraintuitivo (pequeno mais pesado) · e) ordenar três por massa ou capacidade.
+**Erros típicos:** `JULGA_PELO_TAMANHO`; confundir peso com volume; achar que recipiente mais alto sempre “cabe mais”; ignorar a transformação de conservação.
+**Ponte:** depois de comparar/conservar a grandeza sem número, GM.05 introduz ferramentas e unidades padronizadas.
 
 ### GM.02 — Tempo cotidiano
 **Objetivo:** partes do dia, ontem/hoje/amanhã, dias da semana, ordem de eventos.
@@ -506,7 +511,7 @@ o alvo visível não prova cardinalidade produtiva.
 
 ### GM.05 — Medidas padronizadas (cm/m, g/kg, mL/L)
 **Objetivo:** medir com régua virtual e escolher a unidade sensata.
-**Pré-req:** GM.01, N2.02. **Kinds:** measure* (régua arrastável — PRIORIDADE 3), plain, story.
+**Pré-req:** GM.12, N2.02. **Kinds:** measure* (régua arrastável — PRIORIDADE 3), plain, story.
 **Micros:** a) medir com régua começando no ZERO (o erro clássico é começar no 1 — a régua do app pisca se desalinhar) · b) cm vs m: o que mede o quê? · c) g vs kg, mL vs L (escolha sensata: "um elefante pesa 4 __?") · d) comparar medidas (2 m __ 150 cm — exige converter!)
 **Erros típicos:** régua a partir do 1 ou da ponta quebrada; achar que kg serve pra tudo pequeno "porque quilo é comum".
 

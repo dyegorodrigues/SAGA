@@ -1,3 +1,5 @@
+import { unbundleMisconceptions } from "./misconceptionBundle";
+
 export interface QuestionDiagnostics {
   attemptCount: number;
   hadError: boolean;
@@ -16,7 +18,11 @@ export const createQuestionDiagnostics = (): QuestionDiagnostics => ({
   misconceptionTags: new Set<string>(),
 });
 
-/** Records touches in memory; persistence remains reserved for the terminal answer. */
+/**
+ * Registra UMA tentativa observável. O contrato vindo de answerPolicy continua
+ * string; se ela embute várias hipóteses, o bundle é aberto aqui sem inflar o
+ * contador de tentativas.
+ */
 export function recordQuestionAttempt(
   diagnostics: QuestionDiagnostics,
   isCorrect: boolean,
@@ -24,7 +30,16 @@ export function recordQuestionAttempt(
 ): void {
   diagnostics.attemptCount += 1;
   diagnostics.hadError ||= !isCorrect;
-  if (!isCorrect && misconception) diagnostics.misconceptionTags.add(misconception);
+  unbundleMisconceptions(misconception)
+    .forEach(tag => diagnostics.misconceptionTags.add(tag));
+}
+
+/** Mantida para hipóteses de histórico produzidas por outros motores. */
+export function recordQuestionHypothesis(
+  diagnostics: QuestionDiagnostics,
+  misconception?: string,
+): void {
+  if (misconception) diagnostics.misconceptionTags.add(misconception);
 }
 
 export function summarizeQuestionDiagnostics(

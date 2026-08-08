@@ -150,6 +150,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   array: ["ArrayGrid"],
   relogio: ["Relogio"],
   balanca: ["Balanca"],
+  medidas: ["Balanca", "Recipientes"],
   shape: ["ShapeCanvas"],
   "singapore-bars": ["SingaporeBars"],
   "story-bars": ["StoryPanel", "SingaporeBars"],

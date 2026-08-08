@@ -143,6 +143,15 @@
       "prereqs": []
     },
     {
+      "id": "GM.12",
+      "nome": "Massa e capacidade: comparação e conservação",
+      "strand": "GM",
+      "faixa": "F0",
+      "prereqs": [
+        "GM.01"
+      ]
+    },
+    {
       "id": "GM.02",
       "nome": "Tempo cotidiano",
       "strand": "GM",
@@ -520,7 +529,7 @@
       "strand": "GM",
       "faixa": "F2",
       "prereqs": [
-        "GM.01",
+        "GM.12",
         "N2.02"
       ]
     },

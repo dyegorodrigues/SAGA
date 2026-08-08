@@ -293,7 +293,15 @@ export function diagnosticar(acao: AcaoDaMoldura): string | undefined {
  */
 export function evidenciasDe(acao: AcaoDaMoldura): string[] {
   if (acao.resposta !== acao.alvo) return [];
-  if (acao.modo === "contar" && acao.cheias >= 6) return [Evidencia.ESTRUTURA_DAS_DUAS_FILEIRAS];
-  if (acao.modo === "escondidos" && (acao.total ?? 0) > 5) return [Evidencia.TOTAL_ALEM_DE_CINCO];
-  return [];
+  const evidencias: string[] = [];
+  if (acao.modo === "contar" && acao.cheias >= 6) {
+    evidencias.push(Evidencia.ESTRUTURA_DAS_DUAS_FILEIRAS);
+  }
+  if (acao.modo === "escondidos" && (acao.total ?? 0) > 5) {
+    evidencias.push(Evidencia.TOTAL_ALEM_DE_CINCO);
+  }
+  if (acao.modo === "escondidos" && acao.semMoldura) {
+    evidencias.push(Evidencia.SEM_MOLDURA);
+  }
+  return evidencias;
 }

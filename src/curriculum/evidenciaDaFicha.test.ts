@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { Evidencia } from "../constants/evidencias";
 import { JOURNEY_FICHAS } from "./fichas";
+import { evidenciasDe as daClassificacao } from "./procedimentos/classificacaoProcedure";
 import { evidenciasDe as daContagem } from "./procedimentos/touchCountProcedure";
 import { evidenciasDe as daEscuta } from "./procedimentos/audioChoiceProcedure";
 import { evidenciasDe as daProducao } from "./procedimentos/producaoProcedure";
 import { evidenciasDe as daForma } from "./procedimentos/formaProcedure";
 import { evidenciasDe as daGrandeza } from "./procedimentos/grandezaProcedure";
 import { evidenciasDe as daMoldura } from "./procedimentos/tenFrameProcedure";
+import { evidenciasDe as daMedida } from "./procedimentos/medidasProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -25,6 +27,24 @@ import { evidenciasDe as daMoldura } from "./procedimentos/tenFrameProcedure";
 
 /** Cada emissor, com uma ação que DEVE produzir a evidência da ficha. */
 const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] = [
+  {
+    nome: "F51 (classificação) — decisão correta de deixar uma peça fora",
+    evidencia: Evidencia.NAO_PERTENCE,
+    emitir: () => daClassificacao({
+      forma: "um-laco",
+      criterios: [{ atributo: "cor", valor: "vermelho" }],
+      colocacoes: [
+        {
+          peca: { id: 1, cor: "vermelho", forma: "circulo", tamanho: "grande" },
+          onde: [0], tentativas: [],
+        },
+        {
+          peca: { id: 2, cor: "azul", forma: "quadrado", tamanho: "pequeno" },
+          onde: [], tentativas: [],
+        },
+      ],
+    }),
+  },
   {
     nome: "F01 (touchcount) — acerto no arranjo disperso",
     evidencia: Evidencia.ARRANJO_DISPERSO,
@@ -50,6 +70,14 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.DIFERENCA_PEQUENA,
     emitir: () => daGrandeza({
       escolhido: 0, certo: 0, vencedorDoOutroAtributo: 1, diferencaPequena: true, antesDoChao: false,
+    }),
+  },
+  {
+    nome: "F50 (medidas) — acerto em caso contraintuitivo",
+    evidencia: Evidencia.CASO_CONTRAINTUITIVO,
+    emitir: () => daMedida({
+      modo: "peso", escolhido: 0, certo: 0, ordemCerta: [0, 1], ordemVisual: [1, 0],
+      contraintuitivo: true, formatosDiferentes: false, verificou: true, maiorVisual: 1,
     }),
   },
   {
@@ -110,12 +138,30 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
   it("⚠️ nenhuma evidência é emitida por resposta ERRADA", () => {
     // Evidência é prova de competência. Emitida no erro, ela coroaria quem não
     // demonstrou nada — o oposto exato do que a §9 pede.
+    expect(daClassificacao({
+      forma: "um-laco",
+      criterios: [{ atributo: "cor", valor: "vermelho" }],
+      colocacoes: [
+        {
+          peca: { id: 1, cor: "vermelho", forma: "circulo", tamanho: "grande" },
+          onde: [0], tentativas: [],
+        },
+        {
+          peca: { id: 2, cor: "azul", forma: "quadrado", tamanho: "pequeno" },
+          onde: [0], tentativas: [[0]],
+        },
+      ],
+    })).toEqual([]);
     expect(daContagem({ marcados: 4, total: 5, toquesRepetidos: 0, resposta: 4, arranjo: "disperso" })).toEqual([]);
     expect(daEscuta({ resposta: 4, alvo: 3, alternativas: [3, 4], repeticoes: 0 })).toEqual([]);
     expect(daProducao({ colocados: 3, alvo: 4, bandeja: 12, recusas: 0, comAndaime: false })).toEqual([]);
     expect(daForma({ pedida: "triangulo", escolhida: "circulo", pedidaGirada: true, escolhidaEmPe: true })).toEqual([]);
     expect(daGrandeza({
       escolhido: 1, certo: 0, vencedorDoOutroAtributo: 1, diferencaPequena: true, antesDoChao: false,
+    })).toEqual([]);
+    expect(daMedida({
+      modo: "peso", escolhido: 1, certo: 0, ordemCerta: [0, 1], ordemVisual: [1, 0],
+      contraintuitivo: true, formatosDiferentes: false, verificou: true, maiorVisual: 1,
     })).toEqual([]);
   });
 });

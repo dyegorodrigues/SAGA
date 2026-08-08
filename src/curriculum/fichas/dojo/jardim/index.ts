@@ -1,5 +1,6 @@
 import { FichaCompetencia } from "../../../schema";
 import { FALAS } from "../../../procedimentos/emojiRowProcedure";
+import { FALAS as FALAS_MOLDURA } from "../../../procedimentos/tenFrameProcedure";
 import { MisconceptionTag } from "../../../../constants/misconceptions";
 
 /**
@@ -156,17 +157,85 @@ export const JD2: FichaCompetencia = {
   ],
 };
 
+/** JD3 completa: a Jornada usa L1-L2; o Jardim guarda a trilha perceptual inteira. */
+export const JD3: FichaCompetencia = {
+  id: "JD3",
+  nome: "Jardim · Moldura Relampago",
+  strand: "JD",
+  faixa: "F0",
+  prereqs: ["N1.11"],
+  excecaoCPA: "perceptual",
+  howto: FALAS_MOLDURA.faltam.howto,
+  explain: FALAS_MOLDURA.faltam.explain,
+  distratores: [
+    { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
+    { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
+  ],
+  niveis: {
+    1: { primitiva: "moldura", micro: "faltam", rt_alvo: 4000 },
+    2: { primitiva: "moldura", micro: "faltam", rt_alvo: 3500 },
+    3: { primitiva: "moldura", micro: "faltam", rt_alvo: 3000 },
+    4: { primitiva: "moldura", micro: "faltam", rt_alvo: 2500 },
+    5: { primitiva: "moldura", micro: "faltam", rt_alvo: 2000 },
+  },
+  micros: [{
+    id: "faltam",
+    fonte: "JD3",
+    alvo: "ver o vazio da moldura como quantidade ate o disperso virar reflexo",
+    kinds: ["moldura"],
+    params: { modo: "faltam", audio_prompt: FALAS_MOLDURA.faltam.audioPrompt },
+    dominio,
+  }],
+  erros_tipicos: [
+    { id: MisconceptionTag.RESPONDE_O_CHEIO, descricao: "Disse quantas fichas ha, nao quantas faltam." },
+    { id: MisconceptionTag.SEM_ANCORA_CINCO, descricao: "Nao usa a fileira de cinco como unidade." },
+  ],
+};
+
+/** JD5 completa: a Jornada formaliza no L5; o Jardim preserva o L5 sem moldura. */
+export const JD5: FichaCompetencia = {
+  id: "JD5",
+  nome: "Jardim · Ver e Imaginar",
+  strand: "JD",
+  faixa: "F0",
+  prereqs: ["N1.10"],
+  howto: FALAS_MOLDURA.escondidos.howto,
+  explain: FALAS_MOLDURA.escondidos.explain,
+  distratores: [
+    { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
+    { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
+  ],
+  niveis: {
+    1: { primitiva: "moldura", micro: "escondidos", rt_alvo: 6000 },
+    2: { primitiva: "moldura", micro: "escondidos", rt_alvo: 5500 },
+    3: { primitiva: "moldura", micro: "escondidos", rt_alvo: 5000 },
+    4: { primitiva: "moldura", micro: "escondidos", rt_alvo: 4500 },
+    5: { primitiva: "moldura", micro: "escondidos", rt_alvo: 4000 },
+  },
+  micros: [{
+    id: "escondidos",
+    fonte: "JD5",
+    alvo: "manter todo e parte na cabeca ate a moldura desaparecer",
+    kinds: ["moldura"],
+    params: { modo: "escondidos", audio_prompt: FALAS_MOLDURA.escondidos.audioPrompt },
+    dominio,
+  }],
+  erros_tipicos: [
+    { id: MisconceptionTag.RESPONDE_O_VISIVEL, descricao: "Leu so o que ficou visivel." },
+    { id: MisconceptionTag.RESPONDE_O_TODO, descricao: "Respondeu o todo, nao a parte escondida." },
+    { id: MisconceptionTag.DEPENDE_DE_ESTRUTURA, descricao: "Ainda depende da moldura para sustentar a imagem mental." },
+  ],
+};
+
 /**
- * As trilhas do Jardim que já têm primitiva.
- *
- * JD3 (moldura relâmpago) e JD5 (ver e imaginar) dependem do `TenFrame`, que é
- * o passo 3 do `PLANO_DO_BLOCO_F0`. Entram lá, e não aqui, para não nascerem
- * apontando para uma primitiva que ainda vai ser reescrita. JD4 (próximo passo)
- * usa `NumberLine` e pertence ao passo 5.
+ * Todas as trilhas cujo manipulativo ja existe. JD4 continua fora: e outra divida
+ * e nao deve entrar de carona na P17.
  */
 export const JARDIM: TrilhaDoJardim[] = [
   { ficha: JD1, mae: "N1.03", destravaNoNivel: 3 },
   { ficha: JD2, mae: "N1.08", destravaNoNivel: 3 },
+  { ficha: JD3, mae: "N1.11", destravaNoNivel: 3 },
+  { ficha: JD5, mae: "N1.10", destravaNoNivel: 3 },
 ];
 
 export const JARDIM_FICHAS: FichaCompetencia[] = JARDIM.map(t => t.ficha);

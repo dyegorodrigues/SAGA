@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { JARDIM, JD1, JD2 } from "./index";
+import { JARDIM, JD1, JD2, JD3, JD5 } from "./index";
 import { JOURNEY_FICHAS } from "../../index";
 import { Composer } from "../../../Composer";
 import { ALL_MATH_TRACKS } from "../../../motores/curriculum";
 import { EmojiRowSpec } from "../../../procedimentos/emojiRowContract";
 import { configuracaoDaMao, quantidadeDaMao } from "../../../procedimentos/emojiRowProcedure";
+import { MolduraSpec } from "../../../procedimentos/tenFrameContract";
 
 /**
  * O Jardim do Dojo — e a pendência P7.
@@ -19,14 +20,27 @@ import { configuracaoDaMao, quantidadeDaMao } from "../../../procedimentos/emoji
  */
 
 describe("Jardim do Dojo — as trilhas de automaticidade", () => {
-  it("cada trilha gera questão nos CINCO níveis", () => {
+  it("cada trilha gera questão executável nos CINCO níveis, na sua própria primitiva", () => {
     for (const { ficha } of JARDIM) {
       for (let nivel = 1; nivel <= 5; nivel += 1) {
         const q = Composer.generate(ficha, nivel);
-        expect(q.kind, `${ficha.id} n${nivel}`).toBe("fileira");
-        expect(q.options?.length, `${ficha.id} n${nivel}`).toBeGreaterThanOrEqual(2);
+        expect(q.kind, `${ficha.id} n${nivel}`).toBe(ficha.niveis[nivel].primitiva);
+        expect(q.evaluate(q.answer), `${ficha.id} n${nivel} responde`).toBe(true);
+        if (q.kind === "fileira") {
+          expect(q.options?.length, `${ficha.id} n${nivel}`).toBeGreaterThanOrEqual(2);
+        } else if (q.kind === "moldura") {
+          expect((q.uiProps as MolduraSpec).alternativas.length, `${ficha.id} n${nivel}`)
+            .toBeGreaterThanOrEqual(2);
+        }
       }
     }
+  });
+
+  it("JD3 preserva o vazio disperso no topo e JD5 preserva a etapa sem moldura", () => {
+    const jd3 = Composer.generate(JD3, 5).uiProps as MolduraSpec;
+    const jd5 = Composer.generate(JD5, 5).uiProps as MolduraSpec;
+    expect(jd3.disperso).toBe(true);
+    expect(jd5.semMoldura).toBe(true);
   });
 
   it("JD2 serve os TRÊS degraus de duas mãos que a Jornada não comporta — a P7", () => {
