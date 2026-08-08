@@ -17,7 +17,7 @@ Ordem deliberada:
 5. P22.4 — N1.09;
 6. P22.5 — GM.02.
 
-P22.1 e P22.2 estão concluídas. P22.3A é o próximo lote.
+**P22.1, P22.2 e P22.3A estão concluídas. P22.3B/JD4 é o próximo lote.**
 
 ## 1. N1.09 — decisão mantida
 
@@ -41,103 +41,94 @@ O legado atual reduz a competência a “Manhã ou Noite?” com resposta fixa `
 
 N1.07 canônico é **Ordem, sucessor e antecessor até 10**.
 
-Estado atual:
-
-- N1.07 já está ativo no Composer e tem rollback legado;
-- ficha TS cobre predominantemente +1/sucessor;
-- faltam cobertura equivalente de antecessor e ordenação;
-- grafo usa prereqs `N1.02 + N1.06`;
-- ficha TS usa `N1.04 + N1.06`.
-
 JD4 “Próximo Passo” é automaticidade ligada a N1.07, não novo nó do grafo.
 
-**Decisão:**
+Invariante:
 
-- P22.3A: corrigir/completar a Jornada N1.07 primeiro;
-- P22.3B: só depois registrar JD4 no Jardim.
+- Jornada N1.07 = compreensão conceitual;
+- JD4 = treino posterior de acesso rápido a sucessor/antecessor;
+- `dojoTracks` permanece separado do progresso da Jornada;
+- tempo nunca concede domínio conceitual.
 
 O Jardim não pode compensar lacuna conceitual da Jornada.
 
 ## 4. P22.1 — GM.12 CONCLUÍDA
 
-`GM.12` foi promovida em `DEFAULT_COMPOSER_CANARY_IDS`.
-
 Gate final `31276881058`: **success**.
 
-Comprovado:
-
-- teste específico + contrato genérico de canário;
-- estreia→rollback para placeholder→reativação;
-- sonda promovida 390/320/900 px;
-- Composer ativo 23/90;
+- Composer ativo 23/90 à época;
 - servido sem placeholder 50/90;
 - fallback real 40/90;
-- suíte 125 arquivos / 2.145 testes;
-- TypeScript, grafo, build, `pr:check` e diff check verdes.
-
-Cleanup: `35493c012b96aaf64e919babba47cc5f5a4171cf`.
+- sonda e gates completos verdes.
 
 ## 5. P22.2 — N4.09 CONCLUÍDA
 
-N4.09 foi adicionada ao contrato genérico e promovida.
+Gate final `31277213310`: **success**.
 
-### Defeito encontrado pelo primeiro gate
+Defeito encontrado e corrigido: o gabarito de área carregava misconception sentinela `"correta"`. A resposta correta passou a ficar sem tag; somente distratores carregam hipótese diagnóstica.
 
-Run `31277083778` falhou corretamente porque o gabarito de área trazia misconception sentinela `"correta"`. A política global interpreta qualquer tag do option selecionado como diagnóstico; portanto um acerto contaminava o Radar.
+Estado após P22.2:
 
-### Correção causal
-
-- `areaProcedure.ts`: resposta correta não recebe tag;
-- `areaContract.ts`: propaga tag somente quando existe;
-- `areaContract.test.ts`: prova gabarito sem diagnóstico e distratores com hipótese;
-- `canaryContract.test.ts`: N4.09 entrou em `REGISTRO`;
-- `composerCanaryIds.ts`: N4.09 entrou na lista ativa.
-
-O contrato não foi relaxado.
-
-### Gate final
-
-Run `31277213310`: **success**.
-
-Comprovado:
-
-- focal: 3 arquivos / 339 testes;
-- sonda N4.09 promovida verde;
 - Composer registrado: **24/90**;
 - Composer ativo: **24/90**;
-- registrado/inativo: **0/90**;
 - servido sem placeholder: **51/90**;
-- fallback real: **39/90**;
-- `fichas:conferir`: 9/9;
-- suíte completa: **125 arquivos / 2.160 testes**;
-- TypeScript, grafo, build, `pr:check` e `git diff --check`: verdes.
+- fallback real: **39/90**.
 
-Cleanup concluído; head pós-limpeza `e259ccd19d10ec00ed6e4a35e2ce24967796d4f1`.
+## 6. P22.3A — N1.07 CONCLUÍDA
 
-## 6. P22.3A — próxima execução
+Commit permanente: `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
+Gate transacional: `31281685349`: **success**.
 
-Objetivo: fazer a Jornada N1.07 corresponder à competência que o grafo promete, sem criar JD4 ainda.
+### Correções realizadas
 
-Antes da implementação:
+- faixa da ficha: F0;
+- prereqs: `N1.02 + N1.06`;
+- L1: sucessor até 5 com reta;
+- L2: sucessor até 10 com apoio reduzido;
+- L3: antecessor até 5;
+- L4: antecessor até 10;
+- L5: ordenar 3–4 numerais consecutivos;
+- `numberline`: salto positivo/negativo sem escapar do intervalo;
+- `plain`: salto positivo/negativo com prompt coerente;
+- novo `plain/ordering` opt-in para esta necessidade;
+- gabarito de ordenação sem misconception; distratores com `ORDEM_ERRADA`;
+- teste permanente `N1.07.test.ts`;
+- ficha autoral passa a declarar explicitamente Jornada conceitual ≠ JD4 automático.
 
-1. reconstruir a ficha/cânone autoral N1.07;
-2. comparar grafo, ficha Markdown, TS ativa e legado;
-3. decidir a escada de 5 níveis e micros para sucessor, antecessor e ordenação;
-4. reconciliar prereqs para o grafo;
-5. reaproveitar primitivas existentes quando suficientes;
-6. preservar o canário ativo, rollback e telemetria.
+### Portões
 
-Critério de fechamento:
+No lote transacional passaram:
 
-- a Journey deve observar os três componentes da competência, não apenas +1;
-- a ficha TS não pode divergir silenciosamente dos prereqs canônicos;
-- acerto não gera misconception;
-- perguntas/distratores válidos nos cinco níveis;
-- sonda N1.07 e gates completos verdes.
+- auditores curriculares;
+- TypeScript;
+- suíte completa;
+- build;
+- sonda real N1.07;
+- guarda textual/diff check.
 
-Somente depois abrir P22.3B/JD4.
+A bancada temporária foi removida e `ci.yml` restaurado ao blob estável.
 
-## 7. Regra de fechamento P22
+P22.3A não aumenta os contadores de Composer porque N1.07 já era registrada/ativa antes; elimina uma divergência semântica real.
+
+## 7. P22.3B — PRÓXIMA EXECUÇÃO
+
+Objetivo: registrar JD4 como trilha real do Jardim **sem contaminar o domínio da Jornada**.
+
+Contrato proposto:
+
+1. `id: "JD4"`;
+2. `mae: "N1.07"`;
+3. `destravaNoNivel` somente depois de compreensão suficiente da mãe;
+4. cinco níveis de automaticidade com retirada de apoio;
+5. sucessor 1–5 → sucessor 1–10 → sucessor 1–20 → antecessor 2–10 → alternância sucessor/antecessor 1–20;
+6. `rt_alvo` decrescente como metadado de fluência;
+7. progresso em `dojoTracks`, nunca em mastery da Jornada;
+8. JD4 não entra no grafo nem em `JOURNEY_FICHAS`;
+9. teste permanente + sonda real + gates completos.
+
+Somente depois abrir P22.4/N1.09.
+
+## 8. Regra de fechamento P22
 
 P22 só termina quando:
 
