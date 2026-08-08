@@ -115,7 +115,7 @@ function primitivasExistentes(): Set<string> {
  * sem o arquivo aparecer em `src/components/primitives/` significa que alguém
  * apagou a dívida em vez de pagá-la.
  */
-export const PRIMITIVAS_PENDENTES = ["Moedas", "Regua"];
+export const PRIMITIVAS_PENDENTES = ["Moedas", "Recipientes", "Regua"];
 
 /**
  * De que primitiva é feito cada `kind` que o runtime produz.
