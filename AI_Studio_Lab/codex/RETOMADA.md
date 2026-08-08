@@ -1,6 +1,6 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 8/ago/2026 — P21 concluída; P22 em execução. P22.1/GM.12 e P22.2/N4.09 concluídas; próxima tarefa exata: P22.3A/N1.07.**
+> **VIGENTE em 8/ago/2026 — P21 concluída; P22 em execução. P22.1/GM.12, P22.2/N4.09 e P22.3A/N1.07 concluídas; próxima tarefa exata: P22.3B/JD4.**
 
 ## 1. Leia antes de editar
 
@@ -18,7 +18,6 @@ Roadmaps de 5/ago são históricos. Não usar fila ou contagens antigas sem reca
 - branch: `codex/integrar-bloco-f0`;
 - `main` protegida: `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
 - PR #29: open + draft/no-merge;
-- head confirmado após auto-limpeza P22.2: `e259ccd19d10ec00ed6e4a35e2ce24967796d4f1`;
 - não tocar no Creature Engine;
 - não criar branch auxiliar;
 - workflow/script temporário deve se apagar no próprio lote.
@@ -33,9 +32,10 @@ Roadmaps de 5/ago são históricos. Não usar fila ou contagens antigas sem reca
 - P21.1 — registries, cobertura e proveniência;
 - P21.2 — mapa de primitivas reconciliado com builder→kind→renderer real;
 - **P22.1 — GM.12 promovida como estreia Composer**;
-- **P22.2 — N4.09 promovida como estreia Composer e telemetria de área corrigida**.
+- **P22.2 — N4.09 promovida e telemetria de área corrigida**;
+- **P22.3A — N1.07 reconciliada com o grafo: sucessor, antecessor, ordenação e prereqs canônicos**.
 
-## 4. Estado atual após P22.2
+## 4. Estado após P22.3A
 
 - grafo: 90/90;
 - Markdown: 92 fichas cobrindo 88/90 competências;
@@ -48,73 +48,63 @@ Roadmaps de 5/ago são históricos. Não usar fila ou contagens antigas sem reca
 - fallback real: **39/90**;
 - mapa de primitivas: 20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente.
 
+P22.3A não altera essas contagens porque N1.07 já era registrada/ativa; corrige o **significado real** que a ficha servia.
+
 ## 5. P22.1 — GM.12 CONCLUÍDA
 
 Gate final `31276881058`: **success**.
-Bancada auto-removida no commit `35493c012b96aaf64e919babba47cc5f5a4171cf`.
-
-Comprovado:
-
-- contrato específico e contrato genérico de canário;
-- estreia→rollback para placeholder→reativação;
-- sonda promovida em 390/320/900 px;
-- suíte completa: 125 arquivos / 2.145 testes;
-- auditores, TypeScript, grafo, build, `pr:check` e `git diff --check` verdes.
 
 ## 6. P22.2 — N4.09 CONCLUÍDA
 
-Primeiro gate `31277083778` encontrou um defeito semântico real: a alternativa correta de N4.09 carregava a tag diagnóstica sentinela `"correta"`, fazendo um acerto virar misconception no Radar.
-
-Correção causal:
-
-- `areaProcedure.ts`: gabarito sem tag; somente distratores recebem `MisconceptionTag`;
-- `areaContract.ts`: propaga tag somente quando existe;
-- `areaContract.test.ts`: trava gabarito sem diagnóstico e distratores com hipótese diagnóstica;
-- `canaryContract.test.ts`: N4.09 entrou no contrato genérico;
-- `composerCanaryIds.ts`: N4.09 promovida.
-
 Gate final `31277213310`: **success**.
-Bancada auto-removida; head limpo `e259ccd19d10ec00ed6e4a35e2ce24967796d4f1`.
+
+Correção causal preservada: gabarito de área sem tag diagnóstica; somente distratores carregam misconception.
+
+## 7. P22.3A — N1.07 CONCLUÍDA
+
+Commit permanente: `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
+Gate transacional: `31281685349`: **success**.
 
 Comprovado:
 
-- focal N4.09: **3 arquivos / 339 testes**;
-- sonda N4.09 promovida: verde;
-- proveniência: 24 registrados / 24 ativos / 0 inativos / 51 sem placeholder / 39 fallbacks;
-- `fichas:conferir`: 9/9;
-- suíte completa: **125 arquivos / 2.160 testes**;
-- TypeScript, grafo, build, `pr:check` e `git diff --check`: verdes;
-- PR #29 continua open + draft + unmerged; `main` permanece no SHA protegido.
+- faixa canônica F0;
+- prereqs `N1.02 + N1.06`;
+- L1: sucessor até 5 com reta;
+- L2: sucessor até 10 com apoio reduzido;
+- L3: antecessor até 5;
+- L4: antecessor até 10;
+- L5: ordenação de 3–4 numerais;
+- `numberline` e `plain` aceitam salto negativo sem escapar do intervalo;
+- `plain/ordering` é modo opt-in, sem alterar semântica das demais fichas;
+- resposta correta de ordenação não recebe misconception; distratores recebem `ORDEM_ERRADA`;
+- teste permanente `src/curriculum/fichas/jornada/N1.07.test.ts`;
+- cânone autoral explicita Jornada conceitual ≠ JD4 automático;
+- TypeScript, suíte completa, build e sonda real N1.07 verdes;
+- bancada temporária e permissão temporária de escrita foram auto-removidas; `ci.yml` voltou ao blob estável.
 
-## 7. PRÓXIMA TAREFA EXATA — P22.3A N1.07
+## 8. PRÓXIMA TAREFA EXATA — P22.3B JD4
 
-**Completar a compreensão da Jornada antes de criar JD4.**
+Registrar JD4 no Jardim **somente como automaticidade posterior de N1.07**.
 
-Estado auditado:
+Invariantes obrigatórios:
 
-- cânone N1.07: ordem, sucessor e antecessor até 10;
-- grafo: prereqs `N1.02 + N1.06`;
-- ficha TS ativa atual: cobre majoritariamente sucessor/+1 e declara `N1.04 + N1.06`;
-- JD4 é automaticidade da competência-mãe, não substituto do ensino conceitual.
+1. mãe: N1.07;
+2. destrava somente após compreensão suficiente da competência-mãe;
+3. estado em `dojoTracks`, separado do progresso da Jornada;
+4. `rt_alvo` e tempo descrevem fluência — nunca concedem domínio conceitual;
+5. cinco níveis devem treinar sucessor/antecessor com retirada de apoio e culminar em alternância;
+6. JD4 não entra no grafo/Journey registry;
+7. teste permanente + sonda real + gates completos antes de P22.4.
 
-Sequência obrigatória:
+## 9. Depois de P22.3B
 
-1. reler a ficha autoral/cânone N1.07 e o legado;
-2. reconciliar pré-requisitos com o grafo;
-3. implementar micros que provem sucessor + antecessor + ordenação;
-4. manter rollback legado e o contrato genérico;
-5. validar pedagogia, telemetria, tela e gates;
-6. somente depois abrir **P22.3B/JD4**.
+- P22.4 — N1.09: ficha autoral/TS completa para contagem até 20 e a partir de N;
+- P22.5 — GM.02: Tempo cotidiano pré-leitor;
+- depois: auditoria longitudinal dos motores adaptativos;
+- somente após invariantes dos motores: Coverage Matrix executável e fábrica curricular em ondas;
+- depois: mega auditoria pedagógica e release hardening.
 
-Não registrar JD4 enquanto a Jornada N1.07 não estiver completa e verde.
-
-## 8. Depois de P22.3
-
-- P22.4 — N1.09;
-- P22.5 — GM.02;
-- depois: auditoria longitudinal dos motores adaptativos, mega auditoria pedagógica, auditoria integrada JD/FD/PD e release hardening.
-
-## 9. Portões
+## 10. Portões
 
 ```bash
 npm run auditar
