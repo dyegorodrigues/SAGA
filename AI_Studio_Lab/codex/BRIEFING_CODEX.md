@@ -1,9 +1,8 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 8/ago/2026 após GM.01.**
+> **VIGENTE em 8/ago/2026 após P17 v2 e revalidação de N1.10/N1.11.**
 >
-> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md).
-> Este briefing é a versão executiva: regras, sequência e definição de pronto.
+> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md). Este briefing é a versão executiva: regras, sequência e definição de pronto.
 
 ## 0. Estado que não deve ser redescoberto
 
@@ -11,97 +10,96 @@
 - Trabalho: **`codex/integrar-bloco-f0`**.
 - `main`: `68fad4c575e28959b2ca4776e9a541d6828b63f3` — **não tocar**.
 - PR #29: draft, base `main`, somente comparação/CI, nunca auto-merge.
-- Checkpoint funcional: `cb868e77facfc02bf4ea412971393fdc1fbcb8e1`.
-- Nesse checkpoint: branch 190 commits à frente e 0 atrás da main.
+- Creature Engine: fora deste fluxo.
+- Remoto limpo: main + cumulativa + duas branches do Creature Engine.
 
-### O remoto está limpo
+## 1. P17 está fechada
 
-Só existem quatro branches:
+Documento: `DECISAO_P17_N110.md`.
 
-- `main`
-- `codex/integrar-bloco-f0`
-- `agent/creature-engine-tamagotchi`
-- `codex/criar-branch-para-creature-engine-tamagotchi`
+### N1.10
 
-As duas últimas são outro módulo e não devem ser tocadas neste fluxo.
+`JD5 → retirada real de andaime → NumberBond`
 
-## 1. Promoções concluídas nesta retomada
+O L4 alterna moldura e objetos realmente soltos. `SEM_MOLDURA` é gate obrigatório antes de L5. `TOTAL_ALEM_DE_CINCO` continua evidência independente de domínio.
 
-Em ordem, cada uma com commit próprio e CI completa:
+Revalidação: `37595c73795b45c9e16075749bae51690c5d77ac` — CI normal verde.
 
-| nó | ficha | estado anterior | promoção |
-|---|---|---|---|
-| `AL.01` | F51 classificação | intruso legado | `72483db7...` |
-| `N1.06` | F05 ouvir→símbolo | número escrito no legado | `d3c2b7d4...` |
-| `N1.13` | F04 produzir quantidade | fallback; nó novo | `6a6dc16f...` |
-| `GE.01` | F47 posição espacial | palavras/emoji no legado | `a9f9205f...` |
-| `GE.02` | F48 formas planas | pergunta fixa de emojis | `3f8e10cd...` |
-| `GM.01` | F49 grandezas visíveis | fallback | `cb868e77...` |
+### N1.11
 
-A lista ativa agora vive em:
+`JD3 → F28 NumberBond → n + □ = 10`
 
-`src/curriculum/motores/composerCanaryIds.ts`
+Revalidação sobre N1.10 ativa: `ab5b3b613a3226076b1d967a48cc99ba6c8b50c9` — CI normal verde.
 
-**Promoção futura = um id por commit.** Não reescrever `composerCanary.ts` só para ativar nó.
+### Regra estrutural
 
-## 2. Correções importantes que precederam as promoções
+Não criar nós por representação. JD3/JD5 completas vivem no Jardim como treino de automaticidade e não entram no DAG.
 
-### AL.01
+## 2. Canários F0 ativos/revalidados nesta retomada
 
-A §9 dizia que domínio exigia uma peça corretamente deixada fora, mas o runtime não colhia essa prova. Agora existe `Evidencia.NAO_PERTENCE`, procedimento emissor, coleta no GameLoop e fiscal global.
+- `AL.01`
+- `N1.06`
+- `N1.13`
+- `GE.01`
+- `GE.02`
+- `GM.01`
+- `N1.10`
+- `N1.11`
 
-### N1.06
+Ativação declarativa: `src/curriculum/motores/composerCanaryIds.ts`.
 
-Autoplay já tinha acontecido quando o prompt dizia "Aperte e escute". Agora a questão normal pergunta **"Que número você ouviu?"**; a micro-aula continua ensinando replay.
+**Promoção futura = um id por commit.**
 
-### F50 / GM.12
+## 3. GM.12 continua desligada
 
-Implementação e QA fecharam massa/capacidade, inclusive prints pós-despejo. **Não promover ainda.** Ver handoff para detalhes.
+F50/GM.12 está implementada, visualmente revisada e registrada, mas continua fora dos canários por decisão deliberada de observação.
 
-### P18
+Não promover no embalo.
 
-Fechada. `KindType` só contém kinds com builder. Legado continua em `Question.kind` string. Ver `DECISAO_P18_KINDTYPE.md`.
+## 4. Próxima frente obrigatória — P8 / Jardim do Dojo
 
-## 3. Próxima sequência obrigatória
+### O bug estrutural atual
 
-### Etapa 1 — auditar N1.10
+`DojoTab.tsx` chama um modo de **Dojo Garden**, porém esse modo não usa `JARDIM`. Ele lista `ALL_MATH_TRACKS` com estrelas como revisão CRA genérica.
 
-Antes de qualquer ativação:
+As trilhas reais já existem:
 
-1. ler ficha runtime N1.10 e fichas canônicas associadas;
-2. comparar JD5 perceptual × `bond` simbólico legado;
-3. confirmar §3–§9, especialmente voz/tutorial/domínio;
-4. capturar os cinco níveis em 320/390/900 e estados intermediários relevantes;
-5. confirmar o que acontece com a forma simbólica F1 quando a JD5 for promovida;
-6. só então decidir corrigir, promover ou manter desligada.
+- JD1 → N1.03;
+- JD2 → N1.08;
+- JD3 → N1.11;
+- JD5 → N1.10;
+- todas destravam no nível 3 da mãe.
 
-### Etapa 2 — auditar N1.11
+JD4 continua fora: não inventar nessa tarefa.
 
-A competência tem duas fichas conceitualmente diferentes: JD3 perceptual e F28 como conta. Confirmar a fronteira curricular antes de ativar a entrada runtime atual.
+### Não conectar JD* diretamente ao GameLoop
 
-### Etapa 3 — GM.12
+O GameLoop atual sempre usa `applyJourneyAnswer`, que é uma escada de **compreensão conceitual**. Jardim mede **automaticidade**.
 
-Reabrir somente depois do intervalo de observação e de releitura do handoff. Não ativar por conveniência só porque já está pronta tecnicamente.
+Além disso, bônus de velocidade hoje só existe para `rapid-fire` ou ids iniciados por `dojo`.
 
-### Etapa 4 — P8 / Jardim do Dojo
+Portanto a ordem correta é:
 
-Construir o consumidor real das trilhas JD1–JD5 sem criar currículo paralelo ao grafo.
+1. especificar o estado e o motor do Jardim;
+2. derivar unlock da mãe sem criar nó no grafo;
+3. progressão baseada em precisão + fluência/RT, não na coroa da Jornada;
+4. salvar estado separado da competência-mãe;
+5. manter Radar/telemetria sem chamar lentidão de misconception;
+6. criar adapter `Track`/sessão somente depois;
+7. substituir o Garden genérico da UI;
+8. QA em 320/390/900 e teste de save/unlock.
 
-### Etapa 5 — próximas primitivas
+## 5. QA visual — não confundir instrumento com produto
 
-`Moedas` e `Regua` quando suas fichas forem gargalo real. Não antecipar API órfã.
+ZIP de sonda pode conter:
 
-## 4. Ritual de qualquer nova sessão
+- `rollback` = versão legada intencional;
+- fases intermediárias da coreografia;
+- representação nova.
 
-1. conferir branches e SHA da `main`;
-2. `compare main..codex/integrar-bloco-f0` — cumulativa não pode estar atrás;
-3. ler commits posteriores ao checkpoint do handoff;
-4. confirmar PR #29 draft/não mesclada;
-5. verificar CI do head antes do primeiro lote funcional.
+Sonda/layout aprovado **não significa** UI/arte final aprovada. O shell visual antigo e manipulativos básicos continuam dívida de produto, separada da validade pedagógica.
 
-## 5. Portões
-
-Código:
+## 6. Portões
 
 ```bash
 npm run auditar
@@ -122,38 +120,31 @@ npm run sonda -- "<ID>"
 PRINTS_LARGURA=320 PRINTS_WAIT_MS=... node scripts/prints.mjs "<ID>"
 ```
 
-Canário:
+## 7. Regras que não se negociam
 
-- QA visual antes;
-- §9 realmente colhida;
-- rollback conhecido;
-- id já registrado no contrato;
-- um id por commit em `composerCanaryIds.ts`;
-- CI completa verde no SHA da promoção.
-
-## 6. Regras que não se negociam
-
-- uma tela não introduz conteúdo novo e linguagem visual nova ao mesmo tempo;
-- ficha inteira é contrato: §3 a §9;
-- resposta errada não emite evidência;
-- palco que coleta resposta é dono da interação;
-- divergência precisa ser declarada;
-- não editar teste para esconder defeito de código;
-- não guardar workflow temporário se a CI normal basta;
-- não criar branches auxiliares para o bloco atual;
+- não tocar na `main`;
 - não tocar nas branches do Creature Engine;
-- não mexer na `main`.
+- ficha inteira é contrato (§3–§9);
+- resposta errada não emite evidência;
+- não editar teste para esconder defeito de código;
+- não criar currículo paralelo;
+- representação nova não apaga representação anterior necessária;
+- troca de linguagem exige ponte observável;
+- não bypassar `SEM_MOLDURA`;
+- não conectar JD* ao motor da Jornada sem P8;
+- não deixar workflow temporário órfão;
+- não tratar sonda como direção visual final.
 
-## 7. Definição de pronto de um lote
+## 8. Definição de pronto de um lote
 
-- [ ] commit está na cumulativa;
-- [ ] `main` não moveu;
-- [ ] nenhuma branch extra ficou no remoto;
-- [ ] nenhum workflow temporário ficou órfão;
+- [ ] commit na cumulativa;
+- [ ] `main` imóvel;
+- [ ] nenhuma branch extra;
+- [ ] nenhum workflow temporário órfão;
 - [ ] auditorias/grafo/TypeScript/testes/build verdes;
-- [ ] sonda/prints quando há tela;
-- [ ] handoff atualizado se o estado operacional mudou;
-- [ ] PR #29 continua draft e não mesclada;
-- [ ] uma nova conversa consegue retomar sem reler a conversa anterior.
+- [ ] sonda/prints se há tela;
+- [ ] handoff atualizado se o estado mudou;
+- [ ] PR #29 continua draft/não mesclada;
+- [ ] nova conversa consegue retomar sem reler esta conversa.
 
 **Existir não é estar certo. Divergência pode ser corrigida; divergência silenciosa não.**
