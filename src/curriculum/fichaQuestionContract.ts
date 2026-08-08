@@ -17,6 +17,7 @@ import { PosicaoSpec } from "./procedimentos/posicaoContract";
 import { FormaSpec } from "./procedimentos/formaContract";
 import { GrandezaSpec } from "./procedimentos/grandezaContract";
 import { MolduraSpec } from "./procedimentos/tenFrameContract";
+import { MedidasSpec } from "./procedimentos/medidasContract";
 
 export type FichaAnswer = string | number;
 export type FichaEvaluate = (answer: unknown) => boolean;
@@ -57,6 +58,7 @@ export type FichaUiProps =
   | PosicaoSpec
   | FormaSpec
   | GrandezaSpec
+  | MedidasSpec
   | MolduraSpec
   | { text: string };
 

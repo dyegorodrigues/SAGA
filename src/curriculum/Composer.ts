@@ -65,6 +65,7 @@ import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
 import { construirFormaSpec } from "./procedimentos/formaContract";
 import { construirGrandezaSpec } from "./procedimentos/grandezaContract";
+import { construirMedidasSpec } from "./procedimentos/medidasContract";
 import { construirMolduraSpec } from "./procedimentos/tenFrameContract";
 import { ModoDaMoldura } from "./procedimentos/tenFrameProcedure";
 import { soaParecido } from "./procedimentos/audioChoiceProcedure";
@@ -933,6 +934,18 @@ export class Composer {
         answer = spec.resposta;
         uiProps = spec;
         evaluate = candidate => Number(candidate) === answer;
+        promptOverride = spec.enunciado;
+        options = undefined;
+        break;
+      }
+
+      case "medidas": {
+        // F50/GM.12. Um único kind compõe as DUAS primitivas que a ficha nomeia:
+        // Balanca nos degraus de massa e Recipientes nos de capacidade.
+        const spec = construirMedidasSpec(lvl, Math.random);
+        answer = spec.seriacao ? "ordenado" : spec.resposta;
+        uiProps = spec;
+        evaluate = candidate => spec.seriacao ? candidate === "ordenado" : Number(candidate) === spec.resposta;
         promptOverride = spec.enunciado;
         options = undefined;
         break;

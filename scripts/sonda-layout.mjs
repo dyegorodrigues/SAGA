@@ -34,8 +34,9 @@ import path from "node:path";
 
 const PORTA = 5199;
 const BASE = `http://localhost:${PORTA}/sonda/`;
-const CHROME = process.env.SONDA_CHROME
-  || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+// O Playwright conhece a revisão compatível com a própria versão. Congelar
+// `/opt/.../chromium-1194` fez a sonda quebrar quando playwright-core evoluiu.
+const CHROME = process.env.SONDA_CHROME || chromium.executablePath();
 const SALVAR_FOTOS = process.argv.includes("--fotos");
 
 /**

@@ -43,6 +43,7 @@ import { N1_13 } from "../src/curriculum/fichas/jornada/N1.13";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { GE_02 } from "../src/curriculum/fichas/jornada/GE.02";
 import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
+import { GM_12 } from "../src/curriculum/fichas/jornada/GM.12";
 import { N1_10 } from "../src/curriculum/fichas/jornada/N1.10";
 import { N1_11 } from "../src/curriculum/fichas/jornada/N1.11";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
@@ -192,6 +193,10 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
  * vale olhar, não uma por competência.
  */
 export const CENAS: Cena[] = [
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `GM.12 F50 massa/capacidade (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={GM_12} lvl={lvl} semente={s} />,
+  })),
   // N1.01 pelo `track.gen`: é a tela em ROLLBACK — a ficha congelada de
   // draggroup que a produção serve enquanto o pareamento não é ativado. Medir
   // o alvo de rollback importa: uma tela de emergência quebrada não socorre.

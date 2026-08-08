@@ -88,7 +88,7 @@ export interface AnswerMeta {
   };
 
   misconception?: string;
-  source?: "vertical-column" | "array-grid";
+  source?: "vertical-column" | "array-grid" | "medidas";
   columnIndex?: number;
   /**
    * Assinatura do gesto, quando a resposta veio de manipulação (arrasto, corte,

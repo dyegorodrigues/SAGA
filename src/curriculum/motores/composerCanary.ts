@@ -19,6 +19,7 @@ import { N1_13 } from "../fichas/jornada/N1.13";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
+import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
@@ -96,6 +97,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // fallback genérico. Uma competência de faixa F0 com duas fichas escritas no
   // cânone e zero código. Registrada aqui e NÃO ativada.
   "GM.01": GM_01,
+
+  // GM.12/F50: massa e capacidade sem unidade. Implementada aqui, mas NÃO
+  // ativada — tela nova cumpre o mesmo intervalo de observação das anteriores.
+  "GM.12": GM_12,
 };
 
 /**

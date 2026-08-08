@@ -14,7 +14,7 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain("[MAPA FICHA → RUNTIME]");
     expect(output).toContain("TouchCount: executável");
     expect(output).toContain("Moedas: renderer-sem-builder");
-    expect(output).toContain("Recipientes: ausente");
+    expect(output).toContain("Recipientes: executável");
     expect(output).toContain("Regua: ausente");
     expect(output).toContain("[RESULTADO] 92 fichas válidas");
   });

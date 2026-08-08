@@ -62,7 +62,8 @@ export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
     || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
     || (isFormaQuestion(q) && meta?.forma !== undefined)
-    || (q.kind === "grandeza" && meta?.grandeza !== undefined);
+    || (q.kind === "grandeza" && meta?.grandeza !== undefined)
+    || (q.kind === "medidas" && meta?.source === "medidas");
 }
 
 /** Os mesmos palcos também possuem a voz e o fecho definidos pela própria ficha. */
@@ -71,7 +72,8 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
     || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
     || (isFormaQuestion(q) && meta?.forma !== undefined)
-    || (q.kind === "grandeza" && meta?.grandeza !== undefined);
+    || (q.kind === "grandeza" && meta?.grandeza !== undefined)
+    || (q.kind === "medidas" && meta?.source === "medidas");
 }
 
 /**
@@ -89,6 +91,10 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
   }
   if (q.kind === "grandeza" && meta?.grandeza !== undefined) {
     // F49 §4: 1,8s de medida + 1,5s de fecho comparativo.
+    return 3300;
+  }
+  if (q.kind === "medidas" && meta?.source === "medidas") {
+    // F50 §4: verificação física + fecho sob referência comum.
     return 3300;
   }
   // F05 e F04 já fecham seus roteiros dentro desta janela histórica.
@@ -161,7 +167,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
-  "touchplace", "shapecanvas", "grandeza", "moldura",
+  "touchplace", "shapecanvas", "grandeza", "medidas", "moldura",
 ]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {

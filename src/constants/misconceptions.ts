@@ -275,6 +275,17 @@ export const MisconceptionTag = {
   /** Grandezas: acerta a diferença gritante e erra a pequena — enxerga, não compara */
   SO_DIFERENCA_GRANDE: "so-diferenca-grande",
 
+  /* --- massa e capacidade (ficha F50 / GM.12) ----------------------- */
+
+  /** Massa/capacidade: julgou pela aparência mesmo quando a referência contradizia. */
+  JULGA_PELO_TAMANHO: "julga-pelo-tamanho",
+
+  /** Massa: usou volume/tamanho aparente como substituto do peso. */
+  CONFUNDE_PESO_VOLUME: "confunde-peso-volume",
+
+  /** Capacidade: comparou a altura do líquido sem neutralizar o formato do recipiente. */
+  IGNORA_FORMATO: "ignora-formato",
+
   /* --- a moldura de dez (fichas F02, JD3 e JD5) ---------------------- */
 
   /** Moldura: somou as casas vazias às cheias — não distingue ocupado de vago */

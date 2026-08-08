@@ -115,7 +115,7 @@ function primitivasExistentes(): Set<string> {
  * sem o arquivo aparecer em `src/components/primitives/` significa que alguém
  * apagou a dívida em vez de pagá-la.
  */
-export const PRIMITIVAS_PENDENTES = ["Moedas", "Recipientes", "Regua"];
+export const PRIMITIVAS_PENDENTES = ["Moedas", "Regua"];
 
 /**
  * De que primitiva é feito cada `kind` que o runtime produz.
@@ -150,6 +150,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   array: ["ArrayGrid"],
   relogio: ["Relogio"],
   balanca: ["Balanca"],
+  medidas: ["Balanca", "Recipientes"],
   shape: ["ShapeCanvas"],
   "singapore-bars": ["SingaporeBars"],
   "story-bars": ["StoryPanel", "SingaporeBars"],

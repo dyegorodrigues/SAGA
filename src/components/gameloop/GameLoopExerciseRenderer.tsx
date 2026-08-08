@@ -18,6 +18,7 @@ import { TouchPlaceStage } from "../primitives/TouchPlaceStage";
 import { CenaDePosicaoStage } from "../primitives/CenaDePosicaoStage";
 import { FormaStage } from "../primitives/FormaStage";
 import { GrandezaStage } from "../primitives/GrandezaStage";
+import { MedidasStage } from "../primitives/MedidasStage";
 import { MolduraStage, FaseDaMoldura } from "../primitives/MolduraStage";
 import { NumberBond } from "../primitives/NumberBond";
 import { FichaRenderer } from "../FichaRenderer";
@@ -74,6 +75,7 @@ export const PALCOS_JA_DESENHADOS = new Set([
   "touchplace",
   "shapecanvas",
   "grandeza",
+  "medidas",
   "moldura",
 ]);
 
@@ -230,6 +232,15 @@ export function GameLoopExerciseRenderer({
         {/* O `shapecanvas` serve DUAS fichas. Quem distingue é o spec: o da
             F48 traz `opcoes`, o da F47 traz `referencial`. Ler o spec em vez
             de guardar um campo "modo" evita duas fontes para a mesma verdade. */}
+        {q.kind === "medidas" && q.uiProps && (
+          <MedidasStage
+            spec={q.uiProps as never}
+            falar={sound ? (t) => speak(t) : undefined}
+            onAnswer={(valor, meta) => handlePick(valor, undefined, meta)}
+            disabled={status !== null}
+            mostrar={typeof tutShow === "object" ? tutShow : null}
+          />
+        )}
         {q.kind === "shapecanvas" && q.uiProps && "opcoes" in q.uiProps && (
           <FormaStage
             spec={q.uiProps as never}

@@ -65,6 +65,12 @@ export const Evidencia = {
   DIFERENCA_PEQUENA: "diferenca-pequena",
 
   /**
+   * F50 (GM.12): um acerto em caso **contraintuitivo** — formato/tamanho aponta para o lado errado.
+   * A competência é conservação; sem este caso, três acertos óbvios não a provam.
+   */
+  CASO_CONTRAINTUITIVO: "caso-contraintuitivo",
+
+  /**
    * F02 (N1.08): um acerto com quantidade **entre 6 e 10**.
    *
    * É o que exige usar a estrutura das DUAS fileiras — abaixo de seis, a
