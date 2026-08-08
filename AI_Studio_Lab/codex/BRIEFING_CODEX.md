@@ -1,119 +1,142 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 8/ago/2026 após P17 + P8 + P19.**
->
-> Leia primeiro [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md). Depois leia `DECISAO_P17_N110.md`, `DECISAO_P8_JARDIM.md` e `DECISAO_P19_ESTADO_E_DEPENDENCIAS.md`.
+> **VIGENTE em 8/ago/2026, pós-P20.**  
+> Não reconstruir o histórico pela conversa.
 
-## 0. Estado que não deve ser redescoberto
+## 0. Primeira leitura
 
-- Repo: `dyegorodrigues/SAGA`.
-- Trabalho: **`codex/integrar-bloco-f0`**.
-- `main`: `68fad4c575e28959b2ca4776e9a541d6828b63f3` — **não tocar**.
-- Cumulativa: última comparação **266 commits à frente / 0 atrás**.
-- PR #29: open + draft, base `main`, só comparação/CI, nunca auto-merge.
-- Creature Engine: fora deste fluxo.
-- Não criar branches auxiliares.
+1. `MAPA_MESTRE_POS_P20.md`
+2. `HANDOFF_CONTINUIDADE_IA.md`
+3. este briefing
 
-## 1. P17 — fechada
+Repo: `dyegorodrigues/SAGA`  
+Branch: **`codex/integrar-bloco-f0`**  
+`main`: `68fad4c575e28959b2ca4776e9a541d6828b63f3` — **não tocar**.  
+PR #29: draft/no-merge.  
+Creature Engine: fora deste fluxo.
 
-- `N1.10`: JD5 → retirada real de moldura → NumberBond; `SEM_MOLDURA` gate antes de L5.
-- `N1.11`: JD3 → F28 NumberBond → `n + □ = 10`.
-- N1.10/N1.11 ativos e revalidados em CI normal separada.
-- `MasteryRule` executa `acertos/de/sessoes` da ficha.
+## 1. Não redescobrir
 
-## 2. P8 — fechada
+### P17 fechada
+
+- N1.10: JD5 → retirada real de moldura → NumberBond; `SEM_MOLDURA` é gate.
+- N1.11: JD3 → F28 → `n + □ = 10`.
+- tempo não reprova compreensão da Jornada.
+
+### P8 fechada
 
 Jardim real:
 
-- JD1 → N1.03
-- JD2 → N1.08
-- JD3 → N1.11
-- JD5 → N1.10
+- JD1→N1.03;
+- JD2→N1.08;
+- JD3→N1.11;
+- JD5→N1.10.
 
-Regras:
+JD fora do DAG; save em `dojoTracks`; GameLoop Garden não usa progressão conceitual da Jornada. **JD4 continua dívida.**
 
-- JD fora do DAG;
-- unlock pela mãe já ter conquistado nível 3 ou domínio;
-- estado em `dojoTracks`, nunca `progress[JD*]`;
-- GameLoop Garden não chama `applyJourneyAnswer`;
-- round atual 8 itens;
-- 2 rounds ≥80% precisão **e** ≥80% fluência → avança;
-- 2 rounds <60% → recua treino sem retirar conquista;
-- lentidão não é misconception;
-- primeira resposta cognitiva mede automaticidade;
-- erros reais vão para Radar da mãe;
-- sem level picker no Garden.
+### P18 fechada
 
-QA permanente passou 320/390/900; o shell visual atual não é arte premium final.
+Kind autoral sem builder não compila como promessa válida.
 
-## 3. P19 — fechada
+### P19 fechada
 
-### Migrador
+- migrador único em `src/utils/migrator.ts`;
+- npm audit completo/produção = 0 após remediação conservadora do lockfile.
 
-`src/utils/migrator.ts` é agora a **única** fonte de migração; App importa `migrate/defaultState/localDay`.
+### P20 fechada
 
-Commit funcional: `86ecea6b932ee174f81f9b2914d3ffade9088798`.
+Commit funcional:
 
-Testes cobrem save v1, `dojoTracks`, wallet/estrelas, coroa legada, pet, defaults, não-mutação e proibição de migrador duplicado no App.
+`f45509ca73739d93fe32986c9cf7bcc5aaf6337a`
 
-### Dependências
+- local por Firebase UID;
+- legado global só como ponte controlada;
+- bootstrap único local/cloud;
+- migração/validação antes da escolha;
+- sync pendente carrega UID de origem;
+- troca de identidade cancela pendência velha;
+- anonymous→Google preserva UID por link;
+- callback de login não instala estado;
+- logout faz flush antes do sign-out.
 
-Relatório: `AUDITORIA_P19_DEPENDENCIAS.md`.
+Gate P20 run `31273869346`: focais + auditores + suíte inteira + build + publicação = success.
 
-Lockfile remediado sem alterar ranges do `package.json`:
+Documento: `DECISAO_P20_IDENTIDADE_SAVE.md`.
 
-- js-yaml 5.2.3
-- nanoid 3.3.18
-- postcss 8.5.26
-- body-parser 1.20.6
+## 2. Canários
 
-Commit: `bd17e42d55eae3bbff1afd08f137ea001f76b91e`.
+Fonte única:
 
-Após reinstalação limpa:
+`src/curriculum/motores/composerCanaryIds.ts`
 
-- audit completo = **0**;
-- audit produção = **0**;
-- TS/suíte/build/auditorias = verdes.
+Registradas mas não ativas que importam para a fila:
 
-Decisão: `DECISAO_P19_ESTADO_E_DEPENDENCIAS.md`.
+- N4.09;
+- GM.12.
 
-## 4. Canários ativos/revalidados desta retomada
+Promoção = um id/commit, sempre com rollback e QA.
 
-`AL.01`, `N1.06`, `N1.13`, `GE.01`, `GE.02`, `GM.01`, `N1.10`, `N1.11`.
+## 3. PRÓXIMA TAREFA — P21
 
-Única lista declarativa: `src/curriculum/motores/composerCanaryIds.ts`.
+**Reconciliar as fontes de verdade antes de construir mais conteúdo.**
 
-Promoção futura = **um id por commit**.
+Roadmaps antigos contêm números e estados superados. Não os apagar: marcar contexto histórico e recalcular o presente pelo código.
 
-## 5. GM.12 continua desligada
+### Entregáveis P21
 
-F50/GM.12 está implementada e visualmente revisada, mas em observação.
+1. número real de nós;
+2. ficha autoral por nó;
+3. active / registered / legacy / fallback;
+4. catálogo de primitivas e runtime executável;
+5. divergências ficha×runtime atuais;
+6. canários atuais;
+7. dívida confirmada versus dívida histórica já fechada;
+8. atualizar/rotular `RETOMADA`, `ROTEIRO_ATE_O_FIM` e `PLANO_DO_BLOCO_F0`;
+9. atualizar `MAPA_MESTRE_POS_P20.md` com números calculados.
 
-**Não promover por momentum.**
+## 4. Depois da P21
 
-## 6. Próxima frente — P20 / sync local × nuvem
+### Deliberadas
 
-### Começar audit-only
+- reauditar N4.09 antes de promoção;
+- reavaliar GM.12 sem momentum;
+- auditar/definir JD4 e sua relação com N1.07;
+- construir `Moedas`/`Regua` somente se uma ficha real exigir.
 
-App importa `loadStateFromCloud`, `reconcileStateByRevision` e `saveStateToCloud` de `./services/storageSync`, mas o conector não localizou diretamente esse path enquanto TS/build continuam verdes.
+### Revalidar
 
-Não concluir nada por 404 do conector. Primeiro inventariar o checkout real.
+- antiga dívida de coreografia: N3.10, N4.03, N4.04, N4.06, N4.07, N4.08 L3–L5;
+- antigo P4 flaky;
+- qualquer número de “legado/vazio/divergente” anterior a P21.
 
-Responder:
+## 5. Fases sistêmicas grandes
 
-1. qual arquivo real resolve o import;
-2. consumidores e rotas de load/save/reconcile;
-3. precedência por `revision` e regra de empate;
-4. se todos os campos do State viajam juntos;
-5. migração antes/depois da reconciliação;
-6. offline/reconexão;
-7. service worker / `SAVE_REQUEST`;
-8. risco de payload stale/equal revision apagar campo novo;
-9. testes existentes/ausentes.
+### Auditoria dos motores adaptativos
 
-Só depois decidir patch.
+Testar longitudinalmente Progress Engine, Minha Aula/Composer, Radar, Oficina, Jardim, FD/PD, matrícula, revisão espaçada, mastery, unlock e telemetria.
 
-## 7. Portões
+Não basta unit test. Simular crianças sintéticas: correta-lenta, rápida-chutando, misconception persistente, esquecimento, andaime-dependente, visual forte/simbólico fraco, retorno após semanas etc.
+
+### Mega auditoria de engenharia pedagógica
+
+Auditar:
+
+1. currículo/grafo;
+2. cada ficha/escada de níveis;
+3. primitivas como linguagem pedagógica;
+4. trajetória completa da criança desde zero.
+
+Confrontar com pesquisa externa atualizada e classificar cada competência: `OK`, `micro-lacuna`, `lacuna estrutural`, `precisa observação`.
+
+### Dojo completo
+
+Separar e integrar Jardim/JD, fatos/FD e procedimentos/PD.
+
+### Release hardening
+
+Full QA técnico/visual/auth/offline/migração/acessibilidade/performance/dados infantis/documentação antes de qualquer decisão do autor sobre integração.
+
+## 6. Portões
 
 ```bash
 npm run auditar
@@ -127,16 +150,19 @@ npm run pr:check
 git diff --check
 ```
 
-## 8. Não fazer
+Tela afetada: sonda + prints reais.
+
+## 7. Não fazer
 
 - não tocar `main`;
 - não tocar Creature Engine;
-- não reabrir P17/P8/P19 sem falha objetiva;
-- não criar currículo paralelo nem `progress[JD*]`;
-- não promover GM.12 no embalo;
-- não alterar sync antes da auditoria P20;
-- não usar `npm audit fix` cegamente;
-- não tratar sonda como arte final;
-- não deixar workflow/script temporário órfão.
+- não usar roadmap antigo como fila atual;
+- não reabrir P17/P8/P19/P20 sem falha objetiva;
+- não criar currículo paralelo;
+- não criar `progress[JD*]`;
+- não promover N4.09/GM.12 por conveniência;
+- não implementar JD4 por semelhança nominal;
+- não tratar teste verde como prova pedagógica;
+- não deixar bancada temporária órfã.
 
-**Existir não é estar certo. Divergência pode ser corrigida; divergência silenciosa não.**
+**Comece pela P21.**
