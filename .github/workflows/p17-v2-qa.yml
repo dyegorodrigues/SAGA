@@ -26,17 +26,48 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Corrigir âncora conhecida da bancada
+      - name: Corrigir detalhes conhecidos da bancada
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('AI_Studio_Lab/tools/p17_v2_apply.py')
           s = p.read_text()
+
           old = 'anchor = \'\'\'  it("a JD5 levanta a tampa na revelação", () => {\'\'\''
           new = 'anchor = \'\'\'  it("⚠️ a tampa LEVANTA na revelação, mesmo quando ela errou", () => {\'\'\''
           if s.count(old) != 1:
               raise SystemExit(f'âncora inesperada: {s.count(old)}')
-          p.write_text(s.replace(old, new))
+          s = s.replace(old, new)
+
+          # O teste existente importa apenas JD3 e não usa `screen`; a bancada
+          # nova segue o padrão local em vez de inventar uma API de teste paralela.
+          marker = 'text = p.read_text()\nanchor = \'\'\'  it("⚠️ a tampa LEVANTA na revelação, mesmo quando ela errou", () => {\'\'\''
+          repl = '''text = p.read_text()\ntext = text.replace(\n    'import { JD3 } from "../../curriculum/fichas/dojo/jardim";',\n    'import { JD3, JD5 } from "../../curriculum/fichas/dojo/jardim";',\n)\nanchor = \'\'\'  it("⚠️ a tampa LEVANTA na revelação, mesmo quando ela errou", () => {\'\'\''''
+          if s.count(marker) != 1:
+              raise SystemExit(f'marcador fixture: {s.count(marker)}')
+          s = s.replace(marker, repl)
+
+          s = s.replace(
+              'const { rerender } = render(<MolduraStage spec={spec5} fase="mostrando" />);',
+              'const { container, rerender } = render(<MolduraStage spec={spec5} fase="mostrando" />);',
+          )
+          s = s.replace(
+              'expect(screen.getByRole("group", { name: /conjunto solto/ })).toBeTruthy();',
+              'expect(container.querySelector(\'[aria-label^="conjunto solto"]\')).toBeTruthy();',
+          )
+          s = s.replace(
+              'expect(screen.getAllByTestId("objeto-solto")).toHaveLength(spec5.ocupadas.length);',
+              'expect(container.querySelectorAll(\'[data-testid="objeto-solto"]\')).toHaveLength(spec5.ocupadas.length);',
+          )
+          s = s.replace(
+              'expect(screen.getAllByTestId("objeto-solto")).toHaveLength(spec5.visiveis);',
+              'expect(container.querySelectorAll(\'[data-testid="objeto-solto"]\')).toHaveLength(spec5.visiveis);',
+          )
+          s = s.replace(
+              'expect(screen.getAllByTestId("tampa-solta").length).toBeLessThanOrEqual(2);',
+              'expect(container.querySelectorAll(\'[data-testid="tampa-solta"]\').length).toBeLessThanOrEqual(2);',
+          )
+          p.write_text(s)
           PY
 
       - name: Aplicar P17 v2
