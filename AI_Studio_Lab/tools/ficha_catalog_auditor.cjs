@@ -13,7 +13,10 @@ const RENDERER_PATHS = [
   path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
 ];
 const EXPECTED_FICHAS = 92;
-const EXPECTED_COMPETENCIES = 88;
+const EXPLICIT_MISSING_FICHA_EXCEPTIONS = new Map([
+  ["N1.09", "P21/P22: nó do grafo ainda sem ficha Markdown; decisão pedagógica deliberada pendente."],
+  ["GM.02", "P21/P22: Tempo cotidiano ainda sem ficha Markdown; decisão pedagógica deliberada pendente."],
+]);
 const REJECTED_IDS = new Set(["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"]);
 
 const failures = [];
@@ -65,10 +68,6 @@ const uniqueCompetenceIds = new Set(competenceIds);
 
 check(fichas.length === EXPECTED_FICHAS, `esperava ${EXPECTED_FICHAS} fichas; encontrou ${fichas.length}`);
 check(new Set(fichaIds).size === fichaIds.length, "há IDs de ficha duplicados");
-check(
-  uniqueCompetenceIds.size === EXPECTED_COMPETENCIES,
-  `esperava cobertura autoral de ${EXPECTED_COMPETENCIES} competências; encontrou ${uniqueCompetenceIds.size}`
-);
 
 for (const ficha of fichas) {
   check(Boolean(ficha.competenceId), `${ficha.fichaId} não declara competência e primitiva na identidade`);
@@ -83,6 +82,33 @@ for (const ficha of fichas) {
 }
 
 const missingCompetenceFichas = [...graphIds].filter((id) => !uniqueCompetenceIds.has(id));
+const unexpectedMissingCompetences = missingCompetenceFichas
+  .filter((id) => !EXPLICIT_MISSING_FICHA_EXCEPTIONS.has(id));
+const staleMissingExceptions = [...EXPLICIT_MISSING_FICHA_EXCEPTIONS.keys()]
+  .filter((id) => !missingCompetenceFichas.includes(id));
+const unknownMissingExceptions = [...EXPLICIT_MISSING_FICHA_EXCEPTIONS.keys()]
+  .filter((id) => !graphIds.has(id));
+const unjustifiedMissingExceptions = [...EXPLICIT_MISSING_FICHA_EXCEPTIONS]
+  .filter(([, reason]) => typeof reason !== "string" || reason.trim().length < 20)
+  .map(([id]) => id);
+
+check(
+  unexpectedMissingCompetences.length === 0,
+  `grafo possui competências sem ficha e sem exceção explícita: ${unexpectedMissingCompetences.join(", ")}`
+);
+check(
+  staleMissingExceptions.length === 0,
+  `remova exceções de ficha que já não são lacunas: ${staleMissingExceptions.join(", ")}`
+);
+check(
+  unknownMissingExceptions.length === 0,
+  `exceções de ficha apontam para IDs fora do grafo: ${unknownMissingExceptions.join(", ")}`
+);
+check(
+  unjustifiedMissingExceptions.length === 0,
+  `exceções de ficha precisam de justificativa explícita: ${unjustifiedMissingExceptions.join(", ")}`
+);
+
 const primitiveUsage = new Map();
 for (const ficha of fichas) {
   for (const primitive of ficha.primitives) {
@@ -173,8 +199,14 @@ for (const file of files) {
   console.log(`- ${file}: ${fichas.filter((ficha) => ficha.file === file).length} fichas`);
 }
 
-console.log("\n[COMPETÊNCIAS SEM FICHA AUTORAL]");
-console.log(missingCompetenceFichas.join(", ") || "Nenhuma");
+console.log("\n[COMPETÊNCIAS SEM FICHA AUTORAL — EXCEÇÕES EXPLÍCITAS]");
+if (missingCompetenceFichas.length) {
+  for (const id of missingCompetenceFichas) {
+    console.log(`- ${id}: ${EXPLICIT_MISSING_FICHA_EXCEPTIONS.get(id) || "SEM EXCEÇÃO — FALHA"}`);
+  }
+} else {
+  console.log("Nenhuma");
+}
 
 console.log("\n[PRIMITIVAS SEM COMPONENTE HOMÔNIMO]");
 for (const { primitive, usedBy } of unavailablePrimitives) {
@@ -202,5 +234,9 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;
 } else {
-  console.log("\n[RESULTADO] 92 fichas válidas, nove seções presentes e 88 competências cobertas.");
+  console.log(
+    `\n[RESULTADO] ${fichas.length} fichas válidas, nove seções presentes e ` +
+    `${uniqueCompetenceIds.size}/${graphIds.size} competências cobertas; ` +
+    `${missingCompetenceFichas.length} lacuna(s) canônica(s) explícita(s).`
+  );
 }
