@@ -1,0 +1,68 @@
+name: Close GM12 contract v3
+
+permissions:
+  contents: write
+
+on:
+  pull_request:
+    branches: [main]
+    types: [reopened]
+
+jobs:
+  close:
+    if: github.head_ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+
+      - name: Reaplicar contrato e normalizar documentação
+        run: |
+          git show 16b342dee17ad93190bfb3a538f1ab02c9464577:.github/workflows/close-gm12-contract.yml > /tmp/gm12-source.yml
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import YAML from 'yaml';
+          const source = YAML.parse(fs.readFileSync('/tmp/gm12-source.yml', 'utf8'));
+          const first = source.jobs.close.steps.find(s => s.name === 'Ligar tutorial e falas específicas da F50')?.run;
+          let second = source.jobs.close.steps.find(s => s.name === 'Sincronizar cânone e inventário executável')?.run;
+          if (!first || !second) throw new Error('scripts de fechamento não encontrados no checkpoint');
+          // O script original terminava em diff --check antes que pudéssemos
+          // normalizar o Markdown. Retiramos só esse portão intermediário; o
+          // portão real continua logo depois da normalização.
+          second = second.replace(/\n\s*git diff --check\s*$/, '');
+          fs.writeFileSync('/tmp/gm12-first.sh', first, { mode: 0o700 });
+          fs.writeFileSync('/tmp/gm12-second.sh', second, { mode: 0o700 });
+          NODE
+          bash /tmp/gm12-first.sh
+          bash /tmp/gm12-second.sh
+          sed -i -E 's/[[:blank:]]+$//' AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md
+          git diff --check
+
+      - name: Provar fechamento da F50
+        run: |
+          npm run auditar
+          npm run fichas:auditar
+          npm run fichas:conferir
+          npm run grafo:check
+          npx tsc --noEmit
+          npx vitest run src/curriculum/fichas/jornada/GM.12.test.ts src/curriculum/procedimentos/medidasContract.test.ts src/curriculum/procedimentos/medidasProcedure.test.ts src/curriculum/fichaRuntimeMap.test.ts
+          npm test -- --run
+          npm run build
+
+      - name: Publicar fechamento e remover bancada
+        run: |
+          rm .github/workflows/close-gm12-contract-v3.yml
+          git config user.name 'SAGA Codex'
+          git config user.email 'noreply@github.com'
+          git add src AI_Studio_Lab .github/workflows/close-gm12-contract-v3.yml
+          git diff --cached --check
+          git commit -m 'GM.12: fecha tutorial, falas e cânone da F50 validada'
+          git push origin HEAD:codex/integrar-bloco-f0
