@@ -120,11 +120,11 @@ export const COMPOSER_CANARIES = new Set<string>([
   // PR que a escreve. O rollback cai em `gN1_10`, que é o bond que ela serve
   // hoje.
 
-  // A AL.01 SAIU daqui: a ficha dela foi reescrita de `intruso_math` ("qual é
-  // o diferente?", múltipla escolha) para a F51 de verdade — separar peças em
-  // laços, com o "não pertence" como resposta. É tela nova, e tela nova não
-  // estreia no PR que a escreve. O rollback cai em `legadoAL_01`, que é o
-  // intruso que ela serve hoje.
+  // AL.01/F51 — promovida depois do intervalo de observação: cinco níveis
+  // inspecionados em 320/390/900, §9 ligada ponta a ponta à evidência
+  // NAO_PERTENCE e rollback congelado em `legadoAL_01`. A promoção é um único
+  // id e pode ser revertida removendo-o deste conjunto.
+  "AL.01",
 
   // ---- ATIVAÇÃO do bloco F0 ----------------------------------------
   //
