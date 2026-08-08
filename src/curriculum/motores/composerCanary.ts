@@ -15,6 +15,7 @@ import { N1_04 } from "../fichas/jornada/N1.04";
 import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
+import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_13 } from "../fichas/jornada/N1.13";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
@@ -24,6 +25,7 @@ import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
+import { construirContagem20Question } from "../procedimentos/contagem20Contract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -58,6 +60,9 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.06": N1_06,
   "N1.07": N1_07,
   "N1.08": N1_08,
+
+  // P22.4: contagem até 20; desligado volta ao gVis_Sequence legado.
+  "N1.09": N1_09,
 
   // F04: novo nó de produzir quantidade; desligado volta ao fallback.
   "N1.13": N1_13,
@@ -101,6 +106,21 @@ export function hasComposerFicha(id: string): boolean {
   return Object.prototype.hasOwnProperty.call(COMPOSER_FICHAS, id);
 }
 
+/**
+ * Porta única para gerar uma questão autoral registrada.
+ *
+ * A maioria das fichas usa o Composer genérico. N1.09 exige uma resposta de
+ * sequência com três termos para distinguir "partir de N" de um simples
+ * sucessor; por isso delega a um contrato procedimental explícito, da mesma
+ * forma que outras primitivas autorais delegam seus cálculos a contratos.
+ */
+export function generateRegisteredFichaQuestion(id: string, level: number): Question {
+  const ficha = COMPOSER_FICHAS[id];
+  if (!ficha) throw new Error(`Ficha Composer não registrada: ${id}.`);
+  if (id === "N1.09") return construirContagem20Question(ficha, level);
+  return Composer.generate(ficha, level);
+}
+
 function resolveSource(id: string, legacy: Generator | undefined): GeneratorSource {
   if (COMPOSER_CANARIES.has(id) && hasComposerFicha(id)) return "composer";
   return legacy ? "legacy" : "fallback";
@@ -122,7 +142,7 @@ export function selectGenerator(
     gen: level => {
       switch (resolveSource(id, legacy)) {
         case "composer":
-          return Composer.generate(COMPOSER_FICHAS[id], level);
+          return generateRegisteredFichaQuestion(id, level);
         case "legacy":
           return (legacy as Generator)(level);
         default:
