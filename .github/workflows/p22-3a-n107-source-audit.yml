@@ -1,0 +1,54 @@
+name: P22.3A - N1.07 source audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.event.pull_request.head.ref == 'codex/integrar-bloco-f0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/integrar-bloco-f0
+          fetch-depth: 0
+      - name: Canon JD4
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md')
+          s = p.read_text()
+          start = s.index('# FICHA JD4')
+          end = s.find('\n# FICHA ', start + 1)
+          if end < 0: end = len(s)
+          print(s[start:end])
+          PY
+      - name: Grafo e legado N1.07
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          n1 = Path('curriculum/N1.yaml').read_text()
+          m = re.search(r'(?ms)^  N1\.07:.*?(?=^  N1\.08:)', n1)
+          print('--- GRAFO N1.07 ---')
+          print(m.group(0) if m else 'NAO ENCONTRADO')
+          src = Path('src/utils/legadoF0.ts').read_text()
+          m = re.search(r'(?ms)^export function gN1_07.*?(?=^export function |\Z)', src)
+          print('--- LEGADO N1.07 ---')
+          print(m.group(0) if m else 'NAO ENCONTRADO')
+          PY
+      - name: Limpar bancada temporaria
+        if: always()
+        run: |
+          rm .github/workflows/p22-3a-n107-source-audit.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'chore: remove bancada temporaria P22.3A audit'
+          git push origin HEAD:codex/integrar-bloco-f0
