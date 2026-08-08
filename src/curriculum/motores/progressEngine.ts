@@ -28,6 +28,8 @@ export interface MasteryAttempt {
    * exatamente como não bloqueava antes de existir.
    */
   exigeEvidencia?: string;
+  /** Evidência que esta micro exige antes de liberar o próximo nível. */
+  gateEvidenceBeforeAdvance?: string;
   /** Regra de dominio da micro que gerou a questao. */
   masteryRule?: MasteryRule;
 }
@@ -100,6 +102,20 @@ export function applyJourneyAnswer(
     }
     const mastery = updateMasteryEvidence(current, right, masteryAttempt);
     progress.masteryEvidence = mastery;
+
+    if (
+      transition?.type === "level-up"
+      && masteryAttempt.gateEvidenceBeforeAdvance
+      && !(mastery.evidenciasVistas || []).includes(masteryAttempt.gateEvidenceBeforeAdvance)
+    ) {
+      progress.lvl = current.lvl;
+      progress.maxLvl = current.maxLvl || current.lvl;
+      // Mantém a prontidão: o próximo acerto que trouxer a evidência libera o
+      // nível imediatamente, sem obrigar três acertos NOVOS depois da prova.
+      progress.streak = Math.max(progress.streak, mode.kind === "rescue" ? 2 : 3);
+      transition = null;
+    }
+
     if (!progress.dom && mastery.crownedBy === "multidimensional") {
       progress.dom = true;
       transition = { type: "multidimensional-crown" };

@@ -938,7 +938,17 @@ export class Composer {
             + `"contar", "faltam" ou "escondidos" — recebido ${JSON.stringify(params.modo)}.`,
           );
         }
-        const spec = construirMolduraSpec(params.modo as ModoDaMoldura, lvl, Math.random);
+        const fonteA = params.source_level ?? lvl;
+        const fonteB = params.source_level_alt;
+        for (const fonte of [fonteA, fonteB].filter((v): v is number => v !== undefined)) {
+          if (!Number.isInteger(fonte) || fonte < 1 || fonte > 5) {
+            throw new Error(`${ficha.id}/${micro.id}: source_level da moldura deve estar entre 1 e 5.`);
+          }
+        }
+        // Quando há dois degraus, esta micro é um fade de andaime: o mesmo
+        // conceito aparece ora com a estrutura anterior, ora sem ela.
+        const nivelDaMoldura = fonteB !== undefined && Math.random() < 0.5 ? fonteB : fonteA;
+        const spec = construirMolduraSpec(params.modo as ModoDaMoldura, nivelDaMoldura, Math.random);
         answer = spec.resposta;
         uiProps = spec;
         evaluate = candidate => Number(candidate) === answer;
@@ -1139,6 +1149,9 @@ export class Composer {
       explain: params.explain ?? ficha.explain,
       // P13: a condição da §9 viaja na questão até o motor de maestria.
       ...(micro.dominio?.exige ? { exigeEvidencia: micro.dominio.exige.evidencia } : {}),
+      ...(micro.dominio?.gateAntesDeAvancar
+        ? { gateEvidenceBeforeAdvance: micro.dominio.gateAntesDeAvancar.evidencia }
+        : {}),
       ...(micro.dominio ? {
         masteryRule: {
           acertos: micro.dominio.acertos,

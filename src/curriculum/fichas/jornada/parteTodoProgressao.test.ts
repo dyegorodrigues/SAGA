@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Composer } from "../../Composer";
 import { N1_10 } from "./N1.10";
 import { N1_11 } from "./N1.11";
@@ -23,6 +23,20 @@ describe("P17 — uma competencia, multiplas representacoes", () => {
     expect([(l5.uiProps as any).part1, (l5.uiProps as any).part2]).toContain("?");
     expect(l5.uiProps).not.toHaveProperty("interactivePart");
     expect(l5.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+  });
+
+  it("N1.10 L4 faz fade moldura -> sem moldura e exige a retirada antes do bond", () => {
+    const spyA = vi.spyOn(Math, "random").mockReturnValue(0.9);
+    const comEstrutura = Composer.generate(N1_10, 4);
+    spyA.mockRestore();
+    const spyB = vi.spyOn(Math, "random").mockReturnValue(0.1);
+    const semEstrutura = Composer.generate(N1_10, 4);
+    spyB.mockRestore();
+
+    expect((comEstrutura.uiProps as any).semMoldura).not.toBe(true);
+    expect((semEstrutura.uiProps as any).semMoldura).toBe(true);
+    expect(comEstrutura.gateEvidenceBeforeAdvance).toBe("sem-moldura");
+    expect(semEstrutura.gateEvidenceBeforeAdvance).toBe("sem-moldura");
   });
 
   it("N1.11 progride de JD3 para F28: moldura -> bond -> simbolo", () => {

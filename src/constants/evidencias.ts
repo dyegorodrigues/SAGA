@@ -92,6 +92,12 @@ export const Evidencia = {
    * real"*. Guardar três na cabeça é subitização; guardar oito é memória.
    */
   TOTAL_ALEM_DE_CINCO: "total-alem-de-cinco",
+
+  /**
+   * JD5 (N1.10): um acerto com os objetos realmente SOLTOS, sem a geometria
+   * residual da moldura. É a prova de retirada do andaime antes da notação.
+   */
+  SEM_MOLDURA: "sem-moldura",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

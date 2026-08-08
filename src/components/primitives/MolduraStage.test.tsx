@@ -8,7 +8,7 @@ import { Composer } from "../../curriculum/Composer";
 import { N1_08 } from "../../curriculum/fichas/jornada/N1.08";
 import { N1_10 } from "../../curriculum/fichas/jornada/N1.10";
 import { N1_11 } from "../../curriculum/fichas/jornada/N1.11";
-import { JD3 } from "../../curriculum/fichas/dojo/jardim";
+import { JD3, JD5 } from "../../curriculum/fichas/dojo/jardim";
 import { FichaCompetencia } from "../../curriculum/schema";
 import { MolduraSpec, TEMAS_DA_MOLDURA } from "../../curriculum/procedimentos/tenFrameContract";
 import { MisconceptionTag } from "../../constants/misconceptions";
@@ -163,6 +163,18 @@ describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
     };
     const { container } = render(<MolduraStage spec={s} fase="perguntando" />);
     expect(container.querySelectorAll('[aria-label="a tampa"]')).toHaveLength(2);
+  });
+
+  it("JD5 L5 não deixa uma grade 5x2 invisível: renderiza só objetos soltos", () => {
+    const q = Composer.generate(JD5, 5);
+    const spec5 = q.uiProps as MolduraSpec;
+    const { container, rerender } = render(<MolduraStage spec={spec5} fase="mostrando" />);
+    expect(container.querySelector('[aria-label^="conjunto solto"]')).toBeTruthy();
+    expect(container.querySelectorAll('[data-testid="objeto-solto"]')).toHaveLength(spec5.ocupadas.length);
+
+    rerender(<MolduraStage spec={spec5} fase="perguntando" />);
+    expect(container.querySelectorAll('[data-testid="objeto-solto"]')).toHaveLength(spec5.visiveis);
+    expect(container.querySelectorAll('[data-testid="tampa-solta"]').length).toBeLessThanOrEqual(2);
   });
 
   it("⚠️ a tampa LEVANTA na revelação, mesmo quando ela errou", () => {

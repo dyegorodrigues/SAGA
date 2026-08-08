@@ -282,3 +282,23 @@ describe("§9 executavel — acertos/de em sessoes reais", () => {
     expect(p.dom).toBe(true);
   });
 });
+
+
+describe("ponte representacional — evidência antes de avançar", () => {
+  it("segura o nível até a evidência e libera no mesmo acerto que a demonstra", () => {
+    let p: Progress = { lvl: 4, streak: 2, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0, maxLvl: 4 };
+    const base: MasteryAttempt = {
+      durationMs: 3000, helpUsed: false, isReview: false, practiceDay: "2026-08-08",
+      gateEvidenceBeforeAdvance: "sem-moldura",
+    };
+    let r = applyJourneyAnswer(p, true, false, base);
+    expect(r.progress.lvl).toBe(4);
+    expect(r.transition).toBeNull();
+    expect(r.progress.streak).toBeGreaterThanOrEqual(3);
+
+    r = applyJourneyAnswer(r.progress, true, false, { ...base, evidencias: ["sem-moldura"] });
+    expect(r.progress.lvl).toBe(5);
+    expect(r.transition).toEqual({ type: "level-up", level: 5 });
+    expect(r.progress.masteryEvidence?.evidenciasVistas).toContain("sem-moldura");
+  });
+});

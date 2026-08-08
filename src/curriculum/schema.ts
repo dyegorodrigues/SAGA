@@ -37,6 +37,12 @@ export interface FichaDominio {
    * existe para o painel dos pais dizer, em português, o que falta.
    */
   exige?: { evidencia: string; descricao: string };
+  /**
+   * Ponte representacional: impede subir de nível enquanto uma condição desta
+   * micro ainda não foi demonstrada. Útil quando o próximo nível troca de
+   * linguagem (concreto/perceptual -> diagrama -> símbolo).
+   */
+  gateAntesDeAvancar?: { evidencia: string; descricao: string };
 }
 
 export interface FichaMicro {

@@ -50,7 +50,7 @@ export const N1_10: FichaCompetencia = {
     1: { primitiva: "moldura", micro: "esconde_um", andaime: "mao_fantasma" },
     2: { primitiva: "moldura", micro: "esconde_dois", andaime: "alto" },
     3: { primitiva: "moldura", micro: "sem_contagem", andaime: "medio" },
-    4: { primitiva: "moldura", micro: "ate_dez", andaime: "minimo" },
+    4: { primitiva: "moldura", micro: "retira_moldura", andaime: "minimo" },
     5: { primitiva: "bond", micro: "formaliza_bond", andaime: "nenhum", rt_alvo: 8000 },
   },
 
@@ -96,17 +96,25 @@ export const N1_10: FichaCompetencia = {
       dominio,
     },
     {
-      id: "ate_dez",
+      id: "retira_moldura",
       fonte: "JD5",
-      alvo: "ate dez — memoria de trabalho real antes da formalizacao",
+      alvo: "ate dez, alternando a moldura e os objetos realmente soltos antes da formalizacao",
       kinds: ["moldura"],
       params: {
         modo: "escondidos",
+        source_level: 4,
+        source_level_alt: 5,
         audio_prompt: FALAS.escondidos.audioPrompt,
         howto: FALAS.escondidos.howto,
         explain: FALAS.escondidos.explain,
       },
-      dominio,
+      dominio: {
+        ...dominio,
+        gateAntesDeAvancar: {
+          evidencia: Evidencia.SEM_MOLDURA,
+          descricao: "Resolver pelo menos uma vez com os objetos soltos, sem a geometria da moldura.",
+        },
+      },
     },
     {
       id: "formaliza_bond",

@@ -85,6 +85,10 @@ export interface ComposerParams {
   end?: number;
   jump_size?: number;
   moldura?: number;
+  /** Degrau canônico usado pela primitiva moldura, quando difere do nível da Jornada. */
+  source_level?: number;
+  /** Segundo degrau para fade de andaime dentro da mesma micro. */
+  source_level_alt?: number;
   soma_max?: number;
   whole_fixed?: number;
   whole_min?: number;
@@ -148,7 +152,7 @@ type Tutorial = Question["tutorial"];
 
 const NUMBER_KEYS = [
   "n_min", "n_max", "flash_ms", "start", "end", "jump_size", "moldura",
-  "soma_max", "whole_fixed", "whole_min", "dezenas_max", "unidades_max", "minutos_step",
+  "source_level", "source_level_alt", "soma_max", "whole_fixed", "whole_min", "dezenas_max", "unidades_max", "minutos_step",
   "peso_alvo_min", "peso_alvo_max", "top_min", "top_max", "bottom_min",
   "bottom_max", "operand_step", "result_max", "rows_min", "rows_max", "cols_min", "cols_max",
 ] as const;

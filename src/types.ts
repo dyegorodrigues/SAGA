@@ -170,6 +170,8 @@ export interface Question {
    * GameLoop quem monta a tentativa de maestria, e ele não conhece a ficha.
    */
   exigeEvidencia?: string;
+  /** Evidência que precisa existir antes de esta micro liberar o próximo nível. */
+  gateEvidenceBeforeAdvance?: string;
   /** Regra de dominio da micro que gerou esta questao. */
   masteryRule?: MasteryRule;
   /** expressão revelada SÓ ao acertar (ex.: esconde a palavra, mostra "CA + SA = CASA 🏠" depois) */
