@@ -24,6 +24,7 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "N1.06",
   "N1.13",
   "N1.10",
+  "N1.11",
   "AL.01",
   "GE.01",
   "GE.02",
