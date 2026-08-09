@@ -235,21 +235,27 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = AULA_ADAPTI
     }
   };
 
-  // Resgates (Banco de erros). Mesmo uma questão serializada do banco recebe de
-  // novo a identidade do track que a armazenou; saves antigos não tinham esse metadado.
-  const bankQs: Question[] = [];
+  // Banco de erros por SOURCE. Um resgate planejado para A não pode consumir B.
+  // Recolocamos `review` e `sig` depois de embaralhar as opções porque
+  // `shuffleOpts` limpa metadados transitórios da questão serializada.
+  const bankQsByTrack = new Map<string, Question[]>();
   for (const t of tracks) {
+    const sourceBank: Question[] = [];
     for (const item of progOf(t.id).bank || []) {
-      bankQs.push(stampAulaQuestion(shuffleOpts(item.q), t, lvlOf(t), progOf(t.id)));
+      const stamped = stampAulaQuestion(shuffleOpts(item.q), t, lvlOf(t), progOf(t.id));
+      sourceBank.push({ ...stamped, review: true, sig: item.sig });
     }
-  }
-  for (let i = bankQs.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [bankQs[i], bankQs[j]] = [bankQs[j], bankQs[i]];
+    for (let i = sourceBank.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [sourceBank[i], sourceBank[j]] = [sourceBank[j], sourceBank[i]];
+    }
+    if (sourceBank.length) bankQsByTrack.set(t.id, sourceBank);
   }
 
   const rescueQueue = plan.resgates.map(rescue => () => {
-    if (rescue.reason === "error-bank") return bankQs.pop() || null;
+    if (rescue.reason === "error-bank") {
+      return bankQsByTrack.get(rescue.track.id)?.pop() || null;
+    }
     const question = gen(rescue.track, rescue.requiredLevel);
     return question ? { ...question, review: true } : null;
   });
