@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 9/ago/2026.** Próximo bloqueante único: `LENTO_DEDOS` / velocidade sem autoridade conceitual.
+> **VIGENTE — 9/ago/2026.** Fonte principal: `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Próximo bloqueante único: timezone / identidade do dia (`lastDay`).
 
 ## Regra de ouro
 
@@ -14,71 +14,54 @@
 
 ## Primeira leitura
 
-1. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`
+1. `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`
 2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
 3. `RETOMADA.md`
 4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
 ## Fechado
 
-P17/P8/P18/P19/P20/P21/P22, cânone, Radar/source/persist, Sensei full DAG, Oficina causal, Tutor↔Dojo, QA real, Jardim causal, banco composto e telemetria/Leitner da Aula.
+P17/P8/P18/P19/P20/P21/P22, cânone, Radar/source/persist, Sensei full DAG, Oficina causal, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner e autoridade indevida de velocidade (`LENTO_DEDOS`).
 
 Evidências mais novas:
 
 - banco composto: CI #682 / run `31308424789`;
 - telemetria/Leitner: CI #691 / run `31308774424`;
-- head funcional antes do checkpoint documental: `cf925cc239ce7ddad7d33c48e1810a5990aaecd7`.
+- `LENTO_DEDOS`: CI #702 / run `31309761131`;
+- head funcional do fechamento: `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`.
 
-Telemetria v2 corrige `trackId` para a competência-fonte; Leitner materializa `reviewForce/lastDay` no source real. Banco `error-bank` é por source e preserva `review/sig`.
+O Radar conceitual aceita somente tags canônicas e ignora `LENTO_DEDOS`, inclusive em saves legados. A escada conceitual rejeita mutação imperativa externa de `streak`; rápido/lento correto têm a mesma autoridade curricular. RT, estrelas e Dojo continuam separados.
 
-## Próxima tarefa — `LENTO_DEDOS`
+## Próxima tarefa — timezone / `lastDay`
 
-Pré-auditoria provou dois bugs em `GameLoop.tsx`:
+Pré-auditoria encontrou geração de `YYYY-MM-DD` por `toISOString().slice(0, 10)` em runtime, incluindo `GameLoop.tsx`, `radarEngine.ts` e `matricula.ts`. Essa chave representa o dia UTC e pode divergir do dia local da criança perto da meia-noite.
 
-### 1. lentidão correta vira misconception
+### Riscos a provar
 
-Rapid-fire correto >10s chama:
-
-```ts
-trackMisconception(p, "LENTO_DEDOS")
-```
-
-Duas ocorrências iguais podem entrar no Radar e provocar resgate conceitual, embora a resposta esteja correta. A string nem pertence ao catálogo `MisconceptionTag`.
-
-### 2. velocidade injeta domínio conceitual
-
-Rapid-fire correto ≤3s executa:
-
-```ts
-if (p.streak < 3) p.streak = 3
-```
-
-O streak é persistido; na resposta seguinte `applyJourneyAnswer` o herda e pode subir `lvl`. Isso dá à velocidade autoridade sobre a escada conceitual.
-
-### Regra canônica
-
-**RT/fluência mede automaticidade. Não pode criar misconception conceitual, subir/descer `lvl`, nem conceder `dom/masteryEvidence`.**
+- `practiceDay`/mastery session mudar de dia cedo ou tarde;
+- `lastDay` do Leitner/revisão ser adiantado/atrasado;
+- rounds de Jardim/Dojo discordarem de Jornada;
+- primeiro bônus/log diário usar outro conceito de “hoje”;
+- cálculo de diferença de dias sofrer com horário/DST.
 
 ### Método
 
-1. regressões primeiro;
-2. retirar `LENTO_DEDOS` de `Progress.misconceptions`/Radar;
-3. remover bônus de RT sobre streak/lvl/dom/mastery;
-4. preservar RT, estrelas e Dojo/strength como sinais separados;
-5. provar rápido vs lento correto = mesma autoridade conceitual;
-6. provar Dojo prescrito intacto;
+1. mapear a cadeia `relógio → day key → writers → estado → consumers → save/cloud`;
+2. helper puro único de chave de dia local, sem timezone hardcoded;
+3. helper puro de distância entre dias de calendário;
+4. regressões em virada UTC/local, offsets negativo/positivo e DST;
+5. migrar todos os writers/consumers relevantes;
+6. preservar semântica Leitner e separação conceitual/fluência;
 7. gates completos + Chrome;
-8. checkpoint.
-
-Não reintroduzir `TAG_TO_NODE`.
+8. atualizar checkpoint/handoff.
 
 ## Dívida curricular não perdida
 
-26 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; primitivas incompletas no inventário. A fábrica entra depois da Coverage Matrix.
+26 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; 44 estreias a classificar; primitivas incompletas no inventário. A fábrica entra depois da Coverage Matrix.
 
 ## Fila posterior
 
-timezone/`lastDay` → recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
