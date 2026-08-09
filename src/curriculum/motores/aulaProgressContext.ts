@@ -1,4 +1,5 @@
 import { Progress, Question, State, Track } from "../../types";
+import { clearTelemetryAulaSource, setTelemetryAulaSource } from "../../lib/telemetryIdentityContext";
 
 /**
  * PÓS-P22 — identidade curricular de uma questão composta pela Minha Aula.
@@ -58,6 +59,7 @@ function stripMarker(progress: Progress): Progress {
 export function beginAulaProgressSession(): void {
   progressByTrack.clear();
   pendingSourceTrackId = null;
+  clearTelemetryAulaSource();
 }
 
 /** Registra o snapshot inicial apenas se o source ainda não foi atualizado nesta missão. */
@@ -92,6 +94,7 @@ export function stampAulaQuestion(
 export function prepareAulaSourceForAnswer(question: Question): void {
   const sourceTrackId = (question as AulaQuestion).sourceTrackId;
   pendingSourceTrackId = sourceTrackId && sourceTrackId !== "aula" ? sourceTrackId : null;
+  setTelemetryAulaSource(pendingSourceTrackId ?? undefined);
 }
 
 /**
