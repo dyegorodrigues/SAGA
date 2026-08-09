@@ -14,7 +14,7 @@ const CENAS_DIA = [
   { value: "noite", big: "🌙  🍽️➡️🛏️", audio: "A lua apareceu e está chegando a hora de dormir. Que parte do dia é?" },
 ] as const;
 
-const EVENTOS_RELATIVOS = [
+const EVENTOS_RELATIVOS: ReadonlyArray<ReadonlyArray<{ icon: string; say: string }>> = [
   [
     { icon: "🛝", say: "parque" },
     { icon: "🏫", say: "escola" },
@@ -30,7 +30,7 @@ const EVENTOS_RELATIVOS = [
     { icon: "🎹", say: "piano" },
     { icon: "🚲", say: "bicicleta" },
   ],
-] as const;
+];
 
 const DIAS = ["domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"] as const;
 
