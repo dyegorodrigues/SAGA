@@ -856,7 +856,7 @@ Problema falado: *"Leo tem 3 carrinhos. Ganhou mais 2. Quantos tem agora?"* Os c
 - **Parte-todo:** duas partes conhecidas, todo desconhecido → soma. Todo conhecido, uma parte escondida → subtração/completar. **É o mesmo desenho** — só muda ONDE está o "?". 🧒 *Este é o insight que mata o "qual conta eu uso":* a operação não vem de palavra-chave, vem da POSIÇÃO do mistério no desenho.
 - **Comparação aditiva:** duas barras alinhadas pela base, o "?" no buraco (N3.04 pagando dividendo). 🧒 **Armadilha das palavras-chave:** *"Leo tem 5, tem 2 A MAIS que Luna. Quantos tem Luna?"* — o "a mais" grita SOMA, mas a resposta é 5−2. O SAGA NUNCA ensina "palavra-chave = operação" (proibição pedagógica formal); a barra desenhada mostra que a Luna é a barra CURTA. Distrator obrigatório: a operação da palavra-chave.
 - **Comparação multiplicativa:** *"Leo tem 3× os carrinhos da Luna"* → a barra do Leo são 3 CÓPIAS da barra da Luna. 🧒 *Erro:* desenhar "3 a mais" (aditivo) em vez de "3 vezes" (cópias) — o mesmo demônio aditivo de N6.04.
-- **Duas etapas:** o resultado da primeira barra vira peça da segunda. O app dobra o problema em dois quadros ("primeiro descobrimos X... agora usamos X")
+- **Duas etapas:** o resultado da primeira barra vira peça da segunda. O app dobra o problema em dois quadros ("primeiro descobrimos X... agora usamos X").
 
 ## Nível a nível (como o rigor cresce)
 - **F1:** a cena SEMPRE se transforma em barra automaticamente (a criança assiste à tradução). Ela só escolhe onde vai o "?".
