@@ -4,6 +4,7 @@ import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
 import { applyJardimRound, type JardimAttempt, type JardimRoundResult } from "../curriculum/motores/jardimEngine";
 import { tentativaJardimDoTerminal, type JardimMissionSummary } from "../curriculum/motores/jardimSession";
 import { auth, logTelemetryToCloud } from "../lib/firebase";
+import { perfectMissionXpBonus, rewardForTerminalAnswer } from "../lib/rewardPolicy";
 import {
   C, FONT, BODY, Mascote, StarChip, ProgressBar, SoundBtn, Burst, sfx, speak, stopSpeak, pickVoice, applyTheme, pickPraise, PRAISE, OOPS, THEMES,
 } from "./Mascot";
@@ -161,7 +162,6 @@ export function GameLoop({
   const lastSpokenKindRef = useRef<string | null>(null);
 
   // Pula na hora: corta a voz e vai para a próxima (criança no comando do ritmo)
-  
   const advanceNow = () => {
     if (!advanceRef.current) return;
     stopSpeak();
@@ -174,7 +174,7 @@ export function GameLoop({
   useEffect(() => () => stopSpeak(), []);
 
   // AI Tutor states
-    const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
+  const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
   const [mockTutorialN, setMockTutorialN] = useState<number | null>(null);
 
   useEffect(() => {
@@ -185,7 +185,7 @@ export function GameLoop({
   const [showClockTutorial, setShowClockTutorial] = useState(false);
   // kind `order` (ordenar/sequenciar): a criança toca as cenas na ordem certa
   const [orderTaps, setOrderTaps] = useState<any[]>([]);
-    const [orderShake, setOrderShake] = useState<any>(null);
+  const [orderShake, setOrderShake] = useState<any>(null);
   // kind `flash` (subitização): o grupo aparece por ~2s e some — "quantos eram?"
   const [flashHidden, setFlashHidden] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
@@ -400,7 +400,7 @@ export function GameLoop({
       if (nt.length === seq.length) handlePick(value, true); // completou → resolve
     } else {
       // toque fora de ordem: sacode, marca erro (conta como bad) e recomeça — nunca trava
-            setOrderShake(value);
+      setOrderShake(value);
       if (sound) sfx.wrong();
       setTimeout(() => {
         setOrderTaps([]);
@@ -516,7 +516,6 @@ export function GameLoop({
         return; // não avança, não marca answeredRef
       }
       // Se errou a 3ª vez, segue pro erro terminal e avança
-      
       // O resumo terminal abaixo publica as hipóteses deduplicadas no Radar.
     }
 
@@ -586,59 +585,68 @@ export function GameLoop({
 
     if (!gardenMode) {
       // AI smart review: mastering a missed question after 2 hits
-    if (q.review) {
-      const bi = p.bank.findIndex((b) => b.sig === q.sig);
-      if (bi >= 0) {
-        if (right) {
-          const hits = (p.bank[bi].hits || 0) + 1;
-          if (hits >= 2) {
-            p.bank.splice(bi, 1);
-            p.mast = (p.mast || 0) + 1;
-            if (!currentToast) currentToast = "Você dominou essa! 🧠✨";
+      if (q.review) {
+        const bi = p.bank.findIndex((b) => b.sig === q.sig);
+        if (bi >= 0) {
+          if (right) {
+            const hits = (p.bank[bi].hits || 0) + 1;
+            if (hits >= 2) {
+              p.bank.splice(bi, 1);
+              p.mast = (p.mast || 0) + 1;
+              if (!currentToast) currentToast = "Você dominou essa! 🧠✨";
+            } else {
+              p.bank[bi] = { ...p.bank[bi], hits };
+            }
           } else {
-            p.bank[bi] = { ...p.bank[bi], hits };
+            p.bank[bi] = { ...p.bank[bi], hits: 0 };
           }
-        } else {
-          p.bank[bi] = { ...p.bank[bi], hits: 0 };
+        }
+      } else if (!right) {
+        const sig = qSig(q);
+        if (!p.bank.some((b) => b.sig === sig)) {
+          p.bank.push({ sig, hits: 0, q: sanitizeQ(q) });
+          if (p.bank.length > 10) p.bank.shift();
         }
       }
-    } else if (!right) {
-      const sig = qSig(q);
-      if (!p.bank.some((b) => b.sig === sig)) {
-        p.bank.push({ sig, hits: 0, q: sanitizeQ(q) });
-        if (p.bank.length > 10) p.bank.shift();
+
+      if (q.review) {
+        evaluateSpacedRepetition(
+          kid.id,
+          track.id,
+          right,
+          durationMs,
+          { [track.id]: p },
+          targetRtSeconds !== undefined ? targetRtSeconds * 1000 : 10000,
+        );
       }
     }
 
-    if (q.review) {
-      evaluateSpacedRepetition(
-        kid.id,
-        track.id,
-        right,
-        durationMs,
-        { [track.id]: p },
-        targetRtSeconds !== undefined ? targetRtSeconds * 1000 : 10000,
-      );
-    }
+    /**
+     * ⭐ XP de perfil: todo acerto terminal válido vale 1. Velocidade continua
+     * medindo automaticidade no Dojo, mas não compra nível SAGA nem autoridade
+     * conceitual. Criança lenta e correta recebe a mesma identidade de esforço.
+     */
+    const rewardMode = gardenMode
+      ? "garden"
+      : track.id === "mista" || track.id === "mixed"
+        ? "mixed"
+        : (q.kind === "rapid-fire" || track.id.startsWith("dojo"))
+          ? "dojo"
+          : rescue
+            ? "rescue"
+            : track.id === "matricula"
+              ? "placement"
+              : "journey";
+    const starGain = rewardForTerminalAnswer(right, rewardMode).xp;
 
-    }
-
-    // ⭐ XP vitalício e Nivelamento por Velocidade (Dojo)
-    let starGain = 0;
-    if (right) {
-      if (gardenMode) {
-        starGain = 1;
-      } else if (q.kind === "rapid-fire" || track.id.startsWith("dojo")) {
-        if (durationMs <= 3000) starGain = 15; // Genialidade (Subitização mental)
-        else if (durationMs <= 10000) starGain = 5; // Mediano
-        else {
-          starGain = 2; // Contando nos dedos
-          // Se está muito lento na soma/subtração básica, loga misconception
-          trackMisconception(p, "LENTO_DEDOS");
-        }
-      } else {
-        starGain = 1;
-      }
+    // Lentidão no Dojo continua sendo sinal de automaticidade, não desconto de XP.
+    if (
+      right &&
+      !gardenMode &&
+      (q.kind === "rapid-fire" || track.id.startsWith("dojo")) &&
+      durationMs > 10000
+    ) {
+      trackMisconception(p, "LENTO_DEDOS");
     }
     
     const nextStars = stars + starGain;
@@ -648,14 +656,9 @@ export function GameLoop({
       (rescue.requiredLevel === 5 && prog0.lvl === 5 && p.streak >= 2)
     );
     const isLast = idx === totalQFor(track) - 1 || rescueRecovered;
-    let nextBonus = 0;
+    const nextBonus = isLast ? perfectMissionXpBonus(nextOk, totalQFor(track)) : 0;
 
-    p.stars = (p.stars || 0) + starGain;
-
-    if (isLast && nextOk === totalQFor(track)) {
-      nextBonus = 5;
-      p.stars += 5;
-    }
+    p.stars = (p.stars || 0) + starGain + nextBonus;
 
     // E1 (Professor Mágico): telemetria da habilidade — quando praticou + fluência real.
     // O rt é média móvel (70% história, 30% agora): rápido = automatizado; lento = dedos.
@@ -663,13 +666,6 @@ export function GameLoop({
       p.lastDay = new Date().toISOString().slice(0, 10);
       p.rt = Math.round(p.rt ? p.rt * 0.7 + durationMs * 0.3 : durationMs);
     }
-    
-    // Fast level up for rapid-fire
-    if (!gardenMode && right && q.kind === "rapid-fire" && durationMs <= 3000 && p.lvl < 5) {
-      // Speed bonus helps level up faster
-      if (p.streak < 3) p.streak = 3; 
-    }
-
     
     // FIREBASE ATOMIC TELEMETRY
     try {
@@ -691,7 +687,7 @@ export function GameLoop({
         hintsUsed
       });
     } catch(e) {
-       console.warn("Failed to dispatch telemetry", e);
+      console.warn("Failed to dispatch telemetry", e);
     }
 
     if (isLast && rescue) {
@@ -736,8 +732,6 @@ export function GameLoop({
     setSel(val);
     setToast(currentToast);
     setMsg(feedbackAutoral ? null : fb);
-    
-
     setOk(nextOk);
     setStars(nextStars);
 
@@ -817,9 +811,9 @@ export function GameLoop({
             clearInterval(id);
             setGuidedIdx(null);
             if (shouldScaffold) {
-               aulaT(() => speak("Agora continue você!", { onEnd: fireAulaEnd }), 400);
+              aulaT(() => speak("Agora continue você!", { onEnd: fireAulaEnd }), 400);
             } else {
-               aulaT(() => speak(finale, { onEnd: fireAulaEnd }), 700);
+              aulaT(() => speak(finale, { onEnd: fireAulaEnd }), 700);
             }
           }
         }, 1150);
@@ -885,8 +879,6 @@ export function GameLoop({
     });
   };
 
-  
-
   const restart = () => {
     gardenAttemptsRef.current = [];
     gardenDurationRef.current = 0;
@@ -905,7 +897,6 @@ export function GameLoop({
     setMsg(null);
     setDone(false);
     setBonus(0);
-    
   };
 
   if (done) {
@@ -1061,8 +1052,6 @@ export function GameLoop({
         >
           {status ? msg : <QuestionPrompt q={q} />}
         </div>
-
-        
       </div>
 
       {q.kind === "audiochoice" && audioChoicePromptVisible && !status && (
@@ -1082,13 +1071,13 @@ export function GameLoop({
       )}
 
       <div className="flex-1 flex flex-col min-h-0 justify-center">
-      <GameLoopExerciseRenderer
-        q={q} status={status} idx={idx} handlePick={handlePick}
-        timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
-        mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
-        flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
-        onFirstAuditionComplete={() => setAudioChoicePromptVisible(true)}
-      />
+        <GameLoopExerciseRenderer
+          q={q} status={status} idx={idx} handlePick={handlePick}
+          timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
+          mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
+          flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
+          onFirstAuditionComplete={() => setAudioChoicePromptVisible(true)}
+        />
       </div>
       {/* Botão AVANÇAR — surge ao responder; deixa a criança seguir no ritmo dela */}
       {status && (
