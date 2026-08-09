@@ -1,5 +1,5 @@
 import type { State } from "../types";
-import { escolherSaveMaisRecente } from "./reconciliacaoDeSaves";
+import { escolherSaveMaisRecente, materializarEstadoParaPersistencia } from "./reconciliacaoDeSaves";
 import { canUseLegacyState } from "./storageIdentity";
 
 export type BootstrapSource = "scoped-local" | "legacy-local" | "cloud" | "fresh";
@@ -33,10 +33,13 @@ function migrateCandidate(raw: unknown, migrate: (raw: unknown) => State, versio
   // A política atual para schema incompatível é reset. Na RECONCILIAÇÃO ele
   // precisa ser candidato inválido, não um save vazio capaz de vencer empate.
   if (!parsed || parsed.schemaVersion !== version) return null;
-  return migrate(parsed);
+  // Materializar aqui impede que um save interrompido entre resposta e persist
+  // instale `progress.aula`/`progress.dojo_*` em React. O timestamp existente é
+  // preservado: ler/migrar não torna o estado logicamente mais novo.
+  return materializarEstadoParaPersistencia(migrate(parsed));
 }
 
-/** Migra cada candidato ANTES de comparar timestamps e nunca mistura objetos. */
+/** Migra/materializa cada candidato ANTES de comparar timestamps e nunca mistura objetos. */
 export function resolveBootstrapState(args: Args): BootstrapResult {
   const {
     uid, scopedLocalRaw, legacyLocalRaw, legacyOwnerUid, cloudRaw,
