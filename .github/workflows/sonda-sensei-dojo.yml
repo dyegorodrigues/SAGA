@@ -1,0 +1,52 @@
+name: Sonda real Sensei Dojo
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  sonda-sensei-dojo:
+    name: Sonda real Sensei ↔ Dojo
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Checkout do PR real
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Dependências
+        run: npm ci
+
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Sonda real do card e do round prescrito
+        run: npm run sonda:sensei-dojo
+
+      - name: Evidências da sonda
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-sensei-dojo-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-sensei-dojo/
+          if-no-files-found: warn
+          retention-days: 14
