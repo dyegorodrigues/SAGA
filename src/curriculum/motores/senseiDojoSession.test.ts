@@ -68,7 +68,7 @@ describe("Dojo Sensei — elegibilidade por conceito", () => {
 });
 
 describe("Dojo Sensei — questões observáveis", () => {
-  it("todo templo possui 10 políticas e RT válido em todas as faixas", () => {
+  it("todo templo possui 10 políticas, RT válido e porta crua explicitamente manual", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
     for (const temple of SENSEI_DOJO_TEMPLES) {
       expect(Object.keys(temple.levels)).toHaveLength(10);
@@ -79,9 +79,25 @@ describe("Dojo Sensei — questões observáveis", () => {
         expect(q.uiProps?.fluency?.templeId).toBe(temple.id);
         expect(q.uiProps?.fluency?.step).toBe(step);
         expect(q.uiProps?.fluency?.itemId).toBeTruthy();
+        expect(q.uiProps?.fluency?.source).toBe("manual");
         expect(q.rt_max_s).toBeGreaterThan(0);
       }
     }
+  });
+
+  it("missão prescrita sobrescreve somente a autoridade da sessão", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.37);
+    const temple = senseiDojoTempleById("dojo_add")!;
+    const manual = senseiDojoTrack(temple, "manual").gen(1) as any;
+    const prescribed = senseiDojoTrack(temple, "prescribed").gen(1) as any;
+
+    expect(manual.uiProps.fluency.source).toBe("manual");
+    expect(prescribed.uiProps.fluency.source).toBe("prescribed");
+    expect(prescribed.uiProps.fluency.templeId).toBe("dojo_add");
+    expect(prescribed.uiProps.fluency.step).toBe(1);
+    expect(prescribed.uiProps.fluency.itemKind).toBe(manual.uiProps.fluency.itemKind);
+    expect(prescribed.rt_max_s).toBeGreaterThan(0);
+    vi.restoreAllMocks();
   });
 
   it("adição comutativa usa a mesma identidade de fato", () => {
@@ -100,7 +116,7 @@ describe("Dojo Sensei — questões observáveis", () => {
 
   it("tentativa terminal recuperada após erro não vira fluente", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
-    const q = senseiDojoTrack(senseiDojoTempleById("dojo_add")!).gen(1);
+    const q = senseiDojoTrack(senseiDojoTempleById("dojo_add")!, "prescribed").gen(1);
     const attempt = tentativaSenseiDojoDoTerminal({
       question: q,
       terminalRight: true,
