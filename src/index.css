@@ -25,3 +25,33 @@
   }
 }
 
+/*
+ * P22.5 — opções audíveis.
+ *
+ * O GameLoop desenha o selo 🔊/👂 como primeiro filho do botão e o marcava
+ * `absolute top-1 right-1.5`. Em alternativas semanticamente visuais (como
+ * três eventos em sequência), o selo invadia o próprio conteúdo em qualquer
+ * largura. Mantemos o selo meramente indicativo — o botão inteiro continua
+ * sendo o alvo de áudio —, mas ele agora ocupa uma linha real no fluxo.
+ *
+ * O seletor é deliberadamente estreito: só alcança o selo exato das opções
+ * audíveis; não altera outros elementos absolutos de `.mk-optin`.
+ */
+.mk-optin > span.absolute.top-1.right-1\.5 {
+  position: static !important;
+  align-self: flex-end;
+  flex: 0 0 auto;
+  min-height: 1.25rem;
+  line-height: 1.25rem;
+  margin-bottom: 0.125rem;
+}
+
+/*
+ * O aviso "Toque para OUVIR" media 4.22:1 com a cor secundária anterior.
+ * Escurecemos somente este aviso para #475569 (slate-600), sem mudar C.sub no
+ * restante da interface. `:has` é suportado pelos navegadores-alvo modernos e
+ * amarra a regra à grade que contém o selo audível acima.
+ */
+div:has(> .mk-optin > span.absolute.top-1.right-1\.5) + div.text-center.mt-2 {
+  color: #475569 !important;
+}
