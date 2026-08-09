@@ -27,7 +27,7 @@ function sequenceOptions(
   distractors: Array<{ sequence: number[]; misconception?: string }>,
 ): Option[] {
   const correctValue = correct.join(" · ");
-  const candidates = [
+  const candidates: Array<{ value: string; misconception?: string }> = [
     { value: correctValue },
     ...distractors.map(({ sequence, misconception }) => ({
       value: sequence.join(" · "),
