@@ -21,15 +21,11 @@ const h = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("firebase/app", () => ({
-  initializeApp: vi.fn(() => ({})),
-}));
+vi.mock("firebase/app", () => ({ initializeApp: vi.fn(() => ({})) }));
 
 vi.mock("firebase/auth", () => ({
   getAuth: vi.fn(() => h.auth),
-  GoogleAuthProvider: class {
-    setCustomParameters() {}
-  },
+  GoogleAuthProvider: class { setCustomParameters() {} },
   signInWithPopup: vi.fn(),
   signOut: vi.fn(),
   signInAnonymously: vi.fn(),
@@ -86,25 +82,11 @@ const state = (id: string, updatedAt?: string): State => ({
   schemaVersion: 1,
   updatedAt,
   kids: [{ id, name: id, avatar: "🦊", grade: "ano1", theme: "classico" }],
-  progress: {},
-  dojoTracks: {},
-  coins: {},
-  album: {},
-  log: {},
-  sound: true,
-  customTracks: [],
+  progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true, customTracks: [],
 });
 
 const progress = (extra: Record<string, unknown> = {}) => ({
-  lvl: 2,
-  streak: 1,
-  bad: 0,
-  stars: 3,
-  ok: 4,
-  tot: 5,
-  bank: [],
-  mast: 0,
-  ...extra,
+  lvl: 2, streak: 1, bad: 0, stars: 3, ok: 4, tot: 5, bank: [], mast: 0, ...extra,
 });
 
 const cloudState = (): State => JSON.parse(h.cloud.data.state) as State;
@@ -112,13 +94,8 @@ const cloudState = (): State => JSON.parse(h.cloud.data.state) as State;
 beforeEach(() => {
   vi.clearAllMocks();
   h.auth.currentUser = {
-    uid: "uid-a",
-    email: "a@example.test",
-    displayName: "A",
-    isAnonymous: false,
-    emailVerified: true,
-    tenantId: null,
-    providerData: [],
+    uid: "uid-a", email: "a@example.test", displayName: "A", isAnonymous: false,
+    emailVerified: true, tenantId: null, providerData: [],
   };
   h.cloud.data = null;
   h.cloud.getFails = false;
@@ -129,10 +106,8 @@ describe("Cloud Reconciliation — writer Firestore", () => {
   it("H1: write logicamente antigo que chega por último não sobrescreve o estado mais novo", async () => {
     const novo = state("novo", "2026-08-09T12:00:00.000Z");
     const antigo = state("antigo", "2026-08-09T11:00:00.000Z");
-
     await saveStateToCloud(novo, "uid-a");
     await saveStateToCloud(antigo, "uid-a");
-
     expect(cloudState().kids[0].id).toBe("novo");
     expect(cloudState().updatedAt).toBe(novo.updatedAt);
   });
@@ -140,15 +115,8 @@ describe("Cloud Reconciliation — writer Firestore", () => {
   it("H1/H2: o relógio lógico é State.updatedAt, não o horário de chegada do envelope Firestore", async () => {
     const novo = state("novo", "2026-08-09T12:00:00.000Z");
     const antigo = state("antigo", "2026-08-09T11:00:00.000Z");
-    h.cloud.data = {
-      userId: "usr_cloud_uid-a",
-      state: JSON.stringify(novo),
-      // Deliberadamente velho: este campo de transporte NÃO pode dar autoridade ao incoming.
-      updatedAt: "2000-01-01T00:00:00.000Z",
-    };
-
+    h.cloud.data = { userId: "usr_cloud_uid-a", state: JSON.stringify(novo), updatedAt: "2000-01-01T00:00:00.000Z" };
     await saveStateToCloud(antigo, "uid-a");
-
     expect(cloudState().kids[0].id).toBe("novo");
     expect(cloudState().updatedAt).toBe(novo.updatedAt);
   });
@@ -156,53 +124,39 @@ describe("Cloud Reconciliation — writer Firestore", () => {
   it("H6: null temporário por offline não autoriza stale local a destruir cloud mais novo na reconexão", async () => {
     const novo = state("cloud-novo", "2026-08-09T12:00:00.000Z");
     const antigo = state("local-antigo", "2026-08-09T11:00:00.000Z");
-    h.cloud.data = {
-      userId: "usr_cloud_uid-a",
-      state: JSON.stringify(novo),
-      updatedAt: "2026-08-09T12:00:01.000Z",
-    };
-
+    h.cloud.data = { userId: "usr_cloud_uid-a", state: JSON.stringify(novo), updatedAt: "2026-08-09T12:00:01.000Z" };
     h.cloud.getFails = true;
     await expect(loadStateFromCloud()).resolves.toBeNull();
-
     h.cloud.getFails = false;
     await saveStateToCloud(antigo, "uid-a");
-
     expect(cloudState().kids[0].id).toBe("cloud-novo");
     expect(cloudState().updatedAt).toBe(novo.updatedAt);
   });
 
+  it("H6: writer propaga indisponibilidade transitória para a camada de retry", async () => {
+    h.cloud.getFails = true;
+    await expect(saveStateToCloud(state("offline", "2026-08-09T12:30:00.000Z"), "uid-a"))
+      .rejects.toMatchObject({ code: "unavailable" });
+    expect(h.cloud.setCalls).toHaveLength(0);
+  });
+
   it("H2: save sem carimbo não derrota cloud já carimbado", async () => {
     const novo = state("cloud-carimbado", "2026-08-09T12:00:00.000Z");
-    h.cloud.data = {
-      userId: "usr_cloud_uid-a",
-      state: JSON.stringify(novo),
-      updatedAt: "2026-08-09T12:00:01.000Z",
-    };
-
+    h.cloud.data = { userId: "usr_cloud_uid-a", state: JSON.stringify(novo), updatedAt: "2026-08-09T12:00:01.000Z" };
     await saveStateToCloud(state("legado-sem-carimbo"), "uid-a");
-
     expect(cloudState().kids[0].id).toBe("cloud-carimbado");
   });
 
   it("H3: expectedUid impede write atravessar troca de conta", async () => {
     h.auth.currentUser = { ...h.auth.currentUser, uid: "uid-b" };
-
     await saveStateToCloud(state("estado-a", "2026-08-09T12:00:00.000Z"), "uid-a");
-
     expect(h.cloud.setCalls).toHaveLength(0);
   });
 
   it("H4: writer cloud nunca serializa progress.aula transitório", async () => {
     const transient = state("kid-a", "2026-08-09T13:00:00.000Z");
-    transient.progress = {
-      "kid-a": {
-        aula: progress({ __aulaSourceTrackId: "N1.04" }) as any,
-      },
-    };
-
+    transient.progress = { "kid-a": { aula: progress({ __aulaSourceTrackId: "N1.04" }) as any } };
     await saveStateToCloud(transient, "uid-a");
-
     const saved = cloudState();
     expect(saved.progress["kid-a"].aula).toBeUndefined();
     expect(saved.progress["kid-a"]["N1.04"]).toMatchObject({ lvl: 2, ok: 4, tot: 5 });
@@ -213,7 +167,6 @@ describe("Cloud Reconciliation — writer Firestore", () => {
     const instante = "2026-08-09T14:00:00.000Z";
     await saveStateToCloud(state("aba-1", instante), "uid-a");
     await saveStateToCloud(state("aba-2", instante), "uid-a");
-
     expect(cloudState().kids[0].id).toBe("aba-1");
     expect(h.cloud.setCalls).toHaveLength(1);
   });
@@ -222,40 +175,23 @@ describe("Cloud Reconciliation — writer Firestore", () => {
     await saveStateToCloud(state("device-a-antigo", "2026-08-09T14:00:00.000Z"), "uid-a");
     await saveStateToCloud(state("device-b-novo", "2026-08-09T14:02:00.000Z"), "uid-a");
     await saveStateToCloud(state("device-a-atrasado", "2026-08-09T14:01:00.000Z"), "uid-a");
-
     expect(cloudState().kids[0].id).toBe("device-b-novo");
     expect(cloudState().updatedAt).toBe("2026-08-09T14:02:00.000Z");
   });
 
   it("anonymous → Google usa link e preserva o mesmo UID/cloud namespace", async () => {
-    const anon = {
-      ...h.auth.currentUser,
-      uid: "anon-stable",
-      email: null,
-      displayName: null,
-      isAnonymous: true,
-    };
+    const anon = { ...h.auth.currentUser, uid: "anon-stable", email: null, displayName: null, isAnonymous: true };
     h.auth.currentUser = anon;
     const progresso = state("kid-anon", "2026-08-09T14:10:00.000Z");
-    h.cloud.data = {
-      userId: "usr_cloud_anon-stable",
-      state: JSON.stringify(progresso),
-      updatedAt: "2026-08-09T14:10:01.000Z",
-    };
+    h.cloud.data = { userId: "usr_cloud_anon-stable", state: JSON.stringify(progresso), updatedAt: "2026-08-09T14:10:01.000Z" };
 
     vi.mocked(linkWithPopup).mockImplementation(async (user: any) => {
-      const linked = {
-        ...user,
-        uid: "anon-stable",
-        email: "familia@example.test",
-        isAnonymous: false,
-      };
+      const linked = { ...user, uid: "anon-stable", email: "familia@example.test", isAnonymous: false };
       h.auth.currentUser = linked;
       return { user: linked } as any;
     });
 
     const result = await loginWithGoogle();
-
     expect(linkWithPopup).toHaveBeenCalledWith(expect.objectContaining({ uid: "anon-stable" }), expect.anything());
     expect(signInWithPopup).not.toHaveBeenCalled();
     expect(getDeviceUserId()).toBe("usr_cloud_anon-stable");
