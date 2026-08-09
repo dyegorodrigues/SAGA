@@ -28,6 +28,7 @@ const garden: CausalJardimPrescription = {
   sourceNodeId: "N1.03",
   causalDistance: 0,
   step: 2,
+  questionBudget: 8,
   track: track("JD1"),
   reason: "known-perceptual-weakness",
   reasonText: "fraqueza perceptual provada",
