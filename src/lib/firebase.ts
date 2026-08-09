@@ -8,6 +8,7 @@ import {
   collection,
   getDoc,
   setDoc,
+  runTransaction,
   setLogLevel,
   Timestamp,
 } from "firebase/firestore";
@@ -231,6 +232,40 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
+function logicalStateTime(state: State | null | undefined): number {
+  if (!state?.updatedAt) return Number.NEGATIVE_INFINITY;
+  const ms = Date.parse(state.updatedAt);
+  return Number.isFinite(ms) ? ms : Number.NEGATIVE_INFINITY;
+}
+
+function parseCloudState(raw: unknown): State | null {
+  if (!raw || typeof raw !== "object") return null;
+  const encoded = (raw as any).state;
+  if (!encoded) return null;
+  try {
+    const parsed = typeof encoded === "string" ? JSON.parse(encoded) : encoded;
+    return parsed && typeof parsed === "object" ? parsed as State : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Autoridade de um write cloud: o mesmo relógio lógico usado no bootstrap.
+ *
+ * - documento inexistente/corrompido aceita o candidato;
+ * - `State.updatedAt` válido mais novo vence;
+ * - empate fica com o estado que já está na nuvem;
+ * - estado sem carimbo/inválido nunca derrota cloud carimbado.
+ *
+ * O `updatedAt` externo do documento Firestore é somente observabilidade do
+ * transporte e jamais participa desta decisão.
+ */
+export function shouldAcceptCloudWrite(current: State | null | undefined, incoming: State): boolean {
+  if (!current) return true;
+  return logicalStateTime(incoming) > logicalStateTime(current);
+}
+
 /**
  * Saves the entire application state to Cloud Firestore.
  */
@@ -245,16 +280,32 @@ export async function saveStateToCloud(state: State, expectedUid?: string): Prom
 
   try {
     const docRef = doc(db, "userStates", userId);
-    await setDoc(
-      docRef,
-      {
-        userId,
-        state: JSON.stringify(state),
-        updatedAt: new Date().toISOString(),
-      },
-      { merge: true }
-    );
-    console.log("[Firestore] Progresso salvo na nuvem com sucesso!");
+    const gravou = await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(docRef);
+      const current = snapshot.exists() ? parseCloudState(snapshot.data()) : null;
+      if (current && !shouldAcceptCloudWrite(current, state)) {
+        return false;
+      }
+
+      transaction.set(
+        docRef,
+        {
+          userId,
+          state: JSON.stringify(state),
+          // Horário de transporte para observabilidade. A autoridade continua
+          // dentro de `state.updatedAt` e é comparada atomicamente acima.
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+      return true;
+    });
+
+    if (gravou) {
+      console.log("[Firestore] Progresso salvo na nuvem com sucesso!");
+    } else {
+      console.log("[Firestore] Write antigo/empatado descartado; cloud mais novo preservado.");
+    }
   } catch (err: any) {
     console.warn("[Firestore] Não foi possível salvar o progresso na nuvem. Mantendo localmente.", err);
     const isNetworkError =
