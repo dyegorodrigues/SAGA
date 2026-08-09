@@ -12,6 +12,7 @@ import { N1_01 } from "../fichas/jornada/N1.01";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_03 } from "../fichas/jornada/N1.03";
 import { N1_04 } from "../fichas/jornada/N1.04";
+import { N1_05 } from "../fichas/jornada/N1.05";
 import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
@@ -26,6 +27,7 @@ import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
+import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
 import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { Question, Track } from "../../types";
@@ -58,6 +60,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.02": N1_02,
   "N1.03": N1_03,
   "N1.04": N1_04,
+  "N1.05": N1_05,
 
   // F05: legado escreve o número por extenso; a ficha autoral usa áudio.
   "N1.06": N1_06,
@@ -89,6 +92,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
 
 /** Builders especializados ainda passam pela MESMA porta de registro/ativação. */
 const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
+  "N1.05": construirComparacaoQuantidadeQuestion,
   "N1.09": construirContagem20Question,
   "GM.02": construirTempoCotidianoQuestion,
 };
