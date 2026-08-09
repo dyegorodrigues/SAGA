@@ -53,7 +53,10 @@ describe("Simulação longitudinal — automaticidade separada", () => {
 
     const initial = prescribeSenseiDojo(concepts, {}, "2026-08-09");
     expect(initial?.temple.id).toBe("dojo_add");
-    expect(initial?.reason).toBe("newly-unlocked");
+    // N3.01 em nível conceitual 3 libera as faixas 1 e 2. Como o ponteiro
+    // adaptativo nasce na 1, a prioridade correta é fechar a lacuna de fluência
+    // antes da categoria genérica "newly-unlocked".
+    expect(initial?.reason).toBe("fluency-gap");
     expect(initial?.maxEligibleStep).toBe(2);
 
     let state = freshSenseiDojoState(true);
