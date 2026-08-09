@@ -11,6 +11,8 @@ interface Props {
   aulaPlan: AulaPlan;
   senseiEntry: SenseiEntry;
   dojoPrescription: SenseiDojoPrescription | null;
+  /** Misto só aparece quando há ao menos duas competências dominadas/praticadas. */
+  mixedAvailable: boolean;
   onMatricula: () => void;
   /** Porta única: o parent já roteia aula normal, Oficina ou Jardim causal. */
   onAula: () => void;
@@ -21,7 +23,7 @@ interface Props {
   setActiveShellTab: (tab: any) => void;
 }
 
-export function SenseiTab({ kid, prog, aulaPlan, senseiEntry, dojoPrescription, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
+export function SenseiTab({ kid, prog, aulaPlan, senseiEntry, dojoPrescription, mixedAvailable, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
   const [expandedLesson, setExpandedLesson] = useState(true);
   const [expandedDojo, setExpandedDojo] = useState(true);
   const [expandedRescue, setExpandedRescue] = useState(true);
@@ -242,31 +244,33 @@ export function SenseiTab({ kid, prog, aulaPlan, senseiEntry, dojoPrescription, 
               </button>
             )}
 
-            <button
-              onClick={() => {
-                sfx.level();
-                onMixed();
-              }}
-              className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2 hover:border-slate-400"
-              style={{
-                background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
-                borderColor: '#94A3B8',
-                boxShadow: '0 4px 0 #64748B',
-              }}
-            >
-              <div className="flex items-center justify-between gap-3 mb-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-slate-800 bg-slate-200 border border-slate-300">
-                  🌪️ Desafio Opcional
-                </span>
-                <span className="text-xl">⚙️</span>
-              </div>
-              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 17, color: '#1E293B' }}>
-                Mistura Total (Dojô Geral)
-              </div>
-              <div className="text-[11px] font-bold mt-1 leading-snug text-slate-600">
-                Mistura o repertório que você já conquistou para desafiar seus reflexos.
-              </div>
-            </button>
+            {mixedAvailable && (
+              <button
+                onClick={() => {
+                  sfx.level();
+                  onMixed();
+                }}
+                className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2 hover:border-slate-400"
+                style={{
+                  background: 'linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)',
+                  borderColor: '#94A3B8',
+                  boxShadow: '0 4px 0 #64748B',
+                }}
+              >
+                <div className="flex items-center justify-between gap-3 mb-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-slate-800 bg-slate-200 border border-slate-300">
+                    🌪️ Desafio Opcional
+                  </span>
+                  <span className="text-xl">⚙️</span>
+                </div>
+                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 17, color: '#1E293B' }}>
+                  Mistura Total (Dojô Geral)
+                </div>
+                <div className="text-[11px] font-bold mt-1 leading-snug text-slate-600">
+                  Mistura somente habilidades que você já dominou para desafiar seus reflexos.
+                </div>
+              </button>
+            )}
           </div>
         )}
       </div>
