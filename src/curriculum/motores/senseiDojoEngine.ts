@@ -1,4 +1,5 @@
 import type { DojoTrackState, FactStrength, ProcStrength } from "../../types";
+import { normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
 
 export const SENSEI_DOJO_ROUND_ITENS = 10;
 export const SENSEI_DOJO_ALVO = 0.8;
@@ -113,6 +114,7 @@ export function applySenseiDojoRound(
   const ceiling = Math.max(0, Math.min(SENSEI_DOJO_MAX_STEP, Math.floor(maxEligibleStep)));
   if (ceiling < 1) throw new Error("Dojo Sensei não pode rodar sem faixa conceitualmente elegível.");
   if (served > ceiling) throw new Error(`Faixa ${served} excede teto conceitual ${ceiling}.`);
+  const day = normalizeLegacyRuntimeDay(practiceDay) ?? practiceDay;
 
   const correct = attempts.filter(attempt => attempt.right);
   const fluent = attempts.filter(attempt => attempt.right && attempt.durationMs <= attempt.targetRtMs);
@@ -125,8 +127,8 @@ export function applySenseiDojoRound(
   const facts = { ...(current.facts ?? {}) };
   const procs = { ...(current.procs ?? {}) };
   for (const attempt of attempts) {
-    if (attempt.itemKind === "fact") facts[attempt.itemId] = updateFact(facts[attempt.itemId], attempt, practiceDay);
-    else procs[attempt.itemId] = updateProc(procs[attempt.itemId], attempt, practiceDay);
+    if (attempt.itemKind === "fact") facts[attempt.itemId] = updateFact(facts[attempt.itemId], attempt, day);
+    else procs[attempt.itemId] = updateProc(procs[attempt.itemId], attempt, day);
   }
 
   const currentStep = Math.min(ceiling, clampStep(current.currentStep));
@@ -186,7 +188,7 @@ export function applySenseiDojoRound(
     rounds: (current.rounds ?? 0) + 1,
     attempts: (current.attempts ?? 0) + attempts.length,
     correct: (current.correct ?? 0) + correct.length,
-    lastDay: practiceDay,
+    lastDay: day,
     facts,
     procs,
     ...(nextAvg === undefined ? {} : { avgCorrectRtMs: nextAvg }),
