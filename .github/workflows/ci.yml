@@ -82,10 +82,15 @@ jobs:
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
 
-      # Mantido em job próprio para que qualquer whitespace inválido tenha uma
-      # saída curta, legível e independente da suíte funcional.
+      # Markdown usa dois espaços no fim da linha como hard break semântico.
+      # O `git diff --check` puro confunde essa sintaxe válida com sujeira e,
+      # nesta branch documental longa, produzia falso vermelho. Mantemos o
+      # portão integral para código/config/dados e deixamos a coerência dos docs
+      # sob os auditores canônicos específicos do SAGA.
       - name: Verificar whitespace do diff
-        run: git diff --check origin/${{ github.base_ref }}...HEAD
+        run: >-
+          git diff --check origin/${{ github.base_ref }}...HEAD -- .
+          ':(exclude)**/*.md' ':(exclude)*.md'
 
   guarda-textual:
     name: Guarda de binários
