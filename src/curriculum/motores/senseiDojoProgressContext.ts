@@ -5,6 +5,7 @@ import {
   maxEligibleSenseiDojoStepById,
   senseiDojoMeta,
   type SenseiDojoQuestionMeta,
+  type SenseiDojoSessionSource,
   type SenseiDojoTempleId,
 } from "./senseiDojoPolicy";
 
@@ -21,6 +22,7 @@ type DojoAttemptMarker = SenseiDojoAttempt & {
   templeId: SenseiDojoTempleId;
   step: number;
   practiceDay: string;
+  source: SenseiDojoSessionSource;
 };
 
 type MarkedProgress = Progress & {
@@ -29,6 +31,11 @@ type MarkedProgress = Progress & {
 
 type PendingRound = {
   step: number;
+  /**
+   * Saves transitórios anteriores a esta correção podem não ter `source`.
+   * Nesse caso o próximo item inicia um round novo em vez de herdar autoridade.
+   */
+  source?: SenseiDojoSessionSource;
   attempts: SenseiDojoAttempt[];
 };
 
@@ -84,6 +91,7 @@ export function consumeSenseiDojoTerminal(
     durationMs: attempt.durationMs,
     targetRtMs,
     practiceDay: attempt.practiceDay,
+    source: meta.source,
   };
 
   return {
@@ -145,6 +153,7 @@ function normalizeSaved(
     ...(extended[SENSEI_DOJO_PENDING_ROUND]
       ? { [SENSEI_DOJO_PENDING_ROUND]: {
           step: extended[SENSEI_DOJO_PENDING_ROUND]!.step,
+          source: extended[SENSEI_DOJO_PENDING_ROUND]!.source,
           attempts: [...extended[SENSEI_DOJO_PENDING_ROUND]!.attempts],
         } }
       : {}),
@@ -195,12 +204,18 @@ export function materializeSenseiDojoProgress(state: State): State {
         if (ceiling >= marker.step && ceiling > 0) {
           const extended = dojoState as PersistedSenseiDojoState;
           const oldPending = extended[SENSEI_DOJO_PENDING_ROUND];
-          const pending: PendingRound = oldPending?.step === marker.step
-            ? { step: marker.step, attempts: [...oldPending.attempts, marker] }
-            : { step: marker.step, attempts: [marker] };
+          const sameSessionContract = oldPending?.step === marker.step
+            && oldPending.source === marker.source;
+          const pending: PendingRound = sameSessionContract
+            ? {
+                step: marker.step,
+                source: marker.source,
+                attempts: [...oldPending!.attempts, marker],
+              }
+            : { step: marker.step, source: marker.source, attempts: [marker] };
 
           if (pending.attempts.length >= 10) {
-            const adaptive = marker.step === (dojoState.currentStep ?? 1);
+            const adaptive = marker.source === "prescribed";
             const result = applySenseiDojoRound(
               withoutPendingRound(extended),
               pending.attempts.slice(0, 10),
