@@ -16,6 +16,7 @@ import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../c
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { prepareAulaSourceForAnswer } from "../../curriculum/motores/aulaProgressContext";
 import { recordSenseiDojoAttempt } from "../../curriculum/motores/senseiDojoProgressContext";
+import { prepareMatriculaForAnswer } from "../../utils/matricula";
 import { AnswerMeta, Question } from "../../types";
 import { bundleMisconceptions } from "./misconceptionBundle";
 
@@ -78,11 +79,14 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
  *
  * - Aula do Dia registra a competência-fonte para o progressEngine;
  * - Dojo aritmético registra token + número da tentativa para que recuperação
- *   após erro não conte como fluência de primeira resposta.
+ *   após erro não conte como fluência de primeira resposta;
+ * - Matrícula apenas marca qual sonda está na tela; o resultado só é consumido
+ *   no boundary terminal, portanto retry intermediário não vira múltiplos erros.
  */
 export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
   prepareAulaSourceForAnswer(q);
   recordSenseiDojoAttempt(q);
+  prepareMatriculaForAnswer(q);
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
 
   if (meta?.audiochoice) return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
