@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { Progress, Track } from "../../types";
 import type { AulaPlan, RescuePlanItem } from "./composer";
+import type { CausalJardimPrescription } from "./jardimCausalPrescription";
 import { chooseSenseiEntry } from "./senseiOrchestrator";
 
 const p = (): Progress => ({ lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 });
@@ -20,6 +21,17 @@ const plan = (resgates: RescuePlanItem[]): AulaPlan => ({
   fecho: null,
   resumo: "teste",
 });
+const garden: CausalJardimPrescription = {
+  trailId: "JD1",
+  motherId: "N1.03",
+  motherName: "Subitização perceptual (Olhômetro)",
+  sourceNodeId: "N1.03",
+  causalDistance: 0,
+  step: 2,
+  track: track("JD1"),
+  reason: "known-perceptual-weakness",
+  reasonText: "fraqueza perceptual provada",
+};
 
 void p; // fixture mantém o contrato de Progress perto deste teste longitudinal.
 
@@ -31,14 +43,19 @@ describe("Sensei — porta prescritiva", () => {
     ]))).toEqual({ kind: "lesson" });
   });
 
-  it("misconception causal transforma a missão principal em resgate", () => {
+  it("misconception causal sem base perceptual provada vira Oficina", () => {
     const r = rescue("N1.04", "misconception");
     expect(chooseSenseiEntry(plan([r]))).toEqual({ kind: "rescue", rescue: r });
   });
 
-  it("lacuna de pré-requisito tem prioridade sobre misconception no próprio alvo", () => {
+  it("Jardim causal provado ganha da Oficina no próprio alvo", () => {
+    const r = rescue("N1.03", "misconception");
+    expect(chooseSenseiEntry(plan([r]), garden)).toEqual({ kind: "garden", prescription: garden });
+  });
+
+  it("lacuna de pré-requisito conceitual tem prioridade até sobre Jardim fraco", () => {
     const self = rescue("N1.04", "misconception");
     const base = rescue("N1.02", "prerequisite-gap");
-    expect(chooseSenseiEntry(plan([self, base]))).toEqual({ kind: "rescue", rescue: base });
+    expect(chooseSenseiEntry(plan([self, base]), garden)).toEqual({ kind: "rescue", rescue: base });
   });
 });
