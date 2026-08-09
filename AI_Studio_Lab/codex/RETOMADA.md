@@ -1,15 +1,16 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 8/ago/2026 — P21/P22 fechadas; auditoria longitudinal em curso. Próxima tarefa exata: Tutor ↔ Dojo.**
+> **VIGENTE em 9/ago/2026 — P21/P22 fechadas; auditoria longitudinal em curso. Próxima tarefa exata: Tutor ↔ Dojo.**
 
 ## 1. Leia antes de editar
 
-1. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
-2. [`AUDITORIA_MOTORES_ADAPTATIVOS.md`](./AUDITORIA_MOTORES_ADAPTATIVOS.md)
-3. [`DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`](./DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md)
-4. [`DECISAO_P22_DIVIDAS_CURRICULARES.md`](./DECISAO_P22_DIVIDAS_CURRICULARES.md)
-5. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
-6. [`PLANO_POS_P22_FABRICA_CURRICULAR.md`](./PLANO_POS_P22_FABRICA_CURRICULAR.md)
+1. [`CHECKPOINT_EMERGENCIA_2026-08-09.md`](./CHECKPOINT_EMERGENCIA_2026-08-09.md) — checkpoint autossuficiente para retomada sem histórico do chat;
+2. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
+3. [`AUDITORIA_MOTORES_ADAPTATIVOS.md`](./AUDITORIA_MOTORES_ADAPTATIVOS.md)
+4. [`DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`](./DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md)
+5. [`DECISAO_P22_DIVIDAS_CURRICULARES.md`](./DECISAO_P22_DIVIDAS_CURRICULARES.md)
+6. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
+7. [`PLANO_POS_P22_FABRICA_CURRICULAR.md`](./PLANO_POS_P22_FABRICA_CURRICULAR.md)
 
 Roadmaps antigos são históricos. Não usar fila, contagem ou semântica anterior sem recalcular o runtime.
 
@@ -148,7 +149,9 @@ Gate: `31290937246` (CI 593) = success.
 
 ## 8. PRÓXIMA TAREFA EXATA — Tutor ↔ Dojo
 
-Achado inicial já comprovado por leitura:
+O checkpoint completo desta tarefa está em `CHECKPOINT_EMERGENCIA_2026-08-09.md`.
+
+Achado inicial comprovado:
 
 `utils/dojoMode.ts` NÃO é ainda um motor longitudinal de fluência. Ele:
 
@@ -158,34 +161,51 @@ Achado inicial já comprovado por leitura:
 - troca `kind` para `rapid-fire` quando encontra expressão;
 - fixa RT em 5s.
 
-Ao mesmo tempo, os templos `dojo_add/sub/mul/div` já possuem **10 níveis** e o Jardim possui JD1–JD5 com estado próprio.
+Ao mesmo tempo já existem:
 
-Auditar e projetar, nesta ordem:
+- `dojo_add/sub/mul/div` com **10 níveis**;
+- políticas explícitas por faixa em `senseiDojoPolicy.ts`;
+- motor separado `senseiDojoEngine.ts` com `FactStrength/ProcStrength`;
+- sessão/projeção em `senseiDojoSession.ts`;
+- prescrição determinística em `senseiDojoPrescription.ts`;
+- Jardim JD1–JD5 com estado próprio;
+- UI dos templos e bloqueio de faixa conceitualmente insegura.
 
-1. o que cada templo treina e quais conceitos o liberam;
-2. onde o estado de fluência realmente persiste hoje;
-3. se `FactStrength/ProcStrength` possuem consumidores ou são schema órfão;
-4. como o Sensei escolhe família, nível, dose e itens fracos;
-5. como manter prática livre sem conceder mastery conceitual;
-6. como Jardim pode ser prescrito quando a lacuna é perceptual;
-7. como subir/descer dificuldade por precisão + estabilidade + RT sem transformar velocidade em compreensão;
-8. regressões longitudinais antes de substituir `dojoMode.ts`.
+**Lacuna bloqueante atual:** fechar a rota real
 
-**Não criar “motor inteligente” por sorteio. Primeiro provar source→state→consumer.**
+`prescrição → GameLoop → SenseiDojoAttempt → applySenseiDojoRound → dojoTracks[kid][temple] → persist → próxima prescrição`.
+
+Regras desse lote:
+
+1. casca visual pode ser compartilhada, motor de progressão não;
+2. Dojo grava em `dojoTracks`, nunca concede mastery conceitual;
+3. modo prescrito usa `adaptive=true`;
+4. modo manual usa `adaptive=false` e não move o ponteiro do Tutor;
+5. exatamente 10 tentativas terminais por round;
+6. precisão + RT governam automaticidade; RT não governa compreensão;
+7. preservar `currentStep/highestStep`, fatos/procedimentos e teto conceitual;
+8. regressão longitudinal deve provar que o Dojo avança sem alterar semanticamente o `Progress` curricular;
+9. só depois aposentar/substituir `utils/dojoMode.ts` como inteligência principal.
+
+**Não criar motor inteligente por sorteio. Primeiro provar source→state→consumer→persist→próxima decisão.**
 
 ## 9. Depois do Tutor ↔ Dojo
 
-1. banco de erros composto;
-2. identidade observacional de telemetria/Leitner na Aula;
-3. `LENTO_DEDOS` no catálogo canônico;
-4. `lastDay`/timezone;
-5. recomendador paralelo por estrelas;
-6. Desafio Misto por repertório elegível;
-7. Matrícula sem grade rígida;
-8. cloud reconciliation;
-9. simulação longitudinal;
-10. gamificação/economia;
-11. Coverage Matrix e fábrica curricular.
+1. Jardim como intervenção perceptual causal;
+2. banco de erros composto;
+3. identidade observacional de telemetria/Leitner na Aula;
+4. `LENTO_DEDOS` no catálogo canônico;
+5. `lastDay`/timezone;
+6. recomendador paralelo por estrelas;
+7. Desafio Misto por repertório elegível;
+8. Matrícula sem grade rígida;
+9. cloud reconciliation;
+10. simulação longitudinal;
+11. gamificação/economia/mascote;
+12. Coverage Matrix;
+13. fábrica curricular;
+14. mega auditoria pedagógica;
+15. hardening de release.
 
 ## 10. Portões
 
