@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 9/ago/2026.** Fonte principal: `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Próximo bloqueante único: **Misto por repertório elegível**.
+> **VIGENTE — 9/ago/2026.** Fonte principal: `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`. Próximo bloqueante único: **Matrícula adaptativa sem grade rígida**.
 
 ## Regra de ouro
 
@@ -14,45 +14,41 @@
 
 ## Primeira leitura
 
-1. `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`
+1. `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`
 2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
 3. `RETOMADA.md`
 4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
 ## Fechado
 
-P17/P8/P18/P19/P20/P21/P22, cânone, Radar/source/persist, Sensei full DAG, Oficina causal, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone/dia civil e recomendador secundário por estrelas.
+P17–P22, cânone, Radar/source/persist, Sensei full DAG, Oficina causal, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone/dia civil, recomendador secundário por estrelas e Misto elegível.
 
-Evidências recentes:
+Misto final: head `ae47e417332fb7c02134bdda871c853535863838`, CI #733 / run `31311494765`, integralmente verde inclusive Chrome real; artefato visual `9037510112`.
 
-- banco composto: CI #682 / run `31308424789`;
-- telemetria/Leitner: CI #691 / run `31308774424`;
-- `LENTO_DEDOS`: CI #702 / run `31309761131`;
-- timezone: CI #717 / run `31310499361`;
-- recomendador paralelo: CI #720 / run `31310675620`;
-- head funcional mais novo: `fc6227f14be69fcf95cd173a973a24a800479800`.
-
-## Próxima tarefa — Misto por repertório elegível
+## Próxima tarefa — Matrícula adaptativa
 
 Pré-auditoria confirmou:
 
-- `App.tsx` ainda usa `SUBJECTS[mat].tracks[kid.grade]` para montar o Misto;
-- `mixedChallenge.ts` usa tudo que recebe para banco, pior precisão e sorteio;
-- não há filtro explícito de repertório já seguro.
+- `App.tsx` ainda chama `buildMatriculaTrack(...tracks[kid.grade])`;
+- `CORE_IDS` contém 9 âncoras, mas `MAX_TRACKS=6` elimina as finais;
+- trocar só a origem do array não resolve subplacement;
+- `GameLoop` chama `onCommit` antes de gerar a próxima questão, então a Matrícula pode adaptar a própria sequência via closure.
 
-Isso viola a ontologia atual: série não é autoridade curricular e Misto é interleaving opcional do repertório conquistado.
+### Cadeia
+
+`DAG/conteúdo explícito → âncora → questão → resposta → próxima âncora → seed → Sensei`.
 
 ### Método
 
-1. provar `DAG + Progress → pool elegível → questões → persistência`;
-2. universo matemático canônico, não grade;
-3. usar evidência real de progresso/DAG; não criar nova árvore;
-4. excluir nunca praticadas/sem segurança;
-5. filtrar banco/pior/aleatórias pelo mesmo pool;
-6. tratar pool insuficiente explicitamente;
-7. não permitir que Misto compre unlock/mastery;
-8. regressões com track dominada, apenas desbloqueada, nunca praticada e fora da antiga grade;
-9. gates + Chrome se UI/disponibilidade mudar;
+1. universo canônico, nunca série como teto;
+2. usar apenas tracks realmente servidas;
+3. começar com sondas gentis;
+4. acertos consistentes sobem a escada; erros mantêm/deslocam para bases seguras;
+5. não forçar iniciante a questões muito acima;
+6. placement não concede `dom`;
+7. preservar missão curta e amigável;
+8. regressões para criança iniciante, intermediária, avançada, fallback e seed;
+9. gates completos + Chrome se fluxo visual mudar;
 10. checkpoint.
 
 ## Dívida curricular não perdida
@@ -61,7 +57,7 @@ Isso viola a ontologia atual: série não é autoridade curricular e Misto é in
 
 ## Fila posterior
 
-Matrícula sem grade rígida → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
