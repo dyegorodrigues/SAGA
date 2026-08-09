@@ -1,13 +1,10 @@
 import type { State } from "../types";
 import { migrateLegacyCrown } from "../curriculum/motores/progressEngine";
+import { calendarDayDistance, localDay } from "./calendarDay";
+
+export { localDay } from "./calendarDay";
 
 export const CURRENT_SCHEMA_VERSION = 1;
-
-export function localDay(dt = new Date()): string {
-  return dt.getFullYear()
-    + "-" + String(dt.getMonth() + 1).padStart(2, "0")
-    + "-" + String(dt.getDate()).padStart(2, "0");
-}
 
 const PET_NAMES: Record<string, string> = {
   classico: "Mago",
@@ -82,12 +79,9 @@ export function migrate(input: unknown, today = localDay()): State {
     if (!updated.petName) updated.petName = defaultPetName(updated.theme);
 
     // Decaimento gentil: 25/dia, sem morte/doença/regressão do mascote.
+    // A diferença é por DIAS CIVIS; DST não cria um "dia" de 23/25 horas.
     const lastDay = updated.petDay || today;
-    const lastTime = new Date(lastDay).getTime();
-    const todayTime = new Date(today).getTime();
-    const days = Number.isFinite(lastTime) && Number.isFinite(todayTime)
-      ? Math.max(0, Math.round((todayTime - lastTime) / 86400000))
-      : 0;
+    const days = calendarDayDistance(lastDay, today);
     if (days > 0) {
       updated.petEnergy = Math.max(0, (updated.petEnergy ?? 80) - 25 * days);
     }
