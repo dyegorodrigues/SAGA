@@ -24,12 +24,15 @@ const saved = (over: Partial<DojoTrackState> = {}): DojoTrackState => ({
   ...over,
 });
 
+const sourceOfFirstQuestion = (prescription: NonNullable<ReturnType<typeof prescribeSenseiDojo>>) =>
+  (prescription.track.gen(prescription.step).uiProps?.fluency as any)?.source;
+
 describe("Sensei → prescrição do Dojo", () => {
   it("não prescreve operação que o conceito ainda não liberou", () => {
     expect(prescribeSenseiDojo({}, {}, "2026-08-08")).toBeNull();
   });
 
-  it("templo recém-liberado vira round curto, sem sorteio", () => {
+  it("templo recém-liberado vira round curto, sem sorteio e com origem prescrita", () => {
     const prescription = prescribeSenseiDojo(addUnlocked(), {}, "2026-08-08");
     expect(prescription).toMatchObject({
       temple: { id: "dojo_add" },
@@ -37,6 +40,7 @@ describe("Sensei → prescrição do Dojo", () => {
       maxEligibleStep: 2,
       reason: "fluency-gap",
     });
+    expect(sourceOfFirstQuestion(prescription!)).toBe("prescribed");
   });
 
   it("fato fraco tem prioridade sobre mero atraso de faixa", () => {
@@ -60,6 +64,7 @@ describe("Sensei → prescrição do Dojo", () => {
     const prescription = prescribeSenseiDojo(addUnlocked(), dojoTracks, "2026-08-08");
     expect(prescription?.reason).toBe("weak-items");
     expect(prescription?.weakItems).toBe(1);
+    expect(sourceOfFirstQuestion(prescription!)).toBe("prescribed");
   });
 
   it("não prescreve duas vezes no mesmo dia", () => {
@@ -81,6 +86,7 @@ describe("Sensei → prescrição do Dojo", () => {
     const prescription = prescribeSenseiDojo(addUnlocked(), dojoTracks, "2026-08-08");
     expect(prescription?.reason).toBe("refresh");
     expect(prescription?.daysSincePractice).toBe(4);
+    expect(sourceOfFirstQuestion(prescription!)).toBe("prescribed");
   });
 
   it("subtração não vence adição por acaso: prioridade vem do estado", () => {
@@ -94,5 +100,6 @@ describe("Sensei → prescrição do Dojo", () => {
     };
     const prescription = prescribeSenseiDojo(progress, dojoTracks, "2026-08-08");
     expect(prescription?.temple.id).toBe("dojo_sub");
+    expect(sourceOfFirstQuestion(prescription!)).toBe("prescribed");
   });
 });
