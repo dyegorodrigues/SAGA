@@ -8,6 +8,7 @@
 
 import { Progress } from "../../types";
 import { MisconceptionTag, type MisconceptionTagType } from "../../constants/misconceptions";
+import { calendarDayDistance, dayKeyFromNowInput, localDay } from "../../utils/calendarDay";
 
 export const SPACING_INTERVALS: Record<number, number> = {
   1: 1,
@@ -170,7 +171,7 @@ export function evaluateSpacedRepetition(
 
   if (pMap && pMap[trackId]) {
     pMap[trackId].reviewForce = newForce;
-    pMap[trackId].lastDay = new Date().toISOString().slice(0, 10);
+    pMap[trackId].lastDay = localDay();
   }
 
   const nextReviewDays = SPACING_INTERVALS[newForce] || 1;
@@ -179,7 +180,9 @@ export function evaluateSpacedRepetition(
 }
 
 /**
- * Retorna os IDs dos nós cuja data da última prática (`lastDay`) ultrapassou o intervalo da força de revisão Leitner.
+ * Retorna os IDs dos nós cuja data da última prática (`lastDay`) ultrapassou o
+ * intervalo da força de revisão Leitner. A comparação é por dias CIVIS, não por
+ * blocos de 24h; DST e horário da prática não podem antecipar/adiar revisão.
  */
 export function getDueReviews(
   pMap: Record<string, Progress>,
@@ -187,24 +190,14 @@ export function getDueReviews(
 ): string[] {
   if (!pMap) return [];
   const dueNodes: string[] = [];
-
-  const nowMs = typeof nowIsoOrMs === "number"
-    ? nowIsoOrMs
-    : typeof nowIsoOrMs === "string"
-      ? new Date(nowIsoOrMs).getTime()
-      : Date.now();
+  const today = dayKeyFromNowInput(nowIsoOrMs);
 
   for (const [node, progress] of Object.entries(pMap)) {
     if (!progress.lastDay) continue;
 
-    const lastDayMs = new Date(progress.lastDay).getTime();
-    if (isNaN(lastDayMs)) continue;
-
     const force = progress.reviewForce || 1;
     const intervalDays = SPACING_INTERVALS[force] || 1;
-    const intervalMs = intervalDays * 24 * 60 * 60 * 1000;
-
-    if (nowMs - lastDayMs >= intervalMs) {
+    if (calendarDayDistance(progress.lastDay, today) >= intervalDays) {
       dueNodes.push(node);
     }
   }
