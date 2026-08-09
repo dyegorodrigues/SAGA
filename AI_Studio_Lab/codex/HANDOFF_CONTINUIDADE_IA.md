@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 8/ago/2026. P21 concluída; P22.1–P22.4 concluídas; próximo passo P22.5/GM.02.**
+> **VIGENTE — 8/ago/2026. P21 e P22 concluídas. Próxima fase: auditoria longitudinal da máquina adaptativa.**
 
 ## Regra de ouro
 
@@ -31,66 +31,81 @@ Roadmaps de 5/ago são históricos.
 - P20 — save/sync por UID;
 - P21.1 — registries/cobertura/proveniência;
 - P21.2 — mapa autoral de primitivas;
-- P22.1 — GM.12 promovida;
-- P22.2 — N4.09 promovida e telemetria de área corrigida;
-- P22.3A — N1.07 completa segundo o grafo;
-- P22.3B — JD4 automática, separada da Jornada;
-- P22.4 — N1.09 autoral completa e ativa.
+- P22.1 — GM.12;
+- P22.2 — N4.09 + telemetria de área;
+- P22.3A — N1.07 completa;
+- P22.3B — JD4 automática separada da Jornada;
+- P22.4 — N1.09 autoral completa;
+- **P22.5 — GM.02 autoral completa.**
 
-## Estado após P22.4
+## Estado final após P22
 
-- 90 nós canônicos;
-- **93 fichas Markdown / 89 competências cobertas**;
-- única lacuna autoral: **GM.02**;
-- Journey TS: **30/30**;
-- Composer: **25 registrados / 25 ativos / 0 inativos**;
+- **90 nós canônicos**;
+- **94 fichas Markdown / 90 de 90 competências cobertas**;
+- **0 exceções autorais**;
+- Journey TS/registry/AllFichas: **31/31**;
+- Composer: **26 registrados / 26 ativos / 0 inativos**;
 - servido sem placeholder: **51/90**;
 - fallback real: **39/90**;
 - primitivas: **20 executáveis, 4 renderer-sem-builder, 1 isolada, 1 ausente**.
 
-## Evidências recentes
+Dívida runtime ainda explícita: LinkingCubes, Moedas, SingaporeBars e VisualAddition sem builder; Quadrado100 isolado; Regua ausente.
 
-- P22.1 GM.12: `31276881058` = success.
-- P22.2 N4.09: `31277213310` = success.
-- P22.3A N1.07: `31281685349` = success; clean follow-up `31281842046`.
-- P22.3B JD4: `31282358997` = success.
-- P22.4 N1.09 baseline semântico: `31286476155` = success.
-- P22.4 sonda pela rota real de produção: `31286955931` = success.
-- P22.4 cleanup sem bancada: `31287106974` = success.
+## Evidência de P22.4 — N1.09
 
-A sonda P22.4 encontrou e corrigiu uma falha real de `ScatteredItems`: 10–20 objetos podiam colidir quando o sorteio esgotava 50 tentativas. O palco agora usa células invisíveis embaralhadas + jitter determinístico, com teste geométrico permanente.
+- baseline semântico: `31286476155` = success;
+- sonda rota real: `31286955931` = success;
+- clean follow-up: `31287106974` = success.
 
-## Próximo passo — P22.5 GM.02
+A sonda encontrou e corrigiu colisão real em `ScatteredItems`; o palco passou a usar dispersão determinística sem sobreposição e ganhou teste geométrico permanente.
 
-GM.02 continua sendo **Tempo cotidiano**: partes do dia, ontem/hoje/amanhã, dias da semana e ordem de eventos.
+## Evidência de P22.5 — GM.02
 
-O legado “Manhã ou Noite?” é rollback parcial, não a competência inteira.
+- CI semântico: `31287744035` = success;
+- primeira sonda: `31287813598` — encontrou contraste 4,22:1 no aviso audível e selo 🔊 cobrindo conteúdo;
+- correção compartilhada no renderer/CSS de opções audíveis;
+- sonda corrigida: `31288014568` = success;
+- clean follow-up sem `postbuild`/injetor: `31288136803` = success;
+- suíte do lote: **131 arquivos / 2.205 testes**.
 
-Contrato obrigatório:
+GM.02 cobre manhã/tarde/noite, ontem/hoje/amanhã, semana, ordem de eventos e recuperação mista. Toda linguagem essencial chega por áudio; texto é apoio. O legado permanece rollback parcial.
 
-1. prereqs vazios, conforme grafo;
-2. pré-leitor: áudio/iconografia são linguagem primária;
-3. cinco níveis: partes do dia → relativos temporais → semana → ordem de eventos → misto;
-4. `rt_alvo` positivo no L5 como metadado de fluência, nunca mastery;
-5. ficha Markdown com nove seções + Journey TS + teste permanente;
-6. registro Journey/Composer + ativação declarativa;
-7. legado preservado para rollback;
-8. remover a exceção GM.02 somente quando a ficha existir;
-9. corrigir o `EXPECTED_FICHAS = 93` do auditor específico estruturalmente — nunca trocar por 94;
-10. resposta correta sem misconception e diagnósticos apenas quando causais;
-11. sonda real + gates completos;
-12. só então declarar P22 encerrada.
+## Fortalecimentos estruturais colhidos em P22
 
-## Depois de P22
+- nenhum auditor de fichas depende mais de contagem fixa 92/93/94;
+- testes globais de Journey usam a mesma porta autoral da produção;
+- builders especializados N1.09/GM.02 propagam `rt_alvo → rt_max_s`;
+- micro explicitamente `misto` pode emitir apenas a união de kinds já ensinados pela própria ficha;
+- resposta correta nunca deve carregar misconception;
+- tempo continua metadado de fluência/revisão, não gate de domínio conceitual.
+
+## Próxima fase — auditoria longitudinal dos motores
+
+Traçar e provar, nesta ordem:
+
+`GameLoop answer → misconception/evidence → mastery/progression → persistence → Radar/review → recommendation → unlock`.
+
+Primeiros pontos de risco a resolver por evidência:
+
+1. `GameLoop` pode mutar um mapa de progresso com mais de um nó; confirmar que `App` não reduz esse mapa ao nó atual antes de persistir;
+2. verificar se `reviewForce` e `lastDay` escritos pelo Leitner sobrevivem ao commit;
+3. comparar strings reais de `MisconceptionTag` com `TAG_TO_NODE` do Radar;
+4. provar se `getDueReviews` realmente alimenta a recomendação diária;
+5. provar se Radar resgata o nó correto;
+6. confirmar unlock pelo DAG e separação Jardim→mãe;
+7. validar persistência local/cloud dessas dimensões.
+
+Não alterar algoritmo antes de demonstrar a discrepância e escrever teste de regressão.
+
+## Depois
 
 Seguir `PLANO_POS_P22_FABRICA_CURRICULAR.md`:
 
-1. máquina longitudinal dos motores adaptativos;
-2. Coverage Matrix executável;
-3. fábrica curricular por ondas;
-4. mega auditoria pedagógica;
-5. Dojo completo;
-6. release hardening.
+1. Coverage Matrix executável;
+2. fábrica curricular por ondas;
+3. mega auditoria pedagógica;
+4. Dojo completo;
+5. release hardening.
 
 ## Portões padrão
 
@@ -108,4 +123,4 @@ git diff --check
 
 Tela afetada exige sonda real.
 
-**Automaticidade treina o que já foi compreendido; uma ficha só está pronta quando código, telemetria e experiência real da criança concordam.**
+**Uma competência só está pronta quando código, telemetria, persistência e experiência real da criança concordam.**
