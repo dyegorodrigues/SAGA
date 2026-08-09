@@ -103,11 +103,16 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
     if (t.graphId) pMap[t.graphId] = progOf(t.id);
   }
   const status = computeUnlockStatus(pMap);
+  // Fallback é dívida de conteúdo, nunca uma experiência ensinável. Mantemos
+  // todos os nós no pMap/DAG para que histórico e prerequisitos continuem
+  // verdadeiros, mas o Sensei só escolhe um alvo dominante que possa realmente
+  // gerar ensino/evidência agora.
+  const teachableTracks = tracks.filter(t => t.contentStatus !== "fallback");
 
   // 1. AQUECIMENTO
   let aquecimento: Track | null = null;
   let bestAcc = -1;
-  for (const t of tracks) {
+  for (const t of teachableTracks) {
     const p = progOf(t.id);
     if ((p.tot || 0) >= 4 && accOf(p) > bestAcc && !FUN_IDS.includes(t.id)) {
       bestAcc = accOf(p);
@@ -115,15 +120,15 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
     }
   }
   if (!aquecimento) {
-    aquecimento = tracks.find(t => !t.prereqs?.length) || tracks[0] || null;
+    aquecimento = teachableTracks.find(t => !t.prereqs?.length) || teachableTracks[0] || null;
   }
 
   // 2. FRONTEIRA — UM alvo conceitual dominante.
   // Prefere um frontier já praticado mas ainda não dominado; senão o primeiro
   // frontier novo. Os outros blocos da sessão não criam uma segunda fronteira.
-  const learning = tracks.filter((t) => t.graphId && status.frontier.includes(t.graphId) && practiced(progOf(t.id)))
+  const learning = teachableTracks.filter((t) => t.graphId && status.frontier.includes(t.graphId) && practiced(progOf(t.id)))
     .sort((a, b) => accOf(progOf(a.id)) - accOf(progOf(b.id)));
-  const fresh = tracks.find((t) => t.graphId && status.frontier.includes(t.graphId) && !practiced(progOf(t.id)));
+  const fresh = teachableTracks.find((t) => t.graphId && status.frontier.includes(t.graphId) && !practiced(progOf(t.id)));
   const fronteira = learning[0] || fresh || aquecimento;
 
   // 3. RESGATE
