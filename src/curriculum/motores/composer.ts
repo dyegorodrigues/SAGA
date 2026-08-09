@@ -3,30 +3,36 @@ import { computeUnlockStatus } from "./unlockEngine";
 import { RadarEngine } from "./radarEngine";
 import { prescribeMisconceptionRescue } from "./rescuePlanner";
 import { beginAulaProgressSession, stampAulaQuestion } from "./aulaProgressContext";
+import { ALL_MATH_TRACKS } from "./curriculum";
 
 /**
- * COMPOSER SAGA — O Orquestrador da Academia Diária
+ * COMPOSER SAGA — Orquestrador da Aula do Dia do Sensei.
  *
- * Segundo o §6 da Bíblia do SAGA, a sessão na "Academia" (botão Play central)
- * deve possuir exatos 5 blocos, balanceando aprendizado e revisão, nesta ordem:
+ * A Aula do Dia NÃO é um modo misto. Há uma fronteira conceitual dominante;
+ * aquecimento, revisão, resgate e fluência existem para preparar, sustentar ou
+ * consolidar essa progressão. O Desafio Misto é um modo separado.
  *
- * 1. AQUECIMENTO (Warmup): 2-3 questões fáceis, já dominadas (vitória inicial).
- * 2. FRONTEIRA (Frontier): Onde o novo aprendizado acontece (Desbravamento).
- * 3. RESGATE (Rescue): Fixação espaçada (se o RadarEngine pedir).
- * 4. FLUÊNCIA (Fluency): O Bloco Dojo para automatizar cálculos (não confundir
- *    com o Dojo-Pilar standalone onde a criança treina livremente).
- * 5. FECHO (Closure): 1 questão fácil/lúdica para encerrar com um sorriso.
+ * Estrutura atual da sessão:
+ * 1. AQUECIMENTO: vitória acessível e ativação de conhecimento relevante.
+ * 2. FRONTEIRA: a microcompetência dominante onde o novo aprendizado acontece.
+ * 3. RESGATE: somente quando Radar/Leitner/banco apontam necessidade.
+ * 4. FLUÊNCIA: prática sobre conhecimento já compreendido; não concede domínio.
+ * 5. FECHO: encerramento simples e positivo.
  */
 
 export const FLUENCY_IDS = ["N1.01", "N1.02", "N1.11", "N3.01", "N3.02", "N3.06", "N3.07", "N3.08", "N4.03", "N4.06", "N4.07"];
 const FUN_IDS = ["padroes", "intruso", "olho", "formas", "logica", "graficos"];
 
-// Total de questões varia por faixa etária, mas vamos usar um total em torno de 10-12
+/**
+ * API legada mantida apenas para compatibilidade de consumidores antigos.
+ * O runtime do Sensei NÃO usa mais série para definir a dose da Aula do Dia.
+ */
 export const AULA_TOTAL_F0 = 8;
 export const AULA_TOTAL_F1 = 12;
 export const AULA_TOTAL_F2 = 16;
 export const AULA_TOTAL_F3_F4 = 20;
 
+/** @deprecated Use `getAdaptiveAulaTotal`. Série não é autoridade curricular. */
 export function getAulaTotal(grade?: string): number {
   switch (grade) {
     case "pre": return AULA_TOTAL_F0;
@@ -41,6 +47,19 @@ export function getAulaTotal(grade?: string): number {
 type ProgOf = (trackId: string) => Progress;
 const accOf = (p: Progress) => (p.tot ? p.ok / p.tot : -1);
 const practiced = (p: Progress) => (p.tot || 0) > 0;
+
+/**
+ * Universo canônico do Tutor.
+ *
+ * `App` ainda possui caminhos históricos que entregam apenas `tracks[kid.grade]`.
+ * O Sensei não pode aceitar esse recorte como verdade pedagógica: todo o DAG
+ * matemático fica disponível e unlock/prereqs decidem o que é elegível.
+ * Tracks recebidas com o mesmo id vencem para preservar bindings já resolvidos.
+ */
+export function canonicalSenseiTracks(input: Track[]): Track[] {
+  const recebidas = new Map(input.map(track => [track.id, track] as const));
+  return ALL_MATH_TRACKS.map(track => recebidas.get(track.id) ?? track);
+}
 
 const shuffleOpts = (q: Question): Question => {
   const c = JSON.parse(JSON.stringify(q)) as Question;
@@ -99,9 +118,9 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
     aquecimento = tracks.find(t => !t.prereqs?.length) || tracks[0] || null;
   }
 
-  // 2. FRONTEIRA (Seleciona UM único alvo maduro)
-  // Prefere nós que já estão no status "frontier" (abertos) e que o aluno já praticou mas não dominou,
-  // ou pega o primeiro nó frontier nunca praticado.
+  // 2. FRONTEIRA — UM alvo conceitual dominante.
+  // Prefere um frontier já praticado mas ainda não dominado; senão o primeiro
+  // frontier novo. Os outros blocos da sessão não criam uma segunda fronteira.
   const learning = tracks.filter((t) => t.graphId && status.frontier.includes(t.graphId) && practiced(progOf(t.id)))
     .sort((a, b) => accOf(progOf(a.id)) - accOf(progOf(b.id)));
   const fresh = tracks.find((t) => t.graphId && status.frontier.includes(t.graphId) && !practiced(progOf(t.id)));
@@ -119,7 +138,7 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
     .sort((a, b) => (progOf(a.id).lastDay || "0000").localeCompare(progOf(b.id).lastDay || "0000"));
   const bankTrack = tracks.find(t => (progOf(t.id).bank || []).length > 0);
   const resgates: RescuePlanItem[] = [];
-  
+
   for (const rt of radarTracks) {
     const nodeId = rt.graphId || rt.id;
     const prescription = prescribeMisconceptionRescue(nodeId, tracks, pMap);
@@ -143,7 +162,8 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
     resgates.push({ track: dueTracks[0], fromBank: false, reason: "spaced-review" });
   }
 
-  // 4. FLUÊNCIA (Bloco Dojo da Academia)
+  // 4. FLUÊNCIA — ainda é a ponte legada por Track conceitual.
+  // A auditoria pós-P22 vai substituir isto por prescrição real de Dojo/Jardim.
   const fluPool = tracks.filter((t) => FLUENCY_IDS.includes(t.id) && t.id !== fronteira?.id);
   const fluencia =
     fluPool.filter((t) => practiced(progOf(t.id))).sort((a, b) => accOf(progOf(a.id)) - accOf(progOf(b.id)))[0] ||
@@ -155,18 +175,56 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
 
   const revName = resgates.find((r) => !r.fromBank)?.track.name;
   const resumo = fronteira
-    ? `Hoje: treinar ${fronteira.icon} ${fronteira.name}` + (revName ? ` · revisar ${revName}` : "")
-    : "Sua dose diária de magia!";
+    ? `Aula de hoje: ${fronteira.icon} ${fronteira.name}` + (revName ? ` · reforço: ${revName}` : "")
+    : "O Sensei está preparando o próximo passo!";
 
   return { aquecimento, fronteira, resgates, fluencia, fecho, resumo };
 }
 
-export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTotal()): { qs: Question[]; plan: AulaPlan } {
+export const AULA_ADAPTIVE_MIN = 8;
+export const AULA_ADAPTIVE_NORMAL = 10;
+export const AULA_ADAPTIVE_MAX = 12;
+
+/**
+ * Dose adaptativa V1.
+ *
+ * Não tenta inferir “idade ideal”. O orçamento diminui quando há remediação
+ * conceitual/fricção e só cresce um pouco quando a fronteira tem histórico
+ * estável, sem banco nem resgate. Alta facilidade deve aumentar complexidade e
+ * retirar andaime; mais questões é apenas uma pequena margem de prática.
+ */
+export function getAdaptiveAulaTotal(
+  tracks: Track[],
+  progOf: ProgOf,
+  plan: AulaPlan = planAula(tracks, progOf),
+): number {
+  const practicedTracks = tracks.filter(track => practiced(progOf(track.id)));
+  if (practicedTracks.length === 0) return AULA_ADAPTIVE_MIN;
+
+  const target = plan.fronteira ? progOf(plan.fronteira.id) : undefined;
+  const conceptualRescue = plan.resgates.some(rescue =>
+    rescue.reason === "misconception" || rescue.reason === "prerequisite-gap"
+  );
+
+  if (conceptualRescue || (target?.bad || 0) >= 2) return AULA_ADAPTIVE_MIN;
+
+  const targetAccuracy = target?.tot ? (target.ok || 0) / target.tot : -1;
+  const stableFrontier = !!target
+    && (target.tot || 0) >= 8
+    && targetAccuracy >= 0.85
+    && (target.bad || 0) === 0
+    && (target.bank || []).length === 0
+    && plan.resgates.length === 0;
+
+  return stableFrontier ? AULA_ADAPTIVE_MAX : AULA_ADAPTIVE_NORMAL;
+}
+
+export function composeAula(tracks: Track[], progOf: ProgOf, total = AULA_ADAPTIVE_NORMAL): { qs: Question[]; plan: AulaPlan } {
   // Uma composição nova nunca herda snapshots de outra criança/missão.
   beginAulaProgressSession();
   const plan = planAula(tracks, progOf);
   const lvlOf = (t: Track) => Math.min(5, Math.max(1, progOf(t.id).lvl || 1));
-  
+
   const gen = (t: Track | null, lvlOverride?: number): Question | null => {
     if (!t) return null;
     const level = lvlOverride ?? lvlOf(t);
@@ -212,9 +270,8 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
 
   /**
    * Cada fase chama o mesmo gerador em sequência, e geradores de alcance
-   * pequeno repetem com frequência alta. Sem esta guarda, 95% das missões
-   * traziam ao menos uma repetição imediata e um terço dos pares consecutivos
-   * era idêntico — a criança via a mesma pergunta duas vezes seguidas.
+   * pequeno repetem com frequência alta. Sem esta guarda, missões podem trazer
+   * a mesma pergunta duas vezes seguidas.
    */
   const fabricarDistinta = (
     fabricar: () => Question | null,
@@ -236,44 +293,39 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
     const q = fabricarDistinta(fabricar, anterior ? assinatura(anterior) : null);
     if (!q) return false;
     // O fallback "Em construção" é constante: repetir a geração devolve sempre a
-    // mesma carta. Empilhar duas seguidas não ensina nada e parece defeito, então
-    // a segunda é recusada — missão mais curta é melhor que missão preenchida
-    // com a mesma carta vazia.
+    // mesma carta. Missão mais curta é melhor que empilhar placeholder.
     if (q.isFallback && anterior?.isFallback) return false;
     qs.push(q);
     return true;
   };
 
-  // 1. AQUECIMENTO (15% = ~2 questões) -> Nível - 1 (Fácil)
+  // 1. AQUECIMENTO — duas questões acessíveis.
   const nivelAquecimento = () => Math.max(1, lvlOf(plan.aquecimento!) - 1);
   addDistinta(() => gen(plan.aquecimento, nivelAquecimento()));
   addDistinta(() => gen(plan.aquecimento, nivelAquecimento()));
 
-  // 2. FRONTEIRA (~40-50% = ~5-6 questões) -> Nível de Partida Atual (LevelToApply)
+  // 2. FRONTEIRA — maior parte da prática fica no alvo conceitual dominante.
   for (let i = 0; i < 5; i++) {
     addDistinta(() => gen(plan.fronteira));
   }
 
-  // 3. RESGATE (1-2 questões)
-  // Sem repetição aqui: a fila de resgate é consumida por `shift`, e tentar de
-  // novo descartaria um resgate legítimo.
+  // 3. RESGATE — a auditoria seguinte verificará questionBudget ponta a ponta.
+  // Hoje cada item planejado ainda entrega uma questão embutida.
   addQ(genResg());
   addQ(genResg());
 
-  // 4. FLUÊNCIA (25% = ~3 questões) -> Rápido
+  // 4. FLUÊNCIA — ponte legada até a integração formal com o Dojo.
   addDistinta(() => gen(plan.fluencia));
   addDistinta(() => gen(plan.fluencia));
   addDistinta(() => gen(plan.fluencia));
 
-  // Trunca/ajusta se passou do limite (sem remover o fecho)
+  // Preenche o orçamento restante com a própria fronteira, nunca com assunto aleatório.
   while (qs.length < total - 1) {
     if (!addDistinta(() => gen(plan.fronteira) || gen(plan.aquecimento, 1))) break;
   }
   const final = qs.slice(0, total - 1);
 
-  // 5. FECHO (1 questão lúdica)
-  // O fecho é montado depois do corte, para que a comparação seja com a questão
-  // que realmente ficou por último — era aqui que sobrava a última repetição.
+  // 5. FECHO lúdico, sem ganhar autoridade curricular sobre a fronteira.
   const fechoQ = fabricarDistinta(
     () => gen(plan.fecho, Math.max(1, plan.fecho ? lvlOf(plan.fecho) - 1 : 1)) || gen(plan.aquecimento, 1),
     final.length ? assinatura(final[final.length - 1]) : null,
@@ -284,20 +336,17 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
   return { qs: final, plan };
 }
 
-export function buildAulaTrack(tracks: Track[], progOf: ProgOf, grade: string = "ano1"): { track: Track; plan: AulaPlan } {
-  let total = getAulaTotal();
-  if (grade === "pre") total = 8;
-  else if (grade === "ano1") total = 12;
-  else if (grade === "ano2") total = 16;
-  else total = 20;
-
-  const { qs, plan } = composeAula(tracks, progOf, total);
+export function buildAulaTrack(tracks: Track[], progOf: ProgOf, _grade: string = "ano1"): { track: Track; plan: AulaPlan } {
+  const universe = canonicalSenseiTracks(tracks);
+  const previewPlan = planAula(universe, progOf);
+  const total = getAdaptiveAulaTotal(universe, progOf, previewPlan);
+  const { qs, plan } = composeAula(universe, progOf, total);
   let i = 0;
   return {
     plan,
     track: {
       id: "aula",
-      name: "Minha Aula",
+      name: "Aula do Dia",
       icon: "📚",
       color: "#4F46E5",
       dark: "#3730A3",
