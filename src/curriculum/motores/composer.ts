@@ -2,6 +2,7 @@ import { Question, Track, Progress } from "../../types";
 import { computeUnlockStatus } from "./unlockEngine";
 import { RadarEngine } from "./radarEngine";
 import { prescribeMisconceptionRescue } from "./rescuePlanner";
+import { beginAulaProgressSession, stampAulaQuestion } from "./aulaProgressContext";
 
 /**
  * COMPOSER SAGA — O Orquestrador da Academia Diária
@@ -161,22 +162,28 @@ export function planAula(tracks: Track[], progOf: ProgOf): AulaPlan {
 }
 
 export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTotal()): { qs: Question[]; plan: AulaPlan } {
+  // Uma composição nova nunca herda snapshots de outra criança/missão.
+  beginAulaProgressSession();
   const plan = planAula(tracks, progOf);
   const lvlOf = (t: Track) => Math.min(5, Math.max(1, progOf(t.id).lvl || 1));
   
   const gen = (t: Track | null, lvlOverride?: number): Question | null => {
     if (!t) return null;
+    const level = lvlOverride ?? lvlOf(t);
     try {
-      return t.gen(lvlOverride ?? lvlOf(t));
+      return stampAulaQuestion(t.gen(level), t, level, progOf(t.id));
     } catch (e) {
       return null;
     }
   };
 
-  // Resgates (Banco de erros)
+  // Resgates (Banco de erros). Mesmo uma questão serializada do banco recebe de
+  // novo a identidade do track que a armazenou; saves antigos não tinham esse metadado.
   const bankQs: Question[] = [];
   for (const t of tracks) {
-    for (const item of progOf(t.id).bank || []) bankQs.push(shuffleOpts(item.q));
+    for (const item of progOf(t.id).bank || []) {
+      bankQs.push(stampAulaQuestion(shuffleOpts(item.q), t, lvlOf(t), progOf(t.id)));
+    }
   }
   for (let i = bankQs.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -185,7 +192,7 @@ export function composeAula(tracks: Track[], progOf: ProgOf, total = getAulaTota
 
   const rescueQueue = plan.resgates.map(rescue => () => {
     if (rescue.reason === "error-bank") return bankQs.pop() || null;
-    const question = gen(rescue.track);
+    const question = gen(rescue.track, rescue.requiredLevel);
     return question ? { ...question, review: true } : null;
   });
   const genResg = () => rescueQueue.shift()?.() || null;
