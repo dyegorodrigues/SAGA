@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Kid, Track } from "../../types";
 import type { AulaPlan, RescuePlanItem } from "../../curriculum/motores/composer";
-import { chooseSenseiEntry } from "../../curriculum/motores/senseiOrchestrator";
+import type { SenseiEntry } from "../../curriculum/motores/senseiOrchestrator";
 import type { SenseiDojoPrescription } from "../../curriculum/motores/senseiDojoPrescription";
 import { FONT, sfx } from "../Mascot";
 
@@ -10,9 +10,10 @@ interface Props {
   prog: Record<string, any>;
   aulaPlan: AulaPlan;
   rec: { track: Track, reason: string } | null;
+  senseiEntry: SenseiEntry;
   dojoPrescription: SenseiDojoPrescription | null;
   onMatricula: () => void;
-  /** Porta única: o parent já roteia aula normal ou Oficina prescrita. */
+  /** Porta única: o parent já roteia aula normal, Oficina ou Jardim causal. */
   onAula: () => void;
   /** Missão de fluência com autoridade prescrita pelo Sensei. */
   onSenseiDojo: () => void;
@@ -21,12 +22,13 @@ interface Props {
   setActiveShellTab: (tab: any) => void;
 }
 
-export function SenseiTab({ kid, prog, aulaPlan, rec, dojoPrescription, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
+export function SenseiTab({ kid, prog, aulaPlan, rec, senseiEntry, dojoPrescription, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
   const [expandedLesson, setExpandedLesson] = useState(true);
   const [expandedDojo, setExpandedDojo] = useState(true);
   const [expandedRescue, setExpandedRescue] = useState(true);
-  const senseiEntry = chooseSenseiEntry(aulaPlan);
   const rescuePrincipal = senseiEntry.kind === "rescue" ? senseiEntry.rescue : null;
+  const gardenPrincipal = senseiEntry.kind === "garden" ? senseiEntry.prescription : null;
+  const interventionPrincipal = !!rescuePrincipal || !!gardenPrincipal;
 
   return (
     <div className="animate-[mkPop_0.25s_ease-out_1] pb-6">
@@ -69,41 +71,70 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, dojoPrescription, onMatric
 
       {/* AULA DO DIA — uma porta, decisão pedagógica do Tutor */}
       {Object.keys(prog).length > 0 && (
-        <div className="mb-6 relative overflow-hidden border-2" style={{ borderColor: rescuePrincipal ? "#FDBA74" : "#C7D2FE", boxShadow: rescuePrincipal ? "0 6px 0 #FB923C" : "0 6px 0 #A5B4FC", borderRadius: 24 }}>
+        <div className="mb-6 relative overflow-hidden border-2" style={{ borderColor: interventionPrincipal ? "#FDBA74" : "#C7D2FE", boxShadow: interventionPrincipal ? "0 6px 0 #FB923C" : "0 6px 0 #A5B4FC", borderRadius: 24 }}>
           <div
             className="w-full text-left p-5 select-none relative"
-            style={{ background: rescuePrincipal ? "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)" : "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
+            style={{ background: interventionPrincipal ? "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)" : "linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)" }}
           >
             <span className="pointer-events-none absolute w-1/3 h-full -left-[70%] bg-gradient-to-r from-transparent via-white/60 to-transparent animate-[mkShine_3s_ease-in-out_infinite]" />
 
             <div className="flex items-center justify-between gap-3 mb-2">
-              <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 border-2 rounded-lg inline-block shadow-sm ${rescuePrincipal ? "text-orange-950 bg-orange-200 border-orange-300" : "text-indigo-900 bg-indigo-200 border-indigo-300"}`}>
-                {rescuePrincipal ? "🛠️ Aula do Dia · Reconstrução" : "🎓 Aula do Dia · Próximo Passo"}
+              <span className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 border-2 rounded-lg inline-block shadow-sm ${interventionPrincipal ? "text-orange-950 bg-orange-200 border-orange-300" : "text-indigo-900 bg-indigo-200 border-indigo-300"}`}>
+                {gardenPrincipal
+                  ? "🌱 Aula do Dia · Base Perceptual"
+                  : rescuePrincipal
+                    ? "🛠️ Aula do Dia · Reconstrução"
+                    : "🎓 Aula do Dia · Próximo Passo"}
               </span>
               <button
                 onClick={() => setExpandedLesson(!expandedLesson)}
-                className={`text-xs font-bold px-2.5 py-1 rounded-md transition-colors ${rescuePrincipal ? "text-orange-800 bg-orange-100 hover:bg-orange-200" : "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"}`}
+                className={`text-xs font-bold px-2.5 py-1 rounded-md transition-colors ${interventionPrincipal ? "text-orange-800 bg-orange-100 hover:bg-orange-200" : "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"}`}
               >
                 {expandedLesson ? "▲ Compactar" : "▼ Expandir"}
               </button>
             </div>
 
-            <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 22, color: rescuePrincipal ? "#9A3412" : "#312E81", marginBottom: 2 }}>
-              {rescuePrincipal ? `Fortalecer: ${rescuePrincipal.track.name}` : "A Aventura do Sensei"}
+            <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 22, color: interventionPrincipal ? "#9A3412" : "#312E81", marginBottom: 2 }}>
+              {gardenPrincipal
+                ? `Transformar em reflexo: ${gardenPrincipal.track.name}`
+                : rescuePrincipal
+                  ? `Fortalecer: ${rescuePrincipal.track.name}`
+                  : "A Aventura do Sensei"}
             </div>
 
-            <div className={`text-[13px] font-bold leading-snug mb-3 ${rescuePrincipal ? "text-orange-900/90" : "text-indigo-800/90"}`}>
-              {rescuePrincipal
-                ? `O Sensei percebeu uma base que vale fortalecer agora. Você não precisa escolher nada: esta é a missão certa para o seu próximo passo.`
-                : aulaPlan.resumo}
+            <div className={`text-[13px] font-bold leading-snug mb-3 ${interventionPrincipal ? "text-orange-900/90" : "text-indigo-800/90"}`}>
+              {gardenPrincipal
+                ? gardenPrincipal.reasonText
+                : rescuePrincipal
+                  ? `O Sensei percebeu uma base que vale fortalecer agora. Você não precisa escolher nada: esta é a missão certa para o seu próximo passo.`
+                  : aulaPlan.resumo}
             </div>
 
             {expandedLesson && (
-              <div className={`text-[11px] font-bold mt-2 mb-4 leading-snug bg-white/75 p-3.5 rounded-2xl shadow-inner ${rescuePrincipal ? "text-orange-950 border border-orange-200/70" : "text-indigo-950 border border-indigo-200/60"}`}>
-                <div className={`mb-2 uppercase tracking-widest text-[9px] font-black ${rescuePrincipal ? "text-orange-900/70" : "text-indigo-900/70"}`}>
+              <div className={`text-[11px] font-bold mt-2 mb-4 leading-snug bg-white/75 p-3.5 rounded-2xl shadow-inner ${interventionPrincipal ? "text-orange-950 border border-orange-200/70" : "text-indigo-950 border border-indigo-200/60"}`}>
+                <div className={`mb-2 uppercase tracking-widest text-[9px] font-black ${interventionPrincipal ? "text-orange-900/70" : "text-indigo-900/70"}`}>
                   Roteiro Pedagógico Guiado:
                 </div>
-                {rescuePrincipal ? (
+                {gardenPrincipal ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span className="text-emerald-600 text-sm">🌱</span>
+                      <span>Base já compreendida: <b>{gardenPrincipal.motherName}</b></span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-orange-600 text-sm">👀</span>
+                      <span>Treino causal: <b>{gardenPrincipal.track.name}</b></span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-emerald-600 text-sm">🎯</span>
+                      <span>Degrau do Jardim: <b>{gardenPrincipal.step}</b></span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <span className="text-blue-600 text-sm">🧭</span>
+                      <span>Round curto de <b>{gardenPrincipal.questionBudget} desafios</b> para recuperar automaticidade.</span>
+                    </div>
+                  </>
+                ) : rescuePrincipal ? (
                   <>
                     <div className="flex items-center gap-2">
                       <span className="text-orange-600 text-sm">🧱</span>
@@ -152,9 +183,9 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, dojoPrescription, onMatric
                 sfx.level();
                 onAula();
               }}
-              className={`mt-1 inline-flex items-center justify-center w-full gap-2 text-[15px] font-black text-white px-5 py-3 rounded-xl shadow-md hover:scale-[1.01] active:scale-95 transition-all cursor-pointer ${rescuePrincipal ? "bg-orange-600 hover:bg-orange-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
+              className={`mt-1 inline-flex items-center justify-center w-full gap-2 text-[15px] font-black text-white px-5 py-3 rounded-xl shadow-md hover:scale-[1.01] active:scale-95 transition-all cursor-pointer ${interventionPrincipal ? "bg-orange-600 hover:bg-orange-700" : "bg-indigo-600 hover:bg-indigo-700"}`}
             >
-              <span>{rescuePrincipal ? "Começar Reforço Guiado" : "Começar Aula do Dia"}</span>
+              <span>{gardenPrincipal ? "Começar Jardim Guiado" : rescuePrincipal ? "Começar Reforço Guiado" : "Começar Aula do Dia"}</span>
               <span className="text-lg">▶</span>
             </button>
           </div>
