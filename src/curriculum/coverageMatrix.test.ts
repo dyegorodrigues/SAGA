@@ -2,11 +2,25 @@ import { describe, expect, it } from "vitest";
 import {
   buildCoverageMatrix,
   COVERAGE_BASELINE,
+  COVERAGE_CLOSED_BASELINE,
+  COVERAGE_MIGRATIONS,
   renderCoverageMatrixJson,
   renderCoverageMatrixMarkdown,
 } from "../../AI_Studio_Lab/tools/coverage_matrix";
 
 describe("Coverage Matrix executável", () => {
+  it("preserva o fechamento P21.1 e deriva o baseline vigente por migrações nomeadas", () => {
+    expect(COVERAGE_CLOSED_BASELINE.divergences).toBe(21);
+    expect(COVERAGE_MIGRATIONS).toEqual([
+      expect.objectContaining({
+        id: "W1-N1.04",
+        competence: "N1.04",
+        delta: { divergences: -1 },
+      }),
+    ]);
+    expect(COVERAGE_BASELINE.divergences).toBe(20);
+  });
+
   it("liga grafo, ficha, runtime, screen, Sensei, testes, dívida e ordem causal nas 90 competências", () => {
     const result = buildCoverageMatrix();
     const divergent = result.rows
