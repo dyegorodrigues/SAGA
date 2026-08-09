@@ -1,45 +1,71 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`. Próximo bloqueante: **cloud reconciliation**.
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_CLOUD_RECONCILIATION_FECHADA_2026-08-09.md`. Próximo bloqueante único: **simulação longitudinal**.
 
 ## Leia
 
-1. `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`
-2. `PREAUDITORIA_CLOUD_RECONCILIATION_2026-08-09.md`
-3. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
-4. `RETOMADA.md`
+1. `CHECKPOINT_CLOUD_RECONCILIATION_FECHADA_2026-08-09.md`
+2. `RETOMADA.md`
+3. `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`
+4. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
 5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
-Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 draft/unmerged. Não tocar na main `68fad4c575e28959b2ca4776e9a541d6828b63f3`, no Creature Engine, nem criar branch auxiliar. Reancorar PR/head antes de editar e usar o remoto como fonte da verdade.
+Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 open + draft + unmerged. Não tocar na main `68fad4c575e28959b2ca4776e9a541d6828b63f3`, no Creature Engine, nem criar branch auxiliar. Reancorar PR/head remoto antes de editar.
 
 ## Não reabra
 
-Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone, recomendador por estrelas, Misto elegível e Matrícula adaptativa estão fechados.
+Cânone, Tutor↔Dojo, QA Chrome, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone, recomendador por estrelas, Misto elegível, Matrícula adaptativa e **Cloud Reconciliation** estão fechados.
 
-Matrícula funcional: `f4ed86fcd70241e6324392b40bd457d44279ba61`, CI #744 / run `31314596574`, 149 arquivos / 2.309 testes, build e Chrome real verdes; artefato `9038385938`.
+Cloud funcional: `f76017e3a8ed2a15fb5561f2fc886f6445964168`, CI #766 / run `31319778442`, **150 arquivos / 2.325 testes**, build/TypeScript/auditores/higiene/binários/Chrome verdes; artefato `9039831130`.
 
-## Faça agora — cloud reconciliation
+Contratos de cloud fechados:
 
-Cadeia obrigatória:
+- UID local escopado e legado com owner/família;
+- `State.updatedAt` é autoridade lógica;
+- write Firestore transacional rejeita stale arrival;
+- horário externo Firestore é só transporte;
+- empate preserva cloud já aceito;
+- Aula/Dojo materializados antes de React/save sem re-carimbo;
+- anonymous→Google preserva UID/namespace via link;
+- retry offline automático mantém um único pending state;
+- estado novo suplanta retry velho;
+- troca de UID cancela também retry de write antigo em voo;
+- duas abas/dois dispositivos cobertos;
+- campos atuais de learner state sobrevivem round-trip;
+- nenhum merge campo-a-campo inventado;
+- nenhum `DEPLOYMENT-ONLY` novo.
 
-`auth/UID → local save → cloud save → reconcile → migrate/materialize → React state → writers local/cloud → logout/troca de conta → anonymous→Google → offline/reconexão → duas abas/dispositivos concorrentes`.
+## Faça agora — simulação longitudinal
 
-Antes de alterar produção:
+Construa uma simulação sintética determinística que execute o Learner Model/Sensei ao longo de múltiplas sessões e reloads.
 
-1. completar/rodar a matriz do documento de pré-auditoria;
-2. provar autoridade de `State.updatedAt` versus horário de chegada do write Firestore;
-3. provar isolamento entre UID A e UID B;
-4. provar anonymous→Google;
-5. provar comportamento offline e reconexão;
-6. provar writes fora de ordem;
-7. preservar `dojoTracks`, mastery, banco, revisão, `lastDay` e schema em migração/reconcile;
-8. não criar merge campo-a-campo sem especificação;
-9. regressão antes do patch;
-10. gates completos e checkpoint.
+Perfis mínimos:
 
-### Firebase
+1. iniciante absoluto;
+2. ritmo típico;
+3. alta facilidade/avanço rápido;
+4. dificuldade persistente + remediação causal;
+5. esquecimento/retenção + revisão;
+6. retorno após intervalo.
 
-Não pedir ao autor token, service account, ID novo nem configuração de Console para começar. O bloco é testável por código/Vitest/mocks usando os contracts atuais. Se uma necessidade exclusiva de Console/deploy aparecer depois, isolar como `DEPLOYMENT-ONLY` e continuar o que independe dela.
+Trace recomendado:
+
+`estado inicial → Matrícula/estado já existente → planAula/Sensei → respostas → progress/source/mastery/Radar/Leitner → Dojo/Jardim/Oficina quando causalmente elegíveis → persist/reload → próxima sessão → invariantes`.
+
+Provar, entre outros:
+
+- uma meta dominante por Aula;
+- idade/série nunca viram teto curricular;
+- RT/fluência não compram nem retiram domínio conceitual;
+- Dojo manual não move ponteiro adaptativo do Tutor;
+- prescrição de Dojo só move estado próprio;
+- Jardim/Oficina só entram por causa demonstrável e têm saída;
+- Misto só usa repertório elegível;
+- retenção/esquecimento geram revisão sem apagar domínio por velocidade;
+- reload não muda a decisão apenas por efeito de persistência;
+- nenhum estado fica preso em loop sem saída.
+
+Primeiro escreva regressões/invariantes. Corrija produção apenas quando a simulação provar bug real.
 
 ## Dívida curricular continua inventariada
 
