@@ -1,4 +1,5 @@
 import type { JardimTrackState, Progress } from "../../types";
+import { normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
 import type { TrilhaDoJardim } from "../fichas/dojo/jardim";
 
 /** DOJO_SAGA §7: o Jardim trabalha em rounds curtos de 6–10 itens. */
@@ -145,6 +146,7 @@ export function applyJardimRound(
     : historicalAvg === undefined
       ? avgCorrectRtMs
       : historicalAvg * 0.7 + avgCorrectRtMs * 0.3;
+  const normalizedPracticeDay = normalizeLegacyRuntimeDay(practiceDay);
 
   const state: JardimTrackState = {
     ...current,
@@ -159,7 +161,7 @@ export function applyJardimRound(
     attempts: current.attempts + total,
     correct: current.correct + correctAttempts.length,
     ...(nextAvg === undefined ? {} : { avgCorrectRtMs: nextAvg }),
-    ...(practiceDay ? { lastDay: practiceDay } : {}),
+    ...(normalizedPracticeDay ? { lastDay: normalizedPracticeDay } : {}),
   };
 
   const misconceptions = attempts
