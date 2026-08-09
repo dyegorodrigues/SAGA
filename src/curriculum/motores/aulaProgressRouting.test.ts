@@ -47,11 +47,13 @@ const stateWith = (progressMap: Record<string, Progress>): State => ({
   dojoTracks: { kid: {} },
   coins: {},
   trophies: {},
-  logs: [],
+  logs: {},
+  album: {},
   shop: {},
   parentPin: "1234",
+  sound: false,
   tutor: {},
-} as State);
+});
 
 function answer(question: Question, synthetic: Progress): Progress {
   // Este é exatamente o ponto chamado pelo GameLoop antes de applyJourneyAnswer.
@@ -60,7 +62,13 @@ function answer(question: Question, synthetic: Progress): Progress {
     synthetic,
     true,
     false,
-    { fluent: true, practiceDay: "2026-08-08", previousPracticeDay: synthetic.lastDay },
+    {
+      durationMs: 500,
+      targetRtMs: 1000,
+      helpUsed: false,
+      practiceDay: "2026-08-08",
+      previousPracticeDay: synthetic.lastDay,
+    },
   ).progress;
 }
 
