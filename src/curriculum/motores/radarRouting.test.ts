@@ -28,15 +28,15 @@ describe("auditoria longitudinal — identidade de resgate do Radar", () => {
     expect(getRescueItems("kid", pMap)).toEqual(["N4.08"]);
   });
 
-  it("tag histórica LENTO_DEDOS não sequestra qualquer Dojo para N1.03", () => {
+  it("tag histórica LENTO_DEDOS não abre Oficina conceitual", () => {
     const pMap = {
       "N3.01": progressWith("LENTO_DEDOS"),
     };
 
-    expect(getRescueItems("kid", pMap)).toEqual(["N3.01"]);
+    expect(getRescueItems("kid", pMap)).toEqual([]);
   });
 
-  it("cada nó com padrão confirmado permanece uma fonte independente", () => {
+  it("cada nó com padrão conceitual confirmado permanece uma fonte independente", () => {
     const pMap = {
       "N1.07": progressWith(MisconceptionTag.OFF_BY_ONE),
       "GM.02": progressWith(MisconceptionTag.DIRECAO_ERRADA),
