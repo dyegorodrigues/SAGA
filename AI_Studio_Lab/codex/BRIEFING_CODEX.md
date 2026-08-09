@@ -1,55 +1,53 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`. Próximo bloqueante: **Matrícula adaptativa sem grade rígida**.
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`. Próximo bloqueante: **cloud reconciliation**.
 
 ## Leia
 
-1. `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`
-2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
-3. `RETOMADA.md`
-4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
+1. `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`
+2. `PREAUDITORIA_CLOUD_RECONCILIATION_2026-08-09.md`
+3. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
+4. `RETOMADA.md`
+5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
-Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 draft/unmerged. Não tocar na main `68fad4c575e28959b2ca4776e9a541d6828b63f3`, no Creature Engine, nem criar branch auxiliar. Reancorar PR/head antes de editar.
+Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 draft/unmerged. Não tocar na main `68fad4c575e28959b2ca4776e9a541d6828b63f3`, no Creature Engine, nem criar branch auxiliar. Reancorar PR/head antes de editar e usar o remoto como fonte da verdade.
 
 ## Não reabra
 
-Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone, recomendador por estrelas e Misto elegível estão fechados.
+Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone, recomendador por estrelas, Misto elegível e Matrícula adaptativa estão fechados.
 
-Evidência mais nova: Misto em `ae47e417332fb7c02134bdda871c853535863838`, CI #733 / run `31311494765`, integralmente verde inclusive Chrome real.
+Matrícula funcional: `f4ed86fcd70241e6324392b40bd457d44279ba61`, CI #744 / run `31314596574`, 149 arquivos / 2.309 testes, build e Chrome real verdes; artefato `9038385938`.
 
-## Faça agora — Matrícula adaptativa
+## Faça agora — cloud reconciliation
 
-Problemas provados:
+Cadeia obrigatória:
 
-- `App.tsx` passa `tracks[kid.grade]`;
-- `CORE_IDS` tem 9 âncoras, mas `MAX_TRACKS=6` corta as finais;
-- só trocar para `ALL_MATH_TRACKS` continuaria subposicionando criança avançada;
-- `GameLoop` chama `onCommit` antes de gerar a próxima questão, permitindo sessão adaptativa em closure.
+`auth/UID → local save → cloud save → reconcile → migrate/materialize → React state → writers local/cloud → logout/troca de conta → anonymous→Google → offline/reconexão → duas abas/dispositivos concorrentes`.
 
-### Cadeia
+Antes de alterar produção:
 
-`DAG/conteúdo servido → âncora → pergunta → resposta → próxima âncora → seed → Sensei`.
+1. completar/rodar a matriz do documento de pré-auditoria;
+2. provar autoridade de `State.updatedAt` versus horário de chegada do write Firestore;
+3. provar isolamento entre UID A e UID B;
+4. provar anonymous→Google;
+5. provar comportamento offline e reconexão;
+6. provar writes fora de ordem;
+7. preservar `dojoTracks`, mastery, banco, revisão, `lastDay` e schema em migração/reconcile;
+8. não criar merge campo-a-campo sem especificação;
+9. regressão antes do patch;
+10. gates completos e checkpoint.
 
-### Regras
+### Firebase
 
-1. série/idade não limita teto;
-2. só sondar conteúdo real, nunca fallback;
-3. começar gentil;
-4. subir após evidência consistente e manter/descer após erros;
-5. não obrigar iniciante a conteúdo impossível;
-6. placement não concede `dom`;
-7. missão curta e lúdica;
-8. regressões de iniciante/intermediário/avançado/fallback/seed;
-9. gates completos + Chrome se fluxo visual mudar;
-10. checkpoint.
+Não pedir ao autor token, service account, ID novo nem configuração de Console para começar. O bloco é testável por código/Vitest/mocks usando os contracts atuais. Se uma necessidade exclusiva de Console/deploy aparecer depois, isolar como `DEPLOYMENT-ONLY` e continuar o que independe dela.
 
 ## Dívida curricular continua inventariada
 
-26/90 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; primitivas incompletas no inventário. Não iniciar fábrica antes da Coverage Matrix.
+26/90 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; 44 estreias; primitivas incompletas no inventário. Não iniciar fábrica antes da Coverage Matrix.
 
 ## Depois
 
-cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+simulação longitudinal → gamificação/economia/mascote → Coverage Matrix → fábrica curricular → mega auditoria → hardening/performance/release.
 
 ## Gates
 
