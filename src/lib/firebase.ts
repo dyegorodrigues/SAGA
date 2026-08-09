@@ -233,6 +233,22 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
+/**
+ * Erros transitórios não significam inexistência do estado cloud. No writer,
+ * precisam subir até o sincronizador para que o mesmo estado continue pendente;
+ * no reader, apenas permitem o bootstrap offline-first com o local.
+ */
+export function isTransientFirestoreError(err: unknown): boolean {
+  const code = err && typeof err === "object" ? (err as any).code : undefined;
+  const message = err instanceof Error ? err.message : String(err ?? "");
+  return code === "unavailable"
+    || code === "failed-precondition"
+    || message.includes("unavailable")
+    || message.includes("network")
+    || message.includes("Could not reach")
+    || message.includes("offline");
+}
+
 function logicalStateTime(state: State | null | undefined): number {
   if (!state?.updatedAt) return Number.NEGATIVE_INFINITY;
   const ms = Date.parse(state.updatedAt);
@@ -312,16 +328,12 @@ export async function saveStateToCloud(state: State, expectedUid?: string): Prom
     }
   } catch (err: any) {
     console.warn("[Firestore] Não foi possível salvar o progresso na nuvem. Mantendo localmente.", err);
-    const isNetworkError =
-      (err instanceof Error &&
-        (err.message.includes("unavailable") ||
-          err.message.includes("network") ||
-          err.message.includes("Could not reach") ||
-          err.message.includes("offline"))) ||
-      (err && typeof err === "object" && (err.code === "unavailable" || err.code === "failed-precondition"));
-    if (!isNetworkError) {
-      handleFirestoreError(err, OperationType.WRITE, `userStates/${userId}`);
+    if (isTransientFirestoreError(err)) {
+      // A UI continua funcionando porque o sincronizador captura este erro;
+      // lançá-lo aqui é o sinal necessário para manter/reagendar a pendência.
+      throw err;
     }
+    handleFirestoreError(err, OperationType.WRITE, `userStates/${userId}`);
   }
 }
 
@@ -345,14 +357,7 @@ export async function loadStateFromCloud(): Promise<State | null> {
     }
   } catch (err: any) {
     console.warn("[Firestore] Não foi possível carregar o progresso da nuvem. O app continuará com o armazenamento local.", err);
-    const isNetworkError =
-      (err instanceof Error &&
-        (err.message.includes("unavailable") ||
-          err.message.includes("network") ||
-          err.message.includes("Could not reach") ||
-          err.message.includes("offline"))) ||
-      (err && typeof err === "object" && (err.code === "unavailable" || err.code === "failed-precondition"));
-    if (!isNetworkError) {
+    if (!isTransientFirestoreError(err)) {
       handleFirestoreError(err, OperationType.GET, `userStates/${userId}`);
     }
   }
