@@ -36,7 +36,7 @@ const progress = (bankPrompt: string): Progress => ({
 afterEach(() => vi.restoreAllMocks());
 
 describe("Aula composta — identidade do banco de erros", () => {
-  it("um resgate error-bank serve item do MESMO source que justificou o resgate", () => {
+  it("um resgate error-bank serve item do MESMO source e preserva identidade de review", () => {
     const a = track("A", "N1.01");
     const b = track("B", "N1.02");
     const byId: Record<string, Progress> = {
@@ -57,5 +57,7 @@ describe("Aula composta — identidade do banco de erros", () => {
     expect(bankQuestions[0].prompt).toBe("bank-A");
     expect(bankQuestions[0].sourceTrackId).toBe("A");
     expect(bankQuestions[0].sourceGraphId).toBe("N1.01");
+    expect(bankQuestions[0].review).toBe(true);
+    expect(bankQuestions[0].sig).toBe("sig-bank-A");
   });
 });
