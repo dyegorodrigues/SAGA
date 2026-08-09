@@ -2,266 +2,207 @@
 
 **Data:** 9/ago/2026  
 **Repo:** `dyegorodrigues/SAGA`  
-**Branch única deste fluxo:** `codex/integrar-bloco-f0`  
-**PR:** #29 — **open + draft + NÃO MESCLAR**  
+**Branch única:** `codex/integrar-bloco-f0`  
+**PR:** #29 — open + draft + **NÃO MESCLAR**  
 **Main protegida:** `68fad4c575e28959b2ca4776e9a541d6828b63f3`  
-**Creature Engine:** fora deste fluxo; não tocar.
+**Creature Engine:** fora deste fluxo.
 
-> **ESTE É O CHECKPOINT OPERACIONAL MAIS NOVO.** Qualquer seção “próxima tarefa” de checkpoints anteriores é histórica quando conflitar com este arquivo.
+> **FONTE OPERACIONAL MAIS NOVA.** Reancore PR/head remoto antes de editar. Checkpoints anteriores são histórico quando conflitarem com este arquivo.
 
----
+## 1. Regras de ouro
 
-## 0. REGRAS DE OURO PARA QUALQUER NOVA CONVERSA
+1. Trabalhar somente em `codex/integrar-bloco-f0`.
+2. Não tocar/mergear/rebasear/ready/auto-merge `main`.
+3. Não tocar no Creature Engine.
+4. Não criar branch auxiliar.
+5. Não reabrir bloco fechado sem falha objetiva.
+6. Bug exige cadeia `emissor → estado → persistência → consumidor → efeito` + regressão.
+7. Tela alterada exige Chrome real.
+8. Não iniciar fábrica curricular em massa antes da Coverage Matrix.
+9. Preservar documentação rica e histórico; checkpoints operacionais podem ser atualizados cirurgicamente.
 
-1. Reancorar primeiro a PR #29 e o head remoto. Não confiar em SHA narrado sem conferir no GitHub.
-2. Trabalhar somente em `codex/integrar-bloco-f0`.
-3. Não tocar, mergear, rebasear ou tornar ready a `main`.
-4. Não tocar no Creature Engine.
-5. Não criar branch auxiliar.
-6. Não reescrever documentação rica para atualizar números; fazer reconciliação cirúrgica ou apêndice autoritativo.
-7. Código/runtime decide o que está implementado; decisões canônicas vigentes decidem a semântica pedagógica.
-8. Bug só é fechado com cadeia `emissor → estado → persistência → consumidor → efeito` + regressão.
-9. Tela alterada exige navegador real; jsdom sozinho não fecha QA visual.
-10. Não construir conteúdo em massa antes de estabilizar identidade/estado dos motores e Coverage Matrix.
-11. Todo bloco termina com gates, checkpoint e estado remoto verificado.
+## 2. Arquitetura pedagógica vigente
 
----
+- Sensei = autoridade prescritiva, uma meta dominante;
+- Jornada = mapa do conhecimento;
+- Dojo = automaticidade separada, prescrito + livre/manual;
+- Jardim = automaticidade perceptual, prescritível apenas por causa provada;
+- Oficina = recuperação conceitual causal curta;
+- Misto = opcional/interleaving;
+- idade/série = contexto, nunca autoridade curricular;
+- gamificação não compra unlock/mastery;
+- **RT/fluência não concede nem reprova domínio conceitual**.
 
-## 1. ESTADO FUNCIONAL PROVADO
+## 3. Fechado — não reabrir sem falha objetiva
 
-Head funcional que fechou Tutor↔Dojo + Jardim causal:
+### P17/P8/P18/P19/P20/P21/P22 + cânone
 
-`15f73542ddb1f005fd228ac02461c5a71ea8adec`
-
-CI **#671 / run `31307946962` = SUCCESS integral**.
-
-Passaram no mesmo run:
-
-- `npm ci`;
-- catálogo + guard canônico;
-- fichas;
-- conformidade das fichas;
-- grafo;
-- TypeScript;
-- **142 arquivos / 2.278 testes**;
-- build;
-- `pr:check`;
-- higiene do diff;
-- guarda de binários;
-- sonda real Chrome.
-
-Artefato de QA real: **`9036527545`**.
-
-A sonda validou telefone 390×844 e tablet 768×1024, com screenshots de:
-
-- Sensei + Dojo prescrito;
-- round Dojo prescrito;
-- Sensei + Jardim causal;
-- round/relance Jardim causal.
-
-Sem overflow horizontal e sem falha HTTP real/pageerror.
-
----
-
-## 2. ONTOLOGIA PEDAGÓGICA VIGENTE
-
-- **Sensei:** autoridade prescritiva da experiência; uma meta dominante.
-- **Jornada:** mapa de conhecimento, não sequenciador do dia.
-- **Dojo:** automaticidade em estado separado, prescrito ou livre/manual.
-- **Jardim:** automaticidade perceptual/pré-simbólica; pode ser prescrito causalmente quando há evidência real de fraqueza.
-- **Oficina:** recuperação conceitual causal curta e com saída.
-- **Misto:** desafio opcional/interleaving; nunca autoridade curricular.
-- **idade/série:** contexto de apresentação, nunca catraca curricular.
-- **gamificação/economia:** nunca compra unlock/mastery.
-- **RT/fluência:** não concede nem reprova domínio conceitual.
-
----
-
-## 3. FECHADOS — NÃO REABRIR SEM FALHA OBJETIVA
-
-Além de P17/P8/P18/P19/P20/P21/P22 e das auditorias longitudinais anteriores, estão fechados:
-
-### Reconciliação canônica
-
-- grafo 90;
-- fichas autorais 94;
+- 90 competências;
+- 94 fichas autorais;
 - cobertura 90/90;
 - Manual 90/90 + GM.12;
-- Bíblia v3.4;
-- Método reconciliado;
-- coroa conceitual separada de RT/fluência;
-- regra 3/3 alinhada entre Manual e `progressEngine`;
-- `canonical_doc_guard.cjs` no gate.
+- Bíblia v3.4 / Método reconciliados;
+- regra conceitual 3 acertos sobe / 3 erros desce;
+- `canonical_doc_guard.cjs` no CI.
+
+### Auditoria longitudinal inicial
+
+- Radar mantém identidade no nó observado e desce pelo DAG;
+- Aula composta persiste no `sourceTrackId` real;
+- Sensei usa DAG completo, não série;
+- Oficina causal usa a mesma porta principal.
 
 ### Tutor ↔ Dojo
 
-- `SenseiDojoSessionSource = "manual" | "prescribed"`;
-- manual = `adaptive=false` sempre;
-- prescribed = `adaptive=true`;
-- manual atualiza força/RT/precisão/volume sem governar ponteiro do Tutor;
-- rounds parciais não misturam origem;
-- Dojo não concede mastery conceitual;
-- prescrição do Sensei chega explícita até o GameLoop;
-- Dojo prescrito é missão separada da Aula;
-- porta livre/manual preservada;
+- origem explícita `manual | prescribed`;
+- manual nunca move ponteiro adaptativo;
+- prescribed pode mover;
+- manual mantém força/RT/precisão/volume;
+- round parcial não mistura origem;
+- Dojo não concede domínio conceitual;
+- missão prescrita chega até GameLoop/persistência e é separada da Aula;
+- treino livre/manual permanece;
 - `utils/dojoMode.ts` é legado/free-play.
 
 ### Jardim causal
 
-Planner novo: `src/curriculum/motores/jardimCausalPrescription.ts`.
+- misconception ativa + relação no DAG + mãe conceitualmente elegível + fraqueza JD observada;
+- `prerequisite-gap` conceitual tem prioridade;
+- ausência de treino, idade, estrela ou erro isolado não bastam;
+- menor distância causal vence;
+- UI + Chrome real provaram `Base Perceptual → Jardim Guiado → JD1 relance`.
 
-Regra:
+### Banco de erros composto
 
-1. `prerequisite-gap` conceitual ganha sempre;
-2. precisa existir misconception ativa;
-3. mãe do JD precisa ser o próprio nó observado ou ancestral no DAG;
-4. mãe precisa tornar o Jardim elegível;
-5. estado JD precisa conter fraqueza observada (`weakRounds`, recuo ou precisão histórica <80% com amostra mínima);
-6. ausência de treino, idade, estrelas ou erro isolado não bastam;
-7. múltiplos candidatos → menor distância causal no DAG.
+**Bug provado e corrigido.**
 
-Prioridade da porta do Tutor:
+Antes:
 
-`pré-requisito conceitual → Jardim causal provado → misconception conceitual/Oficina → Aula normal`.
+- `planAula` escolhia um `bankTrack`;
+- `composeAula` misturava bancos de todos os tracks em um `bankQs` global;
+- `error-bank` fazia `bankQs.pop()`;
+- `shuffleOpts()` removia `review/sig` e o Composer não os restaurava.
 
-UI e Chromium real provaram a rota `Aula do Dia · Base Perceptual → Começar Jardim Guiado → JD1 relance`.
+Consequências provadas:
 
----
+- resgate A podia servir item do banco B;
+- questão recuperada podia chegar ao GameLoop como questão normal e quebrar hits/remoção do banco.
 
-## 4. INCIDENTES DE QA DESTA FASE — REGISTRAR, NÃO APAGAR
+Agora:
 
-Ao transformar a sonda em gate real foram encontrados e corrigidos problemas de infraestrutura que explicam por que um “QA armado” ainda não era QA executável:
+- banco é indexado por `track.id`;
+- resgate consome apenas o source correspondente;
+- `review=true` + `sig` original sobrevivem;
+- regressão determinística com dois bancos-fonte.
 
-- faltava `npm run sonda:sensei-dojo`;
-- fixture usava storage key e schema errados;
-- workflow isolado novo não aparecia de forma confiável no próprio PR;
-- foi incorporado como job do CI existente;
-- assert pós-clique dependia de texto que GameLoop não promete;
-- screenshots eram tiradas durante transição Framer Motion;
-- 404 genérico era capturado sem URL;
-- package edit transitório alterou `remark-gfm`; o lock provou que a versão correta era `^4.0.1`, restaurada.
+Head de fechamento do banco: `22f691c3a26f44cdc1175e79b97d436e5167cf99`.  
+CI #682 / run `31308424789` = SUCCESS integral.
 
-O estado final está corrigido. Não reescrever histórico para esconder essas detecções: elas são precedentes para QA reproduzível e para comparar `package.json` com lock antes de “restaurar” dependência por memória.
+### Telemetria / Leitner da Aula composta
 
----
+**Fechado.**
 
-## 5. O QUE NÃO FOI PERDIDO: EXERCÍCIOS / FICHAS / EXPERIÊNCIA
+- `prepareAulaSourceForAnswer()` publica a identidade-fonte efêmera da questão;
+- logger normaliza evento de `trackId="aula"` para a competência real;
+- formato de telemetria sobe de **v1 → v2**, porque mudou o significado de `trackId`;
+- questão comum limpa source antigo para impedir identidade fantasma;
+- regressão prova que o Leitner, embora use chave temporária `aula` no frame local, materializa `reviewForce/lastDay` no source real e não persiste `progress.aula`.
 
-O trabalho anterior de fabricação e correção de exercícios continua quantificado. Ele **não foi cancelado**; foi colocado depois da estabilização dos motores.
+Head funcional deste fechamento: `cf925cc239ce7ddad7d33c48e1810a5990aaecd7`.  
+CI #691 / run `31308774424` = **SUCCESS integral**, inclusive `Sonda real Sensei`.
+
+## 4. QA real
+
+O CI existente possui job permanente `Sonda real Sensei`:
+
+- Chrome real;
+- telefone 390×844;
+- tablet 768×1024;
+- Dojo prescrito home/round;
+- Jardim causal home/relance;
+- screenshots;
+- overflow;
+- HTTP/page errors.
+
+QA não depende mais só de jsdom.
+
+## 5. Dívida curricular — inventariada, não perdida
 
 Fonte detalhada: `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`.
 
-Resumo atual:
+- Composer/padrão-ouro: 26/90;
+- servido sem placeholder: 51/90;
+- ficha pronta servida por legado: 25;
+- ficha pronta sem conteúdo servido: 39;
+- divergências ficha↔tela observadas: 21;
+- trocas de linguagem visual sem aviso: 12;
+- estreias de ferramenta a classificar: 44;
+- primitivas: 20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente;
+- `Moedas` bloqueia GM.03;
+- `Regua` bloqueia GM.05.
 
-- padrão-ouro/Composer ativo: **26/90**;
-- ficha pronta ainda servida por legado: **25**;
-- ficha pronta sem conteúdo servido / fallback real: **39**;
-- servido sem placeholder: **51/90**;
-- divergência ficha↔tela observada: **21/90**;
-- troca de linguagem visual sem aviso: **12**;
-- ferramenta nova sem precedente: **44 ocorrências a classificar**;
-- `N1.04`: duas fichas/uma voz — micros sem fonte separada;
-- primitivas: **20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente**.
+**A fábrica dos 39 continua depois da Coverage Matrix.**
 
-Primitivas de dívida:
+## 6. PRÓXIMA TAREFA EXATA — `LENTO_DEDOS` / autoridade indevida da velocidade
 
-- `LinkingCubes` — renderer sem builder;
-- `Moedas` — renderer sem builder; bloqueia GM.03;
-- `SingaporeBars` — renderer sem builder;
-- `VisualAddition` — renderer sem builder;
-- `Quadrado100` — componente isolado;
-- `Regua` — ausente; bloqueia GM.05.
+A pré-auditoria já provou dois conflitos em `GameLoop.tsx`.
 
-**Não começar agora uma onda cega de 39 competências.** Coverage Matrix/fábrica vão usar estas listas depois que a identidade dos motores estiver fechada.
+### Bug A — resposta correta lenta vira misconception conceitual
 
----
+No bloco de estrelas/rapid-fire:
 
-## 6. PRÓXIMA TAREFA EXATA — BANCO DE ERROS COMPOSTO
+```ts
+else {
+  starGain = 2;
+  trackMisconception(p, "LENTO_DEDOS");
+}
+```
 
-### Pré-auditoria já feita
+Como `RadarEngine.getRescueItems()` considera duas tags iguais uma misconception ativa, **duas respostas corretas lentas podem acionar resgate conceitual/Oficina**. Isso viola a regra canônica: RT mede automaticidade, não compreensão.
 
-Arquivos lidos:
+Além disso `LENTO_DEDOS` não pertence hoje ao catálogo `MisconceptionTag`.
 
-- `src/curriculum/motores/aulaProgressContext.ts`;
-- `src/curriculum/motores/composer.ts`.
+### Bug B — resposta rápida injeta streak conceitual
 
-Já está correto:
+Ainda em `GameLoop.tsx`:
 
-- questão composta recebe `sourceTrackId/sourceGraphId/sourceLevel`;
-- progress do envelope `aula` volta ao source real antes de persistir;
-- banco legado é re-carimbado com o track que o armazena.
+```ts
+if (!gardenMode && right && q.kind === "rapid-fire" && durationMs <= 3000 && p.lvl < 5) {
+  if (p.streak < 3) p.streak = 3;
+}
+```
 
-### Suspeita específica a PROVAR
+Esse valor é persistido. Na resposta seguinte `applyJourneyAnswer()` herda `streak=3`, incrementa e pode subir `lvl` imediatamente. Portanto **velocidade pode acelerar a escada conceitual**, também proibido pelo cânone.
 
-`composeAula()` monta um `bankQs` **global** com bancos de todos os tracks e embaralha tudo. Depois cria uma closure por `plan.resgates`; para `error-bank`, a closure usa simplesmente `bankQs.pop()`.
+### Método obrigatório do próximo bloco
 
-Hipótese:
+1. escrever regressões que provem os dois efeitos sem alterar produção;
+2. definir `LENTO_DEDOS` como sinal de automaticidade/fluência, não misconception conceitual;
+3. impedir que acerto lento correto alimente `Progress.misconceptions`/Radar;
+4. remover qualquer bônus de RT que altere `streak/lvl/dom/masteryEvidence` conceitual;
+5. manter RT/estrelas/Dojo como sinais/recompensas separados;
+6. provar que prescribed Dojo continua recebendo RT/strength normalmente;
+7. provar que Journey rapid-fire rápido e lento têm a **mesma autoridade conceitual** quando ambos estão corretos;
+8. gates completos + Chrome real;
+9. checkpoint.
 
-> um `RescuePlanItem` de `error-bank` nominalmente ligado ao track A pode consumir questão originalmente armazenada no banco do track B.
+Não usar o antigo `TAG_TO_NODE`; ele foi removido corretamente.
 
-A persistência da questão pode continuar correta em B por causa de `sourceTrackId`, mas a agenda/resgate que justificou sua presença na sessão fica semanticamente incoerente.
+## 7. Fila depois de `LENTO_DEDOS`
 
-### Cadeia obrigatória
+1. timezone/`lastDay`;
+2. recomendador paralelo por estrelas — retirar autoridade concorrente;
+3. Misto por repertório elegível;
+4. Matrícula sem grade rígida;
+5. cloud reconciliation;
+6. simulação longitudinal;
+7. gamificação/economia/mascote;
+8. Coverage Matrix executável;
+9. fábrica curricular por ondas — 25 legados + 39 vazios + paridade + primitivas;
+10. mega auditoria pedagógica;
+11. hardening/performance/release.
 
-`planAula(error-bank source) → bankQs/rescueQueue → questão servida/source → GameLoop/review → progressEngine/materialize → bank mutation → próximo planAula`.
-
-### Método
-
-1. escrever regressão determinística que construa pelo menos dois bancos-fonte;
-2. provar/refutar a mistura sem alterar código produtivo;
-3. se provada, indexar o banco por source/rescue em vez de `pop()` global;
-4. garantir que retry/review remove/atualiza o item do source correto;
-5. testar missão composta com fontes diferentes;
-6. gates completos;
-7. checkpoint.
-
-Não misturar ainda com a etapa seguinte de telemetria/Leitner: fechar uma identidade por vez.
-
----
-
-## 7. FILA VIGENTE DEPOIS DO BANCO
-
-1. identidade de telemetria/Leitner na Aula composta;
-2. `LENTO_DEDOS` canônico;
-3. timezone/`lastDay`;
-4. recomendador paralelo por estrelas — retirar autoridade concorrente;
-5. Misto por repertório elegível;
-6. Matrícula sem grade rígida;
-7. cloud reconciliation;
-8. simulação longitudinal;
-9. gamificação/economia/mascote — auditoria sistêmica;
-10. Coverage Matrix executável;
-11. fábrica curricular por ondas pedagógicas — 25 legados + 39 vazios + paridade + primitivas;
-12. mega auditoria pedagógica;
-13. hardening/performance/release.
-
----
-
-## 8. DÍVIDAS NÃO BLOQUEANTES DE RELEASE
-
-- Vite alerta JS principal ≈2,26 MB minificado / ≈642 kB gzip;
-- alguns assets de mascote >500 kB;
-- jsdom imprime warnings de canvas em algumas suítes, embora os testes passem;
-- QA visual crítico já possui Chrome real.
-
-Não desviar o próximo bloco pedagógico para otimização prematura; manter na fila de hardening.
-
----
-
-## 9. PRIMEIRA LEITURA DO PRÓXIMO CHAT
-
-1. **este arquivo**;
-2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`;
-3. `RETOMADA.md`;
-4. `AUDITORIA_MOTORES_ADAPTATIVOS.md`;
-5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`;
-6. `BIBLIA_DO_SAGA.md`, `MANUAL_DIDATICO_SAGA.md`, `METODO_SAGA.md` somente se a próxima mudança tocar semântica pedagógica.
-
-Checkpoints anteriores permanecem históricos; não usá-los como fila vigente.
-
----
-
-## 10. GATES
+## 8. Gates
 
 ```bash
 npm run auditar
@@ -275,12 +216,10 @@ npm run pr:check
 npm run sonda:sensei-dojo
 ```
 
-No PR, o CI também roda higiene do diff e guarda de binários.
+O CI da PR também roda higiene do diff e guarda de binários.
 
----
+## 9. Prompt curto de retomada
 
-## 11. PROMPT CURTO PARA RETOMADA
-
-> Continue o SAGA pela fonte operacional `AI_Studio_Lab/codex/CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`. Reancore primeiro a PR #29 e o head remoto da branch `codex/integrar-bloco-f0`; não toque na main nem no Creature Engine. Não reabra cânone, Tutor↔Dojo ou Jardim causal sem falha objetiva. Comece pela auditoria da **identidade do banco de erros composto** descrita no §6: trace `planAula → bankQs/rescueQueue → sourceTrackId → GameLoop → progressEngine/materialize → bank → próximo plan`, escreva primeiro uma regressão determinística com dois bancos-fonte e só corrija se a mistura for provada. Depois rode todos os gates, registre o checkpoint e preserve a fila vigente. Não inicie ainda a fábrica dos 39 fallbacks; a dívida curricular está inventariada em `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` e entra depois da Coverage Matrix.
+> Continue o SAGA pela fonte operacional `AI_Studio_Lab/codex/CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`. Reancore primeiro a PR #29 e o head remoto da `codex/integrar-bloco-f0`; mantenha a PR draft/unmerged e não toque na main nem no Creature Engine. Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto e identidade de telemetria/Leitner estão fechados; não reabra sem falha objetiva. Comece pelo bloco `LENTO_DEDOS` do §6: escreva primeiro regressões que provem (a) resposta correta lenta entrando em misconception/Radar e (b) rapid-fire rápido injetando `streak` conceitual; depois remova a autoridade curricular da velocidade preservando RT/fluência/Dojo/estrelas. Rode todos os gates e atualize o checkpoint. Não inicie ainda a fábrica dos 39 fallbacks; ela está inventariada e entra depois da Coverage Matrix.
 
 **A criança pode escolher treinar. Quando segue o Sensei, quem escolhe o currículo é o Tutor.**
