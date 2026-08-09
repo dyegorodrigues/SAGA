@@ -31,6 +31,18 @@ export interface EscolhaDeSave {
 }
 
 /**
+ * Remove envelopes efêmeros sem alterar o relógio lógico do estado.
+ *
+ * Isto é deliberadamente separado de `carimbar`: bootstrap, migração e writers
+ * defensivos precisam materializar um estado já carimbado sem fazê-lo parecer
+ * mais novo só porque foi lido ou transportado outra vez.
+ */
+export function materializarEstadoParaPersistencia(estado: State): State {
+  const aulaMaterializada = materializeAulaProgress(estado);
+  return materializeSenseiDojoProgress(aulaMaterializada);
+}
+
+/**
  * Carimba o estado com o instante da gravação.
  *
  * Antes do carimbo, dois envelopes transitórios são materializados:
@@ -42,8 +54,7 @@ export interface EscolhaDeSave {
  * como fontes curriculares de verdade.
  */
 export function carimbar(estado: State, agora: Date = new Date()): State {
-  const aulaMaterializada = materializeAulaProgress(estado);
-  const materializado = materializeSenseiDojoProgress(aulaMaterializada);
+  const materializado = materializarEstadoParaPersistencia(estado);
   return { ...materializado, updatedAt: agora.toISOString() };
 }
 
