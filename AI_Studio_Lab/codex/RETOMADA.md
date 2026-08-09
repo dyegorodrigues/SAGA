@@ -1,13 +1,13 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`. Tudo até o Misto elegível está fechado; próxima tarefa única: **Matrícula adaptativa sem grade rígida**.
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`. Tudo até a Matrícula adaptativa está fechado; próxima tarefa única: **cloud reconciliation**.
 
 ## Leia primeiro
 
-1. `CHECKPOINT_MISTO_FECHADO_2026-08-09.md` — fonte operacional mais nova;
-2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` — dívida curricular/visual/primitivas;
-3. `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md` — checkpoint histórico anterior;
-4. `AUDITORIA_MOTORES_ADAPTATIVOS_FECHAMENTO_2026-08-09.md` — fechamento histórico até Jardim;
+1. `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md` — fonte operacional mais nova e registro da recuperação pós-trava;
+2. `PREAUDITORIA_CLOUD_RECONCILIATION_2026-08-09.md` — matriz e hipóteses do próximo bloco;
+3. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` — dívida curricular/visual/primitivas;
+4. `CHECKPOINT_MISTO_FECHADO_2026-08-09.md` — checkpoint histórico anterior;
 5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md` — ontologia.
 
 Checkpoints antigos permanecem históricos. Não usar filas antigas como ordem vigente.
@@ -20,7 +20,8 @@ Checkpoints antigos permanecem históricos. Não usar filas antigas como ordem v
 - PR #29 open + draft + não mesclar;
 - não tocar no Creature Engine;
 - não criar branch auxiliar;
-- reancorar PR/head remoto antes de editar.
+- reancorar PR/head remoto antes de editar;
+- GitHub remoto é a fonte da verdade: não confiar em afirmação de chat sem arquivo/commit/run.
 
 ## Fechado — não reabrir sem falha objetiva
 
@@ -35,29 +36,22 @@ Checkpoints antigos permanecem históricos. Não usar filas antigas como ordem v
 - `LENTO_DEDOS` sem autoridade conceitual — CI #702;
 - timezone/dia civil unificado — CI #717;
 - recomendador paralelo por estrelas removido — CI #720;
-- **Misto por repertório dominado/elegível** — CI #733 / run `31311494765`, head `ae47e417332fb7c02134bdda871c853535863838`, Chrome real verde.
+- Misto por repertório dominado/elegível — CI #733;
+- **Matrícula adaptativa sem teto de série** — cabeça funcional `f4ed86fcd70241e6324392b40bd457d44279ba61`, CI #744 / run `31314596574`, 149 arquivos / 2.309 testes + build + Chrome real; artefato `9038385938`.
 
-## Próxima tarefa — Matrícula adaptativa
+## Próxima tarefa — cloud reconciliation
 
-Problemas já provados:
+Leia `PREAUDITORIA_CLOUD_RECONCILIATION_2026-08-09.md` antes de editar.
 
-- `App.tsx` ainda passa `tracks[kid.grade]` para a Matrícula;
-- `matricula.ts` possui 9 âncoras, mas `MAX_TRACKS=6` corta as finais;
-- trocar apenas a série por `ALL_MATH_TRACKS` ainda subposiciona crianças avançadas;
-- `GameLoop` chama `onCommit` antes de gerar a próxima questão, portanto há uma janela segura para uma sessão de placement adaptativa em closure.
+Cadeia:
 
-### Faça
+`auth/UID → local save → cloud save → reconcile → migrate/materialize → React state → writers → logout/troca de conta → anonymous→Google → offline/reconexão → concorrência`.
 
-1. usar universo canônico/DAG e apenas conteúdo realmente servido;
-2. começar gentil;
-3. registrar cada resultado e escolher a próxima âncora antes da próxima geração;
-4. acertos consistentes permitem subir; erros mantêm a sondagem fundacional, sem expor iniciante a conteúdo impossível;
-5. idade/série nunca vira teto;
-6. placement semeia ponto de partida, não compra `dom`;
-7. preservar missão curta e sem cara de prova;
-8. regressões para iniciante, intermediário, avançado, fallback e seed;
-9. gates completos + Chrome se o fluxo visual mudar;
-10. checkpoint.
+Faça primeiro a matriz de regressão: nenhum save, local-only, cloud-only, local/cloud mais novo, empate, carimbo ausente/inválido, schema antigo, UID divergente, troca de conta, anonymous→Google, offline, duas abas e writes fora de ordem entre dispositivos.
+
+Não inventar merge campo-a-campo sem contrato. Provar perda/corrupção antes de corrigir.
+
+**Não pedir ao autor para abrir Firebase Console, gerar token ou configurar projeto para iniciar este bloco.** A lógica pode e deve ser auditada/testada com código, Vitest e mocks. Qualquer operação futura exclusiva de Console/deploy deve ser isolada como `DEPLOYMENT-ONLY` e não bloquear o desenvolvimento.
 
 ## Dívida curricular não perdida
 
@@ -67,13 +61,14 @@ Problemas já provados:
 - 39 prontos em fallback;
 - 21 divergências ficha↔tela;
 - 12 trocas visuais;
+- 44 estreias a classificar;
 - primitivas incompletas: LinkingCubes, Moedas, SingaporeBars, VisualAddition, Quadrado100, Regua.
 
 A fábrica curricular continua depois da Coverage Matrix.
 
 ## Depois
 
-cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+simulação longitudinal → gamificação/economia/mascote → Coverage Matrix → fábrica curricular → mega auditoria → hardening/performance/release.
 
 ## Gates
 
