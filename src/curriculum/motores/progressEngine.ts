@@ -1,5 +1,6 @@
 import { MasteryEvidence, MasteryRule, Progress } from "../../types";
 import { consumeAulaSourceProgress, markAulaSourceProgress } from "./aulaProgressContext";
+import { consumeSenseiDojoTerminal } from "./senseiDojoProgressContext";
 
 export type ProgressTransition =
   | { type: "level-up"; level: number }
@@ -15,23 +16,9 @@ export interface MasteryAttempt {
   isReview: boolean;
   practiceDay: string;
   previousPracticeDay?: string;
-  /**
-   * As condições que ESTA resposta satisfez — a §9 da ficha (P13).
-   *
-   * Vem do palco, que é o único que sabe: nem o valor da resposta nem o nível
-   * dizem se a criança acertou na primeira audição ou sem vaga fantasma.
-   */
   evidencias?: string[];
-  /**
-   * A condição que a ficha EXIGE ter visto pelo menos uma vez.
-   *
-   * `undefined` numa ficha que não declara nada — e aí a dimensão não bloqueia,
-   * exatamente como não bloqueava antes de existir.
-   */
   exigeEvidencia?: string;
-  /** Evidência que esta micro exige antes de liberar o próximo nível. */
   gateEvidenceBeforeAdvance?: string;
-  /** Regra de dominio da micro que gerou esta questao. */
   masteryRule?: MasteryRule;
 }
 
@@ -48,13 +35,12 @@ export interface ProgressionMode {
 /**
  * Transição pura da escada de proficiência da Jornada.
  *
- * Centraliza a semântica que antes vivia duplicada no GameLoop e no antigo
- * progressEngine. Saves coroados continuam válidos, mas novas coroas só nascem
- * quando compreensão, independência, fluência e retenção estão maduras.
+ * O Dojo Sensei atravessa a mesma casca visual do GameLoop, mas é interceptado
+ * ANTES desta escada. Uma resposta de `dojo_add/sub/mul/div` vira evento de
+ * fluência para `dojoTracks`; não altera lvl/dom/mastery da Jornada.
  *
- * Na Aula do Dia, `current` pode ser o envelope sintético `aula`. O boundary de
- * resposta registra a identidade da questão e `consumeAulaSourceProgress`
- * troca esse envelope pelo Progress da competência que realmente foi ensinada.
+ * Na Aula do Dia, `current` pode ser o envelope sintético `aula`. Depois da
+ * exclusão do Dojo, o boundary resolve a competência-fonte normalmente.
  */
 export function applyJourneyAnswer(
   current: Progress,
@@ -63,6 +49,9 @@ export function applyJourneyAnswer(
   masteryAttempt?: MasteryAttempt,
   mode: ProgressionMode = { kind: "journey" },
 ): AnswerProgressResult {
+  const dojo = consumeSenseiDojoTerminal(current, right, masteryAttempt);
+  if (dojo.handled) return { progress: dojo.progress, transition: null };
+
   const routed = consumeAulaSourceProgress(current);
   const base = routed.progress;
   const progress: Progress = {
@@ -104,9 +93,7 @@ export function applyJourneyAnswer(
   }
 
   if (masteryAttempt) {
-    if (masteryAttempt.helpUsed) {
-      progress.helpClicks = (base.helpClicks || 0) + 1;
-    }
+    if (masteryAttempt.helpUsed) progress.helpClicks = (base.helpClicks || 0) + 1;
     const mastery = updateMasteryEvidence(base, right, masteryAttempt);
     progress.masteryEvidence = mastery;
 
@@ -117,8 +104,6 @@ export function applyJourneyAnswer(
     ) {
       progress.lvl = base.lvl;
       progress.maxLvl = base.maxLvl || base.lvl;
-      // Mantém a prontidão: o próximo acerto que trouxer a evidência libera o
-      // nível imediatamente, sem obrigar três acertos NOVOS depois da prova.
       progress.streak = Math.max(progress.streak, mode.kind === "rescue" ? 2 : 3);
       transition = null;
     }
@@ -128,8 +113,6 @@ export function applyJourneyAnswer(
       transition = { type: "multidimensional-crown" };
     }
   } else if (progress.streak >= 3 && progress.lvl === 5 && !progress.dom) {
-    // Compatibilidade para consumidores antigos durante a migração. O GameLoop
-    // sempre fornece MasteryAttempt e, portanto, nunca usa este caminho.
     progress.dom = true;
     progress.masteryEvidence = legacyMasteryEvidence();
     transition = { type: "legacy-crown" };
@@ -152,13 +135,6 @@ export function legacyMasteryEvidence(): MasteryEvidence {
   };
 }
 
-/**
- * O que ainda falta para a coroa, em português — para o painel dos pais.
- *
- * Existe porque a dimensão nova é a única que uma criança pode não alcançar
- * **sem errar nada**: ela acerta tudo, sempre com andaime, e a coroa não vem.
- * Sem uma frase que diga o quê, isso vira "o app travou".
- */
 const REGRA_PADRAO: MasteryRule = { acertos: 3, de: 3, sessoes: 2 };
 
 function regraValida(rule?: MasteryRule): MasteryRule {
@@ -176,7 +152,6 @@ function compreensaoDaSessaoPronta(evidence: MasteryEvidence): boolean {
 
 function sessoesPassadas(evidence: MasteryEvidence): string[] {
   if (evidence.passedSessionDays?.length) return evidence.passedSessionDays;
-  // Migracao sem perda: a versao anterior ja guardava o primeiro dia maduro.
   return evidence.candidateDay ? [evidence.candidateDay] : [];
 }
 
@@ -191,9 +166,7 @@ export function faltaParaCoroa(
       ? `Acertar ${rule.acertos} seguidas no ultimo nivel, na mesma sessao.`
       : `Acertar ${rule.acertos} de ${rule.de} tentativas recentes no ultimo nivel.`;
   }
-  if (evidence.independenceStreak < Math.min(3, rule.acertos)) {
-    return "Conseguir sem pedir dica.";
-  }
+  if (evidence.independenceStreak < Math.min(3, rule.acertos)) return "Conseguir sem pedir dica.";
   if (evidence.evidenciaDaFicha === false) {
     return descricaoDaEvidencia ?? "Acertar uma vez na condicao mais dificil da competencia.";
   }
@@ -251,7 +224,6 @@ function updateMasteryEvidence(
     passedSessionDays: passedDays,
   };
 
-  // A evidencia especifica da ficha e historica e pode ser colhida antes do L5.
   if (right && attempt.evidencias?.length) {
     for (const nome of attempt.evidencias) {
       if (!evidence.evidenciasVistas!.includes(nome)) evidence.evidenciasVistas!.push(nome);
@@ -263,7 +235,6 @@ function updateMasteryEvidence(
 
   if (before.lvl !== 5) return evidence;
 
-  // Nao carregamos acertos de uma sessao para completar a janela da seguinte.
   if (evidence.sessionDay !== attempt.practiceDay) {
     evidence.sessionDay = attempt.practiceDay;
     evidence.comprehensionWindow = [];
@@ -289,11 +260,7 @@ function updateMasteryEvidence(
 
   if (sessaoMadura && !passedDays.includes(attempt.practiceDay)) {
     const ultima = passedDays.at(-1);
-    // Retencao e parte da coroa multidimensional: sessoes posteriores precisam
-    // estar separadas por pelo menos dois dias.
-    if (!ultima || dayDistance(ultima, attempt.practiceDay) >= 2) {
-      passedDays.push(attempt.practiceDay);
-    }
+    if (!ultima || dayDistance(ultima, attempt.practiceDay) >= 2) passedDays.push(attempt.practiceDay);
   }
 
   evidence.passedSessionDays = passedDays;
