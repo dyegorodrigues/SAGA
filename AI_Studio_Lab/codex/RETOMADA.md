@@ -1,13 +1,14 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 9/ago/2026.** Próxima tarefa única: `LENTO_DEDOS` / autoridade indevida da velocidade. Banco composto e telemetria/Leitner já estão fechados.
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Tudo até `LENTO_DEDOS` está fechado; próxima tarefa única: timezone / identidade do dia (`lastDay`).
 
 ## Leia primeiro
 
-1. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md` — fonte operacional mais nova;
+1. `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md` — fonte operacional mais nova, reconstruída do GitHub após a trava do chat;
 2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` — dívida curricular/visual/primitivas;
-3. `AUDITORIA_MOTORES_ADAPTATIVOS_FECHAMENTO_2026-08-09.md` — fechamento histórico até Jardim;
-4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md` — ontologia.
+3. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md` — checkpoint anterior, histórico a partir do fechamento de `LENTO_DEDOS`;
+4. `AUDITORIA_MOTORES_ADAPTATIVOS_FECHAMENTO_2026-08-09.md` — fechamento histórico até Jardim;
+5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md` — ontologia.
 
 Checkpoints antigos permanecem históricos. Não usar filas antigas como ordem vigente.
 
@@ -33,27 +34,26 @@ Checkpoints antigos permanecem históricos. Não usar filas antigas como ordem v
 - Jardim causal por DAG + evidência JD;
 - banco composto por source + `review/sig` preservados — CI #682 / `31308424789`;
 - telemetria da Aula composta em v2 com `trackId` = competência-fonte;
-- Leitner provado no source real sem `progress.aula` persistido — CI #691 / `31308774424`.
+- Leitner provado no source real sem `progress.aula` persistido — CI #691 / `31308774424`;
+- `LENTO_DEDOS` sem autoridade conceitual: Radar aceita apenas tags canônicas, saves legados não abrem Oficina, mutação externa de `streak` não acelera `lvl`, rápido/lento têm a mesma autoridade curricular — CI #702 / `31309761131`.
 
-## Próxima tarefa — `LENTO_DEDOS`
+Head funcional do fechamento: `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`.
 
-Dois bugs já provados no `GameLoop.tsx`:
+## Próxima tarefa — timezone / `lastDay`
 
-1. resposta correta lenta (>10s) em rapid-fire chama `trackMisconception(p, "LENTO_DEDOS")`; duas ocorrências iguais podem entrar no Radar e produzir resgate conceitual apesar de a resposta estar correta;
-2. rapid-fire correto ≤3s força `p.streak = 3`; o valor persistido pode fazer a resposta seguinte subir `lvl`, dando à velocidade autoridade conceitual.
-
-Isso viola o cânone: RT mede automaticidade, não compreensão.
+Pré-auditoria provou escritores de day key por UTC em `GameLoop.tsx`, `radarEngine.ts` e `matricula.ts`. `new Date().toISOString().slice(0, 10)` representa o dia UTC, não necessariamente o dia local da criança.
 
 ### Faça
 
-1. regressões primeiro para os dois efeitos;
-2. separar `LENTO_DEDOS` de `Progress.misconceptions`/Radar conceitual;
-3. remover bônus de RT sobre `streak/lvl/dom/masteryEvidence`;
-4. preservar estrelas, RT e Dojo/strength como sinais de fluência;
-5. provar que acerto rápido e lento têm a mesma autoridade conceitual;
-6. provar que Dojo prescrito continua medindo fluência normalmente;
-7. gates completos + Chrome;
-8. checkpoint.
+1. mapear todos os escritores e consumidores de `YYYY-MM-DD`;
+2. seguir a cadeia `relógio local → day key → motores → Progress/mastery/log → Radar/Composer/bônus → save/cloud`;
+3. centralizar chave de dia local em helper puro, sem hardcode de timezone;
+4. centralizar distância entre dias de calendário sem erro por DST/horário;
+5. regressões em viradas UTC/local, inclusive UTC−3 e offset positivo;
+6. alinhar GameLoop, Jardim, Dojo, mastery, Leitner, log e bônus diário sobre a mesma identidade de “hoje”;
+7. preservar os intervalos Leitner — corrigir identidade do dia, não reinventar o algoritmo;
+8. gates completos + Chrome se runtime/UI/persistência forem tocados;
+9. checkpoint.
 
 ## Dívida curricular não perdida
 
@@ -69,7 +69,7 @@ A fábrica curricular continua depois da Coverage Matrix.
 
 ## Depois
 
-timezone/`lastDay` → recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
