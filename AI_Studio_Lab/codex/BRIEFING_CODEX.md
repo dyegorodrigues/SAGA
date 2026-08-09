@@ -32,7 +32,11 @@ Cânone P17–P22, Tutor↔Dojo, QA Chrome, Jardim causal, banco composto, telem
 - retry/double tap/reload/materialização não duplicam o mesmo evento técnico;
 - replay legítimo pode pagar prática nova, sem repetir bônus único de primeira missão.
 
-Recibo funcional: `791a21b002794e29818551adbb5cdb93138105e9`; CI #811/run `31325208953`; **155 arquivos / 2.367 testes**; build/TypeScript/auditores/grafo/PR/higiene/binários/Chrome verdes; artefato `9074276985`.
+### Recibo remoto verificável
+
+Implementação revalidada no GitHub remoto em `98fb324ae20b20542120cea5edbd6982658bf6d2`, CI #812/run `31325218446`: **159 arquivos / 2.377 testes**, auditorias, grafo, TypeScript, build, `pr:check`, higiene, binários e sonda real Sensei verdes; artefato da sonda `9041334019`.
+
+Esse SHA é recibo da implementação, não promessa de head eterno. Documentos de continuidade podem estar em commits posteriores: reancore o head atual da PR e o CI correspondente antes de qualquer edição.
 
 ## Faça agora — Coverage Matrix
 
@@ -56,14 +60,14 @@ A matriz deve ser auditável/reproduzível e preservar os números já inventari
 
 ## Dívida de partida — não esconder
 
+- 90 competências / 94 fichas autorais;
 - Composer 26/90;
 - 51/90 servidas sem placeholder;
-- 25 prontas em legado;
+- 25 legado;
 - 39 fallback;
 - 21 divergências ficha↔tela;
 - 12 trocas visuais;
 - 44 estreias;
-- primitivas incompletas `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`;
 - `Moedas` bloqueia GM.03;
 - `Regua` bloqueia GM.05.
 
