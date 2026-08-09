@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "npm run grafo:check && vite build && esbuild ./server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "postbuild": "node AI_Studio_Lab/codex/p22_4_sonda_patch.cjs && SONDA_SEMENTES=1 npm run sonda -- P22.4",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
