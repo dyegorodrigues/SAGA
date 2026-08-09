@@ -2,17 +2,13 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Kid, State } from "../types";
 import { C, FONT, BODY, THEMES, sfx, Mascote, tone } from "./Mascot";
+import { getKidLifetimeXp } from "../lib/gamificationProgress";
 
 /**
  * Calculates total lifetime mathematical stars earned by a kid.
  */
 export function getKidLifetimeStars(kidId: string, state: State): number {
-  const kidProg = state.progress[kidId] || {};
-  let total = 0;
-  for (const trackId in kidProg) {
-    total += kidProg[trackId].stars || 0;
-  }
-  return total;
+  return getKidLifetimeXp(kidId, state);
 }
 
 interface EvolutionStage {
@@ -99,7 +95,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
 
   const totalStars = getKidLifetimeStars(kid.id, state);
   const curStage = getMascotStage(totalStars);
-  const nextStage = curStage.stage < 5 ? STAGES[curStage.stage] : null;
+  const nextStage = curStage.stage < STAGES.length ? STAGES[curStage.stage] : null;
   const progressPercent = nextStage
     ? Math.min(100, Math.max(0, ((totalStars - curStage.minStars) / (nextStage.minStars - curStage.minStars)) * 100))
     : 100;
@@ -357,7 +353,6 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
                 {mood.emoji} {mood.label}
               </span>
             </div>
-
             {/* Energy Bar */}
             <div>
               <div className="flex justify-between items-center text-[11px] font-extrabold text-slate-700 mb-0.5">
