@@ -1,156 +1,122 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 9/ago/2026 — P21/P22 fechadas; reconciliação canônica e contrato Tutor↔Dojo implementados. Leia primeiro o checkpoint pós-reconciliação e o §11 abaixo. A sonda real do novo card do Sensei é o único portão visual ainda pendente.**
+> **VIGENTE em 9/ago/2026.** Cânone, Tutor↔Dojo, QA real e Jardim causal estão fechados. A próxima tarefa exata é **identidade do banco de erros composto**. Checkpoints anteriores continuam no repositório como histórico; não use suas filas antigas como ordem vigente.
 
-## 1. Leia antes de editar
+## 1. Primeira leitura
 
-1. [`CHECKPOINT_POS_RECONCILIACAO_TUTOR_DOJO_2026-08-09.md`](./CHECKPOINT_POS_RECONCILIACAO_TUTOR_DOJO_2026-08-09.md) — **fonte operacional mais nova**; fecha a reconciliação e o contrato `manual | prescribed`, sem declarar sonda real que não ocorreu;
-2. [`CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md`](./CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md) — diagnóstico anterior; suas seções de “próxima tarefa” são histórico do lote já executado;
-3. [`CHECKPOINT_EMERGENCIA_2026-08-09.md`](./CHECKPOINT_EMERGENCIA_2026-08-09.md) — histórico do salvamento após falha do chat;
-4. [`AUDITORIA_MOTORES_ADAPTATIVOS.md`](./AUDITORIA_MOTORES_ADAPTATIVOS.md)
-5. [`DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`](./DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md)
-6. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
-7. [`DECISAO_P22_DIVIDAS_CURRICULARES.md`](./DECISAO_P22_DIVIDAS_CURRICULARES.md)
-8. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
-9. [`PLANO_POS_P22_FABRICA_CURRICULAR.md`](./PLANO_POS_P22_FABRICA_CURRICULAR.md)
-
-Roadmaps antigos são históricos. Código/runtime é fonte de verdade para estado implementado; decisões canônicas vigentes governam semântica pedagógica.
+1. [`CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`](./CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md) — **fonte operacional mais nova**;
+2. [`INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`](./INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md) — dívida real de conteúdo, primitivas, ficha↔tela e hardening;
+3. [`AUDITORIA_MOTORES_ADAPTATIVOS.md`](./AUDITORIA_MOTORES_ADAPTATIVOS.md) — histórico da auditoria longitudinal; suas antigas “próximas tarefas” foram superadas pelo checkpoint novo;
+4. [`DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`](./DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md) — ontologia pedagógica;
+5. [`PLANO_POS_P22_FABRICA_CURRICULAR.md`](./PLANO_POS_P22_FABRICA_CURRICULAR.md) — plano de fábrica; **não executar a fábrica antes da Coverage Matrix**.
 
 ## 2. Git — regra de ouro
 
 - repo: `dyegorodrigues/SAGA`;
-- branch: `codex/integrar-bloco-f0`;
+- branch única: `codex/integrar-bloco-f0`;
 - `main` protegida: `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
-- PR #29: open + draft + **não mesclar**;
+- PR #29 deve permanecer **open + draft + não mesclada**;
 - não tocar no Creature Engine;
 - não criar branch auxiliar;
-- workflow/script temporário não pode permanecer;
-- não reescrever documentação rica para “consertar número”; reconciliação canônica deve ser cirúrgica.
+- não usar workflow/publicador temporário residual;
+- não reescrever documentação pedagógica rica para “arrumar número”.
+
+Sempre reancorar PR/head remoto antes de editar. Um SHA dito no chat não é fonte de verdade até ser confirmado no GitHub.
 
 ## 3. Fechado — não reabrir sem falha objetiva
 
-- P17 — N1.10/N1.11 e ponte perceptual→simbólica;
-- P8 — Jardim e automaticidade separada da Jornada;
-- P18 — `KindType` sem promessa autoral falsa;
-- P19 — migrador único e dependências saneadas;
-- P20 — save/sync por Firebase UID;
-- P21.1 — registries, cobertura e proveniência;
-- P21.2 — mapa de primitivas reconciliado;
-- P22.1 — GM.12 promovida;
-- P22.2 — N4.09 promovida e telemetria corrigida;
-- P22.3A — N1.07 reconciliada;
-- P22.3B — JD4 separada como automaticidade;
-- P22.4 — N1.09 reconstruída;
-- P22.5 — GM.02 reconstruída/promovida;
+- P17, P8, P18, P19, P20, P21.1, P21.2, P22.1–P22.5;
+- grafo/cânone em 90 competências e 94 fichas;
+- cobertura autoral 90/90;
 - Radar tag→nó;
 - Aula composta → `sourceTrackId` → persist;
-- Sensei sem `grade` como trilho;
-- lacuna causal → Oficina pela mesma porta da Aula do Dia.
+- Sensei full DAG, sem série como trilho curricular;
+- Oficina causal pela mesma porta do Tutor;
+- reconciliação Bíblia/Manual/Método + guard documental;
+- Tutor↔Dojo com origem explícita `manual | prescribed`;
+- Dojo prescrito separado da Aula e treino livre manual preservado;
+- QA real em Chrome integrado ao CI;
+- Jardim causal por DAG + evidência JD real.
 
-## 4. Estado final de P22
+Head funcional de fechamento destes blocos: `15f73542ddb1f005fd228ac02461c5a71ea8adec`.
 
-- grafo: **90/90**;
-- fichas Markdown: **94**;
-- cobertura autoral: **90/90**;
-- exceções autorais: **0**;
-- Journey: **31/31**;
-- Composer: **26/26 ativos**;
+CI de fechamento: **#671 / run `31307946962` = SUCCESS integral**, incluindo 2.278 testes e sonda real. Artefato visual: `9036527545`.
+
+## 4. Arquitetura pedagógica vigente
+
+- **Sensei:** professor/tutor prescritivo; uma meta dominante;
+- **Jornada:** mapa do conhecimento;
+- **Dojo:** automaticidade separada; prescrito + livre/manual;
+- **Jardim:** automaticidade perceptual, prescritível apenas por causa provada;
+- **Oficina:** recuperação conceitual causal, curta e com saída;
+- **Misto:** opcional/interleaving;
+- **idade/série:** contexto de apresentação, nunca autoridade de progressão;
+- **gamificação:** não compra unlock/mastery;
+- **RT/fluência:** não concede nem reprova domínio conceitual.
+
+Prioridade da porta do Sensei quando há dificuldade:
+
+`pré-requisito conceitual → Jardim causal comprovado → misconception/Oficina → Aula normal`.
+
+## 5. Estado de cobertura — não confundir “ficha existe” com “runtime pronto”
+
+- padrão-ouro/Composer ativo: **26/90**;
 - servido sem placeholder: **51/90**;
-- fallback real: **39/90**;
-- Jardim: **JD1–JD5**;
+- ficha pronta, servida por legado: **25**;
+- ficha pronta, sem conteúdo servido/fallback: **39**;
+- divergências ficha↔tela observadas: **21**;
+- trocas de linguagem visual sem aviso: **12**;
+- estreias de ferramenta a classificar: **44**;
 - primitivas: **20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente**.
 
-Dívidas de primitiva ainda visíveis: `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`.
+Lista exata e bloqueios estão em `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`.
 
-## 5. Gates já fechados
+**A fabricação de exercícios não foi abandonada.** Ela volta depois de identidade dos motores + Coverage Matrix. Não iniciar 39 fallbacks em massa agora.
 
-- N1.09: `31286476155`; sonda `31286955931`; clean `31287106974`;
-- GM.02: `31287744035`; sonda corrigida `31288014568`; clean `31288136803`;
-- Radar: `31288516415`;
-- Aula source progress: `31290512422` (CI 585);
-- Sensei full DAG/dose por estado: `31290796584` (CI 589);
-- Oficina causal pela porta do Tutor: `31290937246` (CI 593);
-- checkpoint documental anterior: `31292542195` (CI 618) = success.
+## 6. Próxima tarefa exata — banco de erros composto
 
-## 6. Arquitetura pedagógica vigente
+Pré-auditoria encontrou uma hipótese concreta em `composer.ts`:
 
-- **Sensei:** professor/tutor prescritivo; uma meta dominante por missão;
-- **Jornada:** mapa do conhecimento;
-- **Dojo:** automaticidade em estado separado; prescrito + livre/manual;
-- **Jardim:** bases perceptuais/pré-simbólicas, prescritíveis causalmente;
-- **Oficina:** recuperação causal, curta, encorajadora e com saída;
-- **Desafio Misto:** opcional/interleaving; nunca autoridade curricular;
-- **idade/série:** contexto de apresentação, nunca progressão;
-- **gamificação:** não compra unlock/mastery.
+- bancos de vários tracks viram um `bankQs` global embaralhado;
+- cada `RescuePlanItem` de `error-bank` cria uma closure;
+- a closure usa `bankQs.pop()` sem indexar pelo track que originou aquele resgate.
 
-## 7. PRÓXIMA TAREFA A — reconciliação canônica cirúrgica
+Possível bug: resgate planejado para A pode servir item armazenado por B. A questão pode persistir corretamente em B por `sourceTrackId`, mas a **agenda do resgate** fica incoerente.
 
-> **HISTÓRICO:** esta era a tarefa pendente no início do lote. O fechamento autoritativo está no §11 e no checkpoint pós-reconciliação.
+### Não corrigir por intuição
 
-A auditoria final detectou falso verde documental:
+Trace primeiro:
 
-- grafo/runtime estão em **90**;
-- `MANUAL_DIDATICO_SAGA.md` ainda fecha em **89/89**;
-- `METODO_SAGA.md` ainda contém 89/92 e a semântica histórica Jornada 1→3 / Dojo 3→5 + RT conceitual;
-- `BIBLIA_DO_SAGA.md` tem uma retificação correta posterior, mas trechos normativos anteriores ainda misturam coroa conceitual com fluência/RT e dose por faixa etária;
-- `catalog_auditor.cjs` usa `EXPECTED_COMPETENCIES=90`, mas ainda **exige** `/89 de 89/` no Manual e `/grafo de 89 competências/` no Método.
+`planAula(error-bank source) → bankQs/rescueQueue → questão/source → GameLoop/review → progressEngine/materialize → bank mutation → próximo planAula`.
 
-### Fazer primeiro
+Depois:
 
-1. reconciliar Bíblia preservando histórico e bump de versão/changelog;
-2. Manual → 90/90 + GM.12, preservando todo conteúdo didático;
-3. Método → 90 competências / 94 fichas + ontologia Sensei/Jornada/Dojo/Oficina atual, preservando exemplos/fundamentação;
-4. mudar auditor para falhar se prosa canônica voltar a divergir de 90;
-5. gates completos.
+1. regressão determinística com pelo menos dois bancos-fonte;
+2. provar/refutar a mistura;
+3. se provada, corrigir identidade por source/rescue;
+4. provar remoção/atualização do bank certo;
+5. gates completos;
+6. checkpoint.
 
-**Precedente:** commit `b308151...` resumiu demais o Método e foi rejeitado; `14ebaab8...` restaurou o blob original exato `c172abe...`. Não repetir.
+Não misturar ainda com telemetria/Leitner; isso é o bloco seguinte.
 
-## 8. PRÓXIMA TAREFA B — Tutor ↔ Dojo
+## 7. Fila depois do banco
 
-> **HISTÓRICO:** o bug e a integração descritos abaixo foram implementados no lote atual. Ver §11.
+1. identidade de telemetria/Leitner na Aula;
+2. `LENTO_DEDOS` canônico;
+3. timezone/`lastDay`;
+4. recomendador paralelo por estrelas — retirar autoridade concorrente;
+5. Misto por repertório elegível;
+6. Matrícula sem grade rígida;
+7. cloud reconciliation;
+8. simulação longitudinal;
+9. gamificação/economia/mascote;
+10. Coverage Matrix executável;
+11. fábrica curricular por ondas — 25 legados + 39 vazios + paridade + primitivas;
+12. mega auditoria pedagógica;
+13. hardening/performance/release.
 
-### Já implementado
-
-`senseiDojoProgressContext.ts` já conecta tentativa → progressEngine → marcador transitório → `carimbar()` → `dojoTracks`, com testes de round parcial, 10 itens, 20 itens, retry, migração e teto conceitual.
-
-Portanto NÃO reconstruir esse pipeline.
-
-### Bug bloqueante real
-
-A origem `prescribed | manual` ainda não está explícita. Hoje o código pode inferir `adaptive=true` apenas porque `servedStep === currentStep`.
-
-Isso permite que prática manual no próprio `currentStep` mova o ponteiro adaptativo — incorreto.
-
-### Fazer
-
-1. carregar origem da sessão de ponta a ponta;
-2. prescrito = `adaptive=true`;
-3. manual = `adaptive=false`, mesmo no `currentStep`;
-4. teste permanente provando isso;
-5. integrar `prescribeSenseiDojo` ao Sensei/Aula do Dia sem misturar metas;
-6. manter porta livre/manual;
-7. aposentar `utils/dojoMode.ts` como inteligência principal;
-8. sonda real + gates.
-
-## 9. Depois
-
-1. Jardim causal;
-2. banco de erros composto;
-3. identidade de telemetria/Leitner na Aula;
-4. `LENTO_DEDOS` no catálogo;
-5. timezone/`lastDay`;
-6. recomendador paralelo por estrelas;
-7. Misto por repertório elegível;
-8. Matrícula sem grade rígida;
-9. cloud reconciliation;
-10. simulação longitudinal;
-11. gamificação/economia/mascote;
-12. Coverage Matrix;
-13. fábrica curricular;
-14. mega auditoria pedagógica;
-15. hardening.
-
-## 10. Portões
+## 8. Gates
 
 ```bash
 npm run auditar
@@ -161,49 +127,11 @@ npx tsc --noEmit
 npm test -- --run
 npm run build
 npm run pr:check
-git diff --check
+npm run sonda:sensei-dojo
 ```
 
-Tela alterada exige sonda real.
+O CI da PR também executa higiene do diff e guarda de binários.
 
-## 11. FECHAMENTO AUTORITATIVO — reconciliação + Tutor ↔ Dojo
-
-### Cânone
-
-- Bíblia/Manual/Método foram reconciliados preservando histórico e conteúdo rico;
-- Manual está em **90/90 + GM.12**;
-- a última deriva encontrada — `3 acertos sobe, 2 erros desce` — foi corrigida para **3/3**, espelhando `progressEngine.ts`;
-- `canonical_doc_guard.cjs` entrou no `npm run auditar` para impedir regressão desse contrato;
-- `git diff --check` continua rigoroso para código/config/dados, excluindo Markdown porque `  ` no fim da linha é hard break semântico e produzia falso vermelho.
-
-### Dojo
-
-- `SenseiDojoSessionSource = "manual" | "prescribed"` é explícito de ponta a ponta;
-- manual nunca move ponteiro adaptativo, nem quando serve a própria `currentStep`;
-- manual continua atualizando FactStrength/ProcStrength, RT, precisão, volume e rounds;
-- prescrito pode mover o ponteiro segundo o motor existente;
-- rounds parciais não misturam origem manual e prescrita;
-- `prescribeSenseiDojo` gera track `prescribed`;
-- `KidHomeScreen → SenseiTab → App → GameLoop` preserva a origem sem inferência;
-- o card de Dojo prescrito é **missão separada** da Aula do Dia, preservando a meta conceitual dominante;
-- treino livre continua manual;
-- `utils/dojoMode.ts` está `@deprecated` como compatibilidade/free-play, não inteligência do Sensei.
-
-### Evidência automatizada
-
-Head funcional validado: `0dab0ff5a5e5c547db389c339db5c62b505f008c`.
-
-**CI #647 / run `31306042539`: tudo verde.** Passaram auditoria canônica, fichas, conformidade, grafo, TypeScript, suíte completa, build, `pr:check`, higiene do diff e guarda de binários.
-
-### Portão ainda aberto
-
-A tela do Sensei mudou. Há regressão jsdom para presença/isolamento do card e roteamento, mas **sonda real em Chromium ainda não foi executada na cabeça atual** porque este ambiente de conector não dispõe de checkout executável + navegador/deployment da branch. Não registrar QA visual como fechado até existir essa evidência.
-
-### Próxima ação exata
-
-1. sonda real do card `Prescrição do Sensei` e do fluxo até o round do templo;
-2. confirmar que Aula do Dia, treino livre e Misto permanecem visual/funcionalmente separados;
-3. rodar/confirmar gate da cabeça documental final;
-4. só então seguir para Jardim causal → banco composto → telemetria/Leitner → `LENTO_DEDOS` → timezone → recomendador paralelo → Misto elegível → Matrícula → cloud → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+## 9. Regra de continuidade
 
 > **A criança pode escolher treinar. Quando segue o Sensei, quem escolhe o currículo é o Tutor.**
