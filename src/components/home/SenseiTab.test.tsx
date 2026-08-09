@@ -86,7 +86,6 @@ function renderSensei(
       kid={kid}
       prog={{ "N3.01": { lvl: 3 } }}
       aulaPlan={aulaPlan}
-      rec={null}
       senseiEntry={senseiEntry}
       dojoPrescription={dojoPrescription}
       onMatricula={vi.fn()}
@@ -123,6 +122,11 @@ describe("SenseiTab — missão prescrita do Dojo", () => {
     renderSensei(null);
     expect(screen.queryByText(/Prescrição do Sensei/)).toBeNull();
     expect(screen.queryByRole("button", { name: /Fazer round prescrito/ })).toBeNull();
+  });
+
+  it("não exibe recomendação curricular paralela baseada em estrelas", () => {
+    renderSensei(null);
+    expect(screen.queryByText(/Treino Livre Sugerido/)).toBeNull();
   });
 });
 
