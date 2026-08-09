@@ -1,6 +1,6 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 8/ago/2026 — P21 concluída; P22.1–P22.4 concluídas. Próxima tarefa exata: P22.5/GM.02.**
+> **VIGENTE em 8/ago/2026 — P21 e P22 concluídas. Próxima tarefa exata: auditoria longitudinal da máquina adaptativa.**
 
 ## 1. Leia antes de editar
 
@@ -31,129 +31,126 @@ Roadmaps de 5/ago são históricos. Não usar fila ou contagens antigas sem reca
 - P20 — save/sync por Firebase UID;
 - P21.1 — registries, cobertura e proveniência;
 - P21.2 — mapa de primitivas reconciliado com builder→kind→renderer real;
-- **P22.1 — GM.12 promovida como estreia Composer**;
-- **P22.2 — N4.09 promovida e telemetria de área corrigida**;
-- **P22.3A — N1.07 reconciliada com sucessor, antecessor, ordenação e prereqs canônicos**;
-- **P22.3B — JD4 registrada no Jardim como automaticidade de N1.07, separada da Jornada**;
-- **P22.4 — N1.09 reconstruída como contagem flexível 10–20, início em N e regressiva, com rollout autoral completo**.
+- P22.1 — GM.12 promovida;
+- P22.2 — N4.09 promovida e telemetria de área corrigida;
+- P22.3A — N1.07 reconciliada com sucessor, antecessor, ordenação e prereqs canônicos;
+- P22.3B — JD4 registrada no Jardim como automaticidade de N1.07, separada da Jornada;
+- P22.4 — N1.09 reconstruída como contagem flexível 10–20, início em N e regressiva;
+- **P22.5 — GM.02 reconstruída como Tempo cotidiano pré-leitor e promovida.**
 
-## 4. Estado após P22.4
+## 4. Estado final de P22
 
 - grafo: **90/90**;
-- fichas Markdown: **93**;
-- cobertura autoral: **89/90 competências**;
-- única lacuna autoral: **GM.02**;
-- Journey TS/registry: **30/30**;
-- Composer registrado: **25/90**;
-- Composer ativo: **25/90**;
+- fichas Markdown: **94**;
+- cobertura autoral: **90/90 competências**;
+- exceções autorais canônicas: **0**;
+- Journey TS/registry/AllFichas: **31/31**;
+- Composer registrado: **26/90**;
+- Composer ativo: **26/90**;
 - Composer registrado/inativo: **0/90**;
 - servido sem placeholder: **51/90**;
 - fallback real: **39/90**;
 - Jardim: **JD1–JD5 presentes**;
 - mapa de primitivas: **20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente**.
 
-N1.09 já possuía legado, por isso a união “servido sem placeholder” não cresce ao trocar a rota ativa para a ficha autoral.
+Dívidas de primitiva ainda visíveis, não resolvidas por decreto:
 
-## 5. P22.1 — GM.12 CONCLUÍDA
+- `LinkingCubes` — renderer sem builder;
+- `Moedas` — renderer sem builder;
+- `SingaporeBars` — renderer sem builder;
+- `VisualAddition` — renderer sem builder;
+- `Quadrado100` — componente isolado;
+- `Regua` — ausente.
 
-Gate final `31276881058`: **success**.
+## 5. P22.4 — N1.09 CONCLUÍDA
 
-## 6. P22.2 — N4.09 CONCLUÍDA
+Evidência:
 
-Gate final `31277213310`: **success**.
+- baseline semântico: `31286476155` = **success**;
+- sonda pela rota real `track.gen`: `31286955931` = **success**;
+- 390/320/900 px, cinco níveis, zero achados após correção de `ScatteredItems`;
+- CI limpo pós-cleanup: `31287106974` = **success**.
 
-Correção causal preservada: gabarito de área sem tag diagnóstica; somente distratores carregam misconception.
+Correção visual permanente: `ScatteredItems` deixou de aceitar colisões após esgotar tentativas aleatórias e passou a usar células invisíveis embaralhadas + jitter determinístico, com teste geométrico permanente.
 
-## 7. P22.3A — N1.07 CONCLUÍDA
+## 6. P22.5 — GM.02 CONCLUÍDA
 
-Commit permanente: `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
-Gate transacional: `31281685349`: **success**.
-Clean follow-up: `31281842046`: **success**.
-
-N1.07 cobre sucessor até 5/10, antecessor até 5/10 e ordenação de 3–4 numerais, com prereqs `N1.02 + N1.06`.
-
-## 8. P22.3B — JD4 CONCLUÍDA
-
-Commit permanente: `40c571e2d642f80deabb697ebe1d24e3ece450e7`.
-Gate transacional: `31282358997`: **success**.
-
-JD4 permanece em `dojoTracks`; `rt_alvo` mede fluência, nunca domínio conceitual da Jornada.
-
-## 9. P22.4 — N1.09 CONCLUÍDA
-
-N1.09 canônica é **Contagem até 20 e a partir de qualquer número**, prereqs `N1.04 + N1.02`.
+GM.02 permanece **Tempo cotidiano**, prereqs `[]`.
 
 Entregue:
 
-- ficha Markdown autoral com nove seções;
+- 94ª ficha Markdown com nove seções;
 - Journey TS + teste permanente;
-- builder procedimental `contagem20Contract.ts` pela mesma porta usada em produção;
-- L1 contar 10–15 objetos;
-- L2 contar 10–20 objetos;
-- L3 continuar três passos a partir de N interno;
-- L4 regressiva de três passos, inclusive até zero;
-- L5 mistura as três famílias;
-- `rt_alvo = 20s` apenas como metadado de fluência, nunca como gate de mastery;
-- telemetria causal: `NAO_CONTA_A_PARTIR_DE` e `DIRECAO_ERRADA`; erro sem hipótese forte não fabrica diagnosis;
-- N1.09 registrada em Journey/Composer e ativa; legado `gVis_Sequence` preservado como rollback;
-- exceção autoral N1.09 removida;
-- auditor agregado restaurado sem contagem manual de fichas;
-- teste de mapa runtime deixou de hardcodar fotografia histórica de contagem.
+- builder procedimental pré-leitor pela mesma porta autoral usada em produção;
+- L1 manhã/tarde/noite;
+- L2 ontem/hoje/amanhã;
+- L3 dias da semana — antes/depois;
+- L4 ordem de acontecimentos cotidianos;
+- L5 recuperação mista;
+- `audioPrompt + audibleOptions + Option.say` tornam texto apoio, não pré-requisito;
+- `rt_alvo=12s` como metadado de fluência apenas;
+- resposta correta sem misconception;
+- diagnósticos causais `DIRECAO_ERRADA`, `OFF_BY_ONE`, `ORDEM_ERRADA`;
+- GM.02 registrada em Journey/Composer e ativa;
+- legado parcial preservado como rollback;
+- última exceção autoral removida;
+- auditor específico deixou de hardcodar 93/94 fichas;
+- testes globais de Journey passaram a atravessar a mesma porta autoral da produção;
+- builders especializados de N1.09 e GM.02 passaram a propagar `rt_alvo → rt_max_s`.
 
-### Defeito visual descoberto pela sonda
+### Defeitos compartilhados descobertos pela sonda
 
-O `ScatteredItems` aceitava uma posição ainda colidida depois de 50 tentativas aleatórias. Em conjuntos de 10–20 isso produziu sobreposição real.
+A primeira sonda GM.02 encontrou:
 
-Correção permanente:
+1. contraste do aviso “Toque para OUVIR” em **4,22:1**, abaixo de AA 4,5:1;
+2. selo 🔊 absoluto cobrindo conteúdo de uma alternativa de ordem temporal.
 
-- posições determinísticas em células invisíveis embaralhadas;
-- jitter pequeno e limitado;
-- objetos responsivos para 10–20 itens;
-- teste geométrico permanente `ScatteredItems.layout.test.ts`.
+Correção compartilhada em `src/index.css`:
+
+- selo audível passa a ocupar espaço no fluxo do botão;
+- aviso audível escurecido localmente para `#475569`;
+- nenhuma exceção específica de GM.02.
 
 ### Evidência de fechamento
 
-- baseline semântico completo: CI `31286476155` = **success**;
-- sonda pela rota real `track.gen`: CI `31286955931` = **success**;
-- sonda N1.09 L1–L5: 390/320/900 px, zero vazamento/colisão/texto invisível/coberto;
-- suíte nessa rodada: **130 arquivos / 2.197 testes**;
-- cleanup: `postbuild` e injetor P22.4 removidos;
-- CI limpo pós-cleanup: `31287106974` = **success**.
+- CI semântico final: `31287744035` = **success**;
+- primeira sonda `31287813598`: detectou os dois defeitos compartilhados acima;
+- sonda corrigida pela rota real: `31288014568` = **success**;
+- CI limpo sem `postbuild`/injetor: `31288136803` = **success**;
+- suíte final do lote: **131 arquivos / 2.205 testes**;
+- nenhuma bancada temporária P22 permanece.
 
-## 10. PRÓXIMA TAREFA EXATA — P22.5 GM.02
+## 7. PRÓXIMA TAREFA EXATA — máquina longitudinal adaptativa
 
-GM.02 canônica é **Tempo cotidiano** e não pode ser sequestrada por massa/capacidade (GM.12).
+Traçar o caminho real antes de alterar algoritmo:
 
-Contrato do lote:
+`GameLoop answer → misconception/evidence → mastery/progression → persistência → Radar/revisão → recomendação → unlock`.
 
-1. manter `prereqs: []` conforme grafo;
-2. linguagem pré-leitora: áudio e iconografia carregam a instrução; texto é apoio;
-3. L1 partes do dia — manhã/tarde/noite;
-4. L2 ontem/hoje/amanhã;
-5. L3 sequência dos dias da semana;
-6. L4 ordenar eventos cotidianos;
-7. L5 recuperação mista;
-8. ficha Markdown + Journey TS + teste permanente;
-9. registro Journey/Composer + promoção, preservando legado como rollback;
-10. remover a última exceção autoral apenas quando a ficha existir;
-11. nenhuma resposta correta pode carregar misconception;
-12. `rt_alvo` do L5 é metadado de fluência, nunca domínio;
-13. sonda real + gates completos antes de declarar P22 encerrada.
+Perguntas bloqueantes da auditoria:
 
-Antes de adicionar a 94ª ficha, remover estruturalmente o `EXPECTED_FICHAS = 93` do auditor específico — não trocar 93 por 94.
+1. quem é o proprietário de cada mutação de `Progress`;
+2. se mutações em múltiplos nós sobrevivem de `GameLoop` até `App.persist`;
+3. se `reviewForce/lastDay` realmente persistem;
+4. se tags emitidas pelo runtime são as mesmas que o Radar roteia;
+5. se revisões vencidas entram de fato na recomendação;
+6. se resgates do Radar chegam à trilha correta;
+7. se mastery/unlock seguem o DAG e não atalhos históricos;
+8. se Jardim continua incapaz de conceder domínio conceitual à mãe;
+9. se cloud/local reconciliation preserva todas essas dimensões.
 
-## 11. Depois de P22
+**Não corrigir motor por intuição. Primeiro provar a discrepância com source→state→consumer e teste de regressão.**
 
-Sequência já persistida em `PLANO_POS_P22_FABRICA_CURRICULAR.md`:
+## 8. Depois da auditoria longitudinal
 
-1. auditoria longitudinal da máquina de estados adaptativa — `GameLoop answer → evidence → mastery/progression → persistence → Radar/review → recommendation → unlock`;
-2. Coverage Matrix executável;
-3. fábrica curricular em ondas pedagógicas;
-4. mega auditoria pedagógica;
-5. Dojo completo;
-6. release hardening.
+Seguir `PLANO_POS_P22_FABRICA_CURRICULAR.md`:
 
-## 12. Portões
+1. Coverage Matrix executável;
+2. fábrica curricular em ondas;
+3. mega auditoria pedagógica;
+4. Dojo completo;
+5. release hardening.
+
+## 9. Portões
 
 ```bash
 npm run auditar
