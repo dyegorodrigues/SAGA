@@ -17,7 +17,6 @@ import { prescribeCausalJardim } from "../curriculum/motores/jardimCausalPrescri
 import { chooseSenseiEntry } from "../curriculum/motores/senseiOrchestrator";
 import { prescribeSenseiDojo } from "../curriculum/motores/senseiDojoPrescription";
 import type { SenseiDojoSessionSource } from "../curriculum/motores/senseiDojoPolicy";
-import { isTrackUnlocked } from "../curriculum/motores/unlockEngine";
 import { localDay } from "../utils/migrator";
 
 interface KidHomeProps {
@@ -118,41 +117,12 @@ export function KidHomeScreen({
   const totalStars = getKidLifetimeStars(kid.id, state);
   const stageNum = getMascotStage(totalStars).stage;
 
-  // Recomendação secundária de treino livre. A auditoria pós-P22 ainda vai
-  // eliminar a heurística por estrelas para que ela não dispute autoridade com o Sensei.
-  const rec = useMemo(() => {
-    const accessibleTracks = tracks.filter(t =>
-      isTrackUnlocked(t.id, t.graphId, unlockStatus)
-    );
-
-    // 1. Spaced repetition: if a track has pending review items, recommend it
-    const needsReview = accessibleTracks.filter((t) => prog[t.id]?.bank?.length > 0);
-    if (needsReview.length > 0) {
-      // Pick one randomly based on the day to avoid being stuck forever if the kid hates it
-      const daySeed = Math.floor(Date.now() / 86400000);
-      const track = needsReview[daySeed % needsReview.length];
-      return {
-        track,
-        reason: "Hora de revisar e fixar os segredos matemáticos com seu mascote! 🧠✨",
-      };
-    }
-
-    // 2. Balanced learning: recommend the track with the lowest star count to keep progress uniform
-    let bestTrack = accessibleTracks[0];
-    let minStars = Infinity;
-    for (const t of accessibleTracks) {
-      const p = prog[t.id] || { stars: 0 };
-      if ((p.stars || 0) < minStars) {
-        minStars = p.stars || 0;
-        bestTrack = t;
-      }
-    }
-
-    return bestTrack ? {
-      track: bestTrack,
-      reason: "Treino livre sugerido para o seu momento atual. 🦊",
-    } : null;
-  }, [tracks, prog, unlockStatus]);
+  /**
+   * Não existe recomendador curricular secundário por estrelas nesta tela.
+   * Banco/revisão entram pela inteligência do Composer/Radar; automaticidade
+   * prescrita entra pelo Sensei Dojo. Exploração livre continua disponível nas
+   * abas Jornada/Dojo sem fingir ser recomendação pedagógica do Tutor.
+   */
 
   return (
     <div className="mk-pop h-screen max-h-screen flex flex-col bg-slate-50 overflow-hidden">
@@ -193,7 +163,7 @@ export function KidHomeScreen({
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 scrollbar-hide">
         {activeShellTab === "sensei" && (
           <SenseiTab
-            kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec}
+            kid={kid} prog={prog} aulaPlan={aulaPlan}
             senseiEntry={senseiEntry} dojoPrescription={dojoPrescription}
             onMatricula={onMatricula} onAula={startSenseiMission} onSenseiDojo={startSenseiDojoMission}
             onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)}
