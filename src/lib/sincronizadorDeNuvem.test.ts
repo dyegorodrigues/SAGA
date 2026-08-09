@@ -83,15 +83,10 @@ describe("amortecedor de gravações na nuvem", () => {
     expect(gravar).toHaveBeenCalledTimes(2);
   });
 
-  it("H6: falha retryable permanece pendente e volta sozinha após reconexão", async () => {
+  it("H6: falha offline permanece pendente por padrão e volta sozinha após reconexão", async () => {
     const gravar = vi.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValue(undefined);
     const t = relogio();
-    const s = criarSincronizador({
-      gravar,
-      agendar: t.agendar,
-      cancelar: t.cancelar,
-      deveRepetir: () => true,
-    });
+    const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
 
     s.agendar(save("offline"));
     await s.descarregar();
