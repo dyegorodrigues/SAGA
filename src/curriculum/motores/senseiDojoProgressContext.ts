@@ -1,5 +1,6 @@
 import type { DojoTrackState, Progress, Question, State } from "../../types";
 import type { MasteryAttempt } from "./progressEngine";
+import { consumeMatriculaTerminal } from "../../utils/matricula";
 import { applySenseiDojoRound, freshSenseiDojoState, type SenseiDojoAttempt } from "./senseiDojoEngine";
 import {
   maxEligibleSenseiDojoStepById,
@@ -68,15 +69,21 @@ export function recordSenseiDojoAttempt(question: Question): void {
 }
 
 /**
- * Intercepta o progressEngine apenas quando a questão corrente é de um templo.
- * Nenhuma regra de Jornada roda: o retorno é somente um envelope transitório
- * que `materializeSenseiDojoProgress` consome no boundary do save.
+ * Boundary terminal compartilhado das sessões que usam a casca conceitual.
+ *
+ * A Matrícula só arma sua sonda em `answerPolicy`; consumi-la aqui garante que
+ * retries intermediários não contam como múltiplos resultados e que a sessão
+ * escolhe a próxima âncora antes de o GameLoop gerar a próxima questão.
+ *
+ * Para o Dojo Sensei, nenhuma regra de Jornada roda: o retorno é somente um
+ * envelope transitório que `materializeSenseiDojoProgress` consome no save.
  */
 export function consumeSenseiDojoTerminal(
   fallback: Progress,
   terminalRight: boolean,
   attempt?: MasteryAttempt,
 ): { handled: false } | { handled: true; progress: Progress } {
+  consumeMatriculaTerminal(terminalRight);
   if (!pendingQuestion) return { handled: false };
   if (!attempt) throw new Error("Dojo Sensei recebeu resposta terminal sem MasteryAttempt/RT.");
 
