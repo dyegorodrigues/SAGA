@@ -378,8 +378,10 @@ const declaredCountSources = [
 for (const [label, source, pattern] of declaredCountSources) {
   check(pattern.test(source), `${label} não declara o invariante canônico de ${EXPECTED_COMPETENCIES} competências`);
 }
-check(/\*\*Versão 3\.4/.test(bibleText), "Bíblia precisa estar em v3.4 após a reconciliação pós-P22");
-check(/### v3\.4 —/.test(bibleText), "Bíblia v3.4 precisa registrar a reconciliação no changelog");
+// v3.5 é uma mudança canônica intencional: preserva a reconciliação pós-P22 da
+// v3.4 e acrescenta a separação learner state × Nível SAGA × companheiro.
+check(/\*\*Versão 3\.5/.test(bibleText), "Bíblia precisa estar em v3.5 após a reconciliação de meta-jogo");
+check(/### v3\.5 —/.test(bibleText), "Bíblia v3.5 precisa registrar a reconciliação de meta-jogo no changelog");
 check(
   /Registro histórico da receita pré-P22[^\n]*NÃO normativo/.test(bibleText),
   "Bíblia precisa marcar a antiga dose por idade como histórica e não normativa"
