@@ -17,6 +17,8 @@ interface Props {
   onGardenTrack?: (t: Track, currentStep: number) => void;
   prog: Record<string, Progress>;
   dojoTracks?: Record<string, DojoTrackState>;
+  /** O Mestre exige ao menos duas competências conceitualmente dominadas. */
+  mixedAvailable: boolean;
   onMixed: () => void;
 }
 
@@ -61,7 +63,7 @@ const TEMPLE_STYLE: Record<string, { border: string; bg: string; shadow: string;
   dojo_div: { border: "#A7F3D0", bg: "#ECFDF5", shadow: "#A7F3D0", text: "#047857", icon: "➗" },
 };
 
-export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGardenTrack }: Props) {
+export function DojoTab({ prog, dojoTracks = {}, mixedAvailable, onMixed, onOpenPicker, onGardenTrack }: Props) {
   const [mode, setMode] = useState<"garden" | "sensei">("garden");
 
   const gardenEntries = useMemo(() => JARDIM.map(trilha => {
@@ -302,28 +304,48 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
           </div>
 
           <div className="mt-8">
-            <button
-              onClick={() => { sfx.level(); onMixed(); }}
-              className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
-              style={{
-                background: "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)",
-                borderColor: "#EA580C",
-                boxShadow: "0 4px 0 #C2410C",
-              }}
-            >
-              <div className="flex items-center justify-between gap-3 mb-2">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-orange-900 bg-orange-200 border-2 border-orange-300">
-                  🦊 Desafio Opcional
-                </span>
-                <span className="text-2xl">🏆</span>
+            {mixedAvailable ? (
+              <button
+                onClick={() => { sfx.level(); onMixed(); }}
+                className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-1 rounded-2xl border-2"
+                style={{
+                  background: "linear-gradient(135deg, #FFF7ED 0%, #FFEDD5 100%)",
+                  borderColor: "#EA580C",
+                  boxShadow: "0 4px 0 #C2410C",
+                }}
+              >
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-orange-900 bg-orange-200 border-2 border-orange-300">
+                    🦊 Desafio Opcional
+                  </span>
+                  <span className="text-2xl">🏆</span>
+                </div>
+                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#9A3412" }}>
+                  Treino Mestre (Misto)
+                </div>
+                <div className="text-xs font-bold mt-1 leading-snug text-orange-900/80">
+                  Intercale somente habilidades já dominadas. Este desafio não decide o seu currículo nem substitui a Aula do Dia.
+                </div>
+              </button>
+            ) : (
+              <div
+                aria-label="Treino Mestre bloqueado"
+                className="w-full p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 text-left"
+              >
+                <div className="flex items-center justify-between gap-3 mb-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md text-slate-600 bg-slate-200">
+                    🔒 Mestre em preparação
+                  </span>
+                  <span className="text-xl">🏆</span>
+                </div>
+                <div className="font-black text-slate-600" style={{ fontFamily: FONT }}>
+                  Treino Mestre (Misto)
+                </div>
+                <div className="text-[11px] font-bold mt-1 leading-snug text-slate-500">
+                  Domine pelo menos duas habilidades. Depois o Mestre mistura somente o repertório que você já conquistou.
+                </div>
               </div>
-              <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#9A3412" }}>
-                Treino Mestre (Misto)
-              </div>
-              <div className="text-xs font-bold mt-1 leading-snug text-orange-900/80">
-                Intercale o repertório já conquistado. Este desafio não decide o seu currículo nem substitui a Aula do Dia.
-              </div>
-            </button>
+            )}
           </div>
         </div>
       )}
