@@ -2,6 +2,7 @@ import type { Progress, Question } from "../../types";
 import type { FluencyItemKind } from "./senseiDojoEngine";
 
 export type SenseiDojoTempleId = "dojo_add" | "dojo_sub" | "dojo_mul" | "dojo_div";
+export type SenseiDojoSessionSource = "manual" | "prescribed";
 
 export interface SenseiDojoLevelPolicy {
   requires: string[];
@@ -96,12 +97,18 @@ export interface SenseiDojoQuestionMeta {
   itemId: string;
   itemKind: FluencyItemKind;
   token: number;
+  /**
+   * Autoridade da sessão. `manual` nunca governa o ponteiro adaptativo, mesmo
+   * quando a criança escolhe exatamente a faixa que hoje é `currentStep`.
+   */
+  source: SenseiDojoSessionSource;
 }
 
 export function stampSenseiDojoQuestion(
   templeId: SenseiDojoTempleId,
   rawStep: number,
   question: Question,
+  source: SenseiDojoSessionSource = "manual",
 ): Question {
   const step = Math.min(10, Math.max(1, Math.round(rawStep)));
   const policy = SENSEI_DOJO_LEVEL_POLICIES[templeId][step];
@@ -118,6 +125,7 @@ export function stampSenseiDojoQuestion(
     itemId,
     itemKind: policy.itemKind,
     token: ++token,
+    source,
   };
   return {
     ...question,
@@ -128,7 +136,28 @@ export function stampSenseiDojoQuestion(
   };
 }
 
+/**
+ * Recarimba apenas a origem da sessão sem regenerar identidade/RT do item.
+ * O gerador cru é a porta manual; o Sensei usa esta função para declarar uma
+ * missão prescrita de forma explícita na borda da sessão.
+ */
+export function stampSenseiDojoSessionSource(
+  question: Question,
+  source: SenseiDojoSessionSource,
+): Question {
+  const meta = senseiDojoMeta(question);
+  if (!meta) throw new Error("Questão sem metadado de Dojo Sensei para declarar origem da sessão.");
+  return {
+    ...question,
+    uiProps: {
+      ...(question.uiProps ?? {}),
+      fluency: { ...meta, source },
+    },
+  };
+}
+
 export function senseiDojoMeta(question: Question): SenseiDojoQuestionMeta | undefined {
   const meta = question.uiProps?.fluency as SenseiDojoQuestionMeta | undefined;
-  return meta && SENSEI_DOJO_LEVEL_POLICIES[meta.templeId]?.[meta.step] ? meta : undefined;
+  const validSource = meta?.source === "manual" || meta?.source === "prescribed";
+  return meta && validSource && SENSEI_DOJO_LEVEL_POLICIES[meta.templeId]?.[meta.step] ? meta : undefined;
 }
