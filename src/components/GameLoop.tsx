@@ -1123,7 +1123,7 @@ export function GameLoop({
             <h3 className="text-xl font-black text-indigo-900" style={{ fontFamily: FONT }}>
               Segredos do Reloginho!
             </h3>
-            <p className="text-xs text-slate-500 font-bold">
+            <p className="text-xs text-slate-500 font-bold mb-4">
               Aprenda com o Mascote de forma super rápida! 💡
             </p>
 
