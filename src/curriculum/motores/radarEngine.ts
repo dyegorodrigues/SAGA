@@ -80,13 +80,20 @@ export function trackMisconception(
  * Regra do Radar (Bíblia §11.4 e §8.1): 2 ocorrências da MESMA tag em até 5 erros recentes
  * E dentro da janela temporal de sessão (≤ 10 min) = misconception ativa.
  * Erros distantes no tempo ou isolados NUNCA disparam resgate.
+ *
+ * PÓS-P22 — identidade do resgate:
+ * a misconception pertence ao NÓ EM QUE FOI OBSERVADA. O Radar não possui uma
+ * segunda árvore curricular tag→nó. Depois que o padrão é confirmado, o
+ * `rescuePlanner` recebe esse nó-fonte e, usando o DAG canônico, decide se deve
+ * tratá-lo ali ou descer para um pré-requisito ainda imaturo.
+ *
+ * A tabela histórica `TAG_TO_NODE` foi removida porque tinha três problemas:
+ * - `OFF_BY_ONE` esperava uppercase, mas a tag canônica emitida é `off-by-one`;
+ * - `LENTO_DEDOS` podia nascer em qualquer rapid-fire/Dojo e era forçado para N1.03;
+ * - `ERRO_POSICIONAL` não possuía emissor canônico no runtime atual.
+ * Esse roteamento paralelo podia tanto nunca disparar quanto sequestrar um erro
+ * de outra competência para um nó sem relação com o contexto observado.
  */
-const TAG_TO_NODE: Record<string, string> = {
-  "LENTO_DEDOS": "N1.03", // Subitização
-  "OFF_BY_ONE": "N1.02", // Canto Numérico
-  "ERRO_POSICIONAL": "N2.01", // Sistema Decimal
-};
-
 export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): string[] {
   if (!pMap) return [];
   const rescueNodes: Set<string> = new Set();
@@ -104,11 +111,7 @@ export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): 
       );
 
       if (closeMatches.length >= 2) {
-        if (TAG_TO_NODE[current.tag]) {
-          rescueNodes.add(TAG_TO_NODE[current.tag]);
-        } else {
-          rescueNodes.add(node);
-        }
+        rescueNodes.add(node);
         break; // Achou pelo menos uma misconception ativa, avança para o próximo nó
       }
     }
@@ -199,5 +202,3 @@ export const RadarEngine = {
   trackMisconception,
   getDueReviews,
 };
-
-
