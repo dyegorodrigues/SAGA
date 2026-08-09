@@ -6,6 +6,7 @@ import {
   composeAula,
   buildAulaTrack,
 } from "../curriculum/motores/composer";
+import { MisconceptionTag } from "../constants/misconceptions";
 import { Track, Progress } from "../types";
 
 /** trilha-fantasma: toda questão assina o id da trilha no prompt (rastreável) */
@@ -122,7 +123,10 @@ describe("Compositor da Aula do Dia 📚 (Sensei)", () => {
       contar: prog({
         tot: 5,
         ok: 2,
-        misconceptions: [{ tag: "contagem-dupla", ts: now - 1000 }, { tag: "contagem-dupla", ts: now }],
+        misconceptions: [
+          { tag: MisconceptionTag.RECONTOU, ts: now - 1000 },
+          { tag: MisconceptionTag.RECONTOU, ts: now },
+        ],
       }),
     }));
 
@@ -136,7 +140,10 @@ describe("Compositor da Aula do Dia 📚 (Sensei)", () => {
       t1: prog({ maxLvl: 1 }),
       t2: prog({ maxLvl: 2 }),
       contar: prog({
-        misconceptions: [{ tag: "contagem-dupla", ts: now - 1000 }, { tag: "contagem-dupla", ts: now }],
+        misconceptions: [
+          { tag: MisconceptionTag.RECONTOU, ts: now - 1000 },
+          { tag: MisconceptionTag.RECONTOU, ts: now },
+        ],
       }),
     }));
 
