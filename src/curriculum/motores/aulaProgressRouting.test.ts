@@ -46,17 +46,14 @@ const stateWith = (progressMap: Record<string, Progress>): State => ({
   progress: { kid: progressMap },
   dojoTracks: { kid: {} },
   coins: {},
-  trophies: {},
-  logs: {},
   album: {},
-  shop: {},
-  parentPin: "1234",
+  log: {},
   sound: false,
-  tutor: {},
 });
 
 function answer(question: Question, synthetic: Progress): Progress {
-  // Este é exatamente o ponto chamado pelo GameLoop antes de applyJourneyAnswer.
+  // Mesmo boundary do GameLoop: a policy observa a identidade da questão antes
+  // de `applyJourneyAnswer`, que então precisa trabalhar no Progress-fonte.
   misconceptionForAnswer(question, question.answer as string);
   return applyJourneyAnswer(
     synthetic,
@@ -66,14 +63,15 @@ function answer(question: Question, synthetic: Progress): Progress {
       durationMs: 500,
       targetRtMs: 1000,
       helpUsed: false,
+      isReview: false,
       practiceDay: "2026-08-08",
       previousPracticeDay: synthetic.lastDay,
     },
   ).progress;
 }
 
-describe("auditoria longitudinal — roteamento de progresso da Minha Aula", () => {
-  it("questão composta carrega identidade curricular explícita", () => {
+describe("auditoria longitudinal — roteamento de progresso da Aula do Dia", () => {
+  it("questão prescrita pelo Sensei carrega identidade curricular explícita", () => {
     beginAulaProgressSession();
     const q = questionFor("N1.07", progress(3)) as AulaQuestion;
     expect(q.sourceTrackId).toBe("N1.07");
