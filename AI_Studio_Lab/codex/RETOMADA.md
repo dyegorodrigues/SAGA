@@ -1,65 +1,96 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_SIMULACAO_LONGITUDINAL_FECHADA_2026-08-09.md`. Tudo até Simulação Longitudinal está fechado; próxima tarefa única: **auditoria sistêmica de gamificação / economia / mascote**.
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_GAMIFICACAO_ECONOMIA_METAJOGO_FECHADA_2026-08-09.md`. Tudo até **Gamificação / Economia / Meta-jogo** está fechado; próxima tarefa única: **Coverage Matrix**.
 
 ## Leia primeiro
 
-1. `CHECKPOINT_SIMULACAO_LONGITUDINAL_FECHADA_2026-08-09.md` — fonte operacional mais nova;
-2. `CHECKPOINT_CLOUD_RECONCILIATION_FECHADA_2026-08-09.md` — checkpoint histórico imediatamente anterior;
-3. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` — dívida curricular/visual/primitivas;
-4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md` — ontologia pedagógica.
+1. `CHECKPOINT_GAMIFICACAO_ECONOMIA_METAJOGO_FECHADA_2026-08-09.md` — fonte operacional mais nova;
+2. `VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md` — visão futura registrada, não fila atual;
+3. `CHECKPOINT_SIMULACAO_LONGITUDINAL_FECHADA_2026-08-09.md` — checkpoint histórico imediatamente anterior;
+4. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` — dívida curricular/visual/primitivas;
+5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md` — ontologia pedagógica;
+6. `../pedagogia/BIBLIA_DO_SAGA.md`, `GRAFO_DE_CONHECIMENTO_SAGA.md`, `MANUAL_DIDATICO_SAGA.md` e `DOJO_SAGA.md` — cânone pedagógico vigente.
 
 Checkpoints antigos permanecem históricos. Não usar filas antigas como ordem vigente.
 
-## Git
+## Git — regra de ouro
 
 - repo `dyegorodrigues/SAGA`;
 - branch única `codex/integrar-bloco-f0`;
 - main protegida `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
-- PR #29 open + draft + não mesclar/ready/auto-merge;
-- não tocar no Creature Engine;
+- PR #29 deve permanecer **open + draft + unmerged**;
+- não ready, não auto-merge, não rebase/merge na main;
+- não tocar no Creature Engine nesta fila;
 - não criar branch auxiliar;
-- GitHub remoto é a fonte da verdade.
+- GitHub remoto é a fonte da verdade;
+- antes de editar, reancorar PR/head remoto e verificar CI.
 
 ## Fechado — não reabrir sem falha objetiva
 
-P17–P22/cânone; Radar/source/persist/DAG/Oficina causal; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto elegível; Matrícula adaptativa; Cloud Reconciliation; **Simulação Longitudinal**.
+P17–P22/cânone; Radar/source/persist/DAG/Oficina causal; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto elegível; Matrícula adaptativa; Cloud Reconciliation; Simulação Longitudinal; **Gamificação / Economia / Meta-jogo**.
 
-Simulação funcional: `1353dcd515d2f0dcb44abbc67de6f7fafc24cf9d`, CI #778 / run `31321595071`, **152 arquivos / 2.340 testes**, build/TypeScript/auditores/higiene/binários/Chrome verdes; artefato `9040333829`.
+### Contratos permanentes da gamificação
 
-Bugs longitudinais provados/corrigidos:
+- learner state é a verdade pedagógica;
+- **Nível SAGA 1–100 pertence à criança/perfil, não ao mascote**;
+- XP é vitalício e nunca compra mastery/unlock;
+- moedas são gastáveis e compras são atômicas;
+- velocidade não multiplica XP nem concede autoridade conceitual;
+- criança lenta e correta recebe o mesmo XP de perfil;
+- Misto dobra moedas, não XP/mastery;
+- fallback não fornece evidência nem recompensa real;
+- Atlas/insígnias curriculares derivam do Curriculum Graph/learner state;
+- replay legítimo é prática nova, mas não repete o bônus único de primeira missão;
+- double tap/retry/reload/materialização repetida não duplicam o mesmo evento técnico.
 
-- fallback não pode virar fronteira dominante ensinável do Sensei;
-- Oficina bem-sucedida precisa resolver a misconception do **alvo** para ter saída, sem apagar a causa do source quando o resgate desce a pré-requisito.
+Recibo funcional da frente: `791a21b002794e29818551adbb5cdb93138105e9`, CI #811 / run `31325208953`, **155 arquivos / 2.367 testes**, build/TypeScript/auditores/grafo/PR/higiene/binários/Chrome verdes; artefato Chrome `9074276985`.
 
-A simulação permanente cobre: iniciante, ritmo típico, alta facilidade, mastery multisessão, RT lento, revisão/retorno, Oficina, Misto, Matrícula, Dojo manual/prescrito, Jardim causal, prioridade de prerequisito e persistência/reload.
+## Faça agora — COVERAGE MATRIX
 
-## Próxima tarefa — gamificação / economia / mascote
+Construir uma matriz executável, competência por competência:
 
-Não redesenhar por estética. Primeiro auditar a cadeia real:
+`Curriculum Graph → ficha canônica → implementação real → screen/primitiva → Composer → testes/auditoria → status real → dívida/bloqueio → ação → ordem causal`.
 
-`answer/terminal → estrelas/moedas/XP/eventos → carteira/economia → álbum/mascote → UI/consumo → persistência → eventual efeito sobre progressão`.
+Classificar pelo menos:
 
-Provar especialmente que:
+- servido real/canônico;
+- legado aproveitável;
+- fallback;
+- divergência ficha↔screen;
+- linguagem visual inadequada;
+- ferramenta sem onboarding/estreia;
+- primitiva bloqueadora;
+- ausência/fragilidade de testes;
+- bloqueio causal para outras competências.
 
-- estrelas, moedas, XP, streaks cosméticos e mascote não concedem `dom`, unlock, nível conceitual ou avanço de Dojo;
-- compras/equipamentos/álbum não alteram o currículo;
-- recompensas não premiam velocidade de modo que ganhe autoridade conceitual;
-- economia não duplica prêmio em retry/warmup/review indevidamente;
-- logout/reload/cloud preservam saldos sem misturar UID;
-- qualquer vínculo com Creature Engine fica apenas inventariado — **não tocar nele**.
+**Não fabricar conteúdo antes de fechar a Coverage Matrix.** Primeiro transformar a dívida em mapa executável; depois atacar por ordem causal.
 
-Primeiro inventário + regressões; patch apenas para bug provado.
+## Dívida curricular preservada
 
-## Dívida curricular não perdida
+- Composer 26/90;
+- servido sem placeholder 51/90;
+- 25 prontos em legado;
+- 39 fallback;
+- 21 divergências ficha↔tela;
+- 12 trocas de linguagem visual;
+- 44 estreias de ferramenta;
+- primitivas incompletas `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`;
+- `Moedas` bloqueia GM.03;
+- `Regua` bloqueia GM.05.
 
-Composer 26/90; servido sem placeholder 51/90; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; 44 estreias; primitivas incompletas `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`.
+A fábrica continua **depois** da Coverage Matrix.
 
-A fábrica continua depois da Coverage Matrix.
+## Visão futura preservada — não executar agora
 
-## Fila
+A visão do companheiro/NPC vivo, widget móvel, emoções/retratos, cuidados suaves, animais lutadores humanoides em HD pixel art, futuro fighting game/beat ’em up 2.5D e `Laboratório de Raciocínio / Thinking Lab` está registrada em `VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`.
 
-gamificação/economia/mascote → Coverage Matrix → fábrica curricular → mega auditoria → hardening/performance/release.
+Esses itens podem ser aperfeiçoados depois. Não são absolutos e não autorizam tocar no Creature Engine nesta fila.
+
+## Fila vigente
+
+`Coverage Matrix → fábrica curricular → mega auditoria integrada → hardening/performance → release`.
+
+Arte definitiva/Creature Engine/widget/jogo ficam em trilha futura separada até o núcleo matemático estar fechado.
 
 ## Gates
 
@@ -74,3 +105,5 @@ npm run build
 npm run pr:check
 npm run sonda:sensei-dojo
 ```
+
+**A criança pode escolher treinar. Quando segue o Sensei, quem escolhe o currículo é o Tutor. O meta-jogo celebra o caminho; ele nunca decide o que a criança sabe.**
