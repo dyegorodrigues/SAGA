@@ -1,4 +1,5 @@
 import { MasteryEvidence, MasteryRule, Progress } from "../../types";
+import { calendarDayDistance, normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
 import { consumeAulaSourceProgress, markAulaSourceProgress } from "./aulaProgressContext";
 import { consumeSenseiDojoTerminal } from "./senseiDojoProgressContext";
 
@@ -39,17 +40,29 @@ export interface ProgressionMode {
  * direta de `p.streak`. Em vez de permitir que uma camada de recompensa ganhe
  * autoridade curricular, o objeto devolvido pelo motor expõe o valor calculado
  * normalmente, mas ignora escritas externas até a próxima transição do motor.
- * O descriptor é enumerável/configurável: spread, JSON/save e migração continuam
- * vendo um `streak` numérico normal; só mutação imperativa pós-engine é bloqueada.
+ *
+ * O mesmo boundary normaliza escritas legadas de `lastDay`: se a UI entregar o
+ * dia UTC do instante atual, ele vira a data LOCAL antes de persistir. Datas
+ * históricas/injetadas permanecem válidas. Os descriptors são enumeráveis e
+ * configuráveis: spread, JSON/save e migração continuam vendo campos normais.
  */
 export function protectConceptualStreak(progress: Progress): Progress {
   const conceptualStreak = progress.streak || 0;
+  let practiceDay = progress.lastDay;
   Object.defineProperty(progress, "streak", {
     enumerable: true,
     configurable: true,
     get: () => conceptualStreak,
     set: () => {
       // Intencional: RT/estrela/UI não escrevem na progressão conceitual.
+    },
+  });
+  Object.defineProperty(progress, "lastDay", {
+    enumerable: true,
+    configurable: true,
+    get: () => practiceDay,
+    set: (value: string | undefined) => {
+      practiceDay = normalizeLegacyRuntimeDay(value) ?? value;
     },
   });
   return progress;
@@ -72,7 +85,14 @@ export function applyJourneyAnswer(
   masteryAttempt?: MasteryAttempt,
   mode: ProgressionMode = { kind: "journey" },
 ): AnswerProgressResult {
-  const dojo = consumeSenseiDojoTerminal(current, right, masteryAttempt);
+  const normalizedAttempt = masteryAttempt
+    ? {
+        ...masteryAttempt,
+        practiceDay: normalizeLegacyRuntimeDay(masteryAttempt.practiceDay) ?? masteryAttempt.practiceDay,
+      }
+    : undefined;
+
+  const dojo = consumeSenseiDojoTerminal(current, right, normalizedAttempt);
   if (dojo.handled) return { progress: dojo.progress, transition: null };
 
   const routed = consumeAulaSourceProgress(current);
@@ -86,6 +106,7 @@ export function applyJourneyAnswer(
     bad: base.bad || 0,
     lvl: base.lvl || 1,
     maxLvl: base.maxLvl || base.lvl || 1,
+    ...(normalizedAttempt ? { lastDay: normalizedAttempt.practiceDay } : {}),
   };
   let transition: ProgressTransition = null;
 
@@ -115,15 +136,15 @@ export function applyJourneyAnswer(
     }
   }
 
-  if (masteryAttempt) {
-    if (masteryAttempt.helpUsed) progress.helpClicks = (base.helpClicks || 0) + 1;
-    const mastery = updateMasteryEvidence(base, right, masteryAttempt);
+  if (normalizedAttempt) {
+    if (normalizedAttempt.helpUsed) progress.helpClicks = (base.helpClicks || 0) + 1;
+    const mastery = updateMasteryEvidence(base, right, normalizedAttempt);
     progress.masteryEvidence = mastery;
 
     if (
       transition?.type === "level-up"
-      && masteryAttempt.gateEvidenceBeforeAdvance
-      && !(mastery.evidenciasVistas || []).includes(masteryAttempt.gateEvidenceBeforeAdvance)
+      && normalizedAttempt.gateEvidenceBeforeAdvance
+      && !(mastery.evidenciasVistas || []).includes(normalizedAttempt.gateEvidenceBeforeAdvance)
     ) {
       progress.lvl = base.lvl;
       progress.maxLvl = base.maxLvl || base.lvl;
@@ -209,14 +230,6 @@ export function migrateLegacyCrown(progress: Progress): Progress {
   return { ...progress, masteryEvidence: legacyMasteryEvidence() };
 }
 
-function dayDistance(from?: string, to?: string): number {
-  if (!from || !to) return 0;
-  const start = Date.parse(`${from}T00:00:00Z`);
-  const end = Date.parse(`${to}T00:00:00Z`);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return 0;
-  return Math.max(0, Math.floor((end - start) / 86400000));
-}
-
 function updateMasteryEvidence(
   before: Progress,
   right: boolean,
@@ -284,7 +297,7 @@ function updateMasteryEvidence(
 
   if (sessaoMadura && !passedDays.includes(attempt.practiceDay)) {
     const ultima = passedDays.at(-1);
-    if (!ultima || dayDistance(ultima, attempt.practiceDay) >= 2) passedDays.push(attempt.practiceDay);
+    if (!ultima || calendarDayDistance(ultima, attempt.practiceDay) >= 2) passedDays.push(attempt.practiceDay);
   }
 
   evidence.passedSessionDays = passedDays;
