@@ -31,7 +31,6 @@ function cloneProgress(progress: Progress): Progress {
     ...progress,
     bank: [...(progress.bank || [])],
     misconceptions: progress.misconceptions ? [...progress.misconceptions] : undefined,
-    evidenciasVistas: progress.evidenciasVistas ? [...progress.evidenciasVistas] : undefined,
     masteryEvidence: progress.masteryEvidence
       ? {
           ...progress.masteryEvidence,
