@@ -132,7 +132,8 @@ describe("SenseiTab — Jardim causal", () => {
 
     expect(screen.getByText(/Aula do Dia · Base Perceptual/)).toBeTruthy();
     expect(screen.getByText(/Transformar em reflexo: Jardim · Olhômetro Relâmpago/)).toBeTruthy();
-    expect(screen.getByText(/Base já compreendida:.*Subitização perceptual/)).toBeTruthy();
+    expect(screen.getByText(/Base já compreendida:/)).toBeTruthy();
+    expect(screen.getByText("Subitização perceptual (Olhômetro)")).toBeTruthy();
     expect(screen.getByText(/Round curto de/)).toBeTruthy();
     expect(screen.getByRole("button", { name: /Começar Jardim Guiado/ })).toBeTruthy();
   });
