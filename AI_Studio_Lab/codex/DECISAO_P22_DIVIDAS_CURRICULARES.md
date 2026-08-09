@@ -17,123 +17,131 @@ Ordem deliberada:
 5. P22.4 — N1.09;
 6. P22.5 — GM.02.
 
-**P22.1, P22.2 e P22.3A estão concluídas. P22.3B/JD4 é o próximo lote.**
+**P22.1–P22.4 estão concluídas. P22.5/GM.02 é o último lote antes do fechamento de P22.**
 
-## 1. N1.09 — decisão mantida
+## 1. N1.09 — decisão executada em P22.4
 
-`N1.09` é **Contagem até 20 e a partir de qualquer número**.
+`N1.09` permanece **Contagem até 20 e a partir de qualquer número**, prereqs `N1.04 + N1.02`.
 
-Pré-requisitos: `N1.04` e `N1.02`.
+O legado cobre somente continuação parcial de sequência e foi preservado como rollback. A ficha autoral agora mede conjuntos 10–20, início em N, regressiva e recuperação mista.
 
-O legado cobre apenas continuação de sequência e não prova contagem de conjuntos 10–20 nem regressiva. Não há ficha Markdown/TS/Composer.
+**Decisão executada:** não reutilizar N1.13; não devolver N1.09 ao JD4.
 
-**Decisão:** manter o nó e construir ficha autoral + TS completas; não reutilizar N1.13.
-
-## 2. GM.02 — decisão mantida
+## 2. GM.02 — decisão mantida e agora em execução
 
 `GM.02` é **Tempo cotidiano**: partes do dia, ontem/hoje/amanhã, dias da semana e ordenação de eventos.
 
-O legado atual reduz a competência a “Manhã ou Noite?” com resposta fixa `morning`.
+O legado atual reduz a competência a “Manhã ou Noite?” e não cobre o nó inteiro.
 
-**Decisão:** manter Tempo cotidiano e construir ficha autoral + TS pré-leitora, com áudio/cenas/ordenação/iconografia como linguagem primária.
+**Decisão:** manter Tempo cotidiano e construir ficha autoral + TS pré-leitora, com áudio/iconografia/ordenação como linguagem primária. Massa/capacidade permanece em GM.12.
 
-## 3. N1.07 ↔ JD4 — decisão mantida e dividida em dois lotes
-
-N1.07 canônico é **Ordem, sucessor e antecessor até 10**.
-
-JD4 “Próximo Passo” é automaticidade ligada a N1.07, não novo nó do grafo.
-
-Invariante:
+## 3. N1.07 ↔ JD4 — decisão executada
 
 - Jornada N1.07 = compreensão conceitual;
-- JD4 = treino posterior de acesso rápido a sucessor/antecessor;
-- `dojoTracks` permanece separado do progresso da Jornada;
-- tempo nunca concede domínio conceitual.
-
-O Jardim não pode compensar lacuna conceitual da Jornada.
+- JD4 = treino posterior de automaticidade de sucessor/antecessor;
+- `dojoTracks` separado do progresso da Jornada;
+- `rt_alvo` nunca concede domínio conceitual.
 
 ## 4. P22.1 — GM.12 CONCLUÍDA
 
 Gate final `31276881058`: **success**.
 
-- Composer ativo 23/90 à época;
-- servido sem placeholder 50/90;
-- fallback real 40/90;
-- sonda e gates completos verdes.
-
 ## 5. P22.2 — N4.09 CONCLUÍDA
 
 Gate final `31277213310`: **success**.
 
-Defeito encontrado e corrigido: o gabarito de área carregava misconception sentinela `"correta"`. A resposta correta passou a ficar sem tag; somente distratores carregam hipótese diagnóstica.
-
-Estado após P22.2:
-
-- Composer registrado: **24/90**;
-- Composer ativo: **24/90**;
-- servido sem placeholder: **51/90**;
-- fallback real: **39/90**.
+Defeito corrigido: gabarito de área deixou de carregar misconception sentinela; somente distratores carregam hipótese diagnóstica.
 
 ## 6. P22.3A — N1.07 CONCLUÍDA
 
 Commit permanente: `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
 Gate transacional: `31281685349`: **success**.
+Clean follow-up: `31281842046`: **success**.
 
-### Correções realizadas
+N1.07 passou a cobrir sucessor, antecessor e ordenação conforme o grafo, com prereqs canônicos `N1.02 + N1.06`.
 
-- faixa da ficha: F0;
-- prereqs: `N1.02 + N1.06`;
-- L1: sucessor até 5 com reta;
-- L2: sucessor até 10 com apoio reduzido;
-- L3: antecessor até 5;
-- L4: antecessor até 10;
-- L5: ordenar 3–4 numerais consecutivos;
-- `numberline`: salto positivo/negativo sem escapar do intervalo;
-- `plain`: salto positivo/negativo com prompt coerente;
-- novo `plain/ordering` opt-in para esta necessidade;
-- gabarito de ordenação sem misconception; distratores com `ORDEM_ERRADA`;
-- teste permanente `N1.07.test.ts`;
-- ficha autoral passa a declarar explicitamente Jornada conceitual ≠ JD4 automático.
+## 7. P22.3B — JD4 CONCLUÍDA
 
-### Portões
+Gate transacional: `31282358997`: **success**.
 
-No lote transacional passaram:
+JD4 entrou no Jardim com estado em `dojoTracks`, sem entrar no grafo/Journey registry e sem poder conceder domínio conceitual a N1.07.
 
-- auditores curriculares;
-- TypeScript;
-- suíte completa;
-- build;
-- sonda real N1.07;
-- guarda textual/diff check.
+## 8. P22.4 — N1.09 CONCLUÍDA
 
-A bancada temporária foi removida e `ci.yml` restaurado ao blob estável.
+Entregue:
 
-P22.3A não aumenta os contadores de Composer porque N1.07 já era registrada/ativa antes; elimina uma divergência semântica real.
+- 93ª ficha Markdown com nove seções;
+- Journey TS + teste permanente;
+- builder procedimental pela porta autoral de produção;
+- L1 contar 10–15;
+- L2 contar 10–20;
+- L3 continuar três termos a partir de N interno;
+- L4 regressiva simples, inclusive até zero;
+- L5 recuperação mista;
+- `rt_alvo=20s` como metadado de fluência apenas;
+- telemetria causal `NAO_CONTA_A_PARTIR_DE` e `DIRECAO_ERRADA`;
+- N1.09 ativa no Composer, legado preservado como rollback;
+- exceção autoral N1.09 removida;
+- auditor agregado deixou de hardcodar contagem de fichas;
+- teste do mapa runtime deixou de hardcodar fotografia histórica do catálogo.
 
-## 7. P22.3B — PRÓXIMA EXECUÇÃO
+### Defeito real descoberto pela sonda
 
-Objetivo: registrar JD4 como trilha real do Jardim **sem contaminar o domínio da Jornada**.
+O `ScatteredItems` aceitava a última posição mesmo colidida depois de 50 tentativas aleatórias. Com 10–20 objetos, a sonda encontrou colisões reais.
 
-Contrato proposto:
+Correção:
 
-1. `id: "JD4"`;
-2. `mae: "N1.07"`;
-3. `destravaNoNivel` somente depois de compreensão suficiente da mãe;
-4. cinco níveis de automaticidade com retirada de apoio;
-5. sucessor 1–5 → sucessor 1–10 → sucessor 1–20 → antecessor 2–10 → alternância sucessor/antecessor 1–20;
-6. `rt_alvo` decrescente como metadado de fluência;
-7. progresso em `dojoTracks`, nunca em mastery da Jornada;
-8. JD4 não entra no grafo nem em `JOURNEY_FICHAS`;
-9. teste permanente + sonda real + gates completos.
+- grade invisível embaralhada determinística;
+- jitter pequeno e limitado;
+- tamanho responsivo;
+- teste geométrico permanente.
 
-Somente depois abrir P22.4/N1.09.
+### Evidência
 
-## 8. Regra de fechamento P22
+- CI semântico `31286476155`: **success**;
+- sonda pela rota real `track.gen` `31286955931`: **success**;
+- 390/320/900 px, cinco níveis, zero vazamento/colisão/texto invisível/coberto;
+- clean CI após remover `postbuild` e injetor `31287106974`: **success**.
+
+Estado após P22.4:
+
+- 90 nós;
+- 93 fichas;
+- 89/90 competências com cobertura autoral;
+- Journey 30/30;
+- Composer 25 registrados / 25 ativos / 0 inativos;
+- único gap autoral: GM.02;
+- mapa de primitivas continua 20 / 4 / 1 / 1.
+
+## 9. P22.5 — GM.02 EM EXECUÇÃO
+
+Contrato:
+
+1. `prereqs: []`;
+2. L1 manhã/tarde/noite;
+3. L2 ontem/hoje/amanhã;
+4. L3 sequência dos dias da semana;
+5. L4 ordem de eventos cotidianos;
+6. L5 recuperação mista;
+7. áudio/iconografia são linguagem primária; texto é apoio;
+8. `rt_alvo` positivo no L5 como metadado de fluência, nunca mastery;
+9. ficha Markdown + Journey TS + teste permanente;
+10. registro Journey/Composer + promoção ativa;
+11. legado parcial preservado como rollback;
+12. remover a exceção GM.02 somente quando a ficha existir;
+13. eliminar estruturalmente `EXPECTED_FICHAS = 93` do auditor específico, não atualizar para 94;
+14. resposta correta sem misconception; diagnóstico apenas quando causal;
+15. sonda real + gates completos.
+
+## 10. Regra de fechamento P22
 
 P22 só termina quando:
 
-- N1.07 ensinar o conceito inteiro e JD4 estiver separado como automaticidade;
-- N1.09 e GM.02 deixarem de ser lacunas autorais sem reduzir o cânone;
-- todos os auditores, testes, sondas afetadas, TypeScript, build e guards estiverem verdes.
+- N1.07 e JD4 permanecerem semanticamente separados;
+- N1.09 e GM.02 não forem mais lacunas autorais;
+- cobertura autoral for 90/90 sem exceção canônica;
+- registries e proveniência estiverem sincronizados;
+- todos os auditores, testes, sondas afetadas, TypeScript, build e guards estiverem verdes;
+- nenhuma bancada temporária restar na branch.
 
 > **Promoção e automaticidade são consequências de evidência; não atalhos para uma tabela verde.**
