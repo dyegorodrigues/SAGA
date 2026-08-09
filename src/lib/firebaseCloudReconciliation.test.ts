@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { State } from "../types";
+import { linkWithPopup, signInWithPopup } from "firebase/auth";
 
 const h = vi.hoisted(() => ({
   auth: {
@@ -74,7 +75,12 @@ vi.mock("firebase/firestore", () => {
   };
 });
 
-import { loadStateFromCloud, saveStateToCloud } from "./firebase";
+import {
+  getDeviceUserId,
+  loadStateFromCloud,
+  loginWithGoogle,
+  saveStateToCloud,
+} from "./firebase";
 
 const state = (id: string, updatedAt?: string): State => ({
   schemaVersion: 1,
@@ -104,6 +110,7 @@ const progress = (extra: Record<string, unknown> = {}) => ({
 const cloudState = (): State => JSON.parse(h.cloud.data.state) as State;
 
 beforeEach(() => {
+  vi.clearAllMocks();
   h.auth.currentUser = {
     uid: "uid-a",
     email: "a@example.test",
@@ -200,5 +207,59 @@ describe("Cloud Reconciliation — writer Firestore", () => {
     expect(saved.progress["kid-a"].aula).toBeUndefined();
     expect(saved.progress["kid-a"]["N1.04"]).toMatchObject({ lvl: 2, ok: 4, tot: 5 });
     expect(saved.updatedAt).toBe("2026-08-09T13:00:00.000Z");
+  });
+
+  it("duas abas: timestamp igual mantém o estado cloud já aceito", async () => {
+    const instante = "2026-08-09T14:00:00.000Z";
+    await saveStateToCloud(state("aba-1", instante), "uid-a");
+    await saveStateToCloud(state("aba-2", instante), "uid-a");
+
+    expect(cloudState().kids[0].id).toBe("aba-1");
+    expect(h.cloud.setCalls).toHaveLength(1);
+  });
+
+  it("dois dispositivos: writes fora de ordem convergem para o maior State.updatedAt", async () => {
+    await saveStateToCloud(state("device-a-antigo", "2026-08-09T14:00:00.000Z"), "uid-a");
+    await saveStateToCloud(state("device-b-novo", "2026-08-09T14:02:00.000Z"), "uid-a");
+    await saveStateToCloud(state("device-a-atrasado", "2026-08-09T14:01:00.000Z"), "uid-a");
+
+    expect(cloudState().kids[0].id).toBe("device-b-novo");
+    expect(cloudState().updatedAt).toBe("2026-08-09T14:02:00.000Z");
+  });
+
+  it("anonymous → Google usa link e preserva o mesmo UID/cloud namespace", async () => {
+    const anon = {
+      ...h.auth.currentUser,
+      uid: "anon-stable",
+      email: null,
+      displayName: null,
+      isAnonymous: true,
+    };
+    h.auth.currentUser = anon;
+    const progresso = state("kid-anon", "2026-08-09T14:10:00.000Z");
+    h.cloud.data = {
+      userId: "usr_cloud_anon-stable",
+      state: JSON.stringify(progresso),
+      updatedAt: "2026-08-09T14:10:01.000Z",
+    };
+
+    vi.mocked(linkWithPopup).mockImplementation(async (user: any) => {
+      const linked = {
+        ...user,
+        uid: "anon-stable",
+        email: "familia@example.test",
+        isAnonymous: false,
+      };
+      h.auth.currentUser = linked;
+      return { user: linked } as any;
+    });
+
+    const result = await loginWithGoogle();
+
+    expect(linkWithPopup).toHaveBeenCalledWith(expect.objectContaining({ uid: "anon-stable" }), expect.anything());
+    expect(signInWithPopup).not.toHaveBeenCalled();
+    expect(getDeviceUserId()).toBe("usr_cloud_anon-stable");
+    expect(result.email).toBe("familia@example.test");
+    expect(result.state?.kids[0].id).toBe("kid-anon");
   });
 });
