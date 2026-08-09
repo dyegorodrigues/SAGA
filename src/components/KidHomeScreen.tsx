@@ -16,6 +16,7 @@ import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
 import { prescribeCausalJardim } from "../curriculum/motores/jardimCausalPrescription";
 import { chooseSenseiEntry } from "../curriculum/motores/senseiOrchestrator";
 import { prescribeSenseiDojo } from "../curriculum/motores/senseiDojoPrescription";
+import { canBuildMixedChallenge } from "../curriculum/motores/mixedChallenge";
 import type { SenseiDojoSessionSource } from "../curriculum/motores/senseiDojoPolicy";
 import { localDay } from "../utils/migrator";
 
@@ -99,6 +100,17 @@ export function KidHomeScreen({
     onTrackLvl(dojoPrescription.track, dojoPrescription.step, "prescribed");
   };
 
+  /**
+   * Misto = prova de repertório conquistado, não um atalho de série/idade.
+   * O motor expande qualquer slice legado para o currículo canônico e exige ao
+   * menos duas competências praticadas + `dom=true` com conteúdo real.
+   */
+  const mixedAvailable = useMemo(() => {
+    const progOf = (tid: string) =>
+      prog[tid] || { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
+    return canBuildMixedChallenge(tracks, progOf);
+  }, [tracks, prog]);
+
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
   const [activeShellTab, setActiveShellTab] = useState<"sensei" | "jornada" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "sensei") as any);
   React.useEffect(() => { window.localStorage.setItem("mk-active-tab", activeShellTab); }, [activeShellTab]);
@@ -165,6 +177,7 @@ export function KidHomeScreen({
           <SenseiTab
             kid={kid} prog={prog} aulaPlan={aulaPlan}
             senseiEntry={senseiEntry} dojoPrescription={dojoPrescription}
+            mixedAvailable={mixedAvailable}
             onMatricula={onMatricula} onAula={startSenseiMission} onSenseiDojo={startSenseiDojoMission}
             onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)}
           />
@@ -176,6 +189,7 @@ export function KidHomeScreen({
           <DojoTab
             prog={prog}
             dojoTracks={kidDojoTracks}
+            mixedAvailable={mixedAvailable}
             onGardenTrack={(track, currentStep) => onTrackLvl(track, currentStep)}
             onMixed={onMixed}
             onOpenPicker={setPickerTrack}
