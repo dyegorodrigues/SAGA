@@ -28,13 +28,15 @@
 
 P17–P22/cânone; Radar/source/persist; Sensei/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto elegível; Matrícula adaptativa; Cloud Reconciliation; Simulação Longitudinal; **Gamificação / Economia / Meta-jogo**.
 
-### Recibo da gamificação
+### Recibo remoto verificável
 
-Cabeça funcional: `791a21b002794e29818551adbb5cdb93138105e9`.
+Implementação revalidada no GitHub remoto em `98fb324ae20b20542120cea5edbd6982658bf6d2`.
 
-CI #811 / run `31325208953`: **success integral** — 155 arquivos / 2.367 testes, TypeScript/build/auditores/grafo/PR/higiene/binários/Chrome verdes; artefato Chrome `9074276985`.
+CI #812 / run `31325218446`: **success integral** — 159 arquivos / 2.377 testes, auditorias, grafo, TypeScript, build, `pr:check`, higiene, binários e sonda real Sensei verdes; artefato da sonda `9041334019`.
 
-Contratos permanentes:
+Esse SHA é recibo verificável da implementação. A documentação de handoff pode avançar em commits posteriores, por isso o próximo agente deve reancorar o **head atual** da PR e seu CI, em vez de pressupor que qualquer SHA narrado é o head vigente.
+
+### Contratos permanentes
 
 - learner state é soberano para mastery/unlock;
 - Nível SAGA 1–100 é do perfil da criança, não do mascote;
@@ -65,7 +67,18 @@ A matriz precisa responder, sem inferência vaga:
 - quais testes provam o comportamento?
 - o que precisa ser feito antes dela por dependência causal?
 
-Baseline já inventariado: Composer 26/90; 51/90 servidas sem placeholder; 25 prontas em legado; 39 fallback; 21 divergências ficha↔tela; 12 trocas visuais; 44 estreias; primitivas incompletas `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`; `Moedas` bloqueia GM.03 e `Regua` bloqueia GM.05.
+Baseline revalidado no CI #812:
+
+- 90 competências / 94 fichas autorais;
+- 26 padrão-ouro / Composer 26/90;
+- 25 legado;
+- 39 fallback;
+- 51/90 servidas sem placeholder;
+- 21 divergências ficha↔tela;
+- 12 trocas de linguagem visual;
+- 44 estreias de ferramenta;
+- `Moedas` bloqueia GM.03;
+- `Regua` bloqueia GM.05.
 
 **Não fabricar conteúdo antes de a matriz fechar.** Se os números novos divergirem do baseline, investigar e reconciliar; não ajustar teste/relatório para bater com expectativa.
 
