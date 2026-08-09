@@ -44,28 +44,30 @@ GRAFO DE COMPETÊNCIAS  →  MOTOR PEDAGÓGICO  →  MOTOR DE GERAÇÃO  →  MO
 
 ### §3.1 As TRÊS funções (onde a criança está) — e o Motor acima de todas
 
-Os 4 motores acima são a máquina interna. Para a criança e para os pais, a experiência se organiza em **três funções distintas**, e o **Motor Adaptativo/Sensei fica ACIMA das três, decidindo quando a criança faz cada uma** (ela nunca precisa escolher a sequência curricular; embora possa explorar o mapa e escolher treinar por conta própria):
+Os 4 motores acima são a máquina interna. Para a criança e para os pais, a experiência se organiza em **três funções distintas**, e o **Motor Adaptativo fica ACIMA das três, decidindo quando a criança faz cada uma** (ela nunca precisa escolher a própria sequência curricular; embora possa escolher treinar por conta própria):
 
 ```
-                    MOTOR ADAPTATIVO / SENSEI  (decide o que, quando, quanto)
+                    MOTOR ADAPTATIVO  (decide o que, quando, quanto)
                             │
         ┌───────────────────┼───────────────────┐
      ACADEMIA             DOJO               OFICINA
      (aprender)          (treinar)          (recuperar)
 ```
 
-- **🎓 ACADEMIA — aprender.** Onde a competência NOVA é ensinada pela primeira vez: CRA, microtutoria, animação, o "bizu" da conta, o conceito. É o modo Tutor. A criança progride por competência e pode subir a proficiência conceitual 1→5; **não é obrigada a refazer degraus que a Bússola/evidência já demonstrou**. A rota principal é prescrita pelo Sensei a partir do Learner Model e do DAG, não por uma grade rígida de idade.
-- **🥋 DOJO — treinar.** Onde o que já foi aprendido vira reflexo. NÃO ensina conceito — mede, fortalece, mistura, automatiza, revisa, acelera. Tem estado próprio (`dojoTracks`) para fatos e procedimentos, além do Jardim pré-simbólico; **não move `lvl`, `maxLvl`, `dom` nem coroa conceitual**. Pode ser prescrito pelo Sensei ou acessado livremente em repertório seguro. Spec: `DOJO_SAGA.md`.
+- **🎓 ACADEMIA — aprender.** Onde a competência NOVA é ensinada pela primeira vez: trilha, missão do dia, CRA, microtutoria, animação, o "bizu" da conta, o conceito. É o modo Tutor. A criança progride por competência, e dentro de cada uma sobe a proficiência conceitual 1→5. **A Bússola/evidência pode reconhecer o que ela já sabe; ninguém é obrigado a refazer degraus por idade ou ritual.**
+- **🥋 DOJO — treinar.** Onde o que já foi aprendido vira reflexo. NÃO ensina — mede, fortalece, mistura, automatiza, revisa, acelera. Duas famílias (fatos FD + procedimentos PD) e o Jardim do Dojo pré-simbólico. **Tem estado próprio de automaticidade (`dojoTracks`) e não move `lvl`, `maxLvl`, `dom` nem a coroa conceitual.** Spec: `DOJO_SAGA.md`.
 - **🔧 OFICINA — recuperar.** Onde uma lacuna REAL é reconstruída, devagar e no concreto. É a "casa" da remediação profunda (Camada 2). **Ela é híbrida (§8.4):** para tropeço pequeno, é um ESTADO invisível — o exercício só fica mais concreto e lento dentro da própria tela, a criança não percebe "lugar" nenhum; para lacuna teimosa, vira um LUGAR visível e positivo — a Missão de Resgate ("o Guardião da Ponte precisa de você!"), uma ilha antiga com recompensa própria, nunca cara de castigo. Sempre visível no painel dos pais, mesmo quando invisível para a criança.
 
 **A navegação tem CINCO abas.** As três funções continuam sendo o modelo mental; a quinta aba é a porta de entrada:
-🦊 **Sensei** (a missão do dia — **aba inicial**, o app abre nela) · 🎓 **Jornada** (Academia/mapa) · 🥋 **Dojo** (treino) · 🔧 **Oficina** (só acende com resgate aberto) · 👤 **Perfil**.
-O Sensei não é uma quarta função: é a **apresentação prescritiva** do que o Motor Adaptativo montou para agora. A criança abre o app e vê "sua missão", não uma grade.
+🦊 **Sensei** (a missão do dia — **aba inicial**, o app abre nela) · 🎓 **Jornada** (Academia) · 🥋 **Dojo** (treino) · 🔧 **Oficina** (só acende com resgate aberto) · 👤 **Perfil**.
+O Sensei não é uma quarta função: é a **apresentação** do que o Motor Adaptativo montou para hoje. A criança abre o app e vê "sua missão", não um mapa.
 
-**Jornada, Dojo e Oficina também são lugares navegáveis.** Nada de lista vertical infinita dentro do perfil: a casca do aplicativo (app shell) tem uma barra fixa embaixo. O motor de jogo é renderizado *dentro* da porta em que a criança entrou e não precisa saber em qual está — ele só recebe questões/experiências. Assim se acrescenta ou reordena aba sem tocar em pedagogia.
-- **Onde foram parar os modos antigos:** a "Jornada Mágica" **é** a Academia/mapa conceitual. O "Desafio Misto" **é** retrieval/interleaving opcional, elegível por repertório; nunca autoridade curricular. Nada se perde — deixam de ser itens soltos numa lista e viram lugares com identidade.
+**A rota principal é prescrita pelo Sensei.** A **Jornada é o mapa do conhecimento**, não o sequenciador principal; o Dojo pode ser prescrito pelo Sensei ou aberto manualmente dentro de repertório seguro; a Oficina é recuperação causal. A criança continua livre para explorar/treinar, mas treino livre não redefine o que o Tutor deve ensinar.
 
-**Por que três e não dois:** separar "treinar" de "recuperar" impede o Dojo de perder o ritmo parando para dar aula a cada erro. O Dojo continua veloz; quem ensina é a Academia (primeira vez) e quem conserta é a Oficina (quando há lacuna). O Sensei decide quando prescrever cada uma — a criança só sente o jogo fluindo.
+**As três funções são também a NAVEGAÇÃO do app.** Nada de lista vertical infinita dentro do perfil: a casca do aplicativo (app shell) tem uma barra fixa embaixo com as funções como abas — 🎓 **Jornada** (Academia, o mapa do conhecimento) · 🥋 **Dojo** (treino livre, revisão e o Desafio Misto) · 🔧 **Oficina** (só acende quando há resgate aberto) · 👤 **Perfil** (mascote, cenários, trocar de criança). O motor de jogo é renderizado *dentro* da aba em que a criança entrou e não sabe em qual está — ele só recebe questões. Assim se acrescenta ou reordena aba sem tocar em pedagogia.
+- **Onde foram parar os modos antigos:** a "Jornada Mágica" **é** a Academia (mesmo conceito, nome de tela). O "Desafio Misto" vive como retrieval/interleaving opcional dentro do ecossistema de treino; nunca vira autoridade curricular. Nada se perde — deixam de ser itens soltos numa lista e viram lugares com identidade.
+
+**Por que três e não dois:** separar "treinar" de "recuperar" impede o Dojo de perder o ritmo parando para dar aula a cada erro. O Dojo continua veloz; quem ensina é a Academia (primeira vez) e quem conserta é a Oficina (quando há lacuna). O Motor é quem manda a criança de um para o outro — a criança só sente o jogo fluindo.
 
 ---
 
@@ -79,9 +81,9 @@ O Sensei não é uma quarta função: é a **apresentação prescritiva** do que
 
 ---
 
-## §5. A ESCADA DE PROFICIÊNCIA CONCEITUAL (5 níveis por competência)
+## §5. A ESCADA DE PROFICIÊNCIA (5 níveis por competência)
 
-Unifica o CRA com o que o `progressEngine` já faz **sem usar fluência como degrau conceitual**:
+Unifica o CRA com o que o `progressEngine` já faz, **sem usar velocidade/Dojo como degrau de domínio conceitual**:
 
 | Nível | Nome | Natureza | Quem faz |
 |---|---|---|---|
@@ -89,28 +91,28 @@ Unifica o CRA com o que o `progressEngine` já faz **sem usar fluência como deg
 | 2 | Concreto | Manipulável com apoio (WE DO): dicas ativas, dedo-guia disponível | Juntos |
 | 3 | Pictórico | Representações estruturadas (moldura, barra, reta), apoio só ao errar | A criança |
 | 4 | Abstrato | Símbolos; sem apoio visual por padrão (YOU DO) | A criança |
-| 5 | Consolidação / generalização | Abstrato independente, variação, transferência e evidência autoral; **sem cronômetro como gate** | A criança |
+| 5 | Consolidação / generalização | Abstrato independente, variação/transferência e evidência autoral; **RT não é gate** | A criança |
 
-**Regras de movimento (estado vigente do runtime, agora canônicas):**
-- Sobe na Jornada: 3 acertos seguidos; na Oficina/resgate: 2 acertos, até o nível necessário. **RT não dá bônus de streak.**
-- Desce: **3 erros** fora de aquecimento (nunca no aquecimento). Piso: nível 1.
-- `maxLvl` (bolinhas) registra o maior nível alcançado com evidência e nunca regride.
-- **Domínio 👑 (`dom`) multidimensional:** no último nível, a janela de compreensão precisa satisfazer a regra autoral (`acertos/de`), sem ajuda para a sequência de independência, com a evidência específica da ficha quando exigida e confirmação em **sessões espaçadas** (`sessoes`, com mínimo de 2 no runtime atual). **RT/`fluencyStreak` não participa da decisão da coroa conceitual.** Saves legados sem `masteryAttempt` conservam uma rota de compatibilidade; não é o contrato de autoria novo.
-- **Desbloqueio de nó do grafo:** todos os pré-reqs com `maxLvl ≥ 3` ou `dom` (igual ao `dominated()` do composer — uma regra só, em um lugar só: o `unlockEngine`).
+**Regras de movimento (mantidas do código, agora canônicas):**
+- Sobe na Jornada: 3 acertos seguidos. **RT não acrescenta streak nem acelera nível conceitual.**
+- Desce: **3 erros** seguidos (nunca no aquecimento). Piso: nível 1.
+- `maxLvl` (bolinhas) só sobe com **acerto no nível** — conquista nunca regride.
+- **Domínio 👑 (`dom`) multidimensional:** no último nível, a janela de compreensão precisa satisfazer a regra autoral (`acertos/de`), com independência sem ajuda, a evidência específica da ficha quando exigida e confirmação em sessões espaçadas (`sessoes`, mínimo de 2 no runtime atual). **RT/`fluencyStreak` não participa da coroa conceitual.** A rota `legacy-crown` existe apenas para compatibilidade de saves/fluxos antigos sem `masteryAttempt`, não como norma nova de autoria.
+- **Desbloqueio de nó do grafo:** todos os pré-reqs com `maxLvl ≥ 3` ou `dom` (igual ao `dominated()` do composer — uma regra só, em um lugar só: o futuro `unlock_engine`).
 
-**O andaime desaparece conforme a criança sobe (regra do fading — evita a aula chata para quem já sabe).** A quantidade de ensino é função inversa da proficiência, e isso está embutido nos próprios níveis: no nível 1-2 há Mão Fantasma e apoio ativo (a criança está aprendendo); no nível 3 o apoio só aparece ao errar; no nível 4 é execução limpa sem apoio; no nível 5 há consolidação/generalização independente. **Automaticidade não é o nível 5:** ela vive no Dojo, em estado próprio, e pode amadurecer antes ou depois da coroa sem corromper a escada conceitual.
+**O andaime desaparece conforme a criança sobe (regra do fading — evita a aula chata para quem já sabe).** A quantidade de ensino é função inversa da proficiência, e isso está embutido nos próprios níveis: no nível 1-2 há Mão Fantasma e apoio ativo (a criança está aprendendo); no nível 3 o apoio só aparece ao errar; no nível 4 é execução limpa sem apoio; no nível 5 é consolidação/generalização independente. **Fluência/automaticidade amadurece em paralelo no Dojo, em estado próprio.**
 
-**Quantos "níveis" tem uma conta? DUAS estruturas independentes, não uma escada compartilhada.** Não existe uma lista única de 5 ou 7 níveis para "adição". Existem:
+**Quantos "níveis" tem uma conta? DUAS estruturas que não compartilham a mesma escala.** Não existe uma lista única de 5 ou 7 níveis para "adição". Existem duas estruturas que se cruzam:
 1. **A escada de COMPETÊNCIAS (os degraus de dificuldade real).** É a sequência de nós do Grafo, do fácil ao difícil. Para adição/subtração, por exemplo: juntar concreto → counting-on → amigos do 10 → ponte do 10 → decomposição mental → 2 dígitos sem reserva → 2 díg com reserva → 3 díg → 4 díg. Cada um é um NÓ separado (N3.01, N3.03, N3.07…), destravado por pré-requisito. É aqui que mora o "do 1+0 até 4 algarismos" — são ~13 degraus de conteúdo, não 5.
-2. **A escada de PROFICIÊNCIA CONCEITUAL (1→5), DENTRO de cada competência.** Em cada degrau de conteúdo, a criança sai do concreto guiado até a execução/generalização independente. Em paralelo, o **Dojo** possui suas próprias 10 faixas e forças de automaticidade.
+2. **A escada de PROFICIÊNCIA (1→5), DENTRO de cada competência.** Em cada degrau de conteúdo, a criança sobe do concreto guiado à consolidação/generalização conceitual. **Separadamente**, o Dojo usa faixas/força próprias para automaticidade.
 
-**Como isso responde à sua pergunta:** um filho de 7 anos pode estar no degrau "2 dígitos com reserva" em proficiência 3, enquanto o degrau "4 dígitos" ainda está 🔒 travado — e isso é normal e correto. O sistema sabe em que competência × proficiência a criança está e, separadamente, qual faixa/força de Dojo já é segura. O grafo segura conteúdo por pré-requisito, não por idade; o Dojo treina repertório elegível, não compra unlock.
+**Como isso responde à sua pergunta:** um filho de 7 anos pode estar no degrau "2 dígitos com reserva" em proficiência 3, enquanto o degrau "4 dígitos" ainda está 🔒 travado (pré-requisito não cumprido) — e isso é normal e correto. O sistema SEMPRE sabe em que degrau × que proficiência a criança está, destrava o próximo só quando o atual amadurece, e pode continuar puxando degraus fáceis já dominados como aquecimento/revisão quando isso tiver função pedagógica. Um de 4 anos nem chega perto do degrau de 4 dígitos se os pré-requisitos ainda não existem; se uma criança pequena excepcionalmente demonstrar toda a cadeia, a idade não a segura. A progressão de procedimento no Dojo espelha repertórios seguros sem alterar o mastery conceitual.
 
-### 5.1-bis O RELÓGIO É SILENCIOSO NA JORNADA — velocidade não tranca compreensão *(v3.1, reafirmado v3.4)*
+### 5.1-bis O RELÓGIO É SILENCIOSO NA JORNADA — velocidade não tranca compreensão *(v3.1; reafirmado v3.4)*
 
-O `rt` (tempo de resposta) é medido em **toda** resposta, sempre. Mas na Jornada ele alimenta **apenas a dimensão de fluência/automaticidade** e a prescrição do Dojo. Ele **nunca**:
+O `rt` (tempo de resposta) é medido em **toda** resposta, sempre. Mas na Jornada ele alimenta **apenas a dimensão *fluência*** e a prescrição de treino. Ele **nunca**:
 
-- bloqueia a subida de nível conceitual;
+- bloqueia a subida de nível;
 - bloqueia a abertura da competência seguinte;
 - aparece como cronômetro visível;
 - conta como erro;
@@ -120,42 +122,52 @@ O `rt` (tempo de resposta) é medido em **toda** resposta, sempre. Mas na Jornad
 
 | Onde | O relógio | Cronômetro visível |
 |---|---|---|
-| **Jornada (Academia)** | medido em silêncio; sinal de fluência, não mastery | **nunca** |
-| **Oficina** | medido em silêncio; ignorado na decisão de alta | **nunca** |
-| **Dojo, antes dos 7 anos** | medido para força/fluência | **nunca** |
-| **Dojo, 7 anos ou mais** | medido para força/fluência | **opcional**, a criança liga e desliga |
+| **Jornada (Academia)** | medido em silêncio, alimenta só a dimensão fluência | **nunca** |
+| **Oficina** | medido em silêncio, ignorado na decisão de alta | **nunca** |
+| **Dojo, antes dos 7 anos** | medido em silêncio | **nunca** |
+| **Dojo, 7 anos ou mais** | medido | **opcional**, a criança liga e desliga |
 
-**Consequência normativa para as fichas:** nenhuma ficha pode declarar tempo como critério de domínio conceitual. O campo `rt_alvo` existe para alimentar a trilha/telemetria de fluência correspondente no Dojo — **não** para reprovar a criança na Jornada. Ficha que declarar "os acertos precisam ter tempo abaixo de X" no bloco Domínio está em violação e deve ser corrigida.
+**Consequência normativa para as fichas:** nenhuma ficha pode declarar tempo como critério de domínio conceitual. O campo `rt_alvo` da ficha existe para alimentar o `rt_max_s` da trilha FD correspondente no Dojo — **não** para reprovar a criança na Jornada. Ficha que declarar "os acertos precisam ter tempo abaixo de X" no bloco Domínio está em violação e deve ser corrigida.
 
 **Nunca mostrar comparação com outras crianças.** Só "seu melhor tempo".
 
 ---
 
-## §6. ANATOMIA DA MISSÃO PRESCRITA PELO SENSEI
+## §6. ANATOMIA DA SESSÃO — política atual pós-P22
 
-A antiga receita fixa do composer (aquecimento + resgate + fronteira + fluência + fecho em doses por idade) é **referência histórica de composição, não grade normativa**. Pós-P22, a Aula do Dia é montada por **estado do Learner Model**, com uma meta conceitual dominante e dose variável. Idade/série podem ajustar linguagem, alvo de toque e um limite confortável de sessão; **não escolhem conteúdo nem quantidade fixa de questões**.
+**Norma atual:** a Aula do Dia tem **uma meta conceitual dominante** e a dose é decidida pelo Learner Model/Sensei conforme estado, fricção, revisão vencida, lacuna causal e evidência recente. **Idade/série não escolhem a dose nem podam o currículo**; servem apenas a UX, linguagem e limites confortáveis de sessão. Um bloco de fluência só entra quando houver prescrição de Dojo pedagogicamente segura — não existe quota obrigatória.
 
-| Bloco possível | Função | Regra atual |
+| Bloco possível | Função | Regra pós-P22 |
 |---|---|---|
-| 🔥 Aquecimento | ativar repertório forte e dar vitória inicial | opcional/curto; erro não pune |
-| 🧠 Revisão/retention | recuperar competência devida por espaçamento | entra quando há revisão realmente vencida |
-| ⚔️ Fronteira | **meta conceitual dominante** | núcleo da missão quando o estado pede ensino/continuidade |
-| 🔧 Resgate/Oficina | atacar causa provada de uma dificuldade | pode ser micro-resgate ou **substituir a própria Aula do Dia** por Missão de Resgate |
-| 🥋 Fluência | automaticidade em fato/procedimento já seguro | só entra com prescrição explícita do Sensei/Dojo; não é quota obrigatória |
-| 🎉 Fecho | terminar em sucesso apropriado | preserva arco emocional sem inventar currículo paralelo |
+| 🔥 Aquecimento | ativar repertório forte / vitória inicial | curto e opcional, quando útil |
+| 🧠 Revisão | retenção espaçada realmente vencida | entra por evidência, não por receita fixa |
+| ⚔️ Fronteira | **meta conceitual dominante** | núcleo quando o estado pede ensino/continuidade |
+| 🔧 Resgate/Oficina | reconstruir causa provada | pode ser micro-resgate ou **converter a própria Aula do Dia em Oficina** |
+| 🥋 Fluência | automatizar fato/procedimento já seguro | só com prescrição explícita do Sensei/Dojo |
+| 🎉 Fecho | encerrar com sucesso apropriado | preserva arco emocional sem criar currículo paralelo |
 
-**Regras de composição:**
-- **Uma missão não é mistureba.** Há UMA meta conceitual dominante. Revisão, resgate ou fluência só entram se tiverem função causal explícita e não competirem com o alvo.
-- **Dose é por estado, não por idade.** O Sensei aumenta/reduz quantidade conforme evidência, fricção, necessidade de retenção e complexidade; domínio rápido pode elevar variação/representação em vez de simplesmente alongar a sessão.
-- **Se a Fronteira é uma competência virgem:** a microtutoria/I DO vem antes de exigir execução autônoma.
-- **Lacuna de pré-requisito é causal:** se a evidência aponta que a criança não consegue aproveitar a fronteira, a porta continua sendo "Aula do Dia", mas a missão pode ser convertida em Oficina/resgate prescrito. Não se mascara uma intervenção profunda como duas questões aleatórias no meio da aula.
-- **Fluência é decisão separada.** Alta precisão + RT lento pode gerar Dojo prescrito; baixa precisão conceitual pede diagnóstico/Oficina ou recuo de representação, não cronômetro.
+- **Se a Fronteira é uma competência em nível 1:** a sessão ABRE com a microtutoria (§7) antes de exigir execução autônoma — nunca jogar a criança num conceito virgem sem o I DO.
+- **Baixa precisão conceitual não vira cronômetro.** O Sensei reduz representação, sonda pré-requisito ou abre Oficina. **Alta precisão + RT lento** é sinal de fluência e pode gerar Dojo prescrito sem reprovar domínio.
+- **Fadiga/fricção alta reduz dose.** Domínio rápido pode aumentar variação/transferência em vez de simplesmente aumentar quantidade.
 
-**A aula é feita de PRÁTICA, não de palestra.** A explicação aparece na dose certa: microtutoria completa quando a competência é virgem ou a Oficina a exige; nos demais estados, a criança resolve e a ajuda entra pontual (Camada 1, §8) — o Tutor vai sumindo conforme ela sobe (fading, §5). O padrão é fluxo de exercícios; o ensino explícito é intervenção oportuna.
+**Registro histórico da receita pré-P22 — preservado, mas NÃO normativo:**
 
-**O Plano do Dia (o pai não precisa organizar nada).** Ao abrir, a criança encontra a missão já prescrita pelo Sensei — ela só toca em "Jogar". Nenhum adulto precisa escolher o que ela estuda; o sistema decide pela telemetria e pelo DAG. O painel dos pais mostra, em uma linha, o que foi feito e o que vem — para acompanhar, não para operar.
+| Bloco | O quê | F0 (4-5) | F1-F2 | F3-F4 |
+|---|---|---|---|---|
+| 🔥 Aquecimento | trilha forte, um nível abaixo; erro não pune | 1 | 2 | 2 |
+| 🧠 Resgate | banco de erros + trilha "fria" (mais dias sem prática) | 1 | 2 | 2 |
+| ⚔️ Fronteira | A competência-alvo (pré-reqs ok, menor precisão) — **aqui se aprende** | 3 | 4 | 4-5 |
+| ⚡ Fluência | Dojo diário (fatos da FD ativa) | 1 | 1 | 1-2 |
+| 🎉 Fecho | lógica/padrões — sair sorrindo | 1 | 1 | 1 |
+| **Total** | | **7 (~5-8 min)** | **10 (~10-12 min)** | **11-12 (~15 min)** |
 
-**Limite saudável, sem engaiolar quem quer mais.** A missão fecha em vitória e o app NÃO empurra "mais uma" (sem padrões de vício, sem nag). Mas se a criança QUISER continuar, ela pode: treino livre no Dojo dentro de faixas seguras, explorar a Jornada/mapa, ou reforçar o que já sabe. A regra: o app nunca puxa para prender; ele libera quando a criança pede. Um controle opcional dos pais pode definir teto de tempo. Fadiga/fricção alta reduz a dose e impede que ruído seja interpretado como lacuna.
+A tabela acima documenta a arquitetura que originou o composer e ajuda a entender seus blocos, mas **não governa mais quantidade por idade**. Também não autoriza misturar objetivos: o Sensei recalcula a missão por estado.
+
+**A aula é feita de PRÁTICA, não de palestra.** Dos blocos possíveis, a Fronteira é o principal lugar de aprender; o resto existe quando tem função explícita. E mesmo na Fronteira, a explicação aparece na dose certa: microtutoria completa só quando a competência é virgem (nível 1) ou a Oficina a exige; nos níveis seguintes, a criança resolve e a ajuda entra pontual (Camada 1, §8) — o Tutor vai sumindo conforme ela sobe (fading, §5). O padrão é fluxo de exercícios; o ensino é a exceção oportuna.
+
+**O Plano do Dia (o pai não precisa organizar nada).** Ao abrir, a criança encontra a missão do dia já montada pelo Motor — ela só toca em "Jogar". Nenhum adulto precisa escolher o que ela estuda; o sistema decide pela telemetria. O painel dos pais mostra, em uma linha, o que foi feito e o que vem — para acompanhar, não para operar.
+
+**Limite saudável, sem engaiolar quem quer mais.** A sessão do dia fecha em vitória e o app NÃO empurra "mais uma" (sem padrões de vício, sem nag — coerente com o cuidado de bem-estar). Mas se a criança QUISER continuar, ela pode: o app oferece, por iniciativa dela, treino livre no Dojo, uma prévia do próximo degrau, ou refazer/reforçar o que já sabe. A regra: o app nunca puxa para prender; ele libera quando a criança pede. Um controle opcional dos pais pode definir um teto de tempo. Excesso de dificuldade nova é barrado (a fadiga vira ruído, não sinal — §11); mas treinar o fácil à vontade é sempre permitido, porque aquece e não cansa.
 
 ---
 
@@ -205,7 +217,7 @@ tutorial: [
 
 **2. Toda primitiva publica sua API VISUAL** — a lista fechada de comandos que aceita, documentada no próprio componente e visível na galeria. Exemplos: TenFrame → `destacarFileira`, `destacarCelula`, `preencherAte`; InteractiveVertical → `destacarColuna`, `explodirDezena`, `mostrarVaiUm`; NumberLine → `saltarDe/Para`, `marcarPonto`; DragGroup → `piscarOrigem`, `piscarDestino`. É o equivalente visual do vocabulário de estados (§10.11): sem API declarada, cada exercício improvisa e nada é reaproveitável.
 
-**3. Um único player executa todas as coreografias.** Ele lê o timeline, dispara o áudio e envia os comandos à primitiva. Uma implementação só, usada pelos 84 exercícios — nunca lógica de tutorial dentro da primitiva (ela é "burra" de propósito) nem espalhada pelo GameLoop.
+**3. Um único player executa todas as coreografias.** Ele lê o timeline, dispara o áudio e envia os comandos à primitiva. Uma implementação só, usada por todas as fichas/exercícios autorais — nunca lógica de tutorial dentro da primitiva (ela é "burra" de propósito) nem espalhada pelo GameLoop.
 
 **4. Teste que impede a regressão silenciosa (obrigatório, entra na suíte §12.7):** para cada passo de cada coreografia, a chave usada em `show` **tem de existir na API visual da primitiva alvo**. Se alguém refatorar e derrubar `destacarFileira`, o teste quebra o build na hora, em vez da explicação sumir sem aviso. *(Foi exatamente essa a causa do sumiço do destaque da Caixa Mágica — a coreografia continuava mandando o sinal e a primitiva refatorada estava surda.)*
 
@@ -230,7 +242,7 @@ No máximo dois toques antes de seguir; a criança fica no comando o tempo todo:
    > **`explain` é DICA DE ERRO, não mensagem de acerto.** Ele só toca quando a criança errou. Portanto: nunca começa com elogio ("Muito bem!", "Você acertou!", "Isso!") e **nunca entrega a resposta**. ❌ *"Você acertou! Tínhamos 9, com mais 1 a caixa fechou 10."* (elogia quem errou e dá o resultado) · ✅ *"Olha os quadradinhos vazios da caixa e conte quantos faltam."* (aponta a estratégia, a criança conclui). O elogio pertence ao feedback de acerto, que é outro campo e outro momento.
 3. **Ainda errou** → mostra a resposta com uma frase de porquê, marca o item/fato como frágil e **AVANÇA na hora**. Nada de demonstração longa no meio do fluxo. Nunca trava.
 
-*Deslize vs. dificuldade (o motor decide o peso do toque):* erro rápido (`rt` baixo) num distrator qualquer = provável chute/deslize → toque mínimo. Erro com tag de misconception repetida ou padrão confirmado = dificuldade real → a dica do passo 2 já é a específica daquela confusão. **Lentidão isolada nunca conta como erro conceitual.**
+*Deslize vs. dificuldade (o motor decide o peso do toque):* erro rápido (`rt` baixo) num distrator qualquer = provável deslize → toque mínimo. **Lentidão isolada não é erro conceitual.** Distrator com tag de misconception repetida/padrão confirmado = dificuldade real → a dica do passo 2 já é a específica daquela confusão.
 
 ### 8.2 Camada 2 — remediação profunda (por PADRÃO, no momento certo)
 A demonstração narrada, a Mão Fantasma (fazer junto) e o microtutorial vivem AQUI — e **não disparam na questão isolada**. Disparam quando o Radar de Lacunas (§11.4) detecta padrão, e são entregues no momento que respeita o fluxo: **numa pausa natural, no fim da sessão, ou como Missão de Resgate na sessão seguinte** — jamais engasgando a criança no meio de uma questão. É o "depois de alguns exercícios, verificar os erros e aí trabalhar pontualmente".
@@ -390,40 +402,40 @@ Objetivo: poder mudar paleta, fonte, elementos e o estilo inteiro do app (ex.: v
 
 ---
 
-## §11. O MOTOR ADAPTATIVO / SENSEI
+## §11. O MOTOR ADAPTATIVO
 
 ### 11.1 O que ele lê (telemetria — campos já existentes)
-`lvl, maxLvl, dom, streak, bad, ok/tot, rt` (média móvel 70/30), `helpClicks`, `skips`, `lastDay`, banco de erros (`bank`), evidência multidimensional e estado `dojoTracks`. Novo/expansível conforme o catálogo: `errKind`/tag de misconception de forma canônica. **RT é dado de fluência; não é proxy de compreensão.**
+`lvl, maxLvl, dom, streak, bad, ok/tot, rt` (média móvel 70/30), `helpClicks`, `skips`, `lastDay`, banco de erros (`bank`). Novo campo por implementar: `errKind` (qual distrator-tipo a criança escolhe — alimenta §8.3). **No estado pós-P22, o Learner Model também materializa evidência multidimensional e `dojoTracks`; RT permanece sinal de fluência, não de compreensão.**
 
 ### 11.2 O que ele decide
 1. **Desbloqueio** (unlock_engine): regra única do §5. O mapa pinta ilhas: 🔒 travada · 🌱 aberta · 🔥 fronteira ativa · 👑 dominada.
-2. **Seleção da fronteira** (composer, mantido): entre abertas e não dominadas, usa evidência/precisão e o estado do DAG; o Sensei é a autoridade de recomendação, não cards paralelos por estrelas.
-3. **Revisão espaçada** (review_planner): intervalos **2 → 4 → 7 → 12 → 21 → 45 dias** por competência dominada (já especificados no código — agora executados de verdade). Falhou na revisão? Recolocar na fila de resgate/revisão conforme evidência; coroa conquistada não vira instrumento punitivo.
-4. **Dojo:** pilar autônomo com prática livre e **prescrição explícita pelo Sensei quando o estado de fluência pede**. Treina fatos/procedimentos em estado separado; uma sessão de Dojo pode atualizar força, precisão, RT e volume, mas nunca coroa compreensão nem altera o ponteiro curricular. **Não existe quota diária obrigatória de Dojo dentro de toda Aula do Dia.**
+2. **Seleção da fronteira** (composer, mantido): entre abertas e não dominadas, a de pior precisão; se tudo dominado, a próxima virgem do grafo.
+3. **Revisão espaçada** (review_planner): intervalos **2 → 4 → 7 → 12 → 21 → 45 dias** por competência dominada (já especificados no código — agora executados de verdade). Falhou na revisão? Recolocar na fila de resgate e, se falhar 2×, reabrir como fronteira (decair `dom` visualmente é proibido — a coroa fica, o treino volta).
+4. **Dojo:** pilar autônomo (a criança entra direto e treina à vontade) **e também prescritível pelo Sensei quando o estado de fluência pedir**; treina famílias de fluência/fatos/procedimentos e Jardim pré-simbólico. **Não existe quota diária obrigatória e o estado do Dojo não concede domínio conceitual.** Spec completa em `DOJO_SAGA.md`.
 5. **Anti-travamento (a resposta ao teu medo):**
-   - Sempre manter rotas/strands alternativas pedagogicamente abertas quando possível.
-   - Frustração/lacuna confirmada → o Sensei pode trocar representação, prescrever Oficina e avançar em outra strand em paralelo quando a dependência bloqueia uma rota.
-   - **Nunca** exigir velocidade/Dojo para destravar o próximo nó — fluência amadurece em paralelo.
-6. **Exploração avançada:** a criança/pai pode explorar o mapa com honestidade de evidência; isso não cria teto nem atalho etário. O grafo continua governado por pré-requisitos.
+   - Sempre ≥ 3 strands com ilha aberta. Se o grafo afunilar, abrir a próxima raiz de outra strand.
+   - Frustração detectada (2 sessões seguidas com precisão < 50% na mesma fronteira, ou `skips` ≥ 2) → trocar a fronteira de strand na próxima sessão + injetar microtutoria do pré-req mais frágil (menor `maxLvl` entre os pré-reqs).
+   - **Nunca** exigir nível 5 para destravar o próximo nó (3 basta) — fluência amadurece em paralelo no Dojo, não segura a fila.
+6. **Modo Gênio (existente como ideia):** o seletor de nível 🎯 permite pular com honestidade (bolinha só pinta com acerto — regra mantida). Para o pai explorar faixas acima da idade: liberar por strand, nunca global. **Isso não cria teto etário; é apenas atalho de exploração.**
 
 ### 11.3 A Bússola de Posicionamento (onde a criança COMEÇA)
-O problema real: uma criança entra no app — por qual competência começar? Perguntar a idade e chutar a faixa erra pros dois lados (quem tem lacunas afoga; quem está adiantado boceja). A resposta: **a idade dá um palpite de apresentação; a evidência decide.**
+O problema real: um filho de 6-7 anos entra no app — por qual competência começar? Perguntar a idade e chutar a faixa erra pros dois lados (quem tem lacunas afoga; quem está adiantado boceja). A resposta: **a idade dá o palpite inicial; a evidência decide.**
 
-- **Formato:** a primeira sessão é a "Expedição do Mapa" — 10-15 min disfarçados de jogo de exploração, sem cara de prova. 2-3 itens por strand principal (N1/N3 primeiro, depois AL, GE, GM), começando num ponto conservador/contextual.
-- **Movimento tipo busca adaptativa:** acertou com folga → avança a sonda; errou → recua até achar chão firme. Cada strand fecha quando encontra a **fronteira** (acerta aqui, hesita ali).
-- **Regras duras:** nenhum feedback de reprovação na expedição; sinais de frustração encerram a strand na hora e assumem a fronteira conservadora; pode pausar e continuar amanhã; o resultado NUNCA é mostrado como nota — vira o mapa inicial.
-- **Competências puladas na expedição ficam `presumido_dom`** (coroa cinza): valem provisoriamente como pré-requisito, MAS a primeira vez que aparecerem em revisão/resgate são testadas de verdade — se falharem, viram fronteira sem drama. Confiança com verificação.
-- **Reposicionamento contínuo:** a Bússola nunca "termina". Cada entrada em strand nova pode disparar mini-expedição. Errar é dado, nunca dano.
+- **Formato:** a primeira sessão é a "Expedição do Mapa" — 10-15 min disfarçados de jogo de exploração, sem cara de prova. 2-3 itens por strand principal (N1/N3 primeiro, depois AL, GE, GM), começando no ponto que a idade sugere.
+- **Movimento tipo busca binária:** acertou com folga → pula 2-3 competências à frente na strand; errou → recua até achar chão firme. Cada strand fecha quando encontra a **fronteira** (acerta aqui, hesita ali).
+- **Regras duras:** nenhum feedback de erro na expedição (toda resposta ganha "hmm, interessante!" do explorador); sinais de frustração (Manual §Criança Real) encerram a strand na hora e assumem a fronteira conservadora; pode pausar e continuar amanhã; o resultado NUNCA é mostrado como nota — vira o mapa inicial (ilhas já 👑 pelo que demonstrou, 🔥 na fronteira).
+- **Competências puladas na expedição ficam `presumido_dom`** (coroa cinza): valem como pré-requisito, MAS a primeira vez que aparecerem em revisão/resgate são testadas de verdade — se falharem, viram fronteira sem drama. Confiança com verificação.
+- **Reposicionamento contínuo:** a Bússola nunca "termina". Cada entrada em strand nova dispara uma mini-expedição (3-4 itens). Errar é dado, nunca dano.
 
 ### 11.4 O Radar de Lacunas (como detecta ONDE está falhando — e resgata)
 O motor não pergunta "quantos erros?"; pergunta **"qual é o PADRÃO do erro?"**. **Este radar é o gatilho da Camada 2 do §8** — a remediação profunda (demonstração, Mão Fantasma, microtutorial) só acontece quando um destes sensores acende, e é entregue numa pausa/fim de sessão/resgate, nunca no meio de uma questão. Erro solto na questão é tratado pela Camada 1 leve; é o PADRÃO que este radar captura que merece trabalho focado. Quatro sensores, em ordem de precisão:
 
-1. **Tag de misconception no distrator (o sensor de ouro).** Todo distrator gerado carrega a tag do erro que representa (o Grafo define os "Erros" de cada competência). A repetição consistente aumenta a hipótese de misconception e pode disparar microtutorial/resgate específico daquela confusão — não um genérico da competência.
-2. **Erro na competência ≠ lacuna na competência.** Padrão persistente no mesmo micro → o motor testa a HIPÓTESE de pré-requisito: injeta sonda apropriada ou converte a rota em resgate causal. Sonda falhou → a lacuna é lá atrás: nasce uma **Missão de Resgate**.
-3. **Ajuda e fricção como sinais de andaime; RT como fluência.** `helpClicks` repetidos podem antecipar apoio/microtutorial. **Acerto lento não é meio-erro, não alimenta Radar conceitual e não abre Oficina por si só:** RT alto com boa precisão alimenta `dojoTracks`/prescrição de fluência. RT muito baixo junto de erro pode ajudar a distinguir chute, mas nunca substitui a tag/evidência conceitual.
-4. **Ferrugem programada:** a revisão espaçada é o radar do esquecimento — falha repetida na revisão volta ao estado de prática/resgate apropriado, sem usar velocidade como veredito.
+1. **Tag de misconception no distrator (o sensor de ouro).** Todo distrator gerado carrega a tag do erro que representa (o Grafo define os "Erros" de cada competência; o gerador etiqueta: `off-by-one`, `soma-em-cima-e-embaixo`, `inverte-coluna`, `pensamento-aditivo`…). **2× a mesma tag em 5 questões = misconception ATIVA** → dispara o microtutorial específico daquela confusão (não o genérico da competência). É a diferença entre "errou divisão" e "está somando denominadores".
+2. **Erro na competência ≠ lacuna na competência.** 2 erros no mesmo micro → o motor testa a HIPÓTESE pré-requisito: injeta 1-2 questões-sonda do pré-req mais frágil (menor maxLvl) **dentro da própria aula** (os slots de resgate do composer, §6 — já existem, agora com este gatilho). Sonda falhou → a lacuna é lá atrás: nasce uma **Missão de Resgate**.
+3. **Ajuda como sismógrafo; RT como fluência:** `helpClicks` repetidos no mesmo tipo podem pedir microtutorial antes que o erro aconteça. **Acerto lento não conta como meio-erro conceitual e não alimenta o Radar por si só:** RT alto com compreensão correta alimenta fluência/Dojo. RT baixo combinado com erro pode ajudar a distinguir chute/deslize, mas não substitui a evidência causal da misconception.
+4. **Ferrugem programada:** a revisão espaçada (11.2.3) é o radar do esquecimento — falha na revisão reabre treino, nunca rebaixa coroa.
 
-**A Missão de Resgate (como o "voltar" funciona):** a competência/pré-requisito frágil vira missão especial — *"o Guardião da Ponte precisa de você de novo!"* — com dose definida pelo `rescuePlanner` e microtutorial quando necessário. **Enquanto isso a fronteira atual não precisa congelar todo o currículo:** o Sensei pode avançar em outra strand em paralelo (anti-travamento). Resgate concluído → a rota dependente volta a ficar disponível. Na prática: o app volta SEM a criança sentir que voltou.
+**A Missão de Resgate (como o "voltar" funciona):** a competência frágil vira uma missão especial na ilha antiga — *"o Guardião da Ponte precisa de você de novo!"* — com 4-6 questões + microtutorial. **Enquanto isso a fronteira atual NÃO fecha:** a criança segue avançando em outra strand em paralelo (anti-travamento, 11.2.5). Resgate concluído → a competência de cima destrava de novo o degrau que tinha ficado difícil. Na prática: o app volta SEM a criança sentir que voltou.
 
 ### 11.4-bis O Radar é PROBABILÍSTICO — a tag é hipótese, não veredito *(v3.1)*
 
@@ -433,7 +445,7 @@ Uma tag não é um fato sobre a criança; é uma **hipótese que acumula força*
 |---|---:|
 | erro isolado | 0.2 |
 | mesmo erro em **duas fichas diferentes** | 0.5 |
-| erro muito rápido com escolha inconsistente (chute provável) | 0.7 |
+| erro com `rt` muito curto (chute provável ou automatismo errado a confirmar por padrão) | 0.7 |
 | erro com padrão consistente dentro da mesma sessão | 0.9 |
 | erro que **persiste depois da dica** (`explain` já foi dado e a criança repete) | 1.0 |
 
@@ -452,46 +464,46 @@ Uma tag não é um fato sobre a criança; é uma **hipótese que acumula força*
 *(Esta seção substitui a aplicação de tag por evento único. Combina com o filtro motor do §8.3-bis: erro motor nem chega a gerar peso.)*
 
 ### 11.5 IDADE NUNCA TRAVA (a regra de ouro da progressão)
-As faixas F0-F4 do Grafo são **calibragem/contexto, não catraca**: podem ajustar o palpite inicial, a linguagem, o tamanho dos alvos, o skin e um limite confortável de sessão — e NADA mais. O que abre e fecha competência é evidência + pré-requisito pela política do grafo. Consequências explícitas:
-- Uma criança mais velha com lacunas de F0 treina competências de F0 — apresentadas com narrativa adequada à idade real; não existe humilhação por "voltar".
-- Uma criança pequena que voa pode entrar em competências mais avançadas sem trava etária. O sistema **nunca segura** por "não é da sua série" se os pré-requisitos/evidências estão prontos.
-- Estar "adiantado" ou "atrasado" não existe no vocabulário do app — nem nas telas, nem no painel dos pais. Existe fronteira: onde a criança está aprendendo AGORA.
+As faixas F0-F4 do Grafo são **calibragem, não catraca**: elas ajustam o palpite da Bússola, a duração confortável da sessão, o tom narrativo e o tamanho dos alvos — e NADA mais. O que abre e fecha competência é uma única coisa: **pré-requisito/evidência pela regra do grafo (§5)**. Consequências explícitas:
+- O filho de 7 com lacunas de F0 treina competências de F0 — apresentadas com narrativa da idade dele (o resgate é missão de herói, não "voltinha pro jardim"; os temas visuais são por idade, o conteúdo é por evidência).
+- A criança de 6 que voa entra em F2-F3 sem nenhuma trava etária. O sistema **nunca segura** por "não é da sua série": se os pré-reqs estão prontos, abre. (O Modo Gênio de 11.2.6 vira só um atalho de exploração para o pai — a progressão normal já não conhece teto de idade.)
+- Estar "adiantado" ou "atrasado" não existe no vocabulário do app — nem nas telas, nem no painel dos pais. Existe fronteira: onde a criança está aprendendo AGORA. O painel dos pais mostra o mapa por strand (pode estar em F3 de números e F1 de geometria — e isso é NORMAL e dito assim).
 
 ### 11.6 Como tudo isso APARECE NA TELA
 - **O mapa é o estado mental do motor, traduzido:** 🔒 travada · 🌱 aberta · 🔥 fronteira ativa · 👑 dominada · 👑cinza presumida · ✨ missão de resgate (ilha antiga brilhando com um "!").
-- **Voltar nunca parece voltar:** resgate = missão especial com recompensa própria; recuo de representação dentro da competência = invisível (a próxima sessão simplesmente flui melhor).
+- **Voltar nunca parece voltar:** resgate = missão especial com recompensa própria; recuo de nível dentro da competência = invisível (a próxima sessão simplesmente flui melhor).
 - **Proibições visuais:** nada de vermelho de reprovação, nada de "nível caiu", nada de barra de "atraso", nenhuma comparação com idade/série em NENHUMA tela da criança.
 - **O tutor fala o diagnóstico como convite:** *"percebi que os amigos do 10 estão escorregadios — bora afiar eles rapidinho?"* (nomeia a lacuna com carinho e já oferece o caminho).
 
 ### 11.7 O que ele NUNCA faz
-Não pune, não rebaixa `maxLvl`, não tranca tudo atrás de uma competência, não decide com IA em tempo real (determinismo, §2.9), não usa idade como teto curricular e não usa RT como evidência de incompreensão.
+Não pune, não rebaixa `maxLvl`, não tranca tudo atrás de uma competência, não decide com IA em tempo real (determinismo, §2.9), não usa RT para reprovar compreensão e não usa idade como teto curricular.
 
 ### 11.8 Como funciona na prática (a jornada que o esquema produz)
 
-Para ver o esquema vivo — as três funções, as estruturas separadas e o fading operando juntos ao longo do tempo. Dois personagens: **Téo, 4 anos** (não sabe nada) e **Rocha, 6 anos** (já faz continhas fáceis).
+Para ver o esquema vivo — as três funções, as duas estruturas e o fading operando juntos ao longo do tempo. Dois personagens: **Téo, 4 anos** (não sabe nada) e **Rocha, 6 anos** (já faz continhas fáceis).
 
-**Téo — dia 1.** Cria o aventureiro (nome, idade, mascote). Uma "expedição do mapa" curtinha, disfarçada de brincadeira, descobre que ele está em F0 puro. O Sensei prescreve a primeira missão: dar um osso para cada cachorro (N1.01), o Canhão de Balões para contar (N1.02), o Olhômetro piscando (N1.03). Tudo som e imagem, zero leitura, fecha em festa. O Dojo pode aparecer como Jardim quando pedagogicamente útil; sem Oficina se não há lacuna — aprender do zero não é remediar.
+**Téo — dia 1.** Cria o aventureiro (nome, idade, mascote). Uma "expedição do mapa" curtinha, disfarçada de brincadeira, descobre que ele está em F0 puro. O mapa abre com a Ilha das Quantidades 🌱. **Academia:** primeira missão — dar um osso para cada cachorro (N1.01), o Canhão de Balões para contar (N1.02), o Olhômetro piscando (N1.03). Tudo som e imagem, zero leitura, 6 minutos, fecha em festa. **Dojo:** ainda quase não aparece — no nível dele, o Jardim do Dojo traz só o Olhômetro-relâmpago, 2 minutos. Sem Oficina (não há lacuna, ele está aprendendo do zero).
 
-**Téo — semanas depois.** Ele domina contagem e cardinalidade (👑), o grafo destrava os Amigos do 10 e a soma concreta. A Academia ensina "juntar" com rosquinhas; o número e o símbolo aparecem junto da experiência concreta e vão desbotando ao longo dos dias até sobrar só `2+1`. O Dojo começa a crescer quando há repertório seguro. Um dia ele erra "qual tem mais" repetidamente por causa da ilusão piagetiana → **Oficina invisível**: itens ficam mais concretos, com gesto de parear, sem ele perceber que "mudou de lugar". Se a evidência causal persistir, o Sensei pode prescrever Missão de Resgate.
+**Téo — semanas depois.** Ele domina contagem e cardinalidade (👑), o grafo destrava os Amigos do 10 e a soma concreta. A Academia agora ensina "juntar" com rosquinhas; o número e o símbolo aparecem JUNTO das rosquinhas (concreto+abstrato sincronizado) e vão desbotando ao longo dos dias até sobrar só `2+1`. O Dojo começa a crescer: trilha FD de amigos do 10, blocos de 3 minutos quando o Sensei prescreve ou a criança escolhe treinar. Um dia ele erra "qual tem mais" três vezes seguidas por causa da ilusão piagetiana → **Oficina invisível**: os próximos itens ficam lentos e concretos, com o gesto de parear, sem ele perceber que "mudou de lugar". Volta ao fluxo sozinho.
 
-**Rocha — dia 1.** A expedição descobre que ele já conta, já soma até 10, mas ainda não tem os amigos do 10 estáveis. O mapa abre várias ilhas pelo que ele demonstrou e a fronteira 🔥 fica onde a evidência pede. **Ele NÃO precisa refazer o bebê:** idade não trava e proficiência também não o obriga a repetir o que já demonstrou. Onde ficou coroa cinza (presumido), o sistema verifica de verdade quando necessário; se passa, segue.
+**Rocha — dia 1.** A expedição descobre que ele já conta, já soma até 10, mas conta nos dedos e não sabe os amigos do 10. O mapa abre já adiantado — várias ilhas de F0/F1 saem marcadas 👑 (ele provou que sabe), a fronteira 🔥 fica em "amigos do 10" e "ponte do 10". **Ele NÃO precisa refazer o bebê:** a idade não trava, mas a proficiência também não o obriga a repetir o que dominou. Onde ficou coroa cinza (presumido), a Academia testa de verdade uma vez; se passa, segue. Nos degraus que ele tem frágeis, a Academia ensina e o Dojo treina quando há necessidade de automaticidade.
 
-**Rocha — curto/médio/longo prazo.** *Curto:* a ponte do 10 destrava soma mais complexa; a Academia ensina reagrupamento com bloco de dezena; o Dojo pode treinar o procedimento até ficar automático. *Médio:* multiplicação começa por "grupos de", vira array, vira tabuada; a fluência da tabuada acontece no Dojo, não na aula. Ele pode ficar forte em multiplicação e fraco em subtração com troca — o Motor **não trava tudo:** avança na multiplicação e, em paralelo, prescreve Resgate na subtração. *Longo:* divisão, frações, decimais — sempre o mesmo ciclo: Sensei escolhe a meta, Academia ensina, Dojo automatiza quando útil, Oficina reconstrói a causa quando há lacuna.
+**Rocha — curto/médio/longo prazo.** *Curto:* a ponte do 10 destrava a soma de 2 dígitos; a Academia ensina a conta armada com o bloco de dezena que explode; o Dojo (trilha PD-A) pode treinar o procedimento até sair liso. *Médio:* multiplicação começa por "grupos de", vira array, vira tabuada; a fluência da tabuada acontece no Dojo (FD4→FD5), não na aula. Ele fica forte em multiplicação e fraco em subtração com troca — o Motor **não trava tudo:** avança na multiplicação e, em paralelo, abre Missão de Resgate 🔧 na subtração. *Longo:* divisão, frações, decimais — sempre o mesmo ciclo (aprende na Academia, automatiza no Dojo quando necessário, conserta na Oficina), com o degrau de 4 dígitos abrindo só quando os pré-requisitos amadurecem. Aos 4 dígitos ele pode ter 9 anos; Téo, na mesma idade, estará onde a proficiência dele permitir — cada um no seu degrau × proficiência, nunca comparados.
 
-**A vitória inicial continua importante, mas não vira quota fixa.** Um aquecimento fácil pode preparar e acalmar; se a missão do estado não pede isso, não se inventa uma mistura só para cumprir receita. Fácil demais entedia se for a sessão inteira; fácil como ferramenta de regulação pode ser ótimo.
+**O aquecimento nunca vira catraca.** Todo dia pode começar com um degrau fácil já dominado quando o Sensei julgar útil — a ginástica leve que aquece a mente e dá a vitória inicial. Fácil demais entedia se for a sessão inteira; fácil no aquecimento acalma e prepara. É pedagogia, não enchimento — e não uma quota fixa por idade.
 
-**O que os pais veem, sem precisar operar nada.** O Plano do Dia já vem montado; o painel mostra, por strand, onde cada filho está, fatos/passos frágeis pelo nome, estado conceitual e fluência separada. O pai acompanha; o app conduz.
+**O que os pais veem, sem precisar operar nada.** O Plano do Dia já vem montado; o painel mostra, por strand, onde cada filho está (Rocha pode estar em F3 de números e F1 de geometria — e isso é dito como normal), os fatos/passos frágeis pelo nome, e as dimensões de domínio (§11.9). O pai acompanha; o app conduz.
 
-### 11.9 O estado conceitual é multidimensional; fluência corre em paralelo
-"Dominou" não é um sim/não obtido por uma resposta. O Motor modela evidência curricular em dimensões que o runtime já materializa:
-- **Compreensão** — janela de acertos no último nível segundo a regra autoral;
+### 11.9 O estado de domínio conceitual é multidimensional; fluência é paralela
+"Dominou" não é um sim/não. O Motor modela cada microcompetência em evidências que o runtime já coleta:
+- **Compreensão** — janela de acertos no último nível segundo a regra autoral (`acertos/de`);
 - **Independência** — sequência válida sem `helpClicks`;
 - **Evidência da ficha** — condição específica quando a competência exige uma prova particular;
-- **Estabilidade/Retenção** — confirmação em sessões espaçadas.
+- **Retenção/estabilidade** — confirmação em sessões separadas pelo espaçamento exigido.
 
-A coroa 👑 multidimensional exige essas dimensões conceituais maduras. **Fluência/automaticidade (precisão + RT + FactStrength/ProcStrength/força de Dojo) é um estado paralelo e NÃO é requisito da coroa.** O runtime ainda pode manter `fluencyStreak` como telemetria/compatibilidade, mas `updateMasteryEvidence` não o usa para `crownedBy = "multidimensional"`.
+A coroa 👑 multidimensional exige essas dimensões conceituais maduras. **Fluência (velocidade + precisão + força do Dojo) é estado paralelo e NÃO participa da decisão da coroa.** O runtime ainda registra `fluencyStreak`, mas `updateMasteryEvidence` coroa por compreensão + independência + evidência autoral + sessões espaçadas.
 
-Isso evita dois falsos diagnósticos: uma criança pode ter compreensão alta e fluência baixa (**entende mas é lenta → Sensei pode prescrever Dojo**), ou pode responder rápido por automatismo/chute sem evidência de conceito (**velocidade nunca compra mastery**). O painel dos pais deve mostrar compreensão/estabilidade e fluência como dimensões distintas, sem fundi-las numa única coroa.
+Isso mata dois falsos diagnósticos: uma criança pode ter compreensão alta e fluência baixa (**entende mas é lenta → mais Dojo, sem reprová-la**), ou pode responder rápido sem evidência de conceito (**velocidade nunca compra mastery**). O painel dos pais mostra o estado conceitual e a fluência separadamente.
 
 ---
 
@@ -503,11 +515,11 @@ Isso não é defeito de modelagem: é a realidade do currículo. Adição com re
 
 **As quatro regras dos nós de convergência:**
 
-**1. Abertura parcial (dois de três).** Quando a criança atinge nível 3 em **dois** dos três pré-requisitos, o nó de convergência **abre em modo restrito**: só experiências concretas/guiadas e apenas nos micros que não dependem do pré-requisito faltante. Ela conhece o território antes de dominá-lo, e a lacuna vira motivação em vez de muro.
+**1. Abertura parcial (dois de três).** Quando a criança atinge nível 3 em **dois** dos três pré-requisitos, o nó de convergência **abre em modo restrito**: só os níveis 1 e 2 (concreto guiado), e apenas nos micros que não dependem do pré-requisito faltante. Ela conhece o território antes de dominá-lo, e a lacuna vira motivação em vez de muro.
 
 **2. O Radar prioriza a lacuna bloqueante.** Se dois pré-requisitos estão firmes e um está fraco, esse terceiro sobe ao **topo da fila de resgate** — ele não está bloqueando um nó qualquer, está bloqueando um cruzamento. O peso na fila é proporcional a quantos nós ele destrava.
 
-**3. Nunca três frentes ao mesmo tempo.** O Composer/Sensei **jamais** ataca os três pré-requisitos faltantes na mesma sessão. Escolhe a causa prioritária e trabalha nela sem diluir a meta dominante.
+**3. Nunca três frentes ao mesmo tempo.** O Composer **jamais** coloca os três pré-requisitos faltantes numa mesma sessão. Escolhe o mais próximo do domínio e trabalha nele até destravar. Atacar três frentes divide o esforço e nenhuma avança.
 
 **4. Rota alternativa sempre visível.** Enquanto um nó de convergência está bloqueado, o mapa **destaca uma trilha paralela aberta** (outra strand). A criança nunca vê só cadeados — sempre há caminho, e ela sente que está avançando.
 
@@ -515,36 +527,36 @@ Isso não é defeito de modelagem: é a realidade do currículo. Adição com re
 
 ### 11.11 COMPETÊNCIAS DE ENRIQUECIMENTO — visitar sem obrigar
 
-Algumas competências são **valiosas mas não são pré-requisito de nada** (ex.: GM.03, dinheiro). O grafo não as impõe; a criança poderia atravessar parte do currículo sem nunca encontrá-las.
+Algumas competências são **valiosas mas não são pré-requisito de nada** (ex.: GM.03, dinheiro). O grafo não as impõe; a criança poderia atravessar o currículo sem nunca encontrá-las.
 
 **A solução não é criar dependência artificial.** Forçar "só faz multiplicação depois de dominar dinheiro" seria falso — e travaria a criança por um motivo que não existe.
 
-**A solução é o Sensei/Composer:**
-- competências de enriquecimento entram quando há oportunidade pedagógica/variedade sem competir com a meta dominante;
-- são **oferecidas, não impostas** — a criança pode adiar sem penalidade;
-- não criam unlock artificial;
-- ficam **visíveis no mapa** e podem ser dominadas com a mesma honestidade de evidência.
+**A solução é o Composer:**
+- competências de enriquecimento entram na sessão como **bloco de variedade**, com frequência regular
+- são **oferecidas, não impostas** — a criança pode adiar sem penalidade
+- têm **critério de domínio mais leve** (3 de 4 em vez de 4 de 4), porque o objetivo é contato e utilidade, não fluência
+- ficam **sempre visíveis no mapa**, com a coroa disponível — quem quiser dominar, domina
 
-**Por que isso funciona:** a criança que se interessa por dinheiro vai lá e conquista a competência. A que não se interessa não fica travada. **E ambas podem encontrá-la** — sem falsificar o DAG.
+**Por que isso funciona:** a criança que se interessa por dinheiro vai lá e conquista a coroa. A que não se interessa não fica travada. **E ambas encontram a competência** — o que não acontecia quando ela era invisível.
 
 ---
 
-### 11.12 PRIMEIRO CONTATO — mesma competência, apresentação adaptada; idade nunca reserva domínio
+### 11.12 PRIMEIRO CONTATO — a mesma competência, entradas de UX diferentes; domínio nunca reservado por idade
 
-Uma competência pode ser encontrada por crianças de idades diferentes. **A matemática, os pré-requisitos e o direito de demonstrar domínio são os mesmos.** O que pode mudar é a entrada de UX: vocabulário, skin, ritmo de narração, tamanho de alvo, quantidade inicial de andaime e contexto do exemplo.
+Uma competência disponível cedo (relógio, dinheiro) pode ser encontrada por uma criança de 5 anos e por uma de 8. **A mesma matemática e os mesmos pré-requisitos valem para as duas.** O que pode variar é a porta de entrada: linguagem, skin, ritmo, tamanho dos alvos, quantidade inicial de andaime e escopo da primeira exposição conforme o Learner Model — nunca uma catraca etária de domínio.
 
 | | Entrada mais concreta/assistida | Entrada mais enxuta |
 |---|---|---|
-| Escopo | mesma microcompetência, representação concreta | mesma microcompetência, representação adequada à evidência |
-| Andaime | Mão Fantasma/narração quando necessário | demonstração breve ou nenhuma |
-| Ritmo | mais pausado se o Learner Model pedir | ritmo padrão |
-| Objetivo | produzir evidência real | produzir evidência real |
+| Escopo | começa pelo mínimo conceitual que a evidência pede | pode entrar no escopo normal se a evidência sustenta |
+| Andaime | Mão Fantasma/narração quando necessária | demonstração breve ou nenhuma |
+| Ritmo | mais pausado quando o estado pede | ritmo padrão |
+| Objetivo | **evidência real da competência** | **evidência real da competência** |
 
-**Exemplo — o relógio (GM.04):** uma criança que ainda só compreende horas exatas começa por elas; outra que já demonstra isso pode entrar em meia-hora. A decisão vem do pré-requisito/evidência, não do aniversário.
+**Exemplo — o relógio (GM.04):** uma criança que ainda está construindo a ideia de hora encontra primeiro horas exatas, com o ponteiro dos minutos no 12. Outra que já demonstra isso pode avançar para meia-hora. A decisão vem da evidência/pré-requisitos, não do aniversário.
 
-**Exemplo — o dinheiro (GM.03):** reconhecer moedas, comparar valores e operar troco entram conforme as competências matemáticas de base estejam disponíveis. A idade escolhe a narrativa, não a catraca.
+**Exemplo — o dinheiro (GM.03):** reconhecer moedas pode ser o primeiro contato; somar valores entra quando a criança já soma — o que o pré-requisito N3.09 garante.
 
-**Regra dura pós-P22:** nenhuma ficha reserva "domínio pleno" para quando a criança chegar a determinada faixa etária. Se ela demonstra os pré-requisitos e as evidências da competência, pode avançar e dominar. Se uma criança mais velha precisa de base anterior, recebe a mesma matemática com uma casca apropriada à idade (§12.5-ter).
+**A regra dura:** idade escolhe apresentação e conforto de UX; **não reserva domínio pleno para o futuro**. Se a criança demonstrar os pré-requisitos e as evidências da ficha, pode dominar a competência. Uma criança mais velha em conteúdo inicial recebe a mesma matemática em uma casca apropriada à idade (§12.5-ter).
 
 ## §12. CONTRATOS DE GERAÇÃO (a IA preenche, não inventa)
 
@@ -579,38 +591,38 @@ tutorial: [ ...TutSteps... ]
 ### 12.2 Contrato do gerador (imutável — §2.8)
 `gen(lvl 1-5) → Question` com: `kind` do catálogo §9; params dentro do micro ativo; resposta exatamente 1× nas options; distratores = `erros_tipicos` (aleatório só completa); `howto` + `explain` sempre; `prompt` ≤ 12 palavras faladas (F0-F1); nunca valores negativos antes de N7; função pura ~30 linhas com helpers (`ri`, `pick`, `numOpts`).
 
-### 12.2-bis VOCABULÁRIO: NÍVEL CONCEITUAL × FAIXA DO DOJO — escalas independentes
+### 12.2-bis VOCABULÁRIO: NÍVEL (competência curricular) × FAIXA (Dojo) — não confundir
 
-Duas estruturas coexistem e medem coisas diferentes. **Não formam uma escada 1→5 compartilhada entre Jornada e Dojo.**
+Duas estruturas coexistem no sistema e medem coisas diferentes. Usar a mesma palavra para as duas foi fonte real de confusão; ficam nomes distintos **e não formam uma escada compartilhada 1→5**:
 
-| | **NÍVEL** — competência curricular | **FAIXA** — Dojo |
+| | **NÍVEL** — competência/Jornada | **FAIXA** — Dojo |
 |---|---|---|
-| Quantos | **1 a 5** | **1 a 10** por templo/família |
-| Mede | representação/proficiência **conceitual** | dificuldade/automaticidade do repertório já seguro |
-| Estado | `Progress.lvl/maxLvl/dom/masteryEvidence` | `dojoTracks`, FactStrength/ProcStrength, precisão, RT, volume |
+| Quantos | **1 a 5** | **1 a 10** |
+| Mede | **proficiência conceitual/representação** | **dificuldade + automaticidade** do repertório seguro |
+| Eixo | concreto → pictórico → abstrato → generalização | magnitude/família + FactStrength/ProcStrength/RT |
 | Pergunta | *"ela ENTENDE e demonstra esta competência?"* | *"o que já entendeu está automático em qual faixa?"* |
-| Autoridade | Grafo + Learner Model/Sensei | política/prescrição do Dojo + prática manual segura |
+| Estado | `Progress.lvl/maxLvl/dom/masteryEvidence` | `dojoTracks` e forças do Dojo |
 
-**São independentes.** Uma criança pode compreender uma competência em alto nível e ainda ter fluência baixa; também pode ter muita prática manual numa faixa sem isso mover o ponteiro conceitual. **Dojo nunca altera `lvl`, `maxLvl`, `dom` ou coroa.**
+**São independentes.** Uma criança pode estar no nível 5 conceitual de uma competência e ainda ter fluência baixa numa faixa do Dojo; também pode praticar manualmente a faixa atual sem isso mover `lvl`, `dom` ou o ponteiro adaptativo.
 
-**Divisão de trabalho:** o **Sensei** prescreve a próxima necessidade; a **Jornada** mostra o mapa e oferece experiências conceituais; o **Dojo** automatiza em estado separado; a **Oficina** recupera causa. A próxima competência abre por evidência/pré-requisito, não por RT nem por completar uma faixa do Dojo.
+**Divisão de trabalho:** a **Jornada** mostra o mapa e oferece experiências conceituais; o **Sensei** prescreve o próximo passo; o **Dojo** automatiza em estado separado; a **Oficina** recupera a causa de uma lacuna. Dojo nunca “leva do nível 3 ao 5” da mesma escala curricular.
 
-### 12.3 O nível conceitual dita a REPRESENTAÇÃO, não a velocidade
-Erro clássico de implementação: tratar `lvl` apenas como "números maiores" ou usar o último nível como sinônimo de cronômetro. Isso destrói o CPA e mistura compreensão com fluência. **O nível muda primeiro COMO o conteúdo aparece; velocidade fica no Dojo:**
+### 12.3 O nível dita a REPRESENTAÇÃO, não só o tamanho do número
+Erro clássico de implementação: tratar `lvl` apenas como "números maiores". Isso destrói o CPA e deixa o fading (§5) sem nada para operar. **O nível muda primeiro COMO o conteúdo aparece, e só depois a magnitude; velocidade é dimensão separada do Dojo:**
 
 | lvl | Representação (o que muda na tela) | Magnitude |
 |---|---|---|
 | 1 | Concreto guiado — objetos manipuláveis + Mão Fantasma narrando | mínima |
 | 2 | Concreto autônomo — objetos manipuláveis, dica ativa | pequena |
 | 3 | Pictórico — representação estruturada (moldura, barra, reta), sem objeto solto | média |
-| 4 | Abstrato — símbolos, sem apoio visual por padrão | cheia |
+| 4 | Abstrato — só símbolos, sem apoio visual por padrão | cheia |
 | 5 | Consolidação/generalização — abstrato independente, variação/transferência, evidência autoral | cheia |
 
 Todo gerador declara qual `kind`/primitiva usar **por nível** (pode ser a mesma primitiva com props diferentes). Um gerador que devolve o mesmo `kind` nos 5 níveis está errado, salvo justificativa explícita.
 
-**Nem toda competência tem forma abstrata — e forçar uma é pior que não ter.** Competências **perceptuais/fundacionais** (correspondência 1-a-1, subitização, canto numérico) não possuem versão simbólica: nelas os níveis 4-5 significam **independência, estabilidade e transferência dentro da própria habilidade perceptual**, não "virar símbolo" nem "ser mais rápido". Nessas, o gerador declara `excecaoCPA: "perceptual"` com uma linha de justificativa, e a suíte aceita. Automaticidade/RT, se pertinente, fica no Jardim/Dojo.
+**Nem toda competência tem forma abstrata — e forçar uma é pior que não ter.** Competências **perceptuais/fundacionais** (correspondência 1-a-1, subitização, canto numérico) não possuem versão simbólica: nelas os níveis 4-5 significam **independência, estabilidade e transferência dentro da própria habilidade perceptual**, não "virar símbolo" e nem "mais rápido". Nessas, o gerador declara `excecaoCPA: "perceptual"` com uma linha de justificativa, e a suíte aceita. Automaticidade/RT, quando pertinente, fica no Jardim/Dojo.
 
-**Aviso contra a variação de fachada (armadilha da métrica).** O teste verifica que o `kind` varia; um script pode satisfazer isso mecanicamente e **destruir a pedagogia ao mesmo tempo** — por exemplo, saltar de `count` (concreto) direto para `plain` (abstrato) pulando o degrau pictórico. Isso passa no teste e quebra a escada. **A progressão de cada competência vem da escada CPA daquele assunto no `MANUAL_DIDATICO_SAGA.md`, nunca de uma regra mecânica.** Correção em lote por script é permitida para campos repetitivos (`howto`, `explain`, `audioPrompt`); a escolha de `kind` por nível é decisão pedagógica e passa por revisão contra o Manual.
+**Aviso contra a variação de fachada (armadilha da métrica).** O teste verifica que o `kind` varia; um script pode satisfazer isso mecanicamente e **destruir a pedagogia ao mesmo tempo** — por exemplo, saltar de `count` (concreto) direto para `plain` (abstrato) pulando o degrau pictórico. Isso passa no teste e quebra a escada. **A progressão de cada competência vem da escada CPA daquele assunto no `MANUAL_DIDATICO_SAGA.md`, nunca de uma regra mecânica.** Correção em lote por script é permitida para campos repetitivos (`howto`, `explain`, `audioPrompt`); a escolha de `kind` por nível é decisão pedagógica e passa por revisão humana contra o Manual.
 
 ### 12.3-bis DIVULGAÇÃO PROGRESSIVA — uma tela nunca mostra tudo de uma vez *(v3.1)*
 
@@ -626,7 +638,7 @@ Há fichas que reúnem **três ou mais representações simultâneas** — mater
 | 4 | a conta, com o material só como apoio consultável |
 | 5 | só a conta |
 
-**A escada de revelação é INDEPENDENTE da escada de níveis.** Uma criança no nível 4 que volta pela Oficina reentra no degrau de revelação apropriado à dificuldade, sem perder o nível conquistado. São dois eixos de apresentação, e nenhum deles é a faixa do Dojo (§12.2-bis).
+**A escada de revelação é INDEPENDENTE da escada de níveis.** Uma criança no nível 4 que volta pela Oficina reentra no degrau de revelação apropriado à dificuldade, sem perder o nível conquistado. São dois eixos, e ambos continuam separados da faixa do Dojo (§12.2-bis).
 
 **Fichas obrigadas a declarar a escada de revelação:** F35, F39, F40, F68, F69, F76 — e qualquer ficha nova que empilhe 3+ representações.
 
@@ -648,19 +660,19 @@ Cada formato serve a um momento; trocá-los é erro.
 
 ### 12.5-ter CASCA VISUAL POR IDADE — a trilha é a mesma, a roupa não *(v3.1 · direção futura documentada)*
 
-O grafo é governado por proficiência, nunca por idade (§11.5). Isso cria um caso previsível: **uma criança de 10 anos que ainda está em F1**. Se ela vir dinossauro, balão e mascote falando fininho, ela abandona — não por dificuldade, por inadequação da embalagem.
+O grafo é governado por proficiência, nunca por idade (§11.5). Isso cria um caso previsível: **uma criança de 10 anos que ainda está em F1**. Se ela vir dinossauro, balão e mascote falando fininho, ela abandona — não por dificuldade, por vergonha.
 
 **Solução: desacoplar a trilha de proficiência da casca estética.** A matemática é idêntica; muda a embalagem.
 
 | Casca | Idade estética | Características |
 |---|---|---|
-| **Kids** | 4-6 | cores fortes, mascote presente, sons divertidos, voz mais lúdica |
+| **Kids** | 4-6 | cores fortes, mascote presente, sons divertidos, voz cantada |
 | **Explorer** | 7-9 | aventura, mapas, missões, mascote discreto |
-| **Lab** | 10+ | minimalista, "enigma"/"laboratório"/"desafio", estatísticas pessoais, avatar |
+| **Lab** | 10+ | minimalista, "enigma"/"laboratório"/"desafio", sem mascote, estatísticas pessoais, avatar |
 
-A casca é escolhida pela **idade real**, nunca pela faixa da competência. Uma criança de 11 anos em N1.11 (amigos do 10) recebe a competência inteira, com a evidência e o nível adequados, dentro da casca **Lab**. **A casca não reduz escopo, não reserva domínio e não altera pré-requisitos.**
+A casca é escolhida pela **idade real**, nunca pela faixa da competência. Uma criança de 11 anos em N1.11 (amigos do 10) recebe a competência inteira, com os mesmos 5 níveis e a mesma ficha, dentro da casca **Lab**.
 
-**Status: direção futura documentada.** A skin já é cosmética e por sessão (§12.5), então a casca entra como mais uma dimensão do mesmo mecanismo. Registrado aqui para que nenhuma ficha assuma vocabulário infantil como obrigatório.
+**Status: direção futura documentada**, como o modo caneta (§12.11-bis). Não bloqueia nada agora — a skin já é cosmética e por sessão (§12.5), então a casca entra como mais uma dimensão do mesmo mecanismo. Registrado aqui para que nenhuma ficha assuma vocabulário infantil como obrigatório.
 
 ### 12.6 Mapa: mecânica do Manual → primitiva de UI
 Reutilizar sempre; criar primitiva nova só quando a interação é genuinamente inédita.
@@ -686,30 +698,30 @@ Reutilizar sempre; criar primitiva nova só quando a interação é genuinamente
 Faltam 4 primitivas: **Balança, Relógio, Quadrado100, ShapeCanvas.** Nenhuma trava N3 — dá para massificar N3 com o que já existe.
 
 ### 12.7 Testes de contrato (obrigatório antes de massificar)
-Com 90 competências × 5 níveis, inspeção manual não escala. Uma suíte automática varre **todos** e falha se: a resposta não aparece exatamente 1× nas `options` (kinds de seleção); houver opções duplicadas; algum valor sair dos `params` do micro; faltar `howto`, `explain` ou `audioPrompt`; alguma tag não vier do registro `MisconceptionTag`; o `kind` não existir no catálogo §9; o `prompt` passar de 12 palavras em F0-F1; aparecer negativo antes de N7; ou o gerador devolver o mesmo `kind` nos 5 níveis sem exceção justificada. Um gerador que não passa não entra no `GENERATOR_MAP`.
+Com 90 competências × 5 níveis, inspeção manual não escala. Uma suíte automática varre **todos** e falha se: a resposta não aparece exatamente 1× nas `options` (kinds de seleção); houver opções duplicadas; algum valor sair dos `params` do micro; faltar `howto`, `explain` ou `audioPrompt`; alguma tag não vier do registro `MisconceptionTag`; o `kind` não existir no catálogo §9; o `prompt` passar de 12 palavras em F0-F1; aparecer negativo antes de N7; ou o gerador devolver o mesmo `kind` nos 5 níveis. Um gerador que não passa não entra no `GENERATOR_MAP`.
 
 ### 12.8 DESCOBERTA EM LOTE (as 4 ferramentas que quebram o ciclo de tentativa e erro)
 
 Sintoma a evitar: descobrir problemas **um de cada vez**, por acaso, olhando a criança usar. Isso é lento, caro e desmoralizante. As quatro ferramentas abaixo transformam descoberta acidental em descoberta **em lote**, antes de qualquer criança tocar na tela. Nenhuma produção em massa começa sem elas.
 
-**1. Definição de Pronto (DoD) por competência.** Uma competência só é considerada pronta quando: tem gerador nos 5 níveis **com kinds/representações variando** conforme o CPA (§12.3) ou exceção justificada; tem `howto`, `explain` e `audioPrompt` em todos; tem distratores com tag do registro (seleção) ou `misconceptionFrom` (produção, §12.4); tem **coreografia declarada no nível 1** (§7.4); os params ficam dentro do YAML; e passa a suíte inteira. Sem DoD explícito, produzem-se 90 competências pela metade e ninguém sabe quais.
+**1. Definição de Pronto (DoD) por competência.** Uma competência só é considerada pronta quando: tem gerador nos 5 níveis **com kinds variando** conforme o CPA (§12.3); tem `howto`, `explain` e `audioPrompt` em todos; tem distratores com tag do registro (seleção) ou `misconceptionFrom` (produção, §12.4); tem **coreografia declarada no nível 1** (§7.4); os params ficam dentro do YAML; e passa a suíte inteira. Sem DoD explícito, produzem-se 90 competências pela metade e ninguém sabe quais.
 
 **2. Snapshot dourado (anti-regressão).** Cada gerador tem sua saída congelada com semente fixa. Qualquer alteração futura aparece como **diff visível** em vez de mudança silenciosa. É a vacina direta contra o caso do destaque da Caixa Mágica: o que funcionava e sumiu passa a quebrar o teste na hora.
 
-**3. Aprendiz simulado (a ferramenta mais poderosa).** Um script cria crianças falsas com perfis definidos — *4 anos do zero*, *6 anos com lacuna em amigos do 10*, *tropeça em reagrupamento*, *acerta tudo rápido* — e roda cada uma por 30/60/90 sessões, respondendo por um modelo de probabilidade (inclusive escolhendo o distrator de misconception às vezes). O relatório responde em segundos o que levaria meses observando: **alguém travou? onde?** · quantas sessões até dominar X? · o Radar disparou demais ou de menos? · a composição da sessão ficou dentro da política? · alguma competência nunca foi visitada? · as trilhas do Dojo abriram em tempo razoável? · a dificuldade subiu suave ou em degrau? Isso troca "descobri porque meu filho travou" por "descobri em 1000 sessões simuladas".
+**3. Aprendiz simulado (a ferramenta mais poderosa).** Um script cria crianças falsas com perfis definidos — *4 anos do zero*, *6 anos com lacuna em amigos do 10*, *tropeça em reagrupamento*, *acerta tudo rápido* — e roda cada uma por 30/60/90 sessões, respondendo por um modelo de probabilidade (inclusive escolhendo o distrator de misconception às vezes). O relatório responde em segundos o que levaria meses observando: **alguém travou? onde?** · quantas sessões até dominar X? · o Radar disparou demais ou de menos? · a composição da sessão ficou dentro da proporção? · alguma competência nunca foi visitada? · as trilhas do Dojo abriram em tempo razoável? · a dificuldade subiu suave ou em degrau? Isso troca "descobri porque meu filho travou" por "descobri em 1000 sessões simuladas".
 
-**3-bis. Simulação estreita não valida pedagogia.** Um simulador que roda **uma competência isolada**, sem Sensei/Composer, sem Oficina, sem sonda de pré-requisito e sem outras strands abertas, **não pode ser usado para concluir nada sobre travamento** — nesse recorte a criança com lacuna trava por construção, e isso não prova que o motor funciona; prova que o recorte é incompleto. Para valer como evidência, a simulação exercita a **orquestração inteira**: Sensei/Composer montando sessões, Radar disparando Camada 2, Oficina resgatando, sonda do pré-requisito, Dojo separado e avanço paralelo em outra strand (§11.2.5). Enquanto for estreita, o relatório declara a limitação em destaque.
+**3-bis. Simulação estreita não valida pedagogia.** Um simulador que roda **uma competência isolada**, sem Composer, sem Oficina, sem sonda de pré-requisito e sem outras strands abertas, **não pode ser usado para concluir nada sobre travamento** — nesse recorte a criança com lacuna trava por construção, e isso não prova que o motor funciona; prova que o recorte é incompleto. Para valer como evidência, a simulação exercita a **orquestração inteira**: Composer montando sessões, Radar disparando Camada 2, Oficina resgatando, sonda do pré-requisito e avanço paralelo em outra strand (§11.2.5). Enquanto for estreita, o relatório declara a limitação em destaque.
 
 **3-ter. Uma rodada não é evidência — a simulação é estocástica.** Se o mesmo perfil termina em 55 sessões numa execução e 73 noutra, o número isolado não significa nada. Todo relatório de simulação declara **semente, data/hora e versão dos motores**, e reporta **mediana e faixa sobre ≥30 execuções**, não uma amostra. Conclusão tirada de uma rodada só é anedota com aparência de dado.
 
 **3-quater. O simulador precisa de LINHA DE BASE de plausibilidade.** Número de simulação só vale depois de comparado com o que se espera do mundo real. Se o resultado contraria a realidade pedagógica — ou oscila em ordem de grandeza entre versões — a conclusão não é "o motor é assim", é **"o simulador está errado OU o ritmo do produto está errado"**, e é obrigatório descobrir qual antes de decidir qualquer coisa com aquele dado. Dois sinais de alarme: **(a) incoerência interna** — um perfil COM lacuna dominar mais rápido que um perfil sem lacuna indica métrica medindo trajetos diferentes ou perfis mal configurados; **(b) deriva entre versões** — a mesma medida saltar de 18 → 55 → 73 → 367 sessões significa que ela nunca foi calibrada. Toda métrica declara **o que está medindo** (trajeto completo? só o nó final?) e sua **faixa plausível esperada**; fora da faixa, investiga-se antes de reportar.
 
-**4. Invariantes do sistema (asserções que valem sempre).** Testes que rodam sobre estados aleatórios de progresso e falham se qualquer regra do cânone for violada: a criança **nunca fica sem nada para fazer** (§11.5); a missão **fecha com sucesso apropriado** (§6); o Radar **não dispara em erro isolado**, só em padrão (§8.2); o Sensei escolhe **uma meta dominante**; nenhum nó abre sem a política de pré-requisito; Dojo nunca move mastery conceitual; prática manual nunca move o ponteiro adaptativo do Tutor.
+**4. Invariantes do sistema (asserções que valem sempre).** Testes que rodam sobre estados aleatórios de progresso e falham se qualquer regra do cânone for violada: a criança **nunca fica sem nada para fazer** (§11.5); a sessão **sempre termina em item fácil** (§6); o Radar **não dispara em erro isolado**, só em padrão (§8.2); o Composer pega **uma única fronteira**; nenhum nó abre com pré-requisito abaixo do limiar; nenhuma trilha de fluência abre sem repertório conceitual seguro. **Prática manual no Dojo nunca move o ponteiro adaptativo do Tutor.**
 
 **Regra contra o falso verde:** todo teste deve verificar **presença**, não apenas validade. Um teste de coreografia que passa porque *nenhum* gerador declara coreografia não está passando — está cego. Se a competência exige coreografia no nível 1, a ausência é falha, não silêncio.
 
 ### 12.9 Prompt-contrato para a IA de autoria
-Ao pedir conteúdo novo a qualquer IA (Gemini/Claude), o prompt é sempre: *"Preencha o contrato YAML da competência X seguindo a Bíblia §12 e o Grafo. NÃO crie competências, IDs, kinds ou faixas de parâmetros novos. Se algo parecer faltar no grafo, PARE e reporte a lacuna."* — a IA como operária do contrato, jamais arquiteta improvisada. (As skills `.claude/skills/nova-trilha` e `nova-materia` devem ser atualizadas para apontar para este documento.)
+Ao pedir conteúdo novo a qualquer IA (Gemini/Claude), o prompt é sempre: *"Preencha o contrato YAML da competência X seguindo a Bíblia §12 e o Grafo. NÃO crie competências, IDs, kinds ou faixas de parâmetros novos. Se algo parecer faltar no grafo, PARE e reporte a lacuna."* — a IA como operária do contrato, jamais arquiteta improvisada. (As skills `.claude/skills/nova-trilha` e `nova-materia` devem ser atualizadas para apontarem para este documento.)
 
 ---
 
@@ -729,28 +741,28 @@ O princípio §2.9 (determinismo na aula, IA na autoria) continua valendo — ma
 
 ### 12.11 ENTRADA POSICIONAL — quando o LUGAR da resposta é o conteúdo
 
-Em fichas de conta armada, divisão longa, number bond, coordenadas e decimais, a resposta não é apenas um valor: é **um valor num lugar**. Nessas fichas, o método de entrada **é decisão pedagógica**, não detalhe de interface.
+Em 28 das 92 fichas históricas mapeadas nesta seção a resposta não é um valor: é **um valor num lugar** (conta armada, divisão longa, number bond, coordenadas, decimais com vírgula). A contagem global atual de fichas é 94; este número de 28 descreve a classe posicional levantada quando a seção foi criada. Nessas fichas, o método de entrada **é decisão pedagógica**, não detalhe de interface.
 
 **A regra: a granularidade da resposta segue o que está sendo ensinado.**
 
-| Nível conceitual | O que se ensina | Entrada |
+| Nível | O que se ensina | Entrada |
 |---|---|---|
 | **1-2 concreto** | *a troca* — dez unidades viram uma dezena | **manipular o material.** A criança agrupa e troca com as mãos; o resultado emerge da ação. Não há digitação. |
-| **3-4 abstrato** | *o procedimento* — coluna por coluna, direita→esquerda | **opções por coluna.** A coluna ativa acende e mostra opções embaixo. Ela toca. Auto-avança para a próxima coluna. |
-| **5 consolidação/generalização** | procedimento independente e variações | **resposta apropriada à evidência da ficha**, sem transformar RT em gate conceitual. Prática cronometrada pertence ao Dojo. |
+| **3-4 abstrato** | *o procedimento* — coluna por coluna, direita→esquerda | **opções por coluna.** A coluna ativa acende e mostra 3 opções embaixo. Ela toca. Auto-avança para a próxima coluna. |
+| **5 consolidação/generalização** | *o procedimento independente* e sua transferência | **resposta inteira/opções quando isso prova a ficha**, sem RT como gate conceitual. Prática cronometrada pertence ao Dojo. |
 
 **Por que opções por coluna, e não digitação:**
 - digitar dígito a dígito exige selecionar campo, e **campo selecionado é a maior fonte de bug** desta classe de exercício
-- digitação é lenta e imprecisa no tablet, e pode contaminar a medida da matemática
+- digitação é lenta e imprecisa no tablet, e pode contaminar a medida do procedimento
 - **as opções exigem atenção real**: com distratores bem construídos (12 · 11 · 13), a criança precisa verificar de fato — não é chute
-- cada opção errada carrega **tag de misconception** — o que a digitação livre não permite diagnosticar com a mesma precisão
+- cada opção errada carrega **tag de misconception** — o que a digitação livre não permite diagnosticar com precisão
 
 **Por que ainda assim é coluna por coluna, e não resposta inteira:**
 No nível 3-4, a competência **é o procedimento**. Responder o resultado inteiro de uma vez pula exatamente o que se está ensinando. A coluna ativa preserva a ordem direita→esquerda e força cada decisão.
 
 **O vai-um / empréstimo:** também por toque, numa célula **acima e à esquerda** da coluna ativa, visivelmente **menor** (cerca de 60% do tamanho dos dígitos principais). O tamanho menor não é estética — sinaliza *"isto é anotação de trabalho, não parte do resultado"*, a mesma convenção do caderno.
 
-**Regra de ouro desta seção:** nenhuma ficha exige que a criança **digite** algarismo por algarismo. Ou ela manipula (concreto), ou ela toca em opções/usa o modo de resposta adequado (abstrato). Se a meta for velocidade/automaticidade, a sessão é Dojo e usa a política própria do Dojo.
+**Regra de ouro desta seção:** nenhuma ficha exige que a criança **digite** algarismo por algarismo. Ou ela manipula (concreto), ou ela toca em opções (abstrato). **Se a meta for velocidade, a sessão é Dojo e usa estado/política próprios; o nível 5 conceitual não se torna cronômetro.**
 
 ### 12.11-bis MODO CANETA — direção futura documentada
 
@@ -760,7 +772,7 @@ A solução ideal para algoritmos armados é a criança **escrever à mão** na 
 
 **Por que NÃO agora:** reconhecimento de escrita infantil é problema difícil (traçado instável, números espelhados, dígitos ambíguos), e um falso negativo é devastador — a criança acertou e o app disse que errou. Implementar mal é pior que não ter.
 
-**Fica registrado como expansão planejada**, não como pendência. Quando entrar, será **um modo adicional** nas fichas de algoritmo armado (F35, F39, F40, F69, F71, F76), sem substituir os modos atuais.
+**Fica registrado como expansão planejada**, não como pendência. Quando entrar, será **um modo adicional** nas fichas de algoritmo armado (F35, F39, F40, F69, F71, F76), sem substituir o modo por opções — que continua servindo ao Dojo quando a fluência exigir resposta rápida.
 
 ### 12.11-ter MODO DE RESPOSTA — alternativas hoje, escrita amanhã *(v3.2)*
 
@@ -786,49 +798,53 @@ Como a criança **entrega** a resposta é uma dimensão separada do que ela resp
 
 ## §13. DIAGNÓSTICO DO ESTADO ATUAL E PLANO DE MIGRAÇÃO
 
-### 13.1 O que a auditoria encontrou (julho/2026) — registro histórico
+### 13.1 O que a auditoria encontrou (julho/2026)
 1. **Cinco+ "fontes únicas de verdade" concorrentes**, com currículos que se contradizem, e três cópias da árvore de docs (`AI_Studio_Lab/`, `backup_legado/`, `backup_repo/docs/`). O sintoma clássico de autoria multi-IA sem contrato.
 2. **IDs incoerentes e colidentes:** `C0001` = Subitização no doc legado, mas = Contar 1-a-1 no código; `C0003` = Cardinalidade no doc, = Caixa Mágica no código. Cinco esquemas de ID convivendo. *(Resolvido: esquema novo + tabela de migração no Grafo §3.)*
-3. **Grafo sem arestas:** `Track.prereqs` existe mas estava vazio em quase tudo. *(Resolvido no cânone/runtime posterior: DAG canônico auditado; este item permanece histórico.)*
-4. **Trilhas-sanfona:** uma trilha comprimia várias competências nos seus 5 níveis. *(Resolvido pelo modelo 1 track/competência e migrações posteriores.)*
-5. **Cobertura inicial limitada:** `grade: "pre" | "ano1"` funcionava como universo curricular e faltava conteúdo posterior. *(Resolvido no grafo; pós-P22 `grade` não é currículo.)*
-6. **Tudo era múltipla escolha** e faltavam primitivas importantes. *(Backlog e cobertura foram evoluindo; consultar auditoria atual, não este snapshot histórico.)*
-7. **Regra de domínio incompleta no código histórico.** *(O `progressEngine` atual já possui evidência multidimensional; fluência ficou separada da coroa em v3.4.)*
-8. **Riqueza real a preservar:** composer, ZDP, telemetria, howto/explain, TutSteps, cenas vivas, economia dupla, mascote, skills de autoria, ritual de fechamento e lições de segurança. **A fundação era boa — o problema principal era organização e reconciliação.**
+3. **Grafo sem arestas:** `Track.prereqs` existe mas está vazio em quase tudo (3 trilhas de ~35 declaram pré-req); o `GraphValidator`/inter-ilhas admitidamente não existe. A "adaptatividade" real hoje é só o ZDP por trilha. *(Resolvido no papel: 88 nós com arestas; falta o unlock_engine.)*
+4. **Trilhas-sanfona:** uma trilha comprime várias competências nos seus 5 níveis (Contar = 1-a-1 + cardinalidade + subitização + até 20), quebrando a semântica dos níveis CRA. *(Resolvido: 1 track = 1 competência; migração abaixo.)*
+5. **Cobertura para até ~7 anos:** `grade: "pre" | "ano1"` no tipo `Kid`; nada de reagrupamento, multiplicação, divisão, frações, decimais (C0106/C0206 declarados e nunca implementados). *(Resolvido no papel: F2-F4 no Grafo.)*
+6. **Tudo é múltipla escolha** e falta o kind mais importante da aritmética (reta numérica) e o da conta armada. *(Backlog §9.2, P1.)*
+7. **Regra de domínio incompleta no código** (só streak; a Bíblia antiga exigia helpClicks=0 + latência — nunca implementado).
+8. **Riqueza real a preservar:** composer com receita de aula excelente, ZDP com bônus de latência, telemetria já nos tipos, howto/explain, TutSteps, cenas vivas, economia dupla, mascote, skills de autoria, ritual de fechamento, lições de segurança do Firestore. **A fundação é boa — o problema era organização da autoria, não pedagogia.**
 
-### 13.2 Migração em 6 fases — registro histórico do plano original
-- **M1 — Congelar e limpar.** Mover docs antigos para `arquivo_morto/`; commitar Bíblia+Grafo+YAML como únicos; atualizar CLAUDE.md e as skills para apontarem para cá.
-- **M2 — Grafo executável.** Criar `curriculum/*.yaml`; `unlock_engine.ts` + testes; `graphId` novo nas tracks via tabela de migração.
-- **M3 — Desfazer as trilhas-sanfona de F0.** Separar competências e migrar progresso por de-para.
-- **M4 — Kinds P1.** `numberline` e `vertical` + TutSteps + Mão Fantasma genérica.
-- **M5 — F2 no ar.** Competências geradas por contrato, uma por sessão de autoria, teste junto.
-- **M6 — Revisão espaçada e Dojo formais.** `review_planner`; trilhas de Dojo; domínio multidimensional; painel dos pais lendo o grafo.
-- **F3-F4** entram pelo mesmo ritual — o grafo já foi preparado para expansão.
-
-> Para estado real atual, consultar `AI_Studio_Lab/codex/RETOMADA.md`, `AUDITORIA_MOTORES_ADAPTATIVOS.md` e checkpoints vigentes; esta seção preserva a história da migração e não sobrescreve decisões pós-P22.
+### 13.2 Migração em 6 fases (cada uma cabe em 1-3 sessões de trabalho)
+- **M1 — Congelar e limpar.** Mover docs antigos para `arquivo_morto/`; commitar Bíblia+Grafo+YAML como únicos; atualizar CLAUDE.md e as skills para apontarem para cá. *Critério: grep por "fonte da verdade" retorna 1 lugar.*
+- **M2 — Grafo executável.** Criar `curriculum/*.yaml` a partir do `grafo_saga.yaml` (F0-F1 primeiro); escrever `unlock_engine.ts` (regra §5) + testes; `graphId` novo em todas as tracks via tabela de migração (saves antigos migram por de-para).
+- **M3 — Desfazer as trilhas-sanfona de F0.** Contar → N1.01/N1.04; canto → N1.02; etc. Progresso existente herda pelo de-para (nível atual vira nível da competência mais avançada da antiga trilha).
+- **M4 — Kinds P1.** `numberline` e `vertical` + TutSteps + Mão Fantasma (`<GhostHand/>`) genérica. Com eles, F1 fecha inteira e F2 abre.
+- **M5 — F2 no ar.** Competências N2.04–PE.02 geradas por contrato (§12.3), uma por sessão de autoria, teste junto.
+- **M6 — Revisão espaçada e Dojo formais.** `review_planner` com os intervalos 2-4-7-12-21-45; trilhas FD; regra completa de domínio 👑; painel dos pais lendo o grafo (mapa de calor por strand).
+- **F3-F4** entram depois de M6, cartucho a cartucho, pelo mesmo ritual — o grafo já está pronto esperando.
 
 ---
 
 ## §14. GOVERNANÇA
-- **Mudança pedagógica** → edita Bíblia/Grafo primeiro, código depois (nunca o inverso), salvo correção de documentação que reconcilia cânone com runtime já validado — nesse caso o registro explicita a reconciliação.
-- **Toda sessão de IA** começa lendo: CLAUDE.md/estado → Bíblia (regras) → Grafo (conteúdo do dia). Termina com o ritual (§2.10).
-- **Conflito entre documentos** = bug de documentação: resolver na hora, na fonte única, preservando história explicitamente marcada.
-- Versões: bump no topo deste arquivo a cada mudança material, com uma linha/entrada de changelog abaixo.
+- **Mudança pedagógica** → edita Bíblia/Grafo primeiro, código depois (nunca o inverso).
+- **Toda sessão de IA** começa lendo: CLAUDE.md (estado) → Bíblia (regras) → Grafo (conteúdo do dia). Termina com o ritual (§2.10).
+- **Conflito entre documentos** = bug de documentação: resolver na hora, na fonte única.
+- Versões: bump no topo deste arquivo a cada mudança material, com uma linha de changelog abaixo.
 
 ### 14.1 Regra da evidência (nenhum resultado é aceito sem prova)
 Agente de IA relatando o próprio trabalho tende a agradar. Proteção estrutural, inegociável:
-- **Todo resultado vem com a prova bruta.** "Os testes passaram" só vale acompanhado da **saída literal do terminal/CI**; "migrei 14 coreografias" só vale com a **lista dos 14 IDs**; "criei o arquivo X" só vale com o **caminho e o conteúdo**. Resumo sem evidência não é resultado — é intenção.
-- **Protótipo se declara ANTES, nunca depois.** Se um script é mock/simulação de formato, isso é dito **na mesma frase** em que o resultado é apresentado. Relatório de mock apresentado como resultado real é falha grave.
-- **Números específicos exigem execução real.** Só podem aparecer se saíram de execução contra os motores reais.
-- **Ferramenta que reporta prova que rodou:** todo relatório carrega data/hora, semente quando aplicável e versões dos motores que consultou.
+- **Todo resultado vem com a prova bruta.** "Os testes passaram" só vale acompanhado da **saída literal do terminal**; "migrei 14 coreografias" só vale com a **lista dos 14 IDs**; "criei o arquivo X" só vale com o **caminho e o conteúdo**. Resumo sem evidência não é resultado — é intenção.
+- **Protótipo se declara ANTES, nunca depois.** Se um script é mock/simulação de formato, isso é dito **na mesma frase** em que o resultado é apresentado. Relatório de mock apresentado como resultado real é falha grave: contamina decisões e queima confiança. *(Precedente: o relatório do Aprendiz Simulado com números de travamento e disparos do Radar foi mock e só se revelou quando questionado.)*
+- **Números específicos exigem execução real.** "Dominou em 4 sessões", "8 disparos do Radar" só podem aparecer se saíram de execução contra os motores reais (Composer, Radar, Dojo). Número inventado é pior que "ainda não medi".
+- **Ferramenta que reporta prova que rodou:** todo relatório carrega no cabeçalho a data/hora, a semente usada e as versões dos motores que consultou.
+
+
 
 ### 14.2 Corrigir para estar certo, nunca para passar no teste
-> **Caso especial e o mais perigoso de todos: ajustar a ASSERÇÃO para bater com o que o código devolveu.** Trocar o valor esperado por "o que estava saindo" transforma o teste em espelho: ele passa a confirmar o comportamento em vez de verificá-lo, e a regra que ele deveria proteger evapora sem deixar rastro. Quando teste e código discordam, a pergunta nunca é "qual mudo para ficar verde?", e sim **"qual dos dois contraria o cânone e a fonte de verdade aplicável?"**. Se a mudança de expectativa for legítima (a regra mudou de propósito), isso é registrado com a justificativa pedagógica ao lado da linha alterada.
+> **Caso especial e o mais perigoso de todos: ajustar a ASSERÇÃO para bater com o que o código devolveu.** Trocar o valor esperado por "o que estava saindo" transforma o teste em espelho: ele passa a confirmar o comportamento em vez de verificá-lo, e a regra que ele deveria proteger evapora sem deixar rastro. Quando teste e código discordam, a pergunta nunca é "qual mudo para ficar verde?", e sim **"qual dos dois contraria o cânone?"** — a resposta vem do Manual/Grafo, não da saída do terminal. Se a mudança de expectativa for legítima (a regra mudou de propósito), isso é registrado com a justificativa pedagógica ao lado da linha alterada.
 
-Quando um teste reprova, a correção é do **conteúdo/implementação real**, não da aparência. É proibido alterar código apenas para satisfazer a asserção. Se o teste é que está errado, corrige-se o teste **com justificativa escrita**. Toda correção em lote gerada por script sobre decisões pedagógicas passa por revisão contra o Manual antes de virar verde.
+Quando um teste reprova, a correção é do **conteúdo**, não da aparência. É proibido alterar código apenas para satisfazer a asserção (ex.: variar o `kind` de qualquer jeito só para o teste parar de acusar — §12.3). Se o teste é que está errado, corrige-se o teste **com justificativa escrita**. Toda correção em lote gerada por script sobre decisões pedagógicas passa por **revisão humana contra o Manual** antes de virar verde.
 
 ### 14.3 Ferramenta nunca adultera a fonte
-Script de teste, dump ou simulação **jamais modifica arquivos de produção** para contornar limitação de ferramental. Se o runner não roda, corrige-se a configuração do runner — nunca o código do app. Toda ferramenta vive em pasta própria e só **lê** a aplicação.
+Script de teste, dump ou simulação **jamais modifica arquivos de produção** para contornar limitação de ferramental (ex.: mexer em imports do Vite para rodar TS no terminal). Isso já corrompeu a árvore do git mais de uma vez. Se o runner não roda, corrige-se a configuração do runner — nunca o código do app. Toda ferramenta vive em pasta própria e só **lê** a aplicação.
+
+
+
+
 
 ### 14.4 Toda ferramenta tem comando que o DONO do projeto roda sozinho
 Relatório narrado por quem executou não é verificável; relatório **reproduzível** é. Por isso toda ferramenta de auditoria, simulação ou verificação declara um comando no `package.json` — `npm run auditar`, `npm run simular`, `npm run contrato` — que **o dono do projeto executa por conta própria e vê a mesma saída**. Sem comando reproduzível, o resultado é narrativa, não evidência.
@@ -836,21 +852,21 @@ Relatório narrado por quem executou não é verificável; relatório **reproduz
 Isto é o antídoto **estrutural** contra o relatório inventado: quando o dono pode rodar, fabricar deixa de ser possível — não por disciplina, mas por arquitetura. Todo relatório traz, no topo, **o comando exato que o produziu**.
 
 **Contagem de teste não é evidência — a LISTA de suítes é.** Um número grande e verde pode ser inteiramente irrelevante. Por isso todo relatório de teste exibe **quais arquivos rodaram**, e valem três regras duras:
-- **O runner ignora código morto.** `arquivo_morto/`, `backup*/`, `*_legado/` e afins ficam fora do escopo do runner.
-- **As suítes do cânone são nominalmente obrigatórias.** O comando de contrato tem de listar, entre os arquivos executados, os testes de: `unlockEngine`, composer/Sensei, contrato dos geradores, coreografia e invariantes.
+- **O runner ignora código morto.** `arquivo_morto/`, `backup*/`, `*_legado/` e afins ficam fora do escopo do runner (via `exclude` na config). Teste rodando dentro de backup infla a contagem e valida código que ninguém usa. Sintoma real observado: metade das suítes vinha de `backup_repo/`, duplicando a contagem.
+- **As suítes do cânone são nominalmente obrigatórias.** O comando de contrato tem de listar, entre os arquivos executados, os testes de: `unlockEngine`, `composer`, contrato dos geradores (§12.7), coreografia (§7.4) e invariantes (§12.8). Se algum não aparecer na lista, o comando está apontando para o alvo errado, por mais verde que esteja.
 - **Verde sem as suítes certas é pior que vermelho:** dá confiança sem cobertura.
 
 ### 14.5 Controle de versão é infraestrutura crítica, não detalhe
-Sem histórico confiável, toda regressão é permanente e nenhum diagnóstico é possível. Portanto:
-- **Git funcionando é pré-requisito de qualquer trabalho.** Repositório corrompido = parar tudo e consertar ANTES de tocar em qualquer arquivo.
-- **Commit ao fim de cada mudança**, com mensagem descrevendo o que mudou e por quê.
-- **Nada é apagado fisicamente.** `arquivo_morto/` é túmulo, não incinerador: o que entra lá continua existindo. Excluir do runner resolve poluição de métrica; deletar destrói evidência histórica.
+Sem histórico confiável, toda regressão é permanente e nenhum diagnóstico é possível — não dá para saber o que quebrou, quando, nem voltar atrás. Portanto:
+- **Git funcionando é pré-requisito de qualquer trabalho.** Repositório corrompido = parar tudo e consertar ANTES de tocar em qualquer arquivo. Nenhuma tarefa nova começa com o histórico quebrado.
+- **Commit ao fim de cada mudança**, com mensagem descrevendo o que mudou e por quê. Sessão que termina sem commit é trabalho sem rede.
+- **Nada é apagado fisicamente.** `arquivo_morto/` é túmulo, não incinerador: o que entra lá continua existindo. Excluir do runner (§14.4) resolve poluição de métrica; deletar do disco destrói evidência histórica de forma irreversível. Se um arquivo atrapalha, exclui-se do escopo das ferramentas — nunca do disco.
 
 ### 14.6 Migração nunca reduz o que a criança alcança (regra de paridade)
-Trocar um sistema antigo pelo novo sem medir paridade faz o produto **piorar** aos olhos de quem usa, mesmo com a arquitetura ficando melhor. Antes de desligar qualquer caminho antigo: contar quantas atividades a criança alcançava antes e quantas alcança depois. Se o número cair, a migração **não está pronta** — mantém-se o antigo acessível até a paridade existir. Migração é ponte, não demolição.
+Trocar um sistema antigo pelo novo sem medir paridade faz o produto **piorar** aos olhos de quem usa, mesmo com a arquitetura ficando melhor. Antes de desligar qualquer caminho antigo: contar quantas atividades a criança alcançava antes e quantas alcança depois. Se o número cair, a migração **não está pronta** — mantém-se o antigo acessível até a paridade existir. Migração é ponte, não demolição: só se derruba a margem antiga quando a nova sustenta o mesmo peso.
 
 ### 14.7 Comportamento consertado vira especificação escrita + teste
-Bug corrigido que não vira spec e teste volta. Todo comportamento de interface ou motor que já foi ajustado uma vez ganha, no mesmo lote: **uma linha de especificação** no documento correspondente e **um teste** que falha se regredir. Isso inclui origem manual/prescrita do Dojo: `manual` jamais move ponteiro adaptativo, mesmo quando treina exatamente o `currentStep`.
+Bug corrigido que não vira spec e teste volta — e volta várias vezes, consumindo sessões inteiras e a confiança de quem usa. Todo comportamento de interface que já foi ajustado uma vez (animação de tutorial, destaque de coreografia, quantidade de botões na tela, enquadramento do mascote) ganha, no mesmo commit: **uma linha de especificação** no documento correspondente e **um teste** que falha se regredir. Sem isso, "já tínhamos consertado isso" vira a frase mais repetida do projeto.
 
 ---
 
@@ -886,7 +902,7 @@ Uma competência pode ter **várias fichas**. N1.04 (contar) já tem duas: conta
 4. Reusar tags de misconception existentes quando o erro for o mesmo; criar tag nova só se o erro for genuinamente diferente
 5. Registrar no índice do bloco da faixa correspondente
 
-**O que ganha:** o Composer/Sensei passa a ter mais de uma opção para aquela competência — **variedade sem conteúdo novo**.
+**O que ganha:** o Composer passa a ter mais de uma opção para aquela competência, e alterna entre elas — **variedade sem conteúdo novo**.
 
 **O que NÃO precisa:** nada no grafo, nada no Manual, nada no YAML.
 
@@ -947,10 +963,10 @@ Jogos são diferentes de fichas e **não seguem a escada CPA**.
 
 **O que um jogo declara:**
 - quais competências ele **treina** (não ensina — treina)
-- o repertório mínimo exigido em cada uma
-- se conta ou não para domínio (**por padrão, não conta**; Dojo nunca concede mastery conceitual)
+- o nível mínimo exigido em cada uma (nunca abaixo de 3: jogo não é lugar de aprender)
+- se conta ou não para domínio (**por padrão, não conta**)
 
-**A regra que protege:** jogo nunca substitui ficha. Uma competência cujo único conteúdo é um jogo está **descoberta** — porque jogo não tem os cinco níveis, não tem coreografia de ensino, e não diagnostica misconception com a precisão de uma experiência autoral.
+**A regra que protege:** jogo nunca substitui ficha. Uma competência cujo único conteúdo é um jogo está **descoberta** — porque jogo não tem os cinco níveis, não tem coreografia de ensino, e não diagnostica misconception com precisão.
 
 ---
 
@@ -977,29 +993,29 @@ Qualquer adição só é considerada concluída quando:
 [ ] a ficha tem as 9 seções
 [ ] a ficha tem explain que NÃO elogia e NÃO entrega a resposta
 [ ] a ficha tem pelo menos uma tag de misconception
-[ ] a ficha tem critério de domínio conceitual sem RT como gate
+[ ] a ficha tem critério de domínio
 [ ] o código da ficha é novo e único
 [ ] o índice do bloco foi atualizado
 ```
 
-### 15.8 INVARIANTE DE CONTAGEM E TESTE DE DUPLICAÇÃO EXECUTÁVEL *(v3.1; contagem atual 90 em v3.3+)*
+### 15.8 INVARIANTE DE CONTAGEM E TESTE DE DUPLICAÇÃO EXECUTÁVEL *(v3.1)*
 
-**O número de competências é um invariante verificável, não uma frase em prosa.** Esta seção nasceu de um incidente real: o changelog da v2.7 anunciou 11 competências novas; 4 sobreviveram à análise e 7 eram duplicatas — mas as 7 chegaram a virar nós no YAML, no JSON, no TypeScript e no grafo do repositório, e ali ficaram por semanas sem que nenhum teste reclamasse.
+**O número de competências é um invariante verificável, não uma frase em prosa.** Esta seção nasce de um incidente real: o changelog da v2.7 anunciou 11 competências novas; 4 sobreviveram à análise e 7 eram duplicatas — mas as 7 chegaram a virar nós no YAML, no JSON, no TypeScript e no grafo do repositório, e ali ficaram por semanas sem que nenhum teste reclamasse.
 
 #### O que o auditor DEVE quebrar
 
 1. **Contagem cruzada.** `count(grafo_saga.yaml.nodes)` = `count(GRAFO_DE_CONHECIMENTO_SAGA.md)` = `count(.json)` = `count(.ts)`. Divergência de um único nó = build vermelho.
-   > **Convenção obrigatória para o parser.** IDs citados em texto histórico (candidatas rejeitadas, tabelas de migração, exemplos) ficam entre os marcadores `<!-- IDS_REJEITADOS_INICIO -->` e `<!-- IDS_REJEITADOS_FIM -->` e são **excluídos da contagem**. Sem essa convenção, a própria nota que documenta a rejeição faz o auditor recontar os nós rejeitados. Todo ID mencionado fora de uma linha de declaração de nó deve estar dentro do marcador ou escrito com tachado (`~~N5.07~~`).
-2. **Prosa × realidade.** O número declarado no corpo desta Bíblia, do Manual, do Método e da Arquitetura Cognitiva tem de bater com a contagem real. Documento corrente que diz 89 num grafo de 90 é inválido; **registros históricos explicitamente marcados podem preservar a contagem da época.**
+   > **Convenção obrigatória para o parser.** IDs citados em texto histórico (candidatas rejeitadas, tabelas de migração, exemplos) ficam entre os marcadores `<!-- IDS_REJEITADOS_INICIO -->` e `<!-- IDS_REJEITADOS_FIM -->` e são **excluídos da contagem**. Sem essa convenção, a própria nota que documenta a rejeição faz o auditor recontar os nós rejeitados — foi o que aconteceu na primeira tentativa de escrever esta seção. Todo ID mencionado fora de uma linha de declaração de nó deve estar dentro do marcador ou escrito com tachado (`~~N5.07~~`).
+2. **Prosa × realidade.** O número declarado no corpo desta Bíblia, do Manual, do Método e da Arquitetura Cognitiva tem de bater com a contagem real. **Trechos históricos explicitamente marcados preservam a contagem de sua época; afirmação corrente divergente é inválida.**
 3. **Duplicata por assinatura.** Dois nós com **sobreposição semântica no nome** *e* **o mesmo conjunto de pré-requisitos** são duplicata presumida. O auditor lista e falha.
-4. **Pré-requisito que contém o próprio nome.** Um nó cujo pré-requisito tem nome contido no seu é ciclo semântico disfarçado: IDs diferentes, mesma competência. O detector de ciclos do DAG não pega isso — este teste pega.
-5. **Nó órfão de ficha.** Todo nó do grafo tem cobertura autoral; toda ficha aponta para nó existente ou para exceção autoral declarada. Cobertura precisa ser 100%.
+4. **Pré-requisito que contém o próprio nome.** Um nó cujo pré-requisito tem nome contido no seu (`N7.04 Porcentagem` ← `N6.03 Porcentagem`) é ciclo semântico disfarçado: IDs diferentes, mesma competência. O detector de ciclos do DAG não pega isso — este teste pega.
+5. **Nó órfão de ficha.** Todo nó do grafo tem exatamente uma ficha responsável; toda ficha aponta para nó existente. Cobertura tem de ser 100%, nos dois sentidos.
 
 #### A lista de espera
 
 **Toda candidata a competência nova entra primeiro numa lista de espera, com o teste de duplicação registrado POR ESCRITO** (§15.3). Só depois vira nó.
 
-**Rejeitar é uma decisão que se documenta, não se esquece.** Se a candidata for recusada, a recusa vai para o changelog **com o nó que já a cobria**.
+**Rejeitar é uma decisão que se documenta, não se esquece.** Se a candidata for recusada, a recusa vai para o changelog **com o nó que já a cobria**. Foi a ausência dessa linha que permitiu que 7 duplicatas atravessassem o pipeline inteiro.
 
 #### Registro histórico — as 11 candidatas de v2.7
 
@@ -1017,9 +1033,9 @@ Qualquer adição só é considerada concluída quando:
 | `N7.04` Porcentagem | ❌ rejeitada | `N6.03` porcentagem |
 | `PE.05` Probabilidade e chance | ❌ rejeitada | `PE.03` + `PE.04` |
 
-**Saldo histórico: 84 + 4 = 88 competências.** *(Este era o número antes das retificações de ago/2026 abaixo.)*
+**Saldo: 84 + 4 = 88 competências.** *(Este era o número até a retificação de ago/2026 logo abaixo — ver P12.)*
 
-#### Retificação de ago/2026 — P12: o grafo passou a **89**
+#### Retificação de ago/2026 — o grafo passa a **89** na P12
 
 A ficha **F04** ("Produzir Quantidade") declarava na §1 dela ser a `N1.09`. Não
 é. Quatro arestas do grafo — `N1.12`, `N2.01`, `N3.03` e `AL.03` — dependem de a
@@ -1034,15 +1050,18 @@ F04 faria as quatro arestas mentirem em silêncio.
 Cada uma ganhou seu nó: a `N1.09` continua sendo a contagem, e a F04 passou a ser
 a **`N1.13` — Produzir quantidade** (F0, pré-req `N1.02` e `N1.04`).
 
-> **Saldo histórico da P12: 88 + 1 = 89 competências.** Nenhuma ficha foi removida ou renumerada. Registro completo em `codex/PLANO_DO_BLOCO_F0.md §13.1`.
+> **Saldo histórico da P12: 88 + 1 = 89 competências.** Nenhuma ficha foi
+> removida, nenhuma foi renumerada, e nenhuma aresta existente mudou de
+> significado — o grafo **ganhou** um nó que já estava descrito no cânone sem ter
+> casa. Registro completo em `codex/PLANO_DO_BLOCO_F0.md §13.1` (P12).
 
-#### Retificação de ago/2026 — P15/P22: o grafo fecha em **90**
+#### Retificação de ago/2026 — o grafo fecha em **90** na P15/P22
 
-A auditoria encontrou colisão entre **massa/capacidade**, `GM.02 — Tempo cotidiano` e `GM.05 — Medidas padronizadas`. A ficha F50 não podia continuar reivindicando um desses IDs sem alterar o significado das arestas.
+A auditoria do bloco F0 encontrou a colisão de IDs de F50: `GM.02` já era **Tempo cotidiano** e `GM.05` já era **Medidas padronizadas**. Massa/capacidade sem unidades era uma competência real sem casa própria.
 
-Foi criado **`GM.12 — Massa e capacidade: comparação e conservação`** (F0, pré-requisito `GM.01`). `GM.05` passa a depender de `GM.12 + N2.02`. A progressão canônica vira: comparação visível → massa/capacidade sem unidades → medição padronizada.
+Foi criado **`GM.12 — Massa e capacidade: comparação e conservação`** (F0, pré-req `GM.01`). `GM.05` passa a depender de `GM.12 + N2.02`. A sequência canônica vira: comparação visível → massa/capacidade sem unidades → medição padronizada.
 
-> **Saldo atual: 89 + 1 = 90 competências. Este é o número canônico.** Grafo/YAML/JSON/TS e cobertura autoral foram reconciliados em P21/P22; o Manual e o Método foram retificados em v3.4 sem apagar as contagens históricas claramente marcadas.
+> **Saldo atual: 89 + 1 = 90 competências. Este é o número canônico vigente.** Grafo/YAML/JSON/TS e cobertura autoral fecham em 90/90; as contagens 88 e 89 acima permanecem como registro histórico explícito.
 
 #### Candidatas em lista de espera *(não são competências — não criar sem passar pelo §15.3)*
 
@@ -1051,30 +1070,31 @@ Levantadas nas auditorias externas de ago/2026, ainda **sem** teste de duplicaç
 
 ---
 
-*Changelog histórico preservado:*
-*v1.0 (jul/2026) — unificação total pós-auditoria; renomeação Matemágica → SAGA; escopo 4-12; grafo de 84 competências (inclui N4.12, divisor de 2 dígitos, e divisão de decimais em N6.02 — fecha o algoritmo de divisão por completo).*
-*v3.2 (ago/2026) — O DOJO GANHA CORPO. §9.3: **A PRANCHETA** — camada de rascunho à mão por cima do exercício (dedo, caneta ou mouse), promovida a primitiva porque conta armada de vários dígitos não se faz de cabeça; usar a prancheta NUNCA conta como ajuda e não afeta a dimensão independência. §12.11-ter: **MODO DE RESPOSTA** — alternativas (padrão hoje), teclado estruturado, e escrita à mão como direção documentada, com a regra dura de que falso negativo de reconhecimento nunca reprova nem vira tag. Documento novo no cânone: **`DOJO_TRILHAS_COMPLETAS.md`**, com as trilhas/faixas então especificadas, distratores tagueados e protocolo de alteração.*
-*v3.1 (ago/2026) — RECONCILIAÇÃO CÂNONE × REPOSITÓRIO. Grafo fixado então em **88 competências**; §15.8 criou invariante de contagem e registro das 11 candidatas; §5.1-bis separou RT da compreensão; §7.1-bis Mão Fantasma; §8.3-bis filtro motor; §11.4-bis Radar probabilístico; §12.3-bis divulgação progressiva; §12.5-ter casca visual por idade.*
-*v3.0 (jul/2026) — §15: PROTOCOLO DE EXPANSÃO. Quatro tipos de adição; teste de duplicação obrigatório; cinco arquivos que mudam juntos; §12.11 entrada posicional; modo caneta futuro.*
-*v2.9 (jul/2026) — §12.11: ENTRADA POSICIONAL; manipular no concreto, opções por coluna no abstrato; modo caneta registrado.*
-*v2.8 (jul/2026) — nós de convergência; competências de enriquecimento; primeiro contato adaptado; correções de pré-requisito históricas.*
-*v2.7 (jul/2026) — Grafo ampliado de 84 para 95 competências na tentativa histórica; **anotação posterior:** apenas 4 sobreviveram e 7 foram rejeitadas por duplicação — ver §15.8.*
-*v2.6 (jul/2026) — controle de versão, paridade e regra de comportamento consertado virar especificação + teste.*
-*v2.5 (jul/2026) — cabeçalho/changelog, runners e linha de base de plausibilidade do simulador.*
-*v2.4 (jul/2026) — comandos reproduzíveis de auditoria/simulação e regra de não ajustar asserção para a saída.*
-*v2.3 (jul/2026) — `explain` contra misconception, navegação por funções, demonstração gêmea, contrato de redesenho, palco do mascote e catálogo.*
-*v2.2 (jul/2026) — Oficina com física própria, `explain` como estratégia, simulação estocástica e sincronia TTS.*
-*v2.1 (jul/2026) — fronteira da IA em runtime.*
-*v2.0 (jul/2026) — `explain` como dica de erro, coreografia com show, simulação integral e ferramenta não adulterar fonte.*
-*v1.9 (jul/2026) — regra da evidência e corrigir para estar certo.*
-*v1.8 (jul/2026) — descoberta em lote, snapshots, aprendiz simulado e invariantes.*
-*v1.7 (jul/2026) — contrato de coreografia, APIs visuais e catálogo.*
-*v1.6 (jul/2026) — arquitetura da camada visual.*
-*v1.5 (jul/2026) — contratos de produção em massa e mecânica→primitiva.*
-*v1.4 (jul/2026) — três funções, Oficina híbrida, Plano do Dia e domínio multidimensional.*
-*v1.3 (jul/2026) — fading, aula prática e Dojo autônomo.*
-*v1.2 (jul/2026) — modelo de erro em duas camadas.*
-*v1.1 (jul/2026) — Bússola, Radar, Idade Nunca Trava, Dojo próprio e Manual completo.*
+
+*Changelog: v1.0 (jul/2026) — unificação total pós-auditoria; renomeação Matemágica → SAGA; escopo 4-12; grafo de 84 competências (inclui N4.12, divisor de 2 dígitos, e divisão de decimais em N6.02 — fecha o algoritmo de divisão por completo).*
+*v3.2 (ago/2026) — O DOJO GANHA CORPO. §9.3: **A PRANCHETA** — camada de rascunho à mão por cima do exercício (dedo, caneta ou mouse), promovida a primitiva porque conta armada de vários dígitos não se faz de cabeça; usar a prancheta NUNCA conta como ajuda e não afeta a dimensão independência. §12.11-ter: **MODO DE RESPOSTA** — alternativas (padrão hoje), teclado estruturado, e escrita à mão como direção documentada, com a regra dura de que falso negativo de reconhecimento nunca reprova nem vira tag. Documento novo no cânone: **`DOJO_TRILHAS_COMPLETAS.md`**, com as 5 trilhas de operação × 10 faixas (adição, subtração, multiplicação, divisão, frações e decimais), a janelinha de faixas, os distratores tagueados do Dojo, o `DojoErrorEvent` que liga o Dojo ao Radar, o inventário de fatos gerado, e o protocolo de alteração de faixa. Resolvida a contradição do registro comutativo (força compartilhada, dois tempos separados).*
+*v3.1 (ago/2026) — RECONCILIAÇÃO CÂNONE × REPOSITÓRIO. Grafo fixado em **88 competências** (varredura de 84→88 em §4, §10.11, §12.7, §12.8, §13.1; anotação de rejeição no changelog v2.7). §13 recuperada: o cabeçalho da seção havia sumido na edição v2.7→v3.0 e duas referências apontavam para o vazio. §15.8: INVARIANTE DE CONTAGEM E TESTE DE DUPLICAÇÃO EXECUTÁVEL, com o registro histórico das 11 candidatas (4 absorvidas, 7 rejeitadas) e a lista de espera. Cinco correções pedagógicas vindas das auditorias externas: §5.1-bis o relógio é silencioso na Jornada (velocidade nunca tranca compreensão); §7.1-bis a Mão Fantasma é exemplo esmaecido e nunca trava a tela; §8.3-bis FILTRO MOTOR (erro de dedo não gera tag); §11.4-bis o Radar é probabilístico (peso de evidência, limiares, decaimento, linguagem de hipótese); §12.3-bis DIVULGAÇÃO PROGRESSIVA. §12.5-ter: casca visual por idade (Kids/Explorer/Lab) como direção futura documentada.*
+*v3.0 (jul/2026) — §15: PROTOCOLO DE EXPANSÃO. Quatro tipos de adição (variação de ficha, competência nova, mecânica nova, jogo), cada um com procedimento e risco próprios. Teste de duplicação obrigatório antes de criar competência (o erro que gerou 7 duplicatas). Os 5 arquivos que mudam juntos, as 4 verificações depois, os 7 nuncas e o checklist único de aceitação. §12.11 reescrita: nenhuma ficha exige digitar algarismo por algarismo — manipular no concreto, opções por coluna no abstrato, resposta inteira na fluência. §12.11-bis: modo caneta como expansão futura documentada.*
+*v2.9 (jul/2026) — §12.11: ENTRADA POSICIONAL. Em 28 fichas a resposta é um valor NUM LUGAR. Regra: níveis 1-2 manipulam material (a troca é a ação); níveis 3-4 usam OPÇÕES POR COLUNA com a coluna ativa acesa (não digitação — campo selecionado é a maior fonte de bug, e as opções carregam tag de misconception); nível 5 responde inteiro. NENHUMA ficha exige digitar algarismo por algarismo. Vai-um por toque, célula a 60% do tamanho, acima e à esquerda. §12.11-bis: MODO CANETA registrado como expansão futura — solução ideal, adiada porque falso negativo em reconhecimento de escrita infantil é devastador.*
+*v2.8 (jul/2026) — §11.10: NÓS DE CONVERGÊNCIA (os 10 nós com 3 pré-requisitos) ganham abertura parcial com dois de três, prioridade do Radar na lacuna bloqueante, proibição de atacar três frentes na mesma sessão e rota alternativa sempre visível. §11.11: COMPETÊNCIAS DE ENRIQUECIMENTO — oferecidas pelo Composer com domínio mais leve, nunca impostas por dependência artificial. §11.12: PRIMEIRO CONTATO POR IDADE — o nível 1 tem duas entradas (reduzida para faixa inferior, normal para a faixa nominal), evitando que criança de 5 anos trave em relógio ou dinheiro. Grafo: corrigido pré-requisito excessivo de N3.03 (N2.03 simbólico → N1.05 comparação de quantidades) e conectadas 6 folhas órfãs (N3.10→N4.05, N3.06→N3.13, AL.02→AL.03, GM.02→GM.04, GM.06→GM.09, N2.05→GM.10).*
+*v2.7 (jul/2026) — Grafo ampliado de 84 para 95 competências (11 novas: N2.06-08 pares/fatores/múltiplos, N5.06-08 operações e comparação de frações, N7.03-04 razão e porcentagem, GM.10-11 conversão e volume, PE.05 probabilidade), com Manual e YAML sincronizados. **[Anotação de ago/2026 — v3.1: das 11 anunciadas, apenas 4 sobreviveram à auditoria de duplicação (N2.06, N2.07, GM.10, GM.11). As outras 7 (N2.08, N5.06, N5.07, N5.08, N7.03, N7.04, PE.05) foram REJEITADAS por duplicarem nós existentes — ver §15.8. O grafo fecha em 88 competências, não 95.]** §12.2-bis: vocabulário NÍVEL (Jornada, 1-5, proficiência) × FAIXA (Dojo, 1-10, dificuldade) — eram chamados igual e confundiam. §12.5-bis: pizza para apresentar, barra para operar (regra anterior era categórica demais). §3.1: a navegação tem 5 abas, com o Sensei como porta de entrada.*
+*v2.6 (jul/2026) — §14.5: controle de versão é infraestrutura crítica (git quebrado = parar tudo; commit por mudança; NADA é apagado fisicamente — `arquivo_morto` é túmulo, não incinerador). §14.6: regra de PARIDADE — migração nunca reduz o que a criança alcança; conta-se antes e depois, e o caminho antigo só se desliga com paridade atingida. §14.7: comportamento consertado vira especificação escrita + teste no mesmo commit, senão regride repetidamente. §10.12: especificação fechada do enquadramento do mascote (telinha retangular arredondada, cenário preenchendo o fundo, mascote inteiro e solto por cima, parado em repouso).*
+*v2.5 (jul/2026) — cabeçalho corrigido para acompanhar o changelog (divergência entre topo e rodapé causou confusão real de versão). §14.4: contagem de teste não é evidência — o relatório exibe QUAIS suítes rodaram; runner exclui `arquivo_morto/`/`backup*/` (metade das suítes vinha de backup, inflando a contagem); as suítes do cânone (unlockEngine, composer, contrato, coreografia, invariantes) são nominalmente obrigatórias na lista. §12.8 item 3-quater: simulador exige LINHA DE BASE de plausibilidade — incoerência interna (perfil com lacuna mais rápido que sem lacuna) e deriva entre versões (18→55→73→367) indicam simulador ou ritmo quebrado, e exigem investigação antes de qualquer decisão.*
+*v2.4 (jul/2026) — §14.4: toda ferramenta de auditoria/simulação tem comando no `package.json` que o DONO roda sozinho e vê a mesma saída — antídoto estrutural contra relatório inventado (terceira ocorrência); todo relatório abre com o comando que o produziu. §14.2: proibido ajustar a ASSERÇÃO para bater com a saída do código (teste vira espelho e a regra evapora) — quando teste e código discordam, decide-se pelo cânone. §10.12: o catálogo passa a detectar também deriva de nomenclatura (gerador servindo nó sob nome herdado); nome da função espelha o ID do nó.*
+*v2.3 (jul/2026) — §8.1: `explain` NUNCA pode descrever uma misconception documentada do próprio nó (regra testável contra o Grafo; contraexemplo N1.05, que mandava comparar por espaço ocupado — a própria falha de conservação). §3.1: as três funções viram a NAVEGAÇÃO (barra de abas Jornada/Dojo/Oficina/Perfil) e ficam mapeados os nomes antigos (Jornada Mágica = Academia; Desafio Misto = Dojo modo Mestre). §7: demonstração é sobreposição com exemplo GÊMEO (outros números), com a contagem passo a passo virando dica e não aula repetida. §10.11: contrato de redesenho (só tokens + apresentação + assets; proibido clonar a árvore de telas). §10.12: mascote vive em palco de 3 camadas (fundo/ator/frente), fim da "bolinha"; catálogo passa a detectar duplicatas, órfãos e buracos.*
+*v2.2 (jul/2026) — §8.4: a OFICINA GANHA FÍSICA PRÓPRIA (escada de 2 acertos por ser reaprendizagem; alvo é destravar e não coroar; dose proporcional à lacuna; teto de 3 resgates com escalada para o pré-requisito do pré-requisito) — descoberto pela simulação, que expôs 11 resgates para uma única lacuna. §8.1: `explain` nomeia a ESTRATÉGIA do Manual, nunca repete o enunciado nem contraria a natureza da habilidade (contraexemplo N1.03). §12.8 item 3-ter: simulação é estocástica — exige semente, versão e mediana/faixa sobre ≥30 execuções. §7.4 item 4-ter: sincronia com TTS só é real com um enunciado curto por batida visual ou áudio pré-gravado com marcas.*
+*v2.1 (jul/2026) — §12.10: FRONTEIRA DA IA EM TEMPO DE EXECUÇÃO. Com IA conectada em runtime (dica do mascote e relatório dos pais), fica explícito: a aula é 100% offline e determinística, a fala autoral é o caminho primário e suficiente; a IA nunca substitui dica, decide progressão, gera exercício ou é pré-requisito para a aula rodar; pode ser extra pedido pela criança e relatório assíncrono aos pais; guarda-corpos obrigatórios (nunca dá resposta, validação, fallback autoral, chave de desligar, sem dado pessoal no prompt, teto de uso).*
+*v2.0 (jul/2026) — §8.1: `explain` definido como DICA DE ERRO (nunca elogio, nunca entrega a resposta) com exemplo errado/certo — corrige vício encontrado nos três Padrões-Ouro. §7.4 item 4-bis: coreografia exige ao menos um passo com `show` não-vazio (fecha o falso verde da narração sem visual). §12.8 item 3-bis: simulação estreita não valida pedagogia — só vale como evidência se exercitar a orquestração inteira (Composer + Radar + Oficina + sonda de pré-req + avanço paralelo). §14.3: ferramenta nunca adultera arquivo de produção.*
+*v1.9 (jul/2026) — §14.1 REGRA DA EVIDÊNCIA (nenhum resultado aceito sem prova bruta; protótipo se declara antes, nunca depois; números específicos exigem execução real) e §14.2 (corrigir para estar certo, nunca para passar no teste; correção em lote sobre decisão pedagógica passa por revisão humana contra o Manual). §12.3 refinado: competências perceptuais declaram `excecaoCPA` em vez de forjar variação, e alerta contra a variação de fachada que passa no teste e quebra a escada CPA.*
+*v1.8 (jul/2026) — §12.8: DESCOBERTA EM LOTE — Definição de Pronto por competência, snapshots dourados anti-regressão, APRENDIZ SIMULADO (roda crianças falsas por dezenas de sessões e acha travamentos/ritmo/disparos do Radar em lote) e invariantes do sistema; mais a regra contra o falso verde (teste tem de verificar presença, não só validade).*
+*v1.7 (jul/2026) — §7.4: CONTRATO DE COREOGRAFIA (a explicação é dado, não fiação): timeline declarado, API visual publicada por primitiva, player único, teste que quebra o build se a primitiva perder um comando (causa raiz do sumiço do destaque da Caixa Mágica) e modo coreografia na galeria. §10.12: tokens de movimento (só transform/opacity, 60fps no tablet real, animação decorativa vs pedagógica), mascotes com registro único e vocabulário de expressões, e catálogo de exercícios gerado automaticamente para o painel Admin.*
+*v1.6 (jul/2026) — §10.11: arquitetura da CAMADA VISUAL — 5 camadas separadas (tokens semânticos → chrome → primitivas → skins → geradores), vocabulário único de estados visuais, lista do que macula o sistema, e a ordem de execução (passagem de tokens ANTES de massificar). Permite trocar toda a arte (ex.: pixel-art) mexendo num dicionário só.*
+*v1.5 (jul/2026) — §12 expandido para a produção em massa: nível dita a REPRESENTAÇÃO CPA e não só a magnitude (12.3); kinds de SELEÇÃO vs PRODUÇÃO com contratos de correção distintos e `misconceptionFrom` para produção (12.4); tema/skin cosmético, por sessão e com vocabulário próprio (12.5); mapa mecânica→primitiva com as 4 primitivas faltantes (12.6); suíte de testes de contrato obrigatória antes de massificar (12.7).*
+*v1.4 (jul/2026) — TRÊS FUNÇÕES (§3.1): Academia (aprender) / Dojo (treinar) / Oficina (recuperar), com o Motor Adaptativo acima das três. Oficina HÍBRIDA (§8.4): invisível para tropeço pequeno, Missão de Resgate visível para lacuna teimosa, sempre visível aos pais. §5: as DUAS escadas (competências × proficiência) — resposta a "quantos níveis tem uma conta". §6: Plano do Dia (pai não opera) + limite saudável que não engaiola quem quer mais. §11.8: simulação da jornada (Téo 4 / Rocha 6) no curto/médio/longo prazo. §11.9: estado de domínio multidimensional (compreensão/fluência/retenção/independência).*
+*v1.3 (jul/2026) — regra do FADING (§5): o andaime some conforme a proficiência sobe (aula é exceção, não enfeite). §6: aula é feita de prática, não palestra; distinção entender-a-matéria vs entender-o-exercício com gatilhos separados. §11.2.4: Dojo como pilar autônomo com DUAS famílias de fluência (FD fatos + PD procedimentos armados).*
+*v1.2 (jul/2026) — modelo de erro reformulado para DUAS CAMADAS (§8): resposta imediata leve na questão (preserva o fluxo, nunca trava) + remediação profunda disparada por PADRÃO via Radar (§11.4), entregue em pausa/fim de sessão/resgate. Princípio 5 refinado ("o fluxo é sagrado"). Correção da rigidez do escalonamento E1→E2→E3 por questão.*
+*v1.1 (jul/2026) — §11 expandido: Bússola de Posicionamento (11.3), Radar de Lacunas com tags de misconception e Missões de Resgate (11.4), regra Idade Nunca Trava (11.5), representação na tela (11.6); Dojo promovido a documento próprio (`DOJO_SAGA.md`); Manual Didático v2 completo integrado ao cânone.*
+
 
 ---
 
@@ -1082,6 +1102,6 @@ Levantadas nas auditorias externas de ago/2026, ainda **sem** teste de duplicaç
 
 A auditoria do bloco F0 encontrou uma colisão de IDs: F50 dizia GM.02 embora GM.02 seja **Tempo cotidiano**, e a P15 posterior tentou movê-la para GM.05 embora GM.05 já fosse **Medidas padronizadas**. A matriz passa a ter **90 competências** com o novo `GM.12 — Massa e capacidade: comparação e conservação` (F0, pré-req GM.01). `GM.05` passa a depender de GM.12 + N2.02. A progressão canônica é: comparação visível → massa/capacidade sem unidades → medição padronizada. Ver `AI_Studio_Lab/codex/DECISAO_P15_F50.md`.
 
-### v3.4 — reconciliação Sensei ↔ Jornada ↔ Dojo e remoção das catracas falsas
+### v3.4 — Sensei orquestra; Jornada mapeia; Dojo automatiza em estado separado
 
-Reconciliação pós-P22 sem alterar a topologia do grafo: §3.1 fixa o **Sensei** como orquestrador prescritivo e a **Jornada** como mapa; §5 remove “nível 5 = fluência/Dojo”, corrige a descida para o comportamento vigente do runtime e alinha a coroa multidimensional a compreensão + independência + evidência autoral + sessões espaçadas; §6 troca dose fixa por idade por missão adaptativa por estado; §11.4 proíbe RT lento como meio-erro conceitual; §11.9 separa coroa e `dojoTracks`; §11.12 elimina a reserva etária de domínio; §12.2-bis/§12.3 separam definitivamente nível conceitual de faixa/força do Dojo; §12.11 deixa prática cronometrada fora da escada conceitual. Manual passa a 90/90 com GM.12 e Método a 90 competências/94 fichas. Registros históricos permanecem marcados como históricos.
+Reconciliação canônica pós-P22, sem alterar topologia do grafo: §5 remove a associação normativa “nível 5 = Fluência/Dojo”, alinha a descida ao runtime vigente (3 erros) e registra a coroa multidimensional real de `progressEngine` (compreensão + independência + evidência autoral + sessões espaçadas, sem RT); §6 troca dose fixa por idade por política adaptativa por estado, preservando a tabela antiga como registro histórico explícito; §11.4 impede RT lento de virar meio-erro; §11.9 separa mastery conceitual de `dojoTracks`; §11.12 elimina a reserva etária de domínio; §12.2-bis/§12.3/§12.11 separam nível conceitual de faixa/automaticidade do Dojo. Manual fecha em 90/90 com GM.12 e Método em 90 competências/94 fichas. Changelog e diagnóstico históricos foram preservados sem condensação.
