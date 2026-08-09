@@ -1,10 +1,10 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 9/ago/2026.** Próximo bloqueante: `LENTO_DEDOS` / autoridade indevida da velocidade.
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Próximo bloqueante: timezone / identidade do dia (`lastDay`).
 
 ## Leia
 
-1. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`
+1. `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`
 2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
 3. `RETOMADA.md`
 4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
@@ -13,34 +13,36 @@ Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 draf
 
 ## Não reabra
 
-Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto e telemetria/Leitner da Aula composta estão fechados.
+Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner e `LENTO_DEDOS` estão fechados.
+
+Evidências:
 
 - banco: CI #682 / `31308424789`;
 - telemetria/Leitner: CI #691 / `31308774424`;
-- telemetria v2 usa `trackId` = competência-fonte da questão composta;
-- Leitner materializa `reviewForce/lastDay` no source real.
+- `LENTO_DEDOS`: CI #702 / `31309761131`;
+- head funcional desse fechamento: `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`.
 
-## Faça agora — `LENTO_DEDOS`
+`LENTO_DEDOS` não pertence ao Radar conceitual; tags não canônicas são ignoradas, inclusive em saves legados. Mutação imperativa externa de `streak` não pode acelerar a escada conceitual. RT/estrelas/Dojo permanecem sinais separados.
 
-Dois bugs já provados em `GameLoop.tsx`:
+## Faça agora — timezone / `lastDay`
 
-1. rapid-fire correto >10s chama `trackMisconception(p, "LENTO_DEDOS")`; duas ocorrências iguais podem entrar no Radar e acionar remediação conceitual por lentidão;
-2. rapid-fire correto ≤3s força `p.streak = 3`; isso persiste e pode fazer a próxima resposta subir `lvl` por velocidade.
+Há múltiplos escritores de `YYYY-MM-DD` por `new Date().toISOString().slice(0, 10)` em runtime. Isso usa **dia UTC**, não necessariamente o calendário local da criança.
 
-Ambos violam o cânone: RT é automaticidade, não domínio conceitual.
+### Cadeia obrigatória
 
-### Sequência obrigatória
+`relógio local → day key → GameLoop/Jardim/Dojo/Leitner → Progress.lastDay/masteryEvidence/log → Radar/Composer/bônus → save/cloud`.
 
-1. testes/regressões que provem os dois efeitos;
-2. tirar `LENTO_DEDOS` de `Progress.misconceptions`/Radar conceitual;
-3. remover bônus de velocidade sobre `streak/lvl/dom/masteryEvidence`;
-4. preservar RT, estrelas e Dojo/strength como sinais de fluência;
-5. provar rápido vs lento correto = mesma autoridade conceitual;
-6. provar Dojo prescrito intacto;
-7. gates completos + Chrome;
-8. checkpoint.
+### Sequência
 
-Não reintroduzir `TAG_TO_NODE`.
+1. inventariar todos os escritores/consumidores de day key;
+2. criar helper puro único para “dia local” sem hardcode de timezone;
+3. criar distância entre dias de calendário resistente a DST;
+4. testes de virada UTC/local em offsets negativos e positivos;
+5. migrar writers/consumers relevantes para o helper;
+6. alinhar revisão espaçada, mastery session day, Dojo/Jardim e bônus/log diário;
+7. não mudar os intervalos Leitner por acidente;
+8. gates completos + Chrome quando tocar runtime;
+9. checkpoint.
 
 ## Conteúdo continua inventariado
 
@@ -48,7 +50,7 @@ Não reintroduzir `TAG_TO_NODE`.
 
 ## Depois
 
-timezone/`lastDay` → recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
