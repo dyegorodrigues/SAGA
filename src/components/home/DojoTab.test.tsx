@@ -33,12 +33,29 @@ function renderGarden(
     <DojoTab
       prog={prog}
       dojoTracks={dojoTracks}
+      mixedAvailable={false}
       onGardenTrack={onGardenTrack}
       onMixed={vi.fn()}
       onOpenPicker={vi.fn()}
     />,
   );
   return onGardenTrack;
+}
+
+function renderMaster(mixedAvailable: boolean) {
+  const onMixed = vi.fn();
+  render(
+    <DojoTab
+      prog={{}}
+      dojoTracks={{}}
+      mixedAvailable={mixedAvailable}
+      onMixed={onMixed}
+      onOpenPicker={vi.fn()}
+      onGardenTrack={vi.fn()}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: /Dojo Sensei/ }));
+  return onMixed;
 }
 
 describe("P8 — DojoTab consome o Jardim real", () => {
@@ -128,5 +145,22 @@ describe("P8 — DojoTab consome o Jardim real", () => {
     expect(screen.getByText("✨ Reflexo")).toBeTruthy();
     expect(screen.getByText("Treino: 3/5")).toBeTruthy();
     expect(screen.getByText("Melhor: 5/5")).toBeTruthy();
+  });
+});
+
+describe("Misto — porta Mestre no Dojo", () => {
+  it("sem duas competências dominadas mostra estado bloqueado e nenhum CTA", () => {
+    const onMixed = renderMaster(false);
+    expect(screen.getByLabelText("Treino Mestre bloqueado")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Treino Mestre/ })).toBeNull();
+    expect(onMixed).not.toHaveBeenCalled();
+  });
+
+  it("com repertório elegível libera o CTA opcional", () => {
+    const onMixed = renderMaster(true);
+    const button = screen.getByRole("button", { name: /Treino Mestre/ });
+    fireEvent.click(button);
+    expect(onMixed).toHaveBeenCalledTimes(1);
+    expect(screen.queryByLabelText("Treino Mestre bloqueado")).toBeNull();
   });
 });
