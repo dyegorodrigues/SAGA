@@ -53,9 +53,11 @@ function base(ficha: FichaCompetencia, level: number) {
   const microId = ficha.niveis[level]?.micro;
   const micro = microId ? ficha.micros.find(candidate => candidate.id === microId) : undefined;
   if (!micro) throw new Error(`N1.09 sem micro do nível ${level}.`);
+  const rtAlvoMs = ficha.niveis[level]?.rt_alvo;
   return {
     howto: ficha.howto,
     explain: ficha.explain,
+    ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
     masteryRule: {
       acertos: micro.dominio?.acertos ?? 4,
       de: micro.dominio?.de ?? 5,
