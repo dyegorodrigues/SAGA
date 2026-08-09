@@ -1,66 +1,58 @@
 import { Question, Track } from "../../../../types";
-import { ri } from "../../../../utils/generators"; 
+import { ri } from "../../../../utils/generators";
+import { stampSenseiDojoQuestion } from "../../../motores/senseiDojoPolicy";
 
 export const gDojoSub = (lvl: number): Question => {
+  const step = Math.min(10, Math.max(1, Math.round(lvl)));
   let a = 0, b = 0;
-  
-  if (lvl === 1) {
-    // Lvl 1: Subtração simples até 5
+
+  if (step === 1) {
     a = ri(2, 5);
     b = ri(1, a - 1);
-  } else if (lvl === 2) {
-    // Lvl 2: Subtração até 10
+  } else if (step === 2) {
     a = ri(6, 10);
     b = ri(1, a - 1);
-  } else if (lvl === 3) {
-    // Lvl 3: Amigos do 10 reversos (10 - X)
+  } else if (step === 3) {
     a = 10;
     b = ri(1, 9);
-  } else if (lvl === 4) {
-    // Lvl 4: Passando do 10 (ex: 12 - 3)
+  } else if (step === 4) {
     a = ri(11, 18);
     b = ri(a - 9, 9);
-  } else if (lvl === 5) {
-    // Lvl 5: Dezenas exatas menos unidade (ex: 20 - 3)
+  } else if (step === 5) {
     a = ri(2, 9) * 10;
     b = ri(1, 9);
-  } else if (lvl === 6) {
-    // Lvl 6: 2D - 1D sem empréstimo (ex: 25 - 3)
-    a = ri(12, 89);
-    b = ri(1, a % 10);
-  } else if (lvl === 7) {
-    // Lvl 7: 2D - 1D com empréstimo (ex: 23 - 5)
-    a = ri(11, 88);
-    if (a % 10 === 9) a--;
-    b = ri((a % 10) + 1, 9);
-  } else if (lvl === 8) {
-    // Lvl 8: Dezenas exatas menos dezenas exatas
+  } else if (step === 6) {
+    // Sem empréstimo: garante unidade >=1 para existir subtraendo positivo.
+    const tens = ri(1, 8);
+    const units = ri(1, 9);
+    a = tens * 10 + units;
+    b = ri(1, units);
+  } else if (step === 7) {
+    const tens = ri(1, 8);
+    const units = ri(0, 8);
+    a = tens * 10 + units;
+    b = ri(units + 1, 9);
+  } else if (step === 8) {
     a = ri(2, 9) * 10;
-    b = ri(1, (a/10) - 1) * 10;
-  } else if (lvl === 9) {
-    // Lvl 9: 2D - 2D sem empréstimo
-    a = ri(21, 99);
-    let aDez = Math.floor(a/10);
-    let aUni = a % 10;
-    let bDez = ri(1, aDez - 1);
-    let bUni = ri(1, aUni); // ensure bUni <= aUni
-    b = bDez * 10 + bUni;
+    b = ri(1, (a / 10) - 1) * 10;
+  } else if (step === 9) {
+    // Sem empréstimo: ambas as casas de b cabem nas de a.
+    const aTens = ri(2, 9);
+    const aUnits = ri(1, 9);
+    const bTens = ri(1, aTens - 1);
+    const bUnits = ri(0, aUnits);
+    a = aTens * 10 + aUnits;
+    b = bTens * 10 + bUnits;
   } else {
-    // Lvl 10: 2D - 2D com empréstimo
-    a = ri(31, 98);
-    let aDez = Math.floor(a/10);
-    let aUni = a % 10;
-    if (aUni === 9) {
-      a--;
-      aUni--;
-    }
-    let bDez = ri(1, aDez - 2); 
-    let bUni = ri(aUni + 1, 9);
-    b = bDez * 10 + bUni;
+    const aTens = ri(3, 9);
+    const aUnits = ri(0, 8);
+    const bTens = ri(1, aTens - 2);
+    const bUnits = ri(aUnits + 1, 9);
+    a = aTens * 10 + aUnits;
+    b = bTens * 10 + bUnits;
   }
 
   const ans = a - b;
-
   const false1 = ans + ri(1, 3);
   const false2 = ans > 3 ? ans - ri(1, 3) : ans + 4;
   let false3 = ans + 10;
@@ -70,17 +62,18 @@ export const gDojoSub = (lvl: number): Question => {
     { label: `${ans}`, value: ans },
     { label: `${false1}`, value: false1 },
     { label: `${false2}`, value: false2 },
-    { label: `${false3}`, value: false3 }
+    { label: `${false3}`, value: false3 },
   ].sort(() => Math.random() - 0.5);
 
-  return {
-    kind: "rapid-fire", prompt: "",
+  return stampSenseiDojoQuestion("dojo_sub", step, {
+    kind: "rapid-fire",
+    prompt: "",
     expr: `${a} - ${b} = ?`,
     options: opts,
     answer: ans,
     explain: `${a} - ${b} = ${ans}`,
-    rt_max_s: lvl <= 3 ? 6 : (lvl <= 6 ? 8 : (lvl <= 8 ? 10 : 15))
-  };
+    rt_max_s: step <= 3 ? 6 : (step <= 6 ? 8 : (step <= 8 ? 10 : 15)),
+  });
 };
 
 export const dojo_sub: Track = {
@@ -90,6 +83,7 @@ export const dojo_sub: Track = {
   color: "#c7d2fe",
   dark: "#4338ca",
   gen: gDojoSub,
+  totalQ: 10,
   lvlSkills: [
     "Até 5",
     "Até 10",
@@ -100,8 +94,8 @@ export const dojo_sub: Track = {
     "2D - 1D (Com Emprest.)",
     "Dezenas Exatas",
     "2D - 2D (Sem Emprest.)",
-    "2D - 2D (Com Emprest.)"
+    "2D - 2D (Com Emprest.)",
   ],
   prereqs: [],
-  dominio: "2 rounds seguidos ≥80% sobe de faixa, <60% desce"
+  dominio: "automaticidade separada: 2 rounds ≥80% de precisão E fluência para subir; <60% de precisão em 2 rounds recua só o treino",
 };
