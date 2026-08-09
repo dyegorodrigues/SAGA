@@ -13,7 +13,14 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
  * nunca inferências silenciosas.
  */
 const FICHA_RUNTIME_MAP = [
-  { primitive: "ArrayGrid", kinds: ["array", "area-model"], componentFiles: [component("ArrayGrid")], builderKinds: ["arraygrid"], rendererKinds: ["array"] },
+  {
+    primitive: "ArrayGrid",
+    kinds: ["array", "area", "area-model"],
+    componentFiles: [component("ArrayGrid"), component("AreaStage")],
+    builderKinds: ["arraygrid", "area"],
+    rendererKinds: ["array", "area"],
+    note: "F68/N4.09: a ficha nomeia ArrayGrid em modo área; o Composer emite kind area e o renderer entrega AreaStage. O array direto continua atendido por ArrayGrid.",
+  },
   {
     primitive: "AudioChoice",
     kinds: ["audiochoice"],
