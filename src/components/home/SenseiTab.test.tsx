@@ -3,6 +3,8 @@ import React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import type { AulaPlan } from "../../curriculum/motores/composer";
+import type { CausalJardimPrescription } from "../../curriculum/motores/jardimCausalPrescription";
+import type { SenseiEntry } from "../../curriculum/motores/senseiOrchestrator";
 import type { SenseiDojoPrescription } from "../../curriculum/motores/senseiDojoPrescription";
 import type { Kid, Track } from "../../types";
 import { SenseiTab } from "./SenseiTab";
@@ -30,6 +32,16 @@ const dojoTrack: Track = {
   gen: () => ({ kind: "plain", prompt: "1 + 1", options: [{ label: "2", value: 2 }], answer: 2 }),
 };
 
+const jardimTrack: Track = {
+  id: "JD1",
+  name: "Jardim · Olhômetro Relâmpago",
+  icon: "👀",
+  color: "#D1FAE5",
+  dark: "#059669",
+  totalQ: 8,
+  gen: () => ({ kind: "plain", prompt: "Quantos você viu?", options: [{ label: "3", value: 3 }], answer: 3 }),
+};
+
 const aulaPlan: AulaPlan = {
   aquecimento: null,
   fronteira: null,
@@ -49,7 +61,23 @@ const prescription: SenseiDojoPrescription = {
   weakItems: 0,
 };
 
-function renderSensei(dojoPrescription: SenseiDojoPrescription | null) {
+const gardenPrescription: CausalJardimPrescription = {
+  trailId: "JD1",
+  motherId: "N1.03",
+  motherName: "Subitização perceptual (Olhômetro)",
+  sourceNodeId: "N1.03",
+  causalDistance: 0,
+  step: 2,
+  questionBudget: 8,
+  track: jardimTrack,
+  reason: "known-perceptual-weakness",
+  reasonText: "A base perceptual já foi compreendida, mas ainda precisa virar reflexo.",
+};
+
+function renderSensei(
+  dojoPrescription: SenseiDojoPrescription | null,
+  senseiEntry: SenseiEntry = { kind: "lesson" },
+) {
   const onSenseiDojo = vi.fn();
   const onAula = vi.fn();
   const onMixed = vi.fn();
@@ -59,6 +87,7 @@ function renderSensei(dojoPrescription: SenseiDojoPrescription | null) {
       prog={{ "N3.01": { lvl: 3 } }}
       aulaPlan={aulaPlan}
       rec={null}
+      senseiEntry={senseiEntry}
       dojoPrescription={dojoPrescription}
       onMatricula={vi.fn()}
       onAula={onAula}
@@ -94,5 +123,29 @@ describe("SenseiTab — missão prescrita do Dojo", () => {
     renderSensei(null);
     expect(screen.queryByText(/Prescrição do Sensei/)).toBeNull();
     expect(screen.queryByRole("button", { name: /Fazer round prescrito/ })).toBeNull();
+  });
+});
+
+describe("SenseiTab — Jardim causal", () => {
+  it("torna a descida perceptual explícita sem parecer uma Aula conceitual normal", () => {
+    renderSensei(null, { kind: "garden", prescription: gardenPrescription });
+
+    expect(screen.getByText(/Aula do Dia · Base Perceptual/)).toBeTruthy();
+    expect(screen.getByText(/Transformar em reflexo: Jardim · Olhômetro Relâmpago/)).toBeTruthy();
+    expect(screen.getByText(/Base já compreendida:.*Subitização perceptual/)).toBeTruthy();
+    expect(screen.getByText(/Round curto de/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Começar Jardim Guiado/ })).toBeTruthy();
+  });
+
+  it("o CTA do Jardim usa a mesma porta principal e não dispara Dojo prescrito ou Misto", () => {
+    const { onSenseiDojo, onAula, onMixed } = renderSensei(
+      prescription,
+      { kind: "garden", prescription: gardenPrescription },
+    );
+    fireEvent.click(screen.getByRole("button", { name: /Começar Jardim Guiado/ }));
+
+    expect(onAula).toHaveBeenCalledTimes(1);
+    expect(onSenseiDojo).not.toHaveBeenCalled();
+    expect(onMixed).not.toHaveBeenCalled();
   });
 });
