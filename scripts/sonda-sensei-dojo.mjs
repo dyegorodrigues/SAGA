@@ -16,26 +16,60 @@ const viewports = [
 ];
 const MOTION_SETTLE_MS = 500;
 
-const progress = {
+const progress = (overrides = {}) => ({
   lvl: 3, maxLvl: 3, dom: false, streak: 0, bad: 0,
   stars: 0, ok: 3, tot: 3, bank: [], mast: 0,
+  ...overrides,
+});
+
+const baseKid = {
+  id: "sonda-kid", name: "Sonda", avatar: "🦊", grade: "ano1", age: 6,
+  theme: "classico", petName: "Kiro", inventory: [], petFood: 0, petEnergy: 80,
 };
 
-const fixtureState = {
+const stateEnvelope = (kidProgress, dojoTracks = {}) => ({
   schemaVersion: 1,
-  kids: [{
-    id: "sonda-kid", name: "Sonda", avatar: "🦊", grade: "ano1", age: 6,
-    theme: "classico", petName: "Kiro", inventory: [], petFood: 0, petEnergy: 80,
-  }],
-  progress: { "sonda-kid": { "N3.01": progress } },
-  dojoTracks: { "sonda-kid": {} },
+  kids: [baseKid],
+  progress: { "sonda-kid": kidProgress },
+  dojoTracks: { "sonda-kid": dojoTracks },
   coins: { "sonda-kid": 0 },
   album: { "sonda-kid": [] },
   log: { "sonda-kid": [] },
   sound: false,
   revision: 1,
   updatedAt: "2026-08-09T12:00:00.000Z",
-};
+});
+
+const dojoFixtureState = stateEnvelope({ "N3.01": progress() });
+
+// N1.03 é raiz do DAG: duas ocorrências iguais produzem misconception no próprio
+// alvo, sem pré-requisito conceitual anterior. JD1 já está desbloqueado e tem
+// fraqueza observada (recuou 3→2 + 10/16), exatamente o contrato que autoriza
+// o Sensei a descer causalmente para o Jardim.
+const jardimFixtureState = stateEnvelope(
+  {
+    "N1.03": progress({
+      misconceptions: [
+        { tag: "off-by-one", ts: 1_000_000 },
+        { tag: "off-by-one", ts: 1_000_500 },
+      ],
+    }),
+  },
+  {
+    JD1: {
+      unlocked: true,
+      mastered: false,
+      family: "JD",
+      currentStep: 2,
+      highestStep: 3,
+      goodRounds: 0,
+      weakRounds: 0,
+      rounds: 2,
+      attempts: 16,
+      correct: 10,
+    },
+  },
+);
 
 function chromeExecutable() {
   const candidates = [
@@ -68,13 +102,20 @@ async function waitForServer(server, timeoutMs = 30_000) {
   throw new Error(`Vite não respondeu em ${timeoutMs}ms.\n${stderr}`);
 }
 
-async function seedState(page) {
+async function seedState(page, fixtureState) {
   await page.goto(`${baseUrl}/?e2e=1`, { waitUntil: "domcontentloaded" });
   await page.evaluate(({ key, value }) => {
+    window.localStorage.clear();
     window.localStorage.setItem("mk-visitor-mode", "true");
     window.localStorage.setItem(key, value);
   }, { key: stateKey, value: JSON.stringify(fixtureState) });
   await page.reload({ waitUntil: "networkidle" });
+}
+
+async function enterKid(page) {
+  const kidButton = page.getByRole("button").filter({ hasText: "Sonda" }).first();
+  await kidButton.waitFor({ state: "visible", timeout: 15_000 });
+  await kidButton.click();
 }
 
 async function assertNoHorizontalOverflow(page, label) {
@@ -95,9 +136,7 @@ const isIgnorableHttpFailure = ({ url }) => {
   catch { return false; }
 };
 
-async function runViewport(browser, viewport) {
-  const context = await browser.newContext({ viewport });
-  const page = await context.newPage();
+function instrumentPage(page) {
   const consoleErrors = [];
   const pageErrors = [];
   const httpFailures = [];
@@ -112,12 +151,31 @@ async function runViewport(browser, viewport) {
     if (response.status() < 400) return;
     httpFailures.push({ status: response.status(), url: response.url() });
   });
+  return { consoleErrors, pageErrors, httpFailures };
+}
 
-  await seedState(page);
+function assertHealthyBrowser(label, diagnostics) {
+  const fatalHttpFailures = diagnostics.httpFailures.filter(item => !isIgnorableHttpFailure(item));
+  if (diagnostics.pageErrors.length) {
+    throw new Error(`${label}: page errors: ${diagnostics.pageErrors.join(" | ")}`);
+  }
+  if (fatalHttpFailures.length) {
+    throw new Error(`${label}: HTTP failures: ${fatalHttpFailures.map(item => `${item.status} ${item.url}`).join(" | ")}`);
+  }
+  // O Chrome emite "Failed to load resource" sem URL no console para o mesmo
+  // 404 já classificado acima. Erros JS reais continuam fatais.
+  const fatalConsoleErrors = diagnostics.consoleErrors.filter(item => !/Failed to load resource/i.test(item.text));
+  if (fatalConsoleErrors.length) {
+    throw new Error(`${label}: console errors: ${fatalConsoleErrors.map(item => `${item.text}${item.url ? ` @ ${item.url}` : ""}`).join(" | ")}`);
+  }
+}
 
-  const kidButton = page.getByRole("button").filter({ hasText: "Sonda" }).first();
-  await kidButton.waitFor({ state: "visible", timeout: 15_000 });
-  await kidButton.click();
+async function runDojoFlow(browser, viewport) {
+  const context = await browser.newContext({ viewport });
+  const page = await context.newPage();
+  const diagnostics = instrumentPage(page);
+  await seedState(page, dojoFixtureState);
+  await enterKid(page);
 
   await page.getByText("Missões do Dojô", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("Prescrição do Sensei", { exact: false }).waitFor({ state: "visible" });
@@ -125,7 +183,7 @@ async function runViewport(browser, viewport) {
   await page.getByRole("button", { name: /Começar Aula do Dia|Começar Reforço Guiado/i }).waitFor({ state: "visible" });
   await page.getByText("Mistura Total (Dojô Geral)", { exact: true }).waitFor({ state: "visible" });
   await page.waitForTimeout(MOTION_SETTLE_MS);
-  const homeMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/home`);
+  const homeMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/dojo-home`);
   const homeScreenshot = path.join(artifactDir, `${viewport.name}-sensei-home.png`);
   await page.screenshot({ path: homeScreenshot, fullPage: true });
 
@@ -134,28 +192,53 @@ async function runViewport(browser, viewport) {
   await prescribedButton.click();
   await page.getByText(/\d+\s*\+\s*\d+\s*=\s*\?/).first().waitFor({ state: "visible", timeout: 15_000 });
   await page.waitForTimeout(MOTION_SETTLE_MS);
-  const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/game`);
+  const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/dojo-game`);
   const gameScreenshot = path.join(artifactDir, `${viewport.name}-dojo-prescrito.png`);
   await page.screenshot({ path: gameScreenshot, fullPage: true });
 
-  const fatalHttpFailures = httpFailures.filter(item => !isIgnorableHttpFailure(item));
-  if (pageErrors.length) throw new Error(`${viewport.name}: page errors: ${pageErrors.join(" | ")}`);
-  if (fatalHttpFailures.length) {
-    throw new Error(`${viewport.name}: HTTP failures: ${fatalHttpFailures.map(item => `${item.status} ${item.url}`).join(" | ")}`);
-  }
-  // O Chrome emite "Failed to load resource" sem URL no console para o mesmo
-  // 404 já classificado acima. Erros JS reais continuam fatais.
-  const fatalConsoleErrors = consoleErrors.filter(item => !/Failed to load resource/i.test(item.text));
-  if (fatalConsoleErrors.length) {
-    throw new Error(`${viewport.name}: console errors: ${fatalConsoleErrors.map(item => `${item.text}${item.url ? ` @ ${item.url}` : ""}`).join(" | ")}`);
-  }
-
+  assertHealthyBrowser(`${viewport.name}/dojo`, diagnostics);
   await context.close();
   return {
+    flow: "dojo-prescribed",
     viewport,
     homeMetrics,
     gameMetrics,
-    httpFailures,
+    httpFailures: diagnostics.httpFailures,
+    screenshots: [path.basename(homeScreenshot), path.basename(gameScreenshot)],
+  };
+}
+
+async function runJardimFlow(browser, viewport) {
+  const context = await browser.newContext({ viewport });
+  const page = await context.newPage();
+  const diagnostics = instrumentPage(page);
+  await seedState(page, jardimFixtureState);
+  await enterKid(page);
+
+  await page.getByText(/Aula do Dia · Base Perceptual/).waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText(/Transformar em reflexo: Jardim · Olhômetro Relâmpago/).waitFor({ state: "visible" });
+  await page.getByText(/Base já compreendida:/).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: /Começar Jardim Guiado/i }).waitFor({ state: "visible" });
+  await page.waitForTimeout(MOTION_SETTLE_MS);
+  const homeMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/jardim-home`);
+  const homeScreenshot = path.join(artifactDir, `${viewport.name}-jardim-causal-home.png`);
+  await page.screenshot({ path: homeScreenshot, fullPage: true });
+
+  await page.getByRole("button", { name: /Começar Jardim Guiado/i }).click();
+  await page.getByText(/Quantos eram\?/i).first().waitFor({ state: "visible", timeout: 15_000 });
+  await page.waitForTimeout(MOTION_SETTLE_MS);
+  const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/jardim-game`);
+  const gameScreenshot = path.join(artifactDir, `${viewport.name}-jardim-causal-round.png`);
+  await page.screenshot({ path: gameScreenshot, fullPage: true });
+
+  assertHealthyBrowser(`${viewport.name}/jardim`, diagnostics);
+  await context.close();
+  return {
+    flow: "jardim-causal",
+    viewport,
+    homeMetrics,
+    gameMetrics,
+    httpFailures: diagnostics.httpFailures,
     screenshots: [path.basename(homeScreenshot), path.basename(gameScreenshot)],
   };
 }
@@ -176,12 +259,15 @@ try {
   const executablePath = chromeExecutable();
   browser = await chromium.launch({ executablePath, headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
   const results = [];
-  for (const viewport of viewports) results.push(await runViewport(browser, viewport));
+  for (const viewport of viewports) {
+    results.push(await runDojoFlow(browser, viewport));
+    results.push(await runJardimFlow(browser, viewport));
+  }
 
   const summary = { ok: true, executablePath, baseUrl, checkedAt: new Date().toISOString(), results };
   fs.writeFileSync(path.join(artifactDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
-  console.log("[SONDA SENSEI↔DOJO] OK — navegador real, card prescrito, navegação e overflow validados.");
-  for (const result of results) console.log(`- ${result.viewport.name}: ${result.screenshots.join(", ")}`);
+  console.log("[SONDA SENSEI] OK — Dojo prescrito + Jardim causal validados em navegador real.");
+  for (const result of results) console.log(`- ${result.viewport.name}/${result.flow}: ${result.screenshots.join(", ")}`);
 } catch (error) {
   const summary = {
     ok: false,
