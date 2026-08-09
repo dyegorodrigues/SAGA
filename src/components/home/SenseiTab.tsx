@@ -9,7 +9,6 @@ interface Props {
   kid: Kid;
   prog: Record<string, any>;
   aulaPlan: AulaPlan;
-  rec: { track: Track, reason: string } | null;
   senseiEntry: SenseiEntry;
   dojoPrescription: SenseiDojoPrescription | null;
   onMatricula: () => void;
@@ -22,7 +21,7 @@ interface Props {
   setActiveShellTab: (tab: any) => void;
 }
 
-export function SenseiTab({ kid, prog, aulaPlan, rec, senseiEntry, dojoPrescription, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
+export function SenseiTab({ kid, prog, aulaPlan, senseiEntry, dojoPrescription, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
   const [expandedLesson, setExpandedLesson] = useState(true);
   const [expandedDojo, setExpandedDojo] = useState(true);
   const [expandedRescue, setExpandedRescue] = useState(true);
@@ -208,7 +207,7 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, senseiEntry, dojoPrescript
             {expandedDojo ? "▲ Compactar" : "▼ Expandir"}
           </button>
         </div>
-        <p className="text-xs font-bold text-slate-500 mb-4 pl-1">O Sensei pode prescrever um round curto de automaticidade. O treino livre continua sendo escolha sua.</p>
+        <p className="text-xs font-bold text-slate-500 mb-4 pl-1">O Sensei pode prescrever um round curto de automaticidade. O treino livre continua sendo escolha sua nas áreas próprias de exploração.</p>
 
         {expandedDojo && (
           <div className="flex flex-col gap-3">
@@ -268,34 +267,6 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, senseiEntry, dojoPrescript
                 Mistura o repertório que você já conquistou para desafiar seus reflexos.
               </div>
             </button>
-
-            {rec && (
-              <button
-                onClick={() => {
-                  sfx.tick();
-                  onTrack(rec.track);
-                }}
-                className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2 hover:border-emerald-500"
-                style={{
-                  background: 'linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)',
-                  borderColor: '#22C55E',
-                  boxShadow: '0 4px 0 #16A34A',
-                }}
-              >
-                <div className="flex items-center justify-between gap-3 mb-1.5">
-                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-emerald-900 bg-emerald-200 border border-emerald-300">
-                    🎯 Treino Livre Sugerido
-                  </span>
-                  <span className="text-xl">🥋</span>
-                </div>
-                <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 17, color: '#166534' }}>
-                  {rec.track.name}
-                </div>
-                <div className="text-[11px] font-bold mt-1 leading-snug text-emerald-900/80">
-                  {rec.reason}
-                </div>
-              </button>
-            )}
           </div>
         )}
       </div>
