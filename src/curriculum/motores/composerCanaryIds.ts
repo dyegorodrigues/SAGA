@@ -6,9 +6,6 @@
  * - promover um nó é adicionar exatamente um id aqui;
  * - rollback em runtime continua sendo `rollbackComposerCanary(id)`;
  * - cada alteração deste arquivo precisa atravessar `canaryContract.test.ts`.
- *
- * Separar esta lista do mecanismo evita reescrever `composerCanary.ts` a cada
- * promoção e torna o diff de ativação pequeno, auditável e reversível.
  */
 export const DEFAULT_COMPOSER_CANARY_IDS = [
   "N3.09",
@@ -31,6 +28,7 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "GE.01",
   "GE.02",
   "GM.01",
+  "GM.02",
   "GM.12",
 
   // Bloco F0 promovido anteriormente.
