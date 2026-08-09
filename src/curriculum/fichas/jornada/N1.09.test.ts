@@ -66,6 +66,6 @@ describe("P22.4 — N1.09 contagem flexível até 20", () => {
     expect(objetos).toBeGreaterThan(0);
     expect(frente).toBeGreaterThan(0);
     expect(tras).toBeGreaterThan(0);
-    expect(N1_09.niveis[5].rt_alvo).toBeUndefined();
+    expect(N1_09.niveis[5].rt_alvo).toBe(20000);
   });
 });
