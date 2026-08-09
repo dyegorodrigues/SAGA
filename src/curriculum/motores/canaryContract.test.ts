@@ -30,6 +30,7 @@ import { N1_13 } from "../fichas/jornada/N1.13";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
+import { GM_02 } from "../fichas/jornada/GM.02";
 import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_01 } from "../fichas/jornada/N1.01";
@@ -63,7 +64,7 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  *
  * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
  * porta que `selectGenerator` usa em produção. Assim builders procedimentais
- * especializados (como N1.09) não ganham um caminho de teste paralelo.
+ * especializados (como N1.09 e GM.02) não ganham um caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
@@ -75,9 +76,8 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.08": N4_08,
   "N4.09": N4_09,
 
-  // Bloco F0. Estes seis já eram servidos por ficha em produção, mas por fora
-  // do mecanismo — chamavam `Composer.generate` de dentro do gerador legado.
-  // Regularizá-los os traz, pela primeira vez, para debaixo deste contrato.
+  // Bloco F0. Estes nós são servidos por ficha autoral de produção sob o
+  // mesmo contrato, inclusive os builders procedimentais de N1.09 e GM.02.
   "N1.03": N1_03,
   "N1.07": N1_07,
   "N1.08": N1_08,
@@ -86,22 +86,16 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.11": N1_11,
   "AL.01": AL_01,
 
-  // A ativação do bloco F0: as quatro que passaram o intervalo inteiro
-  // desligadas, escritas nos passos 0 a 2 e olhadas print a print.
-  //   N1.01 pareamento (F07) · N1.02 canhão (F27)
-  //   N1.04 contar tocando (F01) · AL.02 padrões (F52)
   "N1.01": N1_01,
   "N1.02": N1_02,
   "N1.04": N1_04,
   "N1.06": N1_06,
 
-  // Candidatos F0 já implementados e registrados ANTES da promoção. Registrar
-  // aqui não ativa nada; a única chave de produção continua sendo
-  // `COMPOSER_CANARIES`. Isto deixa cada promoção futura reduzida a um id.
   "N1.13": N1_13,
   "GE.01": GE_01,
   "GE.02": GE_02,
   "GM.01": GM_01,
+  "GM.02": GM_02,
   "GM.12": GM_12,
 
   "AL.02": AL_02,
@@ -136,8 +130,6 @@ describe("contrato do canário do Composer", () => {
 
     it("o rollback devolve o nó ao que havia antes, e a reativação o traz de volta", () => {
       rollbackComposerCanary(id);
-      // Numa substituição volta o gerador legado; numa estreia volta o
-      // placeholder. Nos dois casos o que importa é que SAI do Composer.
       expect(getTrackById(id)?.generatorSource).toBe(ehEstreia ? "fallback" : "legacy");
 
       enableComposerCanary(id);
@@ -151,15 +143,6 @@ describe("contrato do canário do Composer", () => {
           expect(autoral.evaluate?.(autoral.answer), `${id} autoral L${lvl}`).toBe(true);
           expect(autoral.isFallback, `${id} L${lvl} devolveu placeholder`).toBeFalsy();
 
-          // "Utilizável" era verificado como `Number(answer) >= 0`, o que
-          // supunha que todo canário é aritmético — verdade enquanto os sete
-          // primeiros eram contas. AL.01 é classificação: a resposta é o emoji
-          // intruso, e `Number("🚗")` é NaN. N1.01 será "sobra"/"exato"/"falta".
-          //
-          // O que a asserção realmente queria dizer é o que está escrito agora:
-          // a resposta existe e a criança consegue escolhê-la. É mais forte que
-          // a versão numérica — esta pega gabarito fora das alternativas, que
-          // aquela deixava passar.
           expect(autoral.answer, `${id} autoral L${lvl}: sem gabarito`)
             .not.toBeUndefined();
           expect(String(autoral.answer ?? "").length, `${id} autoral L${lvl}: gabarito vazio`)
@@ -181,8 +164,6 @@ describe("contrato do canário do Composer", () => {
       ? "estreia: o nó deixou de ser placeholder"
       : "paridade: o gerador legado continua produzindo questão válida", () => {
       if (ehEstreia) {
-        // Não há com o que comparar. O que se verifica é que o rollback devolve
-        // ao placeholder — e portanto que a promoção trocou algo de verdade.
         rollbackComposerCanary(id);
         expect(getTrackById(id)?.gen(1).isFallback,
           `${id} não era placeholder antes: isto deveria ser substituição, não estreia`).toBe(true);
@@ -257,25 +238,11 @@ describe("contrato do canário do Composer", () => {
     });
 
     it("a tela nunca oferece mais de quatro alternativas", () => {
-      // §9.1 do cânone: 3 a 4 opções tocáveis. Cinco apareceram de verdade em
-      // N4.07 e só a captura de tela mostrou — excesso de escolha vira ruído
-      // para quem tem 8 anos, não dificuldade. A guarda vale para TODO canário,
-      // presente e futuro, em vez de ficar só na ficha que errou.
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 40; i += 1) {
           const q = gerarAutoral(lvl);
           if (!q.options) continue;
 
-          // Teclado não é leque de alternativas. O cânone §9.1 fixa "3 a 4
-          // opções tocáveis" para o kind `plain` — escolher entre distratores —
-          // e lista `count` ("tocar objetos 1 a 1") como mecânica distinta. A
-          // F01 §5 manda um teclado 1-3, 1-5 ou 1-10, escalado ao escopo: com
-          // quatro teclas, chutar acertaria em 25% e a cardinalidade deixaria de
-          // ser observável.
-          //
-          // Isto NÃO é isenção: o teclado troca uma guarda por outra igualmente
-          // estrita — ele tem de bater exatamente com o escopo que a ficha
-          // declarou, e conter a resposta.
           const teclado = (q.uiProps as { tecladoAte?: number } | undefined)?.tecladoAte;
           if (typeof teclado === "number" && teclado > 0) {
             expect(q.options.length, `${id} L${lvl}: teclado fora do escopo`).toBe(teclado);
