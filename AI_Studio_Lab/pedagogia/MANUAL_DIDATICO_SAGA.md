@@ -721,11 +721,11 @@ Sólidos como objetos da casa (lata=cilindro, dado=cubo, casquinha=cone). **O jo
 
 ---
 
-# 📏 GRANDEZAS E MEDIDAS — TAMANHO, TEMPO E DINHEIRO → GM.01-GM.09
-*Fonte: `medidas.md`, expandido e costurado ao Grafo.*
+# 📏 GRANDEZAS E MEDIDAS — TAMANHO, MASSA, CAPACIDADE, TEMPO E DINHEIRO → GM.01-GM.12
+*Fonte: `medidas.md`, expandido e costurado ao Grafo. Retificado em ago/2026 para separar GM.12 (massa/capacidade sem unidades) de GM.02 (tempo cotidiano) e GM.05 (medidas padronizadas).*
 
 ## Por que trava
-A escola começa pela régua e pelo "1 hora tem 60 minutos". Sintoma: a criança lê "3 cm" mas não sabe se 3 cm é uma formiga ou um ônibus; lê o relógio mas não sente a duração. Causa: pular a comparação direta e as unidades não-padronizadas — os estágios onde o conceito de MEDIR nasce.
+A escola começa pela régua e pelo "1 hora tem 60 minutos". Sintoma: a criança lê "3 cm" mas não sabe se 3 cm é uma formiga ou um ônibus; lê o relógio mas não sente a duração; reconhece "kg" ou "L" sem entender primeiro o que significa uma coisa ser mais pesada, ter maior capacidade ou conservar a mesma quantidade apesar de mudar de recipiente. Causa: pular a comparação direta, a conservação e as unidades não-padronizadas — os estágios onde o conceito de MEDIR nasce.
 
 ## A escada
 ```
@@ -733,8 +733,8 @@ A escola começa pela régua e pelo "1 hora tem 60 minutos". Sintoma: a criança
  Nível 4: O valor do dinheiro (fiduciário)                   → GM.03
  Nível 3: Unidades não-padronizadas — iteração               → GM.05a
  Nível 2: Tempo — sequência e rotina                         → GM.02, GM.04
- Nível 1: Transitividade e conservação                       → GM.01b
- Nível 0: Comparação direta                                  → GM.01a
+ Nível 1: Massa/capacidade sem unidade + conservação         → GM.12
+ Nível 0: Comparação direta, transitividade, comprimento     → GM.01
 ```
 
 ## ▶️ Primeira vez
@@ -742,8 +742,17 @@ Dois prédios tortos na tela. *"Qual é o mais alto?"* A criança tenta responde
 
 ## Nível a nível
 
-### Nível 0-1 — comparar sem números (GM.01)
-Mais alto/baixo, mais pesado/leve (a gangorra), mais comprido/curto, cabe/não cabe. **Conservação (o teste de Piaget):** dois galhos idênticos alinhados; o app desliza um pra direita — *"algum ficou maior?"*. 🧒 *A ilusão é NORMAL até ~6 anos:* a criança jura que o deslocado cresceu. O app devolve o galho ao alinhamento em animação lenta, quantas vezes ela quiser — a reversibilidade vista cura a ilusão com o tempo, não com bronca. **Transitividade:** se a torre A > B e B > C... A > C sem precisar juntar A com C — o primeiro raciocínio dedutivo em cadeia.
+### Nível 0 — comparar sem números (GM.01)
+Mais alto/baixo, mais comprido/curto, cabe/não cabe. **Conservação de comprimento (o teste de Piaget):** dois galhos idênticos alinhados; o app desliza um pra direita — *"algum ficou maior?"*. 🧒 *A ilusão é NORMAL até ~6 anos:* a criança jura que o deslocado cresceu. O app devolve o galho ao alinhamento em animação lenta, quantas vezes ela quiser — a reversibilidade vista cura a ilusão com o tempo, não com bronca. **Transitividade:** se a torre A > B e B > C... A > C sem precisar juntar A com C — o primeiro raciocínio dedutivo em cadeia.
+
+### Nível 1 — massa e capacidade antes das unidades (GM.12)
+**GM.12 existe para impedir que “quilo” e “litro” apareçam antes da grandeza.** A criança primeiro compara e conserva, sem régua, balança graduada nem recipiente marcado.
+- **Massa:** dois objetos vão para uma gangorra/balança simples. O lado que desce é mais pesado; o que sobe é mais leve. Depois entram contraprovas de aparência: um objeto grande e leve contra um pequeno e pesado, para quebrar “maior = mais pesado”.
+- **Capacidade:** dois recipientes transparentes são preenchidos/transvasados. A pergunta é qual **cabe mais** e se a quantidade mudou ao trocar de formato. Um copo alto e fino contra um baixo e largo expõe a ilusão de “nível mais alto = mais líquido”.
+- **Conservação:** a mesma massa/quantidade é transformada ou transvasada diante da criança; ela pode desfazer a transformação. A reversibilidade visual é a explicação, não uma regra verbal.
+- 🧒 *Erros típicos:* julgar massa pelo tamanho aparente; julgar capacidade pela altura do líquido; achar que transvasar “criou” ou “sumiu” quantidade. **Remediação:** voltar à comparação física lado a lado e repetir a transformação reversível.
+
+**Relação canônica:** `GM.01 → GM.12 → GM.05`. GM.02 continua sendo **Tempo cotidiano**. GM.05 continua sendo **Medidas padronizadas** e só entra quando a criança já entende as grandezas que vai medir.
 
 ### Nível 2 — o tempo que se sente (GM.02, GM.04)
 Antes do relógio, a SEQUÊNCIA: ordenar a rotina (acordar → escovar → escola) em cartões; dia/noite; ontem/hoje/amanhã; os dias da semana como música. Depois o relógio SÓ de horas: um ponteiro, o céu mudando de cor conforme gira (sol, entardecer, estrelas). 🧒 *Por que sem minutos:* ler minutos exige contar de 5 em 5 (AL.03b) — apresentar os dois ponteiros juntos é sobrecarga clássica. O ponteiro dos minutos chega em GM.06, e ao girá-lo flores nascem e o contador canta "5 minutos! 10 minutos!" — a duração como coisa viva, não número decorado.
@@ -763,13 +772,14 @@ Antes do relógio, a SEQUÊNCIA: ordenar a rotina (acordar → escovar → escol
 A formiguinha anda EM VOLTA da figura na malha quadriculada, deixando rastro: perímetro é o caminho do contorno. Somar lados dados; deduzir o lado oculto do retângulo (*"se este mede 5, o de lá mede..."*). 🧒 *O erro que define o design:* contar os quadradinhos DE DENTRO em vez do contorno — a colisão frontal com área, e o motivo de área (GM.08) só chegar DEPOIS, quando o contorno estiver firme. Fecho do nível: duas figuras DIFERENTES com o MESMO perímetro (a formiguinha anda o mesmo tanto!) — separando de vez contorno de "tamanho da figura".
 
 ## Microtutoriais
-**"A Linha de Largada"** (GM.01) · **"A Ponte de Tartarugas"** (GM.05) · **"A Máquina de Trocar"** (GM.03) · **"A Régua Quebrada"** (GM.05c).
+**"A Linha de Largada"** (GM.01) · **"A Balança sem Números"** / **"O Transvaso"** (GM.12) · **"A Ponte de Tartarugas"** (GM.05) · **"A Máquina de Trocar"** (GM.03) · **"A Régua Quebrada"** (GM.05c).
 
 ## Regras de implementação
 1. Comparações de nível 0 forçam o alinhamento de base antes de aceitar resposta.
-2. Iteração de unidades com snap ponta-a-ponta; vão ou sobreposição têm consequência física narrada, não "X vermelho".
-3. Relógio: horas primeiro, SEMPRE; minutos só com AL.03b dominado (o grafo garante via GM.06).
-4. Toda unidade padrão nasce de uma crise de comunicação (tartarugas vs minhocas), nunca por decreto.
+2. GM.12 usa comparação/conservação **sem unidade formal**; massa e capacidade não podem ser reduzidas a aparência, altura do recipiente ou número decorado.
+3. Iteração de unidades com snap ponta-a-ponta; vão ou sobreposição têm consequência física narrada, não "X vermelho".
+4. Relógio: horas primeiro, SEMPRE; minutos só com AL.03b dominado (o grafo garante via GM.06).
+5. Toda unidade padrão nasce de uma crise de comunicação (tartarugas vs minhocas), nunca por decreto.
 
 ---
 
@@ -878,6 +888,7 @@ As strands não são silos — elas se pagam dividendos o tempo todo, e o grafo 
 - **Repartir** (N4.05) renasce nas frações (N5.01), na média (PE.03) e na balança algébrica (dividir os dois lados).
 - **O quadrado de 100** é um só objeto: centena (N2.04), centésimos (N6.01), porcentagem (N6.03).
 - **Barras alinhadas pela base** — comparação (GM.01), diferença (N3.04), pictograma (PE.01), Bar Model: o mesmo gesto visual, da pré-escola ao problema de F4.
+- **Massa e capacidade** (GM.12) nascem da comparação/conservação e só depois viram medida padronizada em GM.05 — a unidade registra uma grandeza que a criança já sentiu.
 - **A balança** (AL.05) é a igualdade encarnada — e o antídoto permanente contra "= significa resposta".
 
 Quando o gerador de uma competência precisa de um visual, ele usa O MESMO objeto visual das confluências acima — nunca inventa um paralelo. Uma imagem mental, muitas leituras: é assim que o conhecimento vira rede em vez de gavetas.
@@ -886,11 +897,12 @@ Quando o gerador de uma competência precisa de um visual, ele usa O MESMO objet
 
 # ✅ FECHO — O QUE ESTE MANUAL GARANTE
 
-Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada CPA nível a nível com a fala do tutor e a mecânica de interação, a simulação dos erros e limites reais da criança em cada degrau (🧒), os distratores canônicos que os geradores DEVEM usar, os microtutoriais nomeados com estrutura Eu faço → Fazemos juntos → Você faz, e as regras de implementação inegociáveis. As três lacunas apontadas na tua análise original (Decimais/Porcentagem, Dados, Método de Barras) estão construídas. A fundação dos 4 anos (N1/N2) ganhou didática própria. Os Inteiros (N7), o ramo do espaço (mapas, ângulos, coordenadas), o perímetro e os múltiplos/primos ganharam cobertura própria — **nenhuma das 89 competências do Grafo ficou sem casa didática** — 89 de 89.
+Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada CPA nível a nível com a fala do tutor e a mecânica de interação, a simulação dos erros e limites reais da criança em cada degrau (🧒), os distratores canônicos que os geradores DEVEM usar, os microtutoriais nomeados com estrutura Eu faço → Fazemos juntos → Você faz, e as regras de implementação inegociáveis. As três lacunas apontadas na tua análise original (Decimais/Porcentagem, Dados, Método de Barras) estão construídas. A fundação dos 4 anos (N1/N2) ganhou didática própria. Os Inteiros (N7), o ramo do espaço (mapas, ângulos, coordenadas), o perímetro e os múltiplos/primos ganharam cobertura própria. A retificação GM.12 dá casa própria a massa/capacidade sem sequestrar Tempo cotidiano (GM.02) nem Medidas padronizadas (GM.05) — **nenhuma das 90 competências do Grafo ficou sem casa didática — 90 de 90.**
 
 **Divisão de papéis definitiva:** o **Grafo** é a estrutura (o quê, em que ordem, com quais pré-requisitos e distratores) · o **Manual** é a alma (como se ensina, o que se fala, o que a criança sente e erra) · a **Bíblia** é o comportamento do sistema (motores, sessão, adaptatividade, regras duras) · o **Dojo** (doc próprio) é a academia de fluência · o **YAML** é o grafo executável. Cinco peças, uma linguagem: os IDs.
 
-*Changelog: v2.0 (jul/2026) — detalhamento completo de todos os assuntos no padrão da divisão; novas didáticas: Fundação N1/N2, Decimais/Porcentagem/Proporção, Inteiros (N7), Dados/Probabilidade, Método de Barras; seção A Criança Real (limites de desenvolvimento); mapa de confluências.*
+*v2.5 (ago/2026) — Retificação pós-P15/P22: o grafo canônico passa a **90 competências** com `GM.12 — Massa e capacidade: comparação e conservação`, pré-requisito `GM.01`; `GM.02` permanece Tempo cotidiano e `GM.05` permanece Medidas padronizadas, agora após GM.12 + N2.02. O fecho e a cobertura didática passam a 90/90 sem apagar o histórico das contagens anteriores.*
+
 *v2.4 (ago/2026) — O grafo passa a **89 competências**: a `N1.13` (produzir quantidade) nasceu quando a P12 separou a ficha F04 da `N1.09`, que continua sendo a contagem até 20. A F04 nunca teve casa própria — ela reivindicava um nó cujas quatro arestas dependiam do outro significado. Nenhuma competência foi removida ou renumerada; a cobertura didática continua completa. Ver §15.8 da Bíblia.*
 
 *v2.3 (ago/2026) — Retificação de contagem: o grafo é de **88 competências**, não 84 (o fecho dizia 84 por herança da v1.0; ver §15.8 da Bíblia para o registro das 11 candidatas, 4 absorvidas e 7 rejeitadas por duplicação). Nenhuma alteração didática: a cobertura continua completa, 88 de 88 competências com casa didática.*
@@ -902,7 +914,7 @@ Cada assunto do Grafo agora tem: a primeira explicação roteirizada, a escada C
 
 # 🆕 AS 11 COMPETÊNCIAS NOVAS — DIDÁTICA
 
-*Acrescentadas na v1.1 do Grafo. Cada uma segue o mesmo formato: por que trava, a escada, a primeira vez, os erros típicos.*
+*Seção histórica da expansão v1.1/v2.7. As candidatas abaixo preservam a didática produzida à época; o veredito canônico de duplicação permanece na Bíblia §15.8. Entradas rejeitadas não voltam ao grafo por aparecerem aqui.*
 
 ---
 
