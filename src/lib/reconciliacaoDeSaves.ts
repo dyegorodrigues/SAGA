@@ -1,5 +1,6 @@
 import { State } from "../types";
 import { materializeAulaProgress } from "../curriculum/motores/aulaProgressContext";
+import { materializeSenseiDojoProgress } from "../curriculum/motores/senseiDojoProgressContext";
 
 /**
  * Reconciliação entre dispositivos e entre sessões offline.
@@ -32,12 +33,17 @@ export interface EscolhaDeSave {
 /**
  * Carimba o estado com o instante da gravação.
  *
- * Antes do carimbo, materializa qualquer commit transitório da Aula do Dia no
- * nó curricular que realmente gerou a questão. Assim `progress.aula` nunca
- * chega a React/local/cloud como fonte de mastery, Radar ou Leitner.
+ * Antes do carimbo, dois envelopes transitórios são materializados:
+ *
+ * 1. Aula do Dia → a competência curricular que realmente gerou a questão;
+ * 2. Dojo aritmético → `dojoTracks`, onde automaticidade vive separada de mastery.
+ *
+ * Portanto nem `progress.aula` nem `progress.dojo_*` chegam a React/local/cloud
+ * como fontes curriculares de verdade.
  */
 export function carimbar(estado: State, agora: Date = new Date()): State {
-  const materializado = materializeAulaProgress(estado);
+  const aulaMaterializada = materializeAulaProgress(estado);
+  const materializado = materializeSenseiDojoProgress(aulaMaterializada);
   return { ...materializado, updatedAt: agora.toISOString() };
 }
 
