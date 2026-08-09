@@ -20,16 +20,19 @@ import { N1_13 } from "../fichas/jornada/N1.13";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
+import { GM_02 } from "../fichas/jornada/GM.02";
 import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
+import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
 type Generator = (level: number) => Question;
+type SpecializedBuilder = (ficha: FichaCompetencia, level: number) => Question;
 
 export type GeneratorSource = NonNullable<Track["generatorSource"]>;
 
@@ -67,9 +70,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // F04: novo nó de produzir quantidade; desligado volta ao fallback.
   "N1.13": N1_13,
 
-  // P17 fechou a ponte perceptual→parte-todo de N1.10/N1.11. Estas são as
-  // fichas correntes já promovidas; ativação/rollback continuam declarados fora
-  // deste registry, em `composerCanaryIds.ts` e `COMPOSER_CANARIES`.
+  // P17 fechou a ponte perceptual→parte-todo de N1.10/N1.11.
   "N1.10": N1_10,
   "N1.11": N1_11,
 
@@ -80,9 +81,16 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "GE.01": GE_01,
   "GE.02": GE_02,
 
-  // F49/F50 — grandezas visíveis e conservação sem unidade.
+  // Grandezas F0: comparação, tempo cotidiano e conservação sem unidade.
   "GM.01": GM_01,
+  "GM.02": GM_02,
   "GM.12": GM_12,
+};
+
+/** Builders especializados ainda passam pela MESMA porta de registro/ativação. */
+const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
+  "N1.09": construirContagem20Question,
+  "GM.02": construirTempoCotidianoQuestion,
 };
 
 /**
@@ -90,8 +98,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
  *
  * O conjunto nasce da lista declarativa versionada, mas continua mutável em
  * runtime para que `enableComposerCanary`/`rollbackComposerCanary` façam a troca
- * na próxima questão sem rebuild. O contrato de canário restaura este conjunto
- * após cada teste.
+ * na próxima questão sem rebuild.
  */
 export const COMPOSER_CANARIES = new Set<string>(DEFAULT_COMPOSER_CANARY_IDS);
 
@@ -109,15 +116,15 @@ export function hasComposerFicha(id: string): boolean {
 /**
  * Porta única para gerar uma questão autoral registrada.
  *
- * A maioria das fichas usa o Composer genérico. N1.09 exige uma resposta de
- * sequência com três termos para distinguir "partir de N" de um simples
- * sucessor; por isso delega a um contrato procedimental explícito, da mesma
- * forma que outras primitivas autorais delegam seus cálculos a contratos.
+ * A maioria das fichas usa o Composer genérico. Competências cujo contrato
+ * exige estrutura que um builder genérico não expressa delegam a um builder
+ * procedimental explícito, mas continuam atravessando esta MESMA porta.
  */
 export function generateRegisteredFichaQuestion(id: string, level: number): Question {
   const ficha = COMPOSER_FICHAS[id];
   if (!ficha) throw new Error(`Ficha Composer não registrada: ${id}.`);
-  if (id === "N1.09") return construirContagem20Question(ficha, level);
+  const specialized = SPECIALIZED_BUILDERS[id];
+  if (specialized) return specialized(ficha, level);
   return Composer.generate(ficha, level);
 }
 
@@ -126,13 +133,7 @@ function resolveSource(id: string, legacy: Generator | undefined): GeneratorSour
   return legacy ? "legacy" : "fallback";
 }
 
-/**
- * Liga qualquer competência ao gerador que deve atendê-la.
- *
- * Não existe lista paralela de ids privilegiados: uma promoção exige ficha
- * registrada e um id em `composerCanaryIds.ts`; rollback remove o id do conjunto
- * vivo e volta imediatamente ao legado/fallback correspondente.
- */
+/** Liga qualquer competência ao gerador que deve atendê-la. */
 export function selectGenerator(
   id: string,
   legacy: Generator | undefined,
