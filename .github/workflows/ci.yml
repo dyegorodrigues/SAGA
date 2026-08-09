@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # pr:check e git diff --check precisam comparar o head real com a base.
+          # pr:check compara o head real com a base.
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -67,8 +67,25 @@ jobs:
           PR_BASE: origin/main
         run: npm run pr:check
 
-      - name: Higiene do diff
-        run: git diff --check origin/main...HEAD
+  higiene-diff:
+    name: Higiene do diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Buscar a base do PR
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      # Mantido em job próprio para que qualquer whitespace inválido tenha uma
+      # saída curta, legível e independente da suíte funcional.
+      - name: Verificar whitespace do diff
+        run: git diff --check origin/${{ github.base_ref }}...HEAD
 
   guarda-textual:
     name: Guarda de binários
