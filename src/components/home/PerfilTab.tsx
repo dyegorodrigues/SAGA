@@ -22,10 +22,10 @@ interface Props {
   setCoinsSpent: (val: number) => void;
 }
 
-export function PerfilTab({ 
-  kid, state, coins, albumCount, 
-  onUpdateKid, onAlbum, onBack, 
-  setShowWardrobe, setTempBg, setTempInventory, setTempCoins, setCoinsSpent 
+export function PerfilTab({
+  kid, state, coins, albumCount,
+  onUpdateKid, onAlbum, onBack,
+  setShowWardrobe, setTempBg, setTempInventory, setTempCoins, setCoinsSpent
 }: Props) {
   const stats = useMemo(() => {
     const logs = state.log[kid.id] || [];
@@ -51,8 +51,8 @@ export function PerfilTab({
 
   return (
     <div className="animate-[mkPop_0.25s_ease-out_1]">
-      <div className="text-center mb-5 mt-2"> 
-        <h2 className="text-2xl font-black text-amber-900" style={{ fontFamily: FONT }}>Meu Perfil</h2> 
+      <div className="text-center mb-5 mt-2">
+        <h2 className="text-2xl font-black text-amber-900" style={{ fontFamily: FONT }}>Meu Perfil</h2>
         <p className="text-sm font-bold text-slate-500 mt-1">Sua jornada, conquistas e companheiro 🌟</p>
       </div>
 
@@ -154,7 +154,7 @@ export function PerfilTab({
           coins={coins}
         />
       </div>
-      
+
       <div className="mb-4">
         <button
           onClick={() => {
@@ -197,7 +197,7 @@ export function PerfilTab({
           Você tem {albumCount} de {TOTAL_STICKERS} figurinhas! Complete as páginas.
         </div>
       </button>
-      
+
       <button
         onClick={() => {
           sfx.tick();
