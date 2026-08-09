@@ -7,19 +7,28 @@
 **Main protegida:** `68fad4c575e28959b2ca4776e9a541d6828b63f3`  
 **Creature Engine:** fora deste fluxo.
 
-> **FONTE OPERACIONAL VIGENTE APÓS A TRAVA DO CHAT.** O estado abaixo foi reconstruído e confirmado pelo GitHub remoto, não pela memória da conversa. Reancore PR/head/CI antes de qualquer edição futura.
+> **FONTE OPERACIONAL VIGENTE APÓS AS TRAVAS DO CHAT.** Este checkpoint deve prevalecer sobre filas antigas. Reancore PR/head/CI no GitHub remoto antes de editar.
 
-## 1. Estado remoto confirmado
+## 1. Estado remoto fechado
 
-- head funcional fechado: `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`;
-- PR #29: open, draft, unmerged;
-- base: `main` em `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
-- CI #702 / run `31309761131`: **SUCCESS integral**;
-- passaram: auditoria curricular, auditoria/conformidade das fichas, grafo, TypeScript, suíte completa, build, guarda textual, higiene do diff, guarda de binários e Chrome real;
-- suíte: **2.287 testes**;
-- sonda Chrome real: SUCCESS em telefone/tablet para Sensei→Dojo e Sensei→Jardim.
+Último head funcional deste checkpoint:
 
-Nada deste bloco depende de estado local perdido do chat.
+`fc6227f14be69fcf95cd173a973a24a800479800`
+
+Evidência:
+
+- CI #720 / run `31310675620`: **SUCCESS integral**;
+- auditorias curriculares/fichas: sucesso;
+- grafo: sucesso;
+- TypeScript: sucesso;
+- suíte completa: sucesso;
+- build: sucesso;
+- `pr:check`: sucesso;
+- higiene do diff: sucesso;
+- guarda de binários: sucesso;
+- Chrome real `Sonda real Sensei`: sucesso.
+
+PR #29 permanece open + draft + unmerged. Nada depende de estado local perdido do chat.
 
 ## 2. Regras de ouro
 
@@ -31,7 +40,7 @@ Nada deste bloco depende de estado local perdido do chat.
 6. Bug exige cadeia `emissor → estado → persistência → consumidor → efeito` e regressão.
 7. Alteração visual exige Chrome real.
 8. Não iniciar fábrica curricular em massa antes da Coverage Matrix.
-9. Preservar documentação rica e histórico; checkpoints antigos continuam como ata do raciocínio.
+9. Preservar documentação rica e histórico; checkpoints anteriores continuam como ata.
 
 ## 3. Arquitetura pedagógica vigente
 
@@ -40,7 +49,7 @@ Nada deste bloco depende de estado local perdido do chat.
 - Dojo = automaticidade separada, prescrito + livre/manual;
 - Jardim = automaticidade perceptual, prescritível apenas por causa provada;
 - Oficina = recuperação conceitual causal curta;
-- Misto = opcional/interleaving;
+- Misto = opcional/interleaving apenas sobre repertório seguro;
 - idade/série = contexto, nunca autoridade curricular;
 - gamificação não compra unlock/mastery;
 - **RT/fluência não concede nem reprova domínio conceitual**.
@@ -77,8 +86,7 @@ Nada deste bloco depende de estado local perdido do chat.
 ### QA real
 
 - job permanente `Sonda real Sensei` no CI;
-- Chrome real;
-- telefone 390×844 e tablet 768×1024;
+- Chrome real em telefone 390×844 e tablet 768×1024;
 - Sensei/Dojo prescrito home + round;
 - Sensei/Jardim causal home + relance JD1;
 - screenshots, overflow, HTTP/page errors.
@@ -96,41 +104,74 @@ Nada deste bloco depende de estado local perdido do chat.
 - `review=true` e `sig` original sobrevivem ao Composer;
 - resgate A não serve banco B.
 
-Evidência: CI #682 / run `31308424789` = SUCCESS integral.
+Evidência: CI #682 / run `31308424789`.
 
 ### Telemetria / Leitner da Aula composta
 
-- telemetria v2: `trackId` significa a competência-fonte real da questão;
+- telemetria v2: `trackId` = competência-fonte real;
 - source efêmero é limpo entre questões;
 - Leitner materializa `reviewForce/lastDay` no source real;
 - `progress.aula` não persiste.
 
-Evidência: CI #691 / run `31308774424` = SUCCESS integral.
+Evidência: CI #691 / run `31308774424`.
 
 ### `LENTO_DEDOS` / autoridade da velocidade
 
-**Fechado no CI #702.**
+- Radar conceitual aceita somente tags do catálogo canônico;
+- `LENTO_DEDOS` legado não abre Oficina, inclusive em save antigo;
+- `streak` conceitual não pode ser injetado por bônus de RT/UI;
+- resposta correta rápida ou lenta tem a mesma autoridade curricular;
+- Dojo/RT/estrelas seguem separados da escada conceitual.
 
-Problemas encontrados:
+Evidência: head `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`; CI #702 / run `31309761131`.
 
-1. rapid-fire correto lento chamava `trackMisconception(p, "LENTO_DEDOS")`, podendo transformar lentidão em Oficina conceitual;
-2. rapid-fire correto rápido tentava `p.streak = 3`, podendo dar autoridade curricular ao RT.
+Observação: `GameLoop.tsx` ainda contém fisicamente tentativas legadas de `LENTO_DEDOS`/`p.streak=3`, mas os boundaries canônicos neutralizam a autoridade. Remoção física futura só com patch seguro do arquivo grande.
 
-Correção defensiva:
+### Timezone / identidade civil do dia
 
-- `radarEngine.ts` aceita no Radar conceitual somente tags do catálogo `MisconceptionTag`;
-- saves legados com `LENTO_DEDOS` também são ignorados por `getRescueItems()`;
-- `progressEngine.ts` protege o `streak` calculado pelo motor contra mutação imperativa externa pós-engine;
-- rapidez/lentidão correta têm a mesma autoridade conceitual;
-- tags conceituais canônicas continuam sendo registradas/resgatadas;
-- Dojo/RT/estrelas continuam separados da escada conceitual;
-- fixtures antigos do Composer foram corrigidos para usar `MisconceptionTag.RECONTOU`, em vez da string inventada `contagem-dupla`.
+**Fechado.**
 
-Regressão: `velocityConceptualAuthority.test.ts`.
+Problema provado: App/economia já usavam dia local, enquanto Jornada/Leitner/Matrícula/Jardim/Dojo ainda recebiam/escreviam `toISOString().slice(0,10)`, criando split-brain UTC × calendário local perto da meia-noite.
 
-Evidência final: head `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`; CI #702 / run `31309761131` = **SUCCESS integral**.
+Solução:
 
-Observação de hardening: `GameLoop.tsx` ainda contém as duas tentativas legadas (`LENTO_DEDOS` e `p.streak=3`), mas elas não possuem mais autoridade nos boundaries canônicos. Remoção física futura deve ser feita apenas com patch seguro do arquivo grande e regressões mantidas; não reabrir a semântica já fechada.
+- novo `src/utils/calendarDay.ts` como autoridade de calendário civil;
+- `localDay()` no fuso do dispositivo;
+- regressão pura por offset (`UTC−3`, offset positivo);
+- `calendarDayDistance()` conta dias civis, não blocos de 24h — resistente a DST;
+- `migrator.ts` reexporta `localDay` para compatibilidade e usa distância civil no mascote;
+- Leitner grava dia local e vence por distância civil;
+- Matrícula semeia `lastDay` local;
+- Jardim/Dojo normalizam `practiceDay` legado;
+- Journey/mastery normalizam `practiceDay` e retenção usa dias civis;
+- boundary de `lastDay` intercepta writer UTC legado do GameLoop sem precisar regravar o componente gigante.
+
+Falha encontrada durante QA: a primeira versão tornava `lastDay: undefined` uma chave enumerável e quebrava round-trip de save. O teste antigo capturou. Correção: antes da primeira data, o interceptor é não-enumerável; na primeira gravação real torna-se enumerável/serializável já normalizado. O teste não foi afrouxado.
+
+Regressões: `calendarDay.test.ts`, `timezoneDayRouting.test.ts` e suíte preexistente de round-trip.
+
+Evidência final: head `a9e2a382698be7979f2f5b0e3ce012dab64b5fc6`; CI #717 / run `31310499361` = **SUCCESS integral**, inclusive Chrome.
+
+### Recomendador paralelo por estrelas
+
+**Fechado.**
+
+Problema provado:
+
+- `KidHomeScreen.tsx` calculava uma segunda recomendação curricular;
+- banco de erros tinha prioridade; sem banco escolhia a trilha acessível com menos `stars`;
+- `SenseiTab` exibia isso dentro de `Missões do Dojô` como `Treino Livre Sugerido`;
+- não movia o progresso sozinho, mas fazia estrelas/heurística competirem visualmente com a prescrição do Sensei.
+
+Correção:
+
+- cálculo `rec` por estrelas/banco removido do `KidHomeScreen`;
+- contrato e card `Treino Livre Sugerido` removidos do `SenseiTab`;
+- revisão por banco continua no Composer/Radar/Oficina;
+- exploração livre continua nas portas próprias Jornada/Dojo;
+- regressão `SenseiTab.test.tsx` exige ausência da recomendação paralela.
+
+Evidência final: head `fc6227f14be69fcf95cd173a973a24a800479800`; CI #720 / run `31310675620` = **SUCCESS integral**, inclusive Chrome real.
 
 ## 5. Dívida curricular inventariada — NÃO PERDIDA
 
@@ -150,45 +191,58 @@ Fonte detalhada: `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`.
 
 **Não iniciar a fábrica dos 39 antes da Coverage Matrix.**
 
-## 6. Próxima tarefa exata — timezone / identidade do dia (`lastDay`)
+## 6. Próxima tarefa exata — Misto por repertório elegível
 
-Pré-auditoria já encontrou múltiplos escritores de dia usando UTC:
+Pré-auditoria já provou duas fontes de risco.
 
-- `GameLoop.tsx`: `practiceDay`, `p.lastDay` e rounds usam `new Date().toISOString().slice(0, 10)`;
-- `radarEngine.ts`: Leitner grava `lastDay` com o mesmo padrão;
-- `matricula.ts` também contém geração de data por ISO UTC;
-- consumidores de `lastDay` incluem Radar/Leitner, Composer e fluxos de sessão/recompensa.
+### Runtime atual
 
-Risco: `toISOString()` troca o dia em UTC, não no calendário local da criança. Em fusos negativos, uma prática noturna pode ser registrada como o dia seguinte; em fusos positivos ocorre o inverso perto da meia-noite. Isso pode afetar revisão espaçada, identidade de sessão, retenção e bônus diário.
+`App.tsx` constrói o Misto assim:
 
-### Cadeia obrigatória antes de editar
+- escolhe `SUBJECTS[mat].tracks[kid.grade]`;
+- passa esse recorte para `buildMixedTrack()`.
 
-`relógio local → day key → GameLoop/Jardim/Dojo/Leitner → Progress.lastDay/masteryEvidence/log → getDueReviews/Composer/bônus → save/cloud`.
+`mixedChallenge.ts` então:
+
+- pode puxar banco de qualquer track recebido;
+- escolhe a pior precisão entre tracks recebidos;
+- completa com tracks aleatórias recebidas;
+- **não verifica explicitamente domínio/segurança/elegibilidade conceitual**.
+
+Isso conflita com dois princípios vigentes:
+
+1. série/idade não pode decidir o universo curricular;
+2. Misto é interleaving de repertório já conquistado, não exposição aleatória a conteúdo não seguro.
+
+### Cadeia obrigatória
+
+`DAG + Progress → repertório elegível → pool do Misto → banco/pior/aleatória → Question source → GameLoop → persistência`.
 
 ### Método
 
-1. inventariar todos os escritores e consumidores de `YYYY-MM-DD`;
-2. criar helper puro único para chave de dia local, sem hardcode de timezone do desenvolvedor;
-3. criar helper puro de distância entre dias de calendário, evitando aritmética de horário/DST;
-4. regressões em virada UTC/local (incluindo UTC−3 e UTC+offset);
-5. migrar writers relevantes para a mesma função;
-6. garantir que revisão espaçada, mastery session day, first-mission/log e Dojo/Jardim concordem sobre “hoje”;
-7. não alterar semântica de intervalos Leitner além da correção de identidade do dia;
-8. gates completos + Chrome se o fluxo de UI/persistência for tocado;
-9. checkpoint.
+1. definir função pura de repertório elegível usando o universo matemático canônico + evidência de progresso real;
+2. não usar `kid.grade` como filtro do conteúdo do Misto;
+3. excluir nós nunca praticados/sem segurança conceitual;
+4. decidir critério mínimo com base no estado existente (`dom`, `maxLvl/lvl`, prerequisites), sem criar uma nova árvore paralela;
+5. banco só pode contribuir se seu source pertence ao repertório elegível;
+6. pior precisão só dentro do repertório elegível;
+7. aleatórias só dentro do repertório elegível;
+8. se repertório insuficiente, Misto deve ficar indisponível ou reduzir composição de forma explícita — nunca gerar conteúdo arbitrário;
+9. preservar Misto como opcional, sem autoridade de unlock/mastery;
+10. regressões com trilha dominada, trilha apenas desbloqueada, trilha nunca praticada e trilha fora da antiga grade;
+11. gates completos + Chrome se CTA/disponibilidade mudar;
+12. checkpoint.
 
-## 7. Fila depois de timezone
+## 7. Fila depois do Misto
 
-1. recomendador paralelo por estrelas — retirar autoridade concorrente;
-2. Misto por repertório elegível;
-3. Matrícula sem grade rígida;
-4. cloud reconciliation;
-5. simulação longitudinal;
-6. gamificação/economia/mascote;
-7. Coverage Matrix executável;
-8. fábrica curricular por ondas — 25 legados + 39 vazios + paridade + primitivas;
-9. mega auditoria pedagógica;
-10. hardening/performance/release.
+1. Matrícula sem grade rígida;
+2. cloud reconciliation;
+3. simulação longitudinal;
+4. gamificação/economia/mascote;
+5. Coverage Matrix executável;
+6. fábrica curricular por ondas — 25 legados + 39 vazios + paridade + primitivas;
+7. mega auditoria pedagógica;
+8. hardening/performance/release.
 
 ## 8. Gates
 
@@ -204,10 +258,10 @@ npm run pr:check
 npm run sonda:sensei-dojo
 ```
 
-O CI também roda higiene do diff e guarda de binários.
+CI também roda higiene do diff e guarda de binários.
 
 ## 9. Prompt de retomada para novo chat/agente
 
-> Continue o SAGA usando como fonte principal `AI_Studio_Lab/codex/CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Reancore primeiro a PR #29 e o head remoto de `codex/integrar-bloco-f0`; mantenha a PR draft/unmerged e não toque na main nem no Creature Engine. Tudo até `LENTO_DEDOS` está fechado no head `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`, CI #702/run `31309761131` integralmente verde, inclusive Chrome real. Não reabra esses blocos sem falha objetiva. Comece pela auditoria `timezone/lastDay` do §6: prove todos os escritores/consumidores de day key, centralize o conceito de dia local em helper puro, teste viradas UTC/local e DST, preserve intervalos Leitner e alinhe GameLoop/Jardim/Dojo/mastery/log/recompensa. Rode todos os gates e atualize este checkpoint. Não iniciar ainda a fábrica dos 39 fallbacks; ela permanece inventariada para depois da Coverage Matrix.
+> Continue o SAGA usando como fonte principal `AI_Studio_Lab/codex/CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Reancore primeiro PR #29 e o head remoto de `codex/integrar-bloco-f0`; mantenha PR draft/unmerged e não toque na main nem no Creature Engine. Tudo até timezone e remoção do recomendador paralelo por estrelas está fechado no head funcional `fc6227f14be69fcf95cd173a973a24a800479800`, CI #720/run `31310675620` integralmente verde, inclusive Chrome real. Não reabra blocos fechados sem falha objetiva. Comece pelo §6, Misto por repertório elegível: prove a cadeia DAG/Progress→pool→questões, elimine `kid.grade` como filtro curricular, não permita conteúdo nunca praticado/sem segurança, filtre banco/pior/aleatórias pelo mesmo repertório e trate pool insuficiente explicitamente. Rode todos os gates e atualize este checkpoint. Não iniciar ainda a fábrica dos 39 fallbacks; ela permanece inventariada para depois da Coverage Matrix.
 
 **A criança pode escolher treinar. Quando segue o Sensei, quem escolhe o currículo é o Tutor.**
