@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 9/ago/2026.** Fonte principal: `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`. Próximo bloqueante único: **Matrícula adaptativa sem grade rígida**.
+> **VIGENTE — 9/ago/2026.** Fonte principal: `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`. Próximo bloqueante único: **cloud reconciliation**.
 
 ## Regra de ouro
 
@@ -10,46 +10,49 @@
 - PR #29 open + draft + não mesclar/ready/auto-merge;
 - não tocar Creature Engine;
 - não criar branch auxiliar;
-- reancorar PR/head antes de qualquer edição.
+- reancorar PR/head antes de qualquer edição;
+- GitHub remoto é a fonte da verdade: não assumir que chat/terminal salvou sem verificar arquivo/commit/CI.
 
 ## Primeira leitura
 
-1. `CHECKPOINT_MISTO_FECHADO_2026-08-09.md`
-2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
-3. `RETOMADA.md`
-4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
+1. `CHECKPOINT_MATRICULA_FECHADA_2026-08-09.md`
+2. `PREAUDITORIA_CLOUD_RECONCILIATION_2026-08-09.md`
+3. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
+4. `RETOMADA.md`
+5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
 ## Fechado
 
-P17–P22, cânone, Radar/source/persist, Sensei full DAG, Oficina causal, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone/dia civil, recomendador secundário por estrelas e Misto elegível.
+P17–P22, cânone, Radar/source/persist, Sensei full DAG, Oficina causal, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone/dia civil, recomendador secundário por estrelas, Misto elegível e **Matrícula adaptativa**.
 
-Misto final: head `ae47e417332fb7c02134bdda871c853535863838`, CI #733 / run `31311494765`, integralmente verde inclusive Chrome real; artefato visual `9037510112`.
+Matrícula funcional: head `f4ed86fcd70241e6324392b40bd457d44279ba61`; CI #744 / run `31314596574`; 149 arquivos / 2.309 testes; build/TypeScript/auditores/higiene/binários/Chrome verdes; artefato `9038385938` com telefone + tablet.
 
-## Próxima tarefa — Matrícula adaptativa
+## Próxima tarefa — cloud reconciliation
 
-Pré-auditoria confirmou:
-
-- `App.tsx` ainda chama `buildMatriculaTrack(...tracks[kid.grade])`;
-- `CORE_IDS` contém 9 âncoras, mas `MAX_TRACKS=6` elimina as finais;
-- trocar só a origem do array não resolve subplacement;
-- `GameLoop` chama `onCommit` antes de gerar a próxima questão, então a Matrícula pode adaptar a própria sequência via closure.
+Leia a pré-auditoria antes de editar. O problema a resolver é perda/mistura de estado, não refactor estético.
 
 ### Cadeia
 
-`DAG/conteúdo explícito → âncora → questão → resposta → próxima âncora → seed → Sensei`.
+`auth/UID → storage local escopado → cloud → escolha/reconcile → migrate/materialize → React → persist local imediato → debounce cloud → logout/troca de conta/link anonymous→Google → offline/reconexão → concorrência`.
 
 ### Método
 
-1. universo canônico, nunca série como teto;
-2. usar apenas tracks realmente servidas;
-3. começar com sondas gentis;
-4. acertos consistentes sobem a escada; erros mantêm/deslocam para bases seguras;
-5. não forçar iniciante a questões muito acima;
-6. placement não concede `dom`;
-7. preservar missão curta e amigável;
-8. regressões para criança iniciante, intermediária, avançada, fallback e seed;
-9. gates completos + Chrome se fluxo visual mudar;
-10. checkpoint.
+1. regressões para nenhum/local-only/cloud-only/local mais novo/cloud mais novo/empate/carimbo inválido;
+2. schema antigo e migração;
+3. UID A × UID B no mesmo aparelho;
+4. logout/login e cancelamento de pending write;
+5. anonymous→Google;
+6. offline/cache/reconexão;
+7. duas abas e dois dispositivos com writes fora de ordem;
+8. preservar campos pedagógicos novos;
+9. provar bug antes do patch;
+10. não inventar merge campo-a-campo sem contrato;
+11. gates completos;
+12. checkpoint.
+
+### Firebase / participação do autor
+
+**Não precisa de participação do autor para iniciar este bloco.** Não pedir token, service account, ID novo ou uso do Firebase Console. O trabalho lógico usa código, Vitest, mocks e contracts já existentes. Se surgir uma operação realmente exclusiva do Console/deploy, isolá-la como `DEPLOYMENT-ONLY`; não bloquear o restante nem presumir que o autor consegue fazê-la pelo tablet.
 
 ## Dívida curricular não perdida
 
@@ -57,7 +60,7 @@ Pré-auditoria confirmou:
 
 ## Fila posterior
 
-cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+simulação longitudinal → gamificação/economia/mascote → Coverage Matrix → fábrica curricular → mega auditoria → hardening/performance/release.
 
 ## Gates
 
