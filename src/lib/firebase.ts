@@ -22,6 +22,7 @@ import {
 } from "firebase/auth";
 import { State, TelemetryLog } from "../types";
 import { normalizeTelemetryIdentity } from "./telemetryIdentityContext";
+import { materializarEstadoParaPersistencia } from "./reconciliacaoDeSaves";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -277,13 +278,16 @@ export async function saveStateToCloud(state: State, expectedUid?: string): Prom
     return;
   }
   const userId = `usr_cloud_${user.uid}`;
+  // Defesa no último boundary de persistência. Não cria um timestamp novo:
+  // materializar não pode converter um estado velho em candidato mais recente.
+  const persistableState = materializarEstadoParaPersistencia(state);
 
   try {
     const docRef = doc(db, "userStates", userId);
     const gravou = await runTransaction(db, async transaction => {
       const snapshot = await transaction.get(docRef);
       const current = snapshot.exists() ? parseCloudState(snapshot.data()) : null;
-      if (current && !shouldAcceptCloudWrite(current, state)) {
+      if (current && !shouldAcceptCloudWrite(current, persistableState)) {
         return false;
       }
 
@@ -291,7 +295,7 @@ export async function saveStateToCloud(state: State, expectedUid?: string): Prom
         docRef,
         {
           userId,
-          state: JSON.stringify(state),
+          state: JSON.stringify(persistableState),
           // Horário de transporte para observabilidade. A autoridade continua
           // dentro de `state.updatedAt` e é comparada atomicamente acima.
           updatedAt: new Date().toISOString(),
