@@ -20,7 +20,10 @@ export const N1_09: FichaCompetencia = {
     2: { primitiva: "scattered", micro: "contar20", andaime: "medio" },
     3: { primitiva: "plain", micro: "partirDeN", andaime: "medio" },
     4: { primitiva: "plain", micro: "regressiva", andaime: "minimo" },
-    5: { primitiva: "plain", micro: "misto", andaime: "minimo" },
+    // §5.1-bis: rt_alvo alimenta a dimensão de fluência/Dojo e nunca reprova
+    // domínio conceitual na Jornada. O valor é deliberadamente generoso porque
+    // o misto pode pedir a contagem de até 20 objetos, não só três passos orais.
+    5: { primitiva: "plain", micro: "misto", andaime: "minimo", rt_alvo: 20000 },
   },
   micros: [
     {
