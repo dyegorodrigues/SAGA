@@ -8,7 +8,7 @@
 
 P22 audit-first foi aberta no run `31276442048` = success.
 
-Ordem deliberada:
+Ordem executada:
 
 1. P22.1 — GM.12;
 2. P22.2 — N4.09;
@@ -17,23 +17,19 @@ Ordem deliberada:
 5. P22.4 — N1.09;
 6. P22.5 — GM.02.
 
-**P22.1–P22.4 estão concluídas. P22.5/GM.02 é o último lote antes do fechamento de P22.**
+**P22 está CONCLUÍDA.**
 
 ## 1. N1.09 — decisão executada em P22.4
 
 `N1.09` permanece **Contagem até 20 e a partir de qualquer número**, prereqs `N1.04 + N1.02`.
 
-O legado cobre somente continuação parcial de sequência e foi preservado como rollback. A ficha autoral agora mede conjuntos 10–20, início em N, regressiva e recuperação mista.
+O legado cobre somente continuação parcial de sequência e permanece rollback. A ficha autoral mede conjuntos 10–20, início em N, regressiva e recuperação mista.
 
-**Decisão executada:** não reutilizar N1.13; não devolver N1.09 ao JD4.
+## 2. GM.02 — decisão executada em P22.5
 
-## 2. GM.02 — decisão mantida e agora em execução
+`GM.02` permanece **Tempo cotidiano**, prereqs `[]`: partes do dia, ontem/hoje/amanhã, dias da semana e ordenação de eventos.
 
-`GM.02` é **Tempo cotidiano**: partes do dia, ontem/hoje/amanhã, dias da semana e ordenação de eventos.
-
-O legado atual reduz a competência a “Manhã ou Noite?” e não cobre o nó inteiro.
-
-**Decisão:** manter Tempo cotidiano e construir ficha autoral + TS pré-leitora, com áudio/iconografia/ordenação como linguagem primária. Massa/capacidade permanece em GM.12.
+O legado “Manhã ou Noite?” permanece rollback parcial. A atividade autoral é pré-leitora: `audioPrompt`, opções audíveis e iconografia carregam a linguagem essencial. Massa/capacidade permanece em GM.12.
 
 ## 3. N1.07 ↔ JD4 — decisão executada
 
@@ -44,27 +40,27 @@ O legado atual reduz a competência a “Manhã ou Noite?” e não cobre o nó 
 
 ## 4. P22.1 — GM.12 CONCLUÍDA
 
-Gate final `31276881058`: **success**.
+Gate `31276881058`: **success**.
 
 ## 5. P22.2 — N4.09 CONCLUÍDA
 
-Gate final `31277213310`: **success**.
+Gate `31277213310`: **success**.
 
-Defeito corrigido: gabarito de área deixou de carregar misconception sentinela; somente distratores carregam hipótese diagnóstica.
+Gabarito de área sem misconception; somente distratores carregam hipótese diagnóstica.
 
 ## 6. P22.3A — N1.07 CONCLUÍDA
 
-Commit permanente: `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
-Gate transacional: `31281685349`: **success**.
-Clean follow-up: `31281842046`: **success**.
+Commit `d233591dcb7aa4b5a7883430fa769c5e9dae3823`.
+Gate `31281685349`: **success**.
+Clean follow-up `31281842046`: **success**.
 
-N1.07 passou a cobrir sucessor, antecessor e ordenação conforme o grafo, com prereqs canônicos `N1.02 + N1.06`.
+N1.07 cobre sucessor, antecessor e ordenação conforme o grafo, prereqs `N1.02 + N1.06`.
 
 ## 7. P22.3B — JD4 CONCLUÍDA
 
-Gate transacional: `31282358997`: **success**.
+Gate `31282358997`: **success**.
 
-JD4 entrou no Jardim com estado em `dojoTracks`, sem entrar no grafo/Journey registry e sem poder conceder domínio conceitual a N1.07.
+JD4 entrou no Jardim com estado em `dojoTracks`, sem entrar no grafo/Journey registry e sem conceder domínio conceitual à mãe.
 
 ## 8. P22.4 — N1.09 CONCLUÍDA
 
@@ -73,75 +69,74 @@ Entregue:
 - 93ª ficha Markdown com nove seções;
 - Journey TS + teste permanente;
 - builder procedimental pela porta autoral de produção;
-- L1 contar 10–15;
-- L2 contar 10–20;
-- L3 continuar três termos a partir de N interno;
-- L4 regressiva simples, inclusive até zero;
-- L5 recuperação mista;
-- `rt_alvo=20s` como metadado de fluência apenas;
+- L1 10–15, L2 10–20, L3 partir de N, L4 regressiva, L5 misto;
+- `rt_alvo=20s` como metadado de fluência;
 - telemetria causal `NAO_CONTA_A_PARTIR_DE` e `DIRECAO_ERRADA`;
-- N1.09 ativa no Composer, legado preservado como rollback;
-- exceção autoral N1.09 removida;
-- auditor agregado deixou de hardcodar contagem de fichas;
-- teste do mapa runtime deixou de hardcodar fotografia histórica do catálogo.
+- legado preservado como rollback;
+- exceção autoral N1.09 removida.
 
-### Defeito real descoberto pela sonda
+A sonda encontrou colisões reais em `ScatteredItems`; o palco passou a usar células invisíveis embaralhadas + jitter determinístico, com teste geométrico permanente.
 
-O `ScatteredItems` aceitava a última posição mesmo colidida depois de 50 tentativas aleatórias. Com 10–20 objetos, a sonda encontrou colisões reais.
+Evidência:
 
-Correção:
+- `31286476155` = success;
+- sonda real `31286955931` = success;
+- clean CI `31287106974` = success.
 
-- grade invisível embaralhada determinística;
-- jitter pequeno e limitado;
-- tamanho responsivo;
-- teste geométrico permanente.
+## 9. P22.5 — GM.02 CONCLUÍDA
 
-### Evidência
+Entregue:
 
-- CI semântico `31286476155`: **success**;
-- sonda pela rota real `track.gen` `31286955931`: **success**;
-- 390/320/900 px, cinco níveis, zero vazamento/colisão/texto invisível/coberto;
-- clean CI após remover `postbuild` e injetor `31287106974`: **success**.
+- 94ª ficha Markdown com nove seções;
+- Journey TS + teste permanente;
+- builder procedimental pré-leitor;
+- L1 manhã/tarde/noite;
+- L2 ontem/hoje/amanhã;
+- L3 dia anterior/seguinte;
+- L4 ordenação de três acontecimentos;
+- L5 mistura as quatro famílias;
+- `rt_alvo=12s` como metadado de fluência;
+- resposta correta sem misconception;
+- diagnósticos `DIRECAO_ERRADA`, `OFF_BY_ONE`, `ORDEM_ERRADA` somente quando causais;
+- legado parcial preservado como rollback;
+- GM.02 registrada e ativa no Composer;
+- última exceção autoral removida;
+- auditor específico passou a derivar a contagem em vez de congelar 93/94;
+- testes globais de Journey passaram a usar a mesma porta autoral de produção;
+- builders especializados passaram a propagar `rt_alvo → rt_max_s`.
 
-Estado após P22.4:
+A primeira sonda (`31287813598`) encontrou dois defeitos compartilhados: contraste 4,22:1 no aviso de áudio e selo 🔊 cobrindo conteúdo. O CSS compartilhado foi corrigido — sem exceção de ficha — e a mesma prova passou em `31288014568`.
 
-- 90 nós;
-- 93 fichas;
-- 89/90 competências com cobertura autoral;
-- Journey 30/30;
-- Composer 25 registrados / 25 ativos / 0 inativos;
-- único gap autoral: GM.02;
-- mapa de primitivas continua 20 / 4 / 1 / 1.
+Clean CI sem bancada: `31288136803` = **success**.
 
-## 9. P22.5 — GM.02 EM EXECUÇÃO
+## 10. Estado final de P22
 
-Contrato:
+- grafo: **90/90**;
+- fichas Markdown: **94**;
+- cobertura autoral: **90/90**;
+- exceções autorais: **0**;
+- Journey: **31/31**;
+- Composer registrado: **26**;
+- Composer ativo: **26**;
+- Composer inativo: **0**;
+- servido sem placeholder: **51/90**;
+- fallback real: **39/90**;
+- mapa P21.2: **20 executáveis / 4 renderer-sem-builder / 1 componente-isolado / 1 ausente**.
 
-1. `prereqs: []`;
-2. L1 manhã/tarde/noite;
-3. L2 ontem/hoje/amanhã;
-4. L3 sequência dos dias da semana;
-5. L4 ordem de eventos cotidianos;
-6. L5 recuperação mista;
-7. áudio/iconografia são linguagem primária; texto é apoio;
-8. `rt_alvo` positivo no L5 como metadado de fluência, nunca mastery;
-9. ficha Markdown + Journey TS + teste permanente;
-10. registro Journey/Composer + promoção ativa;
-11. legado parcial preservado como rollback;
-12. remover a exceção GM.02 somente quando a ficha existir;
-13. eliminar estruturalmente `EXPECTED_FICHAS = 93` do auditor específico, não atualizar para 94;
-14. resposta correta sem misconception; diagnóstico apenas quando causal;
-15. sonda real + gates completos.
+Dívidas de primitiva mantidas explícitas: LinkingCubes, Moedas, SingaporeBars, VisualAddition, Quadrado100 e Regua.
 
-## 10. Regra de fechamento P22
+## 11. Próxima fase
 
-P22 só termina quando:
+Seguir `PLANO_POS_P22_FABRICA_CURRICULAR.md`.
 
-- N1.07 e JD4 permanecerem semanticamente separados;
-- N1.09 e GM.02 não forem mais lacunas autorais;
-- cobertura autoral for 90/90 sem exceção canônica;
-- registries e proveniência estiverem sincronizados;
-- todos os auditores, testes, sondas afetadas, TypeScript, build e guards estiverem verdes;
-- nenhuma bancada temporária restar na branch.
+Primeiro: auditoria longitudinal da máquina adaptativa:
 
-> **Promoção e automaticidade são consequências de evidência; não atalhos para uma tabela verde.**
+`GameLoop answer → misconception/evidence → mastery/progression → persistence → Radar/review → recommendation → unlock`.
+
+Somente após provar discrepâncias começar correções algorítmicas.
+
+## 12. Regra que sobrevive a P22
+
+Cobertura 90/90 não significa produto curricular terminado. Significa que nenhum nó canônico está sem especificação autoral. A fábrica curricular, os motores adaptativos, a cobertura executável e o hardening continuam separados e auditáveis.
+
+> **Promoção, mastery e automaticidade são consequências de evidência; nunca atalhos para deixar uma tabela verde.**
