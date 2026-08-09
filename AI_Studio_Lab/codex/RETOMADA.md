@@ -1,17 +1,18 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 9/ago/2026 — P21/P22 fechadas; auditoria longitudinal em curso. Próxima tarefa exata: reconciliação canônica cirúrgica → Tutor ↔ Dojo.**
+> **VIGENTE em 9/ago/2026 — P21/P22 fechadas; reconciliação canônica e contrato Tutor↔Dojo implementados. Leia primeiro o checkpoint pós-reconciliação e o §11 abaixo. A sonda real do novo card do Sensei é o único portão visual ainda pendente.**
 
 ## 1. Leia antes de editar
 
-1. [`CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md`](./CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md) — **fonte operacional mais nova**; corrige o checkpoint de emergência com o estado real do runtime;
-2. [`CHECKPOINT_EMERGENCIA_2026-08-09.md`](./CHECKPOINT_EMERGENCIA_2026-08-09.md) — histórico do salvamento após falha do chat;
-3. [`AUDITORIA_MOTORES_ADAPTATIVOS.md`](./AUDITORIA_MOTORES_ADAPTATIVOS.md)
-4. [`DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`](./DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md)
-5. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
-6. [`DECISAO_P22_DIVIDAS_CURRICULARES.md`](./DECISAO_P22_DIVIDAS_CURRICULARES.md)
-7. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
-8. [`PLANO_POS_P22_FABRICA_CURRICULAR.md`](./PLANO_POS_P22_FABRICA_CURRICULAR.md)
+1. [`CHECKPOINT_POS_RECONCILIACAO_TUTOR_DOJO_2026-08-09.md`](./CHECKPOINT_POS_RECONCILIACAO_TUTOR_DOJO_2026-08-09.md) — **fonte operacional mais nova**; fecha a reconciliação e o contrato `manual | prescribed`, sem declarar sonda real que não ocorreu;
+2. [`CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md`](./CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md) — diagnóstico anterior; suas seções de “próxima tarefa” são histórico do lote já executado;
+3. [`CHECKPOINT_EMERGENCIA_2026-08-09.md`](./CHECKPOINT_EMERGENCIA_2026-08-09.md) — histórico do salvamento após falha do chat;
+4. [`AUDITORIA_MOTORES_ADAPTATIVOS.md`](./AUDITORIA_MOTORES_ADAPTATIVOS.md)
+5. [`DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`](./DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md)
+6. [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md)
+7. [`DECISAO_P22_DIVIDAS_CURRICULARES.md`](./DECISAO_P22_DIVIDAS_CURRICULARES.md)
+8. [`DECISAO_P21_FONTES_DE_VERDADE.md`](./DECISAO_P21_FONTES_DE_VERDADE.md)
+9. [`PLANO_POS_P22_FABRICA_CURRICULAR.md`](./PLANO_POS_P22_FABRICA_CURRICULAR.md)
 
 Roadmaps antigos são históricos. Código/runtime é fonte de verdade para estado implementado; decisões canônicas vigentes governam semântica pedagógica.
 
@@ -84,6 +85,8 @@ Dívidas de primitiva ainda visíveis: `LinkingCubes`, `Moedas`, `SingaporeBars`
 
 ## 7. PRÓXIMA TAREFA A — reconciliação canônica cirúrgica
 
+> **HISTÓRICO:** esta era a tarefa pendente no início do lote. O fechamento autoritativo está no §11 e no checkpoint pós-reconciliação.
+
 A auditoria final detectou falso verde documental:
 
 - grafo/runtime estão em **90**;
@@ -103,6 +106,8 @@ A auditoria final detectou falso verde documental:
 **Precedente:** commit `b308151...` resumiu demais o Método e foi rejeitado; `14ebaab8...` restaurou o blob original exato `c172abe...`. Não repetir.
 
 ## 8. PRÓXIMA TAREFA B — Tutor ↔ Dojo
+
+> **HISTÓRICO:** o bug e a integração descritos abaixo foram implementados no lote atual. Ver §11.
 
 ### Já implementado
 
@@ -160,5 +165,45 @@ git diff --check
 ```
 
 Tela alterada exige sonda real.
+
+## 11. FECHAMENTO AUTORITATIVO — reconciliação + Tutor ↔ Dojo
+
+### Cânone
+
+- Bíblia/Manual/Método foram reconciliados preservando histórico e conteúdo rico;
+- Manual está em **90/90 + GM.12**;
+- a última deriva encontrada — `3 acertos sobe, 2 erros desce` — foi corrigida para **3/3**, espelhando `progressEngine.ts`;
+- `canonical_doc_guard.cjs` entrou no `npm run auditar` para impedir regressão desse contrato;
+- `git diff --check` continua rigoroso para código/config/dados, excluindo Markdown porque `  ` no fim da linha é hard break semântico e produzia falso vermelho.
+
+### Dojo
+
+- `SenseiDojoSessionSource = "manual" | "prescribed"` é explícito de ponta a ponta;
+- manual nunca move ponteiro adaptativo, nem quando serve a própria `currentStep`;
+- manual continua atualizando FactStrength/ProcStrength, RT, precisão, volume e rounds;
+- prescrito pode mover o ponteiro segundo o motor existente;
+- rounds parciais não misturam origem manual e prescrita;
+- `prescribeSenseiDojo` gera track `prescribed`;
+- `KidHomeScreen → SenseiTab → App → GameLoop` preserva a origem sem inferência;
+- o card de Dojo prescrito é **missão separada** da Aula do Dia, preservando a meta conceitual dominante;
+- treino livre continua manual;
+- `utils/dojoMode.ts` está `@deprecated` como compatibilidade/free-play, não inteligência do Sensei.
+
+### Evidência automatizada
+
+Head funcional validado: `0dab0ff5a5e5c547db389c339db5c62b505f008c`.
+
+**CI #647 / run `31306042539`: tudo verde.** Passaram auditoria canônica, fichas, conformidade, grafo, TypeScript, suíte completa, build, `pr:check`, higiene do diff e guarda de binários.
+
+### Portão ainda aberto
+
+A tela do Sensei mudou. Há regressão jsdom para presença/isolamento do card e roteamento, mas **sonda real em Chromium ainda não foi executada na cabeça atual** porque este ambiente de conector não dispõe de checkout executável + navegador/deployment da branch. Não registrar QA visual como fechado até existir essa evidência.
+
+### Próxima ação exata
+
+1. sonda real do card `Prescrição do Sensei` e do fluxo até o round do templo;
+2. confirmar que Aula do Dia, treino livre e Misto permanecem visual/funcionalmente separados;
+3. rodar/confirmar gate da cabeça documental final;
+4. só então seguir para Jardim causal → banco composto → telemetria/Leitner → `LENTO_DEDOS` → timezone → recomendador paralelo → Misto elegível → Matrícula → cloud → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 > **A criança pode escolher treinar. Quando segue o Sensei, quem escolhe o currículo é o Tutor.**
