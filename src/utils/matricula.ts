@@ -1,4 +1,5 @@
 import { Question, Track, Progress } from "../types";
+import { localDay } from "./calendarDay";
 
 /**
  * E3 do Professor Mágico — a MATRÍCULA 🎒 (placement disfarçado de brincadeira)
@@ -77,7 +78,7 @@ export function buildMatriculaTrack(tracks: Track[]): { track: Track; ladder: Ma
  *   nenhuma          → começa do 1 (a escola acolhe do zero, SEM insistir no que não sabe).
  *  maxLvl (bolinhas) acompanha só o que foi CONQUISTADO com acerto. */
 export function seedFromResults(ladder: MatriculaStep[], results: boolean[]): Record<string, Progress> {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localDay();
   const seeds: Record<string, Progress> = {};
   for (let i = 0; i + 1 < ladder.length; i += 2) {
     const id = ladder[i].trackId;
