@@ -10,52 +10,63 @@ Base protegida: `main@68fad4c575e28959b2ca4776e9a541d6828b63f3`
 
 Creature Engine: **não modificado** nesta frente.
 
-## 1. Estado terminal da frente
+> **Nota de auditoria de recibos (9/ago/2026).** Um fechamento anterior gravou neste documento SHAs/runs intermediários que não eram resolvíveis no GitHub remoto. Eles foram removidos. O recibo abaixo é o que foi revalidado diretamente no GitHub remoto antes deste saneamento documental. Próximas sessões devem sempre reancorar o **head atual da PR** e seu CI, sem confiar em SHA narrado por conversa.
 
-Cabeça funcional validada: `791a21b002794e29818551adbb5cdb93138105e9`
+## 1. Estado terminal funcional verificável
 
-CI funcional terminal: **#811 / run `31325208953` — SUCCESS integral**.
+**Head remoto de implementação/documentação da frente revalidado:**
 
-Recibos do run:
+`98fb324ae20b20542120cea5edbd6982658bf6d2`
 
-- Higiene do PR: verde;
-- binários: verde;
-- sonda real do Sensei: verde;
+Commit: `docs: fechar checkpoint de gamificação economia e meta-jogo`.
+
+**CI verificável:** #812 / run `31325218446` — **SUCCESS integral**.
+
+Evidências extraídas do próprio run #812:
+
+- `npm run auditar`: verde;
+- `npm run fichas:auditar`: verde;
+- `npm run fichas:conferir`: verde;
+- `npm run grafo:check`: verde;
 - TypeScript: verde;
-- auditoria de ficha↔tela: verde;
-- auditoria do Curriculum Graph: verde;
-- `pr:check`: verde;
-- **155 arquivos / 2.367 testes Vitest verdes**;
-- build Vite verde;
-- Chrome real verde;
-- artefato Chrome: **`9074276985`** (`chrome-test-artifacts`).
+- **159 arquivos / 2.377 testes Vitest verdes**;
+- build Vite/server: verde;
+- `npm run pr:check`: verde;
+- higiene do diff: verde;
+- guarda de binários: verde;
+- sonda real Sensei: verde;
+- artefato da sonda real: id `9041334019`, nome `sonda-sensei-98fb324ae20b20542120cea5edbd6982658bf6d2`.
 
-Comparação contra o último recibo fechado (`f2ce7119...`):
+A auditoria do mesmo run confirmou:
 
-- 30 commits à frente;
-- 0 atrás;
-- 18 arquivos alterados;
-- nenhum arquivo em `engine/mascot-v2`/Creature Engine;
-- nenhum conteúdo/ficha curricular foi fabricado nesta frente.
+- Curriculum Graph/YAML/JSON/TypeScript: **90 competências**;
+- fichas autorais: **94**;
+- Composer registrado/ativo: **26/90**;
+- servido sem placeholder: **51/90**;
+- fallback real: **39/90**;
+- padrão-ouro: **26**;
+- legado: **25**;
+- divergências ficha↔tela: **21/90**;
+- trocas de linguagem visual sem aviso: **12**;
+- estreias de ferramenta sem precedente: **44**;
+- `Moedas` bloqueia GM.03;
+- `Regua` bloqueia GM.05.
+
+Comparação remota feita durante o saneamento documental contra o último checkpoint anterior `f2ce7119...` mostrou **0 commits atrás** e nenhum arquivo `engine/mascot-v2`/Creature Engine na frente de gamificação. Não congelar aqui a contagem de commits à frente: ela muda quando documentos de handoff são saneados; o próximo agente deve recalculá-la.
 
 ## 2. Falha objetiva que abriu a frente
 
 A frente começou em regression-first no commit `029fa39d6f4f9bda462e5ab8ab3afdee9ed9d58e`.
 
-CI **#784 / run `31322217237`** ficou vermelho de propósito com 1 nova regressão:
+A regressão provou que XP vitalício do Dojo podia desaparecer ao materializar `progress.dojo_*` para `dojoTracks`:
 
-- 2.341 testes vizinhos passaram;
-- falha nova: XP vitalício do Dojo desaparecia ao materializar `progress.dojo_*` para `dojoTracks`;
-- caso: antes = 35 XP; depois = 10 XP;
-- mensagem: `expected 10 to be 35`.
+- antes da materialização: 35 XP;
+- depois: 10 XP;
+- causa: `Progress.stars` estava sendo usado como memória de meta-progressão em uma representação que o Dojo corretamente remove do learner state conceitual.
 
-A causa arquitetural era real: `Progress.stars` estava servindo simultaneamente como memória pedagógica e carteira implícita de XP, mas o Dojo Sensei remove corretamente seus envelopes transitórios de `Progress`. O meta-jogo não podia depender daquela representação.
+A correção não foi tratada como remendo local; a frente redesenhou a separação entre verdade pedagógica, identidade do jogador e economia.
 
-Primeiro fechamento intermediário do bug: `a03c300a0ca03d398289e4f0118cc3c2996974b4`, CI **#790 / run `31323835219`**, verde integral.
-
-## 3. Decisão arquitetural principal — três progressões diferentes
-
-A partir desta frente, o SAGA distingue explicitamente:
+## 3. Três progressões diferentes — contrato permanente
 
 ### A. Progressão do aprendiz
 
@@ -77,110 +88,88 @@ Somente esta camada tem autoridade para mastery, unlock curricular, prescrição
 
 Pergunta: **quanto a criança já viveu/construiu no SAGA?**
 
-Fonte de verdade: XP vitalício legitimamente ganho.
-
 - **Nível SAGA 1–100 pertence à criança/perfil, não ao mascote**;
-- não é nota, série, QI nem nível de matemática;
+- não é nota, série, QI nem nível matemático;
 - trocar personagem/skin/companheiro não altera o nível da criança;
-- XP nunca é gasto;
+- XP é vitalício e não é gasto;
 - XP não compra mastery, unlock, Oficina, Jardim, Matrícula ou autoridade do Sensei.
 
 ### C. Progressão do companheiro
 
 Pergunta: **como o companheiro cresce e reage à jornada?**
 
-Hoje o mascote ainda reage ao XP e possui energia/estágio cosmético. A visão futura exige estado próprio de vínculo/evolução/necessidades suaves. Essa camada é separada conceitualmente da identidade do jogador e da verdade pedagógica.
+É uma camada de fantasia/vínculo separada. Hoje ainda existem estados cosméticos/estágios legados; a evolução futura exige estado próprio de vínculo, emoção, necessidades suaves, inventário e capacidades de jogo. Ela nunca vira learner state.
 
-Documento de visão permanente:
+Visão permanente registrada em:
 
-`AI_Studio_Lab/codex/VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`
+`AI_Studio_Lab/codex/VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`.
 
 ## 4. Fonte de verdade do XP vitalício
 
-Criado `src/lib/gamificationProgress.ts`.
+`src/lib/gamificationProgress.ts` centraliza a leitura:
 
-Leitura única:
+- Jornada/conceito: `progress.*.stars`;
+- Dojo/Jardim/fluência: `dojoTracks.*.xpStars`;
+- total: `getKidLifetimeXp(kidId, state)`.
 
-- Jornada/conceito: soma de `progress.*.stars`;
-- Dojo/Jardim/fluência: soma de `dojoTracks.*.xpStars`;
-- total = `getKidLifetimeXp(kidId, state)`.
-
-O campo de meta-progressão nos estados de fluência é aditivo/opaco e não concede autoridade pedagógica.
+O campo de XP em fluência é meta-progressão opaca; não concede autoridade pedagógica.
 
 ### Dojo
 
-`src/curriculum/motores/senseiDojoProgressContext.ts` agora:
-
-- preserva `stars` de saves `progress.dojo_*` legados em `xpStars`;
-- acumula XP das respostas reais ao materializar os markers;
-- preserva o bônus de missão perfeita;
-- continua removendo `progress.dojo_*`;
-- não migra `dom/masteryEvidence` para o Dojo;
-- marker sem elegibilidade curricular não ganha evidência nem XP.
+`senseiDojoProgressContext.ts` preserva XP de saves legados e dos markers reais ao materializar para `dojoTracks`, sem migrar `dom/masteryEvidence` para o Dojo.
 
 ### Jardim
 
-`src/curriculum/motores/jardimEngine.ts` agora:
+`jardimEngine.ts` acumula `xpStars` no estado JD sem usar a competência-mãe conceitual como carteira.
 
-- acumula `xpStars` dentro do estado JD;
-- preserva automaticidade e misconceptions em seu domínio correto;
-- não altera o `Progress` conceitual da competência-mãe para guardar XP.
+### Persistência
 
-### Reload/migração
+`gamificationPersistence.test.ts` cobre:
 
-`src/lib/gamificationPersistence.test.ts` prova:
-
-- `JSON → migrate` preserva XP conceitual + XP de fluência;
-- legacy Dojo → materialização → JSON → migrate conserva o mesmo total;
-- reload/materialização repetida é idempotente.
-
-Schema permanece 1: a adição é compatível e o migrator atual preserva o campo opcional pelos spreads de estado.
+- `JSON → migrate` preserva XP conceitual + fluência;
+- legacy Dojo → materialização → JSON → migrate preserva total;
+- reload/materialização repetida não duplica XP.
 
 ## 5. Política econômica central
 
-Criado `src/lib/rewardPolicy.ts`.
-
-Regra V1:
+`src/lib/rewardPolicy.ts` é a política V1.
 
 ### XP
 
-- resposta terminal correta válida: **+1 XP**;
-- resposta errada: 0 XP;
+- resposta terminal correta e elegível: **+1 XP**;
+- erro: 0;
 - missão perfeita: **+5 XP**;
 - velocidade não multiplica XP;
 - Misto não multiplica XP;
-- fallback não paga XP;
+- fallback: 0;
 - retry intermediário/double tap não chega ao boundary premiável;
-- deliberate replay é atividade nova e pode render recompensa base, mas não repete o bônus único de primeira missão.
+- replay deliberado é prática nova e pode render base, sem repetir o bônus único da primeira missão.
 
 ### Moedas
 
-- resposta correta normal: **+1 moeda**;
-- conclusão: +3 moedas;
-- primeira missão do dia: +5 moedas adicionais + 1 ração;
-- Misto: moeda 2×, XP continua normal;
-- fallback não paga moeda;
-- nenhum gasto pode gerar saldo negativo.
+- acerto real: **+1 moeda**;
+- conclusão: +3;
+- primeira missão do dia: +5 adicionais +1 ração;
+- Misto: moeda 2×, XP normal;
+- fallback: 0;
+- gasto inválido/saldo insuficiente é rejeitado.
 
-### Por que velocidade saiu do XP
+## 6. Velocidade fica no lugar pedagógico correto
 
-A regra antiga do Dojo pagava 15/5/2 XP conforme RT e ainda possuía um atalho que podia forçar streak por velocidade. Isso criava dois riscos:
+A regra antiga do Dojo pagava 15/5/2 XP conforme RT e continha um atalho que podia acelerar `streak` por rapidez.
 
-1. criança rápida podia comprimir meses de meta-progressão em poucas sessões;
-2. velocidade podia vazar autoridade para a progressão pedagógica.
+Isso foi removido.
 
-Agora RT continua sendo sinal de automaticidade no Dojo, que é seu lugar pedagógico correto, mas **criança lenta e correta recebe o mesmo XP de perfil**.
+RT continua útil para automaticidade/fluência no Dojo, mas:
 
-Guardrails em `src/lib/gamificationWiring.test.ts` impedem o retorno de:
+- criança lenta e correta recebe o mesmo XP de perfil;
+- velocidade não compra mastery;
+- velocidade não acelera nível conceitual;
+- `LENTO_DEDOS` continua sendo sinal de fluência/automaticidade, não reprovação de compreensão.
 
-- `starGain=15/5/2`;
-- shortcut de `streak` por rapidez;
-- UI de moedas fora da política central;
-- recompensa falsa de fallback;
-- perda do guard de double tap/retries;
-- repetição visual do bônus de primeira missão em replay.
+`gamificationWiring.test.ts` protege esses contratos.
 
-## 6. Curva Nível SAGA 1–100
+## 7. Curva Nível SAGA 1–100
 
 Curva inicial configurável:
 
@@ -188,64 +177,54 @@ Curva inicial configurável:
 
 Marcos:
 
-- nível 1: 0 XP;
-- nível 2: 10 XP;
-- nível 10: 118 XP;
-- nível 100: **4.420 XP**.
+- L1: 0 XP;
+- L2: 10 XP;
+- L10: 118 XP;
+- L100: **4.420 XP**.
 
-Uma missão padrão perfeita de 8 itens rende 13 XP: 8 acertos +5 perfeição.
+Missão padrão perfeita de 8 itens: **13 XP**.
 
-Simulações cobertas por teste:
+Simulação:
 
-- 1 missão perfeita/dia → nível 100 em **340 dias**;
-- 2/dia → **170 dias**;
-- 3/dia → **114 dias**.
+- 1 missão perfeita/dia → L100 em ~340 dias;
+- 2/dia → ~170 dias;
+- 3/dia → ~114 dias.
 
-A aceleração por dedicação é aproximadamente proporcional, sem multiplicador oculto por velocidade.
+É primeira calibração, não constante sagrada. Pode ser recalibrada por telemetria sem mexer em mastery.
 
-A curva é uma **primeira calibração**, não uma constante sagrada. Telemetria real futura pode recalibrar thresholds sem mexer em mastery.
+## 8. Economia longitudinal V1
 
-## 7. Economia longitudinal inicial
+Missão comum perfeita de 8 itens:
 
-Para missão normal perfeita de 8 itens:
+- primeira do dia: **16 moedas**;
+- seguintes: **11 moedas**.
 
-- primeira missão do dia: 8 +3 +5 = **16 moedas**;
-- missões seguintes no mesmo dia: 8 +3 = **11 moedas** cada.
+Referências de escala:
 
-Simulações cobertas:
-
-- 1 missão/dia = 16 moedas/dia;
-- 2/dia = 27 moedas/dia;
-- 3/dia = 38 moedas/dia;
+- 1 missão/dia = 16/dia;
+- 2/dia = 27/dia;
+- 3/dia = 38/dia;
 - 30 dias a 1/dia = 480;
-- 90 dias a 1/dia = 1.440;
-- 30 dias a 2/dia = 810;
-- 30 dias a 3/dia = 1.140.
+- 90 dias a 1/dia = 1.440.
 
-O álbum atual permanece **bancada provisória de consumo**, não fundamento da economia. Preços futuros devem ser recalibrados quando houver catálogo definitivo de cosméticos/companheiros/ambientes.
+O álbum atual permanece **bancada provisória de consumo**, não fundamento do motor econômico.
 
-## 8. Transações econômicas atômicas
+## 9. Transações econômicas atômicas
 
-Criado `src/lib/economyTransactions.ts`.
+`src/lib/economyTransactions.ts` fecha o boundary:
 
-Contratos:
-
-- `applyKidPurchase`: mutação do perfil/companheiro + débito ou nada;
-- `purchaseAlbumItem`: item único; duplicata rejeita e não cobra;
+- `applyKidPurchase`: mutação + débito ou nada;
+- `purchaseAlbumItem`: duplicata não cobra;
 - `spendCoins`: saldo insuficiente/valor inválido rejeita;
-- nenhum `Math.max(0, saldo - custo)` pode esconder compra sem dinheiro.
+- nenhum clamp silencioso autoriza compra sem saldo.
 
-Antes, o `App` podia aplicar a mutação e apenas zerar a carteira se uma chamada ultrapassasse o saldo. A UI normalmente evitava isso, mas o boundary não era seguro. Agora o boundary é a autoridade.
+`economyTransactions.test.ts` e `economyWiring.test.ts` guardam o contrato.
 
-`src/lib/economyTransactions.test.ts` e `src/lib/economyWiring.test.ts` guardam esses contratos.
+## 10. Atlas de Habilidades / insígnias
 
-## 9. Atlas de Habilidades / insígnias
+`src/lib/skillAtlas.ts` projeta o **Curriculum Graph real** para uma leitura infantil.
 
-Criado `src/lib/skillAtlas.ts` e integrado ao Perfil.
-
-O Atlas é uma projeção infantil do **Curriculum Graph real**, não uma árvore paralela de gamificação.
-
-Estados derivados:
+Estados:
 
 - `not-started`;
 - `learning`;
@@ -255,135 +234,125 @@ Estados derivados:
 
 Regras:
 
-- XP e moedas são deliberadamente ignorados;
-- `lvl=5` sem domínio maduro aparece como consolidação, não insígnia máxima;
-- somente `dom=true` produz `mastered`;
-- fallback não conta como competência real servida;
-- resumos por ilha/domínio vêm do learner state.
+- XP/moedas são ignorados;
+- `lvl=5` sem domínio maduro não vira insígnia máxima;
+- somente `dom=true` gera `mastered`;
+- fallback não conta como competência real servida.
 
-Isso permite futuramente transformar a visualização em mapa de skills/ilhas/dojo sem alterar a verdade subjacente.
+Isso permite um futuro mapa visual/ilhas/skill tree sem criar uma segunda verdade pedagógica.
 
-## 10. Perfil infantil
+## 11. Perfil infantil
 
-`src/components/home/PerfilTab.tsx` passou a mostrar:
+O Perfil passou a mostrar:
 
-- **Nível SAGA 1–100**;
-- XP vitalício e barra para o próximo nível;
+- Nível SAGA 1–100;
+- XP vitalício e progresso ao próximo nível;
 - Atlas de Habilidades;
-- quantidade de habilidades dominadas;
-- progresso por ilha ativa;
-- dias de jornada;
-- desafios respondidos;
-- companheiro separado;
-- álbum separado.
+- habilidades dominadas e progresso por domínio;
+- dias de jornada e desafios respondidos;
+- companheiro;
+- álbum/coleção.
 
-Não foi construído um megamapa visual definitivo nesta fase porque a Coverage Matrix/fábrica curricular ainda precisa resolver conteúdo real antes de polir a cartografia final.
+O megamapa visual definitivo fica depois da Coverage Matrix/fábrica curricular.
 
-## 11. Mascote — correção limitada, sem Creature Engine
+## 12. Mascote — correção limitada, sem Creature Engine
 
-`src/components/MascotEvolution.tsx` passou a ler o XP vitalício unificado.
+`MascotEvolution.tsx` usa XP vitalício unificado.
 
-Também foi corrigido um bug de UI existente:
-
-- há 8 estágios definidos;
-- a estrada de “próxima evolução” parava erroneamente após o estágio 5;
-- agora segue corretamente até o estágio 8.
+Bug corrigido: existiam 8 estágios, mas a UI de próxima evolução parava no estágio 5. Agora percorre os 8 estágios.
 
 Nenhum arquivo do Creature Engine foi alterado.
 
-## 12. Consistência UI ↔ persistência
+## 13. Consistência UI ↔ persistência
 
 Fechado:
 
-- Misto mostra a mesma moeda 2× que o App credita;
+- Misto mostra a mesma moeda 2× que persiste;
 - fallback não anuncia prêmio inexistente;
-- condição de primeira missão fica congelada no início da sessão para a tela de resultado não perder o bônus após o App atualizar o log;
-- replay não repete bônus de primeira missão;
-- o rótulo do bônus do Misto não finge que é +5 quando o multiplicador econômico torna o valor diferente.
+- primeira missão do dia é congelada no início da sessão para o recibo visual não mudar depois do commit;
+- replay não repete bônus único de primeira missão;
+- rótulos não fingem `+5` quando o multiplicador econômico altera o total.
 
-O commit `f614629f...` introduziu acidentalmente uma remoção visual de `mb-4` ao substituir o `GameLoop` inteiro pela API. A revisão de diff detectou o ruído e o commit `791a21b...` o reverteu antes do fechamento. O diff final funcional não carrega essa alteração acidental.
+## 14. Idempotência — escopo correto
 
-## 13. Idempotência — escopo correto
+Protegido:
 
-Contratos provados/preservados:
+- double tap síncrono;
+- retries intermediários;
+- materialização Dojo repetida;
+- reload;
+- compra duplicada do álbum;
+- replay sem duplicar bônus único;
+- retry de cloud reenvia snapshot reconciliado, não reaplica evento econômico separado.
 
-- double tap síncrono: `answeredRef` barra segundo terminal;
-- retries intermediários retornam antes do terminal premiável;
-- materialização Dojo repetida não duplica XP;
-- reload não duplica XP;
-- compra duplicada de álbum não cobra;
-- replay é nova prática real, mas bônus de primeira missão não reaplica;
-- retry de cloud reenvia snapshot de estado reconciliado, não reaplica um evento de recompensa separadamente.
+Não foi criado event ledger global porque não houve falha objetiva que exigisse essa complexidade. Reavaliar se o produto evoluir para servidor autoritativo, compras pagas ou concorrência aditiva real entre dispositivos.
 
-Não foi criado um event ledger global nesta fase porque não houve falha objetiva que justificasse essa complexidade. Se o produto evoluir para economia multiplayer/servidor autoritativo, compras pagas ou eventos concorrentes aditivos entre dispositivos, esse boundary deve ser reavaliado.
+## 15. Visão futura registrada — não executar agora
 
-## 14. Visão futura registrada — não executar agora
-
-A visão de produto foi capturada em:
-
-`AI_Studio_Lab/codex/VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`
-
-Inclui:
+`VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md` registra, como direção refinável:
 
 - companheiro/NPC meta-inteligente persistente;
 - emoções/retratos;
-- alimentação, banho, carinho, sono, estudo, treino, corrida/artes marciais como necessidades suaves;
+- alimentação, banho, carinho, sono, estudo, corrida e treino/artes marciais como necessidades suaves;
 - widget futuro no celular;
 - sem morte/doença/perda de evolução/culpa por ausência;
 - personagens autorais animais humanoides em HD pixel art;
-- futuro modo de luta 1×1 com combos/especiais;
-- futuro beat ’em up 2.5D/belt-scroll com profundidade;
+- fighting game 1×1 com combos/especiais;
+- beat ’em up 2.5D/belt-scroll com profundidade;
 - contrato de animação reutilizável;
-- `Laboratório de Raciocínio / Thinking Lab` para lógica, resolução de problemas, decomposição, padrões, abstração, algoritmos, modelagem, dados, debugging, pensamento sistêmico, metacognição e futura ponte com programação/engenharia/robótica/IA.
+- `Laboratório de Raciocínio / Thinking Lab` para lógica, resolução de problemas, padrões, abstração, algoritmos, modelagem, dados, debugging, pensamento causal/sistêmico, metacognição e ponte futura com programação/engenharia/robótica/IA.
 
-Esses itens são visão de evolução. **Não são requisito para fechar o aplicativo matemático atual e não autorizam mexer no Creature Engine nesta fila.**
+Tudo pode ser aperfeiçoado. Nada disso autoriza tocar no Creature Engine nesta fila.
 
-## 15. Contratos permanentes desta frente
+## 16. Contratos permanentes desta frente
 
 Não reabrir sem falha objetiva:
 
-1. `mastery/unlock` nunca podem ser comprados por XP/moedas;
+1. learner state é soberano para mastery/unlock;
 2. Nível SAGA é do perfil, não do mascote;
 3. XP é vitalício e não gastável;
-4. moedas são a carteira gastável;
+4. moedas são gastáveis;
 5. velocidade não multiplica XP nem streak conceitual;
-6. criança lenta e correta não recebe menos XP de perfil;
+6. criança lenta e correta não recebe menos XP;
 7. Misto 2× afeta moedas, não XP/mastery;
-8. fallback não fornece evidência nem recompensa real;
+8. fallback não fornece evidência nem prêmio real;
 9. insígnias curriculares derivam do learner state;
-10. compra é atômica e não permite saldo negativo;
-11. UI e persistência devem mostrar/aplicar a mesma política;
+10. compra é atômica e não admite saldo negativo;
+11. UI e persistência usam a mesma política;
 12. ausência não causa perda de nível, morte ou punição do companheiro;
 13. Creature Engine permanece desacoplado da pedagogia/economia.
 
-## 16. Dívida curricular preservada
+## 17. Dívida curricular preservada
 
-Esta frente **não resolve nem deve esconder** a dívida já inventariada:
+A auditoria real do CI #812 confirma:
 
+- 90 competências;
+- 94 fichas autorais;
 - Composer 26/90;
 - servido sem placeholder 51/90;
-- 25 prontos em legado;
+- 25 legado;
 - 39 fallback;
 - 21 divergências ficha↔tela;
 - 12 trocas de linguagem visual;
 - 44 estreias de ferramenta;
-- primitivas incompletas `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`;
 - `Moedas` bloqueia GM.03;
 - `Regua` bloqueia GM.05.
 
-**Não iniciar a fábrica antes da Coverage Matrix.**
+**Não iniciar fábrica antes da Coverage Matrix.**
 
-## 17. Próxima tarefa única
+## 18. Próxima tarefa única
 
 **Coverage Matrix.**
 
-Objetivo: transformar a dívida curricular já inventariada numa matriz executável, competência por competência, ligando grafo → ficha → tela/primitiva → compositor → auditoria → status real de serviço.
+Objetivo:
+
+`Curriculum Graph → ficha canônica → implementação real → screen/primitiva → Composer/Sensei → testes/auditoria → status → dívida/bloqueio → ação → ordem causal`.
 
 Depois:
 
 `Coverage Matrix → fábrica curricular → mega auditoria integrada → hardening/performance → release`.
 
-Arte definitiva, Creature Engine, widget e jogo de luta ficam em trilha futura separada até o núcleo matemático estar fechado.
+Arte definitiva, Creature Engine, widget e jogo ficam em trilha futura separada até o núcleo matemático estar fechado.
 
 ---
 
