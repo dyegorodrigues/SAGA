@@ -2,7 +2,7 @@ import type { AulaPlan } from "./composer";
 import type { DojoTrackState, Progress, Track } from "../../types";
 import { grafoSaga } from "../grafo_saga";
 import { JARDIM, type TrilhaDoJardim } from "../fichas/dojo/jardim";
-import { jardimTrack, resolveJardimState } from "./jardimSession";
+import { JARDIM_ROUND_ITENS, jardimTrack, resolveJardimState } from "./jardimSession";
 
 export interface CausalJardimPrescription {
   trailId: string;
@@ -12,6 +12,7 @@ export interface CausalJardimPrescription {
   /** Quantos arcos de pré-requisito separam o erro observado da base perceptual. */
   causalDistance: number;
   step: number;
+  questionBudget: number;
   track: Track;
   reason: "known-perceptual-weakness";
   reasonText: string;
@@ -132,6 +133,7 @@ export function prescribeCausalJardim(
     sourceNodeId,
     causalDistance: chosen.distance,
     step: chosen.step,
+    questionBudget: JARDIM_ROUND_ITENS,
     track: jardimTrack(chosen.trilha),
     reason: "known-perceptual-weakness",
     reasonText: `A base perceptual ${chosen.motherName} já foi compreendida, mas o Jardim mostrou que ainda precisa virar reflexo.`,
