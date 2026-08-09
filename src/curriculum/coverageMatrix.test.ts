@@ -9,11 +9,17 @@ import {
 describe("Coverage Matrix executável", () => {
   it("liga grafo, ficha, runtime, screen, Sensei, testes, dívida e ordem causal nas 90 competências", () => {
     const result = buildCoverageMatrix();
+    const divergent = result.rows
+      .filter(row => row.divergence.length > 0)
+      .map(row => `${row.id}: pede ${row.canonicalPrimitives.join(" + ")} → entrega ${row.runtimePrimitives.join(" + ") || "nada"}; faltam ${row.divergence.join(" + ")}`);
 
     expect(result.failures, [
       "Coverage Matrix divergiu do baseline vigente.",
       "Não ajuste expectativa para ficar verde: investigue e reconcilie a fonte real.",
       ...result.failures,
+      "",
+      `Divergências observadas (${divergent.length}):`,
+      ...divergent,
     ].join("\n")).toEqual([]);
 
     expect(result.rows).toHaveLength(COVERAGE_BASELINE.competencies);
