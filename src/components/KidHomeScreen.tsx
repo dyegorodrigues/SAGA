@@ -13,6 +13,7 @@ import { LevelPickerModal } from "./home/LevelPickerModal";
 import { WardrobeModal } from "./home/WardrobeModal";
 
 import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
+import { prescribeCausalJardim } from "../curriculum/motores/jardimCausalPrescription";
 import { chooseSenseiEntry } from "../curriculum/motores/senseiOrchestrator";
 import { prescribeSenseiDojo } from "../curriculum/motores/senseiDojoPrescription";
 import type { SenseiDojoSessionSource } from "../curriculum/motores/senseiDojoPolicy";
@@ -58,6 +59,7 @@ export function KidHomeScreen({
   onSpendCoins,
 }: KidHomeProps) {
   const prog = state.progress[kid.id] || {};
+  const kidDojoTracks = (state.dojoTracks || {})[kid.id] || {};
   const unlockStatus = useMemo(() => computeUnlockStatus(prog), [prog]);
   const themeObj = THEMES[kid.theme] || THEMES.classico;
 
@@ -69,21 +71,29 @@ export function KidHomeScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracks, prog]);
 
-  // A criança toca UMA porta conceitual. Se o Radar/DAG provou uma lacuna causal,
-  // o Sensei converte a Aula do Dia na missão de Oficina correspondente; revisão
-  // simples continua dentro da aula normal. Fluência prescrita aparece em uma
-  // missão separada, abaixo, para não transformar a Aula do Dia em mistureba.
-  const senseiEntry = chooseSenseiEntry(aulaPlan);
+  // Jardim só substitui uma Oficina quando o DAG liga a dificuldade a uma base
+  // perceptual e o próprio estado JD já provou fraqueza real. Sem essa evidência,
+  // o Tutor continua na remediação conceitual normal.
+  const causalJardim = useMemo(
+    () => prescribeCausalJardim(aulaPlan, prog, kidDojoTracks),
+    [aulaPlan, prog, kidDojoTracks],
+  );
+
+  // A criança toca UMA porta. Pré-requisito conceitual > Jardim causal provado >
+  // misconception no alvo > Aula normal. Fluência prescrita continua em missão
+  // separada, abaixo, para não transformar a Aula do Dia em mistureba.
+  const senseiEntry = chooseSenseiEntry(aulaPlan, causalJardim);
   const startSenseiMission = () => {
     if (senseiEntry.kind === "rescue") onRescue(senseiEntry.rescue);
+    else if (senseiEntry.kind === "garden") onTrackLvl(senseiEntry.prescription.track, senseiEntry.prescription.step);
     else onAula();
   };
 
   const dojoPrescription = useMemo(() => prescribeSenseiDojo(
     prog,
-    (state.dojoTracks || {})[kid.id] || {},
+    kidDojoTracks,
     localDay(),
-  ), [prog, state.dojoTracks, kid.id]);
+  ), [prog, kidDojoTracks]);
 
   const startSenseiDojoMission = () => {
     if (!dojoPrescription) return;
@@ -184,7 +194,7 @@ export function KidHomeScreen({
         {activeShellTab === "sensei" && (
           <SenseiTab
             kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec}
-            dojoPrescription={dojoPrescription}
+            senseiEntry={senseiEntry} dojoPrescription={dojoPrescription}
             onMatricula={onMatricula} onAula={startSenseiMission} onSenseiDojo={startSenseiDojoMission}
             onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)}
           />
@@ -195,7 +205,7 @@ export function KidHomeScreen({
         {activeShellTab === "dojo" && (
           <DojoTab
             prog={prog}
-            dojoTracks={(state.dojoTracks || {})[kid.id] || {}}
+            dojoTracks={kidDojoTracks}
             onGardenTrack={(track, currentStep) => onTrackLvl(track, currentStep)}
             onMixed={onMixed}
             onOpenPicker={setPickerTrack}
