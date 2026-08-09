@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import type { Progress, State } from "../../types";
+import type { Progress, Question, State } from "../../types";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
 import { carimbar } from "../../lib/reconciliacaoDeSaves";
-import { gDojoAdd } from "../fichas/dojo/sensei/dojo_add";
 import { applyJourneyAnswer } from "./progressEngine";
+import { senseiDojoTempleById, senseiDojoTrack } from "./senseiDojoSession";
+import type { SenseiDojoSessionSource } from "./senseiDojoPolicy";
 
 const progress = (overrides: Partial<Progress> = {}): Progress => ({
   lvl: 1,
@@ -28,7 +29,12 @@ const state = (progressMap: Record<string, Progress>, dojoTracks: State["dojoTra
   sound: false,
 });
 
-const attempt = (q: ReturnType<typeof gDojoAdd>, right = true, durationMs = 500): Progress => {
+const dojoQuestion = (
+  source: SenseiDojoSessionSource = "prescribed",
+  step = 1,
+): Question => senseiDojoTrack(senseiDojoTempleById("dojo_add")!, source).gen(step);
+
+const attempt = (q: Question, right = true, durationMs = 500): Progress => {
   misconceptionForAnswer(q, right ? q.answer : "__wrong__");
   return applyJourneyAnswer(progress({ lvl: 5, maxLvl: 5, dom: true }), right, false, {
     durationMs,
@@ -39,7 +45,7 @@ const attempt = (q: ReturnType<typeof gDojoAdd>, right = true, durationMs = 500)
   }).progress;
 };
 
-function commitAttempt(current: State, q: ReturnType<typeof gDojoAdd>, right = true, durationMs = 500): State {
+function commitAttempt(current: State, q: Question, right = true, durationMs = 500): State {
   const envelope = attempt(q, right, durationMs);
   return carimbar({
     ...current,
@@ -54,7 +60,7 @@ describe("Dojo Sensei — source → evento → dojoTracks", () => {
   it("uma resposta nunca vira mastery conceitual e persiste como round parcial", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
     const initial = state({ "N3.01": progress({ lvl: 3, maxLvl: 3 }) });
-    const saved = commitAttempt(initial, gDojoAdd(1));
+    const saved = commitAttempt(initial, dojoQuestion());
 
     expect(saved.progress.kid.dojo_add).toBeUndefined();
     const dojo = saved.dojoTracks?.kid?.dojo_add as any;
@@ -62,14 +68,15 @@ describe("Dojo Sensei — source → evento → dojoTracks", () => {
     expect(dojo.dom).toBeUndefined();
     expect(dojo.masteryEvidence).toBeUndefined();
     expect(dojo.__senseiDojoPendingRound?.attempts).toHaveLength(1);
+    expect(dojo.__senseiDojoPendingRound?.source).toBe("prescribed");
     expect(dojo.rounds).toBe(0);
     vi.restoreAllMocks();
   });
 
-  it("dez respostas fecham um round e populam força de fatos", () => {
+  it("dez respostas prescritas fecham um round e populam força de fatos", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
     let saved = state({ "N3.01": progress({ lvl: 3, maxLvl: 3 }) });
-    for (let i = 0; i < 10; i += 1) saved = commitAttempt(saved, gDojoAdd(1));
+    for (let i = 0; i < 10; i += 1) saved = commitAttempt(saved, dojoQuestion());
 
     const dojo = saved.dojoTracks?.kid?.dojo_add as any;
     expect(saved.progress.kid.dojo_add).toBeUndefined();
@@ -82,11 +89,11 @@ describe("Dojo Sensei — source → evento → dojoTracks", () => {
     vi.restoreAllMocks();
   });
 
-  it("dois rounds bons avançam a prescrição sem tocar no conceito", () => {
+  it("dois rounds prescritos bons avançam a prescrição sem tocar no conceito", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
     const mother = progress({ lvl: 3, maxLvl: 3, tot: 7, ok: 6 });
     let saved = state({ "N3.01": mother });
-    for (let i = 0; i < 20; i += 1) saved = commitAttempt(saved, gDojoAdd(1));
+    for (let i = 0; i < 20; i += 1) saved = commitAttempt(saved, dojoQuestion());
 
     const dojo = saved.dojoTracks?.kid?.dojo_add as any;
     expect(dojo.currentStep).toBe(2);
@@ -96,9 +103,45 @@ describe("Dojo Sensei — source → evento → dojoTracks", () => {
     vi.restoreAllMocks();
   });
 
+  it("manual no próprio currentStep fortalece fatos/RT, mas nunca move o ponteiro do Tutor", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.37);
+    const mother = progress({ lvl: 3, maxLvl: 3, tot: 7, ok: 6 });
+    let saved = state({ "N3.01": mother });
+    for (let i = 0; i < 20; i += 1) saved = commitAttempt(saved, dojoQuestion("manual", 1));
+
+    const dojo = saved.dojoTracks?.kid?.dojo_add as any;
+    expect(dojo.currentStep).toBe(1);
+    expect(dojo.highestStep).toBe(1);
+    expect(dojo.goodRounds).toBe(0);
+    expect(dojo.weakRounds).toBe(0);
+    expect(dojo.rounds).toBe(2);
+    expect(dojo.attempts).toBe(20);
+    expect(dojo.correct).toBe(20);
+    expect(dojo.avgCorrectRtMs).toBeGreaterThan(0);
+    expect(Object.keys(dojo.facts ?? {}).length).toBeGreaterThan(0);
+    expect(saved.progress.kid["N3.01"]).toEqual(mother);
+    expect(saved.progress.kid.dojo_add).toBeUndefined();
+    vi.restoreAllMocks();
+  });
+
+  it("não mistura round parcial manual com round prescrito na mesma faixa", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.37);
+    let saved = state({ "N3.01": progress({ lvl: 3, maxLvl: 3 }) });
+    for (let i = 0; i < 5; i += 1) saved = commitAttempt(saved, dojoQuestion("manual", 1));
+    for (let i = 0; i < 5; i += 1) saved = commitAttempt(saved, dojoQuestion("prescribed", 1));
+
+    const dojo = saved.dojoTracks?.kid?.dojo_add as any;
+    expect(dojo.rounds).toBe(0);
+    expect(dojo.attempts).toBe(0);
+    expect(dojo.__senseiDojoPendingRound?.source).toBe("prescribed");
+    expect(dojo.__senseiDojoPendingRound?.attempts).toHaveLength(5);
+    expect(dojo.currentStep).toBe(1);
+    vi.restoreAllMocks();
+  });
+
   it("acertar depois de erro conta recompensa, mas não fluência de primeira tentativa", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
-    const q = gDojoAdd(1);
+    const q = dojoQuestion();
     // primeira tentativa errada é retry suave no GameLoop: registra, mas ainda não fecha.
     misconceptionForAnswer(q, -999);
     // segunda tentativa correta é a terminal desta simulação.
@@ -154,7 +197,7 @@ describe("Dojo Sensei — source → evento → dojoTracks", () => {
   it("nível servido acima do teto conceitual não gera crédito", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.37);
     const initial = state({ "N3.01": progress({ lvl: 3, maxLvl: 3 }) }); // teto da adição = 2
-    const saved = commitAttempt(initial, gDojoAdd(3));
+    const saved = commitAttempt(initial, dojoQuestion("prescribed", 3));
     const dojo = saved.dojoTracks?.kid?.dojo_add as any;
     expect(saved.progress.kid.dojo_add).toBeUndefined();
     expect(dojo.attempts).toBe(0);
