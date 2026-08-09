@@ -16,4 +16,22 @@ describe("Wiring da gamificação", () => {
     expect(gameLoopSource).not.toContain("Speed bonus helps level up faster");
     expect(gameLoopSource).not.toMatch(/durationMs\s*<=\s*3000\s*&&\s*p\.lvl\s*<\s*5/);
   });
+
+  it("valor mostrado de moedas vem da mesma política que persiste o Misto 2x", () => {
+    expect(gameLoopSource).toContain("missionCoins(ok, completionRewardMode");
+    expect(gameLoopSource).toContain('track.id === "mista" || track.id === "mixed"');
+    expect(gameLoopSource).not.toContain("const coinsEarned = ok + 3");
+  });
+
+  it("fallback não anuncia XP nem moeda como se fosse conteúdo real", () => {
+    expect(gameLoopSource).toContain("const starGain = q.isFallback ? 0");
+    expect(gameLoopSource).toContain('track.contentStatus === "fallback"');
+    expect(gameLoopSource).toContain("const rewardEligible = !q.isFallback");
+  });
+
+  it("double tap e retries intermediários permanecem antes do terminal premiável", () => {
+    expect(gameLoopSource).toContain("if (status || answeredRef.current) return;");
+    expect(gameLoopSource).toContain("return; // não avança, não marca answeredRef");
+    expect(gameLoopSource).toContain("answeredRef.current = true;");
+  });
 });
