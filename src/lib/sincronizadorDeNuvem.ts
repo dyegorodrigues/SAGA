@@ -5,6 +5,8 @@ export interface OpcoesDoSincronizador<C = undefined> {
   atrasoMs?: number;
   agendar?: (fn: () => void, ms: number) => unknown;
   cancelar?: (handle: unknown) => void;
+  /** Só erros transitórios devem manter trabalho pendente para retry. */
+  deveRepetir?: (erro: unknown) => boolean;
 }
 
 export interface Sincronizador<C = undefined> {
@@ -23,21 +25,40 @@ export function criarSincronizador<C = undefined>(opcoes: OpcoesDoSincronizador<
 
   let pendente: { estado: State; contexto?: C } | null = null;
   let handle: unknown = null;
-
-  const subir = () => {
-    if (!pendente) return Promise.resolve();
-    const trabalho = pendente;
-    pendente = null;
-    return opcoes.gravar(trabalho.estado, trabalho.contexto).catch(err => {
-      console.warn("[Nuvem] Sincronização adiada:", err);
-    });
-  };
+  // Geração muda em cancelamento explícito (ex.: troca de UID). Um write que já
+  // estava em voo não pode ressuscitar depois de a identidade ter mudado.
+  let geracao = 0;
 
   const limparTimer = () => {
     if (handle !== null) {
       cancelarTimer(handle);
       handle = null;
     }
+  };
+
+  const agendarRetry = () => {
+    if (!pendente || handle !== null) return;
+    handle = agendarTimer(() => {
+      handle = null;
+      void subir();
+    }, atrasoMs);
+  };
+
+  const subir = () => {
+    if (!pendente) return Promise.resolve();
+    const trabalho = pendente;
+    const geracaoDoTrabalho = geracao;
+    pendente = null;
+
+    return opcoes.gravar(trabalho.estado, trabalho.contexto).catch(err => {
+      console.warn("[Nuvem] Sincronização adiada:", err);
+      if (!opcoes.deveRepetir?.(err) || geracao !== geracaoDoTrabalho) return;
+
+      // Se outro estado foi agendado enquanto este write estava em voo, o mais
+      // novo já é a pendência autoritativa. Nunca o substitua pelo retry velho.
+      if (!pendente) pendente = trabalho;
+      agendarRetry();
+    });
   };
 
   return {
@@ -54,6 +75,7 @@ export function criarSincronizador<C = undefined>(opcoes: OpcoesDoSincronizador<
       return subir();
     },
     cancelarPendencia() {
+      geracao += 1;
       limparTimer();
       pendente = null;
     },
