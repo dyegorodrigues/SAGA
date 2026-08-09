@@ -43,7 +43,11 @@ P17–P22/cânone; Radar/source/persist/DAG/Oficina causal; Tutor↔Dojo; QA Chr
 - replay legítimo é prática nova, mas não repete o bônus único de primeira missão;
 - double tap/retry/reload/materialização repetida não duplicam o mesmo evento técnico.
 
-Recibo funcional da frente: `791a21b002794e29818551adbb5cdb93138105e9`, CI #811 / run `31325208953`, **155 arquivos / 2.367 testes**, build/TypeScript/auditores/grafo/PR/higiene/binários/Chrome verdes; artefato Chrome `9074276985`.
+### Recibo remoto verificável da implementação
+
+`98fb324ae20b20542120cea5edbd6982658bf6d2`, CI #812 / run `31325218446`: **159 arquivos / 2.377 testes**, auditorias, grafo, TypeScript, build, `pr:check`, higiene, binários e sonda real Sensei verdes. Artefato da sonda: `9041334019`.
+
+Documentação de handoff pode estar em commits posteriores; por isso **sempre** verificar o head atual da PR e seu CI antes de editar, em vez de tratar o SHA acima como head eterno.
 
 ## Faça agora — COVERAGE MATRIX
 
@@ -67,14 +71,14 @@ Classificar pelo menos:
 
 ## Dívida curricular preservada
 
+- 90 competências / 94 fichas autorais;
 - Composer 26/90;
 - servido sem placeholder 51/90;
-- 25 prontos em legado;
+- 25 legado;
 - 39 fallback;
 - 21 divergências ficha↔tela;
 - 12 trocas de linguagem visual;
 - 44 estreias de ferramenta;
-- primitivas incompletas `LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100`, `Regua`;
 - `Moedas` bloqueia GM.03;
 - `Regua` bloqueia GM.05.
 
