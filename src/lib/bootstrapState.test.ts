@@ -13,6 +13,9 @@ const fresh = (): State => ({
   schemaVersion: 1, kids: [], progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true, customTracks: [],
 });
 const base = { uid: "A", legacyLocalRaw: null, legacyOwnerUid: null, migrate, fresh, currentSchemaVersion: 1 };
+const progress = (extra: Record<string, unknown> = {}) => ({
+  lvl: 2, streak: 1, bad: 0, stars: 3, ok: 4, tot: 5, bank: [], mast: 0, ...extra,
+});
 
 describe("P20 — bootstrap local × cloud", () => {
   it("scoped local ignora a chave legada ainda que ela seja mais nova", () => {
@@ -83,5 +86,31 @@ describe("P20 — bootstrap local × cloud", () => {
     const out = resolveBootstrapState({ ...base, scopedLocalRaw: null, cloudRaw: null });
     expect(out.source).toBe("fresh");
     expect(out.shouldUploadCloud).toBe(false);
+  });
+
+  it("H4: materializa Aula antes de instalar candidato local em React", () => {
+    const raw = state("kid-a", "2026-08-09T13:00:00.000Z");
+    raw.progress = { "kid-a": { aula: progress({ __aulaSourceTrackId: "N1.04" }) } };
+
+    const out = resolveBootstrapState({ ...base, scopedLocalRaw: raw, cloudRaw: null });
+
+    expect(out.state.progress["kid-a"].aula).toBeUndefined();
+    expect(out.state.progress["kid-a"]["N1.04"]).toMatchObject({ lvl: 2, ok: 4, tot: 5 });
+    expect(out.state.updatedAt).toBe("2026-08-09T13:00:00.000Z");
+  });
+
+  it("H4: materializa Dojo transitório antes de instalar candidato cloud em React", () => {
+    const raw = state("kid-a", "2026-08-09T13:00:00.000Z");
+    raw.progress = { "kid-a": { dojo_add: progress({ lastDay: "2026-08-09" }) } };
+
+    const out = resolveBootstrapState({ ...base, scopedLocalRaw: null, cloudRaw: raw });
+
+    expect(out.state.progress["kid-a"].dojo_add).toBeUndefined();
+    expect(out.state.dojoTracks?.["kid-a"]?.dojo_add).toMatchObject({
+      attempts: 5,
+      correct: 4,
+      lastDay: "2026-08-09",
+    });
+    expect(out.state.updatedAt).toBe("2026-08-09T13:00:00.000Z");
   });
 });
