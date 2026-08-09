@@ -44,6 +44,11 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain("- renderer-sem-builder: 4");
     expect(output).toContain("- componente-isolado: 1");
     expect(output).toContain("- ausente: 1");
-    expect(output).toContain("[RESULTADO] 92 fichas válidas");
+
+    // A quantidade de fichas cresce quando lacunas curriculares são fechadas;
+    // este teste protege o MAPA de runtime, não uma fotografia histórica do
+    // catálogo. O auditor específico é a autoridade para contagem/cobertura.
+    expect(output).toContain("[RESULTADO]");
+    expect(output).toContain("fichas válidas, nove seções presentes");
   });
 });
