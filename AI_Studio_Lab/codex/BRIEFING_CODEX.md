@@ -1,84 +1,54 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 9/ago/2026.** O briefing antigo de P21 foi superado e permanece recuperável pelo histórico Git. P21/P22, cânone, Tutor↔Dojo, QA real e Jardim causal estão fechados. Próxima execução: **identidade do banco de erros composto**.
+> **VIGENTE em 9/ago/2026.** Próximo bloqueante: `LENTO_DEDOS` / autoridade indevida da velocidade.
 
-## Antes de tocar código
-
-Leia nesta ordem:
+## Leia
 
 1. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`
 2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
 3. `RETOMADA.md`
-4. `AUDITORIA_MOTORES_ADAPTATIVOS.md`
-5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
+4. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
-Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`.  
-`main` = `68fad4c575e28959b2ca4776e9a541d6828b63f3`, **não tocar**.  
-PR #29 = open + draft + no-merge. Creature Engine = fora deste fluxo. Não criar branch auxiliar.
+Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 draft/unmerged. Não tocar na main `68fad4c575e28959b2ca4776e9a541d6828b63f3`, no Creature Engine, nem criar branch auxiliar. Reancorar PR/head antes de editar.
 
-Sempre reancore PR/head remoto antes de editar.
+## Não reabra
 
-## Fechado
+Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto e telemetria/Leitner da Aula composta estão fechados.
 
-Não reabrir sem falha objetiva:
+- banco: CI #682 / `31308424789`;
+- telemetria/Leitner: CI #691 / `31308774424`;
+- telemetria v2 usa `trackId` = competência-fonte da questão composta;
+- Leitner materializa `reviewForce/lastDay` no source real.
 
-- P17/P8/P18/P19/P20/P21/P22;
-- grafo 90 + 94 fichas + cobertura autoral 90/90;
-- Radar tag→nó;
-- `sourceTrackId` da Aula composta até persistência;
-- Sensei full DAG sem grade como trilho;
-- Oficina causal;
-- reconciliação canônica + guard documental;
-- Dojo `manual | prescribed` de ponta a ponta;
-- QA real Chrome integrado ao CI;
-- Jardim causal por DAG + fraqueza JD comprovada.
+## Faça agora — `LENTO_DEDOS`
 
-Head funcional de fechamento: `15f73542ddb1f005fd228ac02461c5a71ea8adec`.  
-CI #671 / run `31307946962` = SUCCESS integral.  
-Artefato visual: `9036527545`.
+Dois bugs já provados em `GameLoop.tsx`:
 
-## Estado de conteúdo — dívida declarada
+1. rapid-fire correto >10s chama `trackMisconception(p, "LENTO_DEDOS")`; duas ocorrências iguais podem entrar no Radar e acionar remediação conceitual por lentidão;
+2. rapid-fire correto ≤3s força `p.streak = 3`; isso persiste e pode fazer a próxima resposta subir `lvl` por velocidade.
 
-- Composer/padrão-ouro: 26/90;
-- servido sem placeholder: 51/90;
-- ficha pronta servida por legado: 25;
-- ficha pronta sem conteúdo: 39;
-- divergência ficha↔tela observada: 21;
-- troca de linguagem visual sem aviso: 12;
-- primitivas: 20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente.
-
-**Não começar a fábrica dos 39 agora.** A lista exata está em `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` e entra depois da Coverage Matrix.
-
-## Faça agora — identidade do banco de erros composto
-
-Pré-auditoria encontrou a hipótese a seguir em `composer.ts`:
-
-- os itens de banco de múltiplos tracks entram em um `bankQs` global e embaralhado;
-- há uma closure por `RescuePlanItem`;
-- para `error-bank`, a closure usa `bankQs.pop()` sem amarrar o item ao source do resgate.
-
-Pode ocorrer:
-
-> resgate de A consumir questão armazenada no banco de B.
-
-Não corrigir por intuição. Primeiro trace e teste:
-
-`planAula(error-bank source) → bankQs/rescueQueue → questão/source → GameLoop/review → progressEngine/materialize → bank mutation → próximo planAula`.
+Ambos violam o cânone: RT é automaticidade, não domínio conceitual.
 
 ### Sequência obrigatória
 
-1. regressão determinística com dois bancos-fonte;
-2. provar ou refutar a mistura;
-3. se provada, corrigir identidade por source/rescue;
-4. provar que retry/review altera o bank do source correto;
-5. gates completos;
-6. checkpoint.
+1. testes/regressões que provem os dois efeitos;
+2. tirar `LENTO_DEDOS` de `Progress.misconceptions`/Radar conceitual;
+3. remover bônus de velocidade sobre `streak/lvl/dom/masteryEvidence`;
+4. preservar RT, estrelas e Dojo/strength como sinais de fluência;
+5. provar rápido vs lento correto = mesma autoridade conceitual;
+6. provar Dojo prescrito intacto;
+7. gates completos + Chrome;
+8. checkpoint.
 
-A etapa **telemetria/Leitner da Aula composta é a seguinte**, não misture os dois bugs no mesmo lote.
+Não reintroduzir `TAG_TO_NODE`.
+
+## Conteúdo continua inventariado
+
+26/90 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; primitivas incompletas listadas no inventário. Não iniciar a fábrica antes da Coverage Matrix.
 
 ## Depois
 
-telemetria/Leitner → `LENTO_DEDOS` → timezone → recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+timezone/`lastDay` → recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
@@ -93,5 +63,3 @@ npm run build
 npm run pr:check
 npm run sonda:sensei-dojo
 ```
-
-**Comece pela regressão de dois bancos-fonte.**
