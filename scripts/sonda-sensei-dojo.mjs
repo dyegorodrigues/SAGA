@@ -144,7 +144,10 @@ async function runViewport(browser, viewport) {
   await prescribedButton.waitFor({ state: "visible" });
   await prescribedButton.click();
 
-  await page.getByText("Academia da Adição", { exact: false }).first().waitFor({ state: "visible", timeout: 15_000 });
+  // O GameLoop não promete exibir `track.name`. O contrato visível do templo de
+  // adição é a equação rapid-fire; ancorar a sonda nela evita falso vermelho por
+  // texto que não faz parte da UX.
+  await page.getByText(/\d+\s*\+\s*\d+\s*=\s*\?/).first().waitFor({ state: "visible", timeout: 15_000 });
   const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/game`);
   const gameScreenshot = path.join(artifactDir, `${viewport.name}-dojo-prescrito.png`);
   await page.screenshot({ path: gameScreenshot, fullPage: true });
