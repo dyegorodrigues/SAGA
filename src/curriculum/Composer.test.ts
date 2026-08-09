@@ -9,6 +9,13 @@ import { JOURNEY_FICHAS } from "./fichas";
 import { N3_09 } from "./fichas/jornada/N3.09";
 import { N3_11 } from "./fichas/jornada/N3.11";
 import { N4_02 } from "./fichas/jornada/N4.02";
+import { FichaCompetencia } from "./schema";
+import { generateRegisteredFichaQuestion, hasComposerFicha } from "./motores/composerCanary";
+
+const generateJourneyQuestion = (ficha: FichaCompetencia, level: number) =>
+  hasComposerFicha(ficha.id)
+    ? generateRegisteredFichaQuestion(ficha.id, level)
+    : Composer.generate(ficha, level);
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
@@ -51,14 +58,11 @@ describe("Composer de fichas", () => {
   });
 
   it("attaches canonical misconception tags only to matching numeric distractors", () => {
-    // ⚠️ Derivado, não fixo. Este teste prendia-se ao N1.08 nível 3, e quebrou
-    // quando aquele nível passou a desenhar as próprias alternativas no palco:
-    // sem `options`, não havia distrator para conferir. Qual ficha põe números
-    // na barra é INVENTÁRIO e muda a cada primitiva nova; a especificação é
-    // "onde o Composer emite alternativa numérica, o vizinho n±1 leva a tag da
-    // ficha, e a certa não leva nenhuma" (§2-bis).
+    // ⚠️ Derivado, não fixo. Builders procedimentais registrados passam pela
+    // mesma porta usada em produção; fichas sem builder especializado continuam
+    // no Composer genérico. Assim este inventário não cria um caminho paralelo.
     const comBanco = JOURNEY_FICHAS
-      .flatMap(ficha => [1, 2, 3, 4, 5].map(lvl => ({ ficha, q: Composer.generate(ficha, lvl), lvl })))
+      .flatMap(ficha => [1, 2, 3, 4, 5].map(lvl => ({ ficha, q: generateJourneyQuestion(ficha, lvl), lvl })))
       .filter(({ ficha, q }) => typeof q.answer === "number"
         && ficha.distratores?.some(d => /^n\s*[+-]\s*\d+$/.test(d.regra))
         && (q.options ?? []).some(o => typeof o.value === "number"));
@@ -66,8 +70,6 @@ describe("Composer de fichas", () => {
     expect(comBanco.length).toBeGreaterThan(0);
     let conferidos = 0;
     for (const { ficha, q, lvl } of comBanco) {
-      // O que a ficha promete: valor → tag, montado da mesma regra que o
-      // Composer lê.
       const prometido = new Map<number, string>();
       for (const d of ficha.distratores ?? []) {
         const m = d.regra.trim().match(/^n\s*([+-])\s*(\d+)$/);
@@ -83,7 +85,6 @@ describe("Composer de fichas", () => {
       expect(q.options?.find(o => o.value === q.answer)?.misconception, `${ficha.id} L${lvl}`)
         .toBeUndefined();
     }
-    // E a tag canônica do vizinho continua sendo o `OFF_BY_ONE` em alguma ficha.
     expect(conferidos).toBeGreaterThan(0);
     expect(JOURNEY_FICHAS.some(f => f.distratores?.some(d =>
       /^n\s*[+-]\s*1$/.test(d.regra) && d.tag === MisconceptionTag.OFF_BY_ONE))).toBe(true);
@@ -93,7 +94,7 @@ describe("Composer de fichas", () => {
     for (const ficha of JOURNEY_FICHAS) {
       for (let level = 1; level <= 5; level += 1) {
         for (let sample = 0; sample < 10; sample += 1) {
-          const question = Composer.generate(ficha, level);
+          const question = generateJourneyQuestion(ficha, level);
           const declaredKind = ficha.niveis?.[level]?.primitiva ?? ficha.micros[0].kinds[0];
           const renderedKind = declaredKind === "intruso_math"
             ? "plain"
@@ -117,15 +118,11 @@ describe("Composer de fichas", () => {
   it("requires a positive level-five response-time target in every registered ficha", () => {
     for (const ficha of JOURNEY_FICHAS) {
       expect(ficha.niveis?.[5]?.rt_alvo, ficha.id).toBeGreaterThan(0);
-      expect(Composer.generate(ficha, 5).rt_max_s, ficha.id).toBeGreaterThan(0);
+      expect(generateJourneyQuestion(ficha, 5).rt_max_s, ficha.id).toBeGreaterThan(0);
     }
   });
 
   it("fails explicitly instead of returning an invalid question for an unknown builder", () => {
-    // A regra é "primitiva sem builder QUEBRA"; o nome usado aqui era só o
-    // exemplo — e era `shapecanvas`, que passou a ter builder quando a F47
-    // chegou. Um nome impossível por construção mantém a regra viva sem
-    // reprovar o dia em que a primitiva de exemplo for implementada (§2-bis).
     const invalid = {
       ...N1_01,
       niveis: { 1: { primitiva: "primitiva-que-nao-existe" as never } },
