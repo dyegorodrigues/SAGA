@@ -216,12 +216,12 @@ Depois:
 
 ## 10. Cabeças documentais e recibo remoto
 
-O SHA de um commit não pode ser escrito dentro do próprio conteúdo que gera esse SHA. Para evitar auto-referência falsa, o fechamento usa três âncoras distintas:
+O SHA de um commit não pode ser escrito dentro do próprio conteúdo que gera esse SHA. Para evitar auto-referência falsa, o fechamento usa âncoras verificáveis:
 
 1. **head funcional:** `f76017e3a8ed2a15fb5561f2fc886f6445964168` — CI #766/run `31319778442` verde;
-2. **head documental auditado:** será o commit que consolida checkpoint + `RETOMADA.md` + `BRIEFING_CODEX.md` + `HANDOFF_CONTINUIDADE_IA.md` e será registrado neste checkpoint por recibo posterior;
-3. **head remoto final/CI terminal:** será registrado também no corpo da PR #29, que não altera a cabeça Git.
+2. **head documental consolidado e auditado:** `018efd60d1c9cfc5e1b91b76d548a2322af9a7ce` — CI **#770**, run **`31320063885`**, integralmente verde;
+3. este commit é apenas o **recibo documental** que escreve a âncora anterior no checkpoint; seu SHA/CI terminal é registrado no corpo da PR #29 depois que o próprio CI terminar, sem criar falsa auto-referência.
 
-Assim nenhum SHA/run é inventado para um commit que ainda não existe.
+O head `018efd60...` contém, em conjunto, este checkpoint, `RETOMADA.md`, `BRIEFING_CODEX.md` e `HANDOFF_CONTINUIDADE_IA.md` já repontados para **simulação longitudinal**. O CI #770 provou auditores, TypeScript, 2.325 testes, build, `pr:check`, higiene, binários e Chrome real nessa documentação consolidada.
 
 > **A criança pode escolher treinar. Quando segue o Sensei, quem escolhe o currículo é o Tutor.**
