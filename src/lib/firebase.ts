@@ -20,6 +20,7 @@ import {
   linkWithPopup,
 } from "firebase/auth";
 import { State, TelemetryLog } from "../types";
+import { normalizeTelemetryIdentity } from "./telemetryIdentityContext";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -320,10 +321,11 @@ export const RETENCAO_TELEMETRIA_DIAS = 550;
  * antigo vira adivinhação — e como o arquivo é imutável, não há como consertar
  * depois. Ver `AI_Studio_Lab/arquitetura/DADOS_EM_ESCALA.md` §4.
  *
- * Suba o número ao mudar o SIGNIFICADO de um campo existente ou ao remover um.
- * Acrescentar campo opcional não exige versão nova: o leitor antigo o ignora.
+ * v1 registrava `trackId="aula"` para questões compostas. Em v2 `trackId`
+ * significa a competência-fonte realmente praticada. Isso muda o significado
+ * do campo e, portanto, exige versão nova conforme o contrato acima.
  */
-export const VERSAO_EVENTO_TELEMETRIA = 1;
+export const VERSAO_EVENTO_TELEMETRIA = 2;
 
 /**
  * Logs an atomic telemetry event to Cloud Firestore asynchronously.
@@ -331,12 +333,13 @@ export const VERSAO_EVENTO_TELEMETRIA = 1;
  */
 export async function logTelemetryToCloud(log: TelemetryLog): Promise<void> {
   const userId = getDeviceUserId();
-  if (userId === "usr_anonymous_device") return; // Optional: skip logging for purely local anonymous without cloud fallback
+  if (userId === "usr_anonymous_device") return;
+  const normalizedLog = normalizeTelemetryIdentity(log);
 
   try {
-    const colRef = collection(db, `userStates/${userId}/Kids/${log.kidId}/TelemetryLogs`);
+    const colRef = collection(db, `userStates/${userId}/Kids/${normalizedLog.kidId}/TelemetryLogs`);
     await setDoc(doc(colRef), {
-      ...log,
+      ...normalizedLog,
       schemaVersion: VERSAO_EVENTO_TELEMETRIA,
       serverTimestamp: new Date().toISOString(),
       // Retenção (§ política em AI_Studio_Lab/DADOS_E_RETENCAO.md): o campo é o
