@@ -9,7 +9,8 @@ const root = path.resolve(__dirname, "..");
 const port = Number(process.env.SONDA_SENSEI_PORT || 4182);
 const baseUrl = `http://127.0.0.1:${port}`;
 const artifactDir = path.join(root, ".artifacts", "sonda-sensei-dojo");
-const stateKey = "matemagica-state-v1";
+// Deve espelhar LEGACY_STATE_KEY em src/lib/storageIdentity.ts.
+const stateKey = "mk-state-v1";
 const viewports = [
   { name: "phone", width: 390, height: 844 },
   { name: "tablet", width: 768, height: 1024 },
@@ -29,16 +30,19 @@ const progress = {
 };
 
 const fixtureState = {
-  schemaVersion: 13,
+  // Deve espelhar CURRENT_SCHEMA_VERSION em src/utils/migrator.ts.
+  schemaVersion: 1,
   kids: [{
     id: "sonda-kid",
     name: "Sonda",
     avatar: "🦊",
     grade: "ano1",
+    age: 6,
     theme: "classico",
     petName: "Kiro",
     inventory: [],
     petFood: 0,
+    petEnergy: 80,
   }],
   progress: {
     "sonda-kid": {
@@ -50,7 +54,6 @@ const fixtureState = {
   album: { "sonda-kid": [] },
   log: { "sonda-kid": [] },
   sound: false,
-  schemaVersion: 13,
   revision: 1,
   updatedAt: "2026-08-09T12:00:00.000Z",
 };
@@ -130,7 +133,9 @@ async function runViewport(browser, viewport) {
 
   await page.getByText("Missões do Dojô", { exact: true }).waitFor({ state: "visible", timeout: 15_000 });
   await page.getByText("Prescrição do Sensei", { exact: false }).waitFor({ state: "visible" });
-  await page.getByText(/Templo da Soma · faixa 1/).waitFor({ state: "visible" });
+  await page.getByText(/Academia da Adição · faixa 1/).waitFor({ state: "visible" });
+  await page.getByRole("button", { name: /Começar Aula do Dia|Começar Reforço Guiado/i }).waitFor({ state: "visible" });
+  await page.getByText("Mistura Total (Dojô Geral)", { exact: true }).waitFor({ state: "visible" });
   const homeMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/home`);
   const homeScreenshot = path.join(artifactDir, `${viewport.name}-sensei-home.png`);
   await page.screenshot({ path: homeScreenshot, fullPage: true });
@@ -139,7 +144,7 @@ async function runViewport(browser, viewport) {
   await prescribedButton.waitFor({ state: "visible" });
   await prescribedButton.click();
 
-  await page.getByText("Templo da Soma", { exact: false }).first().waitFor({ state: "visible", timeout: 15_000 });
+  await page.getByText("Academia da Adição", { exact: false }).first().waitFor({ state: "visible", timeout: 15_000 });
   const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/game`);
   const gameScreenshot = path.join(artifactDir, `${viewport.name}-dojo-prescrito.png`);
   await page.screenshot({ path: gameScreenshot, fullPage: true });
