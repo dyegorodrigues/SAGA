@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Kid, Track } from "../../types";
 import type { AulaPlan, RescuePlanItem } from "../../curriculum/motores/composer";
 import { chooseSenseiEntry } from "../../curriculum/motores/senseiOrchestrator";
+import type { SenseiDojoPrescription } from "../../curriculum/motores/senseiDojoPrescription";
 import { FONT, sfx } from "../Mascot";
 
 interface Props {
@@ -9,15 +10,18 @@ interface Props {
   prog: Record<string, any>;
   aulaPlan: AulaPlan;
   rec: { track: Track, reason: string } | null;
+  dojoPrescription: SenseiDojoPrescription | null;
   onMatricula: () => void;
   /** Porta única: o parent já roteia aula normal ou Oficina prescrita. */
   onAula: () => void;
+  /** Missão de fluência com autoridade prescrita pelo Sensei. */
+  onSenseiDojo: () => void;
   onTrack: (t: Track) => void;
   onMixed: () => void;
   setActiveShellTab: (tab: any) => void;
 }
 
-export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTrack, onMixed, setActiveShellTab }: Props) {
+export function SenseiTab({ kid, prog, aulaPlan, rec, dojoPrescription, onMatricula, onAula, onSenseiDojo, onTrack, onMixed, setActiveShellTab }: Props) {
   const [expandedLesson, setExpandedLesson] = useState(true);
   const [expandedDojo, setExpandedDojo] = useState(true);
   const [expandedRescue, setExpandedRescue] = useState(true);
@@ -157,7 +161,7 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
         </div>
       )}
 
-      {/* 2. 🥋 MISSÕES DO DOJÔ — opção livre; prescrição automática será integrada ao Learner Model */}
+      {/* 2. 🥋 MISSÕES DO DOJÔ — prescrição e porta livre permanecem distintas */}
       <div className="mb-6 bg-white p-5 rounded-3xl shadow-sm border-2 border-slate-200">
         <div className="flex items-center justify-between mb-1 pl-1">
           <div className="flex items-center gap-2">
@@ -173,10 +177,41 @@ export function SenseiTab({ kid, prog, aulaPlan, rec, onMatricula, onAula, onTra
             {expandedDojo ? "▲ Compactar" : "▼ Expandir"}
           </button>
         </div>
-        <p className="text-xs font-bold text-slate-500 mb-4 pl-1">Treino livre de velocidade e automaticidade. O Sensei também poderá prescrever doses específicas.</p>
+        <p className="text-xs font-bold text-slate-500 mb-4 pl-1">O Sensei pode prescrever um round curto de automaticidade. O treino livre continua sendo escolha sua.</p>
 
         {expandedDojo && (
           <div className="flex flex-col gap-3">
+            {dojoPrescription && (
+              <button
+                onClick={() => {
+                  sfx.level();
+                  onSenseiDojo();
+                }}
+                className="w-full text-left p-4 select-none relative transition-all cursor-pointer active:translate-y-0.5 rounded-2xl border-2 hover:border-blue-500"
+                style={{
+                  background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+                  borderColor: '#3B82F6',
+                  boxShadow: '0 4px 0 #2563EB',
+                }}
+              >
+                <div className="flex items-center justify-between gap-3 mb-1.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-blue-950 bg-blue-200 border border-blue-300">
+                    ⚡ Prescrição do Sensei
+                  </span>
+                  <span className="text-xl">🎯</span>
+                </div>
+                <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 17, color: '#1E3A8A' }}>
+                  {dojoPrescription.temple.track.name} · faixa {dojoPrescription.step}
+                </div>
+                <div className="text-[11px] font-bold mt-1 leading-snug text-blue-900/85">
+                  {dojoPrescription.reasonText}
+                </div>
+                <div className="mt-3 inline-flex items-center gap-1.5 text-[11px] font-black text-white bg-blue-600 px-3.5 py-2 rounded-xl shadow-sm">
+                  Fazer round prescrito ▶
+                </div>
+              </button>
+            )}
+
             <button
               onClick={() => {
                 sfx.level();
