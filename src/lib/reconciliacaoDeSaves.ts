@@ -1,4 +1,5 @@
 import { State } from "../types";
+import { materializeAulaProgress } from "../curriculum/motores/aulaProgressContext";
 
 /**
  * Reconciliação entre dispositivos e entre sessões offline.
@@ -28,9 +29,16 @@ export interface EscolhaDeSave {
   houveConflito: boolean;
 }
 
-/** Carimba o estado com o instante da gravação. */
+/**
+ * Carimba o estado com o instante da gravação.
+ *
+ * Antes do carimbo, materializa qualquer commit transitório da Aula do Dia no
+ * nó curricular que realmente gerou a questão. Assim `progress.aula` nunca
+ * chega a React/local/cloud como fonte de mastery, Radar ou Leitner.
+ */
 export function carimbar(estado: State, agora: Date = new Date()): State {
-  return { ...estado, updatedAt: agora.toISOString() };
+  const materializado = materializeAulaProgress(estado);
+  return { ...materializado, updatedAt: agora.toISOString() };
 }
 
 function instanteDe(estado: State | null | undefined): number {
