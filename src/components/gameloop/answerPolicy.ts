@@ -14,6 +14,7 @@ import {
 import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
+import { prepareAulaSourceForAnswer } from "../../curriculum/motores/aulaProgressContext";
 import { AnswerMeta, Question } from "../../types";
 import { bundleMisconceptions } from "./misconceptionBundle";
 
@@ -104,8 +105,13 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
 /**
  * Contrato público permanece `string | undefined`. Quando uma tentativa prova
  * mais de uma hipótese, o bundle interno é desfeito por questionDiagnostics.
+ *
+ * Este também é o boundary comum que TODA resposta terminal atravessa antes do
+ * progressEngine. A questão da Aula do Dia registra aqui sua competência-fonte;
+ * o próximo `applyJourneyAnswer` consome exatamente esse source.
  */
 export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
+  prepareAulaSourceForAnswer(q);
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
 
   if (meta?.audiochoice) {
