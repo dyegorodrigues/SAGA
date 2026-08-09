@@ -36,6 +36,8 @@ import { dojo_add } from "./curriculum/fichas/dojo/sensei/dojo_add";
 import { dojo_sub } from "./curriculum/fichas/dojo/sensei/dojo_sub";
 import { dojo_mul } from "./curriculum/fichas/dojo/sensei/dojo_mul";
 import { dojo_div } from "./curriculum/fichas/dojo/sensei/dojo_div";
+import { senseiDojoTempleById, senseiDojoTrack } from "./curriculum/motores/senseiDojoSession";
+import type { SenseiDojoSessionSource } from "./curriculum/motores/senseiDojoPolicy";
 const dojoTracks = [dojo_add, dojo_sub, dojo_mul, dojo_div];
 import { buildDojoTrack } from "./utils/dojoMode";
 import { buildAulaTrack } from "./curriculum/motores/composer";
@@ -166,6 +168,7 @@ export default function App() {
     kid?: string;
     track?: string;
     lvl?: number;
+    dojoSource?: SenseiDojoSessionSource;
     rescue?: { requiredLevel: number; questionBudget: number };
   }>({ name: "loading" });
   const [userEmail, setUserEmail] = useState<string | null>(getCurrentUserEmail());
@@ -684,7 +687,7 @@ export default function App() {
             albumCount={albumOf(screen.kid!).length}
             onBack={() => setScreen({ name: "pick" })}
             onAlbum={() => setScreen({ name: "album", kid: screen.kid })}
-            onTrackLvl={(t, lvl) => setScreen({ name: "game", kid: screen.kid, track: t.id, lvl })}
+            onTrackLvl={(t, lvl, dojoSource) => setScreen({ name: "game", kid: screen.kid, track: t.id, lvl, dojoSource })}
             onMixed={() => {
             setScreen({ name: "game", kid: screen.kid, track: "mista" });
           }}
@@ -734,8 +737,13 @@ export default function App() {
                 ((state.dojoTracks || {})[kidObj.id] || {})[jardimConfig.ficha.id],
               )
             : null;
+          const prescribedDojoTemple = screen.dojoSource === "prescribed"
+            ? senseiDojoTempleById(screen.track)
+            : undefined;
           const gameTrack = jardimConfig
             ? jardimTrack(jardimConfig)
+            : prescribedDojoTemple
+            ? senseiDojoTrack(prescribedDojoTemple, "prescribed")
             : screen.track === "mista" || screen.track === "mixed"
               ? mixedTrack!
               : screen.track === "aula"
@@ -770,7 +778,7 @@ export default function App() {
                   : screen.lvl
                     ? { ...getProg(screen.kid!, screen.track!), lvl: screen.lvl }
                     : getProg(screen.kid!, screen.track!)}
-              exactLvl={!!jardimState || !!screen.rescue || !!screen.lvl || screen.track === "aula" || screen.track === "matricula"} // sequências puras: sem banco/aquecimento por cima
+              exactLvl={!!jardimState || !!screen.rescue || !!screen.lvl || !!screen.dojoSource || screen.track === "aula" || screen.track === "matricula"} // sequências puras: sem banco/aquecimento por cima
               rescue={jardimState ? undefined : screen.rescue}
               progressionMode={jardimState ? "garden" : "journey"}
               gardenState={jardimState || undefined}
