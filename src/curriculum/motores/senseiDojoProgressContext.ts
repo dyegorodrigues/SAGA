@@ -9,6 +9,11 @@ import {
   type SenseiDojoSessionSource,
   type SenseiDojoTempleId,
 } from "./senseiDojoPolicy";
+import {
+  currentDojoAnswerXp,
+  perfectMissionXpBonus,
+  type XpBearingDojoTrackState,
+} from "../../lib/gamificationProgress";
 
 export const SENSEI_DOJO_ATTEMPT_MARKER = "__senseiDojoAttempt" as const;
 const SENSEI_DOJO_PENDING_ROUND = "__senseiDojoPendingRound" as const;
@@ -40,7 +45,7 @@ type PendingRound = {
   attempts: SenseiDojoAttempt[];
 };
 
-type PersistedSenseiDojoState = DojoTrackState & {
+type PersistedSenseiDojoState = XpBearingDojoTrackState & {
   [SENSEI_DOJO_PENDING_ROUND]?: PendingRound;
 };
 
@@ -135,6 +140,7 @@ function legacyDojoState(progress: Progress, ceiling: number): PersistedSenseiDo
     mastered: false,
     attempts: Math.max(0, progress.tot || 0),
     correct: Math.max(0, progress.ok || 0),
+    xpStars: Math.max(0, progress.stars || 0),
     ...(progress.rt !== undefined ? { avgCorrectRtMs: progress.rt } : {}),
     ...(progress.lastDay ? { lastDay: progress.lastDay } : {}),
   };
@@ -164,7 +170,7 @@ function normalizeSaved(
           attempts: [...extended[SENSEI_DOJO_PENDING_ROUND]!.attempts],
         } }
       : {}),
-  };
+  } as PersistedSenseiDojoState;
 }
 
 /** Remove o buffer parcial antes de entregar um round fechado ao motor puro. */
@@ -177,7 +183,7 @@ function withoutPendingRound(state: PersistedSenseiDojoState): DojoTrackState {
 /**
  * Move eventos transitórios `progress.dojo_*` para o estado de fluência do kid.
  * Também migra silenciosamente saves legados dos quatro templos, preservando
- * volume/RT/faixa como histórico de treino, mas nunca `dom/masteryEvidence`.
+ * volume/RT/faixa/XP como histórico de treino, mas nunca `dom/masteryEvidence`.
  */
 export function materializeSenseiDojoProgress(state: State): State {
   const knownTempleIds: SenseiDojoTempleId[] = ["dojo_add", "dojo_sub", "dojo_mul", "dojo_div"];
@@ -206,8 +212,8 @@ export function materializeSenseiDojoProgress(state: State): State {
       changed = true;
 
       if (marker) {
-        // Defesa final: um nível clicado por UI antiga não ganha evidência se o
-        // conceito ainda não o tornou seguro. A UI é restringida também.
+        // Defesa final: um nível clicado por UI antiga não ganha evidência nem XP
+        // se o conceito ainda não o tornou seguro. A UI é restringida também.
         if (ceiling >= marker.step && ceiling > 0) {
           const extended = dojoState as PersistedSenseiDojoState;
           const oldPending = extended[SENSEI_DOJO_PENDING_ROUND];
@@ -221,21 +227,34 @@ export function materializeSenseiDojoProgress(state: State): State {
               }
             : { step: marker.step, source: marker.source, attempts: [marker] };
 
+          const answerXp = currentDojoAnswerXp(marker.right, marker.durationMs);
+          const accumulatedXp = Math.max(0, extended.xpStars ?? 0) + answerXp;
+
           if (pending.attempts.length >= 10) {
+            const closedRound = pending.attempts.slice(0, 10);
+            const perfectBonus = perfectMissionXpBonus(
+              closedRound.filter(attempt => attempt.right).length,
+              closedRound.length,
+            );
             const adaptive = marker.source === "prescribed";
             const result = applySenseiDojoRound(
-              withoutPendingRound(extended),
-              pending.attempts.slice(0, 10),
+              withoutPendingRound({ ...extended, xpStars: accumulatedXp + perfectBonus }),
+              closedRound,
               marker.step,
               ceiling,
               marker.practiceDay,
               adaptive,
             );
             // O motor recebe e devolve apenas o estado público; o round fechado
-            // não pode reaparecer no 11º item por herança de spread.
-            dojoState = { ...result.state };
+            // não pode reaparecer no 11º item por herança de spread. O spread do
+            // motor preserva `xpStars` como dado opaco de meta-progressão.
+            dojoState = { ...result.state } as PersistedSenseiDojoState;
           } else {
-            dojoState = { ...dojoState, [SENSEI_DOJO_PENDING_ROUND]: pending } as PersistedSenseiDojoState;
+            dojoState = {
+              ...dojoState,
+              xpStars: accumulatedXp,
+              [SENSEI_DOJO_PENDING_ROUND]: pending,
+            } as PersistedSenseiDojoState;
           }
         }
       }
