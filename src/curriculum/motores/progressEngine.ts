@@ -84,6 +84,15 @@ export function protectConceptualStreak(progress: Progress): Progress {
   return progress;
 }
 
+function rescueTargetRecovered(before: Progress, after: Progress, mode: ProgressionMode): boolean {
+  if (mode.kind !== "rescue" || !mode.requiredLevel) return false;
+  // No nível 5 não existe novo degrau para sinalizar a saída. Mantemos a regra
+  // já usada pelo GameLoop: quem entrou no resgate já no 5 precisa confirmar
+  // dois acertos conceituais; quem chega de 4→5 pode sair na própria transição.
+  if (mode.requiredLevel === 5 && (before.lvl || 1) === 5) return (after.streak || 0) >= 2;
+  return (after.lvl || 1) >= mode.requiredLevel;
+}
+
 /**
  * Transição pura da escada de proficiência da Jornada.
  *
@@ -176,6 +185,15 @@ export function applyJourneyAnswer(
     progress.dom = true;
     progress.masteryEvidence = legacyMasteryEvidence();
     transition = { type: "legacy-crown" };
+  }
+
+  // Uma Oficina bem-sucedida precisa ter saída. `current/base` é sempre o
+  // progresso da competência-alvo da missão: portanto limpar aqui resolve
+  // somente misconceptions desse alvo. Em resgate de pré-requisito, a causa
+  // original vive em outro nó e permanece intacta até ser reavaliada lá.
+  if (rescueTargetRecovered(base, progress, mode)) {
+    progress.misconceptions = [];
+    progress.rescueAttempts = 0;
   }
 
   const routedProgress = markAulaSourceProgress(progress, routed.sourceTrackId);
