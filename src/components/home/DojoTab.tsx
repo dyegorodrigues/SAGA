@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { DojoTrackState, Progress, Track } from "../../types";
-import { C, FONT, sfx } from "../Mascot";
+import { FONT, sfx } from "../Mascot";
 import { JARDIM } from "../../curriculum/fichas/dojo/jardim";
 import { jardimTrack, resolveJardimState } from "../../curriculum/motores/jardimSession";
-import { dojo_add } from "../../curriculum/fichas/dojo/sensei/dojo_add";
-import { dojo_sub } from "../../curriculum/fichas/dojo/sensei/dojo_sub";
-import { dojo_mul } from "../../curriculum/fichas/dojo/sensei/dojo_mul";
-import { dojo_div } from "../../curriculum/fichas/dojo/sensei/dojo_div";
+import {
+  SENSEI_DOJO_TEMPLES,
+  resolveSenseiDojoState,
+} from "../../curriculum/motores/senseiDojoSession";
 
 interface Props {
   onOpenPicker: (t: Track) => void;
@@ -54,6 +54,13 @@ const GARDEN_COPY: Record<string, GardenCopy> = {
   },
 };
 
+const TEMPLE_STYLE: Record<string, { border: string; bg: string; shadow: string; text: string; icon: string }> = {
+  dojo_add: { border: "#FECDD3", bg: "#FFF1F2", shadow: "#FECDD3", text: "#BE123C", icon: "➕" },
+  dojo_sub: { border: "#C7D2FE", bg: "#EEF2FF", shadow: "#C7D2FE", text: "#4338CA", icon: "➖" },
+  dojo_mul: { border: "#FDE68A", bg: "#FFFBEB", shadow: "#FDE68A", text: "#B45309", icon: "✖️" },
+  dojo_div: { border: "#A7F3D0", bg: "#ECFDF5", shadow: "#A7F3D0", text: "#047857", icon: "➗" },
+};
+
 export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGardenTrack }: Props) {
   const [mode, setMode] = useState<"garden" | "sensei">("garden");
 
@@ -84,24 +91,34 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
   }, [gardenEntries]);
 
   /**
-   * O painel antigo somava TODO `state.progress`, chamando Jornada de Dojo.
-   * Sensei continua legado, então pelo menos restringimos as estatísticas aos
-   * ids que realmente pertencem aos templos de operação.
+   * Os templos usam `dojoTracks` como fonte de verdade. `progress.dojo_*` foi
+   * aposentado porque misturava treino de automaticidade com mastery conceitual.
    */
+  const senseiEntries = useMemo(() => SENSEI_DOJO_TEMPLES.map(temple => {
+    const resolved = resolveSenseiDojoState(temple, prog, dojoTracks[temple.id]);
+    return { temple, ...resolved };
+  }), [dojoTracks, prog]);
+
   const senseiStats = useMemo(() => {
-    let ok = 0;
-    let tot = 0;
-    for (const [id, p] of Object.entries(prog)) {
-      if (!id.startsWith("dojo_")) continue;
-      ok += p.ok || 0;
-      tot += p.tot || 0;
-    }
+    const states = senseiEntries.map(entry => entry.state);
+    const attempts = states.reduce((sum, state) => sum + (state.attempts ?? 0), 0);
+    const correct = states.reduce((sum, state) => sum + (state.correct ?? 0), 0);
+    const rounds = states.reduce((sum, state) => sum + (state.rounds ?? 0), 0);
+    const weakItems = states.reduce((sum, state) => {
+      const facts = Object.values(state.facts ?? {});
+      const procs = Object.values(state.procs ?? {});
+      return sum
+        + facts.filter(item => item.forca <= 1 || item.erros_seguidos >= 2).length
+        + procs.filter(item => item.forca <= 1 || item.erros_seguidos >= 2).length;
+    }, 0);
     return {
-      batteries: Math.floor(tot / 10),
-      accuracy: tot > 0 ? Math.round((ok / tot) * 100) : 0,
-      total: tot,
+      rounds,
+      accuracy: attempts > 0 ? Math.round((correct / attempts) * 100) : 0,
+      attempts,
+      weakItems,
+      unlocked: senseiEntries.filter(entry => entry.maxEligibleStep >= 1).length,
     };
-  }, [prog]);
+  }, [senseiEntries]);
 
   return (
     <div className="animate-[mkPop_0.25s_ease-out_1]">
@@ -243,26 +260,44 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
                 Os Templos
               </span>
             </div>
-            <p className="text-xs text-slate-500 font-bold mb-4 pl-1">
-              Ginástica pura. Cálculo mental rápido e direto.
+            <p className="text-xs text-slate-500 font-bold mb-4 pl-1 leading-relaxed">
+              Cálculo mental sistemático. O Sensei abre faixas conforme a compreensão fica firme; você pode repetir livremente qualquer faixa já segura.
             </p>
             <div className="grid grid-cols-2 gap-3.5">
-              <button onClick={() => { sfx.tick(); onOpenPicker(dojo_add); }} className="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50 text-left active:translate-y-1 transition-all" style={{ boxShadow: "0 4px 0 #FECDD3" }}>
-                <div className="text-3xl mb-1">➕</div>
-                <div className="font-black text-rose-700">Templo da<br />Adição</div>
-              </button>
-              <button onClick={() => { sfx.tick(); onOpenPicker(dojo_sub); }} className="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50 text-left active:translate-y-1 transition-all" style={{ boxShadow: "0 4px 0 #C7D2FE" }}>
-                <div className="text-3xl mb-1">➖</div>
-                <div className="font-black text-indigo-700">Templo da<br />Subtração</div>
-              </button>
-              <button onClick={() => { sfx.tick(); onOpenPicker(dojo_mul); }} className="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50 text-left active:translate-y-1 transition-all" style={{ boxShadow: "0 4px 0 #FDE68A" }}>
-                <div className="text-3xl mb-1">✖️</div>
-                <div className="font-black text-amber-700">Templo da<br />Multiplicação</div>
-              </button>
-              <button onClick={() => { sfx.tick(); onOpenPicker(dojo_div); }} className="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50 text-left active:translate-y-1 transition-all" style={{ boxShadow: "0 4px 0 #A7F3D0" }}>
-                <div className="text-3xl mb-1">➗</div>
-                <div className="font-black text-emerald-700">Templo da<br />Divisão</div>
-              </button>
+              {senseiEntries.map(({ temple, state, maxEligibleStep }) => {
+                const style = TEMPLE_STYLE[temple.id];
+                const open = maxEligibleStep >= 1;
+                return (
+                  <button
+                    key={temple.id}
+                    onClick={() => { sfx.tick(); onOpenPicker(temple.track); }}
+                    className="p-4 rounded-2xl border-2 text-left active:translate-y-1 transition-all"
+                    style={{
+                      borderColor: open ? style.border : "#E2E8F0",
+                      background: open ? style.bg : "#F8FAFC",
+                      boxShadow: open ? `0 4px 0 ${style.shadow}` : "0 4px 0 #E2E8F0",
+                      opacity: open ? 1 : 0.72,
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="text-3xl mb-1">{open ? style.icon : "🔒"}</div>
+                      {open && (
+                        <span className="text-[9px] font-black rounded-full bg-white/80 px-2 py-1 text-slate-600">
+                          {state.currentStep}/{maxEligibleStep}
+                        </span>
+                      )}
+                    </div>
+                    <div className="font-black" style={{ color: open ? style.text : "#64748B" }}>
+                      {temple.track.name.replace("Academia da ", "Templo da ")}
+                    </div>
+                    <div className="mt-2 text-[10px] font-bold text-slate-500 leading-snug">
+                      {open
+                        ? `Treino atual ${state.currentStep} · melhor ${state.highestStep}`
+                        : "Abre quando a base conceitual estiver pronta."}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -278,7 +313,7 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
             >
               <div className="flex items-center justify-between gap-3 mb-2">
                 <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-orange-900 bg-orange-200 border-2 border-orange-300">
-                  🦊 Desafio do Mestre
+                  🦊 Desafio Opcional
                 </span>
                 <span className="text-2xl">🏆</span>
               </div>
@@ -286,7 +321,7 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
                 Treino Mestre (Misto)
               </div>
               <div className="text-xs font-bold mt-1 leading-snug text-orange-900/80">
-                Tudo misturado! Teste seus reflexos com todos os tópicos que você já aprendeu. As moedinhas valem EM DOBRO! 🪙🪙
+                Intercale o repertório já conquistado. Este desafio não decide o seu currículo nem substitui a Aula do Dia.
               </div>
             </button>
           </div>
@@ -295,7 +330,7 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
 
       <div className="mt-8 pt-6 border-t-2 border-slate-100">
         <h3 className="text-lg font-black text-slate-700 mb-3" style={{ fontFamily: FONT }}>
-          {mode === "garden" ? "Seu Jardim" : "Suas Estatísticas no Sensei"}
+          {mode === "garden" ? "Seu Jardim" : "Seu Treino de Fluência"}
         </h3>
         {mode === "garden" ? (
           <div className="grid grid-cols-3 gap-2.5">
@@ -305,10 +340,12 @@ export function DojoTab({ prog, dojoTracks = {}, onMixed, onOpenPicker, onGarden
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            <StatBox value={senseiStats.batteries} label="Baterias" />
+            <StatBox value={senseiStats.rounds} label="Rounds" />
             <StatBox value={`${senseiStats.accuracy}%`} label="Precisão" />
-            <div className="col-span-2">
-              <StatBox value={senseiStats.total} label="Desafios Enfrentados" />
+            <StatBox value={senseiStats.attempts} label="Contas treinadas" />
+            <StatBox value={senseiStats.weakItems} label="Fatos a reforçar" />
+            <div className="col-span-2 text-center text-[10px] font-bold text-slate-500 mt-1">
+              {senseiStats.unlocked}/4 templos com treino disponível · velocidade é medida em silêncio e não vale como domínio conceitual.
             </div>
           </div>
         )}
