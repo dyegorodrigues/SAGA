@@ -22,11 +22,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # pr:check e git diff --check precisam comparar o head real com a base.
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
+
+      - name: Buscar a base do PR
+        run: git fetch origin main --depth=1
 
       - name: Instalar dependências
         run: npm ci
@@ -39,19 +45,30 @@ jobs:
       - name: Auditoria das fichas
         run: npm run fichas:auditar
 
+      - name: Conformidade das fichas
+        run: npm run fichas:conferir
+
       # O grafo é artefato derivado; o modo --check falha se alguém editar o
       # gerado sem regerar a partir do YAML canônico.
       - name: Sincronia do grafo
         run: npm run grafo:check
 
       - name: TypeScript
-        run: npm run lint
+        run: npx tsc --noEmit
 
       - name: Testes
         run: npm test -- --run
 
       - name: Build
         run: npm run build
+
+      - name: Guarda textual do PR
+        env:
+          PR_BASE: origin/main
+        run: npm run pr:check
+
+      - name: Higiene do diff
+        run: git diff --check origin/main...HEAD
 
   guarda-textual:
     name: Guarda de binários
