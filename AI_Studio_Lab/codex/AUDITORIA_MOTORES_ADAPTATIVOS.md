@@ -1,6 +1,6 @@
 # Auditoria longitudinal dos motores adaptativos
 
-**Data:** 8/ago/2026  
+**Data:** 9/ago/2026  
 **Branch:** `codex/integrar-bloco-f0`  
 **Estado de entrada:** P21 + P22 concluídas; 94 fichas; cobertura autoral 90/90; CI limpo P22 `31288136803`.
 
@@ -175,50 +175,145 @@ Gate: `31290937246` (CI 593) = **success**.
 
 ## 8. Eixo atual — Tutor ↔ Dojo
 
-### Achado inicial — motor genérico do Dojo não é um learner model de fluência
+### 8.1 Legado ainda visível
 
-`utils/dojoMode.ts` hoje:
+`utils/dojoMode.ts` ainda é heurística legada:
 
 - filtra `FLUENCY_IDS` conceituais;
-- escolhe uma track aleatoriamente;
+- sorteia track;
 - força geração em `Math.max(4, lvl)`;
-- se encontra expressão, troca o `kind` para `rapid-fire`;
+- troca expressão para `rapid-fire`;
 - fixa `rt_max_s: 5`.
 
-Isso é incompatível com a arquitetura desejada de treino sistemático adaptativo por fatos/procedimentos.
+**DÍVIDA DECLARADA:** esse caminho não pode continuar como autoridade do Tutor.
 
-Ao mesmo tempo, já existem quatro templos autorais com **10 níveis** (`dojo_add/sub/mul/div`) e o Jardim JD com estado próprio. Os templos possuem progressões úteis, mas ainda precisam ser conectados a:
+### 8.2 Estrutura autoral de fluência já existente
 
-- domínio conceitual que libera a prática;
-- estado longitudinal de fluência;
-- prescrição automática do Sensei;
-- via livre/manual separada;
-- seleção de fatos fracos e dificuldade;
-- critérios de subida/descida que não confundam velocidade com compreensão.
+Quatro templos com 10 faixas:
 
-**Estado:** auditoria em andamento; não corrigir por sorteio ou por star count.
+- `dojo_add`;
+- `dojo_sub`;
+- `dojo_mul`;
+- `dojo_div`.
 
-## 9. Dívidas seguintes já identificadas
+`senseiDojoPolicy.ts` define pré-requisitos conceituais por faixa e `fact | procedure`.
 
-1. Tutor ↔ Dojo real: prescrição de família/faixa/fatos/procedimentos;
-2. banco de erros em Aula composta: revisar sem criar ciclo duplicado;
-3. telemetria/Leitner: rotular source real na Aula;
-4. `LENTO_DEDOS`: sair de string literal fora do catálogo canônico;
-5. `lastDay`/timezone: usar dia local de maneira consistente;
-6. recomendação paralela do `KidHomeScreen` por menor número de estrelas: não pode disputar autoridade com Sensei;
-7. Desafio Misto: elegibilidade por repertório real, não série/track list bruta;
-8. Matrícula: placement também precisa abandonar corte rígido por `grade`;
-9. reconciliação cloud/local com todos os campos novos;
-10. simulação longitudinal: zero absoluto, ritmo típico, alta facilidade, dificuldade persistente, esquecimento e retorno;
-11. gamificação/economia: auditar recompensa sem comprar unlock/mastery.
+`senseiDojoEngine.ts` mantém estado separado:
 
-## 10. Estado atual
+- 10 itens por round;
+- precisão e fluência separadas;
+- `FactStrength/ProcStrength`;
+- current/highest step;
+- bons/fracos rounds;
+- avanço/recuo da automaticidade sem tocar mastery conceitual.
+
+`senseiDojoPrescription.ts` já prescreve sem sorteio, priorizando:
+
+1. itens fracos;
+2. lacuna de fluência;
+3. recém-liberado;
+4. refresh.
+
+### 8.3 Pipeline tentativa → persistência — PROVADO IMPLEMENTADO
+
+A leitura final do runtime corrigiu uma hipótese anterior: **não falta construir esse pipeline do zero**.
+
+`senseiDojoProgressContext.ts` já implementa:
+
+`question fluency meta → tentativa → consumeSenseiDojoTerminal → marcador transitório → carimbar() → materializeSenseiDojoProgress → dojoTracks`.
+
+Conexões:
+
+- `answerPolicy.ts` registra cada tentativa real pelo token da questão;
+- `progressEngine.ts` intercepta Dojo antes de Journey;
+- `reconciliacaoDeSaves.ts` materializa Dojo antes de persistir local/cloud.
+
+Regressões de `senseiDojoProgressContext.test.ts` provam:
+
+- 1 resposta → round parcial em `dojoTracks`;
+- 10 → round fechado;
+- 20 respostas boas → faixa pode avançar;
+- progresso conceitual fica semanticamente intacto;
+- retry não vira fluência de primeira tentativa;
+- save legado de templo não carrega coroa conceitual;
+- faixa acima do teto não recebe crédito.
+
+**PROVADO OK:** separação estrutural de armazenamento entre domínio conceitual e fluência.
+
+### 8.4 BUG PROVADO — origem manual/prescrita não acompanha a sessão
+
+`materializeSenseiDojoProgress` decide hoje se um round é adaptativo por:
+
+`servedStep === currentStep`.
+
+Isso não prova que o Sensei prescreveu a missão.
+
+Se a criança escolher manualmente justamente a faixa corrente, a prática pode mover `goodRounds/weakRounds/currentStep`, contrariando a regra de que treino livre **observa e fortalece**, mas não governa a prescrição.
+
+**Correção bloqueante:** carregar origem explícita `prescribed | manual` do launch até a materialização.
+
+Invariante testável:
+
+- `prescribed` → `adaptive=true`;
+- `manual` → `adaptive=false`, mesmo quando `servedStep === currentStep`;
+- manual ainda atualiza fatos/procedimentos, RT, precisão e volume.
+
+### 8.5 DÍVIDA — prescrição existe, mas ainda não governa a UX do Tutor
+
+- `senseiOrchestrator.ts` ainda decide `lesson | rescue`;
+- `KidHomeScreen` não usa `prescribeSenseiDojo` como parte da rota prescritiva;
+- `LevelPickerModal` possui porta automática opcional, mas o fluxo atual não a liga no `KidHomeScreen`;
+- `App.tsx` ainda mantém `screen.track === "dojo"` no legado `buildDojoTrack`.
+
+Próximo lote de código:
+
+1. origem manual/prescrita explícita;
+2. regressão correspondente;
+3. conectar prescrição ao Sensei sem quebrar meta dominante;
+4. definir dose/posição pedagógica do bloco de fluência;
+5. preservar prática livre;
+6. retirar `dojoMode.ts` da posição de inteligência principal;
+7. sonda visual e gates.
+
+## 9. Dívida canônica detectada durante a auditoria final
+
+O runtime/grafo estão em 90 competências, mas a prosa ainda tem drift histórico:
+
+- Manual fecha em 89/89;
+- Método ainda cita 89/92 e mistura Jornada 1→3 / Dojo 3→5 + RT conceitual;
+- Bíblia v3.3 tem retificação correta posterior, mas seções normativas antigas ainda contradizem a separação de fluência;
+- `catalog_auditor.cjs`, apesar de `EXPECTED_COMPETENCIES = 90`, ainda exige as frases de 89 no Manual/Método.
+
+**DÍVIDA BLOQUEANTE DOCUMENTAL:** reconciliar esses documentos cirurgicamente e fortalecer o auditor antes de chamar o cânone de verde.
+
+Detalhes em `CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-09.md`.
+
+## 10. Dívidas seguintes já identificadas
+
+1. reconciliação canônica pós-P22;
+2. origem manual/prescrita + integração Tutor↔Dojo;
+3. Jardim como remediação perceptual causal;
+4. banco de erros em Aula composta;
+5. telemetria/Leitner: source observacional real na Aula;
+6. `LENTO_DEDOS`: sair de string literal fora do catálogo canônico;
+7. `lastDay`/timezone consistente;
+8. recomendação paralela por estrelas: não disputar autoridade com Sensei;
+9. Desafio Misto por repertório real;
+10. Matrícula sem grade rígida;
+11. reconciliação cloud/local com campos novos;
+12. simulação longitudinal;
+13. gamificação/economia;
+14. Coverage Matrix e fábrica curricular.
+
+## 11. Estado atual
 
 - P21/P22: fechadas;
 - Radar: corrigido;
 - Aula → source Progress → persist: corrigido, CI 585;
 - Sensei full DAG + dose por estado: corrigido, CI 589;
 - lacuna causal → Oficina prescrita: corrigido, CI 593;
-- **próximo bloqueante: transformar o Dojo de sorteio/rapid-fire genérico em pilar de fluência longitudinal integrado ao Sensei, preservando a via livre.**
+- Dojo: motor, política, prescrição e persistência parcial/round **já existem**;
+- Dojo bloqueante: separar origem manual/prescrita e integrar a prescrição à rota do Tutor;
+- cânone bloqueante: reconciliar Bíblia/Manual/Método e o auditor de prosa sem apagar conteúdo histórico.
 
 > Regra de continuidade: a criança escolhe brincar/treinar quando quiser; o Tutor escolhe o currículo quando ela segue a Aula do Dia.
