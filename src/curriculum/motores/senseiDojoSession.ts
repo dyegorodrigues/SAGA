@@ -8,7 +8,8 @@ import {
   SENSEI_DOJO_LEVEL_POLICIES,
   maxEligibleSenseiDojoStepById,
   senseiDojoMeta,
-  stampSenseiDojoQuestion,
+  stampSenseiDojoSessionSource,
+  type SenseiDojoSessionSource,
   type SenseiDojoTempleId,
 } from "./senseiDojoPolicy";
 
@@ -44,11 +45,19 @@ export function senseiDojoTempleById(id: string | undefined): SenseiDojoTemple |
   return TEMPLE_BY_ID.get(id as SenseiDojoTempleId);
 }
 
-export function senseiDojoTrack(temple: SenseiDojoTemple): Track {
+/**
+ * Materializa uma sessão com origem explícita. A porta crua dos templos é
+ * manual; o Sensei deve pedir `prescribed` quando transformar uma prescrição em
+ * missão. A origem viaja dentro de cada questão e chega até a persistência.
+ */
+export function senseiDojoTrack(
+  temple: SenseiDojoTemple,
+  source: SenseiDojoSessionSource = "manual",
+): Track {
   return {
     ...temple.track,
     totalQ: SENSEI_DOJO_ROUND_ITENS,
-    gen: rawStep => stampSenseiDojoQuestion(temple.id, rawStep, temple.track.gen(rawStep)),
+    gen: rawStep => stampSenseiDojoSessionSource(temple.track.gen(rawStep), source),
   };
 }
 
