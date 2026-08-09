@@ -47,6 +47,8 @@ import { carimbar } from "./lib/reconciliacaoDeSaves";
 import { resolveBootstrapState } from "./lib/bootstrapState";
 import { LEGACY_STATE_KEY, LEGACY_STATE_OWNER_KEY, stateKeyForUid } from "./lib/storageIdentity";
 import { criarSincronizador } from "./lib/sincronizadorDeNuvem";
+import { applyKidPurchase, purchaseAlbumItem, spendCoins } from "./lib/economyTransactions";
+import { rewardForMissionCompletion, rewardForTerminalAnswer, type RewardMode } from "./lib/rewardPolicy";
 import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
 import { AdminGodPanel } from "./components/AdminGodPanel";
@@ -225,7 +227,6 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen.name, screen.kid, screen.track]);
 
-  
   // Dojo Mode 🥋
   const dojoBuild = useMemo(() => {
     if (!state || screen.name !== "game" || screen.track !== "dojo" || !screen.kid) return null;
@@ -239,7 +240,6 @@ export default function App() {
     return buildDojoTrack(base, progOf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen.name, screen.kid, screen.track]);
-
 
   // 🎒 MATRÍCULA (E3): sondas na escada das habilidades-núcleo; ao final, SEMEIA o
   // nível real de cada trilha (fim do "todo mundo começa do 1").
@@ -423,6 +423,13 @@ export default function App() {
     return last && last.d === localDay() ? last.m || 0 : 0;
   };
 
+  const rewardModeForTrack = (trackId: string): RewardMode => {
+    if (trackId === "mista" || trackId === "mixed") return "mixed";
+    if (trackId === "matricula") return "placement";
+    if (trackId.startsWith("dojo")) return "dojo";
+    return "journey";
+  };
+
   const commitProg = (
     kidId: string,
     trackId: string,
@@ -435,14 +442,13 @@ export default function App() {
     const today = localDay();
     const lg = [...logOf(kidId)];
     const last = lg[lg.length - 1];
-
-    // Economia dupla (Parte D do plano diretor):
-    // ⭐ starGain = XP vitalício (nunca se gasta) → progress + log
-    // 🪙 coinGain = 1 por acerto + 3 por missão completa + 5 na primeira missão do dia
-    // Desafio Misto 👑 paga moedinhas em DOBRO.
     const doneBefore = last && last.d === today ? last.m || 0 : 0;
-    const coinMult = trackId === "mista" ? 2 : 1;
-    const coinGain = ((right ? 1 : 0) + (missionDone ? 3 + (doneBefore === 0 ? 5 : 0) : 0)) * coinMult;
+    const rewardMode = rewardModeForTrack(trackId);
+    const answerReward = rewardForTerminalAnswer(right, rewardMode);
+    const completionReward = missionDone
+      ? rewardForMissionCompletion(rewardMode, doneBefore === 0)
+      : { xp: 0, coins: 0, freeFood: 0 };
+    const coinGain = answerReward.coins + completionReward.coins;
 
     if (last && last.d === today) {
       lg[lg.length - 1] = {
@@ -457,10 +463,10 @@ export default function App() {
       lg.push({ d: today, ok: right ? 1 : 0, tot: 1, stars: starGain, t: durationMs, m: missionDone ? 1 : 0 });
     }
 
-    // 🍖 Ração grátis do dia: completar a PRIMEIRA missão do dia rende 1 ração
-    const freeFood = missionDone && doneBefore === 0 ? 1 : 0;
-    // 👑 Desafio Misto completado hoje: marca o dia (só pode 1×/dia)
-    const mixedDone = missionDone && trackId === "mista";
+    // 🍖 Ração grátis do dia: completar a PRIMEIRA missão do dia rende 1 ração.
+    const freeFood = missionDone ? completionReward.freeFood : 0;
+    // 👑 Desafio Misto completado hoje: marca o dia (só pode 1×/dia).
+    const mixedDone = missionDone && (trackId === "mista" || trackId === "mixed");
 
     // 🎒 Matrícula (E3): guarda o acerto de cada sonda; no FIM da missão, SEMEIA o
     // nível real das trilhas sondadas (sem jamais sobrescrever progresso existente).
@@ -536,13 +542,15 @@ export default function App() {
       ...((state.dojoTracks || {})[kidId] || {}),
       [trailId]: result.state,
     };
-    const coinGain = summary.rewardedCorrect + 3 + (doneBefore === 0 ? 5 : 0);
-    const freeFood = doneBefore === 0 ? 1 : 0;
+    const answerCoins = summary.rewardedCorrect * rewardForTerminalAnswer(true, "garden").coins;
+    const completionReward = rewardForMissionCompletion("garden", doneBefore === 0);
+    const coinGain = answerCoins + completionReward.coins;
+    const freeFood = completionReward.freeFood;
 
     persist({
       ...state,
       kids: freeFood
-        ? state.kids.map(k => k.id === kidId ? { ...k, petFood: (k.petFood || 0) + 1 } : k)
+        ? state.kids.map(k => k.id === kidId ? { ...k, petFood: (k.petFood || 0) + freeFood } : k)
         : state.kids,
       progress: { ...state.progress, [kidId]: kidProgress },
       dojoTracks: { ...(state.dojoTracks || {}), [kidId]: kidDojo },
@@ -689,8 +697,8 @@ export default function App() {
             onAlbum={() => setScreen({ name: "album", kid: screen.kid })}
             onTrackLvl={(t, lvl, dojoSource) => setScreen({ name: "game", kid: screen.kid, track: t.id, lvl, dojoSource })}
             onMixed={() => {
-            setScreen({ name: "game", kid: screen.kid, track: "mista" });
-          }}
+              setScreen({ name: "game", kid: screen.kid, track: "mista" });
+            }}
             onAula={() => setScreen({ name: "game", kid: screen.kid, track: "aula" })}
             onRescue={(rescue) => setScreen({
               name: "game",
@@ -705,22 +713,13 @@ export default function App() {
             tracks={getTracksForKid(kidById(screen.kid!))}
             onUpdateKid={(updatedKid, coinsToSpend = 0) => {
               const kidId = screen.kid!;
-              const currentCoins = coinsOf(kidId);
-              persist({
-                ...state,
-                kids: state.kids.map((k) => (k.id === updatedKid.id ? updatedKid : k)),
-                coins: coinsToSpend > 0
-                  ? { ...state.coins, [kidId]: Math.max(0, currentCoins - coinsToSpend) }
-                  : state.coins,
-              });
+              const tx = applyKidPurchase(state, kidId, updatedKid, coinsToSpend);
+              if (tx.ok) persist(tx.state);
             }}
             onSpendCoins={(amt) => {
               const kidId = screen.kid!;
-              const currentCoins = coinsOf(kidId);
-              persist({
-                ...state,
-                coins: { ...state.coins, [kidId]: Math.max(0, currentCoins - amt) },
-              });
+              const tx = spendCoins(state, kidId, amt);
+              if (tx.ok) persist(tx.state);
             }}
           />
         )}
@@ -753,17 +752,17 @@ export default function App() {
               : screen.track === "matricula"
               ? matriculaBuild!.track
               : (() => {
-    let found = getTracksForKid(kidObj).find((t) => t.id === screen.track);
-    if (!found) {
-      const allTracks = ["pre", "ano1", "ano2"].flatMap(g => tracksForGrade(g as any));
-      found = allTracks.find((t) => t.id === screen.track) || dojoTracks.find(t => t.id === screen.track);
-    }
-    if (!found) {
-      console.error("TRACK NOT FOUND:", screen.track);
-      return getTracksForKid(kidObj)[0];
-    }
-    return found;
-  })()
+                  let found = getTracksForKid(kidObj).find((t) => t.id === screen.track);
+                  if (!found) {
+                    const allTracks = ["pre", "ano1", "ano2"].flatMap(g => tracksForGrade(g as any));
+                    found = allTracks.find((t) => t.id === screen.track) || dojoTracks.find(t => t.id === screen.track);
+                  }
+                  if (!found) {
+                    console.error("TRACK NOT FOUND:", screen.track);
+                    return getTracksForKid(kidObj)[0];
+                  }
+                  return found;
+                })();
           const activeTrack = screen.rescue
             ? { ...gameTrack, totalQ: screen.rescue.questionBudget }
             : gameTrack;
@@ -800,15 +799,11 @@ export default function App() {
           <AlbumScreen
             kid={kidById(screen.kid!)}
             coins={coinsOf(screen.kid!)}
-            owned={albumOf(screen.kid!)}
+            owned={albumOf(screen.kid!).length ? albumOf(screen.kid!) : []}
             onBuy={(id, cost) => {
-              const w = coinsOf(screen.kid!);
-              if (w < cost) return;
-              persist({
-                ...state,
-                coins: { ...state.coins, [screen.kid!]: w - cost },
-                album: { ...state.album, [screen.kid!]: [...albumOf(screen.kid!), id] },
-              });
+              const kidId = screen.kid!;
+              const tx = purchaseAlbumItem(state, kidId, id, cost);
+              if (tx.ok) persist(tx.state);
             }}
             onBack={() => setScreen({ name: "home", kid: screen.kid })}
           />
@@ -847,30 +842,30 @@ export default function App() {
             onUpdateState={(st) => persist(st)}
             onBack={() => setScreen({ name: "pick" })}
             onTestTrack={(trackId) => {
-               if (state.kids.length > 0) {
-                  setScreen({ name: "game", kid: state.kids[0].id, track: trackId });
-               } else {
-                  const devKidId = "dev_" + Date.now();
-                  const newState = {
-                    ...state,
-                    kids: [{ id: devKidId, name: "Dev Tester", avatar: "🤖", grade: "pre" as any, theme: "classico" as any }],
-                  };
-                  persist(newState);
-                  setScreen({ name: "game", kid: devKidId, track: trackId });
-               }
+              if (state.kids.length > 0) {
+                setScreen({ name: "game", kid: state.kids[0].id, track: trackId });
+              } else {
+                const devKidId = "dev_" + Date.now();
+                const newState = {
+                  ...state,
+                  kids: [{ id: devKidId, name: "Dev Tester", avatar: "🤖", grade: "pre" as any, theme: "classico" as any }],
+                };
+                persist(newState);
+                setScreen({ name: "game", kid: devKidId, track: trackId });
+              }
             }}
             onTestTrackLvl={(trackId, lvl) => {
-               if (state.kids.length > 0) {
-                  setScreen({ name: "game", kid: state.kids[0].id, track: trackId, lvl });
-               } else {
-                  const devKidId = "dev_" + Date.now();
-                  const newState = {
-                    ...state,
-                    kids: [{ id: devKidId, name: "Dev Tester", avatar: "🤖", grade: "pre" as any, theme: "classico" as any }],
-                  };
-                  persist(newState);
-                  setScreen({ name: "game", kid: devKidId, track: trackId, lvl });
-               }
+              if (state.kids.length > 0) {
+                setScreen({ name: "game", kid: state.kids[0].id, track: trackId, lvl });
+              } else {
+                const devKidId = "dev_" + Date.now();
+                const newState = {
+                  ...state,
+                  kids: [{ id: devKidId, name: "Dev Tester", avatar: "🤖", grade: "pre" as any, theme: "classico" as any }],
+                };
+                persist(newState);
+                setScreen({ name: "game", kid: devKidId, track: trackId, lvl });
+              }
             }}
             onTestMascotV2={() => setScreen({ name: "mascot-test" })}
           />
