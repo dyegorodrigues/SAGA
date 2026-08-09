@@ -100,7 +100,7 @@
 ## 3. Estrutura da tela
 1. **Enunciado** — "Dê um capacete para cada bombeiro!"
 2. **Fileira A** (receptores) — os bombeiros, em linha horizontal, espaçamento igual, na metade superior
-3. **Fileira B** (itens) — os capacetes, em linha horizontal, na metade inferior, **em quantidade diferente da fileira A**
+3. **Fileira B** (itens) — os capacetes, em linha horizontal, **em quantidade diferente da fileira A**
 4. **Sem teclado, sem botões** — a resposta é a ação de arrastar
 
 ```
@@ -1391,7 +1391,9 @@ Salte 3 casas a partir do 4.
 *A mesma contagem, três dificuldades. O arranjo é o degrau escondido.*
 
 ## 1. Identidade
-**Competência:** N1.04 (contagem — aprofundamento) · **Primitiva:** `EmojiRow` / `ScatteredItems` · **Faixa:** F0 · **Campo-chave:** `arranjo`
+**Competência:** N1.04 (contagem — aprofundamento) · **Primitiva:** `TouchCount` · **Faixa:** F0 · **Campo-chave:** `arranjo`
+
+> **Retificação W1 — ago/2026.** A declaração antiga `EmojiRow / ScatteredItems` contradizia a própria F03 §2/§4, que exige a marcação por toque da F01 e diz explicitamente: “igual à F01: toque acende, numeral salta, voz conta”. F03 reutiliza `TouchCount`; o degrau novo é o `arranjo`, não uma segunda gramática de interação.
 
 ## 2. Fundamento
 
