@@ -170,6 +170,10 @@ function assertHealthyBrowser(label, diagnostics) {
   }
 }
 
+async function assertAbsent(page, locator, label) {
+  if (await locator.count()) throw new Error(`${label}: elemento indevido ainda presente.`);
+}
+
 async function runDojoFlow(browser, viewport) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
@@ -181,14 +185,32 @@ async function runDojoFlow(browser, viewport) {
   await page.getByText("Prescrição do Sensei", { exact: false }).waitFor({ state: "visible" });
   await page.getByText(/Academia da Adição · faixa 1/).waitFor({ state: "visible" });
   await page.getByRole("button", { name: /Começar Aula do Dia|Começar Reforço Guiado/i }).waitFor({ state: "visible" });
-  await page.getByText("Mistura Total (Dojô Geral)", { exact: true }).waitFor({ state: "visible" });
+
+  // Este fixture tem UMA competência praticada, não duas dominadas. O Sensei não
+  // pode exibir Misto nem a recomendação paralela antiga baseada em estrelas.
+  await assertAbsent(page, page.getByText("Mistura Total (Dojô Geral)", { exact: true }), `${viewport.name}/sensei-misto`);
+  await assertAbsent(page, page.getByText(/Treino Livre Sugerido/i), `${viewport.name}/sensei-rec-paralelo`);
+
   await page.waitForTimeout(MOTION_SETTLE_MS);
   const homeMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/dojo-home`);
   const homeScreenshot = path.join(artifactDir, `${viewport.name}-sensei-home.png`);
   await page.screenshot({ path: homeScreenshot, fullPage: true });
 
+  // QA visual do novo gate do Mestre: no Dojo ele permanece descobrível, mas
+  // bloqueado e sem CTA enquanto o repertório conquistado for insuficiente.
+  await page.getByText("Dojo", { exact: true }).click();
+  await page.getByRole("button", { name: /Dojo Sensei/i }).click();
+  await page.getByLabel("Treino Mestre bloqueado").waitFor({ state: "visible", timeout: 15_000 });
+  await assertAbsent(page, page.getByRole("button", { name: /Treino Mestre/i }), `${viewport.name}/mestre-cta-bloqueado`);
+  await page.waitForTimeout(MOTION_SETTLE_MS);
+  const masterMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/mestre-bloqueado`);
+  const masterScreenshot = path.join(artifactDir, `${viewport.name}-mestre-bloqueado.png`);
+  await page.screenshot({ path: masterScreenshot, fullPage: true });
+
+  // Volta ao Tutor e prova que a rota prescrita de automaticidade continua viva.
+  await page.getByText("Tutor", { exact: true }).click();
   const prescribedButton = page.getByRole("button", { name: /Fazer round prescrito/i });
-  await prescribedButton.waitFor({ state: "visible" });
+  await prescribedButton.waitFor({ state: "visible", timeout: 15_000 });
   await prescribedButton.click();
   await page.getByText(/\d+\s*\+\s*\d+\s*=\s*\?/).first().waitFor({ state: "visible", timeout: 15_000 });
   await page.waitForTimeout(MOTION_SETTLE_MS);
@@ -199,12 +221,13 @@ async function runDojoFlow(browser, viewport) {
   assertHealthyBrowser(`${viewport.name}/dojo`, diagnostics);
   await context.close();
   return {
-    flow: "dojo-prescribed",
+    flow: "dojo-prescribed+mestre-gate",
     viewport,
     homeMetrics,
+    masterMetrics,
     gameMetrics,
     httpFailures: diagnostics.httpFailures,
-    screenshots: [path.basename(homeScreenshot), path.basename(gameScreenshot)],
+    screenshots: [path.basename(homeScreenshot), path.basename(masterScreenshot), path.basename(gameScreenshot)],
   };
 }
 
@@ -268,7 +291,7 @@ try {
 
   const summary = { ok: true, executablePath, baseUrl, checkedAt: new Date().toISOString(), results };
   fs.writeFileSync(path.join(artifactDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
-  console.log("[SONDA SENSEI] OK — Dojo prescrito + Jardim causal validados em navegador real.");
+  console.log("[SONDA SENSEI] OK — Dojo prescrito + gate do Mestre + Jardim causal validados em navegador real.");
   for (const result of results) console.log(`- ${result.viewport.name}/${result.flow}: ${result.screenshots.join(", ")}`);
 } catch (error) {
   const summary = {
