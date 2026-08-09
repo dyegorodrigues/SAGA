@@ -22,7 +22,12 @@ interface RuntimeMapEntry {
 }
 const { FICHA_RUNTIME_MAP } = require("./ficha_runtime_map.cjs") as { FICHA_RUNTIME_MAP: RuntimeMapEntry[] };
 
-export const COVERAGE_BASELINE = {
+/**
+ * Snapshot imutável do fechamento da Coverage Matrix (P21.1).
+ * Nunca reescrever estes números para acomodar trabalho posterior: a fábrica
+ * curricular avança por migrações nomeadas, auditáveis e causalmente justificadas.
+ */
+export const COVERAGE_CLOSED_BASELINE = {
   competencies: 90,
   authoredFichas: 94,
   composer: 26,
@@ -33,6 +38,25 @@ export const COVERAGE_BASELINE = {
   modeSwaps: 12,
   toolIntroductions: 44,
   missingPrimitives: ["Moedas", "Regua"],
+} as const;
+
+/**
+ * Ledger da fábrica curricular. Cada delta só entra depois de a fonte real ter
+ * mudado e a Matrix ter ficado vermelha mostrando o novo valor observado.
+ */
+export const COVERAGE_MIGRATIONS = [
+  {
+    id: "W1-N1.04",
+    competence: "N1.04",
+    rationale: "F03 reconciliada com TouchCount e proveniência/voz F01+F03 explicitadas no runtime.",
+    delta: { divergences: -1 },
+  },
+] as const;
+
+export const COVERAGE_BASELINE = {
+  ...COVERAGE_CLOSED_BASELINE,
+  divergences: COVERAGE_CLOSED_BASELINE.divergences
+    + COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + migration.delta.divergences, 0),
 } as const;
 
 type Status = "padrao-ouro" | "legado" | "fallback";
@@ -417,6 +441,8 @@ function validate(rows: CoverageMatrixRow[], counts: CoverageMatrixCounts): stri
   check(counts.modeSwaps === COVERAGE_BASELINE.modeSwaps, `trocas visuais divergiram: ${counts.modeSwaps} vs ${COVERAGE_BASELINE.modeSwaps}`);
   check(counts.toolIntroductions === COVERAGE_BASELINE.toolIntroductions, `estreias divergiram: ${counts.toolIntroductions} vs ${COVERAGE_BASELINE.toolIntroductions}`);
   check(JSON.stringify(counts.missingPrimitives) === JSON.stringify([...COVERAGE_BASELINE.missingPrimitives]), `primitivas ausentes divergiram: ${counts.missingPrimitives.join(", ")}`);
+  check(new Set(COVERAGE_MIGRATIONS.map(migration => migration.id)).size === COVERAGE_MIGRATIONS.length, "ledger da Coverage Matrix contém IDs de migração duplicados");
+  for (const migration of COVERAGE_MIGRATIONS) check(graphIds.has(migration.competence), `${migration.id}: competência inexistente ${migration.competence}`);
 
   for (const row of rows) {
     const sample = sampleRuntime(row.id);
