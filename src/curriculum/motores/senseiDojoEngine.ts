@@ -172,12 +172,13 @@ export function applySenseiDojoRound(
     : historicalAvg === undefined
       ? avgCorrectRtMs
       : historicalAvg * 0.7 + avgCorrectRtMs * 0.3;
+  const family = attempts.some(attempt => attempt.itemKind === "procedure") ? "PD" : "FD";
 
   const state: DojoTrackState = {
     ...current,
     unlocked: true,
     mastered,
-    family: served <= 5 ? "FD" : "PD",
+    family,
     currentStep: nextStep,
     highestStep,
     goodRounds,
