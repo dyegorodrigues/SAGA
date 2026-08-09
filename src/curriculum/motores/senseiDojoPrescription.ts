@@ -34,6 +34,10 @@ function weakItemCount(state: DojoTrackState): number {
     + procs.filter(item => item.forca <= 1 || item.erros_seguidos >= 2).length;
 }
 
+function prescribedTrack(temple: SenseiDojoTemple): Track {
+  return senseiDojoTrack(temple, "prescribed");
+}
+
 function candidate(
   temple: SenseiDojoTemple,
   progressByNode: Record<string, Progress>,
@@ -55,7 +59,7 @@ function candidate(
       score: 400 + weakItems * 10 + lag,
       prescription: {
         temple,
-        track: senseiDojoTrack(temple),
+        track: prescribedTrack(temple),
         step: currentStep,
         maxEligibleStep,
         reason: "weak-items",
@@ -71,7 +75,7 @@ function candidate(
       score: 300 + lag * 10,
       prescription: {
         temple,
-        track: senseiDojoTrack(temple),
+        track: prescribedTrack(temple),
         step: currentStep,
         maxEligibleStep,
         reason: "fluency-gap",
@@ -87,7 +91,7 @@ function candidate(
       score: 250,
       prescription: {
         temple,
-        track: senseiDojoTrack(temple),
+        track: prescribedTrack(temple),
         step: currentStep,
         maxEligibleStep,
         reason: "newly-unlocked",
@@ -105,7 +109,7 @@ function candidate(
       score: 100 + Math.min(days, 30),
       prescription: {
         temple,
-        track: senseiDojoTrack(temple),
+        track: prescribedTrack(temple),
         step: currentStep,
         maxEligibleStep,
         reason: "refresh",
@@ -128,7 +132,8 @@ function candidate(
  * 3. templo recém-liberado;
  * 4. refresco espaçado.
  *
- * Empate é estável pela ordem dos templos; não há sorteio.
+ * Empate é estável pela ordem dos templos; não há sorteio. Toda prescrição
+ * carrega `source=prescribed` no gerador; a porta livre continua manual.
  */
 export function prescribeSenseiDojo(
   progressByNode: Record<string, Progress>,
