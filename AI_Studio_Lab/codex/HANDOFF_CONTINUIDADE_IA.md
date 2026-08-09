@@ -1,113 +1,115 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 8/ago/2026. P21 e P22 concluídas. Próxima fase: auditoria longitudinal da máquina adaptativa.**
+> **VIGENTE — 9/ago/2026.** O handoff anterior de 8/ago foi superado e permanece no histórico Git. P21/P22, auditorias longitudinais iniciais, reconciliação canônica, Tutor↔Dojo, QA real e Jardim causal estão fechados. Próximo bloqueante: **identidade do banco de erros composto**.
 
 ## Regra de ouro
 
 - Repo: `dyegorodrigues/SAGA`.
-- Branch: `codex/integrar-bloco-f0`.
+- Branch única: `codex/integrar-bloco-f0`.
 - `main` protegida/imóvel: `68fad4c575e28959b2ca4776e9a541d6828b63f3`.
-- PR #29: open + draft, comparação/CI; não mesclar e não ativar auto-merge.
+- PR #29: open + draft; não mesclar, não ready, não auto-merge.
 - Não tocar no Creature Engine.
-- Não criar branch auxiliar desta linha.
-- Bancada temporária deve desaparecer no lote que publica.
+- Não criar branch auxiliar.
+- Workflow/script temporário não pode permanecer.
+- Reancorar PR/head remoto antes de editar.
 
 ## Leia nesta ordem
 
-1. `RETOMADA.md`
-2. `DECISAO_P22_DIVIDAS_CURRICULARES.md`
-3. `DECISAO_P21_FONTES_DE_VERDADE.md`
-4. `PLANO_POS_P22_FABRICA_CURRICULAR.md`
-5. `MAPA_MESTRE_POS_P20.md`
+1. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`
+2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
+3. `RETOMADA.md`
+4. `AUDITORIA_MOTORES_ADAPTATIVOS.md`
+5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
-Roadmaps de 5/ago são históricos.
+Checkpoints/roadmaps anteriores são histórico quando falarem em P21, P22, reconciliação, origem do Dojo, sonda pendente ou Jardim causal como próximo passo.
 
 ## Fechado
 
-- P17 — N1.10/N1.11;
-- P8 — Jardim/automaticidade;
-- P18 — `KindType`;
-- P19 — migrador/dependências;
-- P20 — save/sync por UID;
-- P21.1 — registries/cobertura/proveniência;
-- P21.2 — mapa autoral de primitivas;
-- P22.1 — GM.12;
-- P22.2 — N4.09 + telemetria de área;
-- P22.3A — N1.07 completa;
-- P22.3B — JD4 automática separada da Jornada;
-- P22.4 — N1.09 autoral completa;
-- **P22.5 — GM.02 autoral completa.**
+- P17/P8/P18/P19/P20/P21/P22;
+- 90 competências / 94 fichas / cobertura autoral 90/90;
+- Radar tag→nó;
+- Aula composta persiste no source real;
+- Sensei full DAG, sem série como trilho;
+- Oficina causal;
+- reconciliação canônica + guard documental;
+- Dojo `manual | prescribed` explícito de ponta a ponta;
+- missão Dojo prescrita separada da Aula;
+- QA real Chrome integrado ao CI;
+- Jardim causal com prioridade `pré-requisito conceitual → Jardim provado → Oficina → Aula`.
 
-## Estado final após P22
+Head funcional de fechamento: `15f73542ddb1f005fd228ac02461c5a71ea8adec`.
 
-- **90 nós canônicos**;
-- **94 fichas Markdown / 90 de 90 competências cobertas**;
-- **0 exceções autorais**;
-- Journey TS/registry/AllFichas: **31/31**;
-- Composer: **26 registrados / 26 ativos / 0 inativos**;
-- servido sem placeholder: **51/90**;
-- fallback real: **39/90**;
-- primitivas: **20 executáveis, 4 renderer-sem-builder, 1 isolada, 1 ausente**.
+CI #671 / run `31307946962`: **SUCCESS integral**.
 
-Dívida runtime ainda explícita: LinkingCubes, Moedas, SingaporeBars e VisualAddition sem builder; Quadrado100 isolado; Regua ausente.
+- 142 arquivos de teste;
+- 2.278 testes;
+- build;
+- auditores;
+- higiene;
+- binários;
+- Chrome real telefone + tablet.
 
-## Evidência de P22.4 — N1.09
+Artefato da sonda: `9036527545`.
 
-- baseline semântico: `31286476155` = success;
-- sonda rota real: `31286955931` = success;
-- clean follow-up: `31287106974` = success.
+## Dívida curricular não perdida
 
-A sonda encontrou e corrigiu colisão real em `ScatteredItems`; o palco passou a usar dispersão determinística sem sobreposição e ganhou teste geométrico permanente.
+- padrão-ouro: 26/90;
+- servido sem placeholder: 51/90;
+- 25 fichas prontas servidas por legado;
+- 39 fichas prontas sem conteúdo servido;
+- 21 divergências ficha↔tela observadas;
+- 12 trocas de linguagem visual sem aviso;
+- 44 estreias de ferramenta a classificar;
+- primitivas incompletas: LinkingCubes, Moedas, SingaporeBars, VisualAddition, Quadrado100, Regua.
 
-## Evidência de P22.5 — GM.02
+A lista exata está em `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`.
 
-- CI semântico: `31287744035` = success;
-- primeira sonda: `31287813598` — encontrou contraste 4,22:1 no aviso audível e selo 🔊 cobrindo conteúdo;
-- correção compartilhada no renderer/CSS de opções audíveis;
-- sonda corrigida: `31288014568` = success;
-- clean follow-up sem `postbuild`/injetor: `31288136803` = success;
-- suíte do lote: **131 arquivos / 2.205 testes**.
+**Não iniciar a fábrica curricular ainda.** Ela volta depois da Coverage Matrix e dos motores de identidade/estado.
 
-GM.02 cobre manhã/tarde/noite, ontem/hoje/amanhã, semana, ordem de eventos e recuperação mista. Toda linguagem essencial chega por áudio; texto é apoio. O legado permanece rollback parcial.
+## Próxima tarefa — banco de erros composto
 
-## Fortalecimentos estruturais colhidos em P22
+Pré-auditoria já encontrou uma hipótese concreta:
 
-- nenhum auditor de fichas depende mais de contagem fixa 92/93/94;
-- testes globais de Journey usam a mesma porta autoral da produção;
-- builders especializados N1.09/GM.02 propagam `rt_alvo → rt_max_s`;
-- micro explicitamente `misto` pode emitir apenas a união de kinds já ensinados pela própria ficha;
-- resposta correta nunca deve carregar misconception;
-- tempo continua metadado de fluência/revisão, não gate de domínio conceitual.
+- `composeAula()` agrega bancos de vários tracks em `bankQs` global;
+- embaralha o pool;
+- cria uma closure por `RescuePlanItem`;
+- para `error-bank`, a closure usa `bankQs.pop()` sem filtrar pelo source que originou o resgate.
 
-## Próxima fase — auditoria longitudinal dos motores
+Pode existir a cadeia incorreta:
 
-Traçar e provar, nesta ordem:
+`resgate planejado para A → item de banco de B → sourceTrackId=B`.
 
-`GameLoop answer → misconception/evidence → mastery/progression → persistence → Radar/review → recommendation → unlock`.
+A persistência final pode acertar B, mas a agenda/razão que colocou o item na Aula fica incoerente.
 
-Primeiros pontos de risco a resolver por evidência:
+### Método obrigatório
 
-1. `GameLoop` pode mutar um mapa de progresso com mais de um nó; confirmar que `App` não reduz esse mapa ao nó atual antes de persistir;
-2. verificar se `reviewForce` e `lastDay` escritos pelo Leitner sobrevivem ao commit;
-3. comparar strings reais de `MisconceptionTag` com `TAG_TO_NODE` do Radar;
-4. provar se `getDueReviews` realmente alimenta a recomendação diária;
-5. provar se Radar resgata o nó correto;
-6. confirmar unlock pelo DAG e separação Jardim→mãe;
-7. validar persistência local/cloud dessas dimensões.
+1. construir teste determinístico com bancos de pelo menos A e B;
+2. provar/refutar a mistura antes de editar produção;
+3. se provada, manter pool por source/rescue ou outra identidade explícita;
+4. provar que retry/review remove ou atualiza o banco do source correto;
+5. testar duas fontes na mesma Aula;
+6. rodar todos os gates;
+7. atualizar checkpoint.
 
-Não alterar algoritmo antes de demonstrar a discrepância e escrever teste de regressão.
+Não misturar ainda com telemetria/Leitner. A identidade da telemetria da Aula é o bloco imediatamente seguinte.
 
-## Depois
+## Fila posterior
 
-Seguir `PLANO_POS_P22_FABRICA_CURRICULAR.md`:
+1. telemetria/Leitner da Aula composta;
+2. `LENTO_DEDOS`;
+3. timezone/`lastDay`;
+4. recomendador paralelo por estrelas;
+5. Misto por repertório elegível;
+6. Matrícula sem grade rígida;
+7. cloud reconciliation;
+8. simulação longitudinal;
+9. gamificação/economia/mascote;
+10. Coverage Matrix executável;
+11. fábrica curricular por ondas;
+12. mega auditoria pedagógica;
+13. hardening/performance/release.
 
-1. Coverage Matrix executável;
-2. fábrica curricular por ondas;
-3. mega auditoria pedagógica;
-4. Dojo completo;
-5. release hardening.
-
-## Portões padrão
+## Portões
 
 ```bash
 npm run auditar
@@ -118,9 +120,7 @@ npx tsc --noEmit
 npm test -- --run
 npm run build
 npm run pr:check
-git diff --check
+npm run sonda:sensei-dojo
 ```
-
-Tela afetada exige sonda real.
 
 **Uma competência só está pronta quando código, telemetria, persistência e experiência real da criança concordam.**
