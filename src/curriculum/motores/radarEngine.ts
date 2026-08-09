@@ -7,6 +7,7 @@
  */
 
 import { Progress } from "../../types";
+import { MisconceptionTag, type MisconceptionTagType } from "../../constants/misconceptions";
 
 export const SPACING_INTERVALS: Record<number, number> = {
   1: 1,
@@ -18,6 +19,18 @@ export const SPACING_INTERVALS: Record<number, number> = {
 
 /** Janela máxima de tempo para 2 erros da mesma tag serem considerados o mesmo padrão (10 min) */
 const MAX_MISCONCEPTION_INTERVAL_MS = 10 * 60 * 1000;
+const CANONICAL_MISCONCEPTION_TAGS = new Set<string>(Object.values(MisconceptionTag));
+
+/**
+ * O Radar conceitual aceita somente o catálogo canônico.
+ *
+ * Sinais de automaticidade/fluência (por exemplo o legado `LENTO_DEDOS`) não
+ * são misconceptions matemáticas e não podem abrir Oficina. A validação também
+ * protege saves antigos que já carreguem strings históricas fora do catálogo.
+ */
+export function isCanonicalMisconceptionTag(tag: string): tag is MisconceptionTagType {
+  return CANONICAL_MISCONCEPTION_TAGS.has(tag);
+}
 
 /**
  * Registra uma misconception na janela rolante de até 15 eventos por nó.
@@ -33,7 +46,7 @@ export function trackMisconception(
   if (typeof pOrKidId === "object" && pOrKidId !== null) {
     targetProgress = pOrKidId;
     const tag = nodeOrTag;
-    if (!tag) return;
+    if (!tag || !isCanonicalMisconceptionTag(tag)) return;
     if (!targetProgress.misconceptions) {
       targetProgress.misconceptions = [];
     }
@@ -44,7 +57,7 @@ export function trackMisconception(
   } else if (typeof pOrKidId === "string") {
     const node = nodeOrTag;
     const tag = tagArg;
-    if (!node || !tag) return;
+    if (!node || !tag || !isCanonicalMisconceptionTag(tag)) return;
 
     if (pMapArg && pMapArg[node]) {
       targetProgress = pMapArg[node];
@@ -104,15 +117,18 @@ export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): 
 
     for (let i = 0; i < events.length; i++) {
       const current = events[i];
+      if (!isCanonicalMisconceptionTag(current.tag)) continue;
       const window = events.slice(Math.max(0, i - 4), i + 1);
 
       const closeMatches = window.filter(
-        (e) => e.tag === current.tag && Math.abs(current.ts - e.ts) <= MAX_MISCONCEPTION_INTERVAL_MS
+        (e) => isCanonicalMisconceptionTag(e.tag)
+          && e.tag === current.tag
+          && Math.abs(current.ts - e.ts) <= MAX_MISCONCEPTION_INTERVAL_MS
       );
 
       if (closeMatches.length >= 2) {
         rescueNodes.add(node);
-        break; // Achou pelo menos uma misconception ativa, avança para o próximo nó
+        break;
       }
     }
   }
