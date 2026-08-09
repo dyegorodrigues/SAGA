@@ -53,8 +53,7 @@ function quantidadesDoNivel(nivel: number, sorteio: () => number): [number, numb
     case 3: return [4, 5];
     case 4: return [5, 6];
     default: {
-      // F06 L5: próximas, até 10. Varia o par sem alterar o diagnóstico central.
-      const menor = 5 + Math.floor(sorteio() * 5); // 5..9
+      const menor = 5 + Math.floor(sorteio() * 5);
       return [menor, menor + 1];
     }
   }
@@ -74,12 +73,9 @@ export function construirComparacaoQuantidadeSpec(
   const [emojiMenor, emojiMaior] = mesmaIdentidade
     ? (() => { const emoji = item(EMOJIS, sorteio); return [emoji, emoji] as [string, string]; })()
     : parDiferente(sorteio);
-
   const armadilhaTamanho = clamped === 4;
   const armadilhaEspaco = clamped === 5;
 
-  // A armadilha sempre favorece perceptualmente o conjunto MENOR, para que um
-  // toque nele seja evidência útil de conservação/tamanho — nunca uma pegadinha arbitrária.
   const ordenados: [GrupoQuantidadeSpec, GrupoQuantidadeSpec] = [
     {
       quantidade: menor,
@@ -99,7 +95,6 @@ export function construirComparacaoQuantidadeSpec(
 
   const grupos = embaralharPar(ordenados, sorteio);
   const resposta = (grupos[0].quantidade > grupos[1].quantidade ? 0 : 1) as 0 | 1;
-
   return {
     modo: "quantidade",
     nivel: clamped,
@@ -108,7 +103,6 @@ export function construirComparacaoQuantidadeSpec(
     mesmaIdentidade,
     armadilhaTamanho,
     armadilhaEspaco,
-    // A tabela dos níveis da F06 explicita o botão já em L2. L1 demonstra o primeiro par.
     pareamentoDisponivel: clamped >= 2,
     autoParearNoErro: true,
     enunciado: "Qual grupo tem MAIS?",
@@ -124,23 +118,31 @@ function misconceptionDoNivel(nivel: number): string {
   return "COMPARA_SEM_CONTAR";
 }
 
-/**
- * Builder especializado registrado na mesma porta de canário do Composer.
- * O canal runtime `grandeza` é reutilizado porque o palco já é composto pelo
- * primitive `Grupo`; `modo: quantidade` discrimina a semântica N1.05 de GM.01.
- */
+function microDoNivel(ficha: FichaCompetencia, nivel: number) {
+  const microId = ficha.niveis?.[nivel]?.micro;
+  return ficha.micros.find(micro => micro.id === microId);
+}
+
 export function construirComparacaoQuantidadeQuestion(
   ficha: FichaCompetencia,
   level: number,
 ): Question {
   const spec = construirComparacaoQuantidadeSpec(level);
   const misconception = misconceptionDoNivel(spec.nivel);
+  const micro = microDoNivel(ficha, spec.nivel);
+  const tutorial = Array.isArray(micro?.params?.tutorial)
+    ? micro.params.tutorial.map(step => ({
+        say: step.fala,
+        ...(step.show != null ? { show: step.show } : {}),
+      }))
+    : undefined;
   return {
     kind: "grandeza",
     prompt: spec.enunciado,
     audioPrompt: spec.falado,
     howto: ficha.howto || spec.howto,
     explain: ficha.explain || spec.explain,
+    tutorial,
     uiProps: spec,
     options: [0, 1].map(value => ({
       label: value === 0 ? "grupo da esquerda" : "grupo da direita",
