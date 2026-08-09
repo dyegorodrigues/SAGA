@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Progress, Question, Track } from "../../types";
+import type { AulaQuestion } from "./aulaProgressContext";
 import { composeAula } from "./composer";
 
 const question = (prompt: string): Question => ({
@@ -52,7 +53,7 @@ describe("Aula composta — identidade do banco de erros", () => {
     const rescue = plan.resgates.find(item => item.reason === "error-bank");
     expect(rescue?.track.id).toBe("A");
 
-    const bankQuestions = qs.filter(q => q.prompt === "bank-A" || q.prompt === "bank-B");
+    const bankQuestions = qs.filter(q => q.prompt === "bank-A" || q.prompt === "bank-B") as AulaQuestion[];
     expect(bankQuestions).toHaveLength(1);
     expect(bankQuestions[0].prompt).toBe("bank-A");
     expect(bankQuestions[0].sourceTrackId).toBe("A");
