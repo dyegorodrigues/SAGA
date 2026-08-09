@@ -17,8 +17,8 @@ interface Props {
   onGardenTrack?: (t: Track, currentStep: number) => void;
   prog: Record<string, Progress>;
   dojoTracks?: Record<string, DojoTrackState>;
-  /** O Mestre exige ao menos duas competências conceitualmente dominadas. */
-  mixedAvailable: boolean;
+  /** O Mestre exige ao menos duas competências conceitualmente dominadas. Diagnósticos legados sem a prop ficam bloqueados. */
+  mixedAvailable?: boolean;
   onMixed: () => void;
 }
 
@@ -63,7 +63,7 @@ const TEMPLE_STYLE: Record<string, { border: string; bg: string; shadow: string;
   dojo_div: { border: "#A7F3D0", bg: "#ECFDF5", shadow: "#A7F3D0", text: "#047857", icon: "➗" },
 };
 
-export function DojoTab({ prog, dojoTracks = {}, mixedAvailable, onMixed, onOpenPicker, onGardenTrack }: Props) {
+export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed, onOpenPicker, onGardenTrack }: Props) {
   const [mode, setMode] = useState<"garden" | "sensei">("garden");
 
   const gardenEntries = useMemo(() => JARDIM.map(trilha => {
