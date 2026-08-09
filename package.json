@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "npm run grafo:check && vite build && esbuild ./server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs",
+    "postbuild": "node AI_Studio_Lab/codex/p22_5_sonda_patch.cjs && node node_modules/playwright-core/cli.js install chromium && SONDA_SEMENTES=1 npm run sonda -- P22.5",
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
