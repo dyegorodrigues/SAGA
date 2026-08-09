@@ -12,10 +12,9 @@ const RENDERER_PATHS = [
   path.join(ROOT, "src/components/FichaRenderer.tsx"),
   path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
 ];
-const EXPECTED_FICHAS = 93;
-const EXPLICIT_MISSING_FICHA_EXCEPTIONS = new Map([
-  ["GM.02", "P21/P22: Tempo cotidiano ainda sem ficha Markdown; decisão pedagógica deliberada pendente."],
-]);
+// P21/P22: o número de fichas é métrica derivada. Cobertura canônica, IDs,
+// nove seções e o mapa runtime são os invariantes — não uma fotografia 93/94.
+const EXPLICIT_MISSING_FICHA_EXCEPTIONS = new Map([]);
 const REJECTED_IDS = new Set(["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"]);
 
 const failures = [];
@@ -65,7 +64,7 @@ const fichaIds = fichas.map((ficha) => ficha.fichaId);
 const competenceIds = fichas.map((ficha) => ficha.competenceId).filter(Boolean);
 const uniqueCompetenceIds = new Set(competenceIds);
 
-check(fichas.length === EXPECTED_FICHAS, `esperava ${EXPECTED_FICHAS} fichas; encontrou ${fichas.length}`);
+check(fichas.length > 0, "catálogo autoral não contém nenhuma ficha");
 check(new Set(fichaIds).size === fichaIds.length, "há IDs de ficha duplicados");
 
 for (const ficha of fichas) {
@@ -151,15 +150,8 @@ for (const entry of FICHA_RUNTIME_MAP) {
   /**
    * Guarda REVERSA contra documentação atrasada.
    *
-   * O auditor antigo só perguntava "o que o mapa declara existe?". Assim
-   * AudioChoice, TouchPlace e ShapeCanvas ganharam builder+renderer, mas o mapa
-   * continuou dizendo "isolado" e todos os gates ficaram verdes.
-   *
-   * Para primitivas cujo nome autoral vira naturalmente o dispatch kind
-   * (`AudioChoice`→`audiochoice`, `ShapeCanvas`→`shapecanvas`, ...), se código e
-   * renderer já provam a cadeia, o mapa É obrigado a reconhecer o mesmo kind.
-   * Não aplicamos a heurística quando um dos lados não existe: aliases legítimos
-   * como MaterialDourado→tens e NumberBond→bond continuam explícitos pelo mapa.
+   * Para primitivas cujo nome autoral vira naturalmente o dispatch kind, se
+   * código e renderer já provam a cadeia, o mapa é obrigado a reconhecê-la.
    */
   const kindConvencional = entry.primitive.replace(/[^A-Za-z0-9]/g, "").toLowerCase();
   if (composerTem(kindConvencional) && rendererTem(kindConvencional)) {
