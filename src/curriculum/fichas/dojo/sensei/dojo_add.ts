@@ -1,87 +1,81 @@
 import { Question, Track } from "../../../../types";
-import { ri } from "../../../../utils/generators"; // using random int
+import { ri } from "../../../../utils/generators";
+import { stampSenseiDojoQuestion } from "../../../motores/senseiDojoPolicy";
 
 export const gDojoAdd = (lvl: number): Question => {
+  const step = Math.min(10, Math.max(1, Math.round(lvl)));
   let a = 0, b = 0;
-  
-  if (lvl === 1) {
-    // Lvl 1: 1 digit + 1 digit (sum up to 5)
+
+  if (step === 1) {
     a = ri(1, 4);
     b = ri(1, 5 - a);
-  } else if (lvl === 2) {
-    // Lvl 2: 1 digit + 1 digit (sum up to 10)
+  } else if (step === 2) {
     a = ri(1, 9);
     b = ri(1, 10 - a);
-  } else if (lvl === 3) {
-    // Lvl 3: Amigos do 10 (always sum to 10)
+  } else if (step === 3) {
     a = ri(1, 9);
     b = 10 - a;
-  } else if (lvl === 4) {
-    // Lvl 4: 1 digit + 1 digit (sum up to 18, cross 10)
+  } else if (step === 4) {
     a = ri(6, 9);
-    b = ri(10 - a + 1, 9);
-  } else if (lvl === 5) {
-    // Lvl 5: 10 + 1 digit (Dezenas exatas + unidade)
+    b = ri(11 - a, 9);
+  } else if (step === 5) {
     a = ri(1, 9) * 10;
     b = ri(1, 9);
-  } else if (lvl === 6) {
-    // Lvl 6: 2 digits + 1 digit (no grouping)
-    a = ri(11, 88);
-    b = ri(1, 9 - (a % 10)); // guarantee no grouping
-  } else if (lvl === 7) {
-    // Lvl 7: 2 digits + 1 digit (with grouping)
-    a = ri(11, 88);
-    b = ri(10 - (a % 10), 9);
-  } else if (lvl === 8) {
-    // Lvl 8: Dezenas exatas + Dezenas exatas
+  } else if (step === 6) {
+    // Sem reagrupamento: a unidade nunca pode ser 9, senão não existe b>=1 válido.
+    const tens = ri(1, 8);
+    const units = ri(1, 8);
+    a = tens * 10 + units;
+    b = ri(1, 9 - units);
+  } else if (step === 7) {
+    // Com reagrupamento: unidade 1..9 garante 10-units <= 9.
+    const tens = ri(1, 8);
+    const units = ri(1, 9);
+    a = tens * 10 + units;
+    b = ri(10 - units, 9);
+  } else if (step === 8) {
     a = ri(1, 8) * 10;
-    b = ri(1, 9 - Math.floor(a/10)) * 10;
-  } else if (lvl === 9) {
-    // Lvl 9: 2 digits + 2 digits (no grouping)
-    a = ri(11, 77);
-    b = ri(1, 8 - Math.floor(a/10)) * 10 + ri(1, 9 - (a % 10));
+    b = ri(1, 9 - Math.floor(a / 10)) * 10;
+  } else if (step === 9) {
+    const aTens = ri(1, 7);
+    const aUnits = ri(1, 8);
+    const bTens = ri(1, 8 - aTens);
+    const bUnits = ri(1, 9 - aUnits);
+    a = aTens * 10 + aUnits;
+    b = bTens * 10 + bUnits;
   } else {
-    // Lvl 10: 2 digits + 2 digits (with grouping)
-    a = ri(11, 88);
-    let maxDez = 8 - Math.floor(a/10);
-    if (maxDez < 1) maxDez = 1;
-    let bDez = ri(1, maxDez);
-    let bUni = ri(10 - (a % 10), 9);
-    b = bDez * 10 + bUni;
+    const aTens = ri(1, 7);
+    const aUnits = ri(1, 9);
+    const bTens = ri(1, 8 - aTens);
+    const bUnits = ri(10 - aUnits, 9);
+    a = aTens * 10 + aUnits;
+    b = bTens * 10 + bUnits;
   }
 
-  // Randomize a and b for display
-  if (Math.random() > 0.5) {
-    const temp = a;
-    a = b;
-    b = temp;
-  }
+  if (Math.random() > 0.5) [a, b] = [b, a];
 
   const ans = a + b;
-
-  // Generate false options (off by 1, off by 10, etc.)
   const false1 = ans + ri(1, 3);
   const false2 = ans > 3 ? ans - ri(1, 3) : ans + 4;
   let false3 = ans + 10;
-  if (ans >= 10 && Math.random() > 0.5) {
-    false3 = ans - 10;
-  }
+  if (ans >= 10 && Math.random() > 0.5) false3 = ans - 10;
 
   const opts = [
     { label: `${ans}`, value: ans },
     { label: `${false1}`, value: false1 },
     { label: `${false2}`, value: false2 },
-    { label: `${false3}`, value: false3 }
+    { label: `${false3}`, value: false3 },
   ].sort(() => Math.random() - 0.5);
 
-  return {
-    kind: "rapid-fire", prompt: "",
+  return stampSenseiDojoQuestion("dojo_add", step, {
+    kind: "rapid-fire",
+    prompt: "",
     expr: `${a} + ${b} = ?`,
     options: opts,
     answer: ans,
     explain: `${a} + ${b} = ${ans}`,
-    rt_max_s: lvl <= 3 ? 6 : (lvl <= 6 ? 8 : (lvl <= 8 ? 10 : 15))
-  };
+    rt_max_s: step <= 3 ? 6 : (step <= 6 ? 8 : (step <= 8 ? 10 : 15)),
+  });
 };
 
 export const dojo_add: Track = {
@@ -91,6 +85,7 @@ export const dojo_add: Track = {
   color: "#fda4af",
   dark: "#be123c",
   gen: gDojoAdd,
+  totalQ: 10,
   lvlSkills: [
     "Até 5",
     "Até 10",
@@ -101,8 +96,8 @@ export const dojo_add: Track = {
     "2D + 1D (Com Vai 1)",
     "Dezenas Exatas",
     "2D + 2D (Sem Vai 1)",
-    "2D + 2D (Com Vai 1)"
+    "2D + 2D (Com Vai 1)",
   ],
   prereqs: [],
-  dominio: "2 rounds seguidos ≥80% sobe de faixa, <60% desce"
+  dominio: "automaticidade separada: 2 rounds ≥80% de precisão E fluência para subir; <60% de precisão em 2 rounds recua só o treino",
 };
