@@ -33,6 +33,29 @@ export interface ProgressionMode {
 }
 
 /**
+ * A escada conceitual tem um único escritor: `applyJourneyAnswer`.
+ *
+ * Há código de UI legado que ainda tenta dar bônus de velocidade com mutação
+ * direta de `p.streak`. Em vez de permitir que uma camada de recompensa ganhe
+ * autoridade curricular, o objeto devolvido pelo motor expõe o valor calculado
+ * normalmente, mas ignora escritas externas até a próxima transição do motor.
+ * O descriptor é enumerável/configurável: spread, JSON/save e migração continuam
+ * vendo um `streak` numérico normal; só mutação imperativa pós-engine é bloqueada.
+ */
+export function protectConceptualStreak(progress: Progress): Progress {
+  const conceptualStreak = progress.streak || 0;
+  Object.defineProperty(progress, "streak", {
+    enumerable: true,
+    configurable: true,
+    get: () => conceptualStreak,
+    set: () => {
+      // Intencional: RT/estrela/UI não escrevem na progressão conceitual.
+    },
+  });
+  return progress;
+}
+
+/**
  * Transição pura da escada de proficiência da Jornada.
  *
  * O Dojo Sensei atravessa a mesma casca visual do GameLoop, mas é interceptado
@@ -118,8 +141,9 @@ export function applyJourneyAnswer(
     transition = { type: "legacy-crown" };
   }
 
+  const routedProgress = markAulaSourceProgress(progress, routed.sourceTrackId);
   return {
-    progress: markAulaSourceProgress(progress, routed.sourceTrackId),
+    progress: protectConceptualStreak(routedProgress),
     transition,
   };
 }
