@@ -23,7 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # pr:check compara o head real com a base.
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -37,8 +36,6 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
-      # órfãos e deriva de nomenclatura.
       - name: Auditoria do catálogo
         run: npm run auditar
 
@@ -48,8 +45,6 @@ jobs:
       - name: Conformidade das fichas
         run: npm run fichas:conferir
 
-      # O grafo é artefato derivado; o modo --check falha se alguém editar o
-      # gerado sem regerar a partir do YAML canônico.
       - name: Sincronia do grafo
         run: npm run grafo:check
 
@@ -68,7 +63,7 @@ jobs:
         run: npm run pr:check
 
   sonda-sensei-dojo:
-    name: Sonda real Sensei ↔ Dojo
+    name: Sonda real Sensei
     runs-on: ubuntu-latest
     timeout-minutes: 8
     if: github.event_name == 'pull_request'
@@ -98,14 +93,14 @@ jobs:
           echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
           "$CHROME_BIN" --version
 
-      - name: Sonda real do card e do round prescrito
+      - name: Sonda real das rotas prescritas do Sensei
         run: npm run sonda:sensei-dojo
 
       - name: Evidências da sonda
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sonda-sensei-dojo-${{ github.event.pull_request.head.sha }}
+          name: sonda-sensei-${{ github.event.pull_request.head.sha }}
           path: .artifacts/sonda-sensei-dojo/
           if-no-files-found: warn
           retention-days: 14
@@ -125,11 +120,6 @@ jobs:
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
 
-      # Markdown usa dois espaços no fim da linha como hard break semântico.
-      # O `git diff --check` puro confunde essa sintaxe válida com sujeira e,
-      # nesta branch documental longa, produzia falso vermelho. Mantemos o
-      # portão integral para código/config/dados e deixamos a coerência dos docs
-      # sob os auditores canônicos específicos do SAGA.
       - name: Verificar whitespace do diff
         run: >-
           git diff --check origin/${{ github.base_ref }}...HEAD -- .
@@ -144,10 +134,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Por padrão o Actions confere um merge commit sintético do PR, o que
-          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
-          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -157,8 +144,6 @@ jobs:
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
 
-      # O criador de PR deste ambiente não aceita binários no diff textual.
-      # Falhar aqui é mais barato que descobrir na hora de publicar.
       - name: Verificar ausência de binários no diff
         env:
           PR_BASE: origin/${{ github.base_ref }}
