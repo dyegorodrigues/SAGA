@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { AulaPlan } from "./composer";
-import type { DojoTrackState, Progress } from "../../types";
+import type { DojoTrackState, Progress, State } from "../../types";
 import { ALL_MATH_TRACKS } from "./curriculum";
 import {
   applySenseiDojoRound,
@@ -13,6 +13,7 @@ import { JARDIM } from "../fichas/dojo/jardim";
 import { applyJardimRound, type JardimAttempt } from "./jardimEngine";
 import { prescribeCausalJardim } from "./jardimCausalPrescription";
 import { chooseSenseiEntry } from "./senseiOrchestrator";
+import { defaultState, migrate } from "../../utils/migrator";
 
 const progress = (over: Partial<Progress> = {}): Progress => ({
   lvl: 1,
@@ -177,5 +178,35 @@ describe("Simulação longitudinal — automaticidade separada", () => {
     const entry = chooseSenseiEntry(plan, garden);
     expect(entry.kind).toBe("rescue");
     if (entry.kind === "rescue") expect(entry.rescue.reason).toBe("prerequisite-gap");
+  });
+
+  it("persistir e recarregar preserva a próxima prescrição sem misturar conceito e Dojo", () => {
+    const concepts: Record<string, Progress> = {
+      "N3.01": progress({ lvl: 3, maxLvl: 3, ok: 12, tot: 15 }),
+    };
+    let dojo = freshSenseiDojoState(true);
+    dojo = applySenseiDojoRound(dojo, dojoAttempts(), 1, 2, "2026-08-09", false).state;
+    dojo = applySenseiDojoRound(dojo, dojoAttempts(), 1, 2, "2026-08-09", false).state;
+
+    const before = prescribeSenseiDojo(concepts, { dojo_add: dojo }, "2026-08-10");
+    expect(before).not.toBeNull();
+
+    const raw = defaultState() as State;
+    raw.kids = [{ id: "kid", name: "Kid", avatar: "🦊", grade: "ano1", theme: "classico" }];
+    raw.progress = { kid: concepts };
+    raw.dojoTracks = { kid: { dojo_add: dojo } };
+    const restored = migrate(JSON.parse(JSON.stringify(raw)), "2026-08-10");
+
+    expect(restored.progress.kid["N3.01"]).toEqual(concepts["N3.01"]);
+    expect(restored.dojoTracks?.kid?.dojo_add).toEqual(dojo);
+    const after = prescribeSenseiDojo(
+      restored.progress.kid,
+      restored.dojoTracks?.kid ?? {},
+      "2026-08-10",
+    );
+    expect(after?.temple.id).toBe(before?.temple.id);
+    expect(after?.reason).toBe(before?.reason);
+    expect(after?.step).toBe(before?.step);
+    expect(after?.maxEligibleStep).toBe(before?.maxEligibleStep);
   });
 });
