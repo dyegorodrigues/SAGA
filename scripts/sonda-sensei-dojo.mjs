@@ -225,8 +225,10 @@ async function runJardimFlow(browser, viewport) {
   await page.screenshot({ path: homeScreenshot, fullPage: true });
 
   await page.getByRole("button", { name: /Começar Jardim Guiado/i }).click();
-  await page.getByText(/Quantos eram\?/i).first().waitFor({ state: "visible", timeout: 15_000 });
-  await page.waitForTimeout(MOTION_SETTLE_MS);
+  // JD1 usa a primitiva `fileira`. A fase de relance expõe um grupo acessível
+  // chamado "a área do relance" sem contar os objetos — prova que entramos na
+  // experiência perceptual certa sem depender de um prompt que a UI não promete.
+  await page.getByRole("group", { name: "a área do relance" }).waitFor({ state: "visible", timeout: 15_000 });
   const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/jardim-game`);
   const gameScreenshot = path.join(artifactDir, `${viewport.name}-jardim-causal-round.png`);
   await page.screenshot({ path: gameScreenshot, fullPage: true });
