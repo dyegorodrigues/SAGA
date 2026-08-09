@@ -2,6 +2,8 @@ import React from "react";
 import { motion } from "motion/react";
 import { Grupo } from "./Grupo";
 import { PalcoEscalado } from "./PalcoEscalado";
+import { ComparacaoQuantidadeStage } from "./ComparacaoQuantidadeStage";
+import { ComparacaoQuantidadeSpec } from "../../curriculum/procedimentos/comparacaoQuantidadeContract";
 import {
   ALTURA_DA_CAIXA,
   GrandezaSpec,
@@ -21,8 +23,8 @@ const BASE_OBJETO = 84;
 type Fase = "idle" | "erro" | "acerto" | "fecho";
 
 interface Props {
-  spec: GrandezaSpec;
-  onAnswer?: (valor: number, acao: AcaoDeGrandeza) => void;
+  spec: GrandezaSpec | ComparacaoQuantidadeSpec;
+  onAnswer?: (valor: number, acao?: AcaoDeGrandeza) => void;
   disabled?: boolean;
   falar?: (texto: string) => void;
   mostrar?: {
@@ -30,6 +32,10 @@ interface Props {
     subirLinhaTracejada?: boolean;
     destacarMaior?: boolean;
   } | null;
+}
+
+interface DimensionalProps extends Omit<Props, "spec"> {
+  spec: GrandezaSpec;
 }
 
 function ObjetoVisual({ o, eixo, destaque, erro, delay }: {
@@ -133,7 +139,7 @@ function SetaMedida({ spec, objeto }: { spec: GrandezaSpec; objeto: ObjetoDeGran
   );
 }
 
-export function GrandezaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
+function GrandezaDimensionalStage({ spec, onAnswer, disabled, falar, mostrar }: DimensionalProps) {
   const [fase, setFase] = React.useState<Fase>("idle");
   const [escolhido, setEscolhido] = React.useState<number | null>(null);
   const [ordem, setOrdem] = React.useState<number[]>([]);
@@ -283,4 +289,23 @@ export function GrandezaStage({ spec, onAnswer, disabled, falar, mostrar }: Prop
       </div>
     </PalcoEscalado>
   );
+}
+
+/**
+ * O canal `grandeza` é um palco composto por Grupo. GM.01 usa comparação
+ * dimensional; N1.05 usa comparação de numerosidade. O discriminante impede
+ * que uma semântica vaze para a outra e evita criar um segundo primitive Grupo.
+ */
+export function GrandezaStage(props: Props) {
+  if ("grupos" in props.spec) {
+    return (
+      <ComparacaoQuantidadeStage
+        spec={props.spec}
+        disabled={props.disabled}
+        falar={props.falar}
+        onAnswer={valor => props.onAnswer?.(valor)}
+      />
+    );
+  }
+  return <GrandezaDimensionalStage {...props} spec={props.spec} />;
 }
