@@ -89,6 +89,18 @@ const state = (id: string, updatedAt?: string): State => ({
   customTracks: [],
 });
 
+const progress = (extra: Record<string, unknown> = {}) => ({
+  lvl: 2,
+  streak: 1,
+  bad: 0,
+  stars: 3,
+  ok: 4,
+  tot: 5,
+  bank: [],
+  mast: 0,
+  ...extra,
+});
+
 const cloudState = (): State => JSON.parse(h.cloud.data.state) as State;
 
 beforeEach(() => {
@@ -172,5 +184,21 @@ describe("Cloud Reconciliation — writer Firestore", () => {
     await saveStateToCloud(state("estado-a", "2026-08-09T12:00:00.000Z"), "uid-a");
 
     expect(h.cloud.setCalls).toHaveLength(0);
+  });
+
+  it("H4: writer cloud nunca serializa progress.aula transitório", async () => {
+    const transient = state("kid-a", "2026-08-09T13:00:00.000Z");
+    transient.progress = {
+      "kid-a": {
+        aula: progress({ __aulaSourceTrackId: "N1.04" }) as any,
+      },
+    };
+
+    await saveStateToCloud(transient, "uid-a");
+
+    const saved = cloudState();
+    expect(saved.progress["kid-a"].aula).toBeUndefined();
+    expect(saved.progress["kid-a"]["N1.04"]).toMatchObject({ lvl: 2, ok: 4, tot: 5 });
+    expect(saved.updatedAt).toBe("2026-08-09T13:00:00.000Z");
   });
 });
