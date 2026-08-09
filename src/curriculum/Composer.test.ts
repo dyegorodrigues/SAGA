@@ -17,6 +17,27 @@ const generateJourneyQuestion = (ficha: FichaCompetencia, level: number) =>
     ? generateRegisteredFichaQuestion(ficha.id, level)
     : Composer.generate(ficha, level);
 
+const renderedKindFor = (declaredKind: string) => declaredKind === "intruso_math"
+  ? "plain"
+  : declaredKind === "arraygrid" ? "array"
+  : declaredKind === "storypanel" ? "story-bars"
+  : declaredKind;
+
+function allowedKindsFor(ficha: FichaCompetencia, level: number): string[] {
+  const nivel = ficha.niveis?.[level];
+  const declaredKind = nivel?.primitiva ?? ficha.micros[0].kinds[0];
+  if (nivel?.micro !== "misto") return [renderedKindFor(declaredKind)];
+
+  // Um micro explicitamente chamado `misto` pode alternar famílias já ensinadas
+  // pela própria ficha. Ele NÃO ganha liberdade para emitir um palco novo: a
+  // união permitida deriva somente das primitivas dos demais níveis.
+  return [...new Set(
+    Object.entries(ficha.niveis ?? {})
+      .filter(([rawLevel]) => Number(rawLevel) !== level)
+      .map(([, other]) => renderedKindFor(other.primitiva)),
+  )];
+}
+
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
     // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. Quem
@@ -95,13 +116,7 @@ describe("Composer de fichas", () => {
       for (let level = 1; level <= 5; level += 1) {
         for (let sample = 0; sample < 10; sample += 1) {
           const question = generateJourneyQuestion(ficha, level);
-          const declaredKind = ficha.niveis?.[level]?.primitiva ?? ficha.micros[0].kinds[0];
-          const renderedKind = declaredKind === "intruso_math"
-            ? "plain"
-            : declaredKind === "arraygrid" ? "array"
-            : declaredKind === "storypanel" ? "story-bars"
-            : declaredKind;
-          expect(question.kind, `${ficha.id} L${level}`).toBe(renderedKind);
+          expect(allowedKindsFor(ficha, level), `${ficha.id} L${level}`).toContain(question.kind);
           expect(question.uiProps, `${ficha.id} L${level}`).toBeDefined();
           expect(question.evaluate, `${ficha.id} L${level}`).toBeTypeOf("function");
           expect(question.evaluate?.(question.answer), `${ficha.id} L${level}`).toBe(true);
