@@ -13,6 +13,7 @@ import { LevelPickerModal } from "./home/LevelPickerModal";
 import { WardrobeModal } from "./home/WardrobeModal";
 
 import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
+import { chooseSenseiEntry } from "../curriculum/motores/senseiOrchestrator";
 import { isTrackUnlocked } from "../curriculum/motores/unlockEngine";
 
 interface KidHomeProps {
@@ -24,7 +25,7 @@ interface KidHomeProps {
   /** iniciar a trilha num nível escolhido a dedo (seletor 🎯) */
   onTrackLvl: (t: Track, lvl: number) => void;
   onMixed: () => void;
-  /** ▶️ MINHA AULA 📚 (E2): a missão composta pelo Professor Mágico */
+  /** ▶️ AULA DO DIA 📚: a missão prescrita pelo Sensei */
   onAula: () => void;
   onRescue: (rescue: RescuePlanItem) => void;
   /** 🎒 MATRÍCULA (E3): o placement disfarçado da primeira visita */
@@ -57,7 +58,7 @@ export function KidHomeScreen({
   const unlockStatus = useMemo(() => computeUnlockStatus(prog), [prog]);
   const themeObj = THEMES[kid.theme] || THEMES.classico;
 
-  // ▶️ MINHA AULA 📚: o plano do dia pro card (barato — escolhe trilhas, não gera questão)
+  // ▶️ AULA DO DIA 📚: o plano do dia pro card (barato — escolhe trilhas, não gera questão)
   const aulaPlan = useMemo(() => {
     const progOf = (tid: string) =>
       prog[tid] || { lvl: 1, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0 };
@@ -65,13 +66,20 @@ export function KidHomeScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracks, prog]);
 
+  // A criança toca UMA porta. Se o Radar/DAG provou uma lacuna causal, o Sensei
+  // converte a Aula do Dia na missão de Oficina correspondente; revisão simples
+  // continua dentro da aula normal. A decisão pedagógica nunca é delegada à criança.
+  const senseiEntry = chooseSenseiEntry(aulaPlan);
+  const startSenseiMission = () => {
+    if (senseiEntry.kind === "rescue") onRescue(senseiEntry.rescue);
+    else onAula();
+  };
+
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
   const [activeShellTab, setActiveShellTab] = useState<"sensei" | "jornada" | "dojo" | "oficina" | "perfil">(() => (window.localStorage.getItem("mk-active-tab") || "sensei") as any);
   React.useEffect(() => { window.localStorage.setItem("mk-active-tab", activeShellTab); }, [activeShellTab]);
   const [pickerTrack, setPickerTrack] = useState<Track | null>(null);
 
-  
-  
   // Wardrobe states
   const [showWardrobe, setShowWardrobe] = useState(false);
   const [tempBg, setTempBg] = useState(kid.bgAccessory || "none");
@@ -85,7 +93,8 @@ export function KidHomeScreen({
   const totalStars = getKidLifetimeStars(kid.id, state);
   const stageNum = getMascotStage(totalStars).stage;
 
-  // Adaptive recommendation engine based on child's exact progress history
+  // Recomendação secundária de treino livre. A auditoria pós-P22 ainda vai
+  // eliminar a heurística por estrelas para que ela não dispute autoridade com o Sensei.
   const rec = useMemo(() => {
     const accessibleTracks = tracks.filter(t =>
       isTrackUnlocked(t.id, t.graphId, unlockStatus)
@@ -116,7 +125,7 @@ export function KidHomeScreen({
 
     return bestTrack ? {
       track: bestTrack,
-      reason: "O Sensei separou este exercício para você treinar hoje! 🦊",
+      reason: "Treino livre sugerido para o seu momento atual. 🦊",
     } : null;
   }, [tracks, prog, unlockStatus]);
 
@@ -157,12 +166,10 @@ export function KidHomeScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 scrollbar-hide">
-        
-        
         {activeShellTab === "sensei" && (
-          <SenseiTab 
-            kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec} 
-            onMatricula={onMatricula} onAula={onAula} onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)} 
+          <SenseiTab
+            kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec}
+            onMatricula={onMatricula} onAula={startSenseiMission} onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)}
           />
         )}
         {activeShellTab === "jornada" && (
@@ -181,8 +188,8 @@ export function KidHomeScreen({
           <OficinaTab aulaPlan={aulaPlan} onTrack={onRescue} />
         )}
         {activeShellTab === "perfil" && (
-          <PerfilTab 
-            kid={kid} state={state} coins={coins} albumCount={albumCount} 
+          <PerfilTab
+            kid={kid} state={state} coins={coins} albumCount={albumCount}
             onUpdateKid={onUpdateKid} onAlbum={onAlbum} onBack={onBack}
             setShowWardrobe={setShowWardrobe} setTempBg={setTempBg} setTempInventory={setTempInventory}
             setTempCoins={setTempCoins} setCoinsSpent={setCoinsSpent}
@@ -190,7 +197,6 @@ export function KidHomeScreen({
         )}
       </div>
       <div className="bg-white border-t-2 border-slate-100 flex p-2 pb-5 shrink-0 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
-
         {[
           { id: "sensei", label: "Tutor", icon: "🦊", color: "text-blue-600", activeBg: "bg-blue-50" },
           { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },
