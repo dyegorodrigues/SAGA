@@ -363,15 +363,38 @@ check(
   `canários Composer ativos fora do grafo: ${composerActiveOutsideGraph.join(", ")}`
 );
 
+// O auditor protege o estado CANÔNICO atual e não transforma texto histórico em
+// falso vermelho. Sentinelas positivas provam a reconciliação; regressões antigas
+// nas afirmações correntes mais perigosas são barradas explicitamente.
+const bibleText = read("AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md");
+const manualText = read("AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md");
+const methodText = read("AI_Studio_Lab/pedagogia/METODO_SAGA.md");
 const declaredCountSources = [
-  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 90 competências:/],
-  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 90 competências\.\*\*/],
-  ["Manual", "AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md", /89 de 89/],
-  ["Método", "AI_Studio_Lab/pedagogia/METODO_SAGA.md", /grafo de 89 competências/],
+  ["Bíblia", bibleText, /Saldo atual:[\s\S]{0,120}?90 competências/],
+  ["Grafo humano", read("AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md"), /\*\*Total: 90 competências\.\*\*/],
+  ["Manual", manualText, /90 de 90/],
+  ["Método", methodText, /grafo de 90 competências/],
 ];
-for (const [label, file, pattern] of declaredCountSources) {
-  check(pattern.test(read(file)), `${label} não declara o invariante canônico de ${EXPECTED_COMPETENCIES} competências`);
+for (const [label, source, pattern] of declaredCountSources) {
+  check(pattern.test(source), `${label} não declara o invariante canônico de ${EXPECTED_COMPETENCIES} competências`);
 }
+check(/\*\*Versão 3\.4/.test(bibleText), "Bíblia precisa estar em v3.4 após a reconciliação pós-P22");
+check(/### v3\.4 —/.test(bibleText), "Bíblia v3.4 precisa registrar a reconciliação no changelog");
+check(
+  /Registro histórico da receita pré-P22[^\n]*NÃO normativo/.test(bibleText),
+  "Bíblia precisa marcar a antiga dose por idade como histórica e não normativa"
+);
+check(
+  /Fluência\/automaticidade amadurece em paralelo no Dojo, em estado próprio/.test(bibleText),
+  "Bíblia precisa separar automaticidade do nível conceitual"
+);
+check(!/nenhuma das 89 competências[^\n]*89 de 89/i.test(manualText), "Manual regrediu para o fecho corrente 89/89");
+check(/GM\.12[^\n]*Massa e capacidade/i.test(manualText), "Manual não incorpora GM.12 na didática de grandezas");
+check(/94 fichas autorais cobrindo as 90 competências do grafo/.test(methodText), "Método não declara 94 fichas autorais cobrindo 90 competências");
+check(!/São 92 fichas cobrindo as 89 competências/.test(methodText), "Método regrediu para a contagem autoral 92/89");
+check(!/counting on:\s*tempo de resposta abaixo de 8 segundos/i.test(methodText), "Método voltou a usar RT como critério de domínio conceitual");
+check(!/Leva do nível 1 ao 3/i.test(methodText), "Método voltou a tratar Jornada como metade de uma escala compartilhada com o Dojo");
+check(!/Leva do nível 3 ao 5/i.test(methodText), "Método voltou a tratar Dojo como metade de uma escala conceitual compartilhada");
 
 const authoredFichaFiles = listFiles("AI_Studio_Lab/pedagogia/fichas", ".md");
 const authoredFichaSources = authoredFichaFiles.map(read);
