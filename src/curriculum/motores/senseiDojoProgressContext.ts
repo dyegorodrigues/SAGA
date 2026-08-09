@@ -151,6 +151,13 @@ function normalizeSaved(
   };
 }
 
+/** Remove o buffer parcial antes de entregar um round fechado ao motor puro. */
+function withoutPendingRound(state: PersistedSenseiDojoState): DojoTrackState {
+  const clean = { ...state };
+  delete clean[SENSEI_DOJO_PENDING_ROUND];
+  return clean;
+}
+
 /**
  * Move eventos transitórios `progress.dojo_*` para o estado de fluência do kid.
  * Também migra silenciosamente saves legados dos quatro templos, preservando
@@ -184,7 +191,7 @@ export function materializeSenseiDojoProgress(state: State): State {
 
       if (marker) {
         // Defesa final: um nível clicado por UI antiga não ganha evidência se o
-        // conceito ainda não o tornou seguro. A UI será restringida também.
+        // conceito ainda não o tornou seguro. A UI é restringida também.
         if (ceiling >= marker.step && ceiling > 0) {
           const extended = dojoState as PersistedSenseiDojoState;
           const oldPending = extended[SENSEI_DOJO_PENDING_ROUND];
@@ -195,13 +202,15 @@ export function materializeSenseiDojoProgress(state: State): State {
           if (pending.attempts.length >= 10) {
             const adaptive = marker.step === (dojoState.currentStep ?? 1);
             const result = applySenseiDojoRound(
-              dojoState,
+              withoutPendingRound(extended),
               pending.attempts.slice(0, 10),
               marker.step,
               ceiling,
               marker.practiceDay,
               adaptive,
             );
+            // O motor recebe e devolve apenas o estado público; o round fechado
+            // não pode reaparecer no 11º item por herança de spread.
             dojoState = { ...result.state };
           } else {
             dojoState = { ...dojoState, [SENSEI_DOJO_PENDING_ROUND]: pending } as PersistedSenseiDojoState;
