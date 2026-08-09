@@ -50,6 +50,21 @@ describe("timezone — uma identidade de dia entre motores", () => {
 
     result.progress.lastDay = new Date().toISOString().slice(0, 10);
     expect(result.progress.lastDay).toBe(localDay());
+    expect(Object.keys(result.progress)).toContain("lastDay");
+    expect(JSON.parse(JSON.stringify(result.progress)).lastDay).toBe(localDay());
+  });
+
+  it("progresso sem lastDay não inventa chave serializável antes da primeira prática datada", () => {
+    const result = applyJourneyAnswer(progress(), true, false);
+    expect(result.progress.lastDay).toBeUndefined();
+    expect(Object.keys(result.progress)).not.toContain("lastDay");
+    expect(JSON.parse(JSON.stringify(result.progress))).not.toHaveProperty("lastDay");
+
+    // Simula a escrita legada que o GameLoop faz depois do motor.
+    result.progress.lastDay = new Date().toISOString().slice(0, 10);
+    expect(result.progress.lastDay).toBe(localDay());
+    expect(Object.keys(result.progress)).toContain("lastDay");
+    expect(JSON.parse(JSON.stringify(result.progress)).lastDay).toBe(localDay());
   });
 
   it("Jardim e Dojo preservam day key histórica explícita", () => {
