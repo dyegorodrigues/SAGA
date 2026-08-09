@@ -1,4 +1,5 @@
 import { State } from "../types";
+import { isTransientCloudError } from "./cloudErrorPolicy";
 
 export interface OpcoesDoSincronizador<C = undefined> {
   gravar: (estado: State, contexto?: C) => Promise<void>;
@@ -22,6 +23,7 @@ export function criarSincronizador<C = undefined>(opcoes: OpcoesDoSincronizador<
   const atrasoMs = opcoes.atrasoMs ?? ATRASO_PADRAO_MS;
   const agendarTimer = opcoes.agendar ?? ((fn, ms) => setTimeout(fn, ms));
   const cancelarTimer = opcoes.cancelar ?? (h => clearTimeout(h as ReturnType<typeof setTimeout>));
+  const deveRepetir = opcoes.deveRepetir ?? isTransientCloudError;
 
   let pendente: { estado: State; contexto?: C } | null = null;
   let handle: unknown = null;
@@ -52,7 +54,7 @@ export function criarSincronizador<C = undefined>(opcoes: OpcoesDoSincronizador<
 
     return opcoes.gravar(trabalho.estado, trabalho.contexto).catch(err => {
       console.warn("[Nuvem] Sincronização adiada:", err);
-      if (!opcoes.deveRepetir?.(err) || geracao !== geracaoDoTrabalho) return;
+      if (!deveRepetir(err) || geracao !== geracaoDoTrabalho) return;
 
       // Se outro estado foi agendado enquanto este write estava em voo, o mais
       // novo já é a pendência autoritativa. Nunca o substitua pelo retry velho.
