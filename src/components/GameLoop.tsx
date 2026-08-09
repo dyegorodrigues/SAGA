@@ -156,6 +156,9 @@ export function GameLoop({
   const [done, setDone] = useState(false);
   const [bonus, setBonus] = useState(0);
   const [replays, setReplays] = useState(0);
+  // A condição de "primeira missão" pertence ao início da sessão. O commit final
+  // atualiza o log e pode mudar a prop antes da tela de resultado renderizar.
+  const firstMissionRewardRef = useRef(firstMissionToday);
   // Fluidez: guarda a transição pendente para a criança PULAR com um toque
   const advanceRef = useRef<null | (() => void)>(null);
   const lastSpokenPromptRef = useRef<string | null>(null);
@@ -460,9 +463,10 @@ export function GameLoop({
     : gardenMode
       ? "garden"
       : "journey";
+  const firstMissionReward = firstMissionRewardRef.current && replays === 0;
   const coinsEarned = track.contentStatus === "fallback"
     ? 0
-    : missionCoins(ok, completionRewardMode, firstMissionToday && replays === 0);
+    : missionCoins(ok, completionRewardMode, firstMissionReward);
 
   useEffect(() => {
     if (sound && done) {
@@ -921,7 +925,7 @@ export function GameLoop({
           +{stars} ⭐{bonus > 0 && <span style={{ fontSize: 16, color: C.mintDark }}> (bônus especial!)</span>}
         </div>
         <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 700, color: "#9A3412", marginTop: 4 }}>
-          +{coinsEarned} 🪙{firstMissionToday && replays === 0 && <span style={{ fontSize: 14, color: C.mintDark }}> (primeira missão do dia! +5)</span>}
+          +{coinsEarned} 🪙{firstMissionReward && <span style={{ fontSize: 14, color: C.mintDark }}> (bônus da primeira missão do dia!)</span>}
         </div>
         <div style={{ color: C.sub, fontWeight: 800, fontSize: 16, marginTop: 6 }}>
           {ok} de {totalQFor(track)} acertos!
@@ -1119,7 +1123,7 @@ export function GameLoop({
             <h3 className="text-xl font-black text-indigo-900" style={{ fontFamily: FONT }}>
               Segredos do Reloginho!
             </h3>
-            <p className="text-xs text-slate-500 font-bold mb-4">
+            <p className="text-xs text-slate-500 font-bold">
               Aprenda com o Mascote de forma super rápida! 💡
             </p>
 
