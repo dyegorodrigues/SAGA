@@ -15,6 +15,7 @@ import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from ".
 import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
 import { prepareAulaSourceForAnswer } from "../../curriculum/motores/aulaProgressContext";
+import { recordSenseiDojoAttempt } from "../../curriculum/motores/senseiDojoProgressContext";
 import { AnswerMeta, Question } from "../../types";
 import { bundleMisconceptions } from "./misconceptionBundle";
 
@@ -31,11 +32,6 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
   return Boolean(q.options || q.groups || meta?.source);
 }
 
-/**
- * `shapecanvas` é uma família visual, não uma competência. A discriminação
- * segue exatamente a mesma fronteira do renderer: F48 possui `opcoes`; F47
- * possui `referencial`. Isso impede meta incorreto de sequestrar outra ficha.
- */
 function isFormaQuestion(q: Question): boolean {
   return q.kind === "shapecanvas"
     && q.uiProps != null
@@ -51,13 +47,6 @@ function isPosicaoQuestion(q: Question): boolean {
     && !("opcoes" in q.uiProps);
 }
 
-/**
- * Palcos que a ficha torna donos do próprio erro suave/retry.
- *
- * O meta específico é obrigatório: `shapecanvas` serve F47 e F48; apenas uma
- * leitura `posicao` prova que estamos no fluxo F47. O GameLoop continua dono do
- * Radar/progresso, mas não fala “Ops” nem aplica a terceira tentativa genérica.
- */
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
@@ -67,7 +56,6 @@ export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
     || (q.kind === "medidas" && meta?.source === "medidas");
 }
 
-/** Os mesmos palcos também possuem a voz e o fecho definidos pela própria ficha. */
 export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
   return (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
@@ -77,46 +65,27 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
     || (q.kind === "medidas" && meta?.source === "medidas");
 }
 
-/**
- * Por quanto tempo o GameLoop preserva o palco DEPOIS do gesto correto.
- * O RT já foi capturado antes desta janela — cinema nunca vira latência cognitiva.
- */
 export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
-  if (isPosicaoQuestion(q) && meta?.posicao !== undefined) {
-    // F47 §4: 1,8s de relação/seta + 1,5s de fecho rotulado.
-    return 3300;
-  }
-  if (isFormaQuestion(q) && meta?.forma !== undefined) {
-    // F48 §4: 2,2s de giro/contagem + 1,5s de fecho numerado.
-    return 3700;
-  }
-  if (q.kind === "grandeza" && meta?.grandeza !== undefined) {
-    // F49 §4: 1,8s de medida + 1,5s de fecho comparativo.
-    return 3300;
-  }
-  if (q.kind === "medidas" && meta?.source === "medidas") {
-    // F50 §4: verificação física + fecho sob referência comum.
-    return 3300;
-  }
-  // F05 e F04 já fecham seus roteiros dentro desta janela histórica.
+  if (isPosicaoQuestion(q) && meta?.posicao !== undefined) return 3300;
+  if (isFormaQuestion(q) && meta?.forma !== undefined) return 3700;
+  if (q.kind === "grandeza" && meta?.grandeza !== undefined) return 3300;
+  if (q.kind === "medidas" && meta?.source === "medidas") return 3300;
   return 1500;
 }
 
 /**
- * Contrato público permanece `string | undefined`. Quando uma tentativa prova
- * mais de uma hipótese, o bundle interno é desfeito por questionDiagnostics.
+ * Boundary comum de toda tentativa não-motora.
  *
- * Este também é o boundary comum que TODA resposta terminal atravessa antes do
- * progressEngine. A questão da Aula do Dia registra aqui sua competência-fonte;
- * o próximo `applyJourneyAnswer` consome exatamente esse source.
+ * - Aula do Dia registra a competência-fonte para o progressEngine;
+ * - Dojo aritmético registra token + número da tentativa para que recuperação
+ *   após erro não conte como fluência de primeira resposta.
  */
 export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
   prepareAulaSourceForAnswer(q);
+  recordSenseiDojoAttempt(q);
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
 
-  if (meta?.audiochoice) {
-    return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
-  }
+  if (meta?.audiochoice) return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
 
   if (meta?.pareamento && q.uiProps && "receptores" in q.uiProps) {
     const cena = {
@@ -132,10 +101,6 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
     if (daAcao) return daAcao;
   }
 
-  /**
-   * F04 pode provar na mesma tentativa uma hipótese imediata e a longitudinal
-   * `DEPENDE_DE_ANDAIME`. O bundle mantém uma tentativa e preserva as duas tags.
-   */
   if (meta?.touchplace) {
     const acao = meta.touchplace as ProducaoComHistorico;
     const unidas = bundleMisconceptions([
@@ -185,7 +150,6 @@ export function shouldRenderQuestionOptions(q: Question): boolean {
     && !PALCOS_QUE_RESPONDEM.has(q.kind as string);
 }
 
-/** As condições da §9 que ESTA resposta satisfez. */
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
   if (!meta) return [];
   const achadas: string[] = [];
