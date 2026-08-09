@@ -19,7 +19,7 @@ A ficha mede três componentes que precisam coexistir para N1.09 estar realmente
 4. **Regressiva:** recebe um início entre 3 e 10 e escolhe os três termos anteriores; os casos incluem chegada ao zero.
 5. **Recuperação mista:** alterna contagem de objetos, continuação a partir de N e regressiva sem anunciar previamente qual família será usada.
 
-Não há `rt_alvo`: velocidade pode ser observada, mas não coroa domínio conceitual desta competência.
+O nível 5 declara `rt_alvo = 20 s` **somente como metadado de fluência/Dojo**. Ele não reprova a criança, não reduz `mast` e não participa do critério de domínio conceitual da Jornada; o limite é deliberadamente folgado porque uma questão mista pode exigir contar até 20 objetos.
 
 ## 4. Cena e roteiro
 Nos níveis 1–2, a tela apresenta objetos grandes, separados e visualmente contáveis. A voz diz: **“Conte os objetos. Quantos há?”** O numeral é escolhido depois da contagem; texto é apoio, não requisito de leitura.
@@ -56,7 +56,7 @@ Objetos não podem se sobrepor nem ficar pequenos demais para contagem em 320 px
 ## 8. Evidência de domínio
 Domínio exige evidência em mais de uma sessão e nas três famílias: contar conjuntos 10–20, continuar a partir de N e fazer regressiva simples. Acertar apenas “qual número vem depois?” não é evidência suficiente.
 
-A recuperação mista do nível 5 funciona como contraprova de formato: a criança precisa reconhecer a demanda da situação e não apenas repetir a estratégia da questão anterior. Tempo de resposta pode informar fluência, mas não substitui precisão e cobertura das três famílias.
+A recuperação mista do nível 5 funciona como contraprova de formato: a criança precisa reconhecer a demanda da situação e não apenas repetir a estratégia da questão anterior. `rt_alvo` pode informar fluência, mas não substitui precisão, retenção e cobertura das três famílias e não governa a coroa conceitual.
 
 ## 9. Rollback e contraprovas
 O legado `gVis_Sequence` permanece disponível como **rollback operacional**, não como cânone pedagógico. Ele cobre continuação de sequência de forma parcial e não prova contagem de conjuntos 10–20 nem regressiva.
