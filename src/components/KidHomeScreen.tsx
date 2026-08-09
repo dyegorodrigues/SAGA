@@ -14,7 +14,10 @@ import { WardrobeModal } from "./home/WardrobeModal";
 
 import { planAula, RescuePlanItem } from "../curriculum/motores/composer";
 import { chooseSenseiEntry } from "../curriculum/motores/senseiOrchestrator";
+import { prescribeSenseiDojo } from "../curriculum/motores/senseiDojoPrescription";
+import type { SenseiDojoSessionSource } from "../curriculum/motores/senseiDojoPolicy";
 import { isTrackUnlocked } from "../curriculum/motores/unlockEngine";
+import { localDay } from "../utils/migrator";
 
 interface KidHomeProps {
   state: State;
@@ -23,7 +26,7 @@ interface KidHomeProps {
   streak: number;
   albumCount: number;
   /** iniciar a trilha num nível escolhido a dedo (seletor 🎯) */
-  onTrackLvl: (t: Track, lvl: number) => void;
+  onTrackLvl: (t: Track, lvl: number, dojoSource?: SenseiDojoSessionSource) => void;
   onMixed: () => void;
   /** ▶️ AULA DO DIA 📚: a missão prescrita pelo Sensei */
   onAula: () => void;
@@ -66,13 +69,25 @@ export function KidHomeScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tracks, prog]);
 
-  // A criança toca UMA porta. Se o Radar/DAG provou uma lacuna causal, o Sensei
-  // converte a Aula do Dia na missão de Oficina correspondente; revisão simples
-  // continua dentro da aula normal. A decisão pedagógica nunca é delegada à criança.
+  // A criança toca UMA porta conceitual. Se o Radar/DAG provou uma lacuna causal,
+  // o Sensei converte a Aula do Dia na missão de Oficina correspondente; revisão
+  // simples continua dentro da aula normal. Fluência prescrita aparece em uma
+  // missão separada, abaixo, para não transformar a Aula do Dia em mistureba.
   const senseiEntry = chooseSenseiEntry(aulaPlan);
   const startSenseiMission = () => {
     if (senseiEntry.kind === "rescue") onRescue(senseiEntry.rescue);
     else onAula();
+  };
+
+  const dojoPrescription = useMemo(() => prescribeSenseiDojo(
+    prog,
+    (state.dojoTracks || {})[kid.id] || {},
+    localDay(),
+  ), [prog, state.dojoTracks, kid.id]);
+
+  const startSenseiDojoMission = () => {
+    if (!dojoPrescription) return;
+    onTrackLvl(dojoPrescription.track, dojoPrescription.step, "prescribed");
   };
 
   // Seletor de nível 🎯 (pedido do Zeus: ver e escolher os exercícios de cada nível)
@@ -169,7 +184,9 @@ export function KidHomeScreen({
         {activeShellTab === "sensei" && (
           <SenseiTab
             kid={kid} prog={prog} aulaPlan={aulaPlan} rec={rec}
-            onMatricula={onMatricula} onAula={startSenseiMission} onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)}
+            dojoPrescription={dojoPrescription}
+            onMatricula={onMatricula} onAula={startSenseiMission} onSenseiDojo={startSenseiDojoMission}
+            onTrack={setPickerTrack} onMixed={onMixed} setActiveShellTab={(t: any) => setActiveShellTab(t)}
           />
         )}
         {activeShellTab === "jornada" && (
