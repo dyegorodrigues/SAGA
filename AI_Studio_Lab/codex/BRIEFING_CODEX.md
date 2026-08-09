@@ -1,59 +1,84 @@
 # Briefing operacional — continue daqui
 
-> **Checkpoint: P21.A concluída. Próxima execução: P21.1.**
+> **VIGENTE em 9/ago/2026.** O briefing antigo de P21 foi superado e permanece recuperável pelo histórico Git. P21/P22, cânone, Tutor↔Dojo, QA real e Jardim causal estão fechados. Próxima execução: **identidade do banco de erros composto**.
 
 ## Antes de tocar código
 
-Leia:
+Leia nesta ordem:
 
-1. `RETOMADA.md`
-2. `DECISAO_P21_FONTES_DE_VERDADE.md`
-3. `AUDITORIA_P21_FONTES_DE_VERDADE.md`
-4. `MAPA_MESTRE_POS_P20.md`
+1. `CHECKPOINT_FINAL_CONTINUIDADE_2026-08-09.md`
+2. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
+3. `RETOMADA.md`
+4. `AUDITORIA_MOTORES_ADAPTATIVOS.md`
+5. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
 
-Repo `dyegorodrigues/SAGA`; branch `codex/integrar-bloco-f0`.  
+Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`.  
 `main` = `68fad4c575e28959b2ca4776e9a541d6828b63f3`, **não tocar**.  
-PR #29 = draft/no-merge. Creature Engine = fora deste fluxo.
+PR #29 = open + draft + no-merge. Creature Engine = fora deste fluxo. Não criar branch auxiliar.
+
+Sempre reancore PR/head remoto antes de editar.
 
 ## Fechado
 
-- P17: N1.10/N1.11 e ponte perceptual→simbólica.
-- P8: Jardim JD1/JD2/JD3/JD5, `dojoTracks`, automaticidade separada.
-- P18: KindType autoral sem builder falso.
-- P19: migrador único + audit npm zerado.
-- P20: save/sync por Firebase UID, bootstrap único e link anonymous→Google.
+Não reabrir sem falha objetiva:
 
-Não reabrir sem falha objetiva.
+- P17/P8/P18/P19/P20/P21/P22;
+- grafo 90 + 94 fichas + cobertura autoral 90/90;
+- Radar tag→nó;
+- `sourceTrackId` da Aula composta até persistência;
+- Sensei full DAG sem grade como trilho;
+- Oficina causal;
+- reconciliação canônica + guard documental;
+- Dojo `manual | prescribed` de ponta a ponta;
+- QA real Chrome integrado ao CI;
+- Jardim causal por DAG + fraqueza JD comprovada.
 
-## P21.A mediu o presente
+Head funcional de fechamento: `15f73542ddb1f005fd228ac02461c5a71ea8adec`.  
+CI #671 / run `31307946962` = SUCCESS integral.  
+Artefato visual: `9036527545`.
 
-- grafo: 90 nós;
-- Markdown: 92 fichas, 88/90 competências;
-- sem ficha: N1.09, GM.02;
-- TS Jornada: 29;
-- Composer registrado: 24;
-- canários ativos: 22;
-- registradas/inativas: N4.09, GM.12;
-- `JOURNEY_FICHAS`: 19/29;
-- auditor de ficha ainda espera 88 e não falha por cobertura faltante;
-- auditor agregado mistura legacy/Composer/fallback;
-- mapa de primitivas precisa revalidação contra runtime.
+## Estado de conteúdo — dívida declarada
 
-## Faça agora — P21.1
+- Composer/padrão-ouro: 26/90;
+- servido sem placeholder: 51/90;
+- ficha pronta servida por legado: 25;
+- ficha pronta sem conteúdo: 39;
+- divergência ficha↔tela observada: 21;
+- troca de linguagem visual sem aviso: 12;
+- primitivas: 20 executáveis / 4 renderer-sem-builder / 1 isolada / 1 ausente.
 
-1. completar `AllFichas/JOURNEY_FICHAS` com as fichas TS existentes;
-2. criar teste disco↔registry;
-3. auditor de cobertura derivado do grafo;
-4. N1.09/GM.02 ficam como exceções temporárias explícitas, não silêncio;
-5. separar legacy / Composer registrado / Composer ativo / fallback real;
-6. limpar comentários antigos N1.10/N1.11 em `composerCanary.ts`;
-7. depois P21.2: reconciliar `FICHA_RUNTIME_MAP` pelo caminho builder→kind→renderer.
+**Não começar a fábrica dos 39 agora.** A lista exata está em `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md` e entra depois da Coverage Matrix.
 
-**Não promover nada nessa fase.**
+## Faça agora — identidade do banco de erros composto
+
+Pré-auditoria encontrou a hipótese a seguir em `composer.ts`:
+
+- os itens de banco de múltiplos tracks entram em um `bankQs` global e embaralhado;
+- há uma closure por `RescuePlanItem`;
+- para `error-bank`, a closure usa `bankQs.pop()` sem amarrar o item ao source do resgate.
+
+Pode ocorrer:
+
+> resgate de A consumir questão armazenada no banco de B.
+
+Não corrigir por intuição. Primeiro trace e teste:
+
+`planAula(error-bank source) → bankQs/rescueQueue → questão/source → GameLoop/review → progressEngine/materialize → bank mutation → próximo planAula`.
+
+### Sequência obrigatória
+
+1. regressão determinística com dois bancos-fonte;
+2. provar ou refutar a mistura;
+3. se provada, corrigir identidade por source/rescue;
+4. provar que retry/review altera o bank do source correto;
+5. gates completos;
+6. checkpoint.
+
+A etapa **telemetria/Leitner da Aula composta é a seguinte**, não misture os dois bugs no mesmo lote.
 
 ## Depois
 
-P22 decide N1.09, GM.02, JD4, N4.09 e GM.12. Depois: auditoria dos motores adaptativos → mega auditoria pedagógica → Dojo completo → release hardening.
+telemetria/Leitner → `LENTO_DEDOS` → timezone → recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
@@ -66,7 +91,7 @@ npx tsc --noEmit
 npm test -- --run
 npm run build
 npm run pr:check
-git diff --check
+npm run sonda:sensei-dojo
 ```
 
-**Comece pela P21.1.**
+**Comece pela regressão de dois bancos-fonte.**
