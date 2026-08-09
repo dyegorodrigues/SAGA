@@ -4,7 +4,7 @@ import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
 import { applyJardimRound, type JardimAttempt, type JardimRoundResult } from "../curriculum/motores/jardimEngine";
 import { tentativaJardimDoTerminal, type JardimMissionSummary } from "../curriculum/motores/jardimSession";
 import { auth, logTelemetryToCloud } from "../lib/firebase";
-import { perfectMissionXpBonus, rewardForTerminalAnswer } from "../lib/rewardPolicy";
+import { missionCoins, perfectMissionXpBonus, rewardForTerminalAnswer } from "../lib/rewardPolicy";
 import {
   C, FONT, BODY, Mascote, StarChip, ProgressBar, SoundBtn, Burst, sfx, speak, stopSpeak, pickVoice, applyTheme, pickPraise, PRAISE, OOPS, THEMES,
 } from "./Mascot";
@@ -242,7 +242,7 @@ export function GameLoop({
   const [autoAula, setAutoAula] = useState(() => hasAulinha(q) && !aulaSeen(kid.id, q.kind));
   const [promptDone, setPromptDone] = useState(!sound);
   const [audioChoicePromptVisible, setAudioChoicePromptVisible] = useState(false);
-  
+
   // Update autoAula state on question change
   useEffect(() => {
     setAutoAula(idx === 0 ? (hasAulinha(q) && !aulaSeen(kid.id, q.kind)) : false);
@@ -453,9 +453,16 @@ export function GameLoop({
     if (journeyDone && sound && !status) speak(q.prompt);
   }, [journeyDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 🪙 moedinhas da missão: 1 por acerto + 3 por completar + 5 na primeira do dia
-  // (no "jogar de novo" da mesma tela, o bônus de primeira missão não se repete)
-  const coinsEarned = ok + 3 + (firstMissionToday && replays === 0 ? 5 : 0);
+  // UI e persistência usam a mesma política. No replay o bônus da primeira missão
+  // não se repete; no Misto a tela mostra o mesmo 2× que o App credita.
+  const completionRewardMode = track.id === "mista" || track.id === "mixed"
+    ? "mixed"
+    : gardenMode
+      ? "garden"
+      : "journey";
+  const coinsEarned = track.contentStatus === "fallback"
+    ? 0
+    : missionCoins(ok, completionRewardMode, firstMissionToday && replays === 0);
 
   useEffect(() => {
     if (sound && done) {
@@ -471,7 +478,7 @@ export function GameLoop({
   const handlePick = (val: any, forcedRight?: boolean, answerMeta?: AnswerMeta) => {
     if (val === "__timeout__") setIsTimeout(true);
     if (status || answeredRef.current) return;
-    
+
     // forcedRight: usado por interações que decidem o acerto por conta própria (ex.: `order`)
     const right = forcedRight !== undefined ? forcedRight : val === q.answer;
 
@@ -624,7 +631,7 @@ export function GameLoop({
     /**
      * ⭐ XP de perfil: todo acerto terminal válido vale 1. Velocidade continua
      * medindo automaticidade no Dojo, mas não compra nível SAGA nem autoridade
-     * conceitual. Criança lenta e correta recebe a mesma identidade de esforço.
+     * conceitual. Fallback não é conteúdo real e portanto não paga meta-jogo.
      */
     const rewardMode = gardenMode
       ? "garden"
@@ -637,7 +644,7 @@ export function GameLoop({
             : track.id === "matricula"
               ? "placement"
               : "journey";
-    const starGain = rewardForTerminalAnswer(right, rewardMode).xp;
+    const starGain = q.isFallback ? 0 : rewardForTerminalAnswer(right, rewardMode).xp;
 
     // Lentidão no Dojo continua sendo sinal de automaticidade, não desconto de XP.
     if (
@@ -648,7 +655,7 @@ export function GameLoop({
     ) {
       trackMisconception(p, "LENTO_DEDOS");
     }
-    
+
     const nextStars = stars + starGain;
     const nextOk = ok + (right ? 1 : 0);
     const rescueRecovered = !gardenMode && !!rescue && (
@@ -656,7 +663,8 @@ export function GameLoop({
       (rescue.requiredLevel === 5 && prog0.lvl === 5 && p.streak >= 2)
     );
     const isLast = idx === totalQFor(track) - 1 || rescueRecovered;
-    const nextBonus = isLast ? perfectMissionXpBonus(nextOk, totalQFor(track)) : 0;
+    const rewardEligible = !q.isFallback && track.contentStatus !== "fallback";
+    const nextBonus = isLast && rewardEligible ? perfectMissionXpBonus(nextOk, totalQFor(track)) : 0;
 
     p.stars = (p.stars || 0) + starGain + nextBonus;
 
@@ -666,7 +674,7 @@ export function GameLoop({
       p.lastDay = new Date().toISOString().slice(0, 10);
       p.rt = Math.round(p.rt ? p.rt * 0.7 + durationMs * 0.3 : durationMs);
     }
-    
+
     // FIREBASE ATOMIC TELEMETRY
     try {
       const qPromptText = q.kind === "story" ? String(q.story) : String(q.prompt || "") + (q.kind === "math" ? " " + String(q.expr) : "");
@@ -792,12 +800,12 @@ export function GameLoop({
     const q0 = qRef.current;
     setGuidedIdx(0);
     let current = 0;
-    
+
     // Se for um pedido de ajuda (não automático) E tiver mais de 2 itens,
     // o mascote só conta os dois primeiros (Scaffold) e encoraja a criança a continuar.
     const shouldScaffold = !isAuto && total > 2 && !isMock;
     const limit = (shouldScaffold && !isMock) ? 2 : total;
-    
+
     speak(`${intro} ... Um!`, {
       onEnd: () => {
         if (qRef.current !== q0) return; // a questão mudou no meio: aula morta
@@ -913,7 +921,7 @@ export function GameLoop({
           +{stars} ⭐{bonus > 0 && <span style={{ fontSize: 16, color: C.mintDark }}> (bônus especial!)</span>}
         </div>
         <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 700, color: "#9A3412", marginTop: 4 }}>
-          +{coinsEarned} 🪙{firstMissionToday && <span style={{ fontSize: 14, color: C.mintDark }}> (primeira missão do dia! +5)</span>}
+          +{coinsEarned} 🪙{firstMissionToday && replays === 0 && <span style={{ fontSize: 14, color: C.mintDark }}> (primeira missão do dia! +5)</span>}
         </div>
         <div style={{ color: C.sub, fontWeight: 800, fontSize: 16, marginTop: 6 }}>
           {ok} de {totalQFor(track)} acertos!
@@ -1022,13 +1030,13 @@ export function GameLoop({
         style={q.kind === "audiochoice" ? { display: "none" } : undefined}
       >
         <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`}>
-          <Mascote 
-            theme={kid.theme} 
-            stage={stage} 
-            size={54} 
-            kid={kid} 
+          <Mascote
+            theme={kid.theme}
+            stage={stage}
+            size={54}
+            kid={kid}
             animation={status === "right" ? "happy" : status === "wrong" ? "idle" : "walk"}
-            className="hover:scale-105 active:scale-95 transition-all" 
+            className="hover:scale-105 active:scale-95 transition-all"
           />
         </div>
         <div
