@@ -19,6 +19,7 @@
     "simular": "tsx simulated-learner-real.ts",
     "contrato": "vitest run",
     "sonda": "node scripts/sonda-layout.mjs",
+    "sonda:sensei-dojo": "node scripts/sonda-sensei-dojo.mjs",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
@@ -34,7 +35,7 @@
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1",
+    "remark-gfm": "^4.0.0",
     "yaml": "^2.9.0"
   },
   "devDependencies": {
