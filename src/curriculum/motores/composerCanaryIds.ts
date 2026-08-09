@@ -19,6 +19,7 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "N1.07",
 
   // Retomada F0 — promoções individuais já validadas.
+  "N1.05",
   "N1.06",
   "N1.09",
   "N1.13",
