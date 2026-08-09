@@ -1,4 +1,5 @@
 import type { DojoTrackState, State } from "../types";
+import { missionXp, perfectMissionXpBonus, rewardForTerminalAnswer } from "./rewardPolicy";
 
 /**
  * XP de fluência é meta-progressão, não autoridade pedagógica. Mantemos o campo
@@ -29,24 +30,18 @@ export function getKidLifetimeXp(kidId: string, state: State): number {
 }
 
 /**
- * Política V1 que preserva exatamente a recompensa que a UI atual do GameLoop
- * anuncia para o Dojo. O rebalanceamento dessa curva é um passo separado porque
- * UI, fala e persistência precisam mudar juntas.
+ * Compatibilidade do boundary do Dojo: velocidade continua alimentando a força
+ * de fluência, mas todo acerto terminal vale 1 XP de perfil.
  */
-export function currentDojoAnswerXp(right: boolean, durationMs: number): number {
-  if (!right) return 0;
-  if (durationMs <= 3_000) return 15;
-  if (durationMs <= 10_000) return 5;
-  return 2;
+export function currentDojoAnswerXp(right: boolean, _durationMs: number): number {
+  return rewardForTerminalAnswer(right, "dojo").xp;
 }
 
-export function perfectMissionXpBonus(correct: number, total: number): number {
-  return total > 0 && correct === total ? 5 : 0;
-}
+export { perfectMissionXpBonus };
 
-/** Jardim hoje paga 1 XP por acerto + 5 por round perfeito. */
+/** Jardim usa a mesma identidade econômica das outras modalidades. */
 export function currentGardenRoundXp(correct: number, total: number): number {
-  return Math.max(0, correct) + perfectMissionXpBonus(correct, total);
+  return missionXp(correct, total);
 }
 
 /**
