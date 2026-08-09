@@ -1,6 +1,6 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Próximo bloqueante: timezone / identidade do dia (`lastDay`).
+> **VIGENTE em 9/ago/2026.** Fonte principal: `CHECKPOINT_RECUPERACAO_POS_TRAVA_2026-08-09.md`. Próximo bloqueante: **Misto por repertório elegível**.
 
 ## Leia
 
@@ -13,44 +13,44 @@ Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 draf
 
 ## Não reabra
 
-Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner e `LENTO_DEDOS` estão fechados.
+Cânone, Tutor↔Dojo, QA real, Jardim causal, banco composto, telemetria/Leitner, `LENTO_DEDOS`, timezone e recomendador secundário por estrelas estão fechados.
 
-Evidências:
+Evidências recentes:
 
 - banco: CI #682 / `31308424789`;
 - telemetria/Leitner: CI #691 / `31308774424`;
 - `LENTO_DEDOS`: CI #702 / `31309761131`;
-- head funcional desse fechamento: `d3ffd4f5ca7981b32ffc4b2c90cc963e69231c5a`.
+- timezone: CI #717 / `31310499361`;
+- recomendador paralelo: CI #720 / `31310675620`;
+- head funcional mais novo: `fc6227f14be69fcf95cd173a973a24a800479800`.
 
-`LENTO_DEDOS` não pertence ao Radar conceitual; tags não canônicas são ignoradas, inclusive em saves legados. Mutação imperativa externa de `streak` não pode acelerar a escada conceitual. RT/estrelas/Dojo permanecem sinais separados.
+## Faça agora — Misto por repertório elegível
 
-## Faça agora — timezone / `lastDay`
+O runtime ainda monta o Misto com `SUBJECTS[mat].tracks[kid.grade]`; o construtor mistura banco/pior precisão/aleatórias de tudo que recebe sem um filtro canônico de segurança conceitual.
 
-Há múltiplos escritores de `YYYY-MM-DD` por `new Date().toISOString().slice(0, 10)` em runtime. Isso usa **dia UTC**, não necessariamente o calendário local da criança.
+### Cadeia
 
-### Cadeia obrigatória
-
-`relógio local → day key → GameLoop/Jardim/Dojo/Leitner → Progress.lastDay/masteryEvidence/log → Radar/Composer/bônus → save/cloud`.
+`DAG + Progress → repertório elegível → pool Misto → banco/pior/aleatória → Question → GameLoop → persistência`.
 
 ### Sequência
 
-1. inventariar todos os escritores/consumidores de day key;
-2. criar helper puro único para “dia local” sem hardcode de timezone;
-3. criar distância entre dias de calendário resistente a DST;
-4. testes de virada UTC/local em offsets negativos e positivos;
-5. migrar writers/consumers relevantes para o helper;
-6. alinhar revisão espaçada, mastery session day, Dojo/Jardim e bônus/log diário;
-7. não mudar os intervalos Leitner por acidente;
-8. gates completos + Chrome quando tocar runtime;
+1. universo possível = matemática canônica, não série;
+2. derivar elegibilidade do estado/progresso real e DAG existente;
+3. nunca incluir track nunca praticada/sem segurança;
+4. banco, pior precisão e aleatórias usam o mesmo pool elegível;
+5. pool insuficiente deve produzir indisponibilidade/composição explícita, nunca conteúdo arbitrário;
+6. Misto continua opcional e não altera mastery/unlock;
+7. regressões para dominada, só desbloqueada, nunca praticada e fora da antiga grade;
+8. gates completos + Chrome se UI mudar;
 9. checkpoint.
 
 ## Conteúdo continua inventariado
 
-26/90 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; primitivas incompletas listadas no inventário. Não iniciar a fábrica antes da Coverage Matrix.
+26/90 Composer; 25 prontos em legado; 39 prontos em fallback; 21 divergências ficha↔tela; 12 trocas visuais; primitivas incompletas no inventário. Não iniciar a fábrica antes da Coverage Matrix.
 
 ## Depois
 
-recomendador paralelo → Misto elegível → Matrícula → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
+Matrícula sem grade rígida → cloud reconciliation → simulação longitudinal → gamificação/economia → Coverage Matrix → fábrica curricular → mega auditoria → hardening.
 
 ## Gates
 
