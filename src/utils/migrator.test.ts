@@ -92,4 +92,61 @@ describe("migrador único de estado", () => {
     expect(app).not.toMatch(/function\s+migrate\s*\(/);
     expect(app).not.toMatch(/const\s+defaultState\s*=\s*\(/);
   });
+
+  it("H5: preserva campos pedagógicos atuais em migrate/round-trip", () => {
+    const raw: any = {
+      schemaVersion: 1,
+      updatedAt: "2026-08-09T14:00:00.000Z",
+      kids: [{ id: "k1", name: "D", grade: "ano1", theme: "classico", petDay: "2026-08-09" }],
+      progress: {
+        k1: {
+          "N1.04": {
+            lvl: 4, maxLvl: 5, streak: 2, bad: 1, stars: 17, ok: 21, tot: 25, mast: 1,
+            bank: [{ sig: "n1-04:a", hits: 2, q: { text: "conte", answer: 4, sig: "n1-04:a" } }],
+            reviewForce: 4,
+            lastDay: "2026-08-08",
+            masteryEvidence: {
+              schemaVersion: 1,
+              comprehensionStreak: 3,
+              independenceStreak: 2,
+              fluencyStreak: 7,
+              retentionPasses: 2,
+              evidenciaDaFicha: true,
+              evidenciasVistas: ["disperso"],
+            },
+          },
+        },
+      },
+      dojoTracks: {
+        k1: {
+          dojo_add: {
+            unlocked: true,
+            mastered: false,
+            family: "FD",
+            currentStep: 4,
+            highestStep: 5,
+            lastDay: "2026-08-08",
+            facts: {
+              "2+3": { fact_id: "2+3", forca: 4, rt_medio: 820, ultima_vez: "2026-08-08", erros_seguidos: 0 },
+            },
+            procs: {
+              "alg-add": { proc_id: "alg-add", precisao: 0.92, tempo_medio: 2100, forca: 3, ultima_vez: "2026-08-08", erros_seguidos: 1 },
+            },
+          },
+        },
+      },
+      coins: { k1: 8 }, album: { k1: [] }, log: { k1: [] }, sound: true, customTracks: [],
+    };
+
+    const migrated = migrate(JSON.parse(JSON.stringify(raw)), "2026-08-09");
+
+    expect(migrated.schemaVersion).toBe(1);
+    expect(migrated.updatedAt).toBe(raw.updatedAt);
+    expect(migrated.progress.k1["N1.04"].bank).toEqual(raw.progress.k1["N1.04"].bank);
+    expect(migrated.progress.k1["N1.04"].reviewForce).toBe(4);
+    expect(migrated.progress.k1["N1.04"].lastDay).toBe("2026-08-08");
+    expect(migrated.progress.k1["N1.04"].masteryEvidence).toEqual(raw.progress.k1["N1.04"].masteryEvidence);
+    expect(migrated.dojoTracks?.k1?.dojo_add?.facts).toEqual(raw.dojoTracks.k1.dojo_add.facts);
+    expect(migrated.dojoTracks?.k1?.dojo_add?.procs).toEqual(raw.dojoTracks.k1.dojo_add.procs);
+  });
 });
