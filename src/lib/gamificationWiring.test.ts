@@ -34,4 +34,10 @@ describe("Wiring da gamificação", () => {
     expect(gameLoopSource).toContain("return; // não avança, não marca answeredRef");
     expect(gameLoopSource).toContain("answeredRef.current = true;");
   });
+
+  it("bônus da primeira missão é congelado na sessão e replay não o reaplica", () => {
+    expect(gameLoopSource).toContain("const firstMissionRewardRef = useRef(firstMissionToday)");
+    expect(gameLoopSource).toContain("const firstMissionReward = firstMissionRewardRef.current && replays === 0");
+    expect(gameLoopSource).not.toContain("missionCoins(ok, completionRewardMode, firstMissionToday && replays === 0)");
+  });
 });
