@@ -77,6 +77,7 @@ const gardenPrescription: CausalJardimPrescription = {
 function renderSensei(
   dojoPrescription: SenseiDojoPrescription | null,
   senseiEntry: SenseiEntry = { kind: "lesson" },
+  mixedAvailable = true,
 ) {
   const onSenseiDojo = vi.fn();
   const onAula = vi.fn();
@@ -88,6 +89,7 @@ function renderSensei(
       aulaPlan={aulaPlan}
       senseiEntry={senseiEntry}
       dojoPrescription={dojoPrescription}
+      mixedAvailable={mixedAvailable}
       onMatricula={vi.fn()}
       onAula={onAula}
       onSenseiDojo={onSenseiDojo}
@@ -127,6 +129,19 @@ describe("SenseiTab — missão prescrita do Dojo", () => {
   it("não exibe recomendação curricular paralela baseada em estrelas", () => {
     renderSensei(null);
     expect(screen.queryByText(/Treino Livre Sugerido/)).toBeNull();
+  });
+
+  it("esconde o Misto enquanto o repertório dominado for insuficiente", () => {
+    const { onMixed } = renderSensei(null, { kind: "lesson" }, false);
+    expect(screen.queryByText(/Mistura Total/)).toBeNull();
+    expect(onMixed).not.toHaveBeenCalled();
+  });
+
+  it("mantém o Misto opcional quando o repertório já é seguro", () => {
+    const { onMixed } = renderSensei(null, { kind: "lesson" }, true);
+    const mixed = screen.getByRole("button", { name: /Mistura Total/ });
+    fireEvent.click(mixed);
+    expect(onMixed).toHaveBeenCalledTimes(1);
   });
 });
 
