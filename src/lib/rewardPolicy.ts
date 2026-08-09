@@ -44,3 +44,17 @@ export function rewardForMissionCompletion(mode: RewardMode, firstMissionToday: 
 export function missionXp(correct: number, total: number): number {
   return Math.max(0, correct) + perfectMissionXpBonus(correct, total);
 }
+
+/**
+ * Total exibível/persistível de moedas de uma missão encerrada. Centralizar o
+ * cálculo impede a UI de mostrar um valor e o App creditar outro (especialmente
+ * no Desafio Misto, cuja economia é 2×).
+ */
+export function missionCoins(
+  correct: number,
+  mode: RewardMode,
+  firstMissionToday: boolean,
+): number {
+  const answerCoins = Math.max(0, correct) * rewardForTerminalAnswer(true, mode).coins;
+  return answerCoins + rewardForMissionCompletion(mode, firstMissionToday).coins;
+}
