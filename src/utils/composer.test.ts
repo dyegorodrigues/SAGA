@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { planAula, composeAula, buildAulaTrack, getAulaTotal } from "../curriculum/motores/composer";
+import {
+  AULA_ADAPTIVE_MIN,
+  AULA_ADAPTIVE_NORMAL,
+  planAula,
+  composeAula,
+  buildAulaTrack,
+} from "../curriculum/motores/composer";
 import { Track, Progress } from "../types";
 
 /** trilha-fantasma: toda questão assina o id da trilha no prompt (rastreável) */
@@ -34,11 +40,11 @@ const M_BASE = {
   t2: prog({ dom: true })
 };
 
-describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
-  it("criança NOVA: 10 questões válidas, abre pela 1ª trilha sem pré-requisito", () => {
+describe("Compositor da Aula do Dia 📚 (Sensei)", () => {
+  it("composição direta padrão: 10 questões válidas e uma fronteira dominante", () => {
     const tracks = [...TRACKS_BASE, trk("contar", "N1.04"), trk("soma", "N1.05"), trk("padroes", "AL.01")];
     const { qs, plan } = composeAula(tracks, progOfMap({ ...M_BASE }));
-    expect(qs.length).toBe(getAulaTotal());
+    expect(qs.length).toBe(AULA_ADAPTIVE_NORMAL);
     for (const q of qs) {
       expect(q.options.length).toBeGreaterThanOrEqual(2);
       expect(q.options.some((o: any) => o.value === q.answer)).toBe(true);
@@ -46,7 +52,7 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     // warmup is t1 or t2 because they are the first without prereqs (since they are in TRACKS_BASE)
     // Actually warmup logic defaults to one of the basics. If not found, tracks[0] which is t1.
     expect(plan.aquecimento!.id).toBe("t1");
-    
+
     // fronteira should NOT be N1.05 (soma) because N1.04 (contar) is NOT practiced, so contar should be fronteira (fresh)
     expect(plan.fronteira!.id).toBe("contar");
   });
@@ -149,15 +155,22 @@ describe("Compositor da Minha Aula 📚 (E2 do Professor Mágico)", () => {
     expect(plan.resumo).toContain("soma");
   });
 
-  it("buildAulaTrack entrega trilha sintética que serve as questões NA ORDEM", () => {
-    const tracks = [...TRACKS_BASE, trk("contar", "N1.04"), trk("padroes", "AL.01")];
-    const { track } = buildAulaTrack(tracks, progOfMap({ ...M_BASE }));
+  it("buildAulaTrack serve uma Aula do Dia adaptativa em ordem e não por série", () => {
+    // IDs canônicos para que o build use exatamente estes doubles sobre o DAG completo.
+    const tracks = [trk("N1.01", "N1.01"), trk("N1.02", "N1.02"), trk("AL.01", "AL.01")];
+    const pMap = {
+      "N1.01": prog({ dom: true }),
+      "N1.02": prog({ dom: true }),
+    };
+    const { track } = buildAulaTrack(tracks, progOfMap(pMap), "pre");
     expect(track.id).toBe("aula");
-    expect(track.totalQ).toBe(getAulaTotal());
+    expect(track.name).toBe("Aula do Dia");
+    expect(track.totalQ).toBe(AULA_ADAPTIVE_MIN);
     const seen: string[] = [];
-    for (let i = 0; i < getAulaTotal(); i++) seen.push(track.gen(1).prompt);
-    expect(seen[0]).toBe("t1");
-    expect(seen.length).toBe(getAulaTotal());
+    for (let i = 0; i < track.totalQ!; i++) seen.push(track.gen(1).prompt);
+    expect(seen.length).toBe(track.totalQ);
+    // A sequência é finita e o gerador sintético volta ao início só depois de completar a missão.
+    expect(track.gen(1).prompt).toBe(seen[0]);
   });
 
   it("planAula é barato e nunca explode com listas vazias", () => {
