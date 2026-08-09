@@ -9,46 +9,25 @@ const root = path.resolve(__dirname, "..");
 const port = Number(process.env.SONDA_SENSEI_PORT || 4182);
 const baseUrl = `http://127.0.0.1:${port}`;
 const artifactDir = path.join(root, ".artifacts", "sonda-sensei-dojo");
-// Deve espelhar LEGACY_STATE_KEY em src/lib/storageIdentity.ts.
 const stateKey = "mk-state-v1";
 const viewports = [
   { name: "phone", width: 390, height: 844 },
   { name: "tablet", width: 768, height: 1024 },
 ];
+const MOTION_SETTLE_MS = 500;
 
 const progress = {
-  lvl: 3,
-  maxLvl: 3,
-  dom: false,
-  streak: 0,
-  bad: 0,
-  stars: 0,
-  ok: 3,
-  tot: 3,
-  bank: [],
-  mast: 0,
+  lvl: 3, maxLvl: 3, dom: false, streak: 0, bad: 0,
+  stars: 0, ok: 3, tot: 3, bank: [], mast: 0,
 };
 
 const fixtureState = {
-  // Deve espelhar CURRENT_SCHEMA_VERSION em src/utils/migrator.ts.
   schemaVersion: 1,
   kids: [{
-    id: "sonda-kid",
-    name: "Sonda",
-    avatar: "🦊",
-    grade: "ano1",
-    age: 6,
-    theme: "classico",
-    petName: "Kiro",
-    inventory: [],
-    petFood: 0,
-    petEnergy: 80,
+    id: "sonda-kid", name: "Sonda", avatar: "🦊", grade: "ano1", age: 6,
+    theme: "classico", petName: "Kiro", inventory: [], petFood: 0, petEnergy: 80,
   }],
-  progress: {
-    "sonda-kid": {
-      "N3.01": progress,
-    },
-  },
+  progress: { "sonda-kid": { "N3.01": progress } },
   dojoTracks: { "sonda-kid": {} },
   coins: { "sonda-kid": 0 },
   album: { "sonda-kid": [] },
@@ -68,9 +47,7 @@ function chromeExecutable() {
     chromium.executablePath(),
   ].filter(Boolean);
   const found = candidates.find(candidate => fs.existsSync(candidate));
-  if (!found) {
-    throw new Error(`Chrome/Chromium não encontrado. Candidatos: ${candidates.join(", ")}`);
-  }
+  if (!found) throw new Error(`Chrome/Chromium não encontrado. Candidatos: ${candidates.join(", ")}`);
   return found;
 }
 
@@ -79,9 +56,7 @@ async function waitForServer(server, timeoutMs = 30_000) {
   let stderr = "";
   server.stderr?.on("data", chunk => { stderr += chunk.toString(); });
   while (Date.now() - started < timeoutMs) {
-    if (server.exitCode !== null) {
-      throw new Error(`Vite encerrou antes da sonda.\n${stderr}`);
-    }
+    if (server.exitCode !== null) throw new Error(`Vite encerrou antes da sonda.\n${stderr}`);
     try {
       const response = await fetch(`${baseUrl}/?e2e=1`);
       if (response.ok) return;
@@ -115,15 +90,28 @@ async function assertNoHorizontalOverflow(page, label) {
   return metrics;
 }
 
+const isIgnorableHttpFailure = ({ url }) => {
+  try { return new URL(url).pathname === "/favicon.ico"; }
+  catch { return false; }
+};
+
 async function runViewport(browser, viewport) {
   const context = await browser.newContext({ viewport });
   const page = await context.newPage();
   const consoleErrors = [];
   const pageErrors = [];
+  const httpFailures = [];
+
   page.on("console", msg => {
-    if (msg.type() === "error") consoleErrors.push(msg.text());
+    if (msg.type() !== "error") return;
+    const location = msg.location();
+    consoleErrors.push({ text: msg.text(), url: location.url || "", line: location.lineNumber ?? null });
   });
   page.on("pageerror", error => pageErrors.push(error.message));
+  page.on("response", response => {
+    if (response.status() < 400) return;
+    httpFailures.push({ status: response.status(), url: response.url() });
+  });
 
   await seedState(page);
 
@@ -136,6 +124,7 @@ async function runViewport(browser, viewport) {
   await page.getByText(/Academia da Adição · faixa 1/).waitFor({ state: "visible" });
   await page.getByRole("button", { name: /Começar Aula do Dia|Começar Reforço Guiado/i }).waitFor({ state: "visible" });
   await page.getByText("Mistura Total (Dojô Geral)", { exact: true }).waitFor({ state: "visible" });
+  await page.waitForTimeout(MOTION_SETTLE_MS);
   const homeMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/home`);
   const homeScreenshot = path.join(artifactDir, `${viewport.name}-sensei-home.png`);
   await page.screenshot({ path: homeScreenshot, fullPage: true });
@@ -143,21 +132,22 @@ async function runViewport(browser, viewport) {
   const prescribedButton = page.getByRole("button", { name: /Fazer round prescrito/i });
   await prescribedButton.waitFor({ state: "visible" });
   await prescribedButton.click();
-
-  // O GameLoop não promete exibir `track.name`. O contrato visível do templo de
-  // adição é a equação rapid-fire; ancorar a sonda nela evita falso vermelho por
-  // texto que não faz parte da UX.
   await page.getByText(/\d+\s*\+\s*\d+\s*=\s*\?/).first().waitFor({ state: "visible", timeout: 15_000 });
+  await page.waitForTimeout(MOTION_SETTLE_MS);
   const gameMetrics = await assertNoHorizontalOverflow(page, `${viewport.name}/game`);
   const gameScreenshot = path.join(artifactDir, `${viewport.name}-dojo-prescrito.png`);
   await page.screenshot({ path: gameScreenshot, fullPage: true });
 
-  if (pageErrors.length > 0) {
-    throw new Error(`${viewport.name}: page errors: ${pageErrors.join(" | ")}`);
+  const fatalHttpFailures = httpFailures.filter(item => !isIgnorableHttpFailure(item));
+  if (pageErrors.length) throw new Error(`${viewport.name}: page errors: ${pageErrors.join(" | ")}`);
+  if (fatalHttpFailures.length) {
+    throw new Error(`${viewport.name}: HTTP failures: ${fatalHttpFailures.map(item => `${item.status} ${item.url}`).join(" | ")}`);
   }
-  const fatalConsoleErrors = consoleErrors.filter(message => !/favicon|manifest|net::ERR/i.test(message));
-  if (fatalConsoleErrors.length > 0) {
-    throw new Error(`${viewport.name}: console errors: ${fatalConsoleErrors.join(" | ")}`);
+  // O Chrome emite "Failed to load resource" sem URL no console para o mesmo
+  // 404 já classificado acima. Erros JS reais continuam fatais.
+  const fatalConsoleErrors = consoleErrors.filter(item => !/Failed to load resource/i.test(item.text));
+  if (fatalConsoleErrors.length) {
+    throw new Error(`${viewport.name}: console errors: ${fatalConsoleErrors.map(item => `${item.text}${item.url ? ` @ ${item.url}` : ""}`).join(" | ")}`);
   }
 
   await context.close();
@@ -165,6 +155,7 @@ async function runViewport(browser, viewport) {
     viewport,
     homeMetrics,
     gameMetrics,
+    httpFailures,
     screenshots: [path.basename(homeScreenshot), path.basename(gameScreenshot)],
   };
 }
@@ -183,29 +174,14 @@ let browser;
 try {
   await waitForServer(server);
   const executablePath = chromeExecutable();
-  browser = await chromium.launch({
-    executablePath,
-    headless: true,
-    args: ["--no-sandbox", "--disable-dev-shm-usage"],
-  });
-
+  browser = await chromium.launch({ executablePath, headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
   const results = [];
-  for (const viewport of viewports) {
-    results.push(await runViewport(browser, viewport));
-  }
+  for (const viewport of viewports) results.push(await runViewport(browser, viewport));
 
-  const summary = {
-    ok: true,
-    executablePath,
-    baseUrl,
-    checkedAt: new Date().toISOString(),
-    results,
-  };
+  const summary = { ok: true, executablePath, baseUrl, checkedAt: new Date().toISOString(), results };
   fs.writeFileSync(path.join(artifactDir, "summary.json"), `${JSON.stringify(summary, null, 2)}\n`);
   console.log("[SONDA SENSEI↔DOJO] OK — navegador real, card prescrito, navegação e overflow validados.");
-  for (const result of results) {
-    console.log(`- ${result.viewport.name}: ${result.screenshots.join(", ")}`);
-  }
+  for (const result of results) console.log(`- ${result.viewport.name}: ${result.screenshots.join(", ")}`);
 } catch (error) {
   const summary = {
     ok: false,
