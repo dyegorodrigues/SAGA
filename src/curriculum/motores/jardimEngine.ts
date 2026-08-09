@@ -1,6 +1,7 @@
 import type { JardimTrackState, Progress } from "../../types";
 import { normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
 import type { TrilhaDoJardim } from "../fichas/dojo/jardim";
+import { currentGardenRoundXp, type XpBearingDojoTrackState } from "../../lib/gamificationProgress";
 
 /** DOJO_SAGA §7: o Jardim trabalha em rounds curtos de 6–10 itens. */
 export const JARDIM_MIN_ITENS = 6;
@@ -147,8 +148,10 @@ export function applyJardimRound(
       ? avgCorrectRtMs
       : historicalAvg * 0.7 + avgCorrectRtMs * 0.3;
   const normalizedPracticeDay = normalizeLegacyRuntimeDay(practiceDay);
+  const oldXp = Math.max(0, (current as XpBearingDojoTrackState).xpStars ?? 0);
+  const earnedXp = currentGardenRoundXp(correctAttempts.length, total);
 
-  const state: JardimTrackState = {
+  const state = {
     ...current,
     unlocked: current.unlocked,
     mastered,
@@ -160,9 +163,10 @@ export function applyJardimRound(
     rounds: current.rounds + 1,
     attempts: current.attempts + total,
     correct: current.correct + correctAttempts.length,
+    xpStars: oldXp + earnedXp,
     ...(nextAvg === undefined ? {} : { avgCorrectRtMs: nextAvg }),
     ...(normalizedPracticeDay ? { lastDay: normalizedPracticeDay } : {}),
-  };
+  } as JardimTrackState & XpBearingDojoTrackState;
 
   const misconceptions = attempts
     .filter(a => !a.right && a.misconception)
