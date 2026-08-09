@@ -34,6 +34,30 @@ export interface ProgressionMode {
 }
 
 /**
+ * Instala o boundary de `lastDay` sem inventar uma chave serializável quando o
+ * progresso ainda nunca foi praticado. Antes da primeira escrita a propriedade
+ * existe apenas como interceptor não-enumerável; ao receber uma data válida, ela
+ * se torna enumerável e passa a sobreviver normalmente a spread/JSON/save.
+ */
+function protectLocalPracticeDay(progress: Progress): void {
+  let practiceDay = progress.lastDay;
+
+  const install = (enumerable: boolean) => {
+    Object.defineProperty(progress, "lastDay", {
+      enumerable,
+      configurable: true,
+      get: () => practiceDay,
+      set: (value: string | undefined) => {
+        practiceDay = normalizeLegacyRuntimeDay(value) ?? value;
+        if (!enumerable && practiceDay !== undefined) install(true);
+      },
+    });
+  };
+
+  install(practiceDay !== undefined);
+}
+
+/**
  * A escada conceitual tem um único escritor: `applyJourneyAnswer`.
  *
  * Há código de UI legado que ainda tenta dar bônus de velocidade com mutação
@@ -43,12 +67,11 @@ export interface ProgressionMode {
  *
  * O mesmo boundary normaliza escritas legadas de `lastDay`: se a UI entregar o
  * dia UTC do instante atual, ele vira a data LOCAL antes de persistir. Datas
- * históricas/injetadas permanecem válidas. Os descriptors são enumeráveis e
- * configuráveis: spread, JSON/save e migração continuam vendo campos normais.
+ * históricas/injetadas permanecem válidas. Campos ausentes continuam ausentes
+ * no shape serializável até sua primeira escrita real.
  */
 export function protectConceptualStreak(progress: Progress): Progress {
   const conceptualStreak = progress.streak || 0;
-  let practiceDay = progress.lastDay;
   Object.defineProperty(progress, "streak", {
     enumerable: true,
     configurable: true,
@@ -57,14 +80,7 @@ export function protectConceptualStreak(progress: Progress): Progress {
       // Intencional: RT/estrela/UI não escrevem na progressão conceitual.
     },
   });
-  Object.defineProperty(progress, "lastDay", {
-    enumerable: true,
-    configurable: true,
-    get: () => practiceDay,
-    set: (value: string | undefined) => {
-      practiceDay = normalizeLegacyRuntimeDay(value) ?? value;
-    },
-  });
+  protectLocalPracticeDay(progress);
   return progress;
 }
 
