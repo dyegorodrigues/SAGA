@@ -118,14 +118,34 @@ Commit `1098edea7757ac50e0877af7a815ec50a37791b6` atualizou somente a sentinela 
 
 O diff desse commit é restrito ao bloco de sentinelas de versão do auditor.
 
-## 6. Estado atual e trava de segurança
+## 6. Trava de segurança usada naquele momento
 
-- W1–W4: funcionalmente fechadas;
-- conteúdo A–E: reconciliado;
-- validação remota do fechamento pré-W5: **precisa ficar verde no HEAD que contém esta retificação**;
-- F19/runtime: não reabertos;
-- Creature Engine: intocado;
-- main: intocada;
-- W5: **não implementada no remoto**.
+Naquele instante histórico:
 
-**Regra de retomada:** W5 só pode começar após CI integralmente verde do HEAD exato que contém a correção do auditor + esta retificação. Depois: gerar/inspecionar a Coverage Matrix viva, ranquear candidatos pelo DAG/impacto e escolher uma única competência sem hardcode por número ou blocker.
+- W1–W4 estavam funcionalmente fechadas;
+- conteúdo A–E estava reconciliado;
+- F19/runtime não foram reabertos;
+- Creature Engine e main estavam intocados;
+- W5 foi bloqueada até CI verde do HEAD corrigido.
+
+Essa trava foi obedecida; o texto “W5 não implementada” abaixo não deve ser interpretado como estado atual depois da seção 7.
+
+## 7. Fechamento posterior comprovado — estado histórico final deste checkpoint
+
+A validação pré-W5 **foi efetivamente concluída** antes do início da W5:
+
+- HEAD de fechamento pré-W5: `2258cd23...`;
+- CI **#991 / run `31431398361` — success integral**;
+- auditorias, catálogo, conformidade, grafo, TypeScript, suíte, build, `pr:check`, higiene/binários, Sensei e F19 verdes;
+- Coverage Matrix permaneceu no baseline pré-W5: **29 Composer / 22 legado / 39 fallback / 51 servidas / 17 divergências / 12 swaps / 44 estreias**;
+- blockers naquele ponto: `Moedas` e `Regua`;
+- main e Creature Engine continuaram intocados.
+
+**Somente após esse CI verde a W5 foi selecionada e implementada.** O estado atual depois da W5 está em:
+
+- `CHECKPOINT_FABRICA_CURRICULAR_W5_GM_05_FECHADA_2026-08-10.md`;
+- `RETOMADA.md`;
+- `BRIEFING_CODEX.md`;
+- `HANDOFF_CONTINUIDADE_IA.md`.
+
+Portanto este arquivo é agora um **snapshot histórico fechado da reconciliação pré-W5**, não uma instrução para bloquear ou repetir a W5.
