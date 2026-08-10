@@ -17,6 +17,10 @@ const END_PAD_PX = 10;
  * desenha meia marca de 0,5 cm: isso evita introduzir precisão decimal que a
  * ficha ainda não está ensinando. A marca 0 fica em x=0; a marca N fica em
  * x=N*unitPx. A pequena sobra final é apenas madeira após a última marca.
+ *
+ * A moldura usa ring inset, não border. Border mudava o containing block e
+ * deslocava o tick 0 ~2px para dentro, fazendo a régua parecer alinhada sem
+ * estar geometricamente alinhada à ponta do objeto.
  */
 export function Regua({
   max,
@@ -35,7 +39,7 @@ export function Regua({
       data-regua-unit-px={unitPx}
       data-regua-end-pad={END_PAD_PX}
       data-regua-step="1"
-      className="relative h-[66px] rounded-lg border-2 border-amber-400 bg-gradient-to-b from-amber-50 to-amber-100 shadow-sm"
+      className="relative h-[66px] rounded-lg bg-gradient-to-b from-amber-50 to-amber-100 shadow-sm ring-2 ring-inset ring-amber-400"
       style={{ width }}
     >
       <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-amber-300/70" />
