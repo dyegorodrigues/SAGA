@@ -144,6 +144,24 @@ describe("Reta20Stage — F19 / N1.12", () => {
     );
   });
 
+  it("CONTA_MARCAS pertence só à tentativa em que a origem foi tocada", () => {
+    const spec = construirReta20Spec(2, () => 0.4);
+    const onAnswer = vi.fn();
+    const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} />);
+    const origem = container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.posicaoInicial}"]`)!;
+    const errada = spec.alvo - 1;
+    const destinoErrado = container.querySelector<HTMLButtonElement>(`[data-reta-tick="${errada}"]`)!;
+
+    fireEvent.click(origem);
+    fireEvent.click(destinoErrado);
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+    expect(onAnswer.mock.calls[0][1]).toEqual(expect.objectContaining({ contouMarcaInicial: true }));
+
+    fireEvent.click(destinoErrado);
+    expect(onAnswer).toHaveBeenCalledTimes(2);
+    expect(onAnswer.mock.calls[1][1]).toEqual(expect.objectContaining({ contouMarcaInicial: false }));
+  });
+
   it("salto por toque anima e bipa casa a casa antes de publicar o acerto", () => {
     vi.useFakeTimers();
     const tick = vi.spyOn(sfx, "tick").mockImplementation(() => {});
