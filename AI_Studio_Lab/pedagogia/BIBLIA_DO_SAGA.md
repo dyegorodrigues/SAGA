@@ -1,5 +1,5 @@
 # 📖 A BÍBLIA DO SAGA
-**Versão 3.5 · Agosto 2026 · Fonte única de verdade do projeto**
+**Versão 3.6 · Agosto 2026 · Fonte única de verdade do projeto**
 > *O número acima acompanha SEMPRE a última entrada do changelog no fim do arquivo. Cabeçalho e changelog divergentes = documento inválido.*
 
 > **Cláusula de supremacia.** Este documento + `GRAFO_DE_CONHECIMENTO_SAGA.md` + `MANUAL_DIDATICO_SAGA.md` + `DOJO_SAGA.md` + `grafo_saga.yaml` substituem TODOS os anteriores: `BIBLE_PEDAGOGICA_UNIFICADA.md`, `MAB_CONSTITUICAO_MESTRE.md`, `MANUAL_PEDAGOGICO_MESTRE.md`, `biblia-do-matemagica.md`, `curriculo-mestre.md`, `mapa-mestre.md`, `grafo_competencias.md`, `catalogo-atividades.md`, os 8 docs de didática soltos (`adicao.md`, `subtracao.md`, `multiplicacao.md`, `divisao.md`, `fracoes.md`, `geometria.md`, `medidas.md`, `logica-e-padroes.md` — absorvidos e costurados ao Grafo pelo Manual) e variantes espalhadas em `AI_Studio_Lab/`. Os antigos viram **arquivo histórico** (mover para `AI_Studio_Lab/arquivo_morto/`), nunca mais fonte. Nenhuma IA cria documento paralelo: se falta algo, **edita-se AQUI**.
@@ -317,15 +317,18 @@ Kind = o "molde de interação". Regra viva: **kind novo só com 2+ usos previst
 | `rapid-fire` | dojo cronometrado | todas as FD |
 | `singapore-bars` | barras de Singapura | N3.10, N5, N6.04 |
 
-### 9.2 Novos necessários (o backlog oficial, por prioridade)
-**P1 — destravam F1-F2 (construir primeiro):**
-- `numberline` — reta interativa com saltos animados. Serve 10+ competências (N1.12, N3.03-08, N6.01, N7.01-02…). **É o buraco mais grave do motor atual.**
+### 9.2 Registro histórico do backlog de kinds (não normativo para status atual)
+
+> **Snapshot histórico.** A priorização P1–P3 abaixo registra o backlog que guiou a construção das primitives. Ela não declara o estado executável vigente. `numberline` e `vertical` já existem no runtime. O status atual de primitives deve vir da auditoria executável/Coverage Matrix e do inventário `PRIMITIVAS_SAGA.md`, nunca desta lista manual.
+
+**P1 — histórico: destravavam F1-F2:**
+- `numberline` — reta interativa com saltos animados. Serve 10+ competências (N1.12, N3.03-08, N6.01, N7.01-02…). **Era, neste snapshot, o buraco mais grave do motor.**
 - `vertical` — conta armada interativa, dígito a dígito, com reagrupamento animado e vírgula (N3.11-12, N4.08-10, N4.12, N6.02).
 
-**P2 — destravam o mundo multiplicativo e frações:**
+**P2 — histórico: destravavam o mundo multiplicativo e frações:**
 - `array` (arranjo retangular giratório; N4.02-08, GM.08) · `drag-group` (arrastar para repartir/classificar; N4.05, AL.01d) · `frac-shade` (partir/pintar frações; N5.*, N6.01, N6.03) · `balance` (balança da igualdade; AL.05, AL.08, GM.01c) · `part-whole`/`fact-family` (variações do bond) · `build-number` (compor números com placas/barras/vírgula) · `trace` (traçado do numeral com guia) · `drag-match` (parear).
 
-**P3 — F3-F4 e medidas:**
+**P3 — histórico: F3-F4 e medidas:**
 - `grid` (malha/plano cartesiano) · `measure` (régua arrastável) · `clock-set` (arrastar ponteiros) · `hundred-chart` · `bar-build` · `angle` (transferidor) · `area-model` · `ratio-table` · `chip-model` (fichas ±) · `geo-transform` · `blocks-3d` · `symmetry` · `input` (**teclado numérico para resposta aberta** — a partir de F2 nem tudo pode ser múltipla escolha; distratores viram análise do valor digitado).
 
 ---
@@ -699,7 +702,11 @@ Reutilizar sempre; criar primitiva nova só quando a interação é genuinamente
 | Formas, giro, Tangram, simetria | GE.* | **ShapeCanvas** |
 | Tally, pictograma, barras de dados | PE.01, PE.02 | SingaporeBars (modo vertical) |
 
-**A tabela acima é mapa semântico, não declaração de que a implementação está pronta.** O estado real vem da auditoria/Coverage Matrix. No CI #812, a dívida bloqueadora/incompleta conhecida inclui **`LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100` e `Regua`**; `Moedas` bloqueia GM.03 e `Regua` bloqueia GM.05. Não inferir completude de Balança/Relógio/ShapeCanvas nem de qualquer outra primitiva apenas por aparecer nesta tabela: a **Coverage Matrix** é a próxima fonte executável que reconciliará grafo → ficha → primitiva → runtime → teste.
+**A tabela acima é mapa semântico, não declaração de que a implementação está pronta.** O estado real vem da auditoria executável/Coverage Matrix.
+
+> **Snapshot histórico — CI #812.** Naquele CI, a dívida bloqueadora/incompleta conhecida incluía **`LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100` e `Regua`**; `Moedas` bloqueava GM.03 e `Regua` bloqueava GM.05. Este snapshot é preservado como registro histórico e não deve ser reescrito para imitar o runtime atual.
+
+A **Coverage Matrix já é executável**. O estado vigente evolui a partir do snapshot imutável P21.1 por migrações explícitas em `COVERAGE_MIGRATIONS`; W1–W4 já foram reconciliadas pelo ledger. Portanto o status atual de primitive/runtime deve ser lido da projeção viva + auditoria executável + ledger, nunca inferido desta tabela nem do CI #812.
 
 ### 12.7 Testes de contrato (obrigatório antes de massificar)
 Com 90 competências × 5 níveis, inspeção manual não escala. Uma suíte automática varre **todos** e falha se: a resposta não aparece exatamente 1× nas `options` (kinds de seleção); houver opções duplicadas; algum valor sair dos `params` do micro; faltar `howto`, `explain` ou `audioPrompt`; alguma tag não vier do registro `MisconceptionTag`; o `kind` não existir no catálogo §9; o `prompt` passar de 12 palavras em F0-F1; aparecer negativo antes de N7; ou o gerador devolver o mesmo `kind` nos 5 níveis. Um gerador que não passa não entra no `GENERATOR_MAP`.
@@ -1121,3 +1128,7 @@ Reconciliação canônica pós-P22, sem alterar topologia do grafo: §5 remove a
 ### v3.5 — learner state, Nível SAGA e companheiro deixam de compartilhar significado
 
 Reconciliação canônica pós-fechamento de Gamificação/Economia/Meta-jogo. §3 separa formalmente **progressão do aprendiz** (única autoridade de mastery/unlock), **progressão do perfil/jogador** (Nível SAGA 1–100 por XP vitalício) e **progressão do companheiro** (fantasia/vínculo sem autoridade curricular); XP deixa de ser descrito como moeda e velocidade não multiplica meta-progressão. §3.1 elimina a contradição de navegação e fixa as cinco abas com Sensei como entrada. §5 e §12.2-bis registram a terceira escala, não pedagógica, para impedir confusão entre nível curricular 1–5, faixa do Dojo 1–10 e Nível SAGA 1–100. §10.12 torna o contrato de mascote **renderer-agnostic** (SVG, sprite/atlas pixel art ou backend futuro atrás de ações semânticas). §12.6 substitui o antigo “faltam quatro primitivas” pelo baseline auditado no CI #812 e remete a verdade de cobertura à Coverage Matrix. §13.2 fica explicitamente histórico e a fila vigente passa a `Coverage Matrix → fábrica curricular → mega auditoria integrada → hardening/performance → release`. A visão futura de NPC/widget/animais lutadores/beat ’em up/Thinking Lab fica registrada sem autorizar Creature Engine nesta fila.
+
+### v3.6 — reconciliação documental pré-W5
+
+§9.2 passa a identificar explicitamente P1–P3 como **snapshot histórico**, retirando `numberline` e `vertical` da condição de backlog futuro vigente. §12.6 mantém CI #812 como fotografia histórica e registra o mecanismo vigente: Coverage Matrix executável, snapshot P21.1 imutável e evolução por `COVERAGE_MIGRATIONS`, com W1–W4 reconciliadas pelo ledger. Nenhum runtime funcional foi alterado.
