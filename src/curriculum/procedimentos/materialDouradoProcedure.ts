@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag, MisconceptionTagType } from "../../constants/misconceptions";
 import type { MaterialDouradoSpec } from "./materialDouradoContract";
 
@@ -67,7 +68,7 @@ export function evidenciasMaterialDourado(
     && acao.dezenasProduzidas === spec.dezenas
     && acao.unidadesProduzidas === spec.unidades
     && !acao.contouUmAUm) {
-    evidencias.push("montou-do-numeral");
+    evidencias.push(Evidencia.MONTOU_DO_NUMERAL);
   }
 
   if (acao.modo === "decompor"
