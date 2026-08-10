@@ -2,10 +2,11 @@ import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
 
 /**
- * F21 — A dezena: dez unidades viram uma unidade nova.
+ * F21 — A dezena.
  *
- * A competência não é "ler dois algarismos". É construir a unidade composta e
- * conseguir ir nos dois sentidos: material → numeral e numeral → material.
+ * Dez unidades podem ser agrupadas e tratadas como UMA unidade de ordem
+ * superior. A criança precisa fazer a troca; ver a barra pronta não instala o
+ * conceito. O nível 4 inverte a direção e é a evidência bidirecional exigida.
  */
 export const N2_01: FichaCompetencia = {
   id: "N2.01",
@@ -15,98 +16,90 @@ export const N2_01: FichaCompetencia = {
   prereqs: ["N1.09", "N1.11"],
   bncc: "EF01MA04",
 
-  howto: "Uma barra vale dez cubinhos. Conte as barras de dez em dez e depois junte as unidades soltas.",
-  explain: "Dez unidades podem ser organizadas como uma dezena. A quantidade não muda: muda a unidade que usamos para contar.",
-  // Os erros F21 dependem do gesto/contexto; o palco emite a ação ao Radar.
+  howto: "Cada dez cubinhos viram uma barra. A barra vale dez.",
+  explain: "Conte quantas barras você tem e quantos cubinhos sobraram.",
+  // Os três erros F21 dependem do gesto/contexto; o palco emite a ação ao Radar.
   distratores: [],
 
   niveis: {
-    1: { primitiva: "tens", micro: "troca_10_por_1", andaime: "mao_fantasma" },
-    2: { primitiva: "tens", micro: "ler_ate_59", andaime: "alto" },
-    3: { primitiva: "tens", micro: "ler_ate_99", andaime: "medio" },
-    4: { primitiva: "tens", micro: "produzir_material", andaime: "minimo" },
-    // Relógio silencioso: telemetria/automaticidade; nunca concede mastery.
-    5: { primitiva: "tens", micro: "misto", andaime: "nenhum", rt_alvo: 10000 },
+    1: { primitiva: "tens", micro: "agrupar_ate_19", andaime: "mao_fantasma" },
+    2: { primitiva: "tens", micro: "agrupar_ate_39", andaime: "alto" },
+    3: { primitiva: "tens", micro: "agrupar_sem_moldura", andaime: "nenhum" },
+    4: { primitiva: "tens", micro: "montar_do_numeral", andaime: "minimo" },
+    // RT silencioso: observabilidade/fluência; nunca concede mastery.
+    5: { primitiva: "tens", micro: "decompor_mentalmente", andaime: "nenhum", rt_alvo: 10000 },
   },
 
   micros: [
     {
-      id: "troca_10_por_1",
+      id: "agrupar_ate_19",
       fonte: "F21",
-      alvo: "agrupar dez unidades e reconhecer a dezena como unidade composta",
+      alvo: "agrupar manualmente até 19 e viver a troca de dez unidades por uma dezena",
       kinds: ["tens"],
       params: {
         tutorial: [
-          { fala: "Aqui temos dez cubinhos: dez unidades.", show: { destacarUnidades: true } },
-          { fala: "Junte os dez. Quando fecham dez, eles podem virar uma barra.", show: { destacarAlvoTroca: true } },
-          { fala: "Depois da troca, uma barra vale dez unidades.", show: { pulsarEquivalencia: true } },
+          { fala: "Vamos juntar de dez em dez.", show: { pulsarMoldura: true } },
+          { fala: "Um, dois, três...", show: { preencherAte: 10 } },
+          { fala: "Dez! Viraram uma barra!", show: { fundirEmBarra: true } },
+          { fala: "Isso é uma dezena.", show: { destacarBarra: true } },
         ],
       },
-      dominio: {
-        acertos: 9,
-        de: 10,
-        sessoes: 2,
-        exige: { evidencia: "troca-10-por-1", descricao: "fazer ao menos uma troca real de dez unidades por uma dezena" },
-      },
+      dominio: { acertos: 3, de: 3, sessoes: 2 },
     },
     {
-      id: "ler_ate_59",
+      id: "agrupar_ate_39",
       fonte: "F21",
-      alvo: "ler dezenas e unidades até 59 usando a barra como unidade de dez",
+      alvo: "repetir ciclos manuais de agrupamento de dez em dez até 39",
       kinds: ["tens"],
       params: {},
-      dominio: { acertos: 9, de: 10, sessoes: 2 },
+      dominio: { acertos: 3, de: 3, sessoes: 2 },
     },
     {
-      id: "ler_ate_99",
+      id: "agrupar_sem_moldura",
       fonte: "F21",
-      alvo: "ler qualquer quantidade de 10 a 99 em dezenas e unidades",
+      alvo: "agrupar quantidades até 99 sem a moldura de apoio",
       kinds: ["tens"],
       params: {},
-      dominio: { acertos: 9, de: 10, sessoes: 2 },
+      dominio: { acertos: 3, de: 3, sessoes: 2 },
     },
     {
-      id: "produzir_material",
+      id: "montar_do_numeral",
       fonte: "F21",
-      alvo: "produzir dezenas e unidades a partir de um numeral",
+      alvo: "receber o numeral e montar corretamente suas dezenas e unidades",
       kinds: ["tens"],
       params: {},
       dominio: {
-        acertos: 4,
-        de: 5,
+        acertos: 3,
+        de: 3,
         sessoes: 2,
         exige: {
-          evidencia: "producao-sem-contar-subdivisoes",
-          descricao: "produzir o material tratando cada barra como uma dezena, sem recontar seus dez quadradinhos",
+          evidencia: "montou-do-numeral",
+          descricao: "montar corretamente o material a partir do numeral, provando compreensão bidirecional",
         },
       },
     },
     {
-      id: "misto",
+      id: "decompor_mentalmente",
       fonte: "F21",
-      alvo: "alternar leitura e produção sem pista sobre qual transformação vem",
+      alvo: "decompor mentalmente um numeral em dezenas e unidades sem material",
       kinds: ["tens"],
       params: {},
-      dominio: { acertos: 9, de: 10, sessoes: 2 },
+      dominio: { acertos: 3, de: 3, sessoes: 2 },
     },
   ],
 
   erros_tipicos: [
     {
-      id: MisconceptionTag.IGNORA_DEZENA,
-      descricao: "Responde apenas pelas unidades soltas e trata a barra como se não valesse dez.",
+      id: MisconceptionTag.IGNORA_VALOR,
+      descricao: "Conta barras e cubinhos como se valessem a mesma coisa; não reconhece que a barra vale dez.",
     },
     {
-      id: MisconceptionTag.CONCATENA,
-      descricao: "Concatena a dezena já expandida com a unidade, por exemplo 3 dezenas e 4 unidades → 304.",
+      id: MisconceptionTag.INVERTE_ORDENS,
+      descricao: "Inverte dezenas e unidades; por exemplo, lê ou monta 23 como 32.",
     },
     {
-      id: MisconceptionTag.CONTA_TUDO,
-      descricao: "Abre as barras e conta todos os quadradinhos em vez de usar cada barra como uma unidade de dez.",
-    },
-    {
-      id: MisconceptionTag.TROCA_DU,
-      descricao: "Na produção, coloca o algarismo das dezenas nas unidades e o das unidades nas dezenas.",
+      id: MisconceptionTag.NAO_AGRUPA,
+      descricao: "Continua contando um a um e não usa a dezena como unidade composta.",
     },
   ],
 };
