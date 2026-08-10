@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { MisconceptionTag } from "../../../constants/misconceptions";
 import { JOURNEY_FICHAS } from "../index";
 import { ALL_MATH_TRACKS } from "../../motores/curriculum";
 
@@ -68,11 +69,33 @@ describe("N1.05 / F06 — comparação de quantidades", () => {
     }
   });
 
-  it("preserva onboarding autoral sem transformar tempo em critério de domínio", () => {
+  it("o specialized builder não perde tutorial, domínio nem o RT silencioso", () => {
     const ficha = fichaN105();
-    const primeiroMicro = ficha.micros.find(micro => micro.id === "diferenca_obvia");
-    expect(primeiroMicro?.params?.tutorial).toHaveLength(4);
-    expect(JSON.stringify(primeiroMicro?.params?.tutorial)).not.toMatch(/sobrou\s+\d/i);
-    expect(Object.values(ficha.niveis ?? {}).every(nivel => nivel.rt_alvo == null)).toBe(true);
+    const track = trackN105();
+    const q1 = track.gen(1);
+    const q5 = track.gen(5);
+
+    expect(q1.tutorial).toHaveLength(3);
+    expect(q1.tutorial?.[1]?.show).toEqual({ parear: 0 });
+    expect(q1.tutorial?.[2]?.show).toEqual({ pulsarGrupos: true });
+    expect(JSON.stringify(q1.tutorial)).not.toMatch(/destacarSobra|sobrou\s+\d/i);
+
+    expect(q1.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+    expect(q5.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+
+    expect(ficha.niveis?.[5]?.rt_alvo).toBe(8000);
+    expect(q5.rt_max_s).toBe(8);
+    expect(q1.rt_max_s).toBeUndefined();
+  });
+
+  it("emite as tags canônicas da F06, nunca strings privadas do builder", () => {
+    const track = trackN105();
+    const q4 = track.gen(4);
+    const q5 = track.gen(5);
+    const errada4 = q4.options?.find(option => option.value !== q4.answer);
+    const errada5 = q5.options?.find(option => option.value !== q5.answer);
+
+    expect(errada4?.misconception).toBe(MisconceptionTag.CONFUNDE_TAMANHO_QUANTIDADE);
+    expect(errada5?.misconception).toBe(MisconceptionTag.CONSERVACAO_ESPACO);
   });
 });
