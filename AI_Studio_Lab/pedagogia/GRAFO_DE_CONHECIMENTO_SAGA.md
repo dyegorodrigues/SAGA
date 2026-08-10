@@ -292,8 +292,13 @@ o alvo visível não prova cardinalidade produtiva.
 
 ### N1.12 — Reta numérica até 20
 **Objetivo:** usar a reta como modelo mental: números têm posição, distância e vizinhança.
-**Pré-req:** N1.07, N1.09. **Kinds:** numberline* (PRIORIDADE 1 de kind novo — hoje a "reta" é texto), order, plain.
-**Micros:** a) localizar um número na reta 0–10 · b) 0–20 · c) vizinhos e "entre" (que número mora entre 6 e 8?) · d) saltos de +1/−1 e +2/−2 na reta (animação de pulo)
+**Pré-req:** N1.07, N1.09. **Kinds:** numberline (existente), order, plain.
+**Micros:**
+- L1: localizar 0–10;
+- L2: saltar para frente em 0–10, magnitude 1–3;
+- L3: saltar para trás em 0–10, magnitude 1–3;
+- L4: localizar 0–20 com numerais parciais;
+- L5: saltos variáveis bidirecionais em 0–20, magnitude 1–4.
 **Erros típicos:** contar o ponto de partida como primeiro salto (o erro nº 1 da reta: 5+3 caindo no 7); ignorar o espaçamento (achar que 19 fica "perto do meio").
 
 ### N2.01 — Dezena e unidades
