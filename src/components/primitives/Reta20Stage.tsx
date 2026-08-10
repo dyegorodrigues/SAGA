@@ -83,6 +83,10 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
     manipulacao: EventoManipulacao,
   ) {
     const acao = construirAcao(escolhido, gesto);
+    // `contouMarcaInicial` pertence à tentativa que acabou de ser capturada.
+    // Retry autoral mantém a mesma questão montada, então o bit precisa zerar
+    // aqui — nunca pode contaminar a tentativa seguinte.
+    setContouMarcaInicial(false);
 
     if (escolhido === spec.alvo) {
       setPosicao(escolhido);
@@ -113,6 +117,7 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
     }
 
     const acao = construirAcao(spec.alvo, "toque");
+    setContouMarcaInicial(false);
     animandoRef.current = true;
     setAnimando(true);
     setPercurso(null);
