@@ -1,4 +1,5 @@
 import React from "react";
+import { sfx } from "../Mascot";
 import { InteractiveNumberLineSurface } from "./InteractiveNumberLine";
 import { PalcoEscalado } from "./PalcoEscalado";
 import { Reta20Spec } from "../../curriculum/procedimentos/reta20Contract";
@@ -24,6 +25,12 @@ interface Props {
   disabled?: boolean;
   falar?: (texto: string) => void;
   mostrar?: MostrarReta20 | null;
+}
+
+function falaDeChegada(spec: Reta20Spec, escolhido: number): string {
+  if (spec.modo !== "saltar") return String(escolhido);
+  const percurso = numerosNoPercurso(spec.posicaoInicial, escolhido);
+  return `${percurso.join(", ")}. Chegou no ${escolhido}.`;
 }
 
 /**
@@ -74,20 +81,15 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
     escolhido: number,
     gesto: "arrasto" | "toque",
     manipulacao: EventoManipulacao,
-    audioDoPercursoJaAconteceu = false,
   ) {
     const acao = construirAcao(escolhido, gesto);
 
     if (escolhido === spec.alvo) {
       setPosicao(escolhido);
       setPercurso({ de: spec.posicaoInicial, ate: escolhido });
-      if (!audioDoPercursoJaAconteceu) {
-        if (spec.modo === "saltar") {
-          numerosNoPercurso(spec.posicaoInicial, escolhido).forEach(numero => falar?.(String(numero)));
-        } else {
-          falar?.(String(escolhido));
-        }
-      }
+      // Uma única frase evita que o fallback TTS global cancele a própria
+      // contagem. Os bipes de cada casa já aconteceram no gesto.
+      falar?.(falaDeChegada(spec, escolhido));
     } else {
       // F19 §4: erro matemático volta à partida. Um gesto motor abortado/fora da
       // reta também retorna à origem, mas não recebe shake nem mensagem conceitual.
@@ -119,10 +121,13 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
       const timer = window.setTimeout(() => {
         setPosicao(numero);
         setPercurso({ de: spec.posicaoInicial, ate: numero });
-        // F19 §4: som e movimento são a MESMA representação, no mesmo instante.
-        falar?.(String(numero));
+        // F19 §4: o som curto acontece exatamente quando uma nova casa é pisada.
+        // A frase de chegada conta o percurso inteiro uma única vez, sem TTS se
+        // autocancelando entre números.
+        sfx.tick();
 
         if (index === passos.length - 1) {
+          falar?.(falaDeChegada(spec, spec.alvo));
           animandoRef.current = false;
           setAnimando(false);
           onAnswer?.(spec.alvo, acao, manipulacao);
@@ -149,10 +154,10 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
     publicarImediato(valor, "toque", manipulacao);
   }
 
-  function atravessarTickNoArrasto(valor: number) {
+  function atravessarTickNoArrasto(_valor: number) {
     if (travado || animandoRef.current) return;
-    // O áudio nasce do deslocamento observado, não do endpoint final.
-    falar?.(String(valor));
+    // O bip nasce do deslocamento observado, no mesmo instante da casa cruzada.
+    sfx.tick();
   }
 
   function soltarArrasto(clientX: number, rect: DOMRect) {
@@ -165,7 +170,7 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
     const escolhido = resolvido.manipulacao.foraDeAlvoValido
       ? spec.posicaoInicial
       : resolvido.escolhido;
-    publicarImediato(escolhido, "arrasto", resolvido.manipulacao, true);
+    publicarImediato(escolhido, "arrasto", resolvido.manipulacao);
   }
 
   const alvoTutorial = typeof mostrar?.pulsarAlvo === "number" ? mostrar.pulsarAlvo : spec.alvo;
