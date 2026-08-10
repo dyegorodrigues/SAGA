@@ -10,6 +10,11 @@ const RESPIRO = 6;
 const LIMIAR_DE_ARRASTO_PX = 6;
 export const DESCIDA_DA_ESCALA = BASE_DO_SAPO + RESPIRO;
 
+export interface TapRetaGeometry {
+  clientX: number;
+  rect: DOMRect;
+}
+
 export interface InteractiveNumberLineSurfaceProps {
   start: number;
   end: number;
@@ -28,7 +33,11 @@ export interface InteractiveNumberLineSurfaceProps {
   assistPathFrom?: number | null;
   assistPathTo?: number | null;
   errorPulse?: number;
-  onTapTick?: (value: number) => void;
+  /**
+   * Tap físico vem pela superfície e inclui geometria para o filtro motor.
+   * Ativação por teclado/screen reader vem pelo botão sem geometria.
+   */
+  onTapTick?: (value: number, geometry?: TapRetaGeometry) => void;
   /** Emite cada marca realmente atravessada, inclusive quando o pointer salta pixels. */
   onDragTick?: (value: number) => void;
   onDragRelease?: (clientX: number, rect: DOMRect) => void;
@@ -109,7 +118,7 @@ export function InteractiveNumberLineSurface({
     dragStartXRef.current = e.clientX;
     dragMovedRef.current = false;
     lastDragTickRef.current = position;
-    // Não capturamos ainda: um toque curto sobre o hitbox continua sendo click.
+    // Não capturamos ainda: um toque curto continua elegível para o click da superfície.
   }
 
   function pointerMove(e: React.PointerEvent<HTMLDivElement>) {
@@ -136,7 +145,7 @@ export function InteractiveNumberLineSurface({
     try { lineRef.current?.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
 
     if (moved && geometry) {
-      // Alguns browsers ainda disparam click no botão onde o drag começou.
+      // Alguns browsers ainda disparam click no ponto onde o drag terminou.
       suppressClickUntilRef.current = Date.now() + 250;
       onDragRelease?.(e.clientX, geometry.rect);
     }
@@ -150,6 +159,14 @@ export function InteractiveNumberLineSurface({
     setDragPct(null);
     try { lineRef.current?.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
     // Cancelamento não representa uma decisão matemática; nada é publicado.
+  }
+
+  function surfaceClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (gestureDisabled || !onTapTick) return;
+    if (Date.now() < suppressClickUntilRef.current) return;
+    const geometry = geometryAt(e.clientX);
+    if (!geometry) return;
+    onTapTick(geometry.value, { clientX: e.clientX, rect: geometry.rect });
   }
 
   const currentPct = dragPct !== null ? dragPct : pctFor(position);
@@ -178,6 +195,7 @@ export function InteractiveNumberLineSurface({
         onPointerMove={pointerMove}
         onPointerUp={pointerUp}
         onPointerCancel={pointerCancel}
+        onClick={surfaceClick}
         data-reta-surface
       >
         <div
@@ -228,12 +246,20 @@ export function InteractiveNumberLineSurface({
                 aria-label={`posição ${value}`}
                 disabled={gestureDisabled || !onTapTick}
                 onClick={event => {
+                  // Este caminho é para teclado/tecnologia assistiva. Pointer físico
+                  // atravessa o botão e é resolvido pelo plano da reta acima.
                   event.stopPropagation();
-                  if (Date.now() < suppressClickUntilRef.current) return;
                   onTapTick?.(value);
                 }}
                 className="absolute z-20 rounded-full bg-transparent p-0 disabled:cursor-default"
-                style={{ left: `${pct}%`, top: '50%', width: 48, height: 64, transform: 'translate(-50%, -50%)' }}
+                style={{
+                  left: `${pct}%`,
+                  top: '50%',
+                  width: 48,
+                  height: 64,
+                  transform: 'translate(-50%, -50%)',
+                  pointerEvents: 'none',
+                }}
               />
               <div
                 aria-hidden
