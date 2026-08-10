@@ -5,7 +5,7 @@
 **Natureza:** retificação canônica de precisão pedagógica, geometria e QA visual.  
 **Não cria nova ficha autoral:** o catálogo permanece 90 competências / 94 fichas autorais.
 
-> Para F61/GM.05, este documento prevalece sobre frases históricas conflitantes em `FICHAS_F2_COMPLETAS.md` até a próxima consolidação editorial integral do bloco F2. Runtime, DAG e ficha runtime são as fontes executáveis; divergência exige correção, não adaptação silenciosa do gate.
+> Para F61/GM.05, este documento é o **cânone normativo vigente** e prevalece sobre frases históricas conflitantes em `FICHAS_F2_COMPLETAS.md`. O texto antigo permanece apenas como proveniência histórica; não define pré-requisito, unidade informal, escala ou comportamento atual. Runtime, DAG e ficha runtime são as fontes executáveis; divergência exige correção, não adaptação silenciosa do gate.
 
 ## 1. Pré-requisitos vigentes
 
