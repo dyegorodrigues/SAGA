@@ -14,6 +14,7 @@ import { N1_08 } from './jornada/N1.08';
 import { N1_09 } from './jornada/N1.09';
 import { N1_10 } from './jornada/N1.10';
 import { N1_11 } from './jornada/N1.11';
+import { N1_12 } from './jornada/N1.12';
 import { N1_13 } from './jornada/N1.13';
 import { N2_01 } from './jornada/N2.01';
 import { N3_09 } from './jornada/N3.09';
@@ -38,7 +39,7 @@ import { GM_12 } from './jornada/GM.12';
 import { JARDIM_FICHAS } from './dojo/jardim';
 
 export const JOURNEY_FICHAS = [
-  N1_01, N1_02, N1_03, N1_04, N1_05, N1_06, N1_07, N1_08, N1_09, N1_10, N1_11, N1_13,
+  N1_01, N1_02, N1_03, N1_04, N1_05, N1_06, N1_07, N1_08, N1_09, N1_10, N1_11, N1_12, N1_13,
   N2_01,
   N3_09, N3_10, N3_11,
   N4_02, N4_03, N4_04, N4_06, N4_07, N4_08, N4_09,
