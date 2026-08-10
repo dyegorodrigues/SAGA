@@ -55,3 +55,24 @@
 div:has(> .mk-optin > span.absolute.top-1.right-1\.5) + div.text-center.mt-2 {
   color: #475569 !important;
 }
+
+/*
+ * W4 / F19 — reta 0–20 em phone.
+ *
+ * A superfície já resolve o tap físico por coordenada + snap, portanto os
+ * botões transparentes dos ticks são a camada semântica/teclado, não o alvo
+ * motor. Em 320px, manter os 2rem de padding do wrapper comprimía 21 marcas e
+ * fazia rótulos de dois dígitos colidirem. Recuperamos 3.5rem da largura útil
+ * apenas no phone e reduzimos os botões semânticos para 32px (ainda > WCAG
+ * Target Size mínimo de 24px). A partir de 640px, o layout original permanece.
+ */
+@media (max-width: 639px) {
+  [data-reta-surface] {
+    width: calc(100% + 3.5rem);
+    margin-inline: -1.75rem;
+  }
+
+  [data-reta-tick] {
+    width: 2rem !important;
+  }
+}
