@@ -26,8 +26,8 @@ function alternativas(dezenas: number, unidades: number): number[] {
   const correta = dezenas * 10 + unidades;
   const candidatas = [
     correta,
-    unidades, // IGNORA_DEZENA
-    dezenas * 100 + unidades, // CONCATENA: 3 dezenas + 4 unidades → 304
+    unidades,
+    dezenas * 100 + unidades,
     correta - 1,
     correta + 1,
   ].filter(valor => valor >= 0);
@@ -97,7 +97,10 @@ function microDoNivel(ficha: FichaCompetencia, nivel: number): FichaMicro {
   return micro;
 }
 
-/** Specialized builder: F21 é transformação/manipulação, não `tens` estático. */
+/**
+ * Specialized builder: F21 é transformação/manipulação, não o `tens` estático
+ * antigo. O kind próprio mantém a conformidade capaz de distinguir os dois.
+ */
 export function construirDezenaUnidadesQuestion(
   ficha: FichaCompetencia,
   level: number,
@@ -108,7 +111,7 @@ export function construirDezenaUnidadesQuestion(
   const rtAlvoMs = ficha.niveis?.[spec.nivel]?.rt_alvo;
 
   return {
-    kind: "tens",
+    kind: "material-dourado",
     prompt: spec.enunciado,
     audioPrompt: spec.falado,
     howto: ficha.howto,
@@ -124,8 +127,6 @@ export function construirDezenaUnidadesQuestion(
     uiProps: spec,
     answer: spec.resposta,
     evaluate: answer => Number(answer) === spec.resposta,
-    // O palco autoral responde. Duplicar `options` aqui faria a tela ter dois
-    // boundaries concorrentes e perderia a ação que o diagnóstico precisa.
     options: undefined,
   };
 }
