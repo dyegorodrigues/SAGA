@@ -33,9 +33,11 @@ export interface DestinoResolvidoReta20 {
 /**
  * Resolve geometria ANTES de qualquer julgamento matemático.
  *
- * O drag pode terminar alguns pixels fora da linha sem virar erro conceitual.
- * Depois de resolvido um tick inequívoco, o endpoint passa a ser decisão
- * matemática e ±1 continua elegível para OFF_BY_ONE.
+ * Há duas folgas diferentes de propósito:
+ * - margem externa: tolera o dedo escapar um pouco além da ponta da reta;
+ * - raio de snap conceitual: protege imprecisão perto do alvo certo sem engolir
+ *   o centro da marca vizinha. Assim OFF_BY_ONE continua observável em telas
+ *   estreitas e "dedo torto" continua sendo motor, não matemática.
  */
 export function resolverSolturaReta(
   soltura: SolturaReta20,
@@ -45,8 +47,9 @@ export function resolverSolturaReta(
   const passos = Math.max(1, spec.fim - spec.inicio);
   const passoPx = width / passos;
   const right = soltura.left + width;
-  const margem = Math.max(24, passoPx * 0.65);
-  const fora = soltura.x < soltura.left - margem || soltura.x > right + margem;
+  const margemExterna = Math.max(24, passoPx * 0.65);
+  const raioDeSnap = Math.max(8, Math.min(24, passoPx * 0.55));
+  const fora = soltura.x < soltura.left - margemExterna || soltura.x > right + margemExterna;
   const xClamped = Math.min(right, Math.max(soltura.left, soltura.x));
   const indice = Math.round((xClamped - soltura.left) / passoPx);
   const escolhido = Math.max(spec.inicio, Math.min(spec.fim, spec.inicio + indice));
@@ -56,7 +59,7 @@ export function resolverSolturaReta(
     escolhido,
     manipulacao: {
       distanciaDoAlvoCorreto: Math.abs(soltura.x - xAlvo),
-      raioDeSnap: margem,
+      raioDeSnap,
       foraDeAlvoValido: fora,
     },
   };
