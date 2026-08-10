@@ -6,12 +6,14 @@ import { ModoMaterialDourado } from "./materialDouradoProcedure";
 export interface MaterialDouradoSpec {
   nivel: number;
   modo: ModoMaterialDourado;
+  /** Quantidade total representada/produzida. */
+  total: number;
   dezenas: number;
   unidades: number;
   resposta: number;
   alvoNumeral: number;
-  /** L1: antes de responder, dez cubinhos precisam virar uma barra. */
-  exigeTroca: boolean;
+  /** L1/L2: a moldura de dez organiza cada ciclo de troca. L3 retira o apoio. */
+  usarMoldura: boolean;
   equivalencia: "10 unidades = 1 dezena";
   alternativas: number[];
   enunciado: string;
@@ -19,18 +21,20 @@ export interface MaterialDouradoSpec {
 }
 
 function inteiro(min: number, max: number, sorteio: () => number): number {
-  return min + Math.floor(sorteio() * (max - min + 1));
+  const raw = sorteio();
+  const bounded = Number.isFinite(raw) ? Math.max(0, Math.min(0.999999999, raw)) : 0;
+  return min + Math.floor(bounded * (max - min + 1));
 }
 
-function alternativas(dezenas: number, unidades: number): number[] {
-  const correta = dezenas * 10 + unidades;
+function construirAlternativas(total: number, dezenas: number, unidades: number): number[] {
+  const invertido = unidades * 10 + dezenas;
   const candidatas = [
-    correta,
-    unidades,
-    dezenas * 100 + unidades,
-    correta - 1,
-    correta + 1,
-  ].filter(valor => valor >= 0);
+    total,
+    dezenas + unidades,
+    invertido,
+    total - 1,
+    total + 1,
+  ].filter(valor => valor >= 0 && valor <= 99);
   return [...new Set(candidatas)].slice(0, 4);
 }
 
@@ -39,54 +43,65 @@ export function construirMaterialDouradoSpec(
   sorteio: () => number = Math.random,
 ): MaterialDouradoSpec {
   const clamped = Math.max(1, Math.min(5, Math.round(nivel)));
-  let modo: ModoMaterialDourado;
-  let dezenas: number;
-  let unidades: number;
 
-  if (clamped === 1) {
-    modo = "ler";
-    dezenas = 1;
-    unidades = inteiro(1, 9, sorteio);
-  } else if (clamped === 2) {
-    modo = "ler";
-    dezenas = inteiro(2, 5, sorteio);
-    unidades = inteiro(0, 9, sorteio);
-  } else if (clamped === 3) {
-    modo = "ler";
-    dezenas = inteiro(1, 9, sorteio);
-    unidades = inteiro(0, 9, sorteio);
-  } else if (clamped === 4) {
-    modo = "produzir";
-    dezenas = inteiro(1, 9, sorteio);
-    unidades = inteiro(0, 9, sorteio);
-  } else {
-    modo = sorteio() < 0.5 ? "ler" : "produzir";
-    dezenas = inteiro(1, 9, sorteio);
-    unidades = inteiro(0, 9, sorteio);
+  let modo: ModoMaterialDourado;
+  let total: number;
+  let usarMoldura = false;
+
+  switch (clamped) {
+    case 1:
+      modo = "agrupar";
+      total = inteiro(10, 19, sorteio);
+      usarMoldura = true;
+      break;
+    case 2:
+      modo = "agrupar";
+      total = inteiro(20, 39, sorteio);
+      usarMoldura = true;
+      break;
+    case 3:
+      modo = "agrupar";
+      total = inteiro(10, 99, sorteio);
+      usarMoldura = false;
+      break;
+    case 4:
+      modo = "montar";
+      total = inteiro(10, 99, sorteio);
+      break;
+    default:
+      modo = "decompor";
+      total = inteiro(10, 99, sorteio);
+      break;
   }
 
-  const resposta = dezenas * 10 + unidades;
-  const exigeTroca = clamped === 1;
+  const dezenas = Math.floor(total / 10);
+  const unidades = total % 10;
+
+  const enunciado = modo === "agrupar"
+    ? "Junte os cubinhos de dez em dez!"
+    : modo === "montar"
+      ? `Monte o número ${total} com dezenas e unidades.`
+      : `${total} = quantas dezenas e quantas unidades?`;
+
+  const falado = modo === "agrupar"
+    ? "Junte os cubinhos de dez em dez!"
+    : modo === "montar"
+      ? `Monte o número ${total} com barras de dezena e cubinhos de unidade.`
+      : `Decomponha ${total} em dezenas e unidades.`;
+
   return {
     nivel: clamped,
     modo,
+    total,
     dezenas,
     unidades,
-    resposta,
-    alvoNumeral: resposta,
-    exigeTroca,
+    resposta: total,
+    alvoNumeral: total,
+    usarMoldura,
     equivalencia: "10 unidades = 1 dezena",
-    alternativas: alternativas(dezenas, unidades),
-    enunciado: modo === "produzir"
-      ? `Monte o número ${resposta} com dezenas e unidades.`
-      : exigeTroca
-        ? "Junte dez cubinhos para formar uma dezena. Depois descubra o número."
-        : `Tenho ${dezenas} ${dezenas === 1 ? "dezena" : "dezenas"} e ${unidades} ${unidades === 1 ? "unidade" : "unidades"}. Que número é?`,
-    falado: modo === "produzir"
-      ? `Monte o número ${resposta} com barras de dezena e cubinhos de unidade.`
-      : exigeTroca
-        ? "Junte dez unidades. Quando completar dez, elas viram uma dezena. Depois descubra o número."
-        : `Tenho ${dezenas} ${dezenas === 1 ? "dezena" : "dezenas"} e ${unidades} ${unidades === 1 ? "unidade" : "unidades"}. Que número é?`,
+    alternativas: construirAlternativas(total, dezenas, unidades),
+    enunciado,
+    falado,
   };
 }
 
@@ -125,8 +140,8 @@ export function construirDezenaUnidadesQuestion(
     ...(micro.dominio.exige ? { exigeEvidencia: micro.dominio.exige.evidencia } : {}),
     ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
     uiProps: spec,
-    answer: spec.resposta,
-    evaluate: answer => Number(answer) === spec.resposta,
+    answer: spec.total,
+    evaluate: answer => Number(answer) === spec.total,
     options: undefined,
   };
 }
