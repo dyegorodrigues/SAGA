@@ -12,6 +12,7 @@ import { NumberBond } from './primitives/NumberBond';
 import { NumberLine } from './primitives/NumberLine';
 import { InteractiveNumberLine } from './primitives/InteractiveNumberLine';
 import { Reta20Stage } from './primitives/Reta20Stage';
+import { ReguaStage } from './primitives/ReguaStage';
 import { Quadrado100 } from './primitives/Quadrado100';
 import { ShapeCanvas } from './primitives/ShapeCanvas';
 import { Relogio } from './primitives/Relogio';
@@ -46,6 +47,7 @@ import {
 } from '../curriculum/procedimentos/materialDouradoProcedure';
 import { Reta20Spec } from '../curriculum/procedimentos/reta20Contract';
 import { diagnosticarReta20, evidenciasReta20 } from '../curriculum/procedimentos/reta20Procedure';
+import { ReguaSpec } from '../curriculum/procedimentos/reguaContract';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -97,6 +99,20 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
               ...(evidencias.length ? { evidencias } : {}),
             });
           }}
+        />
+      );
+    }
+
+    case 'regua':
+    case 'regua-f61': {
+      const spec = uiProps as ReguaSpec;
+      return (
+        <ReguaStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          falar={falar}
+          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
         />
       );
     }
