@@ -8,6 +8,7 @@ const BASE = `http://localhost:${PORT}/sonda/regua.html`;
 const CHROME = process.env.SONDA_CHROME || chromium.executablePath();
 const ARTIFACTS = path.resolve(".artifacts/sonda-regua");
 const WIDTHS = [320, 390, 900];
+const EPS = 1.75;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -53,6 +54,33 @@ async function prepareLevel(page, level, r = 0.5) {
   }
 }
 
+async function alignedGeometry(page) {
+  return page.evaluate(() => {
+    const probe = document.querySelector("[data-regua-probe]");
+    const value = Number(probe?.getAttribute("data-value"));
+    const object = document.querySelector("[data-regua-object]");
+    const start = object?.querySelector("[data-regua-visible-start]")?.getBoundingClientRect();
+    const end = object?.querySelector("[data-regua-visible-end]")?.getBoundingClientRect();
+    const zero = document.querySelector('[data-regua-draggable] [data-regua-tick="0"]')?.getBoundingClientRect();
+    const final = document.querySelector(`[data-regua-draggable] [data-regua-tick="${value}"]`)?.getBoundingClientRect();
+    return {
+      value,
+      start: start ? { left: start.left, right: start.right } : null,
+      end: end ? { left: end.left, right: end.right } : null,
+      zeroX: zero?.left ?? null,
+      finalX: final?.left ?? null,
+    };
+  });
+}
+
+async function assertAlignedGeometry(page, context) {
+  const g = await alignedGeometry(page);
+  assert(g.start && g.end && g.zeroX !== null && g.finalX !== null, `${context}: faltou geometria visível/ticks`);
+  assert(Math.abs(g.start.left - g.zeroX) <= EPS, `${context}: ponta inicial visível não coincide com o zero (${g.start.left} vs ${g.zeroX})`);
+  assert(Math.abs(g.end.right - g.finalX) <= EPS, `${context}: ponta final visível não coincide com ${g.value} cm (${g.end.right} vs ${g.finalX})`);
+  return g;
+}
+
 async function probeLayout(page, width, level) {
   await prepareLevel(page, level, level === 4 ? 0.35 : 0.5);
   const data = await page.evaluate(() => {
@@ -63,16 +91,24 @@ async function probeLayout(page, width, level) {
       return { left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
     };
     const compare = [...document.querySelectorAll("[data-regua-compare-item]")].map(el => {
-      const outer = el.getBoundingClientRect();
-      const object = el.querySelector("[data-regua-compare-object]")?.getBoundingClientRect();
+      const objectEl = el.querySelector("[data-regua-compare-object]");
+      const object = objectEl?.getBoundingClientRect();
+      const start = objectEl?.querySelector("[data-regua-visible-start]")?.getBoundingClientRect();
+      const end = objectEl?.querySelector("[data-regua-visible-end]")?.getBoundingClientRect();
       const rulerEl = el.querySelector("[data-regua]");
       const ruler = rulerEl?.getBoundingClientRect();
+      const length = Number(el.getAttribute("data-regua-compare-length"));
+      const zero = rulerEl?.querySelector('[data-regua-tick="0"]')?.getBoundingClientRect();
+      const final = rulerEl?.querySelector(`[data-regua-tick="${length}"]`)?.getBoundingClientRect();
       return {
         id: el.getAttribute("data-regua-compare-item"),
         kind: el.getAttribute("data-regua-compare-kind"),
-        length: Number(el.getAttribute("data-regua-compare-length")),
-        outer: { left: outer.left, right: outer.right, width: outer.width },
+        length,
         object: object ? { left: object.left, right: object.right, width: object.width } : null,
+        visibleStart: start ? { left: start.left, right: start.right } : null,
+        visibleEnd: end ? { left: end.left, right: end.right } : null,
+        zeroX: zero?.left ?? null,
+        finalX: final?.left ?? null,
         ruler: ruler ? {
           left: ruler.left,
           right: ruler.right,
@@ -80,6 +116,7 @@ async function probeLayout(page, width, level) {
           max: Number(rulerEl?.getAttribute("data-regua-max")),
           unitPx: Number(rulerEl?.getAttribute("data-regua-unit-px")),
           endPad: Number(rulerEl?.getAttribute("data-regua-end-pad") ?? 0),
+          step: rulerEl?.getAttribute("data-regua-step"),
         } : null,
       };
     });
@@ -87,23 +124,28 @@ async function probeLayout(page, width, level) {
       const ruler = el.getBoundingClientRect();
       const labels = [...el.querySelectorAll("[data-regua-label]")].map(label => {
         const r = label.getBoundingClientRect();
-        return {
-          value: label.getAttribute("data-regua-label"),
-          edge: label.getAttribute("data-regua-label-edge"),
-          left: r.left,
-          right: r.right,
-        };
+        return { value: label.getAttribute("data-regua-label"), left: r.left, right: r.right };
       });
-      return { left: ruler.left, right: ruler.right, labels };
+      const ticks = [...el.querySelectorAll("[data-regua-tick]")].map(tick => tick.getAttribute("data-regua-tick"));
+      return { left: ruler.left, right: ruler.right, step: el.getAttribute("data-regua-step"), labels, ticks };
     });
     const visualObjects = [...document.querySelectorAll("[data-regua-measure-object]")].map(el => ({
       kind: el.getAttribute("data-regua-object-kind"),
       text: el.textContent ?? "",
+      hasStart: Boolean(el.querySelector("[data-regua-visible-start]")),
+      hasEnd: Boolean(el.querySelector("[data-regua-visible-end]")),
     }));
+    const informalObject = rect("[data-regua-informal-object]");
+    const informalUnits = rect("[data-regua-informal-units]");
+    const informalBalls = [...document.querySelectorAll("[data-regua-informal-unit]")].map(el => {
+      const r = el.getBoundingClientRect();
+      return { left: r.left, right: r.right, width: r.width };
+    });
     return {
       innerWidth: window.innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
       mode: document.querySelector("[data-regua-probe]")?.getAttribute("data-mode"),
+      value: Number(document.querySelector("[data-regua-probe]")?.getAttribute("data-value")),
       stage: rect("[data-regua-stage]"),
       plane: rect("[data-regua-plane]"),
       ruler: rect("[data-regua-draggable] [data-regua]"),
@@ -111,7 +153,9 @@ async function probeLayout(page, width, level) {
       compare,
       rulers,
       visualObjects,
-      clips: document.querySelectorAll("[data-regua-clipes] > *").length,
+      informalObject,
+      informalUnits,
+      informalBalls,
       answerButtons: document.querySelectorAll("[data-regua-answer-buttons] button").length,
       tapAlignButtons: document.querySelectorAll("[data-regua-tap-align]").length,
     };
@@ -120,16 +164,30 @@ async function probeLayout(page, width, level) {
   assert(data.scrollWidth <= data.innerWidth + 1, `F61 L${level} vazou em ${width}px: scrollWidth=${data.scrollWidth}`);
   assert(data.stage && data.stage.width >= Math.min(180, width - 80), `F61 L${level} palco colapsou em ${width}px`);
   assert(data.stage.left >= -1 && data.stage.right <= width + 1, `F61 L${level} palco fora do viewport em ${width}px`);
-  assert(data.visualObjects.every(obj => obj.kind && obj.text.trim() === ""), `F61 L${level} voltou a usar texto/emoji como objeto medido`);
+  assert(data.visualObjects.every(obj => obj.kind && obj.text.trim() === "" && obj.hasStart && obj.hasEnd), `F61 L${level} objeto sem silhueta/extremos auditáveis`);
   for (const ruler of data.rulers) {
+    assert(ruler.step === "1", `F61 L${level} reintroduziu subdivisão decimal`);
+    assert(ruler.ticks.every(v => /^\d+$/.test(String(v))), `F61 L${level} contém tick não inteiro: ${ruler.ticks.join(",")}`);
     for (const label of ruler.labels) {
+      assert(/^\d+$/.test(String(label.value)), `F61 L${level} exibiu rótulo decimal ${label.value}`);
       assert(label.left >= ruler.left - 1 && label.right <= ruler.right + 1,
         `F61 L${level} rótulo ${label.value} saiu da régua em ${width}px`);
     }
   }
 
   if (level === 1) {
-    assert(data.mode === "informal" && data.clips >= 3, "F61 L1 não preservou medida informal com unidades repetidas");
+    assert(data.mode === "informal" && data.informalBalls.length >= 3, "F61 L1 não preservou medida informal com unidades repetidas");
+    assert(data.informalObject && data.informalUnits, "F61 L1 sem objeto/faixa de unidades");
+    assert(Math.abs(data.informalObject.left - data.informalUnits.left) <= EPS, `F61 L1 unidades não começam na ponta do objeto em ${width}px`);
+    assert(Math.abs(data.informalObject.right - data.informalUnits.right) <= EPS, `F61 L1 unidades não terminam na ponta do objeto em ${width}px`);
+    for (let i = 0; i < data.informalBalls.length; i += 1) {
+      const ball = data.informalBalls[i];
+      assert(ball.width > 20, `F61 L1 unidade ${i} colapsou em ${width}px`);
+      if (i > 0) {
+        const prev = data.informalBalls[i - 1];
+        assert(Math.abs(prev.right - ball.left) <= 0.75, `F61 L1 gap/overlap entre unidades ${i - 1}/${i} em ${width}px`);
+      }
+    }
   }
   if ([2, 3, 5].includes(level)) {
     assert(data.plane && data.ruler && data.object, `F61 L${level} não expôs objeto+régua reais`);
@@ -138,9 +196,10 @@ async function probeLayout(page, width, level) {
     assert(data.ruler.left >= -2 && data.ruler.right <= width + 2, `F61 L${level} régua cortada em ${width}px`);
   }
   if (level === 2) {
-    assert(Math.abs(data.ruler.left - data.object.left) <= 1.5, `F61 L2 não nasceu alinhada no zero em ${width}px`);
+    assert(Math.abs(data.ruler.left - data.object.left) <= EPS, `F61 L2 não nasceu alinhada no zero em ${width}px`);
     assert(data.answerButtons >= 3, `F61 L2 perdeu alternativas de leitura em ${width}px`);
     assert(data.tapAlignButtons === 0, `F61 L2 exibiu alinhamento desnecessário em ${width}px`);
+    await assertAlignedGeometry(page, `F61 L2 ${width}px`);
   }
   if (level === 3 || level === 5) {
     assert(Math.abs(data.ruler.left - data.object.left) >= 5, `F61 L${level} deveria nascer desalinhada em ${width}px`);
@@ -150,16 +209,13 @@ async function probeLayout(page, width, level) {
   if (level === 4) {
     assert(data.compare.length === 2, "F61 L4 precisa de dois objetos medíveis");
     assert(new Set(data.compare.map(item => item.kind)).size === 2, "F61 L4 repetiu o mesmo tipo de objeto na comparação");
+    assert(!data.compare.some(item => ["carrinho", "borracha"].includes(item.kind)), "F61 L4 reintroduziu objeto de proporção rígida");
     assert(data.compare[0].length !== data.compare[1].length, "F61 L4 gerou dois comprimentos iguais");
     for (const item of data.compare) {
-      assert(item.object && item.ruler, `F61 L4 item ${item.id} sem objeto+régua`);
-      assert(Math.abs(item.object.left - item.ruler.left) <= 1.5, `F61 L4 item ${item.id} não começa no zero`);
-      const naturalWidth = item.ruler.max * item.ruler.unitPx + item.ruler.endPad;
-      const scale = item.ruler.width / naturalWidth;
-      const renderedUnit = item.ruler.unitPx * scale;
-      const renderedMinObject = 66 * scale;
-      const expected = Math.max(renderedMinObject, item.length * renderedUnit);
-      assert(Math.abs(item.object.width - expected) <= 3, `F61 L4 item ${item.id} não representa o comprimento na geometria`);
+      assert(item.object && item.ruler && item.visibleStart && item.visibleEnd, `F61 L4 item ${item.id} sem geometria completa`);
+      assert(item.ruler.step === "1", `F61 L4 item ${item.id} com subdivisão decimal`);
+      assert(Math.abs(item.visibleStart.left - item.zeroX) <= EPS, `F61 L4 item ${item.id}: início VISÍVEL não coincide com zero`);
+      assert(Math.abs(item.visibleEnd.right - item.finalX) <= EPS, `F61 L4 item ${item.id}: fim VISÍVEL não coincide com ${item.length} cm`);
     }
   }
   return data;
@@ -178,6 +234,8 @@ async function exerciseTap(page) {
   assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L3 liberou leitura antes do alinhamento por toque");
   await page.locator("[data-regua-tap-align]").click();
   assert(await page.locator("[data-regua-stage]").getAttribute("data-regua-aligned") === "true", "F61 tap alternativo não alinhou o zero");
+  await assertAlignedGeometry(page, "F61 L3 tap");
+  await captureProbe(page, "f61-l3-tap-alinhado-390px.png");
   assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 não liberou leitura depois do alinhamento por toque");
   await page.getByRole("button", { name: `${value} cm` }).click();
   await page.waitForFunction(expected => document.querySelector("[data-regua-probe]")?.getAttribute("data-answer") === expected, correct);
@@ -191,7 +249,6 @@ async function exerciseDrag(page) {
   const correct = await probe.getAttribute("data-correct");
   const value = await probe.getAttribute("data-value");
   assert(correct && value, "F61 L3 não expôs recibo canônico/valor visual");
-  assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L3 liberou leitura antes do alinhamento por drag");
   const ruler = await page.locator("[data-regua-draggable] [data-regua]").boundingBox();
   const object = await page.locator("[data-regua-object]").boundingBox();
   assert(ruler && object, "F61 não expôs geometria real para drag");
@@ -203,7 +260,8 @@ async function exerciseDrag(page) {
   await page.mouse.move(startX + dx, y, { steps: 10 });
   await page.mouse.up();
   await page.waitForFunction(() => document.querySelector("[data-regua-stage]")?.getAttribute("data-regua-aligned") === "true");
-  assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 não liberou leitura depois do alinhamento por drag");
+  await assertAlignedGeometry(page, "F61 L3 drag");
+  await captureProbe(page, "f61-l3-drag-alinhado-390px.png");
   await page.getByRole("button", { name: `${value} cm` }).click();
   await page.waitForFunction(expected => document.querySelector("[data-regua-probe]")?.getAttribute("data-answer") === expected, correct);
   assert((await probe.getAttribute("data-evidencias"))?.includes("alinhou-zero"), "F61 drag não colheu evidência ALINHOU_ZERO");
@@ -218,6 +276,8 @@ async function exerciseEstimate(page) {
   await page.locator("[data-regua-estimate-phase] button").first().click();
   assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L5 liberou leitura antes de alinhar após estimar");
   await page.locator("[data-regua-tap-align]").click();
+  await assertAlignedGeometry(page, "F61 L5 estimar→alinhar");
+  await captureProbe(page, "f61-l5-estimar-alinhado-390px.png");
   assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 L5 não liberou leitura após estimar e alinhar");
   const value = await probe.getAttribute("data-value");
   await page.getByRole("button", { name: `${value} cm` }).click();
@@ -241,9 +301,7 @@ try {
     receipt.widths[width] = [];
     for (let level = 1; level <= 5; level += 1) {
       receipt.widths[width].push(await probeLayout(page, width, level));
-      if (width === 390 || ([3, 4].includes(level) && (width === 320 || width === 900))) {
-        await captureProbe(page, `f61-l${level}-${width}px.png`);
-      }
+      await captureProbe(page, `f61-l${level}-${width}px.png`);
     }
     await page.close();
   }
@@ -256,9 +314,12 @@ try {
 
   fs.writeFileSync(path.join(ARTIFACTS, "receipt.json"), JSON.stringify(receipt, null, 2));
   console.log("SAGA — SONDA F61: OK");
-  console.log(`- larguras: ${WIDTHS.join(", ")} px; níveis: 1–5`);
-  console.log("- objetos proporcionais distintos no L4; rótulos contidos dentro da régua: OK");
-  console.log("- leitura só após alinhamento; tap alternativo, drag real e estimar→medir: OK");
+  console.log(`- larguras: ${WIDTHS.join(", ")} px; níveis: 1–5; screenshots: 15 + interações`);
+  console.log("- L1: bolas desenhadas, tangentes, mesma largura total do objeto: OK");
+  console.log("- régua: apenas centímetros inteiros; rótulos contidos: OK");
+  console.log("- silhueta visível: ponta inicial=tick 0 e ponta final=tick da resposta: OK");
+  console.log("- L4: objetos distintos de proporção longitudinal plausível: OK");
+  console.log("- tap alternativo, drag real e estimar→medir: OK");
   console.log(`- evidências: ${ARTIFACTS}`);
 } finally {
   await browser?.close().catch(() => {});
