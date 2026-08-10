@@ -173,7 +173,11 @@ export function MaterialDouradoStage({ spec, onAnswer, disabled, falar, mostrar 
                   <TenFrame moldura={{ casas: 10, ocupadas: Array.from({ length: naTroca }, (_, i) => i), emoji: "🟨" }} />
                 </div>
               ) : (
-                <div className="mx-auto grid w-fit grid-cols-5 gap-1 rounded-xl bg-white p-2" aria-label={`${naTroca} de 10 no grupo`}>
+                <div
+                  role="img"
+                  className="mx-auto grid w-fit grid-cols-5 gap-1 rounded-xl bg-white p-2"
+                  aria-label={`${naTroca} de 10 no grupo`}
+                >
                   {Array.from({ length: 10 }, (_, i) => (
                     <span key={i} aria-hidden className={`h-5 w-5 rounded-sm border ${i < naTroca ? "border-amber-600 bg-amber-400" : "border-slate-300 bg-slate-100"}`} />
                   ))}
