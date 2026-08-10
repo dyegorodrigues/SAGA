@@ -12,107 +12,134 @@ function sorteio(...valores: number[]) {
   return () => valores[Math.min(i++, valores.length - 1)] ?? 0;
 }
 
-describe("N2.01 / F21 — dezena como unidade composta", () => {
-  it("preserva o grafo e usa MaterialDourado nos cinco níveis", () => {
+describe("N2.01 / F21 — dez unidades viram uma unidade nova", () => {
+  it("preserva o grafo, a progressão F21 e o domínio bidirecional", () => {
     expect(N2_01.prereqs).toEqual(["N1.09", "N1.11"]);
-    for (let nivel = 1; nivel <= 5; nivel += 1) {
-      expect(N2_01.niveis?.[nivel]?.primitiva).toBe("tens");
-      expect(N2_01.niveis?.[nivel]?.micro).toBeTruthy();
-    }
+    expect(N2_01.niveis?.[1]?.micro).toBe("agrupar_ate_19");
+    expect(N2_01.niveis?.[2]?.micro).toBe("agrupar_ate_39");
+    expect(N2_01.niveis?.[3]?.micro).toBe("agrupar_sem_moldura");
+    expect(N2_01.niveis?.[4]?.micro).toBe("montar_do_numeral");
+    expect(N2_01.niveis?.[5]?.micro).toBe("decompor_mentalmente");
     expect(N2_01.niveis?.[5]?.rt_alvo).toBeGreaterThan(0);
+
+    for (const micro of N2_01.micros) {
+      expect(micro.dominio.acertos).toBe(3);
+      expect(micro.dominio.de).toBe(3);
+      expect(micro.dominio.sessoes).toBe(2);
+    }
+    expect(N2_01.micros.find(m => m.id === "montar_do_numeral")?.dominio.exige)
+      .toEqual({
+        evidencia: "montou-do-numeral",
+        descricao: expect.stringContaining("montar"),
+      });
   });
 
-  it("L1 exige a troca 10 unidades → 1 dezena antes da leitura", () => {
-    const spec = construirMaterialDouradoSpec(1, sorteio(0));
-    expect(spec.modo).toBe("ler");
-    expect(spec.exigeTroca).toBe(true);
-    expect(spec.dezenas).toBe(1);
-    expect(spec.unidades).toBeGreaterThanOrEqual(1);
-    expect(spec.unidades).toBeLessThanOrEqual(9);
-    expect(spec.equivalencia).toBe("10 unidades = 1 dezena");
-    expect(spec.resposta).toBe(10 + spec.unidades);
-  });
-
-  it("L2/L3 ampliam o material sem retirar a representação concreta", () => {
-    for (const nivel of [2, 3]) {
-      for (let i = 0; i < 30; i += 1) {
-        const spec = construirMaterialDouradoSpec(nivel, Math.random);
-        expect(spec.modo).toBe("ler");
-        expect(spec.exigeTroca).toBe(false);
-        expect(spec.dezenas).toBeGreaterThanOrEqual(nivel === 2 ? 2 : 1);
-        expect(spec.dezenas).toBeLessThanOrEqual(nivel === 2 ? 5 : 9);
-        expect(spec.unidades).toBeGreaterThanOrEqual(0);
-        expect(spec.unidades).toBeLessThanOrEqual(9);
-        expect(spec.resposta).toBe(spec.dezenas * 10 + spec.unidades);
-      }
+  it("L1 gera 10–19 e exige agrupamento manual com moldura", () => {
+    for (let i = 0; i < 40; i += 1) {
+      const spec = construirMaterialDouradoSpec(1, Math.random);
+      expect(spec.modo).toBe("agrupar");
+      expect(spec.total).toBeGreaterThanOrEqual(10);
+      expect(spec.total).toBeLessThanOrEqual(19);
+      expect(spec.usarMoldura).toBe(true);
+      expect(spec.dezenas).toBe(Math.floor(spec.total / 10));
+      expect(spec.unidades).toBe(spec.total % 10);
     }
   });
 
-  it("L4 inverte a operação: numeral → produzir barras e cubinhos", () => {
-    const spec = construirMaterialDouradoSpec(4, sorteio(0.35, 0.2));
-    expect(spec.modo).toBe("produzir");
-    expect(spec.alvoNumeral).toBe(spec.dezenas * 10 + spec.unidades);
-    expect(spec.resposta).toBe(spec.alvoNumeral);
+  it("L2 gera 20–39 e exige ciclos manuais de agrupamento com moldura", () => {
+    for (let i = 0; i < 40; i += 1) {
+      const spec = construirMaterialDouradoSpec(2, Math.random);
+      expect(spec.modo).toBe("agrupar");
+      expect(spec.total).toBeGreaterThanOrEqual(20);
+      expect(spec.total).toBeLessThanOrEqual(39);
+      expect(spec.usarMoldura).toBe(true);
+      expect(spec.dezenas).toBeGreaterThanOrEqual(2);
+      expect(spec.dezenas).toBeLessThanOrEqual(3);
+    }
   });
 
-  it("L5 mistura leitura e produção e aceita zero unidades", () => {
-    const leitura = construirMaterialDouradoSpec(5, sorteio(0.1, 0.3, 0));
-    const producao = construirMaterialDouradoSpec(5, sorteio(0.9, 0.3, 0));
-    expect(leitura.modo).toBe("ler");
-    expect(producao.modo).toBe("produzir");
-    expect(leitura.unidades).toBe(0);
-    expect(producao.unidades).toBe(0);
+  it("L3 continua agrupando até 99, mas retira a moldura de apoio", () => {
+    for (let i = 0; i < 60; i += 1) {
+      const spec = construirMaterialDouradoSpec(3, Math.random);
+      expect(spec.modo).toBe("agrupar");
+      expect(spec.total).toBeGreaterThanOrEqual(10);
+      expect(spec.total).toBeLessThanOrEqual(99);
+      expect(spec.usarMoldura).toBe(false);
+      expect(spec.dezenas).toBe(Math.floor(spec.total / 10));
+      expect(spec.unidades).toBe(spec.total % 10);
+    }
   });
 
-  it("specialized builder preserva tutorial, masteryRule e RT silencioso", () => {
+  it("L4 inverte: recebe um numeral e monta barras + cubinhos", () => {
+    const spec = construirMaterialDouradoSpec(4, sorteio(0.24));
+    expect(spec.modo).toBe("montar");
+    expect(spec.total).toBeGreaterThanOrEqual(10);
+    expect(spec.total).toBeLessThanOrEqual(99);
+    expect(spec.alvoNumeral).toBe(spec.total);
+    expect(spec.dezenas).toBe(Math.floor(spec.total / 10));
+    expect(spec.unidades).toBe(spec.total % 10);
+  });
+
+  it("L5 é decomposição mental, nunca mistura aleatória de leitura/produção", () => {
+    for (let i = 0; i < 40; i += 1) {
+      const spec = construirMaterialDouradoSpec(5, Math.random);
+      expect(spec.modo).toBe("decompor");
+      expect(spec.total).toBeGreaterThanOrEqual(10);
+      expect(spec.total).toBeLessThanOrEqual(99);
+      expect(spec.dezenas).toBe(Math.floor(spec.total / 10));
+      expect(spec.unidades).toBe(spec.total % 10);
+    }
+  });
+
+  it("specialized builder preserva a coreografia F21, domínio e RT silencioso", () => {
     const q1 = construirDezenaUnidadesQuestion(N2_01, 1);
+    const q4 = construirDezenaUnidadesQuestion(N2_01, 4);
     const q5 = construirDezenaUnidadesQuestion(N2_01, 5);
+
     expect(q1.kind).toBe("material-dourado");
-    expect((q1.uiProps as any).modo).toBe("ler");
-    expect(q1.tutorial?.length).toBeGreaterThan(0);
-    expect(q1.masteryRule).toEqual({ acertos: 9, de: 10, sessoes: 2 });
-    expect(q5.masteryRule).toEqual({ acertos: 9, de: 10, sessoes: 2 });
+    expect(q1.tutorial).toEqual([
+      expect.objectContaining({ say: "Vamos juntar de dez em dez.", show: { pulsarMoldura: true } }),
+      expect.objectContaining({ say: "Um, dois, três...", show: { preencherAte: 10 } }),
+      expect.objectContaining({ say: "Dez! Viraram uma barra!", show: { fundirEmBarra: true } }),
+      expect.objectContaining({ say: "Isso é uma dezena.", show: { destacarBarra: true } }),
+    ]);
+    expect(q1.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+    expect(q4.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+    expect(q4.exigeEvidencia).toBe("montou-do-numeral");
+    expect(q5.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
     expect(q5.rt_max_s).toBeGreaterThan(0);
     expect(q1.options).toBeUndefined();
   });
 
-  it("diagnostica pelas ações F21, não por strings soltas de alternativa", () => {
-    const leitura = construirMaterialDouradoSpec(3, sorteio(0.2, 0.4));
-    expect(diagnosticarMaterialDourado({
-      modo: "ler",
-      resposta: leitura.unidades,
-      dezenasProduzidas: leitura.dezenas,
-      unidadesProduzidas: leitura.unidades,
-      contouSubdivisoes: false,
-      completouTroca: true,
-    }, leitura)).toBe(MisconceptionTag.IGNORA_DEZENA);
+  it("usa somente os três diagnósticos canônicos da F21", () => {
+    const spec = construirMaterialDouradoSpec(4, sorteio(0.13));
 
     expect(diagnosticarMaterialDourado({
-      modo: "ler",
-      resposta: leitura.dezenas * 100 + leitura.unidades,
-      dezenasProduzidas: leitura.dezenas,
-      unidadesProduzidas: leitura.unidades,
-      contouSubdivisoes: false,
-      completouTroca: true,
-    }, leitura)).toBe(MisconceptionTag.CONCATENA);
+      modo: "montar",
+      resposta: spec.dezenas + spec.unidades,
+      dezenasProduzidas: 0,
+      unidadesProduzidas: spec.dezenas + spec.unidades,
+      contouUmAUm: false,
+      trocasConcluidas: 0,
+    }, spec)).toBe(MisconceptionTag.IGNORA_VALOR);
 
     expect(diagnosticarMaterialDourado({
-      modo: "ler",
-      resposta: leitura.resposta - 1,
-      dezenasProduzidas: leitura.dezenas,
-      unidadesProduzidas: leitura.unidades,
-      contouSubdivisoes: true,
-      completouTroca: true,
-    }, leitura)).toBe(MisconceptionTag.CONTA_TUDO);
+      modo: "montar",
+      resposta: spec.unidades * 10 + spec.dezenas,
+      dezenasProduzidas: spec.unidades,
+      unidadesProduzidas: spec.dezenas,
+      contouUmAUm: false,
+      trocasConcluidas: 0,
+    }, spec)).toBe(MisconceptionTag.INVERTE_ORDENS);
 
-    const producao = construirMaterialDouradoSpec(4, sorteio(0.3, 0.2));
+    const agrupamento = construirMaterialDouradoSpec(3, sorteio(0.4));
     expect(diagnosticarMaterialDourado({
-      modo: "produzir",
-      resposta: producao.unidades * 10 + producao.dezenas,
-      dezenasProduzidas: producao.unidades,
-      unidadesProduzidas: producao.dezenas,
-      contouSubdivisoes: false,
-      completouTroca: true,
-    }, producao)).toBe(MisconceptionTag.TROCA_DU);
+      modo: "agrupar",
+      resposta: agrupamento.total,
+      dezenasProduzidas: agrupamento.dezenas,
+      unidadesProduzidas: agrupamento.unidades,
+      contouUmAUm: true,
+      trocasConcluidas: agrupamento.dezenas,
+    }, agrupamento)).toBe(MisconceptionTag.NAO_AGRUPA);
   });
 });
