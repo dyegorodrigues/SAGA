@@ -1,6 +1,6 @@
 import React from "react";
 import { AnswerMeta } from "../../types";
-import { ReguaSpec } from "../../curriculum/procedimentos/reguaContract";
+import { ItemRegua, ReguaSpec } from "../../curriculum/procedimentos/reguaContract";
 import {
   AcaoDeRegua,
   diagnosticarRegua,
@@ -44,20 +44,76 @@ function metaDa(spec: ReguaSpec, acao: AcaoDeRegua): AnswerMeta {
   };
 }
 
+function tipoDoItem(item: ItemRegua): string {
+  return item.id.replace(/-(?:a|b)$/, "");
+}
+
+/**
+ * O comprimento visual É o comprimento matemático. Não existe mais uma cápsula
+ * genérica contendo um emoji: cada objeto ocupa a largura que a criança mede.
+ */
+function ObjetoVisual({ item }: { item: ItemRegua }) {
+  const tipo = tipoDoItem(item);
+  return (
+    <div
+      className="relative h-10 w-full"
+      data-regua-measure-object
+      data-regua-object-kind={tipo}
+      role="img"
+      aria-label={item.nome}
+    >
+      {tipo === "lapis" && (
+        <>
+          <span aria-hidden className="absolute left-0 right-3 top-3 h-4 rounded-l-sm border border-amber-700 bg-yellow-300 shadow-sm" />
+          <span aria-hidden className="absolute left-0 top-3 h-4 w-3 rounded-l-sm border-r border-rose-700 bg-rose-400" />
+          <span aria-hidden className="absolute right-0 top-3 h-4 w-4 bg-amber-200" style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }} />
+          <span aria-hidden className="absolute right-0 top-[17px] h-2 w-2 bg-slate-700" style={{ clipPath: "polygon(0 0, 100% 50%, 0 100%)" }} />
+        </>
+      )}
+      {tipo === "borracha" && (
+        <>
+          <span aria-hidden className="absolute inset-x-0 top-2 h-7 rounded-md border-2 border-rose-500 bg-gradient-to-r from-rose-300 via-rose-200 to-sky-200 shadow-sm" />
+          <span aria-hidden className="absolute left-[42%] top-2 h-7 w-2 -skew-x-12 bg-white/85" />
+        </>
+      )}
+      {tipo === "carrinho" && (
+        <>
+          <span aria-hidden className="absolute bottom-2 left-1 right-1 h-5 rounded-[9px_12px_6px_6px] border-2 border-red-700 bg-red-500 shadow-sm" />
+          <span aria-hidden className="absolute bottom-6 left-[24%] h-4 w-[42%] rounded-t-xl border-2 border-b-0 border-red-700 bg-red-400" />
+          <span aria-hidden className="absolute bottom-[2px] left-[16%] h-3 w-3 rounded-full border-2 border-slate-700 bg-slate-900" />
+          <span aria-hidden className="absolute bottom-[2px] right-[16%] h-3 w-3 rounded-full border-2 border-slate-700 bg-slate-900" />
+          <span aria-hidden className="absolute bottom-[26px] left-[33%] h-2 w-[22%] rounded-sm bg-sky-100/90" />
+        </>
+      )}
+      {tipo === "livro" && (
+        <>
+          <span aria-hidden className="absolute inset-x-0 top-1 h-8 rounded-sm border-2 border-red-800 bg-red-600 shadow-sm" />
+          <span aria-hidden className="absolute bottom-2 left-2 right-1 h-[2px] bg-amber-100" />
+          <span aria-hidden className="absolute bottom-1 left-1 top-2 w-2 rounded-sm bg-red-800/80" />
+        </>
+      )}
+      {tipo === "pincel" && (
+        <>
+          <span aria-hidden className="absolute left-0 right-8 top-[17px] h-2 rounded-full border border-amber-800 bg-amber-500 shadow-sm" />
+          <span aria-hidden className="absolute right-7 top-[13px] h-4 w-5 rounded-sm border border-slate-500 bg-slate-300" />
+          <span aria-hidden className="absolute right-0 top-[10px] h-6 w-8 bg-sky-500" style={{ clipPath: "polygon(0 18%, 100% 0, 100% 100%, 0 82%)" }} />
+        </>
+      )}
+    </div>
+  );
+}
+
 function ObjetoMedido({ spec, comprimento }: { spec: ReguaSpec; comprimento: number }) {
   const item = spec.itens[0];
   return (
     <div
-      className="absolute top-2 flex h-11 items-center justify-center overflow-hidden rounded-xl border-2 border-sky-300 bg-sky-50 text-2xl shadow-sm"
-      style={{ left: OBJECT_LEFT, width: Math.max(44, comprimento * UNIT_PX) }}
+      className="absolute top-3"
+      style={{ left: OBJECT_LEFT, width: Math.max(66, comprimento * UNIT_PX) }}
       data-regua-object
       data-regua-object-left={OBJECT_LEFT}
       data-regua-object-length={comprimento}
-      role="img"
-      aria-label={`${item.nome} a medir`}
     >
-      <span aria-hidden>{item.emoji}</span>
-      <span className="ml-1 truncate text-[11px] font-black text-sky-900">{item.nome}</span>
+      <ObjetoVisual item={item} />
     </div>
   );
 }
@@ -210,15 +266,17 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
 
   if (spec.modo === "informal") {
     const quantidade = spec.valorCerto ?? 1;
+    const larguraObjeto = Math.max(104, quantidade * 34);
     return (
       <PalcoEscalado>
         <div className="flex w-[330px] max-w-full flex-col items-center gap-4" data-regua-stage data-regua-mode="informal">
-          <div className="flex min-h-14 items-center rounded-xl border-2 border-sky-200 bg-sky-50 px-5 text-3xl" aria-label={spec.itens[0].nome}>
-            {spec.itens[0].emoji}
+          <div className="text-sm font-black text-slate-700">{spec.itens[0].nome}</div>
+          <div style={{ width: larguraObjeto }} className="max-w-[280px]">
+            <ObjetoVisual item={spec.itens[0]} />
           </div>
-          <div className={`flex flex-wrap justify-center gap-1 rounded-xl p-2 ${mostrar?.destacarClipes ? "ring-4 ring-blue-300" : ""}`} data-regua-clipes>
+          <div className={`flex items-center justify-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-1 shadow-sm ${mostrar?.destacarClipes ? "ring-4 ring-blue-300" : ""}`} data-regua-clipes aria-label={`${quantidade} clipes iguais`}>
             {Array.from({ length: quantidade }, (_, i) => (
-              <span key={i} aria-hidden className="inline-flex h-9 w-5 items-center justify-center rounded-full border-2 border-slate-400 text-[10px]">↕</span>
+              <span key={i} aria-hidden className="inline-flex h-8 w-7 items-center justify-center text-2xl leading-none">📎</span>
             ))}
           </div>
           <div className="flex flex-wrap justify-center gap-2" aria-label="Escolha quantos clipes">
@@ -246,28 +304,28 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
     return (
       <PalcoEscalado>
         <div className="flex w-[340px] max-w-full flex-col gap-3" data-regua-stage data-regua-mode="comparar">
-          {spec.itens.map(item => {
+          {spec.itens.map((item, index) => {
             const medido = medidos.includes(item.id);
             return (
               <div
                 key={item.id}
-                className="rounded-2xl border-2 border-slate-200 bg-white p-3 shadow-sm"
+                className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
                 data-regua-compare-item={item.id}
                 data-regua-compare-length={item.comprimentoCm}
+                data-regua-compare-kind={tipoDoItem(item)}
               >
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="text-2xl" aria-hidden>{item.emoji}</span>
-                  <span className="font-black text-slate-800">{item.nome}</span>
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <span className="font-black text-slate-800">Objeto {index + 1} · {item.nome}</span>
+                  {medido && <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-black text-blue-700">{item.comprimentoCm} cm</span>}
                 </div>
-                <div className="relative h-[118px] overflow-hidden pb-1" data-regua-compare-plane>
+                <div className="relative h-[112px] overflow-visible pb-1" data-regua-compare-plane>
                   <div
-                    className="absolute left-0 top-0 flex h-10 items-center justify-center overflow-hidden rounded-xl border-2 border-sky-300 bg-sky-50 text-xl"
-                    style={{ width: Math.max(44, item.comprimentoCm * UNIT_PX) }}
+                    className="absolute left-0 top-0"
+                    style={{ width: Math.max(66, item.comprimentoCm * UNIT_PX) }}
                     data-regua-compare-object
-                    role="img"
-                    aria-label={`${item.nome} alinhado ao zero`}
+                    data-regua-object-kind={tipoDoItem(item)}
                   >
-                    <span aria-hidden>{item.emoji}</span>
+                    <ObjetoVisual item={item} />
                   </div>
                   <div className="absolute left-0 top-[42px]">
                     <Regua max={12} destacarZero destacarMarca={medido ? item.comprimentoCm : null} />
@@ -276,10 +334,11 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                 <button
                   type="button"
                   className={`${botaoClasse(medido)} mt-2 w-full`}
+                  aria-label={medido ? `${item.nome} mede ${item.comprimentoCm} centímetros` : `Medir ${item.nome}`}
                   disabled={disabled || medido}
                   onClick={() => setMedidos(prev => [...new Set([...prev, item.id])])}
                 >
-                  {medido ? `${item.comprimentoCm} cm` : "Medir"}
+                  {medido ? "Medido" : "Medir"}
                 </button>
               </div>
             );
@@ -301,7 +360,7 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                     unidadeCerta: "cm",
                   })}
                 >
-                  {item.emoji} {item.nome}
+                  {item.nome}
                 </button>
               ))}
             </div>
@@ -312,10 +371,14 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
   }
 
   if (spec.modo === "estimar" && estimativa === null) {
+    const larguraEstimativa = Math.max(110, Math.min(260, (spec.valorCerto ?? 6) * 20));
     return (
       <PalcoEscalado>
         <div className="flex w-[330px] max-w-full flex-col items-center gap-4" data-regua-stage data-regua-mode="estimar" data-regua-estimate-phase>
-          <span className="text-5xl" aria-hidden>{spec.itens[0].emoji}</span>
+          <div className="text-sm font-black text-slate-700">{spec.itens[0].nome}</div>
+          <div style={{ width: larguraEstimativa }} className="max-w-[270px]">
+            <ObjetoVisual item={spec.itens[0]} />
+          </div>
           <p className="text-center text-sm font-bold text-slate-700">Sem medir ainda: qual parece uma boa estimativa?</p>
           <div className="flex flex-wrap justify-center gap-2">
             {spec.estimativas?.map(valor => (
@@ -341,10 +404,14 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
         data-regua-mode={spec.modo}
         data-regua-aligned={alinhado ? "true" : "false"}
       >
-        <div className="relative h-[150px] w-[344px] max-w-full overflow-visible rounded-2xl bg-slate-50" data-regua-plane>
+        <div className="flex w-[344px] max-w-full items-center justify-between px-1 text-sm">
+          <span className="font-black text-slate-800">{spec.itens[0].nome}</span>
+          <span className="text-xs font-bold text-slate-500">meça da ponta até a ponta</span>
+        </div>
+        <div className="relative h-[150px] w-[344px] max-w-full overflow-visible rounded-2xl border border-slate-200 bg-white shadow-inner" data-regua-plane>
           <ObjetoMedido spec={spec} comprimento={comprimento} />
           <div
-            className={`absolute top-[65px] touch-none ${podeManipular ? "cursor-grab active:cursor-grabbing" : ""}`}
+            className={`absolute top-[67px] touch-none ${podeManipular ? "cursor-grab active:cursor-grabbing" : ""}`
             style={{ left: rulerLeft }}
             data-regua-draggable
             data-regua-zero-left={rulerLeft}
