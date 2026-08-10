@@ -98,6 +98,20 @@ export const MisconceptionTag = {
   /** F06: escolheu pela impressão global sem contar ou parear quando a diferença deixou de ser óbvia. */
   COMPARA_SEM_CONTAR: "compara-sem-contar",
 
+  /* --- sistema decimal (ficha F21 / N2.01) -------------------------- */
+
+  /** F21: tratou a barra como 1 e respondeu só as unidades soltas. */
+  IGNORA_DEZENA: "ignora-dezena",
+
+  /** F21: concatenou a dezena já expandida com a unidade (3D + 4U → 304). */
+  CONCATENA: "concatena-dezena-unidade",
+
+  /** F21: abriu as barras e contou todos os quadradinhos, sem usá-las como unidade composta. */
+  CONTA_TUDO: "conta-tudo-material-dourado",
+
+  /** F21: na produção, colocou o algarismo das dezenas nas unidades e vice-versa. */
+  TROCA_DU: "troca-dezenas-unidades",
+
   /* --- contagem (fichas F01 e F27) ---------------------------------- */
 
   /** Contar tocando: contou o mesmo objeto duas vezes — o dedo não marcou o que já passou */
