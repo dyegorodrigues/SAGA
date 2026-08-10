@@ -98,7 +98,10 @@ describe("N1.12 / F19 — número como posição e movimento", () => {
   });
 
   it("diagnostica direção, off-by-one, contagem de marcas e senso espacial pelas assinaturas observáveis", () => {
-    const frente = construirReta20Spec(2, sorteio(0.4, 0));
+    // Origem no meio da reta: o destino espelhado realmente existe. Um teste
+    // com partida no zero pediria uma posição negativa e não provaria a tag.
+    const frente = construirReta20Spec(2, sorteio(0.4, 0.5));
+    expect(frente.posicaoInicial - frente.salto).toBeGreaterThanOrEqual(frente.inicio);
     expect(diagnosticarReta20({
       escolhido: frente.posicaoInicial - frente.salto,
       posicaoInicial: frente.posicaoInicial,
