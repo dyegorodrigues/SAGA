@@ -16,6 +16,7 @@ import { ShapeCanvas } from './primitives/ShapeCanvas';
 import { Relogio } from './primitives/Relogio';
 import { Balanca } from './primitives/Balanca';
 import { MaterialDourado } from './primitives/MaterialDourado';
+import { MaterialDouradoStage } from './primitives/MaterialDouradoStage';
 import { DragGroup } from './primitives/DragGroup';
 import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
 import { StoryBarsStage } from "./primitives/StoryBarsStage";
@@ -37,20 +38,27 @@ import { MedidasStage } from './primitives/MedidasStage';
 import { MolduraStage } from './primitives/MolduraStage';
 import { AudioChoiceStage } from './primitives/AudioChoiceStage';
 import { ArrayGrid } from './primitives/ArrayGrid';
+import { MaterialDouradoSpec } from '../curriculum/procedimentos/materialDouradoContract';
+import {
+  diagnosticarMaterialDourado,
+  evidenciasMaterialDourado,
+} from '../curriculum/procedimentos/materialDouradoProcedure';
 
 interface FichaRendererProps {
   question: Question;
   onAnswer: (answer: any, isCorrect: boolean, meta?: AnswerMeta) => void;
   disabled?: boolean;
   promptDone?: boolean;
+  /** Coreografia da micro-aula; só palcos autorais que conhecem o spec a usam. */
+  mostrar?: unknown;
 }
 
-export function FichaRenderer({ question, onAnswer, disabled, promptDone = true }: FichaRendererProps) {
+export function FichaRenderer({ question, onAnswer, disabled, promptDone = true, mostrar }: FichaRendererProps) {
   const { kind, uiProps, evaluate } = question;
 
   const handleInteract = (val: any, meta?: AnswerMeta) => {
     if (disabled) return;
-    const isCorrect = evaluate(val);
+    const isCorrect = evaluate?.(val) ?? false;
     onAnswer(val, isCorrect, meta);
   };
 
@@ -65,7 +73,28 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
       return <InteractiveNumberLine {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
       
     case 'tens':
+      // Contrato estático legado/genérico. F21 usa kind próprio para não esconder
+      // a diferença semântica do auditor nem sequestrar usos antigos.
       return <MaterialDourado {...uiProps} />;
+
+    case 'material-dourado': {
+      const spec = uiProps as MaterialDouradoSpec;
+      return (
+        <MaterialDouradoStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
+          onAnswer={(valor, acao) => {
+            const misconception = diagnosticarMaterialDourado(acao, spec);
+            const evidencias = evidenciasMaterialDourado(acao, spec);
+            handleInteract(valor, {
+              ...(misconception ? { misconception } : {}),
+              ...(evidencias.length ? { evidencias } : {}),
+            });
+          }}
+        />
+      );
+    }
       
     case 'relogio':
       return <Relogio {...uiProps} />;
@@ -114,7 +143,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true 
     case 'grandeza':
       return <GrandezaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'medidas':
-      return <MedidasStage spec={uiProps as never} onAnswer={(valor, meta) => onAnswer(valor, evaluate(valor), meta)} disabled={Boolean(disabled)} />;
+      return <MedidasStage spec={uiProps as never} onAnswer={(valor, meta) => onAnswer(valor, evaluate?.(valor) ?? false, meta)} disabled={Boolean(disabled)} />;
     case 'fileira':
       return <EmojiRowStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'array':
