@@ -13,7 +13,7 @@ function qDoNivel(nivel: number) {
 }
 
 describe("F19 — Reta20Stage → FichaRenderer → AnswerMeta", () => {
-  it("±1 preciso chega ao Radar como ERRO_DE_UM, não como escorregão motor", () => {
+  it("±1 preciso chega ao Radar como OFF_BY_ONE, não como escorregão motor", () => {
     const q = qDoNivel(3);
     const spec = q.uiProps as Reta20Spec;
     const onAnswer = vi.fn();
@@ -24,7 +24,7 @@ describe("F19 — Reta20Stage → FichaRenderer → AnswerMeta", () => {
       errada,
       false,
       expect.objectContaining({
-        misconception: MisconceptionTag.ERRO_DE_UM,
+        misconception: MisconceptionTag.OFF_BY_ONE,
         manipulacao: expect.objectContaining({ precisoEmDestinoErrado: true }),
       }),
     );
