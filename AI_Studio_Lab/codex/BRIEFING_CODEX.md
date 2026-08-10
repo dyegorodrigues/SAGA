@@ -1,14 +1,15 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e W1–W4 estão fechadas com CI remoto real. Próxima tarefa única: **escolher W5 pela Matrix/DAG vigente**.
+> **VIGENTE em 10/ago/2026.** Leia primeiro `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`, depois `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e W1–W4 estão funcionalmente fechadas. **W5 ainda não começou.** A próxima tarefa única é uma microfrente de reconciliação documental canônica A–E; só depois selecionar W5 pela Matrix/DAG.
 
 ## Leia
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
-2. `RETOMADA.md`;
-3. `HANDOFF_CONTINUIDADE_IA.md`;
-4. checkpoints W3/W2/W1 + Coverage Matrix;
-5. cânone em `AI_Studio_Lab/pedagogia/`.
+1. `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`;
+2. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
+3. `RETOMADA.md`;
+4. `HANDOFF_CONTINUIDADE_IA.md`;
+5. checkpoints W3/W2/W1 + Coverage Matrix;
+6. cânone em `AI_Studio_Lab/pedagogia/`.
 
 Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 sempre open + draft + unmerged. Main protegida `68fad4c575e28959b2ca4776e9a541d6828b63f3`. Não tocar no Creature Engine, não criar branch auxiliar, não merge/rebase/ready/auto-merge. Reancorar PR/head/CI antes de qualquer edição.
 
@@ -31,6 +32,8 @@ CI #975 / run `31404572801`: success integral.
 - artefato F19 `9069082798`, SHA-256 `65a1d3ab456f4320709547dcc98f87958f8ed083fb978b8a80322059e03629f3`;
 - artefato Sensei `9069071435`, SHA-256 `d8b4060ee5bc98feb64a0bc56f7d4b7c0fc5c8ca85f8416730657a83976cf38b`.
 
+Handoff documental anterior: `e3e3cfdf57c6a4371d6c8bac993411efba2fdd33`, CI #979 / run `31405504346` — success integral. A auditoria final posterior detectou apenas deriva textual canônica.
+
 ## Coverage Matrix
 
 Snapshot P21.1 imutável: `26 / 25 / 39 / 51 / 21`.
@@ -46,7 +49,17 @@ Baseline vigente: **29 / 22 / 39 / 51 / 17**, 12 swaps, 44 estreias, blockers `M
 
 Fonte muda primeiro → Matrix observa → ledger por último. Nunca mascarar divergência ajustando baseline sem causalidade.
 
-## W4/F19 — contratos que agora são permanentes
+## W4/F19 — contrato real fechado
+
+A ficha autoral F19 e o runtime concordam:
+
+- L1 localizar 0–10;
+- L2 saltar para frente, magnitude 1–3, em 0–10;
+- L3 saltar para trás, magnitude 1–3, em 0–10;
+- L4 localizar 0–20 com numerais parciais;
+- L5 saltos variáveis bidirecionais, magnitude 1–4, em 0–20.
+
+Contratos permanentes:
 
 - `InteractiveNumberLineSurface` é compartilhada; não duplicar primitive;
 - F19 é responsiva e não usa `PalcoEscalado`;
@@ -64,7 +77,23 @@ Fonte muda primeiro → Matrix observa → ledger por último. Nunca mascarar di
 
 No phone, todas as marcas 0–20 permanecem; rótulos 11/13/15/17/19 são ocultados visualmente para legibilidade. Desktop/tablet amplo mantém 0–20 rotulados no L5.
 
-## W5 — decisão e execução
+## Antes de W5 — reconciliação documental obrigatória
+
+O checkpoint de auditoria final encontrou cinco derivas humanas. Corrigir **somente texto**, sem mudar runtime:
+
+A. `GRAFO_DE_CONHECIMENTO_SAGA.md`: N1.12 ainda chama `numberline*` de kind inexistente/prioridade 1 e mantém micros antigos. Alinhar à F19, preservando ID/prereqs/topologia.
+
+B. `BIBLIA_DO_SAGA.md §9.2`: `numberline`/`vertical` ainda estão como backlog oficial; reclassificar o trecho como histórico e remeter status atual à Coverage Matrix/auditoria.
+
+C. `BIBLIA_DO_SAGA.md §12.6`: CI #812 fica como snapshot histórico; a frase de “próxima Coverage Matrix” precisa apontar para Matrix já executável + ledger vigente.
+
+D. `FICHAS_F0_COMPLETAS.md`: nota de GM.02 sem ficha ficou velha; a ficha atual é `FICHA_P22_GM_02_TEMPO_COTIDIANO.md`, e o catálogo fecha 90/90.
+
+E. checkpoint W4: trocar o resumo L2 “saltos positivos de 2” por magnitude 1–3.
+
+Aplicar com patch textual seguro. Se a Bíblia for alterada, sincronizar versão do cabeçalho com a última entrada do changelog, conforme regra do próprio arquivo. Depois rodar gates completos e provar que Matrix continua **29/22/39/51/17**.
+
+## W5 — somente depois da reconciliação
 
 Antes de escrever código:
 
