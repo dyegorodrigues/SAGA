@@ -1,5 +1,5 @@
 # 🧱 INVENTÁRIO DE PRIMITIVAS SAGA
-**Versão 1.3 · Agosto 2026 · estado medido da cadeia ficha → Composer → renderer**
+**Versão 1.4 · Agosto 2026 · estado medido da cadeia ficha → Composer → renderer**
 
 > **Fonte executável de verdade:** `AI_Studio_Lab/tools/ficha_runtime_map.cjs`.
 > Este documento explica o mapa; não substitui o mapa. O auditor
@@ -12,24 +12,30 @@
 # §1. O RESULTADO QUE IMPORTA
 
 O catálogo autoral F0–F4 usa **26 primitivas mapeadas**. No estado atual da branch
-cumulativa:
+cumulativa, com a infraestrutura da F61/GM.05 implementada mas o canário ainda
+inativo:
 
 | Estado comprovado | Total | O que significa |
 |---|---:|---|
-| **Executável** | **18** | ficha pode chegar a builder e renderer reais |
+| **Executável** | **21** | ficha pode chegar a builder — genérico ou especializado — e renderer reais |
 | **Renderer sem builder** | **4** | app sabe desenhar, Composer ainda não produz o contrato |
-| **Componente isolado** | **3** | componente existe, mas ainda não forma cadeia executável |
-| **Ausente** | **1** | não existe cadeia nem componente suficiente |
+| **Componente isolado** | **1** | componente existe, mas ainda não forma cadeia executável |
+| **Ausente** | **0** | nenhuma primitiva autoral usada pelas fichas está sem componente/cadeia suficiente |
 
 A leitura correta não é “faltam dezenas de primitivas”. O gargalo real é misto:
 algumas peças precisam apenas de ligação, outras precisam de contrato novo, e
 várias que antes constavam como “faltando ligar” **já foram ligadas**.
 
+Importante: **primitive executável não significa competência ativada**. `Regua`
+já existe e possui builder especializado + Stage, mas GM.05 continua em fallback
+enquanto o canário W5 estiver inativo. Infraestrutura e entrega curricular são
+estados diferentes e a Coverage Matrix os mede separadamente.
+
 ---
 
 # §2. MAPA AUTORAL → RUNTIME
 
-## 2.1 🟢 Executáveis — 18
+## 2.1 🟢 Executáveis — 21
 
 | Primitiva autoral | Dispatch/runtime | Observação |
 |---|---|---|
@@ -39,20 +45,23 @@ várias que antes constavam como “faltando ligar” **já foram ligadas**.
 | `Recipientes` | `medidas` | **F50/GM.12**; capacidade sem unidade: fontes cheias → despejo → recipientes iguais de referência |
 | `DragGroup` | `draggroup` | agrupamento por arrasto |
 | `EmojiRow` | `emojirow` | contagem/subitização |
-| `InteractiveNumberLine` | `numberline` | reta interativa |
+| `Grupo` | `grandeza` → `GrandezaStage` | F49/GM.01; cadeia autoral especializada substitui o grupo genérico para manter bases alinhadas |
+| `InteractiveNumberLine` | `numberline` / `numberline-f19` | reta interativa compartilhada; F19 usa builder especializado |
 | `InteractiveVertical` | `vertical` | algoritmo vertical |
-| `MaterialDourado` | `tens` | valor posicional |
+| `MaterialDourado` | `tens` / `material-dourado` | valor posicional; F21 usa Stage manipulativo especializado |
 | `NumberBond` | `bond` | parte–todo |
 | `NumberLine` | `numberline` | reta numérica |
+| `Regua` | `regua-f61` | **F61/GM.05**; alinhamento no zero, drag + alternativa por toque, filtro motor e sonda Chrome |
 | `Relogio` | `relogio` | tempo |
 | `ScatteredItems` | `scattered` | conservação/contagem dispersa |
 | `ShapeCanvas` | `shapecanvas` | **F47/GE.01 + F48/GE.02**; despacha para Stage específico |
+| `StoryPanel` | `storypanel` → `story-bars` | F20/N3.10; builder e Stage narrativo especializados |
 | `TenFrame` | `tenframe` | moldura de dez |
 | `TouchCount` | `touchcount` | **F27/N1.02 + F01/N1.04**; primitiva própria de contagem por toque |
 | `TouchPlace` | `touchplace` | **F04/N1.13**; produção de quantidade, arrasto, retry autoral |
 | `plain` | `plain` | alternativa/simbólico básico |
 
-### Quatro ligações que não podem voltar a aparecer como “faltando”
+### Ligações que não podem voltar a aparecer como “faltando”
 
 - **`AudioChoice`** já possui builder, renderer e Stage executável. O fluxo F05 foi
   auditado em Chromium, inclusive abertura → primeira audição → opções → erro →
@@ -65,6 +74,9 @@ várias que antes constavam como “faltando ligar” **já foram ligadas**.
   portal para continuar sob o dedo.
 - **`ShapeCanvas`** já possui builder `shapecanvas` e renderer. O mesmo contrato é
   especializado por `CenaDePosicaoStage` (F47) e `FormaStage` (F48).
+- **`Regua`** deixou de ser lacuna estrutural na W5. `Regua.tsx` é a superfície
+  visual, `ReguaStage.tsx` governa a interação e `reguaContract.ts` é o builder
+  especializado da GM.05. O canário curricular continua independente desse fato.
 
 ## 2.2 🟡 Renderer existe, builder falta — 4
 
@@ -75,25 +87,24 @@ várias que antes constavam como “faltando ligar” **já foram ligadas**.
 | `SingaporeBars` | `singapore-bars` | renderer legado existe; builder autoral ainda não é geral |
 | `VisualAddition` | `visual-addition` | `subvis`/variação ainda não entra pelo Composer |
 
-## 2.3 🟠 Componente isolado — 3
+## 2.3 🟠 Componente isolado — 1
 
 | Primitiva | Estado |
 |---|---|
-| `Grupo` | componente existe; falta cadeia autoral completa |
 | `Quadrado100` | componente existe; falta builder/renderer autoral para os kinds declarados |
-| `StoryPanel` | componente existe; não confundir com palcos narrativos específicos já criados |
 
-## 2.4 🔴 Ausente — 1 entre as 25 primitivas usadas pelas fichas
+## 2.4 🔴 Ausentes — 0
 
-| Primitiva | Kind | Lacuna |
-|---|---|---|
-| `Regua` | `measure` | régua/fita alinhável no zero + alternativa motora por toque |
+Nenhuma das 26 primitivas autorais mapeadas está atualmente sem componente ou
+cadeia suficiente para ser classificada acima. Isso **não** elimina dívida de
+builder: `Moedas`, `LinkingCubes`, `SingaporeBars` e `VisualAddition` continuam
+sem builder autoral, e `Quadrado100` continua isolado.
 
 ---
 
 # §3. KINDS MAIS AMPLOS DA BÍBLIA
 
-A Bíblia também nomeia modos/kinds que não correspondem 1:1 às 25 primitivas
+A Bíblia também nomeia modos/kinds que não correspondem 1:1 às 26 primitivas
 autorais acima. Não contar cada nome como “um componente faltando”. Antes de
 construir, classificar em uma destas categorias:
 
@@ -102,11 +113,11 @@ construir, classificar em uma destas categorias:
 3. **renderer legado** que precisa de builder;
 4. **mecânica realmente nova**.
 
-Exemplos de mecânicas ainda relevantes fora do mapa autoral atual:
+Exemplos de mecânicas relevantes fora do mapa autoral atual:
 
 | Kind/mecânica | Situação |
 |---|---|
-| `measure` | lacuna real e prioritária |
+| `measure` | realizado pela `Regua`/F61 na cadeia especializada GM.05; não criar segundo componente homônimo |
 | `picto` | requer primitiva de dados/gráfico |
 | `pattern` | requer contrato próprio ou reutilização comprovada |
 | `grid` | malha/mapa; prioridade para GE.05/GE.08 |
@@ -135,6 +146,7 @@ Exemplos de mecânicas ainda relevantes fora do mapa autoral atual:
 | arrasto sempre tem alternativa por toque e snap generoso | acessibilidade motora §8.3-bis |
 | API visual explícita | microaula/Mão Fantasma não depende de seletor improvisado |
 | kind novo exige auditoria de cadeia inteira | ficha → contrato → builder → renderer → Stage → Radar/evidência |
+| builder especializado conta como cadeia real quando o auditor prova ID→builder→renderer | evitar `case` genérico morto apenas para satisfazer inventário |
 
 Antes de criar primitiva nova, responder obrigatoriamente:
 
@@ -153,15 +165,24 @@ existe”, mas não verificava “o código evoluiu e o mapa ficou velho”. Por
 a documentação ainda descrevia estados anteriores.
 
 A partir da v1.2, `ficha_catalog_auditor.cjs` também faz a checagem reversa para
-kinds convencionais. Se Composer + renderer já provam a cadeia e o mapa não a
+kinds convencionais. Na W5 o gate ganhou ainda a noção explícita de **builder
+especializado por competência**, para não forçar um builder genérico morto quando
+uma primitive possui um único consumidor autoral real.
+
+Se Composer/builder especializado + renderer já provam a cadeia e o mapa não a
 reconhece, **o gate falha**.
 
 Isso transforma este inventário de memória humana em contrato verificável.
 
 ---
 
-*Changelog: v1.3 (ago/2026) — adiciona `Recipientes` como a 26ª primitiva mapeada e 18ª executável após F50/GM.12 validada em Chromium e por inspeção visual; mantém unidades padronizadas fora de F0. v1.2 — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace`
-e `ShapeCanvas` com o runtime real; corrige os totais do mapa autoral para
-17 executáveis / 4 renderer-sem-builder / 3 isoladas / 1 ausente; adiciona guarda
-reversa no auditor. v1.1 — introduziu o mapa autoral→runtime auditável e resolveu
-semanticamente `Moedas` e `Regua`. v1.0 — inventário inaugural.*
+*Changelog: v1.4 (ago/2026) — W5/F61 implementa `Regua` com builder especializado,
+Stage responsivo, filtro motor, alternativa por toque e sonda Chrome; estado
+medido passa a 21 executáveis / 4 renderer-sem-builder / 1 isolada / 0 ausentes,
+sem confundir primitive pronta com canário GM.05 ativo. v1.3 — adiciona
+`Recipientes` como a 26ª primitiva mapeada e 18ª executável após F50/GM.12
+validada em Chromium e por inspeção visual; mantém unidades padronizadas fora de
+F0. v1.2 — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace` e `ShapeCanvas`
+com o runtime real; adiciona guarda reversa no auditor. v1.1 — introduziu o mapa
+autoral→runtime auditável e resolveu semanticamente `Moedas` e `Regua`. v1.0 —
+inventário inaugural.*
