@@ -61,10 +61,15 @@ div:has(> .mk-optin > span.absolute.top-1.right-1\.5) + div.text-center.mt-2 {
  *
  * A superfície já resolve o tap físico por coordenada + snap, portanto os
  * botões transparentes dos ticks são a camada semântica/teclado, não o alvo
- * motor. Em 320px, manter os 2rem de padding do wrapper comprimía 21 marcas e
- * fazia rótulos de dois dígitos colidirem. Recuperamos 3.5rem da largura útil
- * apenas no phone e reduzimos os botões semânticos para 32px (ainda > WCAG
- * Target Size mínimo de 24px). A partir de 640px, o layout original permanece.
+ * motor. Em 320px, manter os 2rem de padding do wrapper comprimia 21 marcas.
+ * Recuperamos 3.5rem da largura útil e reduzimos os botões semânticos para 32px
+ * (ainda > WCAG Target Size mínimo de 24px).
+ *
+ * Mesmo com a largura recuperada, onze rótulos de dois dígitos consecutivos
+ * (10–20) não cabem legíveis em 320px. Em phone escondemos apenas as âncoras
+ * ímpares 11/13/15/17/19; todas as marcas continuam presentes/interativas, os
+ * pares 12/14/16/18/20 permanecem rotulados e >=640px continua mostrando 0–20
+ * integralmente. Isso reduz clutter sem alterar posição, snap ou resposta.
  */
 @media (max-width: 639px) {
   [data-reta-surface] {
@@ -74,5 +79,13 @@ div:has(> .mk-optin > span.absolute.top-1.right-1\.5) + div.text-center.mt-2 {
 
   [data-reta-tick] {
     width: 2rem !important;
+  }
+
+  [data-reta-label="11"],
+  [data-reta-label="13"],
+  [data-reta-label="15"],
+  [data-reta-label="17"],
+  [data-reta-label="19"] {
+    visibility: hidden !important;
   }
 }
