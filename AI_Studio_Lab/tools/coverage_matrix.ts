@@ -81,6 +81,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F19 materializada na InteractiveNumberLine compartilhada com reta responsiva, tap/drag filtrados por geometria motora, salto e som sincronizados, arcos somente no L2 e sonda Chrome 320/390/900; o legado saiu de produção e a divergência ficha↔screen foi fechada.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W5-GM.05",
+    competence: "GM.05",
+    rationale: "F61 materializada com Regua especializada: medida informal→leitura→alinhamento do zero→comparação→estimativa, filtro motor e evidência ALINHOU_ZERO; canário inativo passou suíte completa e Chrome 320/390/900 antes da promoção. A Matrix observou 30 Composer, 38 fallback e 52 servidas após a ativação.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
