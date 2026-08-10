@@ -331,6 +331,17 @@ export const MisconceptionTag = {
   /** Capacidade: comparou a altura do líquido sem neutralizar o formato do recipiente. */
   IGNORA_FORMATO: "ignora-formato",
 
+  /* --- medida padronizada com régua (ficha F61 / GM.05) ------------- */
+
+  /** F61: tratou a marca 1 como origem e mediu a partir dela, ignorando o zero. */
+  COMECA_NO_UM: "comeca-no-um",
+
+  /** F61: posicionou deliberadamente outra marca como origem da medição. */
+  REGUA_DESALINHADA: "regua-desalinhada",
+
+  /** F61: leu o valor mas atribuiu uma unidade incompatível com a escala. */
+  CONFUNDE_UNIDADE: "confunde-unidade",
+
   /* --- a moldura de dez (fichas F02, JD3 e JD5) ---------------------- */
 
   /** Moldura: somou as casas vazias às cheias — não distingue ocupado de vago */
