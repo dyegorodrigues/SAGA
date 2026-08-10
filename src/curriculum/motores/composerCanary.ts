@@ -24,6 +24,7 @@ import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
 import { GM_02 } from "../fichas/jornada/GM.02";
+import { GM_05 } from "../fichas/jornada/GM.05";
 import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
@@ -32,6 +33,7 @@ import { AL_02 } from "../fichas/jornada/AL.02";
 import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
 import { construirReta20Question } from "../procedimentos/reta20Contract";
+import { construirReguaQuestion } from "../procedimentos/reguaContract";
 import { construirDezenaUnidadesQuestion } from "../procedimentos/materialDouradoContract";
 import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { Question, Track } from "../../types";
@@ -98,6 +100,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "GM.01": GM_01,
   "GM.02": GM_02,
   "GM.12": GM_12,
+
+  // W5 — F61 registrada, mas INATIVA. Só pode ser promovida depois que
+  // contrato/palco/filtro motor/a11y/sonda real e CI inativo ficarem verdes.
+  "GM.05": GM_05,
 };
 
 /** Builders especializados ainda passam pela MESMA porta de registro/ativação. */
@@ -107,6 +113,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N1.12": construirReta20Question,
   "N2.01": construirDezenaUnidadesQuestion,
   "GM.02": construirTempoCotidianoQuestion,
+  "GM.05": construirReguaQuestion,
 };
 
 /**
@@ -117,6 +124,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
 const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N1.12": "numberline-f19",
   "N2.01": "material-dourado",
+  "GM.05": "regua-f61",
 };
 
 export function registeredFichaRuntimeKindOverride(id: string): string | undefined {
