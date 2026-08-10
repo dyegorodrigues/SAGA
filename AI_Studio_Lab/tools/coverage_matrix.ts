@@ -17,6 +17,7 @@ interface RuntimeMapEntry {
   kinds: string[];
   componentFiles: string[];
   builderKinds: string[];
+  specializedBuilderIds?: string[];
   rendererKinds: string[];
   note?: string;
 }
@@ -476,7 +477,16 @@ function validate(rows: CoverageMatrixRow[], counts: CoverageMatrixCounts): stri
   check(counts.divergences === COVERAGE_BASELINE.divergences, `divergências ficha↔screen divergiram: ${counts.divergences} vs ${COVERAGE_BASELINE.divergences}`);
   check(counts.modeSwaps === COVERAGE_BASELINE.modeSwaps, `trocas visuais divergiram: ${counts.modeSwaps} vs ${COVERAGE_BASELINE.modeSwaps}`);
   check(counts.toolIntroductions === COVERAGE_BASELINE.toolIntroductions, `estreias divergiram: ${counts.toolIntroductions} vs ${COVERAGE_BASELINE.toolIntroductions}`);
-  check(JSON.stringify(counts.missingPrimitives) === JSON.stringify([...COVERAGE_BASELINE.missingPrimitives]), `primitivas ausentes divergiram: ${counts.missingPrimitives.join(", ")}`);
+
+  // A lista P21.1 continua imutável no snapshot, mas a presença física de uma
+  // primitive é infraestrutura viva: ela pode ser resolvida enquanto a ficha
+  // ainda está registrada e INATIVA. O ledger governa entrega curricular; não
+  // deve fingir que um arquivo/renderer real continua ausente só para ficar verde.
+  const closedMissing = new Set<string>(COVERAGE_CLOSED_BASELINE.missingPrimitives);
+  for (const primitive of counts.missingPrimitives) {
+    check(closedMissing.has(primitive), `nova primitiva bloqueadora ausente: ${primitive}`);
+  }
+
   check(new Set(COVERAGE_MIGRATIONS.map(migration => migration.id)).size === COVERAGE_MIGRATIONS.length, "ledger da Coverage Matrix contém IDs de migração duplicados");
   for (const migration of COVERAGE_MIGRATIONS) check(graphIds.has(migration.competence), `${migration.id}: competência inexistente ${migration.competence}`);
 
@@ -496,7 +506,18 @@ function validate(rows: CoverageMatrixRow[], counts: CoverageMatrixCounts): stri
   const moedas = rows.filter(row => row.missingPrimitives.includes("Moedas")).map(row => row.id);
   const regua = rows.filter(row => row.missingPrimitives.includes("Regua")).map(row => row.id);
   check(moedas.includes("GM.03"), `Moedas deveria bloquear GM.03; bloqueia ${moedas.join(", ") || "ninguém"}`);
-  check(regua.includes("GM.05"), `Regua deveria bloquear GM.05; bloqueia ${regua.join(", ") || "ninguém"}`);
+
+  // Enquanto a primitive ainda não existe, Regua precisa bloquear GM.05. A
+  // partir do instante em que o componente real nasce, o blocker estrutural
+  // desaparece mesmo com GM.05 em fallback; ativação e mastery continuam sob o
+  // canário/learner state. Depois que W5 entrar no ledger, a ausência volta a
+  // ser regressão permanente.
+  const gm05Migrated = COVERAGE_MIGRATIONS.some(migration => migration.competence === "GM.05");
+  if (gm05Migrated || primitiveFiles.has("Regua")) {
+    check(!regua.includes("GM.05"), `Regua já existe e não deveria bloquear GM.05; bloqueia ${regua.join(", ") || "ninguém"}`);
+  } else {
+    check(regua.includes("GM.05"), `Regua deveria bloquear GM.05; bloqueia ${regua.join(", ") || "ninguém"}`);
+  }
   return failures;
 }
 
