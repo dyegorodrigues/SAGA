@@ -8,10 +8,16 @@ interface Props {
   ariaLabel?: string;
 }
 
+const END_PAD_PX = 10;
+
 /**
  * Régua visual pura. Currículo e diagnóstico ficam fora deste componente.
  * A marca 0 está exatamente no x=0 do plano da régua: o Stage pode comparar
  * geometria real sem compensação invisível de padding.
+ *
+ * Há uma pequena sobra física APÓS a última marca. Ela não altera a escala
+ * matemática (`unitPx` continua soberano), apenas impede que o rótulo final
+ * fique pendurado para fora da madeira em telas pequenas.
  */
 export function Regua({
   max,
@@ -20,7 +26,7 @@ export function Regua({
   destacarMarca = null,
   ariaLabel = "Régua em centímetros",
 }: Props) {
-  const width = max * unitPx;
+  const width = max * unitPx + END_PAD_PX;
   return (
     <div
       role="img"
@@ -28,6 +34,7 @@ export function Regua({
       data-regua
       data-regua-max={max}
       data-regua-unit-px={unitPx}
+      data-regua-end-pad={END_PAD_PX}
       className="relative h-[66px] rounded-lg border-2 border-amber-400 bg-gradient-to-b from-amber-50 to-amber-100 shadow-sm"
       style={{ width }}
     >
@@ -55,12 +62,8 @@ export function Regua({
                 data-regua-label-edge={borda}
                 className={`absolute top-[29px] whitespace-nowrap text-[11px] font-black ${destaque ? "text-blue-700" : "text-amber-950"}`}
                 style={{
-                  left: valor === 0 ? 2 : valor === max ? -2 : 0,
-                  transform: valor === 0
-                    ? "none"
-                    : valor === max
-                      ? "translateX(-100%)"
-                      : "translateX(-50%)",
+                  left: valor === 0 ? 2 : 0,
+                  transform: valor === 0 ? "none" : "translateX(-50%)",
                 }}
               >
                 {valor}
