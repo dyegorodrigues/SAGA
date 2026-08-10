@@ -169,6 +169,7 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
   }
 
   const alvoTutorial = typeof mostrar?.pulsarAlvo === "number" ? mostrar.pulsarAlvo : spec.alvo;
+  const mostraArcosAssistidos = spec.nivel === 2 && spec.modo === "saltar";
 
   return (
     <PalcoEscalado>
@@ -196,6 +197,8 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
           pulsarTarget={Boolean(mostrar?.pulsarAlvo)}
           pathFrom={percurso?.de ?? null}
           pathTo={percurso?.ate ?? null}
+          assistPathFrom={mostraArcosAssistidos ? spec.posicaoInicial : null}
+          assistPathTo={mostraArcosAssistidos ? spec.alvo : null}
           errorPulse={erroPulse}
           onTapTick={tocarTick}
           onDragTick={atravessarTickNoArrasto}
