@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from "react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "@testing-library/react";
 import { FichaRenderer } from "../FichaRenderer";
 import { MisconceptionTag } from "../../constants/misconceptions";
 import { N1_12 } from "../../curriculum/fichas/jornada/N1.12";
@@ -38,17 +38,24 @@ describe("F19 — Reta20Stage → FichaRenderer → AnswerMeta", () => {
     );
   });
 
-  it("acerto não produz misconception e mantém a decisão como manipulação válida", () => {
-    const q = qDoNivel(2);
-    const spec = q.uiProps as Reta20Spec;
-    const onAnswer = vi.fn();
-    const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
-    fireEvent.click(container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.alvo}"]`)!);
-    expect(onAnswer).toHaveBeenCalledWith(
-      spec.alvo,
-      true,
-      expect.not.objectContaining({ misconception: expect.anything() }),
-    );
+  it("acerto só chega ao boundary depois da coreografia e não produz misconception", () => {
+    vi.useFakeTimers();
+    try {
+      const q = qDoNivel(2);
+      const spec = q.uiProps as Reta20Spec;
+      const onAnswer = vi.fn();
+      const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
+      fireEvent.click(container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.alvo}"]`)!);
+      expect(onAnswer).not.toHaveBeenCalled();
+      act(() => vi.runAllTimers());
+      expect(onAnswer).toHaveBeenCalledWith(
+        spec.alvo,
+        true,
+        expect.not.objectContaining({ misconception: expect.anything() }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("o GameLoop reconhece numberline-f19 como retry e feedback autorais sem options", () => {
