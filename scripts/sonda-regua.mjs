@@ -85,6 +85,7 @@ async function probeLayout(page, width, level) {
       compare,
       clips: document.querySelectorAll("[data-regua-clipes] > *").length,
       answerButtons: document.querySelectorAll("[data-regua-answer-buttons] button").length,
+      tapAlignButtons: document.querySelectorAll("[data-regua-tap-align]").length,
     };
   });
 
@@ -100,13 +101,16 @@ async function probeLayout(page, width, level) {
     assert(data.ruler.width >= 150, `F61 L${level} régua colapsou em ${width}px`);
     assert(data.object.width >= 40, `F61 L${level} objeto colapsou em ${width}px`);
     assert(data.ruler.left >= -2 && data.ruler.right <= width + 2, `F61 L${level} régua cortada em ${width}px`);
-    assert(data.answerButtons >= 3 || level === 5, `F61 L${level} perdeu alternativas de leitura`);
   }
   if (level === 2) {
     assert(Math.abs(data.ruler.left - data.object.left) <= 1.5, `F61 L2 não nasceu alinhada no zero em ${width}px`);
+    assert(data.answerButtons >= 3, `F61 L2 perdeu alternativas de leitura em ${width}px`);
+    assert(data.tapAlignButtons === 0, `F61 L2 exibiu alinhamento desnecessário em ${width}px`);
   }
   if (level === 3 || level === 5) {
     assert(Math.abs(data.ruler.left - data.object.left) >= 5, `F61 L${level} deveria nascer desalinhada em ${width}px`);
+    assert(data.answerButtons === 0, `F61 L${level} liberou leitura antes do alinhamento em ${width}px`);
+    assert(data.tapAlignButtons === 1, `F61 L${level} perdeu alternativa motora de alinhamento em ${width}px`);
   }
   if (level === 4) {
     assert(data.compare.length === 2, "F61 L4 precisa de dois objetos medíveis");
@@ -126,8 +130,10 @@ async function exerciseTap(page) {
   await prepareLevel(page, 3);
   const probe = page.locator("[data-regua-probe]");
   const correct = await probe.getAttribute("data-correct");
+  assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L3 liberou leitura antes do alinhamento por toque");
   await page.locator("[data-regua-tap-align]").click();
   assert(await page.locator("[data-regua-stage]").getAttribute("data-regua-aligned") === "true", "F61 tap alternativo não alinhou o zero");
+  assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 não liberou leitura depois do alinhamento por toque");
   await page.getByRole("button", { name: correct }).click();
   await page.waitForFunction(expected => document.querySelector("[data-regua-probe]")?.getAttribute("data-answer") === expected, correct);
   assert((await probe.getAttribute("data-evidencias"))?.includes("alinhou-zero"), "F61 tap não colheu evidência ALINHOU_ZERO");
@@ -138,6 +144,7 @@ async function exerciseDrag(page) {
   await prepareLevel(page, 3);
   const probe = page.locator("[data-regua-probe]");
   const correct = await probe.getAttribute("data-correct");
+  assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L3 liberou leitura antes do alinhamento por drag");
   const ruler = await page.locator("[data-regua-draggable] [data-regua]").boundingBox();
   const object = await page.locator("[data-regua-object]").boundingBox();
   assert(ruler && object, "F61 não expôs geometria real para drag");
@@ -149,6 +156,7 @@ async function exerciseDrag(page) {
   await page.mouse.move(startX + dx, y, { steps: 10 });
   await page.mouse.up();
   await page.waitForFunction(() => document.querySelector("[data-regua-stage]")?.getAttribute("data-regua-aligned") === "true");
+  assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 não liberou leitura depois do alinhamento por drag");
   await page.getByRole("button", { name: correct }).click();
   await page.waitForFunction(expected => document.querySelector("[data-regua-probe]")?.getAttribute("data-answer") === expected, correct);
   assert((await probe.getAttribute("data-evidencias"))?.includes("alinhou-zero"), "F61 drag não colheu evidência ALINHOU_ZERO");
@@ -159,8 +167,11 @@ async function exerciseEstimate(page) {
   await page.goto(`${BASE}?level=5&r=0.5`, { waitUntil: "networkidle" });
   const probe = page.locator("[data-regua-probe]");
   assert(await page.locator("[data-regua-estimate-phase]").count() === 1, "F61 L5 não começou pela estimativa");
+  assert(await page.locator("[data-regua-draggable]").count() === 0, "F61 L5 expôs régua antes da estimativa");
   await page.locator("[data-regua-estimate-phase] button").first().click();
+  assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L5 liberou leitura antes de alinhar após estimar");
   await page.locator("[data-regua-tap-align]").click();
+  assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 L5 não liberou leitura após estimar e alinhar");
   const value = await probe.getAttribute("data-value");
   await page.getByRole("button", { name: `${value} cm` }).click();
   assert(await page.locator("[data-regua-unit-buttons]").count() === 1, "F61 L5 não pediu unidade após a medida");
@@ -202,7 +213,7 @@ try {
   fs.writeFileSync(path.join(ARTIFACTS, "receipt.json"), JSON.stringify(receipt, null, 2));
   console.log("SAGA — SONDA F61: OK");
   console.log(`- larguras: ${WIDTHS.join(", ")} px; níveis: 1–5`);
-  console.log("- tap alternativo, drag real e estimar→medir: OK");
+  console.log("- leitura só após alinhamento; tap alternativo, drag real e estimar→medir: OK");
   console.log(`- evidências: ${ARTIFACTS}`);
 } finally {
   await browser?.close().catch(() => {});
