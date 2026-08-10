@@ -35,6 +35,7 @@ import { GE_02 } from './jornada/GE.02';
 import { GM_01 } from './jornada/GM.01';
 import { GM_02 } from './jornada/GM.02';
 import { GM_04 } from './jornada/GM.04';
+import { GM_05 } from './jornada/GM.05';
 import { GM_12 } from './jornada/GM.12';
 import { JARDIM_FICHAS } from './dojo/jardim';
 
@@ -45,7 +46,7 @@ export const JOURNEY_FICHAS = [
   N4_02, N4_03, N4_04, N4_06, N4_07, N4_08, N4_09,
   AL_01, AL_02, AL_05,
   GE_01, GE_02,
-  GM_01, GM_02, GM_04, GM_12,
+  GM_01, GM_02, GM_04, GM_05, GM_12,
 ];
 
 export const AllFichas = [
