@@ -1,21 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { Composer } from "./Composer";
 import { FichaCompetencia, KindType } from "./schema";
+import { generateRegisteredFichaQuestion } from "./motores/composerCanary";
 import type { Question } from "../types";
 
 /**
- * P18 — o tipo autoral não pode prometer uma tela que o Composer não sabe montar.
+ * P18 — o tipo autoral não pode prometer uma tela que não possua caminho de
+ * construção real.
  *
- * Antes deste fechamento, nove nomes legados/futuros estavam em `KindType` sem
- * builder. Isso fazia uma ficha autoral COMPILAR e só quebrar na geração diante
- * da criança. A auditoria AST `AUDITORIA_P18_KINDS.md` provou que nenhum dos nove
- * é usado hoje por uma ficha TypeScript real.
+ * Regra vigente: um `KindType` precisa de UM destes caminhos, comprovado por
+ * código e não por lista de exceções:
  *
- * `Question.kind` continua `string`: retirar um nome do `KindType` NÃO remove
- * geradores/renderers legados. Apenas fecha a API autoral até que uma futura
- * ficha traga contrato + builder + renderer + teste no mesmo lote.
+ * 1. builder genérico em `Composer.ts`; ou
+ * 2. todas as fichas runtime que usam aquele kind possuem builder especializado
+ *    registrado em `composerCanary.ts`.
+ *
+ * O segundo caso existe para contratos deliberadamente ficha-específicos, como
+ * F61/GM.05: criar um `case "regua"` genérico que só aceita GM.05 seria uma
+ * segunda porta morta para a mesma implementação. A prova especializada continua
+ * estrita: kind sem consumidor, consumidor sem builder ou ID divergente falha.
  */
 
 const LEGADO_OU_FUTURO_FORA_DA_API_AUTORAL = [
@@ -30,13 +35,21 @@ const LEGADO_OU_FUTURO_FORA_DA_API_AUTORAL = [
   "visual-addition",
 ] as const;
 
-/** Os `case` do `switch` que escolhe o builder, lidos do próprio Composer. */
-function kindsComBuilder(): Set<string> {
+function kindsComBuilderGenerico(): Set<string> {
   const fonte = readFileSync(join(__dirname, "Composer.ts"), "utf8");
   return new Set([...fonte.matchAll(/case ["']([a-z_-]+)["']/g)].map(m => m[1]));
 }
 
-/** Todo valor do `KindType`, lido do próprio schema. */
+function idsComBuilderEspecializado(): Set<string> {
+  const fonte = readFileSync(join(__dirname, "motores/composerCanary.ts"), "utf8");
+  const bloco = fonte.match(/const SPECIALIZED_BUILDERS[\s\S]*?=\s*\{([\s\S]*?)\n\};/);
+  return new Set(
+    bloco
+      ? [...bloco[1].matchAll(/["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2})["']\s*:\s*construir[A-Za-z0-9_]+/g)].map(m => m[1])
+      : [],
+  );
+}
+
 function todosOsKinds(): string[] {
   const fonte = readFileSync(join(__dirname, "schema.ts"), "utf8");
   const linha = /export type KindType = ([^;]+);/.exec(fonte);
@@ -44,21 +57,58 @@ function todosOsKinds(): string[] {
   return [...linha[1].matchAll(/"([a-z_-]+)"/g)].map(m => m[1]);
 }
 
-describe("P18 — todo KindType autoral tem builder real", () => {
-  const comBuilder = kindsComBuilder();
+interface UsoDeKind { id: string; kind: string; file: string }
+function usosRuntimeDeKind(): UsoDeKind[] {
+  const dir = join(__dirname, "fichas/jornada");
+  const usos: UsoDeKind[] = [];
+  for (const file of readdirSync(dir).filter(name => name.endsWith(".ts") && !name.endsWith(".test.ts"))) {
+    const fonte = readFileSync(join(dir, file), "utf8");
+    const id = fonte.match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2})["']/)?.[1];
+    if (!id) continue;
+    for (const match of fonte.matchAll(/\bprimitiva:\s*["']([a-z_-]+)["']/g)) {
+      usos.push({ id, kind: match[1], file });
+    }
+    for (const match of fonte.matchAll(/\bkinds:\s*\[([^\]]+)\]/g)) {
+      for (const kind of match[1].matchAll(/["']([a-z_-]+)["']/g)) {
+        usos.push({ id, kind: kind[1], file });
+      }
+    }
+  }
+  return usos;
+}
+
+describe("P18 — todo KindType autoral tem caminho de builder real", () => {
+  const genericos = kindsComBuilderGenerico();
+  const especializados = idsComBuilderEspecializado();
   const todos = todosOsKinds();
+  const usos = usosRuntimeDeKind();
 
   it("o inventário foi lido e contém primitivas autorais recentes", () => {
     expect(todos.length).toBeGreaterThan(20);
     expect(todos).toContain("moldura");
     expect(todos).toContain("medidas");
-    expect(comBuilder).toContain("touchplace");
+    expect(todos).toContain("regua");
+    expect(genericos).toContain("touchplace");
+    expect(especializados).toContain("GM.05");
   });
 
-  it("⚠️ não existe mais exceção: todo kind que a ficha pode declarar tem builder", () => {
-    const orfaos = todos.filter(k => !comBuilder.has(k));
-    expect(orfaos, `kind(s) autoral(is) sem builder: ${orfaos.join(", ")}`)
+  it("todo kind tem builder genérico ou é usado só por fichas com builder especializado", () => {
+    const semCaminho: string[] = [];
+    for (const kind of todos) {
+      if (genericos.has(kind)) continue;
+      const consumidores = [...new Set(usos.filter(uso => uso.kind === kind).map(uso => uso.id))];
+      if (!consumidores.length || consumidores.some(id => !especializados.has(id))) {
+        semCaminho.push(`${kind}[${consumidores.join(",") || "sem-consumidor"}]`);
+      }
+    }
+    expect(semCaminho, `kind(s) autoral(is) sem caminho de builder: ${semCaminho.join(", ")}`)
       .toEqual([]);
+  });
+
+  it("o builder especializado F61 é executável pela porta registrada", () => {
+    const q = generateRegisteredFichaQuestion("GM.05", 3);
+    expect(q.kind).toBe("regua-f61");
+    expect(q.uiProps).toEqual(expect.objectContaining({ modo: "alinhar", unidade: "cm" }));
   });
 
   it("legado e contratos futuros não vazam de volta para KindType", () => {
@@ -68,9 +118,6 @@ describe("P18 — todo KindType autoral tem builder real", () => {
   });
 
   it("retirar do KindType não proíbe Question.kind legado", () => {
-    // Este objeto compilar é a prova importante: Question.kind continua string.
-    // Portanto saves/geradores legados podem atravessar a transição sem que uma
-    // ficha AUTORAL possa declarar a mesma API incompleta.
     const legado: Question = {
       kind: "multiple_choice",
       prompt: "fallback legado",
