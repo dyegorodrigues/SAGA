@@ -140,6 +140,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   groups: ["DragGroup"],
   tenframe: ["TenFrame"],
   tens: ["Quadrado100"],
+  "material-dourado": ["MaterialDourado", "TenFrame"],
   bond: ["NumberBond"],
   numberline: ["NumberLine"],
   "numberline-interactive": ["InteractiveNumberLine"],
