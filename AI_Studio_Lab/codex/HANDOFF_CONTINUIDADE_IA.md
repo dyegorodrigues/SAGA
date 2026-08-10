@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e W1–W4 estão fechadas com recibo remoto. Próxima tarefa única: **selecionar W5 pela Coverage Matrix/DAG atual**.
+> **VIGENTE — 10/ago/2026.** Leia primeiro `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`, depois `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e W1–W4 estão funcionalmente fechadas. **W5 ainda não começou.** A próxima tarefa única é reconciliar as cinco derivas documentais A–E da auditoria final; só depois selecionar W5 pela Coverage Matrix/DAG atual.
 
 ## Regra de ouro
 
@@ -15,11 +15,12 @@
 
 ## Leia primeiro
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
-2. `RETOMADA.md`;
-3. `BRIEFING_CODEX.md`;
-4. checkpoints W3/W2/W1 + Coverage Matrix;
-5. cânone em `AI_Studio_Lab/pedagogia/`.
+1. `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`;
+2. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
+3. `RETOMADA.md`;
+4. `BRIEFING_CODEX.md`;
+5. checkpoints W3/W2/W1 + Coverage Matrix;
+6. cânone em `AI_Studio_Lab/pedagogia/`.
 
 ## Fechado — não reabrir sem falha objetiva
 
@@ -42,6 +43,8 @@ CI **#975 / run `31404572801` — success integral**:
 - F19 artifact ID `9069082798`, SHA-256 `65a1d3ab456f4320709547dcc98f87958f8ed083fb978b8a80322059e03629f3`;
 - Sensei artifact ID `9069071435`, SHA-256 `d8b4060ee5bc98feb64a0bc56f7d4b7c0fc5c8ca85f8416730657a83976cf38b`.
 
+Handoff documental anterior: `e3e3cfdf57c6a4371d6c8bac993411efba2fdd33`, CI #979 / run `31405504346` — success integral. A auditoria final feita depois dele encontrou deriva textual, não falha funcional.
+
 ## Coverage Matrix
 
 Snapshot histórico P21.1 é imutável:
@@ -61,11 +64,19 @@ Baseline vigente:
 
 Blockers continuam `Moedas` e `Regua`.
 
-## W4/F19 — arquitetura preservada
+## W4/F19 — arquitetura e progressão preservadas
 
 Fluxo real:
 
 `F19 → reta20Contract/procedure → specialized builder → numberline-f19 → Reta20Stage → InteractiveNumberLineSurface → gesto/geom. motor → AnswerMeta → GameLoop/Radar → canário → Matrix → Chrome real`.
+
+Progressão canônica materializada:
+
+- L1 localizar 0–10;
+- L2 saltar para frente em 0–10, magnitude 1–3;
+- L3 saltar para trás em 0–10, magnitude 1–3;
+- L4 localizar 0–20 com numerais parciais;
+- L5 saltos variáveis bidirecionais em 0–20, magnitude 1–4.
 
 Invariantes:
 
@@ -88,11 +99,25 @@ A sonda real encontrou e bloqueou reta colapsada, hitboxes sobrepostos e colisõ
 
 No phone todas as marcas 0–20 permanecem presentes. Só rótulos 11/13/15/17/19 são ocultados visualmente para não colidir; em largura maior o L5 rotula 0–20.
 
-## Próxima onda W5
+## Única pendência pré-W5 — reconciliação textual canônica
 
-Não escolher por memória deste documento. Primeiro consultar a Matrix viva.
+O checkpoint `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md` é obrigatório porque encontrou cinco derivas que não podem ser esquecidas:
 
-Critérios: DAG/descendentes, legado/fallback, divergência, blocker de primitive, onboarding, risco motor/a11y, risco pedagógico e custo.
+A. `GRAFO_DE_CONHECIMENTO_SAGA.md`: N1.12 ainda marca `numberline*` como inexistente/prioridade 1 e descreve micros antigos. Alinhar à F19 sem alterar ID/prereqs/topologia.
+
+B. `BIBLIA_DO_SAGA.md §9.2`: `numberline`/`vertical` ainda aparecem como backlog oficial. Reclassificar esse backlog como histórico e fazer status atual vir da Coverage Matrix/auditoria.
+
+C. `BIBLIA_DO_SAGA.md §12.6`: CI #812 fica histórico; a Matrix já existe e seu ledger W1–W4 é a fonte operacional atual.
+
+D. `FICHAS_F0_COMPLETAS.md`: nota de GM.02 sem ficha ficou obsoleta; apontar para `FICHA_P22_GM_02_TEMPO_COTIDIANO.md` e cobertura 90/90.
+
+E. checkpoint W4: corrigir “L2 saltos positivos de 2” para magnitude 1–3.
+
+Essa microfrente é **documental apenas**. Não mudar o runtime F19 para imitar texto antigo. Usar patch textual seguro; na Bíblia, sincronizar versão do cabeçalho e changelog conforme a regra interna do próprio arquivo. Rodar gates completos e confirmar Matrix **29/22/39/51/17** sem delta funcional.
+
+## Próxima onda W5 — só depois
+
+Depois que A–E estiverem reconciliadas, consultar a Matrix viva e escolher W5 por DAG/descendentes, legado/fallback, divergência, blocker de primitive, onboarding, risco motor/a11y, risco pedagógico e custo.
 
 Fluxo obrigatório:
 
