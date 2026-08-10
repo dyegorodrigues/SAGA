@@ -58,7 +58,16 @@ describe("GM.05 / F61 — medir com régua", () => {
     for (let nivel = 2; nivel <= 5; nivel += 1) {
       for (let i = 0; i < 100; i += 1) {
         const spec = construirReguaSpec(nivel, () => (i % 97) / 97);
-        expect(Number.isInteger(spec.valorCerto)).toBe(true);
+        if (nivel === 4) {
+          // L4 não pede um número: mede dois comprimentos inteiros e responde
+          // qual objeto é maior. Portanto `valorCerto` é intencionalmente vazio.
+          expect(spec.valorCerto).toBeUndefined();
+          expect(spec.itens).toHaveLength(2);
+          expect(spec.itens.every(item => Number.isInteger(item.comprimentoCm))).toBe(true);
+          expect(spec.itemCerto).toBeTruthy();
+        } else {
+          expect(Number.isInteger(spec.valorCerto)).toBe(true);
+        }
         expect(spec.alternativas.every(Number.isInteger)).toBe(true);
         expect((spec.estimativas ?? []).every(Number.isInteger)).toBe(true);
         expect(spec.offsetInicialCm).toBe(Math.round(spec.offsetInicialCm));
