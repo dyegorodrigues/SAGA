@@ -105,6 +105,13 @@ export const Evidencia = {
    * material pronto não basta; precisa saber produzir dezenas/unidades.
    */
   MONTOU_DO_NUMERAL: "montou-do-numeral",
+
+  /**
+   * F19 (N1.12): pelo menos um acerto em um salto para trás.
+   * A §9 exige esta direção explicitamente para impedir que três acertos só
+   * avançando sejam confundidos com domínio bidirecional da reta.
+   */
+  SALTO_PARA_TRAS: "salto-para-tras",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
