@@ -40,6 +40,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // contrato/palco/boundary/a11y + sonda Chrome 320/390/900 ficarem verdes.
   "N1.12",
 
+  // W5 — F61: medida padronizada com régua. Promoção somente depois do canário
+  // inativo passar suíte completa + Chrome real 320/390/900, L1–L5, tap/drag.
+  "GM.05",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
