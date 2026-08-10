@@ -100,16 +100,25 @@ export const MisconceptionTag = {
 
   /* --- sistema decimal (ficha F21 / N2.01) -------------------------- */
 
-  /** F21: tratou a barra como 1 e respondeu só as unidades soltas. */
+  /** F21 canônica: contou barra e cubinho como se tivessem o mesmo valor. */
+  IGNORA_VALOR: "ignora-valor",
+
+  /** F21 canônica: inverteu a ordem das dezenas e unidades (23 ↔ 32). */
+  INVERTE_ORDENS: "inverte-ordens",
+
+  /** F21 canônica: não adotou a dezena como unidade e seguiu contando um a um. */
+  NAO_AGRUPA: "nao-agrupa",
+
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
   IGNORA_DEZENA: "ignora-dezena",
 
-  /** F21: concatenou a dezena já expandida com a unidade (3D + 4U → 304). */
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
   CONCATENA: "concatena-dezena-unidade",
 
-  /** F21: abriu as barras e contou todos os quadradinhos, sem usá-las como unidade composta. */
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
   CONTA_TUDO: "conta-tudo-material-dourado",
 
-  /** F21: na produção, colocou o algarismo das dezenas nas unidades e vice-versa. */
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
   TROCA_DU: "troca-dezenas-unidades",
 
   /* --- contagem (fichas F01 e F27) ---------------------------------- */
