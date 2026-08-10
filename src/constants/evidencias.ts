@@ -5,8 +5,8 @@
  *
  * ### Por que existe um catálogo (pendência P13)
  *
- * Algumas fichas do bloco F0 escrevem, na §9, uma segunda condição além da
- * contagem de acertos. Todas dizem a mesma coisa com palavras diferentes:
+ * Algumas fichas escrevem, na §9, uma segunda condição além da contagem de
+ * acertos. Todas dizem a mesma coisa com palavras diferentes:
  *
  * > *acertar não basta; é preciso ter acertado uma vez **na condição que prova
  * > a competência**.*
@@ -98,6 +98,13 @@ export const Evidencia = {
    * residual da moldura. É a prova de retirada do andaime antes da notação.
    */
   SEM_MOLDURA: "sem-moldura",
+
+  /**
+   * F21 (N2.01): no nível 4, a criança recebeu o NUMERAL e construiu o material
+   * correto a partir dele. É a prova bidirecional explícita da §9: reconhecer
+   * material pronto não basta; precisa saber produzir dezenas/unidades.
+   */
+  MONTOU_DO_NUMERAL: "montou-do-numeral",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
