@@ -274,7 +274,7 @@ export function InteractiveNumberLineSurface({
                 />
                 <span
                   data-reta-label={value}
-                  className="mt-2 whitespace-nowrap font-black tabular-nums text-base md:text-2xl"
+                  className="mt-2 whitespace-nowrap font-black tabular-nums text-sm sm:text-base md:text-2xl"
                   style={{ color: tokens.cor.texto.principal, visibility: labels.has(value) ? 'visible' : 'hidden' }}
                 >
                   {value}
