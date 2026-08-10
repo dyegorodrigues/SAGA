@@ -28,13 +28,15 @@ export function Regua({
       data-regua
       data-regua-max={max}
       data-regua-unit-px={unitPx}
-      className="relative h-[70px] rounded-b-xl border-2 border-amber-500 bg-amber-100 shadow-sm"
+      className="relative h-[66px] rounded-lg border-2 border-amber-400 bg-gradient-to-b from-amber-50 to-amber-100 shadow-sm"
       style={{ width }}
     >
+      <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-amber-300/70" />
       {Array.from({ length: max * 2 + 1 }, (_, i) => i / 2).map(valor => {
         const inteiro = Number.isInteger(valor);
         const x = valor * unitPx;
         const destaque = destacarMarca === valor || (valor === 0 && destacarZero);
+        const borda = valor === 0 ? "start" : valor === max ? "end" : "middle";
         return (
           <span
             key={valor}
@@ -49,7 +51,17 @@ export function Regua({
           >
             {inteiro && (
               <span
-                className={`absolute top-[29px] -translate-x-1/2 text-xs font-black ${destaque ? "text-blue-700" : "text-amber-950"}`}
+                data-regua-label={valor}
+                data-regua-label-edge={borda}
+                className={`absolute top-[29px] whitespace-nowrap text-[11px] font-black ${destaque ? "text-blue-700" : "text-amber-950"}`}
+                style={{
+                  left: valor === 0 ? 2 : valor === max ? -2 : 0,
+                  transform: valor === 0
+                    ? "none"
+                    : valor === max
+                      ? "translateX(-100%)"
+                      : "translateX(-50%)",
+                }}
               >
                 {valor}
               </span>
@@ -57,7 +69,7 @@ export function Regua({
           </span>
         );
       })}
-      <span aria-hidden className="absolute bottom-1 right-2 text-[10px] font-black text-amber-900">cm</span>
+      <span aria-hidden className="absolute bottom-1 right-2 rounded bg-amber-200/80 px-1 text-[9px] font-black uppercase tracking-wide text-amber-900">cm</span>
     </div>
   );
 }
