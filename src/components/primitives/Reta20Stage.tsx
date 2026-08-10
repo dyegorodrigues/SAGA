@@ -64,11 +64,11 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
         falar?.(String(escolhido));
       }
     } else {
-      // F19 §4: erro volta à partida. Como o endpoint errado nunca é persistido,
-      // o foguete permanece/retorna à origem e o shake marca a tentativa.
+      // F19 §4: erro matemático volta à partida. Um gesto motor abortado/fora da
+      // reta também retorna à origem, mas não recebe shake nem mensagem conceitual.
       setPosicao(spec.posicaoInicial);
       setPercurso(null);
-      setErroPulse(pulse => pulse + 1);
+      if (!manipulacao.foraDeAlvoValido) setErroPulse(pulse => pulse + 1);
     }
 
     onAnswer?.(escolhido, acao, manipulacao);
@@ -88,7 +88,14 @@ export function Reta20Stage({ spec, onAnswer, disabled, falar, mostrar }: Props)
   function soltarArrasto(clientX: number, rect: DOMRect) {
     if (travado) return;
     const resolvido = resolverSolturaReta({ x: clientX, left: rect.left, width: rect.width }, spec);
-    publicar(resolvido.escolhido, "arrasto", resolvido.manipulacao);
+    // O resolver geométrico clampa coordenadas para descobrir o tick mais próximo,
+    // mas uma soltura declaradamente fora da reta NÃO pode virar acerto por clamp.
+    // Publicamos a origem como valor neutro de retry, preservando `foraDeAlvoValido`
+    // para que o filtro motor impeça qualquer misconception/Radar.
+    const escolhido = resolvido.manipulacao.foraDeAlvoValido
+      ? spec.posicaoInicial
+      : resolvido.escolhido;
+    publicar(escolhido, "arrasto", resolvido.manipulacao);
   }
 
   const alvoTutorial = typeof mostrar?.pulsarAlvo === "number" ? mostrar.pulsarAlvo : spec.alvo;
