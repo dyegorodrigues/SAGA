@@ -39,7 +39,7 @@ describe("GM.05 / F61 — medir com régua", () => {
     const l5 = construirReguaSpec(5, sorteio(0.6));
 
     expect(l1.modo).toBe("informal");
-    expect(l1.unidade).toBe("clipes");
+    expect(l1.unidade).toBe("bolas");
     expect(l2.modo).toBe("ler");
     expect(l2.unidade).toBe("cm");
     expect(l2.reguaAlinhada).toBe(true);
@@ -52,6 +52,31 @@ describe("GM.05 / F61 — medir com régua", () => {
     expect(l4.itens[0].id.replace(/-a$/, "")).not.toBe(l4.itens[1].id.replace(/-b$/, ""));
     expect(l5.modo).toBe("estimar");
     expect(l5.estimativas?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("F61 usa apenas centímetros inteiros; 0,5 não entra na progressão", () => {
+    for (let nivel = 2; nivel <= 5; nivel += 1) {
+      for (let i = 0; i < 100; i += 1) {
+        const spec = construirReguaSpec(nivel, () => (i % 97) / 97);
+        expect(Number.isInteger(spec.valorCerto)).toBe(true);
+        expect(spec.alternativas.every(Number.isInteger)).toBe(true);
+        expect((spec.estimativas ?? []).every(Number.isInteger)).toBe(true);
+        expect(spec.offsetInicialCm).toBe(Math.round(spec.offsetInicialCm));
+      }
+    }
+  });
+
+  it("não usa objetos de proporção rígida que virem caricatura ao alongar", () => {
+    const proibidos = ["carrinho", "borracha"];
+    for (let nivel = 1; nivel <= 5; nivel += 1) {
+      for (let i = 0; i < 100; i += 1) {
+        const spec = construirReguaSpec(nivel, () => (i % 99) / 99);
+        for (const objeto of spec.itens) {
+          const tipo = objeto.id.replace(/-(?:a|b)$/, "");
+          expect(proibidos).not.toContain(tipo);
+        }
+      }
+    }
   });
 
   it("não repete o mesmo tipo de objeto no L4 mesmo com sorteio determinístico idêntico", () => {
@@ -106,7 +131,7 @@ describe("GM.05 / F61 — medir com régua", () => {
       unitPx: 24,
       duracaoMs: 550,
     }, spec);
-    expect(slip.manipulacao.distanciaDoAlvoCorreto).toBeLessThan(slip.manipulacao.raioDeSnap! * 1.5);
+    expect(slip.manipulacao?.distanciaDoAlvoCorreto).toBeLessThan((slip.manipulacao?.raioDeSnap ?? 0) * 1.5);
     expect(diagnosticarRegua(slip, spec)).toBeUndefined();
 
     expect(diagnosticarRegua({
