@@ -31,6 +31,10 @@ interface Props {
     destacarLinhaBase?: boolean;
     subirLinhaTracejada?: boolean;
     destacarMaior?: boolean;
+    // F06 / comparação de quantidades — mesmo canal, outra semântica.
+    destacarAmbos?: boolean;
+    parear?: number;
+    pulsarGrupos?: boolean;
   } | null;
 }
 
@@ -303,6 +307,7 @@ export function GrandezaStage(props: Props) {
         spec={props.spec}
         disabled={props.disabled}
         falar={props.falar}
+        mostrar={props.mostrar}
         onAnswer={valor => props.onAnswer?.(valor)}
       />
     );
