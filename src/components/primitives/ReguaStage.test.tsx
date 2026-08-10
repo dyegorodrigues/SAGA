@@ -28,6 +28,18 @@ describe("ReguaStage — F61 / GM.05", () => {
     }));
   });
 
+  it("renderiza o próprio objeto proporcional, sem cápsula/emoji como substituto", () => {
+    const spec = construirReguaSpec(3, meio);
+    const { container } = render(<ReguaStage spec={spec} />);
+    const objeto = container.querySelector("[data-regua-object]");
+    const desenho = objeto?.querySelector("[data-regua-measure-object]");
+
+    expect(objeto).not.toBeNull();
+    expect(desenho).not.toBeNull();
+    expect(desenho?.getAttribute("data-regua-object-kind")).toBeTruthy();
+    expect(desenho?.textContent).toBe("");
+  });
+
   it("pointercancel aborta o arrasto e não publica tentativa", () => {
     const spec = construirReguaSpec(3, meio);
     const onAnswer = vi.fn();
@@ -54,16 +66,20 @@ describe("ReguaStage — F61 / GM.05", () => {
     expect(container.querySelector("[data-regua-draggable]")).not.toBeNull();
   });
 
-  it("L4 só permite comparar depois de medir os dois objetos", () => {
+  it("L4 usa dois objetos distintos e só permite comparar depois de medir ambos", () => {
     const spec = construirReguaSpec(4, meio);
     const { container, getAllByRole } = render(<ReguaStage spec={spec} />);
-    const medir = getAllByRole("button", { name: "Medir" });
+    const itens = [...container.querySelectorAll("[data-regua-compare-item]")];
+    const tipos = itens.map(item => item.getAttribute("data-regua-compare-kind"));
+    expect(new Set(tipos).size).toBe(2);
+
+    const medir = getAllByRole("button", { name: /^Medir / });
     expect(medir).toHaveLength(2);
     expect(container.querySelector('[aria-label="Escolha o objeto mais comprido"]')).toBeNull();
 
     fireEvent.click(medir[0]);
     expect(container.querySelector('[aria-label="Escolha o objeto mais comprido"]')).toBeNull();
-    fireEvent.click(getAllByRole("button", { name: "Medir" })[0]);
+    fireEvent.click(getAllByRole("button", { name: /^Medir / })[0]);
 
     const escolhas = container.querySelector<HTMLElement>('[aria-label="Escolha o objeto mais comprido"]');
     expect(escolhas).not.toBeNull();
