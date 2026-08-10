@@ -12,13 +12,21 @@ function qDoNivel(nivel: number) {
   return construirReta20Question(N1_12, nivel);
 }
 
+function vizinhoErradoQueNaoEhOrigem(spec: Reta20Spec): number {
+  const candidatos = [spec.alvo - 1, spec.alvo + 1]
+    .filter(valor => valor >= spec.inicio && valor <= spec.fim)
+    .filter(valor => valor !== spec.posicaoInicial);
+  if (!candidatos.length) throw new Error("F19 sem vizinho ±1 distinto da origem para testar OFF_BY_ONE.");
+  return candidatos[0];
+}
+
 describe("F19 — Reta20Stage → FichaRenderer → AnswerMeta", () => {
   it("±1 preciso chega ao Radar como OFF_BY_ONE, não como escorregão motor", () => {
     const q = qDoNivel(3);
     const spec = q.uiProps as Reta20Spec;
     const onAnswer = vi.fn();
     const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
-    const errada = spec.alvo + 1 <= spec.fim ? spec.alvo + 1 : spec.alvo - 1;
+    const errada = vizinhoErradoQueNaoEhOrigem(spec);
     fireEvent.click(container.querySelector<HTMLButtonElement>(`[data-reta-tick="${errada}"]`)!);
     expect(onAnswer).toHaveBeenCalledWith(
       errada,
