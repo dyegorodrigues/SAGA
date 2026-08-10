@@ -56,12 +56,24 @@ async function probeLayout(page, width, level) {
         center: rect.left + rect.width / 2,
       };
     });
+    const labels = [...document.querySelectorAll("[data-reta-label]")]
+      .filter(el => getComputedStyle(el).visibility !== "hidden")
+      .map(el => {
+        const rect = el.getBoundingClientRect();
+        return {
+          value: el.getAttribute("data-reta-label"),
+          left: rect.left,
+          right: rect.right,
+          width: rect.width,
+        };
+      });
     const stage = document.querySelector("[data-reta20-stage]")?.getBoundingClientRect();
     const surface = document.querySelector("[data-reta-surface]")?.getBoundingClientRect();
     return {
       innerWidth: window.innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
       ticks,
+      labels,
       stage: stage ? { left: stage.left, right: stage.right, width: stage.width } : null,
       surface: surface ? { left: surface.left, right: surface.right, width: surface.width } : null,
       arcs: document.querySelectorAll("[data-reta-arco-assistido]").length,
@@ -83,6 +95,15 @@ async function probeLayout(page, width, level) {
     for (let i = 1; i < ordered.length; i += 1) {
       assert(ordered[i].center > ordered[i - 1].center, `F19 L${level} marcas não estão estritamente ordenadas`);
     }
+  }
+  const visibleLabels = [...data.labels].sort((a, b) => Number(a.value) - Number(b.value));
+  for (let i = 1; i < visibleLabels.length; i += 1) {
+    const previous = visibleLabels[i - 1];
+    const current = visibleLabels[i];
+    assert(
+      previous.right <= current.left + 0.5,
+      `F19 L${level} rótulos ${previous.value}/${current.value} se sobrepõem em ${width}px (${previous.right} > ${current.left})`,
+    );
   }
   if (level === 2) assert(data.arcs === Math.abs(data.jump), `F19 L2 deveria ter ${Math.abs(data.jump)} arcos, tem ${data.arcs}`);
   if (level >= 3) assert(data.arcs === 0, `F19 L${level} manteve andaime de arcos`);
