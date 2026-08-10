@@ -17,6 +17,7 @@ import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
 import { N4_09 } from "../fichas/jornada/N4.09";
 import { N1_03 } from "../fichas/jornada/N1.03";
+import { N1_05 } from "../fichas/jornada/N1.05";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
@@ -79,6 +80,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   // Bloco F0. Estes nós são servidos por ficha autoral de produção sob o
   // mesmo contrato, inclusive os builders procedimentais de N1.09 e GM.02.
   "N1.03": N1_03,
+  "N1.05": N1_05,
   "N1.07": N1_07,
   "N1.08": N1_08,
   "N1.09": N1_09,
