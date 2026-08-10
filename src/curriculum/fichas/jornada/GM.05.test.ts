@@ -49,8 +49,15 @@ describe("GM.05 / F61 — medir com régua", () => {
     expect(l4.modo).toBe("comparar");
     expect(l4.itens).toHaveLength(2);
     expect(l4.itens[0].comprimentoCm).not.toBe(l4.itens[1].comprimentoCm);
+    expect(l4.itens[0].id.replace(/-a$/, "")).not.toBe(l4.itens[1].id.replace(/-b$/, ""));
     expect(l5.modo).toBe("estimar");
     expect(l5.estimativas?.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("não repete o mesmo tipo de objeto no L4 mesmo com sorteio determinístico idêntico", () => {
+    const l4 = construirReguaSpec(4, () => 0.5);
+    const tipos = l4.itens.map(item => item.id.replace(/-(?:a|b)$/, ""));
+    expect(new Set(tipos).size).toBe(2);
   });
 
   it("specialized builder mantém a resposta dentro do palco e domínio/evidência da ficha", () => {
