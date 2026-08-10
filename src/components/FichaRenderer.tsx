@@ -51,9 +51,11 @@ interface FichaRendererProps {
   promptDone?: boolean;
   /** Coreografia da micro-aula; só palcos autorais que conhecem o spec a usam. */
   mostrar?: unknown;
+  /** Voz do shell para feedback autoral no mesmo instante do gesto. */
+  falar?: (texto: string) => void;
 }
 
-export function FichaRenderer({ question, onAnswer, disabled, promptDone = true, mostrar }: FichaRendererProps) {
+export function FichaRenderer({ question, onAnswer, disabled, promptDone = true, mostrar, falar }: FichaRendererProps) {
   const { kind, uiProps, evaluate } = question;
 
   const handleInteract = (val: any, meta?: AnswerMeta) => {
@@ -83,6 +85,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
         <MaterialDouradoStage
           spec={spec}
           disabled={Boolean(disabled)}
+          falar={falar}
           mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
           onAnswer={(valor, acao) => {
             const misconception = diagnosticarMaterialDourado(acao, spec);
