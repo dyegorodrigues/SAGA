@@ -23,6 +23,61 @@ describe("Reta20Stage — F19 / N1.12", () => {
     );
   });
 
+  it("um toque real pointerdown/up + click publica uma única tentativa", () => {
+    const spec = construirReta20Spec(1, zero);
+    const onAnswer = vi.fn();
+    const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} />);
+    const alvo = container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.alvo}"]`)!;
+
+    fireEvent.pointerDown(alvo, { pointerId: 1, clientX: 42 });
+    fireEvent.pointerUp(alvo, { pointerId: 1, clientX: 42 });
+    fireEvent.click(alvo);
+
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+    expect(onAnswer).toHaveBeenCalledWith(
+      spec.alvo,
+      expect.objectContaining({ gesto: "toque" }),
+      expect.anything(),
+    );
+  });
+
+  it("pointercancel aborta o gesto e não publica resposta", () => {
+    const spec = construirReta20Spec(2, () => 0.4);
+    const onAnswer = vi.fn();
+    const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} />);
+    const surface = container.querySelector<HTMLElement>("[data-reta-surface]")!;
+
+    fireEvent.pointerDown(surface, { pointerId: 2, clientX: 80 });
+    fireEvent.pointerCancel(surface, { pointerId: 2, clientX: 110 });
+
+    expect(onAnswer).not.toHaveBeenCalled();
+  });
+
+  it("soltura muito fora da reta vira retry motor e nunca acerto por clamp", () => {
+    const spec = construirReta20Spec(1, () => 0.999); // alvo = 10
+    const onAnswer = vi.fn();
+    const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} />);
+    const surface = container.querySelector<HTMLElement>("[data-reta-surface]")!;
+    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 420,
+      bottom: 120,
+      width: 420,
+      height: 120,
+      toJSON: () => ({}),
+    } as DOMRect);
+
+    fireEvent.pointerDown(surface, { pointerId: 3, clientX: 200 });
+    fireEvent.pointerUp(surface, { pointerId: 3, clientX: 1000 });
+
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+    expect(onAnswer.mock.calls[0][0]).not.toBe(spec.alvo);
+    expect(onAnswer.mock.calls[0][2]).toEqual(expect.objectContaining({ foraDeAlvoValido: true }));
+  });
+
   it("erro conceitual balança mas não move o personagem nem apaga a origem", () => {
     const spec = construirReta20Spec(3, () => 0.5);
     const onAnswer = vi.fn();
