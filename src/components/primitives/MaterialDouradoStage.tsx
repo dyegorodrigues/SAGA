@@ -101,7 +101,7 @@ export function MaterialDouradoStage({ spec, onAnswer, disabled, falar, mostrar 
               </motion.div>
             )}
             <div data-material-dezena-fundida={spec.exigeTroca || undefined} className="w-full">
-              <MaterialDourado dezenas={spec.dezenas} unidades={spec.unidades} onTenSubunitClick={() => setContouSubdivisoes(true)} />
+              <MaterialDourado dezenas={spec.dezenas} unidades={spec.unidades} onTenInspect={() => setContouSubdivisoes(true)} />
             </div>
             <div className="grid w-full grid-cols-2 gap-2" aria-label="Escolha o número representado">
               {spec.alternativas.map(valor => (
