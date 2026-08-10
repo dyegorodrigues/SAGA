@@ -105,6 +105,24 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
 };
 
 /**
+ * Alguns builders especializados encapsulam uma composição de primitivas e,
+ * portanto, emitem um `Question.kind` deliberadamente diferente do `KindType`
+ * usado pela ficha para selecionar a família autoral.
+ *
+ * Este mapa é contrato de runtime, não exceção de teste: qualquer auditor que
+ * compare ficha → question pode consultá-lo. O N2.01 usa `tens` como família
+ * autoral (MaterialDourado), mas o palco F21 é a composição explícita
+ * MaterialDourado + TenFrame e por isso se identifica como `material-dourado`.
+ */
+const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
+  "N2.01": "material-dourado",
+};
+
+export function registeredFichaRuntimeKindOverride(id: string): string | undefined {
+  return SPECIALIZED_RUNTIME_KIND[id];
+}
+
+/**
  * Nós efetivamente servidos pelo Composer neste processo.
  *
  * O conjunto nasce da lista declarativa versionada, mas continua mutável em
