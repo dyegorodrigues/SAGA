@@ -6,6 +6,9 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
  * Ponte explícita entre a nomenclatura autoral das fichas e o runtime.
  *
  * `builderKinds` são cases comprovados em src/curriculum/Composer.ts.
+ * `specializedBuilderIds` são competências comprovadamente ligadas a um builder
+ * especializado em composerCanary.ts — caminho legítimo quando uma primitive
+ * existe para UMA ficha e um case genérico só criaria implementação morta.
  * `rendererKinds` são kinds comprovados em FichaRenderer ou GameLoopExerciseRenderer.
  * Uma primitiva autoral pode ser realizada por um Stage mais específico do que o
  * componente que herdou seu nome. Nesses casos o alias/substituição fica listado
@@ -108,11 +111,12 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "Regua",
-    kinds: ["measure"],
-    componentFiles: [],
+    kinds: ["measure", "regua", "regua-f61"],
+    componentFiles: [component("Regua"), component("ReguaStage")],
     builderKinds: [],
-    rendererKinds: [],
-    note: "Lacuna real: requer régua alinhável no zero e alternativa por toque.",
+    specializedBuilderIds: ["GM.05"],
+    rendererKinds: ["regua", "regua-f61"],
+    note: "W5/F61/GM.05: builder especializado único produz regua-f61; ReguaStage mede/alinha no zero com drag e alternativa por toque. Não há case genérico morto porque nenhuma outra ficha usa Regua.",
   },
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
