@@ -8,33 +8,40 @@ export interface MaterialDouradoProps {
   centenas?: number;
   state?: UIState;
   compact?: boolean;
-  /** Sensor F21: tocar um quadradinho dentro da barra é evidência de recontagem. */
-  onTenSubunitClick?: (tenIndex: number, unitIndex: number) => void;
+  /** Sensor F21: inspecionar a barra para recontar subdivisões é um gesto observável. */
+  onTenInspect?: (tenIndex: number) => void;
 }
 
 export function MaterialUnitCube() {
   return <span aria-hidden className="block h-5 w-5 rounded-sm border border-amber-600 bg-amber-400 shadow-sm" />;
 }
 
-export function MaterialTenBar({ tenIndex = 0, onSubunitClick }: {
-  tenIndex?: number;
-  onSubunitClick?: (tenIndex: number, unitIndex: number) => void;
-}) {
+function TenCells() {
   return (
-    <span data-material-ten className="flex flex-col gap-[1px] rounded-sm bg-amber-600 p-[1px] shadow-md">
-      {Array.from({ length: 10 }).map((_, i) => onSubunitClick ? (
-        <button
-          key={i}
-          type="button"
-          data-material-subunidade
-          aria-label={`quadradinho ${i + 1} da dezena ${tenIndex + 1}`}
-          className="h-5 w-5 cursor-pointer bg-amber-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-700"
-          onClick={() => onSubunitClick(tenIndex, i)}
-        />
-      ) : (
-        <span key={i} aria-hidden className="h-5 w-5 bg-amber-400" />
+    <span className="flex flex-col gap-[1px] rounded-sm bg-amber-600 p-[1px] shadow-md" aria-hidden>
+      {Array.from({ length: 10 }).map((_, i) => (
+        <span key={i} className="h-5 w-5 bg-amber-400" />
       ))}
     </span>
+  );
+}
+
+export function MaterialTenBar({ tenIndex = 0, onInspect }: {
+  tenIndex?: number;
+  onInspect?: (tenIndex: number) => void;
+}) {
+  if (!onInspect) return <span data-material-ten><TenCells /></span>;
+  return (
+    <button
+      type="button"
+      data-material-ten
+      data-material-inspect-ten
+      aria-label={`inspecionar os dez quadradinhos da dezena ${tenIndex + 1}`}
+      className="rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-700"
+      onClick={() => onInspect(tenIndex)}
+    >
+      <TenCells />
+    </button>
   );
 }
 
@@ -54,7 +61,7 @@ export function MaterialDourado({
   centenas = 0,
   state = 'ocioso',
   compact = false,
-  onTenSubunitClick,
+  onTenInspect,
 }: MaterialDouradoProps) {
   return (
     <div className={`flex flex-wrap justify-center items-end select-none bg-slate-50/50 rounded-xl border-2 border-dashed border-slate-200 ${compact ? 'gap-3 p-3' : 'gap-8 p-6'} ${tokens.estado[state]}`}>
@@ -76,7 +83,7 @@ export function MaterialDourado({
           <div className="flex max-w-[150px] flex-wrap items-end justify-center gap-2">
             {Array.from({ length: dezenas }).map((_, i) => (
               <motion.div key={`d-${i}`} initial={{ scale: 0, y: -20 }} animate={{ scale: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-                <MaterialTenBar tenIndex={i} onSubunitClick={onTenSubunitClick} />
+                <MaterialTenBar tenIndex={i} onInspect={onTenInspect} />
               </motion.div>
             ))}
           </div>
