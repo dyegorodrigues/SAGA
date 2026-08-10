@@ -411,7 +411,7 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
         <div className="relative h-[150px] w-[344px] max-w-full overflow-visible rounded-2xl border border-slate-200 bg-white shadow-inner" data-regua-plane>
           <ObjetoMedido spec={spec} comprimento={comprimento} />
           <div
-            className={`absolute top-[67px] touch-none ${podeManipular ? "cursor-grab active:cursor-grabbing" : ""}`
+            className={`absolute top-[67px] touch-none ${podeManipular ? "cursor-grab active:cursor-grabbing" : ""}`}
             style={{ left: rulerLeft }}
             data-regua-draggable
             data-regua-zero-left={rulerLeft}
