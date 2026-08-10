@@ -50,7 +50,7 @@
 | 18 | **F51** — Separar por atributo | AL.01 | classificar — e o "não pertence" | ✅ |
 | 19 | **F52** — O que vem depois? | AL.02 | padrões — a regra geral | ✅ |
 
-**Legenda de progresso:** ✅ **21 fichas autorais completas.** A auditoria de IDs tornou visível uma lacuna do grafo: **GM.02 (tempo cotidiano) ainda não tem ficha autoral própria**. Portanto “fichas escritas” não é sinônimo de “cobertura integral do F0”. *(JD1 a JD5 permanecem completos.)*
+**Legenda de progresso:** ✅ **21 fichas autorais completas neste bloco.** A ficha autoral de **GM.02 (tempo cotidiano)** existe separadamente em `FICHA_P22_GM_02_TEMPO_COTIDIANO.md`. No catálogo canônico vigente, o SAGA fecha **90 competências / 94 fichas autorais**. *(JD1 a JD5 permanecem completos.)*
 
 *Três fichas deste bloco (JD5, F28, F19) tratam competências que **pertencem à faixa F1** no grafo (N1.10, N1.11, N1.12). Estão aqui porque a criança as encontra antes — o número da faixa indica a complexidade do conceito, não a ordem de contato.*
 
@@ -100,7 +100,7 @@
 ## 3. Estrutura da tela
 1. **Enunciado** — "Dê um capacete para cada bombeiro!"
 2. **Fileira A** (receptores) — os bombeiros, em linha horizontal, espaçamento igual, na metade superior
-3. **Fileira B** (itens) — os capacetes, em linha horizontal, na metade inferior, **em quantidade diferente da fileira A**
+3. **Fileira B** (itens) — os capacetes, em linha horizontal, **em quantidade diferente da fileira A**
 4. **Sem teclado, sem botões** — a resposta é a ação de arrastar
 
 ```
