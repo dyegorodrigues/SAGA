@@ -1,12 +1,26 @@
 // @vitest-environment jsdom
 import React from "react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "@testing-library/react";
 import axe from "axe-core";
 import { Reta20Stage } from "./Reta20Stage";
 import { construirReta20Spec } from "../../curriculum/procedimentos/reta20Contract";
 
 const zero = () => 0;
+
+function rectDaReta(width = 420): DOMRect {
+  return {
+    x: 0,
+    y: 0,
+    left: 0,
+    top: 0,
+    right: width,
+    bottom: 120,
+    width,
+    height: 120,
+    toJSON: () => ({}),
+  } as DOMRect;
+}
 
 describe("Reta20Stage — F19 / N1.12", () => {
   it("oferece toque por tick como alternativa ao arrasto", () => {
@@ -41,6 +55,32 @@ describe("Reta20Stage — F19 / N1.12", () => {
     );
   });
 
+  it("arrasto pode começar sobre o hitbox do foguete e fala cada casa atravessada", () => {
+    const spec = construirReta20Spec(2, () => 0.4);
+    const onAnswer = vi.fn();
+    const falar = vi.fn();
+    const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} falar={falar} />);
+    const surface = container.querySelector<HTMLElement>("[data-reta-surface]")!;
+    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(rectDaReta());
+
+    const xInicial = (spec.posicaoInicial / spec.fim) * 420;
+    const xAlvo = (spec.alvo / spec.fim) * 420;
+    const origem = container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.posicaoInicial}"]`)!;
+
+    fireEvent.pointerDown(origem, { pointerId: 7, clientX: xInicial });
+    fireEvent.pointerMove(surface, { pointerId: 7, clientX: xAlvo });
+    fireEvent.pointerUp(surface, { pointerId: 7, clientX: xAlvo });
+
+    const esperados = Array.from({ length: spec.salto }, (_, i) => spec.posicaoInicial + i + 1);
+    expect(falar.mock.calls.map(call => call[0])).toEqual(esperados.map(String));
+    expect(onAnswer).toHaveBeenCalledTimes(1);
+    expect(onAnswer).toHaveBeenCalledWith(
+      spec.alvo,
+      expect.objectContaining({ gesto: "arrasto" }),
+      expect.anything(),
+    );
+  });
+
   it("pointercancel aborta o gesto e não publica resposta", () => {
     const spec = construirReta20Spec(2, () => 0.4);
     const onAnswer = vi.fn();
@@ -58,17 +98,7 @@ describe("Reta20Stage — F19 / N1.12", () => {
     const onAnswer = vi.fn();
     const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} />);
     const surface = container.querySelector<HTMLElement>("[data-reta-surface]")!;
-    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue({
-      x: 0,
-      y: 0,
-      left: 0,
-      top: 0,
-      right: 420,
-      bottom: 120,
-      width: 420,
-      height: 120,
-      toJSON: () => ({}),
-    } as DOMRect);
+    vi.spyOn(surface, "getBoundingClientRect").mockReturnValue(rectDaReta());
 
     fireEvent.pointerDown(surface, { pointerId: 3, clientX: 200 });
     fireEvent.pointerUp(surface, { pointerId: 3, clientX: 1000 });
@@ -94,18 +124,40 @@ describe("Reta20Stage — F19 / N1.12", () => {
     );
   });
 
-  it("acerto move, mantém o percurso visível e fala somente números realmente atravessados", () => {
-    const spec = construirReta20Spec(3, () => 0.5);
-    const onAnswer = vi.fn();
-    const falar = vi.fn();
-    const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} falar={falar} />);
-    fireEvent.click(container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.alvo}"]`)!);
-    expect(container.querySelector("[data-reta-personagem]")?.getAttribute("data-posicao")).toBe(String(spec.alvo));
-    expect(container.querySelector("[data-reta-percurso]")).not.toBeNull();
-    const esperados = spec.salto > 0
-      ? Array.from({ length: spec.salto }, (_, i) => spec.posicaoInicial + i + 1)
-      : Array.from({ length: Math.abs(spec.salto) }, (_, i) => spec.posicaoInicial - i - 1);
-    expect(falar.mock.calls.map(call => call[0])).toEqual(esperados.map(String));
+  it("salto por toque anima e fala casa a casa antes de publicar o acerto", () => {
+    vi.useFakeTimers();
+    try {
+      const spec = construirReta20Spec(3, () => 0.5);
+      const onAnswer = vi.fn();
+      const falar = vi.fn();
+      const { container } = render(<Reta20Stage spec={spec} onAnswer={onAnswer} falar={falar} />);
+      const inicial = spec.posicaoInicial;
+      const esperados = Array.from({ length: Math.abs(spec.salto) }, (_, i) => inicial - i - 1);
+
+      fireEvent.click(container.querySelector<HTMLButtonElement>(`[data-reta-tick="${spec.alvo}"]`)!);
+      expect(container.querySelector("[data-reta20-stage]")?.getAttribute("data-reta-animando")).toBe("true");
+      expect(container.querySelector("[data-reta-personagem]")?.getAttribute("data-posicao")).toBe(String(inicial));
+      expect(onAnswer).not.toHaveBeenCalled();
+      expect(falar).not.toHaveBeenCalled();
+
+      act(() => vi.advanceTimersByTime(380));
+      expect(container.querySelector("[data-reta-personagem]")?.getAttribute("data-posicao")).toBe(String(esperados[0]));
+      expect(falar.mock.calls.map(call => call[0])).toEqual([String(esperados[0])]);
+      expect(onAnswer).not.toHaveBeenCalled();
+      expect(container.querySelector("[data-reta-percurso]")).not.toBeNull();
+
+      act(() => vi.runAllTimers());
+      expect(container.querySelector("[data-reta-personagem]")?.getAttribute("data-posicao")).toBe(String(spec.alvo));
+      expect(falar.mock.calls.map(call => call[0])).toEqual(esperados.map(String));
+      expect(onAnswer).toHaveBeenCalledTimes(1);
+      expect(onAnswer).toHaveBeenCalledWith(
+        spec.alvo,
+        expect.objectContaining({ escolhido: spec.alvo, gesto: "toque" }),
+        expect.anything(),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("tutorial mostra a reta/alvo sem contaminar a posição da tentativa", () => {
