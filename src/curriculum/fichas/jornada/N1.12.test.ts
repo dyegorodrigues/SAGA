@@ -5,7 +5,7 @@ import {
   construirReta20Question,
   construirReta20Spec,
 } from "../../procedimentos/reta20Contract";
-import { diagnosticarReta20 } from "../../procedimentos/reta20Procedure";
+import { diagnosticarReta20, resolverSolturaReta } from "../../procedimentos/reta20Procedure";
 
 function sorteio(...valores: number[]) {
   let i = 0;
@@ -73,6 +73,20 @@ describe("N1.12 / F19 — número como posição e movimento", () => {
     expect(q5.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
     expect(q5.rt_max_s).toBe(7);
     expect(q1.options).toBeUndefined();
+  });
+
+  it("resolve o snap antes do diagnóstico e preserva a dúvida a favor do motor", () => {
+    const spec = construirReta20Spec(3, sorteio(0.4, 0));
+    const largura = 420;
+    const passo = largura / (spec.fim - spec.inicio);
+    const centroAlvo = (spec.alvo - spec.inicio) * passo;
+
+    const perto = resolverSolturaReta({ x: centroAlvo + passo * 0.2, left: 0, width: largura }, spec);
+    expect(perto.escolhido).toBe(spec.alvo);
+    expect(perto.manipulacao.distanciaDoAlvoCorreto).toBeLessThan(perto.manipulacao.raioDeSnap!);
+
+    const fora = resolverSolturaReta({ x: -80, left: 0, width: largura }, spec);
+    expect(fora.manipulacao.foraDeAlvoValido).toBe(true);
   });
 
   it("diagnostica a decisão matemática depois da resolução motora", () => {
