@@ -112,6 +112,13 @@ export const Evidencia = {
    * avançando sejam confundidos com domínio bidirecional da reta.
    */
   SALTO_PARA_TRAS: "salto-para-tras",
+
+  /**
+   * F61 (GM.05): a criança posicionou a régua — por arrasto ou pela alternativa
+   * motora equivalente — com a marca ZERO na ponta do objeto antes de ler.
+   * Régua já alinhada pelo app não satisfaz esta evidência.
+   */
+  ALINHOU_ZERO: "alinhou-zero",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
