@@ -1,4 +1,6 @@
-import { FichaCompetencia } from "../schema";
+import { MisconceptionTag, MisconceptionTagType } from "../../constants/misconceptions";
+import { normalizeFichaTutorial } from "../fichaQuestionContract";
+import { FichaCompetencia, FichaMicro } from "../schema";
 import { Question } from "../../types";
 
 export type DistribuicaoGrupo = "normal" | "compacta" | "espalhada";
@@ -112,37 +114,52 @@ export function construirComparacaoQuantidadeSpec(
   };
 }
 
-function misconceptionDoNivel(nivel: number): string {
-  if (nivel >= 5) return "CONSERVACAO_ESPACO";
-  if (nivel === 4) return "CONFUNDE_TAMANHO_QUANTIDADE";
-  return "COMPARA_SEM_CONTAR";
+function misconceptionDoNivel(nivel: number): MisconceptionTagType {
+  if (nivel >= 5) return MisconceptionTag.CONSERVACAO_ESPACO;
+  if (nivel === 4) return MisconceptionTag.CONFUNDE_TAMANHO_QUANTIDADE;
+  return MisconceptionTag.COMPARA_SEM_CONTAR;
 }
 
-function microDoNivel(ficha: FichaCompetencia, nivel: number) {
+function microDoNivel(ficha: FichaCompetencia, nivel: number): FichaMicro {
   const microId = ficha.niveis?.[nivel]?.micro;
-  return ficha.micros.find(micro => micro.id === microId);
+  const micro = ficha.micros.find(candidate => candidate.id === microId);
+  if (!micro) throw new Error(`N1.05 sem micro do nível ${nivel}.`);
+  return micro;
 }
 
+/**
+ * Builder especializado registrado na mesma porta de canário do Composer.
+ *
+ * Specialized não pode significar "fora do contrato universal": tutorial,
+ * domínio e relógio silencioso precisam atravessar a fronteira exatamente como
+ * atravessariam no Composer genérico.
+ */
 export function construirComparacaoQuantidadeQuestion(
   ficha: FichaCompetencia,
   level: number,
 ): Question {
+  if (ficha.id !== "N1.05") {
+    throw new Error(`comparacaoQuantidadeContract recebeu ${ficha.id}.`);
+  }
+
   const spec = construirComparacaoQuantidadeSpec(level);
   const misconception = misconceptionDoNivel(spec.nivel);
   const micro = microDoNivel(ficha, spec.nivel);
-  const tutorial = Array.isArray(micro?.params?.tutorial)
-    ? micro.params.tutorial.map(step => ({
-        say: step.fala,
-        ...(step.show != null ? { show: step.show } : {}),
-      }))
-    : undefined;
+  const rtAlvoMs = ficha.niveis?.[spec.nivel]?.rt_alvo;
+
   return {
     kind: "grandeza",
     prompt: spec.enunciado,
     audioPrompt: spec.falado,
     howto: ficha.howto || spec.howto,
     explain: ficha.explain || spec.explain,
-    tutorial,
+    tutorial: normalizeFichaTutorial(micro.params.tutorial),
+    masteryRule: {
+      acertos: micro.dominio.acertos,
+      de: micro.dominio.de,
+      sessoes: micro.dominio.sessoes,
+    },
+    ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
     uiProps: spec,
     options: [0, 1].map(value => ({
       label: value === 0 ? "grupo da esquerda" : "grupo da direita",
