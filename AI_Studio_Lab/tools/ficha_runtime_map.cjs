@@ -62,7 +62,14 @@ const FICHA_RUNTIME_MAP = [
     rendererKinds: ["grandeza"],
     note: "F49/GM.01 nomeia Grupo no cânone, mas o runtime substitui deliberadamente o Grupo genérico por grandeza/GrandezaStage para alinhar as bases e não ensinar comparação visual errada. Grupo.tsx permanece não ligado diretamente.",
   },
-  { primitive: "InteractiveNumberLine", kinds: ["numberline"], componentFiles: [component("InteractiveNumberLine")], builderKinds: ["numberline"], rendererKinds: ["numberline"] },
+  {
+    primitive: "InteractiveNumberLine",
+    kinds: ["numberline", "numberline-f19"],
+    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage")],
+    builderKinds: ["numberline"],
+    rendererKinds: ["numberline", "numberline-f19"],
+    note: "F19/N1.12 usa specialized builder e emite numberline-f19 sobre a mesma superfície InteractiveNumberLine; o wrapper numberline legado permanece intacto para N1.07 e demais consumidores.",
+  },
   { primitive: "InteractiveVertical", kinds: ["vertical"], componentFiles: [component("InteractiveVertical")], builderKinds: ["vertical"], rendererKinds: ["vertical"] },
   {
     primitive: "LinkingCubes",
