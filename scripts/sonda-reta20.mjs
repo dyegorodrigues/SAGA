@@ -49,23 +49,40 @@ async function probeLayout(page, width, level) {
   const data = await page.evaluate(() => {
     const ticks = [...document.querySelectorAll("[data-reta-tick]")].map(el => {
       const rect = el.getBoundingClientRect();
-      return { value: el.getAttribute("data-reta-tick"), left: rect.left, right: rect.right };
+      return {
+        value: el.getAttribute("data-reta-tick"),
+        left: rect.left,
+        right: rect.right,
+        center: rect.left + rect.width / 2,
+      };
     });
     const stage = document.querySelector("[data-reta20-stage]")?.getBoundingClientRect();
+    const surface = document.querySelector("[data-reta-surface]")?.getBoundingClientRect();
     return {
       innerWidth: window.innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
       ticks,
       stage: stage ? { left: stage.left, right: stage.right, width: stage.width } : null,
+      surface: surface ? { left: surface.left, right: surface.right, width: surface.width } : null,
       arcs: document.querySelectorAll("[data-reta-arco-assistido]").length,
       jump: Number(document.querySelector("[data-reta20-probe]")?.getAttribute("data-salto") ?? 0),
     };
   });
 
   assert(data.scrollWidth <= data.innerWidth + 1, `F19 L${level} vazou em ${width}px: scrollWidth=${data.scrollWidth}`);
-  assert(data.stage && data.stage.left >= -1 && data.stage.right <= width + 1, `F19 L${level} palco fora do viewport ${width}px`);
+  assert(data.stage && data.stage.width >= Math.min(240, width - 40), `F19 L${level} palco colapsou em ${width}px`);
+  assert(data.stage.left >= -1 && data.stage.right <= width + 1, `F19 L${level} palco fora do viewport ${width}px`);
+  assert(data.surface && data.surface.width >= Math.min(170, width - 120), `F19 L${level} superfície colapsou em ${width}px`);
   for (const tick of data.ticks) {
     assert(tick.left >= -1 && tick.right <= width + 1, `F19 L${level} tick ${tick.value} cortado em ${width}px`);
+  }
+  const ordered = [...data.ticks].sort((a, b) => Number(a.value) - Number(b.value));
+  if (ordered.length > 1) {
+    const spread = ordered.at(-1).center - ordered[0].center;
+    assert(spread >= data.surface.width * 0.95, `F19 L${level} marcas colapsaram: spread=${spread}, surface=${data.surface.width}`);
+    for (let i = 1; i < ordered.length; i += 1) {
+      assert(ordered[i].center > ordered[i - 1].center, `F19 L${level} marcas não estão estritamente ordenadas`);
+    }
   }
   if (level === 2) assert(data.arcs === Math.abs(data.jump), `F19 L2 deveria ter ${Math.abs(data.jump)} arcos, tem ${data.arcs}`);
   if (level >= 3) assert(data.arcs === 0, `F19 L${level} manteve andaime de arcos`);
@@ -78,7 +95,12 @@ async function exerciseTap(page) {
   const probe = page.locator("[data-reta20-probe]");
   const target = Number(await probe.getAttribute("data-alvo"));
   const jump = Math.abs(Number(await probe.getAttribute("data-salto")));
-  await page.locator(`[data-reta-tick="${target}"]`).click();
+  const targetBox = await page.locator(`[data-reta-tick="${target}"]`).boundingBox();
+  assert(targetBox, "F19 não expôs geometria do alvo para tap");
+
+  // Tap físico: os botões semânticos não recebem pointer; o plano da reta resolve
+  // a coordenada para o tick mais próximo e preserva o filtro motor.
+  await page.mouse.click(targetBox.x + targetBox.width / 2, targetBox.y + targetBox.height / 2);
   await page.waitForFunction(
     expected => document.querySelector("[data-reta20-probe]")?.getAttribute("data-answer") === String(expected),
     target,
@@ -96,7 +118,7 @@ async function exerciseDrag(page) {
   const target = Number(await probe.getAttribute("data-alvo"));
   const originBox = await page.locator(`[data-reta-tick="${origin}"]`).boundingBox();
   const targetBox = await page.locator(`[data-reta-tick="${target}"]`).boundingBox();
-  assert(originBox && targetBox, "F19 não expôs hitboxes reais para o drag");
+  assert(originBox && targetBox, "F19 não expôs geometria real para o drag");
 
   await page.mouse.move(originBox.x + originBox.width / 2, originBox.y + originBox.height / 2);
   await page.mouse.down();
