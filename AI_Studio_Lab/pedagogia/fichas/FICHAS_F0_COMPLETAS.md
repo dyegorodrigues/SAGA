@@ -100,7 +100,7 @@
 ## 3. Estrutura da tela
 1. **Enunciado** — "Dê um capacete para cada bombeiro!"
 2. **Fileira A** (receptores) — os bombeiros, em linha horizontal, espaçamento igual, na metade superior
-3. **Fileira B** (itens) — os capacetes, em linha horizontal, **em quantidade diferente da fileira A**
+3. **Fileira B** (itens) — os capacetes, em linha horizontal, na metade inferior, **em quantidade diferente da fileira A**
 4. **Sem teclado, sem botões** — a resposta é a ação de arrastar
 
 ```
