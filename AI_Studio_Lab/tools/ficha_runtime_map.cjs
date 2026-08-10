@@ -72,7 +72,14 @@ const FICHA_RUNTIME_MAP = [
     rendererKinds: ["linking-cubes"],
     note: "Renderer existe no FichaRenderer/GameLoop, mas a cadeia autoral ainda não possui builder Composer comprovado.",
   },
-  { primitive: "MaterialDourado", kinds: ["tens"], componentFiles: [component("MaterialDourado")], builderKinds: ["tens"], rendererKinds: ["tens"] },
+  {
+    primitive: "MaterialDourado",
+    kinds: ["tens", "material-dourado"],
+    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage")],
+    builderKinds: ["tens"],
+    rendererKinds: ["tens", "material-dourado"],
+    note: "F21/N2.01 usa specialized builder registrado no canário e emite material-dourado: palco manipulativo sobre o MaterialDourado existente. O kind tens permanece o contrato estático legado/genérico.",
+  },
   {
     primitive: "Moedas",
     kinds: ["money"],
@@ -128,11 +135,11 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "TenFrame",
-    kinds: ["tenframe", "moldura", "bond", "plain"],
-    componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond")],
+    kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"],
+    componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage")],
     builderKinds: ["tenframe", "moldura", "bond", "plain"],
-    rendererKinds: ["tenframe", "moldura", "bond", "plain"],
-    note: "F02/JD3/JD5 realizam a moldura autoral pelo MolduraStage; F28/N1.11 usa bond/plain conforme o micro. tenframe permanece o contrato direto para fichas que realmente o emitem.",
+    rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"],
+    note: "F02/JD3/JD5 realizam a moldura autoral pelo MolduraStage; F28/N1.11 usa bond/plain. F21/N2.01 usa TenFrame como organizador explícito da troca 10 unidades→1 dezena dentro de MaterialDouradoStage.",
   },
   {
     primitive: "TouchCount",
