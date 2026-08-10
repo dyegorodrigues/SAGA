@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import axe from "axe-core";
 import { Evidencia } from "../../constants/evidencias";
 import { construirReguaSpec } from "../../curriculum/procedimentos/reguaContract";
+import { UNIDADE_INFORMAL_PX } from "./ObjetoMedidaArt";
 import { ReguaStage } from "./ReguaStage";
 
 const meio = () => 0.5;
@@ -28,7 +29,21 @@ describe("ReguaStage — F61 / GM.05", () => {
     }));
   });
 
-  it("renderiza o próprio objeto proporcional, sem cápsula/emoji como substituto", () => {
+  it("L1 usa bolas desenhadas com unidade física explícita, sem emoji/sprite", () => {
+    const spec = construirReguaSpec(1, meio);
+    const { container } = render(<ReguaStage spec={spec} />);
+    const unidades = [...container.querySelectorAll<HTMLElement>("[data-regua-informal-unit]")];
+    const faixa = container.querySelector<HTMLElement>("[data-regua-informal-units]");
+    const objeto = container.querySelector<HTMLElement>("[data-regua-informal-object]");
+
+    expect(unidades).toHaveLength(spec.valorCerto!);
+    expect(faixa?.getAttribute("data-regua-informal-unit-px")).toBe(String(UNIDADE_INFORMAL_PX));
+    expect(faixa?.style.width).toBe(`${spec.valorCerto! * UNIDADE_INFORMAL_PX}px`);
+    expect(objeto?.style.width).toBe(`${spec.valorCerto! * UNIDADE_INFORMAL_PX}px`);
+    expect(faixa?.textContent).toBe("");
+  });
+
+  it("renderiza silhueta própria com extremos visíveis auditáveis", () => {
     const spec = construirReguaSpec(3, meio);
     const { container } = render(<ReguaStage spec={spec} />);
     const objeto = container.querySelector("[data-regua-object]");
@@ -37,6 +52,8 @@ describe("ReguaStage — F61 / GM.05", () => {
     expect(objeto).not.toBeNull();
     expect(desenho).not.toBeNull();
     expect(desenho?.getAttribute("data-regua-object-kind")).toBeTruthy();
+    expect(desenho?.querySelector("[data-regua-visible-start]")).not.toBeNull();
+    expect(desenho?.querySelector("[data-regua-visible-end]")).not.toBeNull();
     expect(desenho?.textContent).toBe("");
   });
 
@@ -66,12 +83,14 @@ describe("ReguaStage — F61 / GM.05", () => {
     expect(container.querySelector("[data-regua-draggable]")).not.toBeNull();
   });
 
-  it("L4 usa dois objetos distintos e só permite comparar depois de medir ambos", () => {
+  it("L4 usa dois objetos plausíveis distintos e só permite comparar depois de medir ambos", () => {
     const spec = construirReguaSpec(4, meio);
     const { container, getAllByRole } = render(<ReguaStage spec={spec} />);
     const itens = [...container.querySelectorAll("[data-regua-compare-item]")];
     const tipos = itens.map(item => item.getAttribute("data-regua-compare-kind"));
     expect(new Set(tipos).size).toBe(2);
+    expect(tipos).not.toContain("carrinho");
+    expect(tipos).not.toContain("borracha");
 
     const medir = getAllByRole("button", { name: /^Medir / });
     expect(medir).toHaveLength(2);
