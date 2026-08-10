@@ -3,7 +3,7 @@
  *
  * ---
  *
- * **A pergunta que ninguém tinha feito.** As 92 fichas em
+ * **A pergunta que ninguém tinha feito.** As 94 fichas em
  * `AI_Studio_Lab/pedagogia/fichas/` são o cânone: cada uma declara a
  * competência, a primitiva obrigatória e as regras duras da tela. O runtime, no
  * entanto, cresceu por dois caminhos — o Padrão Ouro (que nasce da ficha) e os
@@ -115,7 +115,7 @@ function primitivasExistentes(): Set<string> {
  * sem o arquivo aparecer em `src/components/primitives/` significa que alguém
  * apagou a dívida em vez de pagá-la.
  */
-export const PRIMITIVAS_PENDENTES = ["Moedas", "Regua"];
+export const PRIMITIVAS_PENDENTES = ["Moedas"];
 
 /**
  * De que primitiva é feito cada `kind` que o runtime produz.
@@ -152,6 +152,8 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   relogio: ["Relogio"],
   balanca: ["Balanca"],
   medidas: ["Balanca", "Recipientes"],
+  regua: ["Regua"],
+  "regua-f61": ["Regua"],
   shape: ["ShapeCanvas"],
   "singapore-bars": ["SingaporeBars"],
   "story-bars": ["StoryPanel", "SingaporeBars"],
