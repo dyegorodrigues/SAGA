@@ -61,6 +61,18 @@ function ObjetoMedido({ spec, comprimento }: { spec: ReguaSpec; comprimento: num
   );
 }
 
+/**
+ * PalcoEscalado usa transform:scale. PointerEvent chega em px renderizados,
+ * enquanto `left`/UNIT_PX estão no plano lógico. Converter pela escala real do
+ * elemento evita que o drag alinhe em 390px e erre sistematicamente em 320px.
+ */
+function deltaLogico(e: React.PointerEvent<HTMLDivElement>, xInicial: number): number {
+  const natural = e.currentTarget.offsetWidth;
+  const renderizado = e.currentTarget.getBoundingClientRect().width;
+  const escala = natural > 0 && renderizado > 0 ? renderizado / natural : 1;
+  return (e.clientX - xInicial) / escala;
+}
+
 export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
   const [alinhado, setAlinhado] = React.useState(spec.reguaAlinhada);
   const [alinhouManualmente, setAlinhouManualmente] = React.useState(false);
@@ -116,14 +128,14 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
   function pointerMove(e: React.PointerEvent<HTMLDivElement>) {
     const atual = drag.current;
     if (!atual || atual.pointerId !== e.pointerId || !podeManipular) return;
-    const proximo = atual.left + (e.clientX - atual.x);
+    const proximo = atual.left + deltaLogico(e, atual.x);
     setRulerLeft(Math.max(OBJECT_LEFT - spec.escalaMax * UNIT_PX, Math.min(OBJECT_LEFT + 2 * UNIT_PX, proximo)));
   }
 
   function pointerEnd(e: React.PointerEvent<HTMLDivElement>) {
     const atual = drag.current;
     if (!atual || atual.pointerId !== e.pointerId) return;
-    const finalLeft = atual.left + (e.clientX - atual.x);
+    const finalLeft = atual.left + deltaLogico(e, atual.x);
     const acao = resolverSolturaRegua({
       rulerLeft: finalLeft,
       objectLeft: OBJECT_LEFT,
@@ -234,13 +246,28 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
           {spec.itens.map(item => {
             const medido = medidos.includes(item.id);
             return (
-              <div key={item.id} className="rounded-2xl border-2 border-slate-200 bg-white p-3 shadow-sm">
+              <div
+                key={item.id}
+                className="rounded-2xl border-2 border-slate-200 bg-white p-3 shadow-sm"
+                data-regua-compare-item={item.id}
+                data-regua-compare-length={item.comprimentoCm}
+              >
                 <div className="mb-2 flex items-center gap-2">
                   <span className="text-2xl" aria-hidden>{item.emoji}</span>
                   <span className="font-black text-slate-800">{item.nome}</span>
                 </div>
-                <div className="overflow-hidden pb-1">
-                  <Regua max={12} destacarMarca={medido ? item.comprimentoCm : null} />
+                <div className="relative h-[118px] overflow-hidden pb-1" data-regua-compare-plane>
+                  <div
+                    className="absolute left-0 top-0 flex h-10 items-center justify-center overflow-hidden rounded-xl border-2 border-sky-300 bg-sky-50 text-xl"
+                    style={{ width: Math.max(44, item.comprimentoCm * UNIT_PX) }}
+                    data-regua-compare-object
+                    aria-label={`${item.nome} alinhado ao zero`}
+                  >
+                    <span aria-hidden>{item.emoji}</span>
+                  </div>
+                  <div className="absolute left-0 top-[42px]">
+                    <Regua max={12} destacarZero destacarMarca={medido ? item.comprimentoCm : null} />
+                  </div>
                 </div>
                 <button
                   type="button"
