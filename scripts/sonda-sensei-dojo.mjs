@@ -131,9 +131,20 @@ async function assertNoHorizontalOverflow(page, label) {
   return metrics;
 }
 
+/**
+ * A sonda funcional não pode depender da disponibilidade de CDN de fonte.
+ * Falhas first-party continuam fatais; apenas favicon e arquivos de fonte de
+ * fonts.gstatic.com são classificados como ruído externo não funcional.
+ */
 const isIgnorableHttpFailure = ({ url }) => {
-  try { return new URL(url).pathname === "/favicon.ico"; }
-  catch { return false; }
+  try {
+    const parsed = new URL(url);
+    if (parsed.pathname === "/favicon.ico") return true;
+    return parsed.hostname === "fonts.gstatic.com"
+      && /\.(?:woff2?|ttf|otf)$/i.test(parsed.pathname);
+  } catch {
+    return false;
+  }
 };
 
 function instrumentPage(page) {
@@ -163,7 +174,7 @@ function assertHealthyBrowser(label, diagnostics) {
     throw new Error(`${label}: HTTP failures: ${fatalHttpFailures.map(item => `${item.status} ${item.url}`).join(" | ")}`);
   }
   // O Chrome emite "Failed to load resource" sem URL no console para o mesmo
-  // 404 já classificado acima. Erros JS reais continuam fatais.
+  // HTTP já classificado acima. Erros JS reais continuam fatais.
   const fatalConsoleErrors = diagnostics.consoleErrors.filter(item => !/Failed to load resource/i.test(item.text));
   if (fatalConsoleErrors.length) {
     throw new Error(`${label}: console errors: ${fatalConsoleErrors.map(item => `${item.text}${item.url ? ` @ ${item.url}` : ""}`).join(" | ")}`);
