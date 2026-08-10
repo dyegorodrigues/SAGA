@@ -274,7 +274,7 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
           <div style={{ width: larguraObjeto }} className="max-w-[280px]">
             <ObjetoVisual item={spec.itens[0]} />
           </div>
-          <div className={`flex items-center justify-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-1 shadow-sm ${mostrar?.destacarClipes ? "ring-4 ring-blue-300" : ""}`} data-regua-clipes aria-label={`${quantidade} clipes iguais`}>
+          <div role="img" className={`flex items-center justify-center gap-0.5 rounded-xl border border-slate-200 bg-white px-2 py-1 shadow-sm ${mostrar?.destacarClipes ? "ring-4 ring-blue-300" : ""}`} data-regua-clipes aria-label={`${quantidade} clipes iguais`}>
             {Array.from({ length: quantidade }, (_, i) => (
               <span key={i} aria-hidden className="inline-flex h-8 w-7 items-center justify-center text-2xl leading-none">📎</span>
             ))}
