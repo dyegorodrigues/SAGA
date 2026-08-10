@@ -1,6 +1,6 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 9/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W1_N1_04_FECHADA_2026-08-09.md`. Coverage Matrix e **W1/N1.04** estão fechadas. Próximo bloqueante único: **continuar a fábrica curricular pelo próximo nó causal da Coverage Matrix**.
+> **VIGENTE — 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W2_N1_05_FECHADA_2026-08-10.md`. Coverage Matrix, **W1/N1.04** e **W2/N1.05** estão fechadas com recibo remoto verde. Próxima tarefa única: **W3/N2.01 — Dezena e unidades**.
 
 ## Regra de ouro
 
@@ -15,142 +15,108 @@
 
 ## Leia primeiro
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W1_N1_04_FECHADA_2026-08-09.md`
-2. `RETOMADA.md`
-3. `BRIEFING_CODEX.md`
-4. `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`
-5. `CHECKPOINT_GAMIFICACAO_ECONOMIA_METAJOGO_FECHADA_2026-08-09.md`
-6. `VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`
-7. `INVENTARIO_LIMBO_E_COBERTURA_2026-08-09.md`
-8. `DECISAO_POS_P22_SENSEI_ECOSSISTEMA_PEDAGOGICO.md`
-9. cânone: `AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md`, `GRAFO_DE_CONHECIMENTO_SAGA.md`, `MANUAL_DIDATICO_SAGA.md`, `METODO_SAGA.md`, `DOJO_SAGA.md`.
+1. `CHECKPOINT_FABRICA_CURRICULAR_W2_N1_05_FECHADA_2026-08-10.md`;
+2. `RETOMADA.md`;
+3. `BRIEFING_CODEX.md`;
+4. `CHECKPOINT_FABRICA_CURRICULAR_W1_N1_04_FECHADA_2026-08-09.md`;
+5. `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`;
+6. cânone em `AI_Studio_Lab/pedagogia/`, especialmente F21 em `fichas/FICHAS_F1_COMPLETAS.md`.
 
 ## Fechado — não reabrir sem falha objetiva
 
-P17–P22/cânone; Radar/source/persist; Sensei/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto elegível; Matrícula adaptativa; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04**.
+P17–P22/cânone; Radar/source/persist; Sensei/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; Misto; Matrícula; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04; W2/N1.05**.
 
-### Recibo funcional verificável da W1
+## Recibo funcional verificável da W2
 
-Head funcional: `4637d205bc6d5b144dddc926e9f669d835f40d70`.
+Head funcional: `3af6dc6554d4938adeca4f86bdaf9fe57f6089a9`.
 
-CI #842 / run `31340827946`: **success integral** — higiene, binários, Coverage Matrix/auditorias, grafo, TypeScript, testes, build, `pr:check` e sonda real Sensei verdes.
-
-O conector GitHub não expôs de forma confiável nesta sessão o corpo detalhado do log para transcrever a nova contagem total de testes. Não inferir. O run #842 é o recibo canônico.
-
-### Contratos permanentes
-
-- learner state é soberano para mastery/unlock/prescrição;
-- Nível SAGA 1–100 é do perfil da criança, não do mascote;
-- XP é vitalício e não compra aprendizagem;
-- moedas são gastáveis e compras são atômicas;
-- velocidade/RT não concede autoridade conceitual;
-- criança lenta e correta não recebe menos XP;
-- Misto 2× afeta moedas, não XP/mastery;
-- fallback não gera evidência nem recompensa real;
-- Atlas/insígnias vêm do Curriculum Graph + learner state;
-- retry/double tap/reload/materialização repetida não duplicam o mesmo evento técnico;
-- Coverage Matrix é projeção derivada, não segunda fonte de verdade curricular;
-- telemetria pode abrir investigação, mas não reescreve automaticamente grafo/cânone;
-- `COVERAGE_CLOSED_BASELINE` é histórico; evolução usa `COVERAGE_MIGRATIONS`;
-- Creature Engine permanece fora desta fila.
-
-## Coverage Matrix — FECHADA, COM LEDGER EVOLUTIVO
-
-A matriz executável conecta as 90 competências por:
-
-`grafo → ficha canônica → implementação real → screen/primitiva → Composer/Sensei → testes/auditoria → status → dívida/bloqueio → ação → ordem causal`.
-
-Implementação/gates:
-
-- `AI_Studio_Lab/tools/coverage_matrix.ts`;
-- `src/curriculum/coverageMatrix.test.ts`;
-- `AI_Studio_Lab/tools/ficha_runtime_map.cjs`;
-- `npm run coverage:matrix`;
-- `npm run coverage:matrix:markdown`;
-- `npm run coverage:matrix:json`;
-- `npm run auditar` inclui a matriz.
-
-Snapshot histórico P21.1:
+CI **#868 / run `31356943271` — success integral**:
 
 - 90 competências / 94 fichas autorais;
-- Composer 26/90;
-- 25 legado;
-- 39 fallback;
-- 51/90 servidas;
-- **21** divergências ficha↔tela;
-- 12 trocas de linguagem visual;
-- 44 estreias de ferramenta;
-- `Moedas` bloqueia GM.03;
-- `Regua` bloqueia GM.05.
+- Composer 27; legado 24; fallback 39; servidas 51;
+- divergências 19; swaps 12; estreias 44;
+- blockers `Moedas`, `Regua`;
+- Journey fichas 32/32 com `rt_alvo` positivo no nível 5;
+- TypeScript verde;
+- **163 arquivos / 2406 testes passando**;
+- build e `pr:check` verdes;
+- sonda real Sensei verde.
 
-Baseline vigente após `W1-N1.04`:
+Artefato: `sonda-sensei-3af6dc6554d4938adeca4f86bdaf9fe57f6089a9`, ID `9050977700`, SHA-256 `bbd554433de3d7e92890327692c720a291bb5f8bd2f6700c5230073641bff58f`.
 
-- 90 / 94;
+O checkpoint W2 registra os CIs vermelhos que impediram o fechamento prematuro; não apagar nem substituir essa cronologia.
+
+## Coverage Matrix — snapshot + ledger
+
+Snapshot histórico P21.1 é imutável:
+
 - Composer 26;
 - legado 25;
 - fallback 39;
 - servidas 51;
-- **20** divergências;
-- 12 trocas visuais;
-- 44 estreias;
-- `Moedas` e `Regua` seguem bloqueadoras.
+- divergências 21;
+- swaps 12;
+- estreias 44;
+- blockers `Moedas`, `Regua`.
 
-O fechamento de 21 não foi apagado: `W1-N1.04` registra `delta.divergences = -1` no ledger. Toda mudança futura de contagem precisa nascer da fonte real, aparecer na Matrix e só então ser governada por migração nomeada.
+Migrações:
 
-## W1/N1.04 — FECHADA
+- `W1-N1.04`: divergências −1;
+- `W2-N1.05`: Composer +1, legado −1, divergências −1.
 
-- teste nominal regression-first;
-- `TouchCount` preservado como gramática correta de contagem;
-- `fonte` explícita: níveis 1–2 F01, níveis 3–5 F03;
-- falas pedagógicas separadas por origem;
-- nível 5 não promete marcação visual retirada;
-- F03 autoral reconciliada de `EmojiRow / ScatteredItems` para `TouchCount` porque seu próprio roteiro exige o comportamento da F01;
-- divergência N1.04 removida objetivamente: 21 → 20;
-- alteração lateral acidental em F07 detectada por diff e restaurada antes do fechamento.
+Baseline vigente: **27 Composer / 24 legado / 39 fallback / 51 servidas / 19 divergências**, 12 swaps, 44 estreias, mesmos blockers.
 
-## Próxima tarefa — CONTINUAR A FÁBRICA
+Regra permanente: a fonte real muda primeiro; a Matrix observa; só então entra migração nomeada. Nunca editar expectativa para esconder uma divergência.
 
-A próxima competência deve ser escolhida pela Matrix, não por série ou conveniência. Ordem de raciocínio:
+## W3 — N2.01 / F21
 
-1. profundidade no DAG;
-2. impacto causal/descendentes;
-3. primitiva/builder bloqueador;
-4. base legado/fallback;
-5. divergência ficha↔screen;
-6. onboarding/ponte visual;
-7. risco de propagar um modelo pedagógico errado.
+A prioridade foi escolhida por causalidade, não por série:
 
-Fluxo por nó:
+- N2.01 é legado + divergente;
+- depende de N1.09 e N1.11, já autorais/ativos;
+- instala a dezena como unidade composta;
+- alimenta grande parte do DAG N2/N3/AL/GM, incluindo o caminho até reagrupamento e sistema monetário.
 
-`investigar cânone + runtime → regressão primeiro → corrigir fonte real → Matrix/gates → governar eventual delta → checkpoint → próximo nó`.
+A F21 exige `MaterialDourado + TenFrame` e uma experiência manipulativa real:
 
-N1.04 deixou uma lição operacional: divergência não implica automaticamente runtime errado. O cânone também pode estar stale; a investigação precisa decidir antes da implementação.
+- 10 cubinhos soltos;
+- criança agrupa os 10;
+- fusão visual `10 unidades → 1 dezena`;
+- rótulo `10 unidades = 1 dezena` somente depois da fusão;
+- leitura D dezenas + U unidades;
+- L4 inverso: numeral → produzir barras + cubinhos;
+- L5 mistura leitura/produção sem pista de qual operação vem;
+- diagnósticos causais `IGNORA_DEZENA`, `CONCATENA`, `CONTA_TUDO`, `TROCA_DU`.
 
-Dívida ainda viva:
+Infra atual:
 
-- 25 legados;
-- 39 fallbacks;
-- 20 divergências;
-- 12 trocas visuais;
-- 44 estreias;
-- `Moedas`/GM.03;
-- `Regua`/GM.05;
-- `Quadrado100` componente isolado;
-- `LinkingCubes`, `SingaporeBars`, `VisualAddition` renderer sem builder completo.
+- `MaterialDourado.tsx` existe e deve ser reutilizado;
+- hoje é somente visual/estático;
+- renderer `kind: tens` apenas desenha dezenas/unidades;
+- o legado atual de N2.01 entrega `Quadrado100` e não satisfaz a transformação 10→1.
 
-Não massificar dependentes sobre base/primitiva quebrada. Não usar idade/série como ordem causal. Não transformar fábrica, meta-jogo ou telemetria em autoridade paralela ao Tutor.
+Fluxo obrigatório:
 
-## Visão futura preservada
+`F21 integral + runtime → teste vermelho → procedimento/contrato de troca → palco autoral reutilizando MaterialDourado → diagnóstico/telemetria → registro sem ativação → canário só após cadeia completa → Matrix observa → W3 entra no ledger → gates → checkpoint`.
 
-`VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md` continua guardando a direção de produto: companheiro/NPC persistente, widget, emoções/retratos, necessidades suaves, animais lutadores humanoides em HD pixel art, futuro fighting game/beat ’em up 2.5D e `Laboratório de Raciocínio / Thinking Lab`.
+Não promover apenas trocando o desenho. A competência é compreender e usar a **unidade composta**.
 
-Nada disso autoriza tocar no Creature Engine nesta fila.
+## Contratos permanentes
+
+- learner state é soberano para mastery/unlock/prescrição;
+- Nível SAGA é do perfil da criança;
+- XP não compra aprendizagem;
+- RT/velocidade é telemetria/automaticidade, nunca autoridade conceitual;
+- fallback não gera evidência nem recompensa real;
+- Misto dobra moedas, não XP/mastery;
+- Atlas/insígnias derivam do Curriculum Graph + learner state;
+- Coverage Matrix é projeção derivada, não segunda ontologia;
+- telemetria pode abrir investigação, não reescrever automaticamente grafo/cânone;
+- Creature Engine permanece fora desta fila.
 
 ## Fila
 
-`Coverage Matrix FECHADA → fábrica curricular por ondas (W1/N1.04 fechada; seguir próximo nó) → mega auditoria integrada → hardening/performance → release`.
-
-Arte definitiva/Creature Engine/widget/jogo ficam em trilha futura separada até o núcleo matemático estar fechado.
+`Coverage Matrix → W1 fechada → W2 fechada → W3/N2.01 → próximas ondas causais → mega auditoria integrada → hardening/performance → release`.
 
 ## Gates
 
