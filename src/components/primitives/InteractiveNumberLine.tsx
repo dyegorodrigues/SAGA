@@ -50,7 +50,6 @@ export function InteractiveNumberLineSurface({
   onDragRelease,
 }: InteractiveNumberLineSurfaceProps) {
   const length = Math.max(1, end - start);
-  const stepWidth = 100 / length;
   const lineRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragPct, setDragPct] = useState<number | null>(null);
@@ -88,6 +87,14 @@ export function InteractiveNumberLineSurface({
     if (rect) onDragRelease?.(e.clientX, rect);
   }
 
+  function pointerCancel(e: React.PointerEvent<HTMLDivElement>) {
+    if (!isDragging) return;
+    setIsDragging(false);
+    setDragPct(null);
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
+    // Cancelamento não representa uma decisão matemática; nada é publicado.
+  }
+
   const currentPct = dragPct !== null ? dragPct : pctFor(position);
   const hasPath = pathFrom !== null && pathTo !== null && pathFrom !== pathTo;
   const pathLeft = hasPath ? Math.min(pctFor(pathFrom!), pctFor(pathTo!)) : 0;
@@ -101,7 +108,7 @@ export function InteractiveNumberLineSurface({
         onPointerDown={pointerDown}
         onPointerMove={pointerMove}
         onPointerUp={pointerUp}
-        onPointerCancel={pointerUp}
+        onPointerCancel={pointerCancel}
         data-reta-surface
       >
         <div
@@ -130,6 +137,10 @@ export function InteractiveNumberLineSurface({
                 data-reta-tick={value}
                 aria-label={`posição ${value}`}
                 disabled={disabled || !onTapTick}
+                onPointerDown={event => event.stopPropagation()}
+                onPointerMove={event => event.stopPropagation()}
+                onPointerUp={event => event.stopPropagation()}
+                onPointerCancel={event => event.stopPropagation()}
                 onClick={event => {
                   event.stopPropagation();
                   onTapTick?.(value);
