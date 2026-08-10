@@ -33,7 +33,7 @@ export interface ReguaSpec {
 
 const OBJETOS = [
   { id: "lapis", nome: "lápis", emoji: "✏️" },
-  { id: "borracha", nome: "borracha", emoji: "🧽" },
+  { id: "borracha", nome: "borracha", emoji: "▰" },
   { id: "carrinho", nome: "carrinho", emoji: "🚗" },
   { id: "livro", nome: "livro", emoji: "📕" },
   { id: "pincel", nome: "pincel", emoji: "🖌️" },
@@ -45,8 +45,17 @@ function inteiro(min: number, max: number, sorteio: () => number): number {
   return min + Math.floor(bounded * (max - min + 1));
 }
 
-function item(comprimentoCm: number, sorteio: () => number, suffix = ""): ItemRegua {
-  const base = OBJETOS[inteiro(0, OBJETOS.length - 1, sorteio)];
+function item(
+  comprimentoCm: number,
+  sorteio: () => number,
+  suffix = "",
+  excluirBaseId?: string,
+): ItemRegua {
+  let indice = inteiro(0, OBJETOS.length - 1, sorteio);
+  if (excluirBaseId && OBJETOS[indice].id === excluirBaseId) {
+    indice = (indice + 1) % OBJETOS.length;
+  }
+  const base = OBJETOS[indice];
   return { ...base, id: `${base.id}${suffix}`, comprimentoCm };
 }
 
@@ -83,7 +92,7 @@ export function construirReguaSpec(
       valorCerto: valor,
       alternativas: alternativas(valor, 1, 8),
       enunciado: `Quantos clipes medem o ${alvo.nome}?`,
-      falado: `Meça o ${alvo.nome} usando os clipes iguais.` ,
+      falado: `Meça o ${alvo.nome} usando os clipes iguais.`,
     };
   }
 
@@ -91,7 +100,10 @@ export function construirReguaSpec(
     const a = inteiro(4, 8, sorteio);
     let b = inteiro(5, 11, sorteio);
     if (b === a) b = Math.min(12, b + 1);
-    const itens = [item(a, sorteio, "-a"), item(b, sorteio, "-b")];
+    const primeiro = item(a, sorteio, "-a");
+    const primeiroBaseId = primeiro.id.replace(/-a$/, "");
+    const segundo = item(b, sorteio, "-b", primeiroBaseId);
+    const itens = [primeiro, segundo];
     const maior = itens[0].comprimentoCm > itens[1].comprimentoCm ? itens[0] : itens[1];
     return {
       nivel: 4,
