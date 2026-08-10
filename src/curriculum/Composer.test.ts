@@ -68,7 +68,7 @@ describe("Composer de fichas", () => {
 
   it("normalizes legacy tutorial speech into the runtime contract", () => {
     const q = Composer.generate(N1_03, 1);
-    expect(q.tutorial?.[0]?.fala).toBeTruthy();
+    expect(q.tutorial?.[0]?.say).toBeTruthy();
   });
 
   it("converts the level response-time target from milliseconds to seconds", () => {
