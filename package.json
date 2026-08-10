@@ -23,6 +23,7 @@
     "contrato": "vitest run",
     "sonda": "node scripts/sonda-layout.mjs",
     "sonda:sensei-dojo": "node scripts/sonda-sensei-dojo.mjs && node scripts/sonda-matricula.mjs",
+    "sonda:reta20": "node scripts/sonda-reta20.mjs",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
@@ -50,7 +51,6 @@
     "autoprefixer": "^10.4.21",
     "axe-core": "^4.12.1",
     "esbuild": "^0.25.0",
-    "js-yaml": "^5.2.1",
     "jsdom": "^30.0.1",
     "playwright-core": "^1.62.1",
     "tsx": "^4.21.0",
