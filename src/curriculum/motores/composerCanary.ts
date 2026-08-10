@@ -17,6 +17,7 @@ import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
+import { N1_12 } from "../fichas/jornada/N1.12";
 import { N1_13 } from "../fichas/jornada/N1.13";
 import { N2_01 } from "../fichas/jornada/N2.01";
 import { GE_01 } from "../fichas/jornada/GE.01";
@@ -30,6 +31,7 @@ import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
+import { construirReta20Question } from "../procedimentos/reta20Contract";
 import { construirDezenaUnidadesQuestion } from "../procedimentos/materialDouradoContract";
 import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { Question, Track } from "../../types";
@@ -72,6 +74,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // P22.4: contagem até 20; desligado volta ao gVis_Sequence legado.
   "N1.09": N1_09,
 
+  // W4: F19 registrada sem ativação. Só entra em produção após contract/palco,
+  // filtro motor, evidência, conformidade e CI inativo integralmente verdes.
+  "N1.12": N1_12,
+
   // F04: novo nó de produzir quantidade; desligado volta ao fallback.
   "N1.13": N1_13,
 
@@ -79,8 +85,6 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.10": N1_10,
   "N1.11": N1_11,
 
-  // W3: registrada, mas só entra em produção quando o canário declarativo for
-  // ligado depois dos testes de palco/boundary/conformidade.
   "N2.01": N2_01,
 
   "AL.01": AL_01,
@@ -100,21 +104,18 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
 const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N1.05": construirComparacaoQuantidadeQuestion,
   "N1.09": construirContagem20Question,
+  "N1.12": construirReta20Question,
   "N2.01": construirDezenaUnidadesQuestion,
   "GM.02": construirTempoCotidianoQuestion,
 };
 
 /**
- * Alguns builders especializados encapsulam uma composição de primitivas e,
- * portanto, emitem um `Question.kind` deliberadamente diferente do `KindType`
- * usado pela ficha para selecionar a família autoral.
- *
- * Este mapa é contrato de runtime, não exceção de teste: qualquer auditor que
- * compare ficha → question pode consultá-lo. O N2.01 usa `tens` como família
- * autoral (MaterialDourado), mas o palco F21 é a composição explícita
- * MaterialDourado + TenFrame e por isso se identifica como `material-dourado`.
+ * Alguns builders especializados encapsulam uma interação procedural e,
+ * portanto, emitem um `Question.kind` deliberadamente diferente da família
+ * autoral usada na ficha. Isto é contrato de runtime, não exceção de teste.
  */
 const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
+  "N1.12": "numberline-f19",
   "N2.01": "material-dourado",
 };
 
@@ -122,19 +123,11 @@ export function registeredFichaRuntimeKindOverride(id: string): string | undefin
   return SPECIALIZED_RUNTIME_KIND[id];
 }
 
-/**
- * Nós efetivamente servidos pelo Composer neste processo.
- *
- * O conjunto nasce da lista declarativa versionada, mas continua mutável em
- * runtime para que `enableComposerCanary`/`rollbackComposerCanary` façam a troca
- * na próxima questão sem rebuild.
- */
+/** Nós efetivamente servidos pelo Composer neste processo. */
 export const COMPOSER_CANARIES = new Set<string>(DEFAULT_COMPOSER_CANARY_IDS);
 
 export interface GeneratorBinding {
-  /** Resolve a origem a cada questão, refletindo o estado atual dos canários. */
   gen: Generator;
-  /** Proveniência observável; avaliada na leitura, nunca congelada. */
   source(): GeneratorSource;
 }
 
@@ -142,13 +135,7 @@ export function hasComposerFicha(id: string): boolean {
   return Object.prototype.hasOwnProperty.call(COMPOSER_FICHAS, id);
 }
 
-/**
- * Porta única para gerar uma questão autoral registrada.
- *
- * A maioria das fichas usa o Composer genérico. Competências cujo contrato
- * exige estrutura que um builder genérico não expressa delegam a um builder
- * procedimental explícito, mas continuam atravessando esta MESMA porta.
- */
+/** Porta única para gerar uma questão autoral registrada. */
 export function generateRegisteredFichaQuestion(id: string, level: number): Question {
   const ficha = COMPOSER_FICHAS[id];
   if (!ficha) throw new Error(`Ficha Composer não registrada: ${id}.`);
