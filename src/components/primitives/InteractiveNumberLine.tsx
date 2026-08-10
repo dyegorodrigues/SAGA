@@ -24,6 +24,9 @@ export interface InteractiveNumberLineSurfaceProps {
   pulsarTarget?: boolean;
   pathFrom?: number | null;
   pathTo?: number | null;
+  /** Andaime F19/L2: arcos unitários já desenhados entre partida e destino. */
+  assistPathFrom?: number | null;
+  assistPathTo?: number | null;
   errorPulse?: number;
   onTapTick?: (value: number) => void;
   /** Emite cada marca realmente atravessada, inclusive quando o pointer salta pixels. */
@@ -51,6 +54,8 @@ export function InteractiveNumberLineSurface({
   pulsarTarget = false,
   pathFrom = null,
   pathTo = null,
+  assistPathFrom = null,
+  assistPathTo = null,
   errorPulse = 0,
   onTapTick,
   onDragTick,
@@ -152,6 +157,18 @@ export function InteractiveNumberLineSurface({
   const pathLeft = hasPath ? Math.min(pctFor(pathFrom!), pctFor(pathTo!)) : 0;
   const pathWidth = hasPath ? Math.abs(pctFor(pathTo!) - pctFor(pathFrom!)) : 0;
 
+  const assistSegments: Array<{ from: number; to: number }> = [];
+  if (assistPathFrom !== null && assistPathTo !== null && assistPathFrom !== assistPathTo) {
+    const direction = assistPathTo > assistPathFrom ? 1 : -1;
+    for (
+      let from = assistPathFrom;
+      direction > 0 ? from < assistPathTo : from > assistPathTo;
+      from += direction
+    ) {
+      assistSegments.push({ from, to: from + direction });
+    }
+  }
+
   return (
     <div className={`w-full py-12 px-8 select-none ${tokens.estado[state]}`}>
       <div
@@ -167,6 +184,27 @@ export function InteractiveNumberLineSurface({
           className="absolute left-0 right-0 h-4 rounded-full pointer-events-none"
           style={{ backgroundColor: disabled ? tokens.cor.elementos.borda : tokens.cor.elementos.base_A, opacity: disabled ? 0.5 : 0.3 }}
         />
+
+        {assistSegments.map(({ from, to }) => {
+          const left = Math.min(pctFor(from), pctFor(to));
+          const width = Math.abs(pctFor(to) - pctFor(from));
+          return (
+            <div
+              key={`assist-${from}-${to}`}
+              data-reta-arco-assistido
+              aria-hidden
+              className="absolute pointer-events-none border-t-4 border-dashed rounded-[50%]"
+              style={{
+                left: `${left}%`,
+                width: `${width}%`,
+                height: 26,
+                top: 'calc(50% - 34px)',
+                borderColor: tokens.cor.elementos.base_A,
+                opacity: 0.55,
+              }}
+            />
+          );
+        })}
 
         {hasPath && (
           <motion.div
