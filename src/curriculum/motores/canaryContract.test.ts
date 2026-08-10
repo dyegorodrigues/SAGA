@@ -23,6 +23,7 @@ import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
+import { N2_01 } from "../fichas/jornada/N2.01";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { N1_04 } from "../fichas/jornada/N1.04";
@@ -65,7 +66,7 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  *
  * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
  * porta que `selectGenerator` usa em produção. Assim builders procedimentais
- * especializados (como N1.09 e GM.02) não ganham um caminho de teste paralelo.
+ * especializados (como N1.09, N2.01 e GM.02) não ganham caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
@@ -78,7 +79,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.09": N4_09,
 
   // Bloco F0. Estes nós são servidos por ficha autoral de produção sob o
-  // mesmo contrato, inclusive os builders procedimentais de N1.09 e GM.02.
+  // mesmo contrato, inclusive os builders procedimentais especializados.
   "N1.03": N1_03,
   "N1.05": N1_05,
   "N1.07": N1_07,
@@ -99,6 +100,9 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "GM.01": GM_01,
   "GM.02": GM_02,
   "GM.12": GM_12,
+
+  // W3 — F21: substituição do legado pela experiência autoral de agrupamento.
+  "N2.01": N2_01,
 
   "AL.02": AL_02,
 };
