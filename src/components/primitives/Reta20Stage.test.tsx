@@ -81,6 +81,18 @@ describe("Reta20Stage — F19 / N1.12", () => {
     );
   });
 
+  it("L2 desenha um arco por salto e L3 retira esse andaime", () => {
+    const l2 = construirReta20Spec(2, () => 0.4);
+    const primeiro = render(<Reta20Stage spec={l2} />);
+    expect(primeiro.container.querySelectorAll("[data-reta-arco-assistido]")).toHaveLength(Math.abs(l2.salto));
+    primeiro.unmount();
+
+    const l3 = construirReta20Spec(3, () => 0.4);
+    const segundo = render(<Reta20Stage spec={l3} />);
+    expect(segundo.container.querySelectorAll("[data-reta-arco-assistido]")).toHaveLength(0);
+    segundo.unmount();
+  });
+
   it("pointercancel aborta o gesto e não publica resposta", () => {
     const spec = construirReta20Spec(2, () => 0.4);
     const onAnswer = vi.fn();
