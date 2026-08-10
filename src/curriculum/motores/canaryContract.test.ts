@@ -34,6 +34,7 @@ import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
 import { GM_02 } from "../fichas/jornada/GM.02";
+import { GM_05 } from "../fichas/jornada/GM.05";
 import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_01 } from "../fichas/jornada/N1.01";
@@ -67,7 +68,7 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  *
  * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
  * porta que `selectGenerator` usa em produção. Assim builders procedimentais
- * especializados (como N1.09, N2.01 e GM.02) não ganham caminho de teste paralelo.
+ * especializados (como N1.09, N2.01, GM.02 e GM.05) não ganham caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
@@ -108,6 +109,10 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   // W4 — F19: substituição do legado pela reta interativa autoral. O rollback
   // continua descoberto por `geradorLegadoDe`, como em toda substituição.
   "N1.12": N1_12,
+
+  // W5 — F61: estreia real. Antes da promoção GM.05 era fallback; por isso o
+  // próprio contrato deve provar rollback→placeholder e reativação→Composer.
+  "GM.05": GM_05,
 
   "AL.02": AL_02,
 };
