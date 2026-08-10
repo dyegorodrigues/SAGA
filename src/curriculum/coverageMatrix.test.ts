@@ -10,15 +10,34 @@ import {
 
 describe("Coverage Matrix executável", () => {
   it("preserva o fechamento P21.1 e deriva o baseline vigente por migrações nomeadas", () => {
-    expect(COVERAGE_CLOSED_BASELINE.divergences).toBe(21);
+    expect(COVERAGE_CLOSED_BASELINE).toMatchObject({
+      composer: 26,
+      legacy: 25,
+      fallback: 39,
+      served: 51,
+      divergences: 21,
+    });
     expect(COVERAGE_MIGRATIONS).toEqual([
       expect.objectContaining({
         id: "W1-N1.04",
         competence: "N1.04",
         delta: { divergences: -1 },
       }),
+      expect.objectContaining({
+        id: "W2-N1.05",
+        competence: "N1.05",
+        delta: { composer: 1, legacy: -1, divergences: -1 },
+      }),
     ]);
-    expect(COVERAGE_BASELINE.divergences).toBe(20);
+    expect(COVERAGE_BASELINE).toMatchObject({
+      composer: 27,
+      legacy: 24,
+      fallback: 39,
+      served: 51,
+      divergences: 19,
+      modeSwaps: 12,
+      toolIntroductions: 44,
+    });
   });
 
   it("liga grafo, ficha, runtime, screen, Sensei, testes, dívida e ordem causal nas 90 competências", () => {
