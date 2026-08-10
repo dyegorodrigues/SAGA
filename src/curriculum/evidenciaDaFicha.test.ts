@@ -13,6 +13,8 @@ import { construirMaterialDouradoSpec } from "./procedimentos/materialDouradoCon
 import { evidenciasMaterialDourado as daDezena } from "./procedimentos/materialDouradoProcedure";
 import { construirReta20Spec } from "./procedimentos/reta20Contract";
 import { evidenciasReta20 as daReta } from "./procedimentos/reta20Procedure";
+import { construirReguaSpec } from "./procedimentos/reguaContract";
+import { evidenciasDaRegua as daRegua } from "./procedimentos/reguaProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -103,6 +105,22 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       }, spec);
     },
   },
+  {
+    nome: "F61 (régua) — alinhou a marca zero antes da leitura",
+    evidencia: Evidencia.ALINHOU_ZERO,
+    emitir: () => {
+      const spec = construirReguaSpec(3, () => 0);
+      return daRegua({
+        alinhado: true,
+        marcaAlinhada: 0,
+        alinhouManualmente: true,
+        valorEscolhido: spec.valorCerto,
+        valorCerto: spec.valorCerto,
+        unidadeEscolhida: "cm",
+        unidadeCerta: "cm",
+      }, spec);
+    },
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -177,5 +195,16 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       gesto: "toque",
       contouMarcaInicial: false,
     }, reta)).toEqual([]);
+
+    const regua = construirReguaSpec(3, () => 0);
+    expect(daRegua({
+      alinhado: false,
+      marcaAlinhada: 1,
+      alinhouManualmente: true,
+      valorEscolhido: regua.valorCerto,
+      valorCerto: regua.valorCerto,
+      unidadeEscolhida: "cm",
+      unidadeCerta: "cm",
+    }, regua)).toEqual([]);
   });
 });
