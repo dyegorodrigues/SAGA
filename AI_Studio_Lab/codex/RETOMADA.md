@@ -1,15 +1,15 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W3_N2_01_FECHADA_2026-08-10.md`. Coverage Matrix, W1/N1.04, W2/N1.05 e **W3/N2.01** estão fechadas com recibo remoto real. Próxima tarefa única: **W4**, escolhida pela Matrix/DAG; a auditoria preliminar favorece N1.12/F19, mas só a análise causal completa pode promovê-la à onda.
+> **VIGENTE em 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e ondas **W1/N1.04, W2/N1.05, W3/N2.01 e W4/N1.12** estão fechadas com recibo remoto. Próxima tarefa única: escolher W5 pela Coverage Matrix/DAG vigente — não por ordem numérica nem por memória do chat.
 
 ## Leia primeiro
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W3_N2_01_FECHADA_2026-08-10.md`;
+1. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
 2. `BRIEFING_CODEX.md` e `HANDOFF_CONTINUIDADE_IA.md`;
-3. checkpoints W2, W1 e `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`;
+3. checkpoints W3, W2, W1 e `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`;
 4. cânone em `AI_Studio_Lab/pedagogia/`, especialmente `BIBLIA_DO_SAGA.md` e as fichas autorais.
 
-Checkpoints antigos continuam históricos. Em conflito, vence esta fonte vigente + GitHub remoto + gates executáveis.
+GitHub remoto + gates executáveis vencem qualquer texto antigo ou memória de conversa.
 
 ## Git — regra de ouro
 
@@ -20,31 +20,32 @@ Checkpoints antigos continuam históricos. Em conflito, vence esta fonte vigente
 - não ready, não auto-merge, não merge/rebase na main;
 - não tocar no Creature Engine nesta fila;
 - não criar branch auxiliar;
-- GitHub remoto é a fonte da verdade;
 - antes de editar: reancorar PR/head/CI e resolver qualquer falha objetiva primeiro.
 
 ## Fechado — não reabrir sem falha objetiva
 
-P17–P22/cânone; Radar/source/persist/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto; Matrícula; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04; W2/N1.05; W3/N2.01**.
+P17–P22/cânone; Radar/source/persist/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto; Matrícula; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04; W2/N1.05; W3/N2.01; W4/N1.12**.
 
-## Recibo funcional W3
+## Recibo funcional W4
 
-Head funcional: `929dc5b234a842116b31b998850ceacabe2248dd`.
+Head funcional: `841a4a3691662829b9d1432ff070191522fd9a6e`.
 
-CI **#916 / run `31386605676` — success integral**:
+CI **#975 / run `31404572801` — success integral**:
 
 - 90 competências / 94 fichas autorais;
-- Composer 28; legado 23; fallback 39; servidas 51;
-- divergências 18; swaps 12; estreias 44;
+- Composer **29**; legado **22**; fallback **39**; servidas **51**;
+- divergências **17**; swaps **12**; estreias **44**;
 - blockers `Moedas`, `Regua`;
 - TypeScript verde;
-- **166 arquivos / 2443 testes passando**;
+- **169 arquivos de teste / 2480 testes passando**;
 - build e `pr:check` verdes;
-- sonda real Sensei verde em phone + tablet.
+- higiene do diff e guarda de binários verdes;
+- sonda Sensei/Matrícula verde;
+- sonda F19 Chrome real verde em 320/390/900 px, níveis 1–5, tap + drag.
 
-Artefato: `sonda-sensei-929dc5b234a842116b31b998850ceacabe2248dd`, ID `9061964350`, SHA-256 `cb0bd490ab0b6576043bab8869d8c55e9786513767f102c0e5a9b7a38e5b1fcb`.
+Artefato F19: ID `9069082798`, SHA-256 `65a1d3ab456f4320709547dcc98f87958f8ed083fb978b8a80322059e03629f3`.
 
-A W3 só foi promovida depois do estado inativo #912 ficar integralmente verde. O checkpoint W3 registra a meia-migração inicialmente encontrada, os gates vermelhos e a correção canônica completa.
+Artefato Sensei: ID `9069071435`, SHA-256 `d8b4060ee5bc98feb64a0bc56f7d4b7c0fc5c8ca85f8416730657a83976cf38b`.
 
 ## Coverage Matrix — snapshot + ledger
 
@@ -54,73 +55,69 @@ Ledger:
 
 - `W1-N1.04`: divergências −1;
 - `W2-N1.05`: Composer +1, legado −1, divergências −1;
-- `W3-N2.01`: Composer +1, legado −1, divergências −1.
+- `W3-N2.01`: Composer +1, legado −1, divergências −1;
+- `W4-N1.12`: Composer +1, legado −1, divergências −1.
 
-Baseline vigente: **28 / 23 / 39 / 51 / 18**, com 12 swaps, 44 estreias e os mesmos blockers.
+Baseline vigente: **29 / 22 / 39 / 51 / 17**, 12 swaps, 44 estreias e os mesmos blockers.
 
 Regra: fonte real muda primeiro → Matrix observa → migração nomeada governa. Nunca reescrever snapshot ou expectativa só para ficar verde.
 
-## W3/F21 — o que ficou fechado
+## W4/F19 — o que ficou fechado
 
-N2.01 ensina dezena como **unidade composta**:
+N1.12 agora é Composer ativo e entrega uma reta numérica produtiva/responsiva:
 
-- L1/L2 agrupamento manual com TenFrame;
-- L3 agrupamento manual sem moldura;
-- L4 numeral → montar MaterialDourado;
-- L5 decomposição mental D/U;
-- domínio 3/3 em duas sessões + evidência `montou-do-numeral` no L4;
-- diagnósticos canônicos `IGNORA_VALOR`, `INVERTE_ORDENS`, `NAO_AGRUPA`;
-- aliases provisórios antigos ficaram deprecated apenas para compatibilidade longitudinal de telemetria.
+- mesma `InteractiveNumberLineSurface` reutilizada, sem primitive duplicada;
+- tap físico resolvido pelo plano da reta + geometria/snap;
+- drag real pode começar sobre o foguete;
+- `pointercancel` não publica resposta;
+- soltura fora da reta nunca vira acerto por clamp;
+- imprecisão motora não vira misconception;
+- L2 mostra arcos unitários; L3+ retira esse andaime;
+- salto por tap anima casa a casa, bipa em cada casa e publica só no fim;
+- drag bipa as casas atravessadas e publica na soltura;
+- TTS é uma única frase de chegada para evitar autocancelamento;
+- `CONTA_MARCAS` é assinatura por tentativa e não vaza em retry;
+- sonda Chrome permanente mede geometria e colisão de rótulos.
 
-Não reabrir sem falha objetiva.
+No phone, todas as marcas 0–20 continuam presentes/interativas; para manter legibilidade em 320/390 px, rótulos ímpares 11/13/15/17/19 são ocultados visualmente. Em largura maior, 0–20 permanecem integralmente rotulados.
 
-## Faça agora — W4
+Não reabrir W4 sem falha objetiva.
 
-Primeiro gere/inspecione a Coverage Matrix vigente e compare candidatos por:
+## Faça agora — escolher W5
 
-1. profundidade causal no DAG;
-2. número/criticidade de descendentes;
-3. legado/fallback;
-4. divergência ficha↔screen;
-5. blocker de primitive;
-6. onboarding/risco motor/a11y;
-7. custo de implementação e risco pedagógico.
+1. reancorar PR #29, HEAD e CI;
+2. gerar/inspecionar `npm run coverage:matrix:markdown` ou JSON;
+3. ranquear dívida por profundidade/impacto no DAG, legado/fallback, divergência, blocker de primitive, onboarding/motor/a11y e risco pedagógico;
+4. escolher **uma competência**;
+5. ler ficha integral + runtime integral;
+6. regression-first;
+7. implementar inativo;
+8. testar/sondar no nível apropriado;
+9. promover canário somente com estado inativo verde;
+10. deixar a Matrix observar o delta;
+11. atualizar ledger só depois do delta real;
+12. fechar checkpoint.
 
-### Candidato preliminar: N1.12 / F19
+Blockers que merecem peso alto: `Moedas`/GM.03 e `Regua`/GM.05. A ordem final, porém, deve sair da Matrix/DAG.
 
-A leitura já feita aponta forte prioridade:
+## Dívida objetiva atual
 
-- legado + divergente;
-- pré-requisitos `N1.07` e `N1.09` já autorais;
-- YAML marca `Prioridade 1 (kind novo)`;
-- legado `gN1_12` ensina antes/depois/entre, números muito maiores e ±10 — não a progressão F19;
-- `InteractiveNumberLine.tsx` já existe e deve ser evoluído/reutilizado, não duplicado.
+- **22 legados**;
+- **39 fallback**;
+- **17 divergências ficha↔screen**;
+- `Moedas`: renderer sem builder;
+- `Regua`: ausente;
+- `Quadrado100`: componente isolado;
+- `LinkingCubes`, `SingaporeBars`, `VisualAddition`: renderer sem builder;
+- bundle >500 kB e warnings jsdom de canvas continuam hardening, não blockers da W4.
 
-F19 canônica:
-
-- L1 localizar 0–10;
-- L2 localizar 0–20;
-- L3 saltos +1/+2;
-- L4 saltos −1/−2;
-- L5 misto +1/+2/−1/−2;
-- gesto produtivo na reta com snap generoso;
-- toque alternativo ao drag;
-- imprecisão motora não pode virar erro matemático;
-- percurso fica visível;
-- erro balança sem deslocar o personagem;
-- áudio acompanha movimento real;
-- domínio 3/3 em duas sessões; RT L5 7s;
-- reconciliar tags `CONTA_SEM_POSICAO`, `DIRECAO_INVERTIDA`, `ERRO_DE_UM`, `SO_SEQUENCIA` no catálogo.
-
-Se a Matrix confirmar N1.12 como W4, fluxo:
-
-`F19 inteira → runtime inteiro → teste vermelho → contract/procedure → evolução do InteractiveNumberLine → stage/boundary/telemetria/a11y → registro inativo → CI → canário → Matrix observa → ledger W4 → gates → checkpoint`.
+A lista completa está no checkpoint W4.
 
 ## Thinking Lab — regra de impacto
 
-Pesquisa externa/Thinking Lab pode propor arquitetura, simuladores, property-based tests, QA visual/áudio, agentes e observabilidade. Isso **não** muda o cânone automaticamente.
+Pesquisa externa/Thinking Lab pode propor simuladores, property-based tests, QA visual/áudio, agentes e observabilidade. Isso **não** muda o cânone automaticamente.
 
-Qualquer proposta que altere grafo, learner state, evidência, runtime determinístico/offline, persistência, privacidade ou rollback passa primeiro por uma **Invariant Impact Review**. Até W3 não há sinal de reconstrução total: as direções úteis são incrementais; propostas incompatíveis ficam em quarentena até prova.
+Qualquer proposta que altere grafo, learner state, evidência, runtime determinístico/offline, persistência, privacidade ou rollback passa por **Invariant Impact Review**. Telemetria observa; não reescreve Curriculum Graph. IA propõe; não muta produção sem contracts/CI/revisão.
 
 ## Contratos permanentes
 
@@ -130,7 +127,6 @@ Qualquer proposta que altere grafo, learner state, evidência, runtime determin�
 - Misto dobra moedas, não XP/mastery;
 - Atlas/insígnias derivam do grafo + learner state;
 - Coverage Matrix é projeção derivada;
-- telemetria observa e abre investigação, não muda cânone automaticamente;
 - Creature Engine fora desta fila.
 
 ## Gates
@@ -145,6 +141,9 @@ npm test -- --run
 npm run build
 npm run pr:check
 npm run sonda:sensei-dojo
+npm run sonda:reta20
 ```
+
+**Para primitives responsivas em que gesto/geometria importam: unit/jsdom + sonda Chrome real.**
 
 **Uma competência só está pronta quando código, telemetria, persistência, ficha canônica e experiência real da criança concordam.**
