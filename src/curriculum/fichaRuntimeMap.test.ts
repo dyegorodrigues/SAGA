@@ -27,8 +27,14 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "StoryPanel: executável | kinds=story+scene+storypanel+story-bars | builder=storypanel | renderer=story-bars",
     );
+    // W3/F21 compõe MaterialDourado + TenFrame no palco especializado. O alias
+    // `material-dourado` precisa continuar visível nos DOIS componentes reais;
+    // retirar daqui esconderia uma regressão do mapa, não uma mudança cosmética.
     expect(output).toContain(
-      "TenFrame: executável | kinds=tenframe+moldura+bond+plain | builder=tenframe+moldura+bond+plain | renderer=tenframe+moldura+bond+plain",
+      "MaterialDourado: executável | kinds=tens+material-dourado | builder=tens | renderer=tens+material-dourado",
+    );
+    expect(output).toContain(
+      "TenFrame: executável | kinds=tenframe+moldura+bond+plain+material-dourado | builder=tenframe+moldura+bond+plain | renderer=tenframe+moldura+bond+plain+material-dourado",
     );
 
     // Lacunas reais permanecem visíveis: reconciliar o mapa não significa
