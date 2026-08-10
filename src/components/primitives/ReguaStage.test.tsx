@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React from "react";
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import axe from "axe-core";
 import { Evidencia } from "../../constants/evidencias";
@@ -56,17 +56,18 @@ describe("ReguaStage — F61 / GM.05", () => {
 
   it("L4 só permite comparar depois de medir os dois objetos", () => {
     const spec = construirReguaSpec(4, meio);
-    const { getAllByRole, queryByRole } = render(<ReguaStage spec={spec} />);
+    const { container, getAllByRole } = render(<ReguaStage spec={spec} />);
     const medir = getAllByRole("button", { name: "Medir" });
     expect(medir).toHaveLength(2);
-    expect(queryByRole("button", { name: new RegExp(spec.itens[0].nome, "i") })).toBeNull();
+    expect(container.querySelector('[aria-label="Escolha o objeto mais comprido"]')).toBeNull();
 
     fireEvent.click(medir[0]);
-    expect(queryByRole("button", { name: new RegExp(spec.itens[1].nome, "i") })).toBeNull();
+    expect(container.querySelector('[aria-label="Escolha o objeto mais comprido"]')).toBeNull();
     fireEvent.click(getAllByRole("button", { name: "Medir" })[0]);
 
-    expect(queryByRole("button", { name: new RegExp(spec.itens[0].nome, "i") })).not.toBeNull();
-    expect(queryByRole("button", { name: new RegExp(spec.itens[1].nome, "i") })).not.toBeNull();
+    const escolhas = container.querySelector<HTMLElement>('[aria-label="Escolha o objeto mais comprido"]');
+    expect(escolhas).not.toBeNull();
+    expect(within(escolhas!).getAllByRole("button")).toHaveLength(2);
   });
 
   it("tutorial pode alinhar visualmente sem fabricar evidência da criança", () => {
