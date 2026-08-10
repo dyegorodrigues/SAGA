@@ -30,7 +30,7 @@ export const N1_05: FichaCompetencia = {
     1: { primitiva: "grandeza", micro: "diferenca_obvia", andaime: "mao_fantasma" },
     2: { primitiva: "grandeza", micro: "diferenca_clara", andaime: "alto" },
     3: { primitiva: "grandeza", micro: "quantidades_proximas", andaime: "medio" },
-    4: { primitiva: "grandeza", micro: "tamanho_engana", andaime: "baixo" },
+    4: { primitiva: "grandeza", micro: "tamanho_engana", andaime: "minimo" },
     5: { primitiva: "grandeza", micro: "espaco_engana", andaime: "nenhum", rt_alvo: 8000 },
   },
 
