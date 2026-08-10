@@ -35,9 +35,6 @@ function allowedKindsFor(ficha: FichaCompetencia, level: number): string[] {
   const declaredKind = nivel?.primitiva ?? ficha.micros[0].kinds[0];
   if (nivel?.micro !== "misto") return [renderedKindFor(declaredKind)];
 
-  // Um micro explicitamente chamado `misto` pode alternar famílias já ensinadas
-  // pela própria ficha. Ele NÃO ganha liberdade para emitir um palco novo: a
-  // união permitida deriva somente das primitivas dos demais níveis.
   return [...new Set(
     Object.entries(ficha.niveis ?? {})
       .filter(([rawLevel]) => Number(rawLevel) !== level)
@@ -47,14 +44,6 @@ function allowedKindsFor(ficha: FichaCompetencia, level: number): string[] {
 
 describe("Composer de fichas", () => {
   it("uses the level primitive as the effective builder", () => {
-    // O mecanismo: o `niveis[lvl].primitiva` vence o `micro.kinds[0]`. Quem
-    // demonstra hoje é o N1.08, servido por DUAS fichas: a JD2 (mão relâmpago,
-    // `fileira`) nos níveis 1-2 e a F02 (moldura de dez) nos 3-5. Se o Composer
-    // olhasse o micro, os cinco níveis viriam iguais.
-    //
-    // As primitivas vêm DA FICHA, não escritas aqui: o nome delas é inventário
-    // e já mudou uma vez (`tenframe` → `moldura`, quando a F02 ganhou as cinco
-    // casas dos níveis 1-2). O que é especificação é o nível mandar (§2-bis).
     expect(Composer.generate(N1_08, 1).kind).toBe("fileira");
     expect(Composer.generate(N1_08, 3).kind).toBe("moldura");
   });
@@ -115,7 +104,6 @@ describe("Composer de fichas", () => {
           expect(question.uiProps, `${ficha.id} L${level}`).toBeDefined();
           expect(question.evaluate, `${ficha.id} L${level}`).toBeTypeOf("function");
           expect(question.evaluate?.(question.answer), `${ficha.id} L${level}`).toBe(true);
-
           if (question.options) {
             const matching = question.options.filter(option => option.value === question.answer);
             expect(matching, `${ficha.id} L${level}`).toHaveLength(1);
@@ -142,14 +130,14 @@ describe("Composer de fichas", () => {
   it("rejects malformed ficha parameters at the Composer boundary", () => {
     const ficha = {
       ...N1_01,
-      niveis: { 1: { primitiva: "tenframe", micro: "a" } },
+      niveis: { 1: { primitiva: "pareamento", micro: "a" } },
       micros: [{
         ...N1_01.micros[0],
         id: "a",
-        params: { qtd: "não-é-número" },
+        params: { ...N1_01.micros[0].params, audio_prompt: 123 },
       }],
     } as unknown as FichaCompetencia;
-    expect(() => Composer.generate(ficha, 1)).toThrow();
+    expect(() => Composer.generate(ficha, 1)).toThrow(/audio_prompt inválido/i);
   });
 
   it("builds a typed vertical question with a single valid answer", () => {
@@ -159,11 +147,14 @@ describe("Composer de fichas", () => {
   });
 
   it("rejects an invalid vertical operation at the typed boundary", () => {
+    const level1 = N3_11.niveis?.[1]?.micro;
     const ficha = {
       ...N3_11,
-      micros: N3_11.micros.map(m => ({ ...m, params: { ...m.params, op: "division" } })),
-    } as FichaCompetencia;
-    expect(() => Composer.generate(ficha, 1)).toThrow();
+      micros: N3_11.micros.map(m => m.id === level1
+        ? ({ ...m, params: { ...m.params, operation: "division" } })
+        : m),
+    } as unknown as FichaCompetencia;
+    expect(() => Composer.generate(ficha, 1)).toThrow(/operation inválido/i);
   });
 
   it("builds F39 with an explicit regrouping bridge and double regrouping at level 5", () => {
@@ -192,10 +183,22 @@ describe("Composer de fichas", () => {
   });
 
   it("rejeita dimensão fora de 1..10 e giro obrigatório sem permissão", () => {
-    const ficha = {
+    const level1 = N4_02.niveis?.[1]?.micro;
+    const dimensaoInvalida = {
       ...N4_02,
-      micros: N4_02.micros.map(m => ({ ...m, params: { ...m.params, rowsMax: 20 } })),
+      micros: N4_02.micros.map(m => m.id === level1
+        ? ({ ...m, params: { ...m.params, rows_max: 20 } })
+        : m),
     } as FichaCompetencia;
-    expect(() => Composer.generate(ficha, 1)).toThrow();
+    expect(() => Composer.generate(dimensaoInvalida, 1)).toThrow();
+
+    const level3 = N4_02.niveis?.[3]?.micro;
+    const giroInvalido = {
+      ...N4_02,
+      micros: N4_02.micros.map(m => m.id === level3
+        ? ({ ...m, params: { ...m.params, allow_rotate: false, require_rotate: true } })
+        : m),
+    } as FichaCompetencia;
+    expect(() => Composer.generate(giroInvalido, 3)).toThrow();
   });
 });
