@@ -1,3 +1,4 @@
+import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
 
 /**
@@ -8,13 +9,17 @@ import { FichaCompetencia } from "../../schema";
  * enganoso → espalhamento enganoso. O primitive canônico é Grupo; em runtime a
  * ficha usa o canal `grandeza`, cujo palco é composto por Grupo e discrimina
  * `modo: quantidade` no specialized builder da porta de canário.
+ *
+ * `rt_alvo` é relógio silencioso: alimenta fluência/telemetria, nunca domínio.
  */
 export const N1_05: FichaCompetencia = {
   id: "N1.05",
   nome: "Comparar quantidades",
   strand: "N1",
   faixa: "F0",
-  prereqs: ["N1.03", "N1.04"],
+  // O Curriculum Graph é a autoridade causal: N1.05 depende de cardinalidade.
+  // Subitização ajuda, mas não é pré-requisito de desbloqueio para parear grupos.
+  prereqs: ["N1.04"],
   bncc: "EI03ET07",
 
   howto: "Faça um par de cada vez: um daqui, um dali. Quem sobrar tem mais.",
@@ -26,7 +31,7 @@ export const N1_05: FichaCompetencia = {
     2: { primitiva: "grandeza", micro: "diferenca_clara", andaime: "alto" },
     3: { primitiva: "grandeza", micro: "quantidades_proximas", andaime: "medio" },
     4: { primitiva: "grandeza", micro: "tamanho_engana", andaime: "baixo" },
-    5: { primitiva: "grandeza", micro: "espaco_engana", andaime: "nenhum" },
+    5: { primitiva: "grandeza", micro: "espaco_engana", andaime: "nenhum", rt_alvo: 8000 },
   },
 
   micros: [
@@ -36,11 +41,12 @@ export const N1_05: FichaCompetencia = {
       alvo: "comparar dois grupos com diferença grande e aprender o pareamento",
       kinds: ["grandeza"],
       params: {
+        // Adendo normativo §7.1-bis: demonstra o primeiro gesto e devolve a tela.
+        // Nunca mostra a sobra inteira antes de a criança responder.
         tutorial: [
           { fala: "Olha os dois grupos.", show: { destacarAmbos: true } },
           { fala: "Vou ligar um de cada lado.", show: { parear: 0 } },
-          { fala: "Mais um par.", show: { parear: 1 } },
-          { fala: "Quem sobrar tem mais.", show: { destacarSobra: true } },
+          { fala: "Agora compare você.", show: { pulsarGrupos: true } },
         ],
       },
       dominio: { acertos: 3, de: 3, sessoes: 2 },
@@ -80,8 +86,17 @@ export const N1_05: FichaCompetencia = {
   ],
 
   erros_tipicos: [
-    { id: "CONSERVACAO_ESPACO", descricao: "Escolheu o grupo que ocupa mais espaço, não o que tem mais itens." },
-    { id: "CONFUNDE_TAMANHO_QUANTIDADE", descricao: "Escolheu objetos maiores como se tamanho físico fosse quantidade." },
-    { id: "COMPARA_SEM_CONTAR", descricao: "Acerta diferenças grandes e perde as próximas porque julga só pela percepção global." },
+    {
+      id: MisconceptionTag.CONSERVACAO_ESPACO,
+      descricao: "Escolheu o grupo que ocupa mais espaço, não o que tem mais itens.",
+    },
+    {
+      id: MisconceptionTag.CONFUNDE_TAMANHO_QUANTIDADE,
+      descricao: "Escolheu objetos maiores como se tamanho físico fosse quantidade.",
+    },
+    {
+      id: MisconceptionTag.COMPARA_SEM_CONTAR,
+      descricao: "Acerta diferenças grandes e perde as próximas porque julga só pela percepção global.",
+    },
   ],
 };
