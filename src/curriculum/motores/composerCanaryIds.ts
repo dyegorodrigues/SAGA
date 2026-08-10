@@ -36,6 +36,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // inativa (contrato/palco/boundary/a11y/evidência) ficar integralmente verde.
   "N2.01",
 
+  // W4 — F19: reta numérica responsiva e interativa. Promoção somente após
+  // contrato/palco/boundary/a11y + sonda Chrome 320/390/900 ficarem verdes.
+  "N1.12",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
