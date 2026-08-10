@@ -1,128 +1,127 @@
 # Briefing operacional — continue daqui
 
-> **VIGENTE em 10/ago/2026.** Leia primeiro `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`, depois `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e W1–W4 estão funcionalmente fechadas. **W5 ainda não começou.** A próxima tarefa única é uma microfrente de reconciliação documental canônica A–E; só depois selecionar W5 pela Matrix/DAG.
+> **VIGENTE em 10/ago/2026.** W1–W5 estão funcionalmente materializadas; W5 é **GM.05 / F61 / Regua**. Antes de qualquer W6, reancore o GitHub e confirme CI integral do HEAD remoto. Não confie em memória de chat.
 
 ## Leia
 
-1. `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`;
-2. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
+1. `CHECKPOINT_FABRICA_CURRICULAR_W5_GM_05_FECHADA_2026-08-10.md`;
+2. `AI_Studio_Lab/pedagogia/fichas/RETIFICACAO_W5_F61_GM_05_2026-08-10.md`;
 3. `RETOMADA.md`;
 4. `HANDOFF_CONTINUIDADE_IA.md`;
-5. checkpoints W3/W2/W1 + Coverage Matrix;
-6. cânone em `AI_Studio_Lab/pedagogia/`.
+5. checkpoint pré-W5 + W4/W3/W2/W1 + Coverage Matrix;
+6. cânone em `AI_Studio_Lab/pedagogia/` e `curriculum/grafo_saga.yaml`.
 
-Repo `dyegorodrigues/SAGA`; branch única `codex/integrar-bloco-f0`; PR #29 sempre open + draft + unmerged. Main protegida `68fad4c575e28959b2ca4776e9a541d6828b63f3`. Não tocar no Creature Engine, não criar branch auxiliar, não merge/rebase/ready/auto-merge. Reancorar PR/head/CI antes de qualquer edição.
+## Git — não negociar
 
-## Não reabra sem falha objetiva
+- repo `dyegorodrigues/SAGA`;
+- branch única `codex/integrar-bloco-f0`;
+- PR #29 open + draft + unmerged;
+- main protegida `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
+- não merge/rebase/ready/auto-merge;
+- não criar branch auxiliar;
+- Creature Engine fora desta fila;
+- GitHub remoto é a fonte da verdade.
 
-P17–P22/cânone; Radar/source/persist/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; Misto; Matrícula; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04; W2/N1.05; W3/N2.01; W4/N1.12**.
+## Coverage Matrix após W5
 
-## Recibo W4
+Snapshot P21.1 continua imutável: `26 / 25 / 39 / 51 / 21`, 12 swaps, 44 estreias, blockers históricos `Moedas` + `Regua`.
 
-Head funcional: `841a4a3691662829b9d1432ff070191522fd9a6e`  
-CI #975 / run `31404572801`: success integral.
-
-- **29 Composer / 22 legado / 39 fallback / 51 servidas**;
-- **17 divergências / 12 swaps / 44 estreias**;
-- blockers `Moedas`, `Regua`;
-- **169 arquivos / 2480 testes verdes**;
-- build, `pr:check`, higiene e binários verdes;
-- sonda Sensei/Matrícula verde;
-- sonda F19 Chrome real verde em 320/390/900 px, níveis 1–5, tap + drag;
-- artefato F19 `9069082798`, SHA-256 `65a1d3ab456f4320709547dcc98f87958f8ed083fb978b8a80322059e03629f3`;
-- artefato Sensei `9069071435`, SHA-256 `d8b4060ee5bc98feb64a0bc56f7d4b7c0fc5c8ca85f8416730657a83976cf38b`.
-
-Handoff documental anterior: `e3e3cfdf57c6a4371d6c8bac993411efba2fdd33`, CI #979 / run `31405504346` — success integral. A auditoria final posterior detectou apenas deriva textual canônica.
-
-## Coverage Matrix
-
-Snapshot P21.1 imutável: `26 / 25 / 39 / 51 / 21`.
-
-Ledger fechado:
+Ledger:
 
 - W1 N1.04: divergência −1;
 - W2 N1.05: Composer +1, legado −1, divergência −1;
 - W3 N2.01: Composer +1, legado −1, divergência −1;
-- W4 N1.12: Composer +1, legado −1, divergência −1.
+- W4 N1.12: Composer +1, legado −1, divergência −1;
+- **W5 GM.05: Composer +1, fallback −1, servidas +1.**
 
-Baseline vigente: **29 / 22 / 39 / 51 / 17**, 12 swaps, 44 estreias, blockers `Moedas` e `Regua`.
+Baseline vigente observado: **30 Composer / 22 legado / 38 fallback / 52 servidas / 17 divergências / 12 swaps / 44 estreias**. Único blocker de primitive: **Moedas**.
 
-Fonte muda primeiro → Matrix observa → ledger por último. Nunca mascarar divergência ajustando baseline sem causalidade.
+A estreia permanece 44: `Regua` já entrou na linguagem visual quando a implementação física nasceu inativa; a promoção GM.05 não cria uma segunda estreia.
 
-## W4/F19 — contrato real fechado
+## W5 / F61 — contrato real
 
-A ficha autoral F19 e o runtime concordam:
+Pré-requisitos executáveis: `GM.12 + N2.02`. N2.04 não é prereq da F61 vigente.
 
-- L1 localizar 0–10;
-- L2 saltar para frente, magnitude 1–3, em 0–10;
-- L3 saltar para trás, magnitude 1–3, em 0–10;
-- L4 localizar 0–20 com numerais parciais;
-- L5 saltos variáveis bidirecionais, magnitude 1–4, em 0–20.
+Progressão:
 
-Contratos permanentes:
+- L1: medida informal por bolas iguais tangentes;
+- L2: régua alinhada + leitura inteira;
+- L3: alinhar zero + medir;
+- L4: medir/comparar dois objetos distintos;
+- L5: estimar inteiro → alinhar → medir → unidade.
 
-- `InteractiveNumberLineSurface` é compartilhada; não duplicar primitive;
-- F19 é responsiva e não usa `PalcoEscalado`;
-- tap físico passa pelo plano da reta + snap/filtro motor;
-- drag inicia sobre o foguete e diferencia tap por limiar;
-- `pointercancel` não publica resposta;
-- out-of-bounds não pode virar acerto por clamp;
-- erro motor não vira misconception;
-- L2 usa arcos; L3+ os remove;
-- salto por tap anima/bipa casa a casa e só publica ao final;
-- drag bipa ticks atravessados e publica na soltura;
-- TTS é uma fala única de chegada;
-- `CONTA_MARCAS` reseta por tentativa;
-- a sonda `npm run sonda:reta20` mede geometria real e colisão de rótulos.
+### Regras visuais que viraram invariantes
 
-No phone, todas as marcas 0–20 permanecem; rótulos 11/13/15/17/19 são ocultados visualmente para legibilidade. Desktop/tablet amplo mantém 0–20 rotulados no L5.
+A revisão visual humana encontrou e rejeitou versões que tecnicamente “passavam” mas eram inadequadas: cápsula+emoji, carrinho-limusine, borracha repetida, `12` fora da régua, clipes emoji com whitespace, meia marca `0,5`, container correto com silhueta errada e tick 0 deslocado por border.
 
-## Antes de W5 — reconciliação documental obrigatória
+Estado vigente:
 
-O checkpoint de auditoria final encontrou cinco derivas humanas. Corrigir **somente texto**, sem mudar runtime:
+- sem emoji/sprite como objeto/unidade métrica;
+- objetos longitudinais plausíveis: lápis, pincel, giz de cera, marcador, fita de treino;
+- `ponta visível inicial = tick 0` e `ponta visível final = tick correto`;
+- apenas centímetros inteiros na F61;
+- L1 usa bolas procedurais de diâmetro constante, `gap=0`, extensão total igual ao objeto;
+- `Regua` usa sistema de coordenadas sem border deslocando o tick 0;
+- rótulo final contido;
+- tap e drag equivalentes; filtro motor soberano;
+- `ALINHOU_ZERO` nunca é fabricada pelo tutorial.
 
-A. `GRAFO_DE_CONHECIMENTO_SAGA.md`: N1.12 ainda chama `numberline*` de kind inexistente/prioridade 1 e mantém micros antigos. Alinhar à F19, preservando ID/prereqs/topologia.
+Fonte normativa: `RETIFICACAO_W5_F61_GM_05_2026-08-10.md`.
 
-B. `BIBLIA_DO_SAGA.md §9.2`: `numberline`/`vertical` ainda estão como backlog oficial; reclassificar o trecho como histórico e remeter status atual à Coverage Matrix/auditoria.
+## QA F61
 
-C. `BIBLIA_DO_SAGA.md §12.6`: CI #812 fica como snapshot histórico; a frase de “próxima Coverage Matrix” precisa apontar para Matrix já executável + ledger vigente.
+`npm run sonda:regua` é gate permanente e precisa rodar em Chrome real:
 
-D. `FICHAS_F0_COMPLETAS.md`: nota de GM.02 sem ficha ficou velha; a ficha atual é `FICHA_P22_GM_02_TEMPO_COTIDIANO.md`, e o catálogo fecha 90/90.
+- 320/390/900 px;
+- L1–L5;
+- todos os ticks/rótulos inteiros;
+- silhueta visível contra ticks reais;
+- bolas L1 tangentes;
+- L4 com dois tipos/comprimentos distintos;
+- tap/drag/estimativa;
+- screenshots de todos os níveis/larguras.
 
-E. checkpoint W4: trocar o resumo L2 “saltos positivos de 2” por magnitude 1–3.
-
-Aplicar com patch textual seguro. Se a Bíblia for alterada, sincronizar versão do cabeçalho com a última entrada do changelog, conforme regra do próprio arquivo. Depois rodar gates completos e provar que Matrix continua **29/22/39/51/17**.
-
-## W5 — somente depois da reconciliação
-
-Antes de escrever código:
-
-1. reancorar remoto;
-2. inspecionar `npm run coverage:matrix:markdown`/JSON;
-3. ranquear profundidade/descendentes + legado/fallback + divergência + blocker + onboarding/motor/a11y + risco pedagógico;
-4. escolher **um nó**.
-
-Depois:
-
-`ficha integral + runtime → regressão vermelha → contract/procedure → stage/boundary/telemetria/a11y → registro inativo → CI/sonda → canário → Matrix observa → ledger → gates → checkpoint`.
-
-`Moedas`/GM.03 e `Regua`/GM.05 são blockers importantes, mas não hardcode a ordem sem consultar a Matrix.
+**Não declarar qualidade visual com base apenas em jsdom, container geometry ou CI genérico.**
 
 ## Dívida atual
 
 - 22 legados;
-- 39 fallback;
+- 38 fallback;
 - 17 divergências;
-- `Moedas` renderer-sem-builder;
-- `Regua` ausente;
-- `Quadrado100` componente-isolado;
-- `LinkingCubes`, `SingaporeBars`, `VisualAddition` renderer-sem-builder.
+- `Moedas`: único blocker, renderer-sem-builder, afeta GM.03;
+- `LinkingCubes`, `SingaporeBars`, `VisualAddition`: renderer-sem-builder;
+- `Quadrado100`: componente isolado;
+- primitives: 21 executáveis / 4 renderer-sem-builder / 1 isolada / 0 ausentes.
 
-Lista completa no checkpoint W4.
+## W6 — recalcular, não adivinhar
 
-## Thinking Lab / arquitetura
+Antes de código:
 
-Trate como risk review. Simulador de learner, property-based testing, QA visual/áudio, agentes e observabilidade podem entrar incrementalmente. Telemetria não reescreve grafo; LLM não é soberano em runtime; RT/idade/gamificação não concedem mastery. Mudança de invariantes exige Invariant Impact Review.
+1. reancorar PR/head/CI;
+2. gerar Coverage Matrix Markdown/JSON;
+3. cruzar DAG: profundidade + descendentes;
+4. pesar legado/fallback + divergência + blocker + onboarding + motor/a11y + risco pedagógico + primitive reuse + custo/evidência;
+5. `Moedas/GM.03` merece peso alto, mas não é seleção hardcoded;
+6. escolher uma competência.
+
+Depois:
+
+`regression-first → ficha/contract/procedure → stage/boundary/evidência/a11y → registro INATIVO → suíte + browser se geométrico → CI verde → canário → Matrix observa → ledger → gates → checkpoint`.
+
+## Contratos permanentes
+
+- learner state é autoridade de mastery/unlock/prescrição;
+- nível curricular pertence ao perfil/criança;
+- XP lifetime não gastável; moedas spendable atômicas;
+- RT não multiplica mastery/XP;
+- fallback sem evidência/recompensa real;
+- Misto dobra moedas apenas;
+- Atlas/insígnias derivam graph + learner state;
+- retry/replay idempotentes;
+- Matrix derivada; snapshots históricos imutáveis;
+- telemetria observa; não reescreve currículo automaticamente;
+- LLM não é soberano em runtime;
+- mudanças invasivas de Thinking Lab exigem Invariant Impact Review.
 
 ## Gates
 
@@ -137,6 +136,7 @@ npm run build
 npm run pr:check
 npm run sonda:sensei-dojo
 npm run sonda:reta20
+npm run sonda:regua
 ```
 
-**Regression-first. Fonte real primeiro. Matrix depois. Ledger por último. Para geometria infantil responsiva, browser real faz parte do contrato.**
+**Fonte real primeiro → Matrix observa → ledger por último. Experiência visual real da criança é parte do contrato.**
