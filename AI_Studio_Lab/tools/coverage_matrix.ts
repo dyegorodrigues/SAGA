@@ -40,23 +40,48 @@ export const COVERAGE_CLOSED_BASELINE = {
   missingPrimitives: ["Moedas", "Regua"],
 } as const;
 
+type CoverageDelta = Partial<Record<
+  "composer" | "legacy" | "fallback" | "served" | "divergences" | "modeSwaps" | "toolIntroductions",
+  number
+>>;
+interface CoverageMigration {
+  id: string;
+  competence: string;
+  rationale: string;
+  delta: CoverageDelta;
+}
+
 /**
  * Ledger da fábrica curricular. Cada delta só entra depois de a fonte real ter
  * mudado e a Matrix ter ficado vermelha mostrando o novo valor observado.
  */
-export const COVERAGE_MIGRATIONS = [
+export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
   {
     id: "W1-N1.04",
     competence: "N1.04",
     rationale: "F03 reconciliada com TouchCount e proveniência/voz F01+F03 explicitadas no runtime.",
     delta: { divergences: -1 },
   },
+  {
+    id: "W2-N1.05",
+    competence: "N1.05",
+    rationale: "F06 materializada no specialized builder Grupo-backed; o legado abstrato saiu de produção e a divergência ficha↔screen foi fechada.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
+
+const migrationDelta = (key: keyof CoverageDelta) =>
+  COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
 
 export const COVERAGE_BASELINE = {
   ...COVERAGE_CLOSED_BASELINE,
-  divergences: COVERAGE_CLOSED_BASELINE.divergences
-    + COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + migration.delta.divergences, 0),
+  composer: COVERAGE_CLOSED_BASELINE.composer + migrationDelta("composer"),
+  legacy: COVERAGE_CLOSED_BASELINE.legacy + migrationDelta("legacy"),
+  fallback: COVERAGE_CLOSED_BASELINE.fallback + migrationDelta("fallback"),
+  served: COVERAGE_CLOSED_BASELINE.served + migrationDelta("served"),
+  divergences: COVERAGE_CLOSED_BASELINE.divergences + migrationDelta("divergences"),
+  modeSwaps: COVERAGE_CLOSED_BASELINE.modeSwaps + migrationDelta("modeSwaps"),
+  toolIntroductions: COVERAGE_CLOSED_BASELINE.toolIntroductions + migrationDelta("toolIntroductions"),
 } as const;
 
 type Status = "padrao-ouro" | "legado" | "fallback";
