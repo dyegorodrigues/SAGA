@@ -11,6 +11,7 @@ import { TakeApart } from './primitives/TakeApart';
 import { NumberBond } from './primitives/NumberBond';
 import { NumberLine } from './primitives/NumberLine';
 import { InteractiveNumberLine } from './primitives/InteractiveNumberLine';
+import { Reta20Stage } from './primitives/Reta20Stage';
 import { Quadrado100 } from './primitives/Quadrado100';
 import { ShapeCanvas } from './primitives/ShapeCanvas';
 import { Relogio } from './primitives/Relogio';
@@ -43,6 +44,9 @@ import {
   diagnosticarMaterialDourado,
   evidenciasMaterialDourado,
 } from '../curriculum/procedimentos/materialDouradoProcedure';
+import { Reta20Spec } from '../curriculum/procedimentos/reta20Contract';
+import { diagnosticarReta20, evidenciasReta20 } from '../curriculum/procedimentos/reta20Procedure';
+import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
   question: Question;
@@ -73,6 +77,29 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
       
     case 'numberline':
       return <InteractiveNumberLine {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
+
+    case 'numberline-f19': {
+      const spec = uiProps as Reta20Spec;
+      return (
+        <Reta20Stage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          falar={falar}
+          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
+          onAnswer={(valor, acao, manipulacao) => {
+            const misconception = podeGerarDiagnostico(manipulacao)
+              ? diagnosticarReta20(acao, spec)
+              : undefined;
+            const evidencias = evidenciasReta20(acao, spec);
+            handleInteract(valor, {
+              manipulacao,
+              ...(misconception ? { misconception } : {}),
+              ...(evidencias.length ? { evidencias } : {}),
+            });
+          }}
+        />
+      );
+    }
       
     case 'tens':
       // Contrato estático legado/genérico. F21 usa kind próprio para não esconder
