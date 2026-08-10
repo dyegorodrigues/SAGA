@@ -7,6 +7,7 @@ const TAMANHO_DO_SAPO = 64;
 const SUBIDA_DO_SAPO = 24;
 const BASE_DO_SAPO = TAMANHO_DO_SAPO / 2 - SUBIDA_DO_SAPO;
 const RESPIRO = 6;
+const LIMIAR_DE_ARRASTO_PX = 6;
 export const DESCIDA_DA_ESCALA = BASE_DO_SAPO + RESPIRO;
 
 export interface InteractiveNumberLineSurfaceProps {
@@ -15,6 +16,8 @@ export interface InteractiveNumberLineSurfaceProps {
   position: number;
   emoji?: string;
   disabled?: boolean;
+  /** Bloqueia gesto sem mudar a aparência: usado durante coreografia autoral. */
+  interactionDisabled?: boolean;
   state?: UIState;
   numeraisVisiveis?: number[];
   target?: number;
@@ -23,6 +26,8 @@ export interface InteractiveNumberLineSurfaceProps {
   pathTo?: number | null;
   errorPulse?: number;
   onTapTick?: (value: number) => void;
+  /** Emite cada marca realmente atravessada, inclusive quando o pointer salta pixels. */
+  onDragTick?: (value: number) => void;
   onDragRelease?: (clientX: number, rect: DOMRect) => void;
 }
 
@@ -39,6 +44,7 @@ export function InteractiveNumberLineSurface({
   position,
   emoji = "🐸",
   disabled = false,
+  interactionDisabled = false,
   state = 'ocioso',
   numeraisVisiveis,
   target,
@@ -47,51 +53,97 @@ export function InteractiveNumberLineSurface({
   pathTo = null,
   errorPulse = 0,
   onTapTick,
+  onDragTick,
   onDragRelease,
 }: InteractiveNumberLineSurfaceProps) {
   const length = Math.max(1, end - start);
   const lineRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [dragPct, setDragPct] = useState<number | null>(null);
+  const draggingRef = useRef(false);
+  const dragStartXRef = useRef<number | null>(null);
+  const dragMovedRef = useRef(false);
+  const lastDragTickRef = useRef(position);
+  const suppressClickUntilRef = useRef(0);
   const labels = new Set(numeraisVisiveis ?? Array.from({ length: length + 1 }, (_, i) => start + i));
+  const gestureDisabled = disabled || interactionDisabled;
 
   function pctFor(value: number) {
     return ((value - start) / length) * 100;
   }
 
-  function updateDrag(clientX: number) {
+  function geometryAt(clientX: number) {
     const rect = lineRef.current?.getBoundingClientRect();
-    if (!rect || !rect.width) return;
-    const pct = ((clientX - rect.left) / rect.width) * 100;
-    setDragPct(Math.max(0, Math.min(100, pct)));
+    if (!rect || !rect.width) return null;
+    const raw = (clientX - rect.left) / rect.width;
+    const pct = Math.max(0, Math.min(1, raw));
+    const value = Math.max(start, Math.min(end, start + Math.round(pct * length)));
+    return { rect, pct: pct * 100, value };
+  }
+
+  function emitCrossedTicks(nextValue: number) {
+    const previous = lastDragTickRef.current;
+    if (nextValue === previous) return;
+    const direction = nextValue > previous ? 1 : -1;
+    for (let value = previous + direction; direction > 0 ? value <= nextValue : value >= nextValue; value += direction) {
+      onDragTick?.(value);
+    }
+    lastDragTickRef.current = nextValue;
+  }
+
+  function updateDrag(clientX: number, emitTicks: boolean) {
+    const geometry = geometryAt(clientX);
+    if (!geometry) return null;
+    setDragPct(geometry.pct);
+    if (emitTicks) emitCrossedTicks(geometry.value);
+    return geometry;
   }
 
   function pointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (disabled || !onDragRelease) return;
-    setIsDragging(true);
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* browser sem capture */ }
-    updateDrag(e.clientX);
+    if (gestureDisabled || !onDragRelease) return;
+    draggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+    dragMovedRef.current = false;
+    lastDragTickRef.current = position;
+    // Não capturamos ainda: um toque curto sobre o hitbox continua sendo click.
   }
 
   function pointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    if (!isDragging || disabled) return;
-    updateDrag(e.clientX);
+    if (!draggingRef.current || gestureDisabled) return;
+    const startX = dragStartXRef.current ?? e.clientX;
+    if (!dragMovedRef.current && Math.abs(e.clientX - startX) < LIMIAR_DE_ARRASTO_PX) return;
+    if (!dragMovedRef.current) {
+      dragMovedRef.current = true;
+      try { lineRef.current?.setPointerCapture(e.pointerId); } catch { /* browser sem capture */ }
+    }
+    updateDrag(e.clientX, true);
   }
 
   function pointerUp(e: React.PointerEvent<HTMLDivElement>) {
-    if (!isDragging) return;
-    setIsDragging(false);
+    if (!draggingRef.current) return;
+    const startX = dragStartXRef.current ?? e.clientX;
+    const moved = dragMovedRef.current || Math.abs(e.clientX - startX) >= LIMIAR_DE_ARRASTO_PX;
+    const geometry = moved ? updateDrag(e.clientX, true) : geometryAt(e.clientX);
+
+    draggingRef.current = false;
+    dragStartXRef.current = null;
+    dragMovedRef.current = false;
     setDragPct(null);
-    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
-    const rect = lineRef.current?.getBoundingClientRect();
-    if (rect) onDragRelease?.(e.clientX, rect);
+    try { lineRef.current?.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
+
+    if (moved && geometry) {
+      // Alguns browsers ainda disparam click no botão onde o drag começou.
+      suppressClickUntilRef.current = Date.now() + 250;
+      onDragRelease?.(e.clientX, geometry.rect);
+    }
   }
 
   function pointerCancel(e: React.PointerEvent<HTMLDivElement>) {
-    if (!isDragging) return;
-    setIsDragging(false);
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    dragStartXRef.current = null;
+    dragMovedRef.current = false;
     setDragPct(null);
-    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
+    try { lineRef.current?.releasePointerCapture(e.pointerId); } catch { /* browser sem capture */ }
     // Cancelamento não representa uma decisão matemática; nada é publicado.
   }
 
@@ -136,13 +188,10 @@ export function InteractiveNumberLineSurface({
                 type="button"
                 data-reta-tick={value}
                 aria-label={`posição ${value}`}
-                disabled={disabled || !onTapTick}
-                onPointerDown={event => event.stopPropagation()}
-                onPointerMove={event => event.stopPropagation()}
-                onPointerUp={event => event.stopPropagation()}
-                onPointerCancel={event => event.stopPropagation()}
+                disabled={gestureDisabled || !onTapTick}
                 onClick={event => {
                   event.stopPropagation();
+                  if (Date.now() < suppressClickUntilRef.current) return;
                   onTapTick?.(value);
                 }}
                 className="absolute z-20 rounded-full bg-transparent p-0 disabled:cursor-default"
