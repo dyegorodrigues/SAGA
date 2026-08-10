@@ -23,6 +23,7 @@ import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
+import { N1_12 } from "../fichas/jornada/N1.12";
 import { N2_01 } from "../fichas/jornada/N2.01";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
@@ -103,6 +104,10 @@ const REGISTRO: Record<string, FichaCompetencia> = {
 
   // W3 — F21: substituição do legado pela experiência autoral de agrupamento.
   "N2.01": N2_01,
+
+  // W4 — F19: substituição do legado pela reta interativa autoral. O rollback
+  // continua descoberto por `geradorLegadoDe`, como em toda substituição.
+  "N1.12": N1_12,
 
   "AL.02": AL_02,
 };
