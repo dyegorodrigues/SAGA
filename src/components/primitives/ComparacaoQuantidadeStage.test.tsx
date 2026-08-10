@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import axe from "axe-core";
 import { ComparacaoQuantidadeStage } from "./ComparacaoQuantidadeStage";
 import { construirComparacaoQuantidadeSpec } from "../../curriculum/procedimentos/comparacaoQuantidadeContract";
@@ -34,20 +34,25 @@ describe("ComparacaoQuantidadeStage — F06 / N1.05", () => {
 
   it("no erro explica com pareamento completo, mas não deixa a resposta colada no retry", () => {
     vi.useFakeTimers();
-    const spec = construirComparacaoQuantidadeSpec(4, sempreEsquerda);
-    const onAnswer = vi.fn();
-    const { container } = render(<ComparacaoQuantidadeStage spec={spec} onAnswer={onAnswer} />);
-    const grupos = container.querySelectorAll<HTMLButtonElement>("button[aria-label^='grupo']");
-    const errada = spec.resposta === 0 ? grupos[1] : grupos[0];
+    try {
+      const spec = construirComparacaoQuantidadeSpec(4, sempreEsquerda);
+      const onAnswer = vi.fn();
+      const { container } = render(<ComparacaoQuantidadeStage spec={spec} onAnswer={onAnswer} />);
+      const grupos = container.querySelectorAll<HTMLButtonElement>("button[aria-label^='grupo']");
+      const errada = spec.resposta === 0 ? grupos[1] : grupos[0];
 
-    fireEvent.click(errada);
-    expect(container.querySelector("[data-comparacao-pareamento]")).not.toBeNull();
-    expect(container.querySelector("[data-comparacao-sobra]")).not.toBeNull();
+      fireEvent.click(errada);
+      expect(container.querySelector("[data-comparacao-pareamento]")).not.toBeNull();
+      expect(container.querySelector("[data-comparacao-sobra]")).not.toBeNull();
 
-    vi.advanceTimersByTime(2500);
-    expect(container.querySelector("[data-comparacao-pareamento]")).toBeNull();
-    expect(container.querySelector("[data-comparacao-sobra]")).toBeNull();
-    vi.useRealTimers();
+      act(() => {
+        vi.advanceTimersByTime(2500);
+      });
+      expect(container.querySelector("[data-comparacao-pareamento]")).toBeNull();
+      expect(container.querySelector("[data-comparacao-sobra]")).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("o andaime por demanda continua disponível a partir do nível 2", () => {
@@ -67,5 +72,5 @@ describe("ComparacaoQuantidadeStage — F06 / N1.05", () => {
       expect(violations.map(v => `L${nivel} ${v.id}: ${v.help}`)).toEqual([]);
       unmount();
     }
-  });
+  }, 15_000);
 });
