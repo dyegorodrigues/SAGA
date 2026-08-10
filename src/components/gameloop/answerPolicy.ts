@@ -30,9 +30,9 @@ export function isMotorSlip(meta?: AnswerMeta): boolean {
 export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta): boolean {
   if (value === "__timeout__") return false;
   if (isMotorSlip(meta)) return true;
-  // F21 responde no próprio palco e não possui q.options; ainda assim o erro
-  // manipulativo precisa voltar ao mesmo material, não consumir a questão.
-  if (q.kind === "material-dourado") return true;
+  // F21 e F19 respondem dentro do próprio palco e não possuem q.options; ainda
+  // assim um erro deve voltar à mesma representação, não consumir a questão.
+  if (q.kind === "material-dourado" || q.kind === "numberline-f19") return true;
   return Boolean(q.options || q.groups || meta?.source);
 }
 
@@ -53,6 +53,7 @@ function isPosicaoQuestion(q: Question): boolean {
 
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return q.kind === "material-dourado"
+    || q.kind === "numberline-f19"
     || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
     || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
@@ -63,6 +64,7 @@ export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
 
 export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
   return q.kind === "material-dourado"
+    || q.kind === "numberline-f19"
     || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
     || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
@@ -73,6 +75,7 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
 
 export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
   if (q.kind === "material-dourado") return 3000;
+  if (q.kind === "numberline-f19") return 1800;
   if (isPosicaoQuestion(q) && meta?.posicao !== undefined) return 3300;
   if (isFormaQuestion(q) && meta?.forma !== undefined) return 3700;
   if (q.kind === "grandeza" && meta?.grandeza !== undefined) return 3300;
@@ -149,6 +152,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
   "touchplace", "shapecanvas", "grandeza", "medidas", "moldura", "material-dourado",
+  "numberline-f19",
 ]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
