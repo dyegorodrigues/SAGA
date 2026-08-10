@@ -63,9 +63,9 @@ jobs:
         run: npm run pr:check
 
   sonda-sensei-dojo:
-    name: Sonda real Sensei
+    name: Sondas reais
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     if: github.event_name == 'pull_request'
 
     steps:
@@ -96,12 +96,24 @@ jobs:
       - name: Sonda real das rotas prescritas do Sensei
         run: npm run sonda:sensei-dojo
 
-      - name: Evidências da sonda
+      - name: Evidências da sonda Sensei
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sonda-sensei-${{ github.event.pull_request.head.sha }}
           path: .artifacts/sonda-sensei-dojo/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F19 — reta numérica
+        run: npm run sonda:reta20
+
+      - name: Evidências da sonda F19
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f19-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-reta20/
           if-no-files-found: warn
           retention-days: 14
 
