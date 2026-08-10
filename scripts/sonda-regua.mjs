@@ -130,20 +130,24 @@ async function exerciseTap(page) {
   await prepareLevel(page, 3);
   const probe = page.locator("[data-regua-probe]");
   const correct = await probe.getAttribute("data-correct");
+  const value = await probe.getAttribute("data-value");
+  assert(correct && value, "F61 L3 não expôs recibo canônico/valor visual");
   assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L3 liberou leitura antes do alinhamento por toque");
   await page.locator("[data-regua-tap-align]").click();
   assert(await page.locator("[data-regua-stage]").getAttribute("data-regua-aligned") === "true", "F61 tap alternativo não alinhou o zero");
   assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 não liberou leitura depois do alinhamento por toque");
-  await page.getByRole("button", { name: correct }).click();
+  await page.getByRole("button", { name: `${value} cm` }).click();
   await page.waitForFunction(expected => document.querySelector("[data-regua-probe]")?.getAttribute("data-answer") === expected, correct);
   assert((await probe.getAttribute("data-evidencias"))?.includes("alinhou-zero"), "F61 tap não colheu evidência ALINHOU_ZERO");
-  return { correct, spoken: await probe.getAttribute("data-spoken") };
+  return { correct, value, spoken: await probe.getAttribute("data-spoken") };
 }
 
 async function exerciseDrag(page) {
   await prepareLevel(page, 3);
   const probe = page.locator("[data-regua-probe]");
   const correct = await probe.getAttribute("data-correct");
+  const value = await probe.getAttribute("data-value");
+  assert(correct && value, "F61 L3 não expôs recibo canônico/valor visual");
   assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L3 liberou leitura antes do alinhamento por drag");
   const ruler = await page.locator("[data-regua-draggable] [data-regua]").boundingBox();
   const object = await page.locator("[data-regua-object]").boundingBox();
@@ -157,10 +161,10 @@ async function exerciseDrag(page) {
   await page.mouse.up();
   await page.waitForFunction(() => document.querySelector("[data-regua-stage]")?.getAttribute("data-regua-aligned") === "true");
   assert(await page.locator("[data-regua-answer-buttons] button").count() >= 3, "F61 não liberou leitura depois do alinhamento por drag");
-  await page.getByRole("button", { name: correct }).click();
+  await page.getByRole("button", { name: `${value} cm` }).click();
   await page.waitForFunction(expected => document.querySelector("[data-regua-probe]")?.getAttribute("data-answer") === expected, correct);
   assert((await probe.getAttribute("data-evidencias"))?.includes("alinhou-zero"), "F61 drag não colheu evidência ALINHOU_ZERO");
-  return { correct, dx, spoken: await probe.getAttribute("data-spoken") };
+  return { correct, value, dx, spoken: await probe.getAttribute("data-spoken") };
 }
 
 async function exerciseEstimate(page) {
