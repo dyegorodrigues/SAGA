@@ -67,7 +67,7 @@ describe("N2.01 / F21 — dezena como unidade composta", () => {
   it("specialized builder preserva tutorial, masteryRule e RT silencioso", () => {
     const q1 = construirDezenaUnidadesQuestion(N2_01, 1);
     const q5 = construirDezenaUnidadesQuestion(N2_01, 5);
-    expect(q1.kind).toBe("tens");
+    expect(q1.kind).toBe("material-dourado");
     expect((q1.uiProps as any).modo).toBe("ler");
     expect(q1.tutorial?.length).toBeGreaterThan(0);
     expect(q1.masteryRule).toEqual({ acertos: 9, de: 10, sessoes: 2 });
