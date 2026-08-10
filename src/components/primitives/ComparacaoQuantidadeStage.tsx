@@ -9,11 +9,19 @@ const ACERTO_MS = 1100;
 
 type Fase = "idle" | "erro" | "acerto";
 
+export interface ComparacaoQuantidadeMostrar {
+  destacarAmbos?: boolean;
+  /** Índice zero-based do último par demonstrado: 0 = só o primeiro par. */
+  parear?: number;
+  pulsarGrupos?: boolean;
+}
+
 interface Props {
   spec: ComparacaoQuantidadeSpec;
   onAnswer?: (valor: number) => void;
   disabled?: boolean;
   falar?: (texto: string) => void;
+  mostrar?: ComparacaoQuantidadeMostrar | null;
 }
 
 function itensDoGrupo(grupo: GrupoQuantidadeSpec) {
@@ -37,22 +45,32 @@ function itensDoGrupo(grupo: GrupoQuantidadeSpec) {
   ));
 }
 
-function Pareamento({ spec }: { spec: ComparacaoQuantidadeSpec }) {
-  const pares = Math.min(spec.grupos[0].quantidade, spec.grupos[1].quantidade);
-  const sobraEsquerda = spec.grupos[0].quantidade - pares;
-  const sobraDireita = spec.grupos[1].quantidade - pares;
+function Pareamento({ spec, limitePares, mostrarSobra }: {
+  spec: ComparacaoQuantidadeSpec;
+  limitePares?: number;
+  mostrarSobra: boolean;
+}) {
+  const paresTotais = Math.min(spec.grupos[0].quantidade, spec.grupos[1].quantidade);
+  const paresVisiveis = limitePares == null
+    ? paresTotais
+    : Math.max(0, Math.min(paresTotais, limitePares));
+  const sobraEsquerda = spec.grupos[0].quantidade - paresTotais;
+  const sobraDireita = spec.grupos[1].quantidade - paresTotais;
   return (
     <motion.div
       data-comparacao-pareamento
+      data-pares-visiveis={paresVisiveis}
       className="mt-2 flex flex-col items-center gap-1 rounded-xl border border-blue-200 bg-blue-50/90 px-3 py-2"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
     >
       <span className="text-xs font-bold text-blue-900">Um de cada lado</span>
       <div className="flex max-w-[290px] flex-wrap justify-center gap-1" aria-hidden>
-        {Array.from({ length: pares }, (_, i) => <span key={i} className="text-sm">●—●</span>)}
+        {Array.from({ length: paresVisiveis }, (_, i) => (
+          <span key={i} data-comparacao-par className="text-sm">●—●</span>
+        ))}
       </div>
-      {(sobraEsquerda > 0 || sobraDireita > 0) && (
+      {mostrarSobra && (sobraEsquerda > 0 || sobraDireita > 0) && (
         <span data-comparacao-sobra className="text-sm font-black text-blue-800">
           {sobraEsquerda > 0 ? `Sobrou ${sobraEsquerda} à esquerda` : `Sobrou ${sobraDireita} à direita`}
         </span>
@@ -61,22 +79,28 @@ function Pareamento({ spec }: { spec: ComparacaoQuantidadeSpec }) {
   );
 }
 
-export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar }: Props) {
+export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
   const [fase, setFase] = React.useState<Fase>("idle");
   const [escolhido, setEscolhido] = React.useState<number | null>(null);
-  const [mostrarPares, setMostrarPares] = React.useState(spec.nivel === 1);
+  const [mostrarPares, setMostrarPares] = React.useState(false);
   const timer = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     setFase("idle");
     setEscolhido(null);
-    setMostrarPares(spec.nivel === 1);
+    setMostrarPares(false);
     return () => {
       if (timer.current != null) window.clearTimeout(timer.current);
     };
   }, [spec]);
 
-  const travado = Boolean(disabled) || fase !== "idle";
+  const emAula = mostrar != null && Object.keys(mostrar).length > 0;
+  const travado = Boolean(disabled) || fase !== "idle" || emAula;
+  const paresTutorial = typeof mostrar?.parear === "number" ? mostrar.parear + 1 : 0;
+  const pareamentoDeErro = fase === "erro" && spec.autoParearNoErro;
+  const exibirPareamento = pareamentoDeErro || mostrarPares || paresTutorial > 0;
+  const limitePares = pareamentoDeErro || mostrarPares ? undefined : paresTutorial;
+  const mostrarSobra = pareamentoDeErro || mostrarPares;
 
   function tocar(i: number) {
     if (travado) return;
@@ -85,11 +109,12 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar }: P
     onAnswer?.(i);
     if (!certo) {
       setFase("erro");
-      setMostrarPares(spec.autoParearNoErro);
       falar?.(spec.explain);
       timer.current = window.setTimeout(() => {
         setFase("idle");
         setEscolhido(null);
+        // A explicação pode mostrar a solução; o retry precisa voltar limpo.
+        setMostrarPares(false);
       }, ERRO_MS);
       return;
     }
@@ -112,6 +137,8 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar }: P
             const selecionado = escolhido === i;
             const correto = fase === "acerto" && i === spec.resposta;
             const erro = fase === "erro" && selecionado;
+            const destaqueAula = Boolean(mostrar?.destacarAmbos);
+            const pulsarAula = Boolean(mostrar?.pulsarGrupos);
             return (
               <motion.div
                 key={`${grupo.emoji}-${grupo.quantidade}-${i}`}
@@ -119,9 +146,19 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar }: P
                 data-quantidade={grupo.quantidade}
                 data-distribuicao={grupo.distribuicao}
                 data-caixa={`${grupo.caixa.largura}x${grupo.caixa.altura}`}
-                animate={erro ? { x: [0, -4, 4, 0] } : correto ? { scale: [1, 1.04, 1] } : {}}
-                transition={{ duration: 0.35 }}
-                style={{ width: grupo.caixa.largura, minHeight: grupo.caixa.altura }}
+                animate={erro
+                  ? { x: [0, -4, 4, 0] }
+                  : correto || pulsarAula
+                    ? { scale: [1, 1.04, 1] }
+                    : destaqueAula
+                      ? { opacity: 1 }
+                      : {}}
+                transition={{ duration: pulsarAula ? 0.7 : 0.35 }}
+                style={{
+                  width: grupo.caixa.largura,
+                  minHeight: grupo.caixa.altura,
+                  opacity: emAula && !destaqueAula && !pulsarAula && paresTutorial === 0 ? 0.78 : 1,
+                }}
               >
                 <Grupo
                   items={itensDoGrupo(grupo)}
@@ -135,7 +172,7 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar }: P
           })}
         </div>
 
-        {spec.pareamentoDisponivel && fase === "idle" && (
+        {spec.pareamentoDisponivel && fase === "idle" && !emAula && (
           <button
             type="button"
             data-comparacao-parear
@@ -147,7 +184,9 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar }: P
           </button>
         )}
 
-        {mostrarPares && <Pareamento spec={spec} />}
+        {exibirPareamento && (
+          <Pareamento spec={spec} limitePares={limitePares} mostrarSobra={mostrarSobra} />
+        )}
       </div>
     </PalcoEscalado>
   );
