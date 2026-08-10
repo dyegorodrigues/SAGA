@@ -74,6 +74,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F21 materializada como agrupamento manual 10U→1D com MaterialDourado + TenFrame, montagem inversa no L4 e decomposição mental no L5; o legado estático saiu de produção e a divergência ficha↔screen foi fechada.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W4-N1.12",
+    competence: "N1.12",
+    rationale: "F19 materializada na InteractiveNumberLine compartilhada com reta responsiva, tap/drag filtrados por geometria motora, salto e som sincronizados, arcos somente no L2 e sonda Chrome 320/390/900; o legado saiu de produção e a divergência ficha↔screen foi fechada.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
