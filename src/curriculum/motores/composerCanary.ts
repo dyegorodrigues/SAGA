@@ -18,6 +18,7 @@ import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
 import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_13 } from "../fichas/jornada/N1.13";
+import { N2_01 } from "../fichas/jornada/N2.01";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
@@ -29,6 +30,7 @@ import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
+import { construirDezenaUnidadesQuestion } from "../procedimentos/materialDouradoContract";
 import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
@@ -77,6 +79,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N1.10": N1_10,
   "N1.11": N1_11,
 
+  // W3: registrada, mas só entra em produção quando o canário declarativo for
+  // ligado depois dos testes de palco/boundary/conformidade.
+  "N2.01": N2_01,
+
   "AL.01": AL_01,
   "AL.02": AL_02,
 
@@ -94,6 +100,7 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
 const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N1.05": construirComparacaoQuantidadeQuestion,
   "N1.09": construirContagem20Question,
+  "N2.01": construirDezenaUnidadesQuestion,
   "GM.02": construirTempoCotidianoQuestion,
 };
 
