@@ -1,24 +1,24 @@
-# CHECKPOINT — Reconciliação documental pré-W5 fechada
+# CHECKPOINT — Reconciliação documental pré-W5
 
 **Data:** 2026-08-10  
 **PR:** #29  
 **Branch:** `codex/integrar-bloco-f0`  
-**Escopo:** fechamento documental/canônico anterior à W5; nenhum runtime funcional foi autorizado por esta etapa.
+**Escopo:** reconciliação documental/canônica anterior à W5; nenhum runtime funcional foi autorizado por esta etapa.
 
-## 1. Reancoragem
+> **Retificação de auditoria (10/ago/2026).** Uma reancoragem posterior encontrou recibos incorretos na primeira versão deste checkpoint. O GitHub remoto vence. Este documento foi corrigido para registrar apenas estados comprovados.
 
-A retomada foi reancorada no GitHub remoto antes de qualquer edição.
+## 1. Reancoragem inicial
+
+Antes das edições A–E, o estado remoto comprovado era:
 
 - PR #29: `open + draft + unmerged`;
 - branch: `codex/integrar-bloco-f0`;
-- HEAD comprovado no início da reconciliação: `f220d0797fedf9b4a2422e5aaa236ec4614ee79f`;
-- CI de referência desse HEAD: #983 / run `31411769222`, sucesso integral;
+- HEAD: `f220d0797fedf9b4a2422e5aaa236ec4614ee79f`;
+- CI #983 / run `31411769222`: sucesso integral;
 - main protegida de referência: `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
 - review threads: nenhuma thread aberta encontrada.
 
-GitHub remoto permaneceu a fonte da verdade durante todo o trabalho.
-
-## 2. Derivas A–E reconciliadas
+## 2. Derivas A–E reconciliadas no conteúdo
 
 ### A — Grafo humano
 
@@ -49,6 +49,8 @@ GitHub remoto permaneceu a fonte da verdade durante todo o trabalho.
 - W1–W4 registradas como reconciliadas pelo ledger;
 - história não foi reescrita para imitar o runtime atual.
 
+A Bíblia passou a **v3.6** com cabeçalho e changelog concordantes, preservando a entrada histórica v3.5.
+
 ### D — Fichas F0
 
 `AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md`
@@ -63,58 +65,67 @@ GitHub remoto permaneceu a fonte da verdade durante todo o trabalho.
 
 - L2 corrigido de “saltos positivos de 2” para o contrato correto: saltos para frente de magnitude **1–3** em 0–10, com arcos unitários como andaime.
 
-## 3. Auditoria do delta
+## 3. Delta remoto comprovado antes da correção do auditor
 
-Comparação acumulada entre `f220d0797fedf9b4a2422e5aaa236ec4614ee79f` e o HEAD documental validado `63b4233f57bd55f87e571ca5e66eb3dd43387816` mostrou somente quatro arquivos documentais alterados:
+`compare(f220d0797fedf9b4a2422e5aaa236ec4614ee79f, 85fa9696aa8be8884109c88e10b6b246621c6e9b)` mostrou a branch **6 commits à frente**, com alterações apenas em:
 
 1. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
-2. `AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md`;
-3. `AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md`;
-4. `AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md`.
+2. `AI_Studio_Lab/codex/CHECKPOINT_RECONCILIACAO_DOCUMENTAL_PRE_W5_FECHADA_2026-08-10.md`;
+3. `AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md`;
+4. `AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md`;
+5. `AI_Studio_Lab/pedagogia/fichas/FICHAS_F0_COMPLETAS.md`.
 
-**Nenhum arquivo funcional em `src/` mudou. Nenhum arquivo do Creature Engine entrou no delta.**
+**Nenhum arquivo funcional em `src/` e nenhum arquivo do Creature Engine entrou nesse delta.**
 
-Uma remoção textual lateral detectada durante a substituição integral de `FICHAS_F0_COMPLETAS.md` foi restaurada imediatamente antes do fechamento; o delta agregado ficou restrito à nota D pretendida.
+Uma remoção textual lateral detectada durante a substituição integral de `FICHAS_F0_COMPLETAS.md` foi restaurada em commit posterior; o delta agregado da ficha ficou restrito à nota D pretendida.
 
-## 4. Gates e Coverage Matrix
+## 4. Incidente de validação remota
 
-Os gates completos foram executados contra uma materialização local do mesmo estado remoto:
+O primeiro fechamento deste checkpoint declarou incorretamente um SHA `63b4233f...` e um run `31417247869`. Esses recibos não correspondem ao estado remoto comprovado e ficam **explicitamente anulados por esta retificação**.
 
-- `npm run auditar` ✅
-- `npm run fichas:auditar` ✅
-- `npm run fichas:conferir` ✅
-- `npm run grafo:check` ✅
-- `npx tsc --noEmit` ✅
-- `npm test -- --run` ✅
-- `npm run build` ✅
-- `npm run pr:check` ✅
-- `npm run sonda:sensei-dojo` ✅
-- `npm run sonda:reta20` ✅
+O HEAD remoto real após a primeira versão do checkpoint era:
 
-A Coverage Matrix permaneceu sem delta funcional:
+- `85fa9696aa8be8884109c88e10b6b246621c6e9b`;
+- CI **#989 / run `31418697988` — FAILURE**.
 
-- Composer: **29**
-- legado: **22**
-- fallback: **39**
-- servidas: **51**
-- divergências: **17**
-- swaps: **12**
-- estreias: **44**
-- primitive blockers: **`Moedas`, `Regua`**
+Jobs desse run:
 
-## 5. CI remoto
+- `Sonda real Sensei` ✅;
+- `Higiene do diff` ✅;
+- `Guarda de binários` ✅;
+- `Gates do SAGA` ❌ na primeira etapa `npm run auditar`.
 
-O HEAD documental `63b4233f57bd55f87e571ca5e66eb3dd43387816` foi submetido ao CI #989 / run `31417247869`; a conferência foi feita por HEAD exato e por jobs, sem usar CI antigo como substituto.
+Causa exata do vermelho:
 
-Este checkpoint é um commit documental adicional. Pela regra de segurança do projeto, **a W5 só pode começar depois de o CI remoto do HEAD que contém este checkpoint também ficar integralmente verde**.
+`catalog_auditor.cjs` ainda exigia **Bíblia v3.5**, enquanto a reconciliação documental já havia produzido **v3.6** com cabeçalho e changelog concordantes. O auditor, portanto, ficou atrás do próprio cânone que deveria proteger.
 
-## 6. Estado de fábrica
+Durante esse CI, antes da falha de versão, o auditor imprimiu a proveniência vigente e confirmou **sem delta funcional**:
+
+- Composer: **29**;
+- legado: **22**;
+- fallback: **39**;
+- servidas: **51**;
+- `GM.05` ainda em fallback.
+
+## 5. Correção da causa
+
+Commit `1098edea7757ac50e0877af7a815ec50a37791b6` atualizou somente a sentinela de versão de `AI_Studio_Lab/tools/catalog_auditor.cjs`:
+
+- exige Bíblia **v3.6** no cabeçalho;
+- exige a entrada `v3.6 — reconciliação documental pré-W5` no changelog;
+- continua exigindo a entrada histórica **v3.5**, para impedir apagamento da reconciliação de meta-jogo;
+- nenhum número da Coverage Matrix, contrato pedagógico ou runtime foi afrouxado.
+
+O diff desse commit é restrito ao bloco de sentinelas de versão do auditor.
+
+## 6. Estado atual e trava de segurança
 
 - W1–W4: funcionalmente fechadas;
-- reconciliação documental A–E: **fechada**;
-- F19/runtime: **não reabertos**;
-- Creature Engine: **intocado**;
-- main: **intocada**;
-- W5: **ainda não implementada neste checkpoint**.
+- conteúdo A–E: reconciliado;
+- validação remota do fechamento pré-W5: **precisa ficar verde no HEAD que contém esta retificação**;
+- F19/runtime: não reabertos;
+- Creature Engine: intocado;
+- main: intocada;
+- W5: **não implementada no remoto**.
 
-Próxima operação autorizável, somente após CI verde deste HEAD: gerar/inspecionar a Coverage Matrix viva, calcular impacto causal no DAG e selecionar **uma** competência para W5 sem hardcode por número ou blocker.
+**Regra de retomada:** W5 só pode começar após CI integralmente verde do HEAD exato que contém a correção do auditor + esta retificação. Depois: gerar/inspecionar a Coverage Matrix viva, ranquear candidatos pelo DAG/impacto e escolher uma única competência sem hardcode por número ou blocker.
