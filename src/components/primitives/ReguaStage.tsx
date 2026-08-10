@@ -53,6 +53,7 @@ function ObjetoMedido({ spec, comprimento }: { spec: ReguaSpec; comprimento: num
       data-regua-object
       data-regua-object-left={OBJECT_LEFT}
       data-regua-object-length={comprimento}
+      role="img"
       aria-label={`${item.nome} a medir`}
     >
       <span aria-hidden>{item.emoji}</span>
@@ -122,7 +123,9 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
   function pointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (!podeManipular) return;
     drag.current = { pointerId: e.pointerId, x: e.clientX, left: rulerLeft, t: performance.now() };
-    e.currentTarget.setPointerCapture(e.pointerId);
+    if (typeof e.currentTarget.setPointerCapture === "function") {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
   }
 
   function pointerMove(e: React.PointerEvent<HTMLDivElement>) {
@@ -261,6 +264,7 @@ export function ReguaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                     className="absolute left-0 top-0 flex h-10 items-center justify-center overflow-hidden rounded-xl border-2 border-sky-300 bg-sky-50 text-xl"
                     style={{ width: Math.max(44, item.comprimentoCm * UNIT_PX) }}
                     data-regua-compare-object
+                    role="img"
                     aria-label={`${item.nome} alinhado ao zero`}
                   >
                     <span aria-hidden>{item.emoji}</span>
