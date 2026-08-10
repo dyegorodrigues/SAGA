@@ -3,12 +3,11 @@ import { FichaCompetencia, FichaMicro } from "../schema";
 import { Question } from "../../types";
 
 export type ModoRegua = "informal" | "ler" | "alinhar" | "comparar" | "estimar";
-export type UnidadeRegua = "clipes" | "cm";
+export type UnidadeRegua = "bolas" | "cm";
 
 export interface ItemRegua {
   id: string;
   nome: string;
-  emoji: string;
   comprimentoCm: number;
 }
 
@@ -18,7 +17,7 @@ export interface ReguaSpec {
   unidade: UnidadeRegua;
   itens: ItemRegua[];
   escalaMax: number;
-  /** Qual marca começa alinhada à ponta do objeto. Zero é o alinhamento correto. */
+  /** Qual marca INTEIRA começa alinhada à ponta do objeto. Zero é o alinhamento correto. */
   offsetInicialCm: number;
   reguaAlinhada: boolean;
   resposta: string;
@@ -31,12 +30,16 @@ export interface ReguaSpec {
   falado: string;
 }
 
+/**
+ * Só entram objetos cuja forma pode variar longitudinalmente sem virar caricatura
+ * esticada. Pontas/caps mantêm tamanho fixo; o corpo central absorve a variação.
+ */
 const OBJETOS = [
-  { id: "lapis", nome: "lápis", emoji: "✏️" },
-  { id: "borracha", nome: "borracha", emoji: "▰" },
-  { id: "carrinho", nome: "carrinho", emoji: "🚗" },
-  { id: "livro", nome: "livro", emoji: "📕" },
-  { id: "pincel", nome: "pincel", emoji: "🖌️" },
+  { id: "lapis", nome: "lápis" },
+  { id: "pincel", nome: "pincel" },
+  { id: "giz", nome: "giz de cera" },
+  { id: "marcador", nome: "marcador" },
+  { id: "fita", nome: "fita de treino" },
 ] as const;
 
 function inteiro(min: number, max: number, sorteio: () => number): number {
@@ -61,13 +64,13 @@ function item(
 
 function alternativas(valor: number, min = 1, max = 14): number[] {
   const candidatas = [valor, valor + 1, valor - 1, valor + 2, valor - 2]
-    .filter(n => n >= min && n <= max);
+    .filter(n => Number.isInteger(n) && n >= min && n <= max);
   return [...new Set(candidatas)].slice(0, 4);
 }
 
 function estimativas(valor: number): number[] {
   const candidatas = [valor - 2, valor, valor + 2, valor + 4]
-    .filter(n => n > 0 && n <= 16);
+    .filter(n => Number.isInteger(n) && n > 0 && n <= 16);
   return [...new Set(candidatas)].slice(0, 4);
 }
 
@@ -83,16 +86,16 @@ export function construirReguaSpec(
     return {
       nivel: 1,
       modo: "informal",
-      unidade: "clipes",
+      unidade: "bolas",
       itens: [alvo],
       escalaMax: 8,
       offsetInicialCm: 0,
       reguaAlinhada: true,
-      resposta: `${valor}:clipes`,
+      resposta: `${valor}:bolas`,
       valorCerto: valor,
       alternativas: alternativas(valor, 1, 8),
-      enunciado: `Quantos clipes medem o ${alvo.nome}?`,
-      falado: `Meça o ${alvo.nome} usando os clipes iguais.`,
+      enunciado: `Quantas bolas iguais medem o ${alvo.nome}?`,
+      falado: `Meça o ${alvo.nome} colocando bolas iguais, uma encostada na outra, sem deixar espaço.`,
     };
   }
 
@@ -121,6 +124,8 @@ export function construirReguaSpec(
     };
   }
 
+  // F61 nesta faixa trabalha leitura em centímetros INTEIROS. Meio centímetro
+  // não é resposta nem marca pedagógica desta progressão.
   const valor = clamped === 2 ? inteiro(3, 10, sorteio) : inteiro(4, 12, sorteio);
   const alvo = item(valor, sorteio);
 
@@ -138,7 +143,7 @@ export function construirReguaSpec(
       unidadeCerta: "cm",
       alternativas: alternativas(valor),
       enunciado: `Quantos centímetros mede o ${alvo.nome}?`,
-      falado: `A régua já está alinhada. Leia onde termina o ${alvo.nome}.`,
+      falado: `A régua já está alinhada. Leia a marca inteira onde termina o ${alvo.nome}.`,
     };
   }
 
@@ -157,7 +162,7 @@ export function construirReguaSpec(
       unidadeCerta: "cm",
       alternativas: alternativas(valor),
       enunciado: `Alinhe a régua e meça o ${alvo.nome}.`,
-      falado: `Alinhe o zero da régua com a ponta do ${alvo.nome}. Depois leia onde ele termina.`,
+      falado: `Alinhe o zero da régua com a ponta do ${alvo.nome}. Depois leia a marca inteira onde ele termina.`,
     };
   }
 
@@ -175,7 +180,7 @@ export function construirReguaSpec(
     alternativas: alternativas(valor, 1, 14),
     estimativas: estimativas(valor),
     enunciado: `Primeiro estime. Depois meça o ${alvo.nome}.`,
-    falado: `Quanto você acha que mede? Faça uma estimativa e depois confira com a régua.`,
+    falado: `Quanto você acha que mede? Faça uma estimativa inteira em centímetros e depois confira com a régua.`,
   };
 }
 
