@@ -68,6 +68,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F06 materializada no specialized builder Grupo-backed; o legado abstrato saiu de produção e a divergência ficha↔screen foi fechada.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W3-N2.01",
+    competence: "N2.01",
+    rationale: "F21 materializada como agrupamento manual 10U→1D com MaterialDourado + TenFrame, montagem inversa no L4 e decomposição mental no L5; o legado estático saiu de produção e a divergência ficha↔screen foi fechada.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
@@ -246,7 +252,6 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   if (kind === "area") {
     qualified = bases.map(base => base === "ArrayGrid" ? "ArrayGrid#área" : base);
   } else if (kind === "moldura" && rawMode === "faltam") {
-    // JD3/N1.11: o palco moldura executa o flash da TenFrame antes da pergunta.
     qualified = bases.map(base => base === "TenFrame" ? "TenFrame#flash" : base);
   } else {
     const mode = rawMode ? modeByRuntime.get(String(rawMode)) : undefined;
