@@ -87,6 +87,17 @@ export const MisconceptionTag = {
   /** Pareamento: disse que sobrou quando não sobrou — julgou pela aparência, não pelo pareamento */
   COMPARACAO_VISUAL: "comparacao-visual",
 
+  /* --- comparação de quantidades (ficha F06 / N1.05) --------------- */
+
+  /** F06: julgou o tamanho físico dos itens como se fosse quantidade. */
+  CONFUNDE_TAMANHO_QUANTIDADE: "confunde-tamanho-quantidade",
+
+  /** F06: julgou a área ocupada/espalhamento como se fosse quantidade. */
+  CONSERVACAO_ESPACO: "conservacao-espaco",
+
+  /** F06: escolheu pela impressão global sem contar ou parear quando a diferença deixou de ser óbvia. */
+  COMPARA_SEM_CONTAR: "compara-sem-contar",
+
   /* --- contagem (fichas F01 e F27) ---------------------------------- */
 
   /** Contar tocando: contou o mesmo objeto duas vezes — o dedo não marcou o que já passou */
