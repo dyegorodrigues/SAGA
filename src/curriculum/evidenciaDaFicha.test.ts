@@ -9,6 +9,8 @@ import { evidenciasDe as daForma } from "./procedimentos/formaProcedure";
 import { evidenciasDe as daGrandeza } from "./procedimentos/grandezaProcedure";
 import { evidenciasDe as daMoldura } from "./procedimentos/tenFrameProcedure";
 import { evidenciasDe as daMedida } from "./procedimentos/medidasProcedure";
+import { construirMaterialDouradoSpec } from "./procedimentos/materialDouradoContract";
+import { evidenciasMaterialDourado as daDezena } from "./procedimentos/materialDouradoProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -93,6 +95,21 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       total: 8, visiveis: 5,
     }),
   },
+  {
+    nome: "F21 (dezena) — L4 monta o material a partir do numeral",
+    evidencia: Evidencia.MONTOU_DO_NUMERAL,
+    emitir: () => {
+      const spec = construirMaterialDouradoSpec(4, () => 0);
+      return daDezena({
+        modo: "montar",
+        resposta: spec.total,
+        dezenasProduzidas: spec.dezenas,
+        unidadesProduzidas: spec.unidades,
+        contouUmAUm: false,
+        trocasConcluidas: 0,
+      }, spec);
+    },
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -163,5 +180,15 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       modo: "peso", escolhido: 1, certo: 0, ordemCerta: [0, 1], ordemVisual: [1, 0],
       contraintuitivo: true, formatosDiferentes: false, verificou: true, maiorVisual: 1,
     })).toEqual([]);
+
+    const spec = construirMaterialDouradoSpec(4, () => 0);
+    expect(daDezena({
+      modo: "montar",
+      resposta: spec.total - 1,
+      dezenasProduzidas: Math.max(0, spec.dezenas - 1),
+      unidadesProduzidas: spec.unidades,
+      contouUmAUm: false,
+      trocasConcluidas: 0,
+    }, spec)).toEqual([]);
   });
 });
