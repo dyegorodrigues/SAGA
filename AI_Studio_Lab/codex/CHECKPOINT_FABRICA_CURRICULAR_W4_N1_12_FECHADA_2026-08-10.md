@@ -42,7 +42,7 @@ A reta deixa de ser mero desenho/alternativa e vira uma representação produtiv
 ### Progressão runtime fechada
 
 - **L1:** posicionar em 0–10;
-- **L2:** saltos positivos de 2 com arcos unitários como andaime;
+- **L2:** saltos para frente de 1–3 em 0–10, com arcos unitários como andaime;
 - **L3:** saltos para trás de 1–3, sem arcos;
 - **L4:** posicionar em 0–20 com rótulos de referência mais esparsos;
 - **L5:** deslocamentos mistos de ±1–±4 em 0–20, sem arcos.
