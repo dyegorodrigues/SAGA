@@ -37,6 +37,13 @@ describe("mapa autoral de fichas para o runtime", () => {
       "TenFrame: executável | kinds=tenframe+moldura+bond+plain+material-dourado | builder=tenframe+moldura+bond+plain | renderer=tenframe+moldura+bond+plain+material-dourado",
     );
 
+    // W5/F61: infraestrutura pode ficar pronta ANTES do canário. O mapa precisa
+    // provar builder especializado + renderer sem confundir isso com ativação
+    // curricular de GM.05 (que continua governada por composerCanaryIds/Matrix).
+    expect(output).toContain(
+      "Regua: executável | kinds=measure+regua+regua-f61 | builder=special:GM.05 | renderer=regua+regua-f61",
+    );
+
     // Lacunas reais permanecem visíveis: reconciliar o mapa não significa
     // fabricar builder/componente só para deixar a tabela verde.
     expect(output).toContain("LinkingCubes: renderer-sem-builder");
@@ -44,12 +51,11 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain("Quadrado100: componente-isolado");
     expect(output).toContain("SingaporeBars: renderer-sem-builder");
     expect(output).toContain("VisualAddition: renderer-sem-builder");
-    expect(output).toContain("Regua: ausente");
 
-    expect(output).toContain("- executável: 20");
+    expect(output).toContain("- executável: 21");
     expect(output).toContain("- renderer-sem-builder: 4");
     expect(output).toContain("- componente-isolado: 1");
-    expect(output).toContain("- ausente: 1");
+    expect(output).toContain("- ausente: 0");
 
     // A quantidade de fichas cresce quando lacunas curriculares são fechadas;
     // este teste protege o MAPA de runtime, não uma fotografia histórica do
