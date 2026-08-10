@@ -65,14 +65,22 @@ async function probeLayout(page, width, level) {
     const compare = [...document.querySelectorAll("[data-regua-compare-item]")].map(el => {
       const outer = el.getBoundingClientRect();
       const object = el.querySelector("[data-regua-compare-object]")?.getBoundingClientRect();
-      const ruler = el.querySelector("[data-regua]")?.getBoundingClientRect();
+      const rulerEl = el.querySelector("[data-regua]");
+      const ruler = rulerEl?.getBoundingClientRect();
       return {
         id: el.getAttribute("data-regua-compare-item"),
         kind: el.getAttribute("data-regua-compare-kind"),
         length: Number(el.getAttribute("data-regua-compare-length")),
         outer: { left: outer.left, right: outer.right, width: outer.width },
         object: object ? { left: object.left, right: object.right, width: object.width } : null,
-        ruler: ruler ? { left: ruler.left, right: ruler.right, width: ruler.width } : null,
+        ruler: ruler ? {
+          left: ruler.left,
+          right: ruler.right,
+          width: ruler.width,
+          max: Number(rulerEl?.getAttribute("data-regua-max")),
+          unitPx: Number(rulerEl?.getAttribute("data-regua-unit-px")),
+          endPad: Number(rulerEl?.getAttribute("data-regua-end-pad") ?? 0),
+        } : null,
       };
     });
     const rulers = [...document.querySelectorAll("[data-regua]")].map(el => {
@@ -146,8 +154,11 @@ async function probeLayout(page, width, level) {
     for (const item of data.compare) {
       assert(item.object && item.ruler, `F61 L4 item ${item.id} sem objeto+régua`);
       assert(Math.abs(item.object.left - item.ruler.left) <= 1.5, `F61 L4 item ${item.id} não começa no zero`);
-      const unit = item.ruler.width / 12;
-      const expected = Math.max(66 * (unit / 22), item.length * unit);
+      const naturalWidth = item.ruler.max * item.ruler.unitPx + item.ruler.endPad;
+      const scale = item.ruler.width / naturalWidth;
+      const renderedUnit = item.ruler.unitPx * scale;
+      const renderedMinObject = 66 * scale;
+      const expected = Math.max(renderedMinObject, item.length * renderedUnit);
       assert(Math.abs(item.object.width - expected) <= 3, `F61 L4 item ${item.id} não representa o comprimento na geometria`);
     }
   }
