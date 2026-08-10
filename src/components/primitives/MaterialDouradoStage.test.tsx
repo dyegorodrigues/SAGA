@@ -15,6 +15,7 @@ describe("MaterialDouradoStage — F21 / N2.01", () => {
 
     expect(container.querySelector("[data-material-equivalencia]")).toBeNull();
     expect(container.querySelectorAll("[data-material-unidade-solta]")).toHaveLength(10);
+    expect(container.querySelector("[data-material-tenframe]")).not.toBeNull();
 
     const agrupar = () => container.querySelector<HTMLButtonElement>("[data-material-unidade-solta]");
     for (let i = 0; i < 9; i += 1) fireEvent.click(agrupar()!);
@@ -27,13 +28,13 @@ describe("MaterialDouradoStage — F21 / N2.01", () => {
     expect(container.querySelectorAll("[data-material-resposta]").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("tocar subdivisões da barra fica observável para o diagnóstico CONTA_TUDO", () => {
+  it("inspecionar uma barra é um único foco e fica observável para CONTA_TUDO", () => {
     const spec = construirMaterialDouradoSpec(3, zero);
     const onAnswer = vi.fn();
     const { container } = render(<MaterialDouradoStage spec={spec} onAnswer={onAnswer} />);
-    const sub = container.querySelector<HTMLButtonElement>("[data-material-subunidade]");
-    expect(sub).not.toBeNull();
-    fireEvent.click(sub!);
+    const barras = container.querySelectorAll<HTMLButtonElement>("[data-material-inspect-ten]");
+    expect(barras).toHaveLength(spec.dezenas);
+    fireEvent.click(barras[0]);
     const errada = container.querySelector<HTMLButtonElement>("[data-material-resposta-errada]");
     fireEvent.click(errada!);
     expect(onAnswer).toHaveBeenCalledWith(
