@@ -1,3 +1,4 @@
+import { Evidencia } from "../../../constants/evidencias";
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
 
@@ -73,7 +74,7 @@ export const N2_01: FichaCompetencia = {
         de: 3,
         sessoes: 2,
         exige: {
-          evidencia: "montou-do-numeral",
+          evidencia: Evidencia.MONTOU_DO_NUMERAL,
           descricao: "montar corretamente o material a partir do numeral, provando compreensão bidirecional",
         },
       },
