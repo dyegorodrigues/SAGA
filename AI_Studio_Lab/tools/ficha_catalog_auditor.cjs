@@ -8,6 +8,7 @@ const FICHAS_DIR = path.join(ROOT, "AI_Studio_Lab/pedagogia/fichas");
 const GRAPH_PATH = path.join(ROOT, "curriculum/grafo_saga.yaml");
 const COMPONENTS_DIR = path.join(ROOT, "src/components");
 const COMPOSER_PATH = path.join(ROOT, "src/curriculum/Composer.ts");
+const COMPOSER_CANARY_PATH = path.join(ROOT, "src/curriculum/motores/composerCanary.ts");
 const RENDERER_PATHS = [
   path.join(ROOT, "src/components/FichaRenderer.tsx"),
   path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
@@ -31,9 +32,14 @@ const componentNames = new Set(
 );
 const builtInPrimitives = new Set(["plain"]);
 const composerSource = fs.readFileSync(COMPOSER_PATH, "utf8");
+const composerCanarySource = fs.readFileSync(COMPOSER_CANARY_PATH, "utf8");
 const rendererSource = RENDERER_PATHS.map((file) => fs.readFileSync(file, "utf8")).join("\n");
 
 const composerTem = (kind) => composerSource.includes(`case "${kind}"`) || composerSource.includes(`case '${kind}'`);
+const specializedBuilderTem = (id) => {
+  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`["']${escaped}["']\\s*:\\s*construir[A-Za-z0-9_]+`).test(composerCanarySource);
+};
 const rendererTem = (kind) => rendererSource.includes(`kind === "${kind}"`)
   || rendererSource.includes(`kind === '${kind}'`)
   || rendererSource.includes(`case "${kind}"`)
@@ -143,6 +149,10 @@ for (const entry of FICHA_RUNTIME_MAP) {
   for (const kind of entry.builderKinds) {
     check(composerTem(kind), `${entry.primitive} declara builder ausente para ${kind}`);
   }
+  for (const id of entry.specializedBuilderIds || []) {
+    check(graphIds.has(id), `${entry.primitive} declara builder especializado para ID fora do grafo: ${id}`);
+    check(specializedBuilderTem(id), `${entry.primitive} declara builder especializado ausente para ${id}`);
+  }
   for (const kind of entry.rendererKinds) {
     check(rendererTem(kind), `${entry.primitive} declara renderer ausente para ${kind}`);
   }
@@ -168,7 +178,7 @@ for (const entry of FICHA_RUNTIME_MAP) {
 
 function runtimeStatus(entry) {
   const hasComponent = entry.builtin || entry.componentFiles.length > 0;
-  const hasBuilder = entry.builderKinds.length > 0;
+  const hasBuilder = entry.builderKinds.length > 0 || (entry.specializedBuilderIds || []).length > 0;
   const hasRenderer = entry.rendererKinds.length > 0;
   if (hasBuilder && hasRenderer) return "executável";
   if (hasComponent && hasRenderer) return "renderer-sem-builder";
@@ -208,9 +218,13 @@ if (!unavailablePrimitives.length) console.log("Nenhuma");
 console.log("\n[MAPA FICHA → RUNTIME]");
 for (const entry of FICHA_RUNTIME_MAP) {
   const usage = primitiveUsage.get(entry.primitive) || [];
+  const builders = [
+    ...entry.builderKinds,
+    ...(entry.specializedBuilderIds || []).map(id => `special:${id}`),
+  ];
   console.log(
     `- ${entry.primitive}: ${runtimeStatuses.get(entry.primitive)} | ` +
-    `kinds=${entry.kinds.join("+")} | builder=${entry.builderKinds.join("+") || "—"} | ` +
+    `kinds=${entry.kinds.join("+")} | builder=${builders.join("+") || "—"} | ` +
     `renderer=${entry.rendererKinds.join("+") || "—"} | fichas=${usage.length}`
   );
 }
