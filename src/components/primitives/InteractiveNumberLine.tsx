@@ -272,7 +272,11 @@ export function InteractiveNumberLineSurface({
                   animate={destacado && pulsarTarget ? { scaleY: [1, 1.45, 1], opacity: [0.55, 1, 0.55] } : { scaleY: 1 }}
                   transition={{ repeat: destacado && pulsarTarget ? Infinity : 0, duration: 0.9 }}
                 />
-                <span className="mt-2 font-black text-2xl" style={{ color: tokens.cor.texto.principal, visibility: labels.has(value) ? 'visible' : 'hidden' }}>
+                <span
+                  data-reta-label={value}
+                  className="mt-2 whitespace-nowrap font-black tabular-nums text-base md:text-2xl"
+                  style={{ color: tokens.cor.texto.principal, visibility: labels.has(value) ? 'visible' : 'hidden' }}
+                >
                   {value}
                 </span>
               </div>
