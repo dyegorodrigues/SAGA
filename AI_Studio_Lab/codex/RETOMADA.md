@@ -1,16 +1,13 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W2_N1_05_FECHADA_2026-08-10.md`. Coverage Matrix, **W1/N1.04** e **W2/N1.05** estão fechadas. Próxima tarefa única: **W3/N2.01 — Dezena e unidades**, salvo se nova falha objetiva da reancoragem bloquear a fila.
+> **VIGENTE em 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W3_N2_01_FECHADA_2026-08-10.md`. Coverage Matrix, W1/N1.04, W2/N1.05 e **W3/N2.01** estão fechadas com recibo remoto real. Próxima tarefa única: **W4**, escolhida pela Matrix/DAG; a auditoria preliminar favorece N1.12/F19, mas só a análise causal completa pode promovê-la à onda.
 
 ## Leia primeiro
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W2_N1_05_FECHADA_2026-08-10.md` — fonte operacional mais nova;
-2. `CHECKPOINT_FABRICA_CURRICULAR_W1_N1_04_FECHADA_2026-08-09.md` — histórico W1;
-3. `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md` — snapshot histórico P21.1;
-4. `BRIEFING_CODEX.md` e `HANDOFF_CONTINUIDADE_IA.md`;
-5. `CHECKPOINT_GAMIFICACAO_ECONOMIA_METAJOGO_FECHADA_2026-08-09.md`;
-6. `VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`;
-7. cânone em `AI_Studio_Lab/pedagogia/`, especialmente `BIBLIA_DO_SAGA.md` e as fichas autorais.
+1. `CHECKPOINT_FABRICA_CURRICULAR_W3_N2_01_FECHADA_2026-08-10.md`;
+2. `BRIEFING_CODEX.md` e `HANDOFF_CONTINUIDADE_IA.md`;
+3. checkpoints W2, W1 e `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`;
+4. cânone em `AI_Studio_Lab/pedagogia/`, especialmente `BIBLIA_DO_SAGA.md` e as fichas autorais.
 
 Checkpoints antigos continuam históricos. Em conflito, vence esta fonte vigente + GitHub remoto + gates executáveis.
 
@@ -24,103 +21,117 @@ Checkpoints antigos continuam históricos. Em conflito, vence esta fonte vigente
 - não tocar no Creature Engine nesta fila;
 - não criar branch auxiliar;
 - GitHub remoto é a fonte da verdade;
-- antes de editar: reancorar PR/head remoto/CI e resolver qualquer falha objetiva primeiro.
+- antes de editar: reancorar PR/head/CI e resolver qualquer falha objetiva primeiro.
 
 ## Fechado — não reabrir sem falha objetiva
 
-P17–P22/cânone; Radar/source/persist/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto; Matrícula; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04; W2/N1.05**.
+P17–P22/cânone; Radar/source/persist/DAG/Oficina; Tutor↔Dojo; QA Chrome; Jardim causal; banco composto; telemetria/Leitner; `LENTO_DEDOS`; timezone; recomendador por estrelas removido; Misto; Matrícula; Cloud Reconciliation; Simulação Longitudinal; Gamificação/Economia/Meta-jogo; **Coverage Matrix; W1/N1.04; W2/N1.05; W3/N2.01**.
 
-## Recibo funcional W2
+## Recibo funcional W3
 
-Head funcional fechado: `3af6dc6554d4938adeca4f86bdaf9fe57f6089a9`.
+Head funcional: `929dc5b234a842116b31b998850ceacabe2248dd`.
 
-CI **#868 / run `31356943271` — success integral**:
+CI **#916 / run `31386605676` — success integral**:
 
 - 90 competências / 94 fichas autorais;
-- Composer 27; legado 24; fallback 39; servidas 51;
-- divergências 19; swaps 12; estreias 44;
+- Composer 28; legado 23; fallback 39; servidas 51;
+- divergências 18; swaps 12; estreias 44;
 - blockers `Moedas`, `Regua`;
-- Journey 32/32 com `rt_alvo` L5;
 - TypeScript verde;
-- **163 arquivos / 2406 testes passando**;
-- build verde;
-- `pr:check` verde, 254 arquivos no diff integral, nenhum binário;
-- sonda real Sensei verde.
+- **166 arquivos / 2443 testes passando**;
+- build e `pr:check` verdes;
+- sonda real Sensei verde em phone + tablet.
 
-Artefato: `sonda-sensei-3af6dc6554d4938adeca4f86bdaf9fe57f6089a9`, ID `9050977700`, SHA-256 `bbd554433de3d7e92890327692c720a291bb5f8bd2f6700c5230073641bff58f`.
+Artefato: `sonda-sensei-929dc5b234a842116b31b998850ceacabe2248dd`, ID `9061964350`, SHA-256 `cb0bd490ab0b6576043bab8869d8c55e9786513767f102c0e5a9b7a38e5b1fcb`.
 
-O checkpoint W2 registra também os CIs vermelhos que impediram o falso fechamento: `rt_alvo`, ledger W2 ausente, enum de andaime inválido, contrato de canário ausente e harness de retry/axe. Não apagar essa história.
+A W3 só foi promovida depois do estado inativo #912 ficar integralmente verde. O checkpoint W3 registra a meia-migração inicialmente encontrada, os gates vermelhos e a correção canônica completa.
 
-## Coverage Matrix — fechada e evolutiva
+## Coverage Matrix — snapshot + ledger
 
-Snapshot P21.1 é imutável:
+Snapshot P21.1 é imutável: **26 Composer / 25 legado / 39 fallback / 51 servidas / 21 divergências / 12 swaps / 44 estreias**, blockers `Moedas`, `Regua`.
 
-- Composer 26;
-- legado 25;
-- fallback 39;
-- servidas 51;
-- divergências 21;
-- swaps 12;
-- estreias 44;
-- blockers `Moedas`, `Regua`.
-
-Ledger vigente:
+Ledger:
 
 - `W1-N1.04`: divergências −1;
-- `W2-N1.05`: Composer +1, legado −1, divergências −1.
+- `W2-N1.05`: Composer +1, legado −1, divergências −1;
+- `W3-N2.01`: Composer +1, legado −1, divergências −1.
 
-Baseline atual: **27 / 24 / 39 / 51 / 19**, com 12 swaps, 44 estreias e os mesmos blockers.
+Baseline vigente: **28 / 23 / 39 / 51 / 18**, com 12 swaps, 44 estreias e os mesmos blockers.
 
-Regra: fonte real muda primeiro → Matrix observa → migração nomeada governa. Nunca editar o snapshot histórico ou a expectativa apenas para ficar verde.
+Regra: fonte real muda primeiro → Matrix observa → migração nomeada governa. Nunca reescrever snapshot ou expectativa só para ficar verde.
+
+## W3/F21 — o que ficou fechado
+
+N2.01 ensina dezena como **unidade composta**:
+
+- L1/L2 agrupamento manual com TenFrame;
+- L3 agrupamento manual sem moldura;
+- L4 numeral → montar MaterialDourado;
+- L5 decomposição mental D/U;
+- domínio 3/3 em duas sessões + evidência `montou-do-numeral` no L4;
+- diagnósticos canônicos `IGNORA_VALOR`, `INVERTE_ORDENS`, `NAO_AGRUPA`;
+- aliases provisórios antigos ficaram deprecated apenas para compatibilidade longitudinal de telemetria.
+
+Não reabrir sem falha objetiva.
+
+## Faça agora — W4
+
+Primeiro gere/inspecione a Coverage Matrix vigente e compare candidatos por:
+
+1. profundidade causal no DAG;
+2. número/criticidade de descendentes;
+3. legado/fallback;
+4. divergência ficha↔screen;
+5. blocker de primitive;
+6. onboarding/risco motor/a11y;
+7. custo de implementação e risco pedagógico.
+
+### Candidato preliminar: N1.12 / F19
+
+A leitura já feita aponta forte prioridade:
+
+- legado + divergente;
+- pré-requisitos `N1.07` e `N1.09` já autorais;
+- YAML marca `Prioridade 1 (kind novo)`;
+- legado `gN1_12` ensina antes/depois/entre, números muito maiores e ±10 — não a progressão F19;
+- `InteractiveNumberLine.tsx` já existe e deve ser evoluído/reutilizado, não duplicado.
+
+F19 canônica:
+
+- L1 localizar 0–10;
+- L2 localizar 0–20;
+- L3 saltos +1/+2;
+- L4 saltos −1/−2;
+- L5 misto +1/+2/−1/−2;
+- gesto produtivo na reta com snap generoso;
+- toque alternativo ao drag;
+- imprecisão motora não pode virar erro matemático;
+- percurso fica visível;
+- erro balança sem deslocar o personagem;
+- áudio acompanha movimento real;
+- domínio 3/3 em duas sessões; RT L5 7s;
+- reconciliar tags `CONTA_SEM_POSICAO`, `DIRECAO_INVERTIDA`, `ERRO_DE_UM`, `SO_SEQUENCIA` no catálogo.
+
+Se a Matrix confirmar N1.12 como W4, fluxo:
+
+`F19 inteira → runtime inteiro → teste vermelho → contract/procedure → evolução do InteractiveNumberLine → stage/boundary/telemetria/a11y → registro inativo → CI → canário → Matrix observa → ledger W4 → gates → checkpoint`.
+
+## Thinking Lab — regra de impacto
+
+Pesquisa externa/Thinking Lab pode propor arquitetura, simuladores, property-based tests, QA visual/áudio, agentes e observabilidade. Isso **não** muda o cânone automaticamente.
+
+Qualquer proposta que altere grafo, learner state, evidência, runtime determinístico/offline, persistência, privacidade ou rollback passa primeiro por uma **Invariant Impact Review**. Até W3 não há sinal de reconstrução total: as direções úteis são incrementais; propostas incompatíveis ficam em quarentena até prova.
 
 ## Contratos permanentes
 
-- learner state é a única autoridade para mastery/unlock/prescrição;
-- Nível SAGA pertence ao perfil da criança, não ao mascote;
-- XP não compra competência;
-- moedas são gastáveis e compras são atômicas;
-- RT/velocidade é telemetria/automaticidade, nunca autoridade conceitual ou multiplicador de XP;
-- criança lenta e correta não é penalizada no XP de perfil;
+- learner state decide mastery/unlock/prescrição;
+- RT/velocidade não compra mastery nem XP;
+- fallback não gera evidência/recompensa real;
 - Misto dobra moedas, não XP/mastery;
-- fallback não fornece evidência nem recompensa real;
-- Atlas/insígnias derivam do Curriculum Graph + learner state;
-- retry/double tap/reload não duplicam o mesmo evento técnico;
-- Coverage Matrix é projeção derivada, não segunda ontologia;
-- telemetria pode revelar defeito e abrir investigação, não reescrever automaticamente o grafo;
-- Creature Engine permanece desacoplado desta fila.
-
-## Faça agora — W3 / N2.01 / F21
-
-A auditoria causal feita após W2 escolheu **N2.01 — Dezena e unidades** porque é legado + divergente, seus pré-requisitos `N1.09` e `N1.11` já estão autorais e ela alimenta uma parcela grande do DAG: N2, fazer 10, operações sem/com reagrupamento, saltos e o caminho que chega ao sistema monetário.
-
-Cânone F21 exige:
-
-- `MaterialDourado + TenFrame`;
-- 10 cubinhos soltos realmente agrupados pela criança;
-- fusão visual `10 unidades → 1 dezena`;
-- rótulo `10 unidades = 1 dezena` somente depois da fusão;
-- leitura D dezenas + U unidades;
-- L4 inverso: dado um numeral, produzir barras + cubinhos;
-- L5 mistura leitura/produção sem pista de qual operação vem;
-- diagnósticos `IGNORA_DEZENA`, `CONCATENA`, `CONTA_TUDO`, `TROCA_DU` com evidência de ação quando necessário.
-
-Infra existente:
-
-- `MaterialDourado.tsx` é visual e estático;
-- renderer `kind: tens` apenas desenha `dezenas/unidades`;
-- isso **não** satisfaz a ação/fusão/inversão da F21.
-
-Portanto não promover cosmicamente o `tens` atual. Fluxo obrigatório:
-
-`regressão F21 primeiro → contrato procedimental de troca → palco autoral que reutiliza MaterialDourado → diagnóstico/telemetria → specialized builder/canário → Matrix observa → ledger W3 → gates → checkpoint`.
-
-Se a investigação objetiva descobrir que parte dessa cadeia já existe sob outro componente, reutilizar e adaptar; não duplicar primitive.
-
-## Fila
-
-`Coverage Matrix → W1 fechada → W2 fechada → W3/N2.01 → próximas ondas causais → mega auditoria integrada → hardening/performance → release`.
-
-Arte definitiva/Creature Engine/widget/jogo continuam em trilha separada.
+- Atlas/insígnias derivam do grafo + learner state;
+- Coverage Matrix é projeção derivada;
+- telemetria observa e abre investigação, não muda cânone automaticamente;
+- Creature Engine fora desta fila.
 
 ## Gates
 
