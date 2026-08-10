@@ -1,13 +1,14 @@
 # Retomada — comece por aqui
 
-> **VIGENTE em 10/ago/2026.** Fonte principal: `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e ondas **W1/N1.04, W2/N1.05, W3/N2.01 e W4/N1.12** estão fechadas com recibo remoto. Próxima tarefa única: escolher W5 pela Coverage Matrix/DAG vigente — não por ordem numérica nem por memória do chat.
+> **VIGENTE em 10/ago/2026.** Leia primeiro `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`, depois `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`. Coverage Matrix e ondas **W1/N1.04, W2/N1.05, W3/N2.01 e W4/N1.12** estão funcionalmente fechadas. **W5 ainda não começou.** Antes de selecionar W5 existe uma única microfrente obrigatória: reconciliar cinco derivas documentais humanas A–E registradas no checkpoint de auditoria final.
 
 ## Leia primeiro
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
-2. `BRIEFING_CODEX.md` e `HANDOFF_CONTINUIDADE_IA.md`;
-3. checkpoints W3, W2, W1 e `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`;
-4. cânone em `AI_Studio_Lab/pedagogia/`, especialmente `BIBLIA_DO_SAGA.md` e as fichas autorais.
+1. `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md`;
+2. `CHECKPOINT_FABRICA_CURRICULAR_W4_N1_12_FECHADA_2026-08-10.md`;
+3. `BRIEFING_CODEX.md` e `HANDOFF_CONTINUIDADE_IA.md`;
+4. checkpoints W3, W2, W1 e `CHECKPOINT_COVERAGE_MATRIX_FECHADA_2026-08-09.md`;
+5. cânone em `AI_Studio_Lab/pedagogia/`, especialmente `BIBLIA_DO_SAGA.md`, `GRAFO_DE_CONHECIMENTO_SAGA.md` e as fichas autorais.
 
 GitHub remoto + gates executáveis vencem qualquer texto antigo ou memória de conversa.
 
@@ -47,6 +48,8 @@ Artefato F19: ID `9069082798`, SHA-256 `65a1d3ab456f4320709547dcc98f87958f8ed083
 
 Artefato Sensei: ID `9069071435`, SHA-256 `d8b4060ee5bc98feb64a0bc56f7d4b7c0fc5c8ca85f8416730657a83976cf38b`.
 
+Handoff documental anterior: `e3e3cfdf57c6a4371d6c8bac993411efba2fdd33`, CI #979 / run `31405504346` — success integral. A auditoria final posterior encontrou deriva **documental**, não regressão funcional.
+
 ## Coverage Matrix — snapshot + ledger
 
 Snapshot P21.1 é imutável: **26 Composer / 25 legado / 39 fallback / 51 servidas / 21 divergências / 12 swaps / 44 estreias**, blockers `Moedas`, `Regua`.
@@ -64,7 +67,15 @@ Regra: fonte real muda primeiro → Matrix observa → migração nomeada govern
 
 ## W4/F19 — o que ficou fechado
 
-N1.12 agora é Composer ativo e entrega uma reta numérica produtiva/responsiva:
+N1.12 agora é Composer ativo e entrega uma reta numérica produtiva/responsiva. A ficha autoral e o runtime concordam na progressão real:
+
+- L1 localizar 0–10;
+- L2 saltar para frente em 0–10, magnitude 1–3;
+- L3 saltar para trás em 0–10, magnitude 1–3;
+- L4 localizar 0–20 com numerais parciais de referência;
+- L5 saltos variáveis bidirecionais em 0–20, magnitude 1–4.
+
+Contratos permanentes da implementação:
 
 - mesma `InteractiveNumberLineSurface` reutilizada, sem primitive duplicada;
 - tap físico resolvido pelo plano da reta + geometria/snap;
@@ -83,7 +94,25 @@ No phone, todas as marcas 0–20 continuam presentes/interativas; para manter le
 
 Não reabrir W4 sem falha objetiva.
 
-## Faça agora — escolher W5
+## Faça agora — reconciliação documental canônica pré-W5
+
+**Não começar W5 ainda.** O checkpoint `CHECKPOINT_AUDITORIA_FINAL_PRE_W5_2026-08-10.md` encontrou cinco derivas textuais:
+
+A. `GRAFO_DE_CONHECIMENTO_SAGA.md`: N1.12 ainda marca `numberline*` como kind inexistente/prioridade 1 e descreve micros antigos; alinhar à F19 sem mudar ID/prereqs/topologia.
+
+B. `BIBLIA_DO_SAGA.md §9.2`: `numberline`/`vertical` ainda aparecem como backlog oficial; transformar esse trecho em registro histórico e remeter estado real à Coverage Matrix/auditoria de fichas.
+
+C. `BIBLIA_DO_SAGA.md §12.6`: CI #812 deve permanecer snapshot histórico, mas a frase “Coverage Matrix será a próxima fonte” precisa virar referência à Matrix já executável + ledger vigente.
+
+D. `FICHAS_F0_COMPLETAS.md`: nota de que GM.02 não tem ficha ficou obsoleta; apontar para `FICHA_P22_GM_02_TEMPO_COTIDIANO.md` e cobertura 90/90.
+
+E. checkpoint W4: corrigir o resumo estreito “L2 saltos positivos de 2” para magnitude 1–3.
+
+Use patch textual seguro. Se alterar a Bíblia, respeitar a própria regra de versão: cabeçalho e última entrada do changelog precisam permanecer iguais. Depois rode todos os gates e confirme Matrix **29/22/39/51/17** sem delta funcional.
+
+**Só depois dessa reconciliação** escolher W5 pela Matrix/DAG.
+
+## Depois da reconciliação — escolher W5
 
 1. reancorar PR #29, HEAD e CI;
 2. gerar/inspecionar `npm run coverage:matrix:markdown` ou JSON;
