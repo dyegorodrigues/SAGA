@@ -5,55 +5,69 @@ import { fireEvent, render } from "@testing-library/react";
 import { FichaRenderer } from "../FichaRenderer";
 import { MisconceptionTag } from "../../constants/misconceptions";
 import { N2_01 } from "../../curriculum/fichas/jornada/N2.01";
-import { construirDezenaUnidadesQuestion } from "../../curriculum/procedimentos/materialDouradoContract";
+import {
+  MaterialDouradoSpec,
+  construirDezenaUnidadesQuestion,
+} from "../../curriculum/procedimentos/materialDouradoContract";
 import { isRetryableAnswer, ownsAuthorialFeedback, ownsAuthorialRetry } from "../gameloop/answerPolicy";
 
 function qDoNivel(nivel: number) {
   return construirDezenaUnidadesQuestion(N2_01, nivel);
 }
 
+function agruparTodasAsDezenas(container: HTMLElement, spec: MaterialDouradoSpec) {
+  for (let i = 0; i < spec.dezenas * 10; i += 1) {
+    const cubo = container.querySelector<HTMLButtonElement>("[data-material-unidade-solta]");
+    expect(cubo).not.toBeNull();
+    fireEvent.click(cubo!);
+  }
+}
+
 describe("F21 — palco → FichaRenderer → AnswerMeta", () => {
-  it("propaga CONTA_TUDO quando a criança inspeciona a barra e erra", () => {
+  it("propaga NAO_AGRUPA mesmo quando o total final está correto", () => {
     const q = qDoNivel(3);
+    const spec = q.uiProps as MaterialDouradoSpec;
     const onAnswer = vi.fn();
     const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
 
+    agruparTodasAsDezenas(container, spec);
     const barra = container.querySelector<HTMLButtonElement>("[data-material-inspect-ten]");
-    const errada = container.querySelector<HTMLButtonElement>("[data-material-resposta-errada]");
     expect(barra).not.toBeNull();
-    expect(errada).not.toBeNull();
     fireEvent.click(barra!);
-    fireEvent.click(errada!);
 
-    expect(onAnswer).toHaveBeenCalledWith(
-      expect.any(Number),
-      false,
-      expect.objectContaining({ misconception: MisconceptionTag.CONTA_TUDO }),
-    );
-  });
-
-  it("L1 só emite a evidência da troca depois do décimo cubinho e resposta correta", () => {
-    const q = qDoNivel(1);
-    const onAnswer = vi.fn();
-    const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
-
-    for (let i = 0; i < 10; i += 1) {
-      fireEvent.click(container.querySelector<HTMLButtonElement>("[data-material-unidade-solta]")!);
-    }
     const certa = [...container.querySelectorAll<HTMLButtonElement>("[data-material-resposta]")]
-      .find(button => Number(button.textContent) === q.answer);
+      .find(button => Number(button.textContent) === spec.total);
+    expect(certa).not.toBeUndefined();
     fireEvent.click(certa!);
 
     expect(onAnswer).toHaveBeenCalledWith(
-      q.answer,
+      spec.total,
       true,
-      expect.objectContaining({ evidencias: expect.arrayContaining(["troca-10-por-1"]) }),
+      expect.objectContaining({ misconception: MisconceptionTag.NAO_AGRUPA }),
     );
   });
 
-  it("produção correta emite evidência sem recontar subdivisões", () => {
+  it("L1 só emite evidência de agrupamento depois das dez unidades e resposta correta", () => {
+    const q = qDoNivel(1);
+    const spec = q.uiProps as MaterialDouradoSpec;
+    const onAnswer = vi.fn();
+    const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
+
+    agruparTodasAsDezenas(container, spec);
+    const certa = [...container.querySelectorAll<HTMLButtonElement>("[data-material-resposta]")]
+      .find(button => Number(button.textContent) === spec.total);
+    fireEvent.click(certa!);
+
+    expect(onAnswer).toHaveBeenCalledWith(
+      spec.total,
+      true,
+      expect.objectContaining({ evidencias: expect.arrayContaining(["agrupou-dez-em-dez"]) }),
+    );
+  });
+
+  it("L4 correto emite a evidência bidirecional exigida pela F21 §9", () => {
     const q = qDoNivel(4);
-    const spec = q.uiProps as { dezenas: number; unidades: number };
+    const spec = q.uiProps as MaterialDouradoSpec;
     const onAnswer = vi.fn();
     const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
 
@@ -64,11 +78,28 @@ describe("F21 — palco → FichaRenderer → AnswerMeta", () => {
     fireEvent.click(container.querySelector<HTMLButtonElement>("[data-material-pronto]")!);
 
     expect(onAnswer).toHaveBeenCalledWith(
-      q.answer,
+      spec.total,
       true,
-      expect.objectContaining({
-        evidencias: expect.arrayContaining(["producao-sem-contar-subdivisoes"]),
-      }),
+      expect.objectContaining({ evidencias: expect.arrayContaining(["montou-do-numeral"]) }),
+    );
+  });
+
+  it("L5 decompõe sem material e mantém o mesmo boundary de evidência", () => {
+    const q = qDoNivel(5);
+    const spec = q.uiProps as MaterialDouradoSpec;
+    const onAnswer = vi.fn();
+    const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);
+
+    const addD = container.querySelector<HTMLButtonElement>("[data-decompor-add-dezena]")!;
+    const addU = container.querySelector<HTMLButtonElement>("[data-decompor-add-unidade]")!;
+    for (let i = 0; i < spec.dezenas; i += 1) fireEvent.click(addD);
+    for (let i = 0; i < spec.unidades; i += 1) fireEvent.click(addU);
+    fireEvent.click(container.querySelector<HTMLButtonElement>("[data-decompor-pronto]")!);
+
+    expect(onAnswer).toHaveBeenCalledWith(
+      spec.total,
+      true,
+      expect.objectContaining({ evidencias: expect.arrayContaining(["decomposicao-mental-du"]) }),
     );
   });
 
