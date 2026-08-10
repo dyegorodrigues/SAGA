@@ -32,6 +32,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "GM.02",
   "GM.12",
 
+  // W3 — F21: dezena como unidade composta; promovida somente após a cadeia
+  // inativa (contrato/palco/boundary/a11y/evidência) ficar integralmente verde.
+  "N2.01",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
