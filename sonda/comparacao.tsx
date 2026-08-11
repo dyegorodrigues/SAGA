@@ -26,6 +26,7 @@ function Probe() {
         data-comparacao-probe
         data-level={spec.nivel}
         data-correct={spec.resposta}
+        data-lados={JSON.stringify(spec.lados)}
         data-answer={receipt?.value ?? ""}
         data-misconception={receipt?.meta?.misconception ?? ""}
         data-evidencias={(receipt?.meta?.evidencias ?? []).join("|")}

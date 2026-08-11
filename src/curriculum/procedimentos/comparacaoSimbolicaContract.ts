@@ -40,17 +40,33 @@ function parComRelacao(max: number, sorteio: () => number): [number, number] {
   return [base, base];
 }
 
-function expressaoComValor(valor: number, sorteio: () => number): string {
-  if (valor <= 1) return `${valor} + 0`;
-  const primeira = inteiro(1, valor - 1, sorteio);
-  return `${primeira} + ${valor - primeira}`;
+/**
+ * L5 é relacional, não um teste oculto de adição. Os dois lados preservam
+ * exatamente seus valores, mas compartilham uma parcela na mesma posição;
+ * a criança pode comparar só as parcelas que variam, sem precisar calcular
+ * somas de dois dígitos que não pertencem aos pré-requisitos de N2.03.
+ */
+function expressoesComParcelaCompartilhada(
+  a: number,
+  b: number,
+  sorteio: () => number,
+): [string, string] {
+  const limiteComum = Math.min(a, b);
+  const comum = limiteComum <= 1 ? limiteComum : inteiro(1, limiteComum - 1, sorteio);
+  const restanteA = a - comum;
+  const restanteB = b - comum;
+  const comumPrimeiro = sorteio() < 0.5;
+
+  return comumPrimeiro
+    ? [`${comum} + ${restanteA}`, `${comum} + ${restanteB}`]
+    : [`${restanteA} + ${comum}`, `${restanteB} + ${comum}`];
 }
 
-function lado(tipo: TipoLadoComparacao, valor: number, sorteio: () => number): LadoComparacaoSimbolica {
+function lado(tipo: TipoLadoComparacao, valor: number): LadoComparacaoSimbolica {
   return {
     tipo,
     valor,
-    texto: tipo === "expressao" ? expressaoComValor(valor, sorteio) : String(valor),
+    texto: String(valor),
   };
 }
 
@@ -63,21 +79,25 @@ export function construirComparacaoSimbolicaSpec(
   sorteio: () => number = Math.random,
 ): ComparacaoSimbolicaSpec {
   const clamped = Math.max(1, Math.min(5, Math.round(nivel)));
-  const max = clamped === 1 ? 10 : clamped <= 3 ? 20 : 100;
+  const max = clamped <= 2 ? 10 : clamped === 3 ? 20 : 100;
   const [a, b] = parComRelacao(max, sorteio);
 
   let lados: [LadoComparacaoSimbolica, LadoComparacaoSimbolica];
   if (clamped === 1) {
-    lados = [lado("grupo", a, sorteio), lado("grupo", b, sorteio)];
+    lados = [lado("grupo", a), lado("grupo", b)];
   } else if (clamped === 2) {
     const grupoNaEsquerda = sorteio() < 0.5;
     lados = grupoNaEsquerda
-      ? [lado("grupo", a, sorteio), lado("numeral", b, sorteio)]
-      : [lado("numeral", a, sorteio), lado("grupo", b, sorteio)];
+      ? [lado("grupo", a), lado("numeral", b)]
+      : [lado("numeral", a), lado("grupo", b)];
   } else if (clamped <= 4) {
-    lados = [lado("numeral", a, sorteio), lado("numeral", b, sorteio)];
+    lados = [lado("numeral", a), lado("numeral", b)];
   } else {
-    lados = [lado("expressao", a, sorteio), lado("expressao", b, sorteio)];
+    const [textoA, textoB] = expressoesComParcelaCompartilhada(a, b, sorteio);
+    lados = [
+      { tipo: "expressao", valor: a, texto: textoA },
+      { tipo: "expressao", valor: b, texto: textoB },
+    ];
   }
 
   return {

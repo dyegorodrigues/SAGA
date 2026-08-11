@@ -13,6 +13,12 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
+function parcelas(texto) {
+  const valores = String(texto).split(" + ").map(Number);
+  assert(valores.length === 2 && valores.every(Number.isFinite), `F29 expressão inválida: ${texto}`);
+  return valores;
+}
+
 async function startVite() {
   const proc = spawn("npx", ["vite", "--port", String(PORT), "--strictPort"], {
     stdio: ["ignore", "pipe", "pipe"],
@@ -71,6 +77,7 @@ async function probe(page, width, level) {
       scrollWidth: document.documentElement.scrollWidth,
       stage: stage ? { left: stage.left, right: stage.right, width: stage.width } : null,
       types: [...document.querySelectorAll("[data-lado-tipo]")].map(el => el.getAttribute("data-lado-tipo")),
+      lados: JSON.parse(probe?.getAttribute("data-lados") ?? "[]"),
       alligator: document.querySelector("[data-andaime-jacare]")?.getAttribute("data-andaime-jacare") ?? null,
       symbols,
       correct: probe?.getAttribute("data-correct") ?? "",
@@ -84,6 +91,22 @@ async function probe(page, width, level) {
   assert(data.symbols.length === 3, `F29 L${level} não expôs >, < e = exatamente uma vez`);
   assert(data.symbols.every(button => button.width >= 72 && button.height >= 72), `F29 L${level} alvo de toque menor que 72px`);
   assert(level <= 3 ? Boolean(data.alligator) : !data.alligator, `F29 L${level} andaime do jacaré em nível incorreto`);
+
+  if (level === 2) {
+    assert(data.lados.length === 2 && data.lados.every(lado => lado.valor <= 10), `F29 L2 ultrapassou teto 10 em ${width}px`);
+  }
+
+  if (level === 5) {
+    assert(data.lados.length === 2, `F29 L5 não expôs dois lados em ${width}px`);
+    const esquerda = parcelas(data.lados[0].texto);
+    const direita = parcelas(data.lados[1].texto);
+    assert(
+      esquerda[0] === direita[0] || esquerda[1] === direita[1],
+      `F29 L5 perdeu a parcela compartilhada em ${width}px: ${data.lados[0].texto} × ${data.lados[1].texto}`,
+    );
+    assert(esquerda[0] + esquerda[1] === data.lados[0].valor, `F29 L5 texto esquerdo não preserva valor em ${width}px`);
+    assert(direita[0] + direita[1] === data.lados[1].valor, `F29 L5 texto direito não preserva valor em ${width}px`);
+  }
 
   await page.locator(`[data-simbolo="${data.correct}"]`).click();
   await page.waitForFunction(correct => document.querySelector("[data-comparacao-probe]")?.getAttribute("data-answer") === correct, data.correct);
