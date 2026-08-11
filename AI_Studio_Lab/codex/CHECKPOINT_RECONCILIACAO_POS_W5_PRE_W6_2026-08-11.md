@@ -1,199 +1,176 @@
 # Checkpoint — Reconciliação pós-W5 / pré-W6
 
-**Data:** 11/08/2026 · **Status:** EM ANDAMENTO · **Escopo:** saneamento antes de selecionar W6
+**Data:** 11/08/2026 · **Status:** FECHAMENTO EM VALIDAÇÃO FINAL · **Escopo:** saneamento antes de selecionar W6
 
-Este checkpoint é a continuação operacional da reconciliação iniciada antes da W5. A W5 (`GM.05 / F61 / Regua`) está fechada; o estado correto agora é **pós-W5 / pré-W6**.
+A W5 (`GM.05 / F61 / Regua`) permanece fechada. A W6 permanece **NÃO SELECIONADA**. Este checkpoint reconcilia a auditoria externa de 11/08 com o código, o CI, a documentação e a Foundry reais.
 
-## 1. Fonte de verdade reancorada
+> GitHub remoto + código + gates executáveis vencem este texto se houver deriva. A **receita final de fechamento** deve ser registrada no corpo do PR #29 contra o HEAD corrente, para evitar um commit documental auto-referente que dispare outro portão longo.
 
-Estado remoto verificado antes de qualquer correção:
+## 1. Reancoragem inicial
+
+Antes de qualquer correção foi verificado:
 
 - repo: `dyegorodrigues/SAGA`;
 - branch única: `codex/integrar-bloco-f0`;
-- HEAD observado: `2e48bb985e2e896e4d61834075fcb7de16696ecf`;
-- main protegida de referência: `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
+- HEAD inicial auditado: `2e48bb985e2e896e4d61834075fcb7de16696ecf`;
+- main protegida: `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
 - PR #29: **open + draft + unmerged**;
-- branch: **937 commits à frente / 0 atrás** da referência observada;
 - review threads abertas: **0**;
-- CI do HEAD: run `31444601708`, conclusão **success**, 4/4 jobs verdes;
-- produto: 90 competências, 30 Composer, 22 legado, 38 fallback, 52 servidas, 17 divergências, 12 swaps, 44 estreias;
-- única primitiva bloqueadora vigente: `Moedas`.
+- CI inicial: run `31444601708`, verde;
+- Coverage Matrix: **30 Composer / 22 legado / 38 fallback / 52 servidas / 17 divergências / 12 swaps / 44 estreias**;
+- única primitive bloqueadora: `Moedas`.
 
-GitHub remoto + código + gates executáveis vencem este documento se houver deriva posterior.
+## 2. Auditoria externa: vereditos reconciliados
 
-## 2. Auditoria externa recebida
+### R01 · Foundry / originais — CONFIRMADO, mas não há perda intelectual conhecida
 
-Entrada de reconciliação: auditoria técnica/curricular de 11/08/2026 sobre:
+A auditoria provou divergência de hashes em `part05` e `part08` do transporte Base64 e desmentiu a antiga declaração `originals_archive_verified: true`.
 
-- `dyegorodrigues/SAGA@2e48bb9`;
-- `dyegorodrigues/SAGA-Research-Foundry@4b89c51`.
+Correção decisiva: os **10/10 arquivos-fonte** listados pela Foundry foram localizados individualmente na File Library de origem, inclusive `thinking-extensions (1).ts` e `thinking-integration.test (1).ts`. Portanto o incidente restante é **proveniência/transporte byte-a-byte**, não desaparecimento conhecido do conteúdo intelectual.
 
-A auditoria é **fonte de achados e hipóteses**, não autoridade. Cada item abaixo foi classificado contra código, workflow, documentação ou material de proveniência disponível.
+Na `SAGA-Research-Foundry` foram instalados:
 
-## 3. Achados reconciliados
+- `CURRENT_STATE.yaml` com `originals_archive_verified: false`;
+- `06_research/external_reviews/RECOVERY_STATUS_2026-08-11.md`;
+- `ORIGINALS_MANIFEST.sha256.json` dedicado aos originais;
+- `tools/verify_originals_integrity.py`;
+- workflow automático `.github/workflows/integrity.yml`;
+- Issue #1 para a recuperação exata do archive transport.
 
-### R01 · Foundry: arquivo de originais inconsistente — P0 / fora do runtime do produto
+Os hashes esperados de `part05`/`part08` **não foram alterados para fazer o teste passar**. Thinking continua DEFERRED e os `.ts` recuperados continuam protótipos, não patches de produção.
 
-**Veredito:** CONFIRMADO COM CORREÇÃO DE SEVERIDADE.
+### R02 · Sonda transversal — CONFIRMADO E MECANIZADO
 
-- `CURRENT_STATE.yaml` da Foundry declara `originals_archive_verified: true`;
-- `MIGRATION_FROM_TEMP_ARCHIVE.md` declara hashes/manifesto verificados;
-- existe `tools/verify_integrity.py` + `MANIFEST.sha256.json` para tornar a afirmação verificável;
-- a auditoria executou essa ferramenta e registrou divergência em `part05` e `part08`;
-- a Foundry não possui workflow de CI para executar o verificador automaticamente.
+A auditoria encontrou uma inconsistência real: `scripts/sonda-layout.mjs` chama a varredura transversal de **O PORTÃO**, enquanto runbooks e CI só exigiam sondas dirigidas.
 
-**Correção importante:** os **10 arquivos-fonte** listados no README do pacote estão disponíveis individualmente na File Library de origem, inclusive `thinking-extensions (1).ts` e `thinking-integration.test (1).ts`. Logo, não há perda intelectual irreversível conhecida. O que permanece crítico é a **falsa atestação de integridade byte-a-byte do transporte ZIP/Base64**.
+O primeiro mecanismo automático foi deliberadamente executado inteiro num job de 30 min. Resultado no run `31494057998`, HEAD `153634079b7af77415ebb9cfea77e0c144cb2025`:
 
-**Critério de fechamento:** Foundry deixa de declarar `verified=true` enquanto o arquivo não passar no verificador; recuperação fica registrada; verificação passa a ter mecanismo automático. Não promover protótipos recuperados a runtime.
+- **390 px × 8 sementes terminou completamente limpa**;
+- o job entrou em 320 px, continuou imprimindo `ok`, e foi cancelado exatamente pelo timeout de 30 min;
+- não houve achado de layout antes do cancelamento.
 
-### R02 · Sonda transversal: script, runbook e CI discordam — P1
+Logo, o vermelho era **timeout do mecanismo**, não defeito de produto.
 
-**Veredito:** CONFIRMADO, mas a formulação da auditoria precisava correção.
+Contrato final, sem redução de cobertura:
 
-- `scripts/sonda-layout.mjs` chama `npm run sonda` de **O PORTÃO** e define 8 sementes como portão completo;
-- `RETOMADA.md` vigente lista apenas `sonda:sensei-dojo`, `sonda:reta20` e `sonda:regua` nos gates de fechamento;
-- `.github/workflows/ci.yml` executa essas três sondas dirigidas, mas não `npm run sonda`.
+- job A: `390 px × 8 sementes`;
+- job B: `320 + 900 px × 1 semente`;
+- os dois rodam em paralelo e juntos equivalem exatamente ao contrato de `npm run sonda`;
+- sondas dirigidas Sensei, F19 e F61 continuam permanentes.
 
-Portanto não é simplesmente "o CI não roda o que a RETOMADA manda": há uma **inconsistência normativa tripla**. O mecanismo e o runbook precisam convergir.
+### R03 · Mascotes / JPG — CONFIRMADO E CORRIGIDO NO CAMINHO EXECUTÁVEL
 
-**Critério de fechamento:** definir explicitamente sonda transversal PR/smoke versus sonda transversal completa; automatizar ambas no nível adequado; RETOMADA e script descrevem exatamente o mesmo contrato.
+Foi confirmado que o contrato exigia PNG com alfa real, mas o registro importava JPGs `_nobg_`, impossível fisicamente ter canal alfa.
 
-### R03 · Mascotes: contrato de arte violado pelo runtime — P1
+Correções:
 
-**Veredito:** CONFIRMADO E MAIS AMPLO QUE O LAUDO.
+- `mascotAssets.ts` agora registra somente `src/assets/mascotes/*.png`;
+- enquanto PNG definitivo não existir, o renderer usa o fallback SVG já governado;
+- os 10 JPGs históricos (~5,4 MB) deixaram de aparecer no build por esse caminho;
+- `TransparentMascotImage.tsx`, código morto de chroma-key/canvas em runtime que também violava a regra, foi removido.
 
-- `src/assets/mascotes/README.md` exige PNG 512×512, alfa real e <80KB; JPG é proibido;
-- `src/components/mascots/mascotAssets.ts` registra `../../assets/images/*.jpg` apesar do próprio cabeçalho dizer JPG proibido;
-- o build inclui 10 JPGs totalizando aproximadamente 5,4 MB;
-- arquivos com `_nobg_` são JPG e portanto não possuem canal alfa;
-- `MascotRenderer.tsx` usa `mixBlendMode: "multiply"` quando a URL termina em `.jpg`, embora o cabeçalho do próprio renderer proíba JPG e mistura/remoção de fundo em runtime;
-- o renderer já possui fallback SVG quando `getMascotPng()` retorna `null`.
+Residual P2: `MascotRenderer.tsx` ainda contém uma condição morta `pngUrl.endsWith(".jpg")` para `mixBlendMode`; ela é hoje inalcançável porque `getMascotPng()` só pode devolver `.png`. Não reescrever um renderer grande apenas para limpeza cosmética durante esta reconciliação; remover numa manutenção de baixo risco futura.
 
-**Correção segura:** parar de registrar JPG como arte definitiva e remover o workaround `mixBlendMode`; enquanto não houver PNG transparente válido, usar o fallback vetorial já existente.
+### R04 · §6.36 / progressão visual — CONFIRMADO E TRANSFORMADO EM REGRESSÃO
 
-**Critério de fechamento:** nenhum JPG é carregado pelo registro de mascotes, nenhum `mixBlendMode` tenta simular transparência e o build deixa de empacotar os 10 assets por esse caminho.
+A detecção já existia na conformidade e na Coverage Matrix, mas não bloqueava dívida nova.
 
-### R04 · Progressão de linguagem visual §6.36 detecta, mas não bloqueia — P1
+Foi adicionado `src/curriculum/visualOnboardingGate.test.ts` com baseline explícito da dívida Padrão Ouro:
 
-**Veredito:** CONFIRMADO COM NUANCE.
+`N1.07, N1.09, N3.10, N4.03, N4.06`.
 
-O mecanismo não está "ausente" por completo:
+O gate:
 
-- `conformidadeDeFichas.test.ts` já calcula ancestrais e imprime troca de modo/ferramenta nova sem precedente;
-- `coverage_matrix.ts` já calcula `visualOnboarding` (`presente`, `nao-comprovado`, etc.);
-- a Coverage Matrix já carrega `downstream` e profundidade causal.
+- falha se surgir nova dívida Gold;
+- falha se uma dívida resolvida continuar anistiada;
+- não mascara legado/fallback.
 
-A lacuna real é que o levantamento **não falha** quando um canário Padrão Ouro estreia linguagem visual sem onboarding comprovado. O próprio teste comenta que é apenas levantamento.
+Prova executada: a suíte subiu de **171 arquivos / 2.514 testes** para **172 arquivos / 2.516 testes**, com o novo arquivo realmente descoberto e verde.
 
-**Critério de fechamento:** criar mecanismo regression-safe: dívida atual explicitamente baselineada; nenhuma nova promoção pode aumentar a dívida; entradas resolvidas precisam sair do baseline. Depois zerar a dívida já ativa, sem esconder legado/fallback.
+### R05 · N4.09 / texto antigo — CONFIRMADO E DOCUMENTADO
 
-### R05 · N4.09: doutrina textual ficou velha — P2
+O runtime de N4.09 já contém nível 1 e tutorial que alfabetizam o modelo de área. A pendência específica antiga foi marcada como resolvida em `ERRATA_PADRAO_OURO_N4_09_2026-08-11.md`; a regra geral de §6.36 continua vigente.
 
-**Veredito:** CONFIRMADO.
+### R06 · Fluxo Git histórico — CONFIRMADO E MARCADO COMO SUPERADO
 
-`PADRAO_OURO.md §6.36` ainda diz que F68 precisa ser revista antes de N4.09 ser ativado. O runtime atual de `N4.09.ts` já contém:
+`FLUXO_GIT_SEM_BUG.md` foi preservado como proveniência, mas agora avisa explicitamente que o ritual `merge → apagar branch → branch nova` é **superado para o PR #29**. `RETOMADA.md` é autoridade operacional.
 
-- nível 1 dedicado a alfabetizar o modelo de área;
-- tutorial explícito de seis passos;
-- comentário normativo referenciando §6.36.
+### R07 · Bundle — CONFIRMADO / DÍVIDA CONTROLADA
 
-**Critério de fechamento:** manter a lição geral de §6.36, mas marcar a pendência específica de N4.09 como resolvida e apontar a implementação vigente.
+Após remover o caminho JPG, o build deixou de emitir aqueles ~5,4 MB. O chunk JS permanece em aproximadamente **2,349 MB minificado / 664,6 kB gzip** e o Vite continua alertando. Não otimizar às cegas: analisar bundle/lazy-loading em frente própria.
 
-### R06 · Documento Git histórico contradiz a política atual — P1 documental
+### R08 · CI do mesmo HEAD — NOVO ACHADO, CORRIGIDO
 
-**Veredito:** CONFIRMADO.
+`gates` usava o merge-ref sintético enquanto as outras jobs usavam o PR head. Agora o checkout do PR head é explícito também nos gates, garantindo que typecheck/test/build/guardas/sondas provem o mesmo commit.
 
-`AI_Studio_Lab/codex/FLUXO_GIT_SEM_BUG.md` ainda manda `merge → apagar branch → fetch → branch nova`, enquanto o protocolo vigente do PR #29 usa branch cumulativa única, main protegida e PR draft sem merge.
+### R09 · downstream / alavancagem — ACEITO COMO MÉTRICA, NÃO COMO DITADOR
 
-**Critério de fechamento:** preservar o documento como histórico, mas marcá-lo de forma inequívoca como **SUPERADO para o PR #29/fábrica atual**, apontando `RETOMADA.md` como autoridade.
+A queda histórica de downstream é um sinal útil e deve aparecer explicitamente na seleção W6. Porém o método vigente já combina **profundidade/descendentes + legado/fallback + divergência + blocker + onboarding + motor/a11y + risco pedagógico + reuso de primitive + custo/evidência**.
 
-### R07 · Bundle pesado — P2 engenharia
+Não declarar W5 errada retroativamente e não substituir o método por “maior downstream vence”.
 
-**Veredito:** CONFIRMADO.
+### R10 · Foundry / plano invisível — CONFIRMADO E PRESERVADO SEM ATIVAR
 
-No CI reancorado:
+`09_integration/DEFERRED_IMPLEMENTATION_PLAN.md` torna o plano de seis mudanças legível/versionado. O documento é explicitamente **DEFERRED / não autorizativo**. Thinking não entra no runtime durante a fábrica curricular.
 
-- `index.js`: ~2,35 MB minificado / ~665 kB gzip;
-- Vite emite aviso de chunk grande;
-- os JPGs de mascote adicionam ~5,4 MB de assets.
+### R11 · Evidence Ledger — CONFIRMADO E MELHORADO
 
-Remover o caminho JPG resolve uma parcela imediata. O chunk JS permanece dívida separada e requer análise de bundle/lazy loading antes de otimização cega.
+O ledger recebeu classificação de claims, referências, implicações e limites (“o que não prova”). Pendências bibliográficas restantes ficam explícitas em vez de números sem fonte.
 
-### R08 · CI "mesmo HEAD" não é uniforme — P1 governança
+### R12 · IDs e inventários da Foundry — NOVOS CONTRATOS
 
-**Veredito:** NOVO ACHADO.
+Foram adicionados:
 
-No workflow atual:
+- `03_architecture/IDENTIFIER_NAMESPACES.md` para distinguir `FD-Dxxx`, IDs históricos externos e IDs SAGA;
+- `03_architecture/PRIMITIVE_INVENTORY_CONTRACT.md` para impedir comparação indevida entre “26 nomes declarados”, “21 executáveis”, “30 competências Composer” e inventários históricos.
 
-- `sonda-sensei-dojo`, `higiene-diff` e `guarda-textual` fazem checkout explícito de `${{ github.event.pull_request.head.sha }}`;
-- `gates` usa `actions/checkout@v4` sem `ref`, portanto em `pull_request` o GitHub testa o merge-ref sintético por padrão.
+## 3. Incidente encontrado durante a própria reconciliação: F61
 
-Hoje a branch está 0 atrás da main observada, então isso não explica falha atual. Porém o protocolo afirma que código/gates/CI do **mesmo HEAD** devem concordar. Se main mover, o job principal pode testar árvore diferente do HEAD que os demais jobs testam.
+Ao fortalecer o CI, `sonda:regua` reproduziu duas vezes `L5 / 390px / scrollWidth=397`.
 
-**Critério de fechamento:** decidir e documentar uma política única. Para o protocolo atual de branch cumulativa/main congelada, o job `gates` deve testar explicitamente o PR head; compatibilidade com main pode continuar sendo um sinal separado, não uma ambiguidade silenciosa.
+A investigação mostrou uma corrida de estabilização na transição `estimativa → medição`: o palco troca dimensão e `PalcoEscalado` reage via `ResizeObserver`, enquanto a sonda media cedo demais.
 
-### R09 · Alavancagem downstream — melhoria de seleção, não bug comprovado — P1 método
+Correção em `scripts/sonda-regua.mjs`:
 
-**Veredito:** PARCIALMENTE ACEITO.
+- esperar **estabilidade geométrica observável** após preparar cada nível e após a transição L5;
+- manter a asserção de overflow rígida;
+- não aumentar tolerância;
+- não alterar a régua/pedagogia.
 
-A auditoria mostrou queda de impacto downstream nas ondas já escolhidas e destacou legados F1 de alto alcance. Isso é informação estratégica relevante.
+No run `31494057998`, Sensei + F19 + **F61 passaram verdes** após essa correção.
 
-Porém a `RETOMADA.md` vigente **já exige** que a W6 seja recalculada por profundidade/descendentes junto com fallback/legado, divergência, blocker, onboarding, motor/a11y, risco pedagógico, reuso de primitive e custo. A W5 também teve objetivo de infraestrutura/risco visual (`Regua`), não apenas cobertura downstream.
+## 4. Ruídos classificados, não silenciados
 
-**Regra reconciliada:** `downstream` ganha peso explícito e precisa aparecer na evidência de seleção, mas não vira critério soberano. Não declarar W5 erro retroativamente sem contrafactual executável.
+- `HTMLCanvasElement.getContext()` no jsdom aparece associado sobretudo a axe/WCAG e os testes passam; é ruído/harness de acessibilidade, não defeito funcional conhecido. Não instalar `canvas` nem mockar cegamente.
+- stderr de fallback de micro/Firestore em testes negativos é exercitado deliberadamente e os testes passam.
+- GitHub Actions avisa que actions v4 estão sendo forçadas a runtime Node 24; manutenção preventiva, não falha atual.
 
-### R10 · Foundry: plano futuro não pode ficar operacionalmente invisível — P2 / DEFER
+## 5. Dívida controlada que NÃO bloqueia a reconciliação
 
-**Veredito:** CONFIRMADO COMO GOVERNANÇA DE P&D.
+Esses itens continuam reais e devem permanecer visíveis, mas não são falhas de saneamento desta etapa:
 
-A Foundry está corretamente em `pre_canonical` e a decisão vigente continua sendo **não ativar Thinking no runtime agora**. Entretanto `09_integration/FUTURE_PROOFING.md` é muito mais raso do que os materiais preservados de integração.
+- 22 legados;
+- 38 fallbacks;
+- 17 divergências;
+- `Moedas` como última primitive bloqueadora;
+- cinco dívidas Gold de onboarding explicitamente baselineadas;
+- chunk JS ~2,349 MB / 664,6 kB gzip;
+- recuperação byte-a-byte da Foundry no Issue #1;
+- condição morta de JPG em `MascotRenderer.tsx`;
+- manutenção futura das actions/harness jsdom.
 
-**Critério de fechamento:** registrar um plano legível/versionado em `09_integration/` como material **DEFERRED / não autorizativo**, com precedência clara e sem tocar no runtime do SAGA.
+## 6. Regra de parada e fechamento
 
-### R11 · Foundry: Evidence Ledger não sustenta ainda o nome "ledger" — P2
+**W6 continua NÃO SELECIONADA.** Não tocar main, Creature Engine ou Thinking Engine.
 
-**Veredito:** CONFIRMADO.
+Este checkpoint passa de `FECHAMENTO EM VALIDAÇÃO FINAL` para **FECHADO operacionalmente** quando o corpo do PR #29 registrar uma receita do HEAD final mostrando:
 
-`06_research/evidence/EVIDENCE_LEDGER.md` enumera temas, mas não traz referências bibliográficas completas nem vínculo claim→fonte. As referências já existem em materiais históricos/apêndices e devem ser promovidas para o ledger versionado quando a Foundry for saneada.
+1. PR open + draft + unmerged;
+2. todos os jobs do CI concluídos verdes no mesmo HEAD;
+3. Gates com 172 arquivos / 2.516 testes ou contagem superior coerente;
+4. Sensei/F19/F61 verdes;
+5. sonda transversal `390px × 8 sementes` verde;
+6. sonda transversal `320/900px × 1 semente` verde;
+7. W6 ainda não selecionada.
 
-### R12 · Foundry: protótipos recuperados continuam sendo protótipos — regra de segurança
-
-Os arquivos recuperados `thinking-extensions`, `thinking-integration.test` e `audit-thinking-reuse` **não são patches aprovados**. O teste de integração contém stubs/asserções locais que não provam integração real, e o audit de reuse contém inventário/percentuais hardcoded. Preservar como proveniência; não copiar para `src/` do produto.
-
-## 4. Itens adicionais observados, ainda não bloqueadores
-
-- runner do GitHub emite aviso de transição de runtime Node das actions; manutenção preventiva, não falha atual;
-- a suíte imprime mensagens `HTMLCanvasElement.getContext()` não implementado no jsdom; investigar origem antes de silenciar, porque mock cego pode esconder defeito;
-- existe stderr de teste de Composer com fallback de micro; classificar antes de alterar;
-- comentários quantitativos antigos da sonda podem ter derivado do número atual de cenas; output executado vence comentário.
-
-Nenhum desses itens autoriza abrir frente paralela antes dos P0/P1.
-
-## 5. Ordem de saneamento antes da W6
-
-1. registrar este checkpoint e congelar seleção da W6;
-2. corrigir contradições documentais objetivas (`FLUXO_GIT_SEM_BUG`, N4.09, RETOMADA/gates);
-3. corrigir contrato de assets dos mascotes usando fallback existente;
-4. alinhar CI ao HEAD explícito e mecanizar sonda transversal em dois níveis;
-5. transformar progressão visual em gate regression-safe, sem apagar dívida histórica;
-6. sanear a Foundry: verdade de integridade, recuperação registrada, CI de integridade, plano de integração visível, evidence ledger;
-7. reexecutar CI e gates do produto no novo HEAD;
-8. só então gerar Matrix viva e selecionar W6 com ranking reconciliado.
-
-## 6. Regra de parada
-
-**W6 permanece NÃO SELECIONADA enquanto este checkpoint estiver `EM ANDAMENTO`.**
-
-Não tocar main. Não tocar Creature Engine. Não implementar Thinking Engine. Não alterar learner state/mastery por causa desta reconciliação.
-
-## 7. Critério de fechamento da reconciliação
-
-A reconciliação pode virar `FECHADA` quando:
-
-- nenhum P0/P1 acima estiver sem mecanismo ou dívida explicitamente baselineada;
-- documentação operacional não se contradizer;
-- CI do PR executar o contrato acordado no HEAD correto;
-- build/test/typecheck/gates estiverem verdes;
-- a Foundry deixar de afirmar integridade que sua própria ferramenta não prova;
-- o novo HEAD remoto e o run de CI forem registrados em `RETOMADA.md`;
-- a W6 continuar não selecionada até o fechamento formal.
+Depois disso, a próxima ação permitida é **selecionar W6 pela Matrix+DAG reconciliada**. Selecionar não significa implementar automaticamente: primeiro registrar a evidência causal da escolha.
