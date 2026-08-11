@@ -15,6 +15,7 @@ import { construirReta20Spec } from "./procedimentos/reta20Contract";
 import { evidenciasReta20 as daReta } from "./procedimentos/reta20Procedure";
 import { construirReguaSpec } from "./procedimentos/reguaContract";
 import { evidenciasDaRegua as daRegua } from "./procedimentos/reguaProcedure";
+import { evidenciasComparacaoSimbolica as daComparacaoSimbolica } from "./procedimentos/comparacaoSimbolicaProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -121,6 +122,17 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       }, spec);
     },
   },
+  {
+    nome: "F29 (comparação simbólica) — acerto no L3+ sem objetos",
+    evidencia: Evidencia.COMPARACAO_SIMBOLICA_SEM_OBJETOS,
+    emitir: () => daComparacaoSimbolica({
+      nivel: 3,
+      ordemDeToques: [0, 1],
+      revisoesDeSimbolo: 0,
+      escolha: ">",
+      correta: true,
+    }),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -206,5 +218,13 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       unidadeEscolhida: "cm",
       unidadeCerta: "cm",
     }, regua)).toEqual([]);
+
+    expect(daComparacaoSimbolica({
+      nivel: 3,
+      ordemDeToques: [0, 1],
+      revisoesDeSimbolo: 1,
+      escolha: "<",
+      correta: false,
+    })).toEqual([]);
   });
 });

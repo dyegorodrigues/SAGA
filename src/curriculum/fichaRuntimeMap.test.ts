@@ -21,8 +21,10 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "EmojiRow: executável | kinds=emojirow+fileira+moldura | builder=emojirow+fileira+moldura | renderer=emojirow+fileira+moldura",
     );
+    // W6/F29: Grupo continua com o builder genérico de grandeza e ganha apenas
+    // o builder especializado local de N2.03; não existe dispatch genérico groups.
     expect(output).toContain(
-      "Grupo: executável | kinds=groups+grandeza | builder=grandeza | renderer=grandeza",
+      "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica | builder=grandeza+special:N2.03 | renderer=grandeza+comparacao-simbolica",
     );
     expect(output).toContain(
       "StoryPanel: executável | kinds=story+scene+storypanel+story-bars | builder=storypanel | renderer=story-bars",
