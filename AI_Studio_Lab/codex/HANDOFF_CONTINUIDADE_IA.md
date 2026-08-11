@@ -1,33 +1,33 @@
 # Handoff de continuidade — SAGA
 
-> **VIGENTE — 10/ago/2026.** W5 materializou **GM.05 / F61 / Regua** e a Matrix já contém `W5-GM.05`. Não iniciar W6 sem reancorar HEAD/CI e sem reler a retificação visual F61.
+> **VIGENTE em 11/ago/2026.** W1–W5 estão fechadas. A reconciliação pós-W5/pré-W6 está em **validação final**. **Não selecionar nem implementar W6 até o PR #29 registrar a receita verde do HEAD corrente.**
 
 ## Regra de ouro
 
 - repo `dyegorodrigues/SAGA`;
 - branch única `codex/integrar-bloco-f0`;
-- PR #29 open + draft + unmerged;
+- PR #29 **open + draft + unmerged**;
 - main protegida `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
 - não merge/rebase/ready/auto-merge;
-- nenhuma branch auxiliar;
+- não criar branch auxiliar;
 - Creature Engine fora desta fila;
+- Thinking Engine continua DEFERRED;
 - GitHub remoto é a fonte da verdade.
 
-## Ordem de leitura
+## Ordem de retomada
 
-1. `CHECKPOINT_FABRICA_CURRICULAR_W5_GM_05_FECHADA_2026-08-10.md`;
-2. `AI_Studio_Lab/pedagogia/fichas/RETIFICACAO_W5_F61_GM_05_2026-08-10.md`;
+1. PR #29: estado, HEAD, jobs e corpo do PR;
+2. `CHECKPOINT_RECONCILIACAO_POS_W5_PRE_W6_2026-08-11.md`;
 3. `RETOMADA.md`;
 4. `BRIEFING_CODEX.md`;
-5. reconciliação pré-W5 + W4/W3/W2/W1 + Coverage Matrix;
+5. checkpoint W5 + retificação F61 + errata N4.09;
 6. cânone pedagógico + `curriculum/grafo_saga.yaml`.
 
-## Estado curricular atual
+`FLUXO_GIT_SEM_BUG.md` é proveniência histórica e está marcado como superado para o protocolo cumulativo atual.
 
-Snapshot P21.1 imutável:
-`26 Composer / 25 legado / 39 fallback / 51 servidas / 21 divergências / 12 swaps / 44 estreias`.
+## Estado curricular
 
-Após W1–W5, projeção vigente:
+Baseline observada após W5:
 
 - **30 Composer**;
 - **22 legado**;
@@ -36,124 +36,99 @@ Após W1–W5, projeção vigente:
 - **17 divergências**;
 - **12 swaps**;
 - **44 estreias**;
-- blocker restante: **Moedas**.
+- blocker restante: **`Moedas`**.
 
-Ledger W5: `{ composer: +1, fallback: -1, served: +1 }`. Não inventar `toolIntroductions +1`: Regua já era estreia visual antes da promoção do canário.
+W5 = `GM.05 / F61 / Regua`; prereqs `GM.12 + N2.02`.
 
-## W5 / GM.05 / F61
+## Estado da reconciliação
 
-GM.05 foi escolhida pela Matrix+DAG após a reconciliação pré-W5. A implementação atravessou regression-first, registro inativo, CI/Chrome real, ativação, Matrix observada e ledger.
+### Produto
 
-Pré-requisitos vigentes: `GM.12 + N2.02`.
+- `gates` e sondas usam PR head explícito;
+- `src/curriculum/visualOnboardingGate.test.ts` baselineia a dívida Gold de §6.36: `N1.07,N1.09,N3.10,N4.03,N4.06`;
+- suíte comprovada: **172 arquivos / 2.516 testes**;
+- N4.09 já possui onboarding real e a pendência histórica foi corrigida por errata;
+- mascote runtime registry é PNG-only; JPG histórico `_nobg_` não entra mais como arte definitiva; fallback SVG é o caminho seguro;
+- chroma-key/canvas morto foi removido;
+- os ~5,4 MB de JPGs deixaram de ser emitidos pelo build por esse caminho;
+- chunk JS continua dívida ~2,349 MB / ~664,6 kB gzip;
+- F61 ganhou espera de estabilidade geométrica na sonda, sem relaxar tolerância nem alterar UI/pedagogia.
 
-Progressão vigente:
+### Sonda transversal
 
-- L1 bolas iguais tangentes como unidade informal;
-- L2 régua alinhada + cm inteiros;
-- L3 alinhar zero + medir;
-- L4 medir/comparar dois objetos distintos;
-- L5 estimar inteiro → medir → escolher unidade.
+O portão completo continua semanticamente o mesmo:
 
-### Invariantes visuais F61
+- 390px com 8 sementes;
+- 320px com 1 semente;
+- 900px com 1 semente.
 
-A revisão humana do artifact encontrou problemas que o primeiro gate não enxergava. Eles foram tratados como bugs de produto/pedagogia e convertidos em regressões:
+No CI ele é paralelizado em dois jobs:
 
-- não usar cápsula genérica/emoji para representar objeto;
-- não esticar objetos de proporção rígida, como carrinho ou borracha;
-- não repetir o mesmo objeto na comparação;
-- não deixar rótulo final sair da régua;
-- não usar emoji de clipe como unidade física;
-- não mostrar meia marca `0,5 cm` nesta progressão;
-- não validar só container: medir a silhueta visível;
-- decoração/border não pode deslocar tick 0.
+1. `Sonda transversal — 390px × 8 sementes`;
+2. `Sonda transversal — 320/900px × 1 semente`.
 
-Estado atual:
+No run `31494057998`, HEAD `153634079b7af77415ebb9cfea77e0c144cb2025`, 390×8 terminou integralmente limpa. O job único expirou somente depois, já medindo 320px, por timeout de 30 min. Sensei/F19/F61 ficaram verdes nesse mesmo HEAD.
 
-- objetos procedurais plausíveis: lápis, pincel, giz de cera, marcador, fita de treino;
-- extremos visíveis instrumentados;
-- `extremo inicial = tick 0`;
-- `extremo final = tick inteiro correto`;
-- apenas marcas inteiras;
-- L1: bolas procedurais, diâmetro constante, `gap=0`, sem emoji/sprite, largura total exata;
-- snap generoso + alternativa de toque;
-- imprecisão motora não vira misconception;
-- `ALINHOU_ZERO` só por ação da criança.
+A receita final deve ser a do HEAD corrente do PR, após a paralelização e documentação reconciliada.
 
-A autoridade normativa é `RETIFICACAO_W5_F61_GM_05_2026-08-10.md`. Frases antigas conflitantes no monolito F2 são proveniência histórica e não definem o runtime atual.
+### Foundry
 
-## QA obrigatório
+A auditoria externa estava certa sobre a quebra de integridade do archive transport, mas exagerou a perda: **10/10 arquivos-fonte estão localizados individualmente**, inclusive os dois protótipos considerados perdidos.
 
-A sonda F61 mede Chrome real em 320/390/900 px e L1–L5. Ela falha por:
+A Foundry agora:
 
-- overflow;
-- tick/rótulo decimal;
-- unidade informal com gap/overlap;
-- silhueta sem extremos auditáveis;
-- ponta visível que não bate no tick;
-- L4 com objetos iguais ou rígidos;
-- falha de tap/drag/estimativa;
-- label final fora da madeira.
+- declara archive transport como `unverified`;
+- possui manifesto/verificador dedicado aos originais;
+- possui workflow de integridade;
+- preserva plano futuro em `DEFERRED_IMPLEMENTATION_PLAN.md` sem autorizar runtime;
+- possui Evidence Ledger melhorado;
+- separa namespaces de IDs e universos de inventário;
+- mantém recuperação byte-a-byte no Issue #1.
 
-Screenshots de todos os níveis/larguras fazem parte do artifact. Não trocar esse gate por jsdom.
+Não copiar protótipos `.ts` recuperados para `src/` do SAGA.
 
-## Dívida viva
+## Dívida controlada, não apagar do radar
 
-- legados: 22;
-- fallback: 38;
-- divergências: 17;
-- `Moedas`: único blocker; renderer-sem-builder, GM.03;
-- `LinkingCubes`, `SingaporeBars`, `VisualAddition`: renderer-sem-builder;
-- `Quadrado100`: componente isolado;
-- inventário: 21 executáveis / 4 renderer-sem-builder / 1 isolada / 0 ausentes.
+- 22 legados;
+- 38 fallbacks;
+- 17 divergências;
+- `Moedas` blocker;
+- cinco dívidas Gold de onboarding baselineadas;
+- bundle JS grande;
+- Foundry Issue #1;
+- condição morta `.jpg` em `MascotRenderer.tsx`, hoje inalcançável;
+- warnings de runtime das GitHub Actions;
+- ruído `canvas.getContext()` do harness axe/jsdom, sem falha funcional conhecida.
 
-## Próxima onda
+## Fechamento da reconciliação
 
-**W6 não está selecionada.** Recalcular a partir das fontes atuais:
+O corpo do PR #29 é o recibo final. Ele precisa registrar, no **mesmo HEAD**:
 
-1. PR/head/CI;
-2. Matrix viva;
-3. DAG e descendentes;
-4. fallback/legado/divergência;
-5. blocker/reuso de primitive;
-6. onboarding, motor/a11y e risco pedagógico;
-7. custo e evidência.
+- PR open + draft + unmerged;
+- Gates verdes;
+- 172 arquivos / 2.516 testes ou contagem superior coerente;
+- Sensei/F19/F61 verdes;
+- transversal 390×8 verde;
+- transversal 320/900×1 verde;
+- W6 ainda não selecionada.
 
-`Moedas/GM.03` deve receber peso alto por ser o último blocker, mas a seleção não pode ser hardcoded.
+Quando isso ocorrer, considerar `CHECKPOINT_RECONCILIACAO_POS_W5_PRE_W6_2026-08-11.md` **FECHADO operacionalmente** pela condição que ele próprio define.
 
-Depois repetir:
+## Próxima tarefa após o fechamento
 
-`regressão → implementação inativa → gates → browser quando aplicável → canário → Matrix observa → ledger → checkpoint`.
+**Selecionar W6**, ainda sem implementar.
 
-## Alvos de encerramento da fábrica curricular
+Gerar Matrix+DAG atual e documentar ranking/contrafactual usando:
 
-O projeto só chega ao fechamento curricular quando:
+`profundidade/descendentes + legado/fallback + divergência + blocker + onboarding + motor/a11y + risco pedagógico + reuso de primitive + custo/evidência`.
 
-- nenhuma competência permanece fallback sem conteúdo real;
-- todo legado é migrado ou explicitamente aceito com justificativa/evidência;
-- divergências ficha↔screen chegam a zero ou exceções normativas explícitas;
-- não há primitive bloqueadora;
-- cada primitive usada tem ownership/build/render/test coerentes;
-- onboarding visual existe nas estreias/trocas que precisam dele;
-- geometria/motor/a11y passam em browser real onde necessário;
-- learner state, reward, persistência, telemetry e DAG mantêm os invariantes;
-- Coverage Matrix final é derivada das fontes, não editada para ficar verde.
+Downstream deve estar explícito, mas não domina sozinho. `Moedas/GM.03` merece peso pelo último blocker, sem seleção hardcoded.
 
-## Invariantes permanentes
+Depois de registrar a decisão:
 
-- learner state é autoridade;
-- nível curricular pertence à criança/perfil;
-- XP lifetime não gastável; moeda spendable atômica;
-- RT não multiplica mastery/XP;
-- fallback não recompensa nem gera evidência real;
-- Misto dobra só moedas;
-- Atlas/insígnias derivam graph + learner state;
-- retry/replay idempotentes;
-- snapshots da Matrix são históricos e imutáveis;
-- telemetria não reescreve o Curriculum Graph;
-- LLM não é soberano em runtime;
-- alterações Thinking Lab de graph/state/evidence/persist/privacy/offline/rollback exigem Invariant Impact Review.
+`regressão → implementação inativa → gates → browser → canário → Matrix observa → ledger → checkpoint`.
 
-## Gates
+## Gates permanentes
 
 ```bash
 npm run auditar
@@ -167,6 +142,7 @@ npm run pr:check
 npm run sonda:sensei-dojo
 npm run sonda:reta20
 npm run sonda:regua
+npm run sonda
 ```
 
-**Não avance por aparência de progresso: avance somente quando fonte, comportamento real e recibos do mesmo HEAD concordarem.**
+**Nenhum agente deve “continuar a fábrica” a partir deste arquivo sem reancorar o PR #29 primeiro.**
