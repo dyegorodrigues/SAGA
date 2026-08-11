@@ -21,7 +21,20 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      # Em pull_request, actions/checkout sem ref usa o merge-ref sintético.
+      # O protocolo do PR #29 exige que gates e sondas provem o MESMO HEAD
+      # remoto; por isso o PR head é explícito. Push em main continua usando o
+      # SHA do próprio evento.
+      - name: Checkout do HEAD do PR
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Checkout do push
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -61,6 +74,40 @@ jobs:
         env:
           PR_BASE: origin/main
         run: npm run pr:check
+
+  sonda-transversal:
+    name: Sonda transversal completa
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Sonda transversal — 8 sementes + larguras do portão
+        run: npm run sonda
 
   sonda-sensei-dojo:
     name: Sonda real Sensei
