@@ -9,9 +9,14 @@
  *
  * Quando um PNG existir para o tema+estágio, o MascotRenderer o usa
  * automaticamente; senão, cai no desenho SVG (DragonMascot / bases antigas).
+ *
+ * IMPORTANTE: assets históricos em `src/assets/images/*.jpg` não participam
+ * deste registro. JPG não possui canal alfa e um sufixo `_nobg_` não transforma
+ * o formato em imagem transparente. Manter o fallback SVG é mais correto do que
+ * maquiar fundo opaco em runtime.
  */
 
-const pngModules = import.meta.glob(["../../assets/mascotes/*.png", "../../assets/images/*.jpg"], {
+const pngModules = import.meta.glob("../../assets/mascotes/*.png", {
   eager: true,
   query: "?url",
   import: "default",
@@ -23,7 +28,7 @@ const ALIAS: Record<string, string> = {
 };
 
 export function getMascotPng(theme: string, stage: number): string | null {
-  const prefixes = [`${ALIAS[theme] || theme}-${stage}`, `${theme}-${stage}`, `${theme}_stage${stage}_nobg`];
+  const prefixes = [`${ALIAS[theme] || theme}-${stage}`, `${theme}-${stage}`];
   for (const [path, url] of Object.entries(pngModules)) {
     const file = path.split("/").pop() || "";
     if (prefixes.some((p) => file.startsWith(p))) return url;
