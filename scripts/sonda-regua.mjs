@@ -9,6 +9,13 @@ const CHROME = process.env.SONDA_CHROME || chromium.executablePath();
 const ARTIFACTS = path.resolve(".artifacts/sonda-regua");
 const WIDTHS = [320, 390, 900];
 const EPS = 1.75;
+const OBJECT_SAMPLES = [
+  { raw: 0.05, kind: "lapis" },
+  { raw: 0.25, kind: "pincel" },
+  { raw: 0.45, kind: "giz" },
+  { raw: 0.65, kind: "marcador" },
+  { raw: 0.85, kind: "fita" },
+];
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -225,6 +232,21 @@ async function captureProbe(page, file) {
   await page.locator("[data-regua-probe]").screenshot({ path: path.join(ARTIFACTS, file) });
 }
 
+async function probeObjectGallery(page) {
+  const seen = [];
+  for (const sample of OBJECT_SAMPLES) {
+    await page.goto(`${BASE}?level=2&r=0.5&obj=${sample.raw}`, { waitUntil: "networkidle" });
+    await page.locator("[data-regua-probe]").waitFor();
+    const kind = await page.locator("[data-regua-probe]").getAttribute("data-object-kind");
+    assert(kind === sample.kind, `galeria F61 esperava ${sample.kind} e recebeu ${kind}`);
+    await assertAlignedGeometry(page, `galeria ${sample.kind}`);
+    await captureProbe(page, `f61-object-${sample.kind}-390px.png`);
+    seen.push(kind);
+  }
+  assert(new Set(seen).size === OBJECT_SAMPLES.length, `galeria F61 não cobriu cinco famílias: ${seen.join(",")}`);
+  return seen;
+}
+
 async function exerciseTap(page) {
   await prepareLevel(page, 3);
   const probe = page.locator("[data-regua-probe]");
@@ -295,7 +317,7 @@ const vite = await startVite();
 let browser;
 try {
   browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ["--no-sandbox"] });
-  const receipt = { chrome: CHROME, widths: {}, interactions: {} };
+  const receipt = { chrome: CHROME, widths: {}, objectGallery: [], interactions: {} };
   for (const width of WIDTHS) {
     const page = await browser.newPage({ viewport: { width, height: 1000 } });
     receipt.widths[width] = [];
@@ -306,6 +328,10 @@ try {
     await page.close();
   }
 
+  const galleryPage = await browser.newPage({ viewport: { width: 390, height: 1000 } });
+  receipt.objectGallery = await probeObjectGallery(galleryPage);
+  await galleryPage.close();
+
   const interactionPage = await browser.newPage({ viewport: { width: 390, height: 1000 } });
   receipt.interactions.tap = await exerciseTap(interactionPage);
   receipt.interactions.drag = await exerciseDrag(interactionPage);
@@ -314,10 +340,11 @@ try {
 
   fs.writeFileSync(path.join(ARTIFACTS, "receipt.json"), JSON.stringify(receipt, null, 2));
   console.log("SAGA — SONDA F61: OK");
-  console.log(`- larguras: ${WIDTHS.join(", ")} px; níveis: 1–5; screenshots: 15 + interações`);
+  console.log(`- larguras: ${WIDTHS.join(", ")} px; níveis: 1–5; screenshots: 15 + interações + 5 objetos`);
   console.log("- L1: bolas desenhadas, tangentes, mesma largura total do objeto: OK");
   console.log("- régua: apenas centímetros inteiros; rótulos contidos: OK");
   console.log("- silhueta visível: ponta inicial=tick 0 e ponta final=tick da resposta: OK");
+  console.log(`- galeria visual: ${receipt.objectGallery.join(", ")}`);
   console.log("- L4: objetos distintos de proporção longitudinal plausível: OK");
   console.log("- tap alternativo, drag real e estimar→medir: OK");
   console.log(`- evidências: ${ARTIFACTS}`);
