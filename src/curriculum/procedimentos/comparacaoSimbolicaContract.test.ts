@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MisconceptionTagF29 } from "../../constants/misconceptionsF29";
+import { MisconceptionTag } from "../../constants/misconceptions";
 import { N2_03 } from "../fichas/jornada/N2.03";
 import {
   construirComparacaoSimbolicaQuestion,
@@ -44,24 +44,28 @@ describe("contrato F29 — comparação simbólica", () => {
     expect(spec.resposta).toBe(a > b ? ">" : a < b ? "<" : "=");
   });
 
-  it("entrega os três símbolos e tags reais nos distratores", () => {
+  it("entrega os três símbolos e tags canônicas reais nos distratores", () => {
+    const canonicas = new Set(Object.values(MisconceptionTag));
     for (let i = 0; i < 40; i += 1) {
       const q = construirComparacaoSimbolicaQuestion(N2_03, 4);
       expect(q.options?.map(o => o.value).sort()).toEqual(["<", "=", ">"].sort());
       for (const opcao of q.options ?? []) {
         if (opcao.value === q.answer) expect(opcao.misconception).toBeUndefined();
-        else expect(opcao.misconception).toBeTruthy();
+        else {
+          expect(opcao.misconception).toBeTruthy();
+          expect(canonicas).toContain(opcao.misconception);
+        }
       }
     }
   });
 
   it("diagnostica inversão, igualdade indevida e comparação ausente", () => {
     const maior = { ...construirComparacaoSimbolicaSpec(4), resposta: ">" as const };
-    expect(diagnosticarComparacaoSimbolica("<", maior)).toBe(MisconceptionTagF29.INVERTE_SIMBOLO);
-    expect(diagnosticarComparacaoSimbolica("=", maior)).toBe(MisconceptionTagF29.IGNORA_DIFERENCA);
+    expect(diagnosticarComparacaoSimbolica("<", maior)).toBe(MisconceptionTag.INVERTE_SIMBOLO);
+    expect(diagnosticarComparacaoSimbolica("=", maior)).toBe(MisconceptionTag.IGNORA_DIFERENCA);
 
     const igual = { ...maior, resposta: "=" as const };
-    expect(diagnosticarComparacaoSimbolica(">", igual)).toBe(MisconceptionTagF29.NAO_COMPARA_SIMBOLO);
+    expect(diagnosticarComparacaoSimbolica(">", igual)).toBe(MisconceptionTag.NAO_COMPARA_SIMBOLO);
   });
 
   it("só emite evidência de domínio a partir do L3 e quando a resposta está certa", () => {

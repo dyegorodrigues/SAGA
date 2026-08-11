@@ -1,4 +1,4 @@
-import { MisconceptionTagF29 } from "../../constants/misconceptionsF29";
+import { MisconceptionTag } from "../../constants/misconceptions";
 import { Question } from "../../types";
 import { normalizeFichaTutorial } from "../fichaQuestionContract";
 import { FichaCompetencia, FichaMicro } from "../schema";
@@ -103,9 +103,9 @@ function opcoesDaRelacao(resposta: SimboloComparacao) {
   return ([">", "<", "="] as SimboloComparacao[]).map(value => {
     let misconception: string | undefined;
     if (value !== resposta) {
-      if (value === "=" && resposta !== "=") misconception = MisconceptionTagF29.IGNORA_DIFERENCA;
-      else if (resposta === "=") misconception = MisconceptionTagF29.NAO_COMPARA_SIMBOLO;
-      else misconception = MisconceptionTagF29.INVERTE_SIMBOLO;
+      if (value === "=" && resposta !== "=") misconception = MisconceptionTag.IGNORA_DIFERENCA;
+      else if (resposta === "=") misconception = MisconceptionTag.NAO_COMPARA_SIMBOLO;
+      else misconception = MisconceptionTag.INVERTE_SIMBOLO;
     }
     return {
       label: value,

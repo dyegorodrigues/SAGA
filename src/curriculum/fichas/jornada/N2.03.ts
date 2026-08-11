@@ -1,5 +1,5 @@
 import { Evidencia } from "../../../constants/evidencias";
-import { MisconceptionTagF29 } from "../../../constants/misconceptionsF29";
+import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
 
 /**
@@ -19,9 +19,9 @@ export const N2_03: FichaCompetencia = {
   howto: "A boca aberta fica virada para o número maior. O bico fica para o menor.",
   explain: "Qual dos dois é maior? O jacaré sempre abre a boca para esse lado.",
   distratores: [
-    { regra: "inverter a direção de > ou <", tag: MisconceptionTagF29.INVERTE_SIMBOLO },
-    { regra: "usar = quando os lados são diferentes", tag: MisconceptionTagF29.IGNORA_DIFERENCA },
-    { regra: "não comparar corretamente depois da retirada dos objetos", tag: MisconceptionTagF29.NAO_COMPARA_SIMBOLO },
+    { regra: "inverter a direção de > ou <", tag: MisconceptionTag.INVERTE_SIMBOLO },
+    { regra: "usar = quando os lados são diferentes", tag: MisconceptionTag.IGNORA_DIFERENCA },
+    { regra: "não comparar corretamente depois da retirada dos objetos", tag: MisconceptionTag.NAO_COMPARA_SIMBOLO },
   ],
 
   niveis: {
@@ -102,15 +102,15 @@ export const N2_03: FichaCompetencia = {
 
   erros_tipicos: [
     {
-      id: MisconceptionTagF29.INVERTE_SIMBOLO,
+      id: MisconceptionTag.INVERTE_SIMBOLO,
       descricao: "Inverte > e < mesmo tendo identificado qual lado é maior.",
     },
     {
-      id: MisconceptionTagF29.IGNORA_DIFERENCA,
+      id: MisconceptionTag.IGNORA_DIFERENCA,
       descricao: "Escolhe = quando as duas quantidades ou expressões têm valores diferentes.",
     },
     {
-      id: MisconceptionTagF29.NAO_COMPARA_SIMBOLO,
+      id: MisconceptionTag.NAO_COMPARA_SIMBOLO,
       descricao: "Sem objetos, escolhe o símbolo sem comparar corretamente os valores dos dois lados.",
     },
   ],

@@ -98,6 +98,17 @@ export const MisconceptionTag = {
   /** F06: escolheu pela impressão global sem contar ou parear quando a diferença deixou de ser óbvia. */
   COMPARA_SEM_CONTAR: "compara-sem-contar",
 
+  /* --- comparação simbólica (ficha F29 / N2.03) -------------------- */
+
+  /** F29: identificou os lados, mas inverteu a direção de > ou <. */
+  INVERTE_SIMBOLO: "inverte-simbolo",
+
+  /** F29: usou igualdade apesar de os dois lados terem valores diferentes. */
+  IGNORA_DIFERENCA: "ignora-diferenca",
+
+  /** F29: sem objetos, escolheu o sinal sem comparar corretamente os valores. */
+  NAO_COMPARA_SIMBOLO: "nao-compara-simbolo",
+
   /* --- sistema decimal (ficha F21 / N2.01) -------------------------- */
 
   /** F21 canônica: contou barra e cubinho como se tivessem o mesmo valor. */

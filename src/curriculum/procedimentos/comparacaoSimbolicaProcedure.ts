@@ -1,5 +1,5 @@
 import { Evidencia } from "../../constants/evidencias";
-import { MisconceptionTagF29 } from "../../constants/misconceptionsF29";
+import { MisconceptionTag } from "../../constants/misconceptions";
 import { AnswerMeta } from "../../types";
 import type { ComparacaoSimbolicaSpec, SimboloComparacao } from "./comparacaoSimbolicaContract";
 
@@ -26,12 +26,12 @@ export function diagnosticarComparacaoSimbolica(
   spec: ComparacaoSimbolicaSpec,
 ): string | undefined {
   if (escolha === spec.resposta) return undefined;
-  if (escolha === "=" && spec.resposta !== "=") return MisconceptionTagF29.IGNORA_DIFERENCA;
-  if (spec.resposta === "=" && escolha !== "=") return MisconceptionTagF29.NAO_COMPARA_SIMBOLO;
+  if (escolha === "=" && spec.resposta !== "=") return MisconceptionTag.IGNORA_DIFERENCA;
+  if (spec.resposta === "=" && escolha !== "=") return MisconceptionTag.NAO_COMPARA_SIMBOLO;
   if ((escolha === ">" || escolha === "<") && (spec.resposta === ">" || spec.resposta === "<")) {
-    return MisconceptionTagF29.INVERTE_SIMBOLO;
+    return MisconceptionTag.INVERTE_SIMBOLO;
   }
-  return MisconceptionTagF29.NAO_COMPARA_SIMBOLO;
+  return MisconceptionTag.NAO_COMPARA_SIMBOLO;
 }
 
 export function evidenciasComparacaoSimbolica(
