@@ -151,7 +151,7 @@ jobs:
   sonda-sensei-dojo:
     name: Sonda real Sensei
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     if: github.event_name == 'pull_request'
 
     steps:
@@ -212,6 +212,18 @@ jobs:
         with:
           name: sonda-f61-${{ github.event.pull_request.head.sha }}
           path: .artifacts/sonda-regua/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F29 — comparação simbólica registrada e inativa
+        run: npm run sonda:comparacao-simbolica
+
+      - name: Evidências da sonda F29
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f29-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-comparacao/
           if-no-files-found: warn
           retention-days: 14
 

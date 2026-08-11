@@ -25,6 +25,7 @@
     "sonda:sensei-dojo": "node scripts/sonda-sensei-dojo.mjs && node scripts/sonda-matricula.mjs",
     "sonda:reta20": "node scripts/sonda-reta20.mjs",
     "sonda:regua": "node scripts/sonda-regua.mjs",
+    "sonda:comparacao-simbolica": "node scripts/sonda-comparacao.mjs",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
