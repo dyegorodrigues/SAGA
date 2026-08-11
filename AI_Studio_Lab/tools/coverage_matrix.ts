@@ -87,6 +87,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F61 materializada com Regua especializada: medida informal→leitura→alinhamento do zero→comparação→estimativa, filtro motor e evidência ALINHOU_ZERO; canário inativo passou suíte completa e Chrome 320/390/900 antes da promoção. A Matrix observou 30 Composer, 38 fallback e 52 servidas após a ativação.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W6-N2.03",
+    competence: "N2.03",
+    rationale: "F29 materializada no specialized builder local Grupo-backed: quantidade→comparação→símbolo, com N1.05/W2 como pré-requisito direto; o legado saiu de produção e a divergência ficha↔screen foi fechada. A Matrix observou 31 Composer, 21 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
