@@ -1,5 +1,10 @@
 # Fluxo Git sem bug — guia bem simples
 
+> [!WARNING]
+> **DOCUMENTO HISTÓRICO / SUPERADO PARA A FÁBRICA ATUAL DO PR #29.**
+> O ritual `merge → apagar branch → fetch → branch nova` abaixo **não se aplica** ao fluxo vigente de `codex/integrar-bloco-f0`.
+> Enquanto o PR #29 estiver no protocolo cumulativo atual, a autoridade operacional é `AI_Studio_Lab/codex/RETOMADA.md`: branch única, main protegida, PR **open + draft + unmerged**, sem merge/rebase/branch auxiliar. Este arquivo é preservado apenas como proveniência de uma política anterior.
+
 Este é o ritual para o proprietário usar depois que o Codex terminar um lote.
 Pense em cada PR como **uma caixa fechada de brinquedos**: primeiro conferimos a
 caixa, depois guardamos na estante `main`, e só então abrimos uma caixa nova.
