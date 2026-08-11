@@ -4,11 +4,24 @@
 **Status:** W6 SELECIONADA · IMPLEMENTAÇÃO NÃO INICIADA  
 **Alvo:** `N2.03 / F29 — Maior, Menor, Igual`  
 **Branch:** `codex/integrar-bloco-f0`  
-**Escopo deste commit:** decisão e handoff; **nenhuma alteração de runtime/currículo executável**.
+**Escopo:** decisão e handoff; **nenhuma alteração de runtime/currículo executável**.
 
 > Este checkpoint é posterior ao fechamento da reconciliação pós-W5/pré-W6. Ele tem precedência **somente** sobre frases anteriores que dizem “W6 não selecionada”. Todo o restante de `RETOMADA.md`, `BRIEFING_CODEX.md`, `HANDOFF_CONTINUIDADE_IA.md`, checkpoint W5, retificação F61 e checkpoint da reconciliação continua vigente.
 >
 > GitHub remoto, PR #29, CI do HEAD e fontes executáveis vencem este texto se houver deriva.
+
+## 0. Errata interna incorporada antes do fechamento
+
+A primeira versão deste checkpoint classificou `Grupo` de forma imprecisa como “primitive já executável para F29”. A revisão adversarial feita **antes de encerrar a rodada** mostrou que isso misturava dois universos:
+
+- `Grupo.tsx` existe e é um componente-base funcional (`items`, clique, seleção e referências geométricas);
+- porém `AI_Studio_Lab/tools/ficha_runtime_map.cjs` prova que **não existe hoje builder/renderer genérico de `Grupo` ligado ao Composer**;
+- o único caminho runtime classificado como executável para a primitive autoral `Grupo` é a substituição deliberada `grandeza/GrandezaStage` da F49/GM.01;
+- portanto F29 **não pode** simplesmente “usar o Grupo já governado” sem nova integração.
+
+A decisão W6 foi recalculada com essa correção. Ela **permanece N2.03**, mas o custo correto é: **builder/Stage especializado F29 composto a partir do componente-base `Grupo`**, ou outra solução igualmente estreita e provada. Não declarar um `groups` genérico só para fazer a Matrix ficar verde sem antes reconciliar as demais fichas que nomeiam `Grupo`.
+
+A mesma revisão eliminou outro falso atalho: `N3.02/F15` usa `EmojiRow#riscar`, mas a escada governada de `emojiRowProcedure.ts` contém hoje `plain → flash → flash-mao → padrao`; `riscar` é um **modo novo**, não uma configuração já pronta.
 
 ## 1. Âncora usada para selecionar
 
@@ -26,7 +39,7 @@ A seleção só foi feita depois de o corpo do PR #29 registrar o recibo canôni
 - transversal `320/900px × 1 semente` verde;
 - review threads abertas: `0`.
 
-A seleção não altera esse snapshot histórico; o próximo CI deve apenas provar que este commit documental não quebrou mecanismos.
+A seleção não altera esse snapshot histórico.
 
 ## 2. Método — sem score mágico
 
@@ -41,7 +54,7 @@ Não foi criado um peso numérico arbitrário. Os candidatos foram comparados po
 7. reuso de primitive;
 8. custo/evidência para implementar com regression-first.
 
-`downstream` fica explícito, mas não é soberano. Da mesma forma, “último blocker” não vira atalho automático.
+`downstream` fica explícito, mas não é soberano. “Último blocker” também não vira atalho automático.
 
 ## 3. Descendentes dos 22 legados
 
@@ -76,34 +89,48 @@ A contagem explica por que `GM.03/Moedas` não pode ser escolhida só por ser o 
 
 ## 4. Shortlist reconciliada
 
-| candidato | downstream | divergência atual | primitive/custo estrutural | leitura |
+| candidato | downstream | divergência atual | custo estrutural comprovado | leitura |
 |---|---:|---|---|---|
-| `N2.02 / F36` | **45** | não | `Quadrado100` é componente isolado; aparece em 10 fichas | maior downstream e grande reuso potencial, mas exige integrar uma primitive ainda fora do builder/renderer do Composer; mudança estrutural maior e a tela legada hoje já é classificada como conforme |
-| `N3.01 / F13` | **44** | não | `VisualAddition` tem renderer, sem builder; 1 ficha | quase máximo downstream, mas precisa inaugurar builder e a tela atual não está na lista das 17 divergências |
-| `N2.03 / F29` | **38** | **sim** | `Grupo` já é executável | combina downstream muito alto, dívida legado, defeito visível real e caminho de implementação com primitive já governada |
-| `N3.03 / F14` | **36** | **sim** | `LinkingCubes` renderer-sem-builder + `NumberLine` | alto impacto, mas carrega primitive incompleta e composição mais complexa |
-| `AL.03 / F30` | **34** | **sim** | `InteractiveNumberLine` + `Quadrado100` isolado | alto impacto, porém depende da integração estrutural do Quadrado100 |
-| `N3.02 / F15` | **33** | **sim + mode swap** | `EmojiRow` já executável; modo `riscar` | candidato forte e barato; a troca de linguagem visual é séria, mas downstream menor que N2.03 e fica excelente contrafactual para a próxima onda |
-| `N4.01 / F97` | **31** | **sim** | `Grupo` já executável | bom custo/benefício, mas mais abaixo na cadeia que N2.03 |
-| `GM.03 / F53+F54` | **0** | **sim + blocker** | `Moedas` renderer-sem-builder; 2 fichas | fecha o último blocker e merece frente próxima, mas baixa alavancagem causal nesta rodada |
+| `N2.02 / F36` | **45** | não | `Quadrado100` é componente isolado, sem builder/renderer; aparece em 10 fichas | maior downstream e reuso potencial enorme, mas abre frente transversal de primitive e a tela legada hoje está conforme |
+| `N3.01 / F13` | **44** | não | `VisualAddition` tem renderer, sem builder; 1 ficha | quase máximo downstream, mas requer integrar builder e não corrige uma das 17 divergências atuais |
+| `N2.03 / F29` | **38** | **sim** | `Grupo.tsx` existe, mas sem dispatch genérico; requer Stage/builder especializado F29 ou integração equivalente estreita | combina downstream muito alto + legado + defeito visual real; a matéria-prima existe e a especialização pode ficar confinada a uma ficha |
+| `N3.03 / F14` | **36** | **sim** | `LinkingCubes` renderer-sem-builder + `NumberLine` | alto impacto, porém composição mais larga e primitive incompleta |
+| `AL.03 / F30` | **34** | **sim** | `InteractiveNumberLine` + `Quadrado100` isolado | alto impacto, mas herda a frente estrutural do Quadrado100 |
+| `N3.02 / F15` | **33** | **sim + mode swap** | `EmojiRow` existe, porém o modo autoral `riscar` **não existe** na escada governada | corrigiria divergência séria, mas introduz nova linguagem visual dentro de primitive compartilhada; exige onboarding e regressões de escada |
+| `N4.01 / F97` | **31** | **sim** | também nomeia `Grupo`; não pode assumir dispatch genérico já existente | bom impacto, mas mais abaixo na cadeia e compartilha a mesma necessidade de reconciliação de `Grupo` |
+| `N3.07 / F33` | **24** | não | `TenFrame` já possui builder/renderer | tecnicamente mais barato e causalmente relevante, porém corrige só legado/proveniência, não uma divergência visível atual |
+| `N3.04 / F31` | **17** | **sim** | `InteractiveNumberLine` já possui builder/renderer | alternativa de menor risco técnico, mas com menos da metade do downstream de N2.03 |
+| `GM.03 / F53+F54` | **0** | **sim + blocker** | `Moedas` renderer-sem-builder; 2 fichas | fecha o último blocker, mas baixa alavancagem causal nesta rodada |
 
 ## 5. Decisão — W6 = `N2.03 / F29`
 
-### Por que vence
+### Por que continua vencendo depois da errata
 
-`N2.03` está no melhor ponto de compromisso entre impacto e risco:
+`N2.03` permanece no melhor ponto de compromisso entre impacto, defeito real e raio controlável:
 
 - é **#3 entre todos os 22 legados em descendência**, com **38 descendentes**;
-- é uma das **17 divergências ficha ↔ tela**: F29 pede `Grupo ×2 + símbolo`, mas o runtime atual entrega apenas pergunta/alternativas;
-- sua ficha autoral está completa e o conceito é claro: **comparar quantidades primeiro; símbolo depois**;
-- a primitive `Grupo` já é **executável** no mapa runtime, portanto a onda não precisa criar/regularizar `Quadrado100`, `VisualAddition`, `LinkingCubes` ou `Moedas` para começar;
-- corrige experiência real da criança, não apenas proveniência arquitetural;
-- remove simultaneamente uma dívida `legado` e uma divergência, sem introduzir uma linguagem visual inédita desnecessária;
-- é upstream de uma parte ampla da estrutura aditiva/multiplicativa, então melhorar sua fidelidade reduz risco conceitual propagado.
+- é uma das **17 divergências ficha ↔ tela**: F29 pede a sequência quantidade→comparação→símbolo; o legado entrega L1–L2 como comparação de dois **numerais por opções**, e só depois usa `> < =`;
+- F29 está autorada de ponta a ponta e deixa a pedagogia testável;
+- `Grupo.tsx` já fornece a matéria-prima visual/interativa; a lacuna é de **integração**, não de inventar uma primitive do zero;
+- um Stage/builder especializado F29 pode ser isolado, como já ocorre legitimamente com outras fichas, sem prometer genericidade para as demais fichas `Grupo`;
+- corrige experiência real da criança e remove simultaneamente uma dívida `legado` e uma divergência;
+- evita, nesta onda, as frentes mais transversais `Quadrado100`, `Moedas` e a escada compartilhada `EmojiRow#riscar`;
+- mantém `N3.04` como fallback de baixo risco caso regression-first prove que a especialização F29 exige raio maior do que o previsto.
+
+### Condição de invalidação da escolha
+
+A seleção **não é dogma**. Antes de implementar, regression-first deve provar que F29 consegue ser materializada com um contrato especializado e escopo local. Se para fazê-la corretamente for necessário:
+
+- criar um `groups` genérico que mude múltiplas fichas;
+- alterar o contrato público de `Grupo` de forma incompatível com F49;
+- introduzir nova regra global de renderer;
+- ou tocar pré-requisitos/learner state para acomodar a UI,
+
+**parar e reabrir a seleção**. Nesse caso, `N3.04/F31` é o contrafactual técnico mais conservador e a Matrix+DAG deve ser novamente registrada antes de trocar a W6.
 
 ### Efeito esperado após ativação, se e somente se a Matrix observar
 
-Não editar a Matrix à mão. O efeito esperado é:
+Não editar a Matrix à mão. Hipótese de ledger:
 
 - Composer: `30 → 31`;
 - legado: `22 → 21`;
@@ -111,28 +138,32 @@ Não editar a Matrix à mão. O efeito esperado é:
 - servidas: `52`;
 - divergências: `17 → 16`;
 - swaps: sem mudança esperada;
-- estreias: sem mudança esperada;
+- estreias: **recalcular**, não assumir; um Stage especializado pode ou não contar como nova linguagem dependendo da gramática visual efetivamente introduzida;
 - blocker `Moedas`: continua aberto.
 
-Esses números são **hipótese de ledger**, não fato, até a implementação ser ativada e a Coverage Matrix derivada confirmar.
+Esses números não são fato até a implementação ser ativada e a Coverage Matrix derivada confirmar.
 
 ## 6. Contrafactuais preservados
 
-### Por que não `N2.02` agora
+### `N2.02`
 
-Tem 45 descendentes e merece prioridade alta, mas a migração Composer exige resolver `Quadrado100` como componente isolado/builder e a tela legada não aparece entre as 17 divergências atuais. É uma frente com ganho arquitetural/reuso enorme, porém maior raio de mudança. Não misturar a integração do `Quadrado100` com a primeira onda pós-reconciliação sem necessidade.
+45 descendentes. Prioridade estrutural altíssima, mas `Quadrado100` está isolado e aparece em 10 fichas. Integrá-lo merece desenho transversal próprio, não carona na primeira onda pós-reconciliação.
 
-### Por que não `N3.01` agora
+### `N3.01`
 
-Tem 44 descendentes, mas `VisualAddition` ainda é renderer-sem-builder e a tela legada atual não aparece como divergente. É ótima candidata depois de criar uma estratégia explícita para builders faltantes.
+44 descendentes. `VisualAddition` possui renderer, sem builder. É excelente candidata, mas a tela legada não está na lista das divergências atuais; N2.03 corrige arquitetura **e** experiência observada.
 
-### Por que não `N3.02` agora
+### `N3.02`
 
-É divergência + `mode swap` perigoso e usa primitive existente. Fica como candidato de altíssimo valor para a onda seguinte. `N2.03` vence por cinco descendentes adicionais e por hoje entregar **nenhuma** representação da ficha, não apenas o modo visual errado.
+33 descendentes + divergência + mode swap. A revisão mostrou que `riscar` não é modo existente da escada `EmojiRow`; introduzi-lo exige decisão/onboarding/regressão de uma primitive compartilhada. Não é o atalho barato que parecia pelo inventário resumido.
 
-### Por que não `GM.03/Moedas` agora
+### `N3.04`
 
-Fechar o último blocker é valioso, mas o nó tem zero descendentes. `Moedas` deve permanecer prioridade arquitetural explícita — potencialmente uma frente de primitive — sem sequestrar a ordem causal da fábrica.
+17 descendentes + divergência e `InteractiveNumberLine` já governada. É o melhor **fallback técnico** se a especialização F29 extrapolar o raio local previsto.
+
+### `GM.03/Moedas`
+
+Último blocker, duas fichas, zero descendentes. Deve continuar prioridade arquitetural explícita, possivelmente numa frente de primitive, sem sequestrar a ordem causal da fábrica.
 
 ## 7. Contrato pedagógico mínimo da W6
 
@@ -141,20 +172,37 @@ Fonte: F29 — **Maior, Menor, Igual**.
 Invariantes que a implementação não pode simplificar para “um quiz de > < =”:
 
 1. a criança **compara antes de simbolizar**;
-2. L1: dois grupos de objetos + jacaré/ponte semântica;
+2. L1: dois grupos de objetos + ponte semântica do jacaré;
 3. L2: grupo vs numeral;
 4. L3: dois numerais até 20;
 5. L4: numerais até 100, só símbolo;
 6. L5: comparar expressões — calcular antes de comparar;
-7. `>`, `<` e `=` precisam manter a orientação semanticamente correta;
-8. erro invertido deve gerar `INVERTE_SIMBOLO`, não ruído motor;
-9. acerto com objetos e erro com numerais deve poder evidenciar `NAO_COMPARA_SIMBOLO`;
-10. domínio exige evidência no nível 3 ou superior;
-11. filtro motor, relógio silencioso, Radar probabilístico, divulgação/casca visual e demais adendos normativos continuam vigentes.
+7. `>`, `<` e `=` mantêm orientação semanticamente correta;
+8. igualdade precisa aparecer de verdade, não como opção decorativa;
+9. erro invertido deve poder gerar `INVERTE_SIMBOLO`, sem confundir ruído motor;
+10. acerto com objetos e erro com numerais deve poder evidenciar `NAO_COMPARA_SIMBOLO`;
+11. domínio exige evidência no nível 3 ou superior;
+12. filtro motor, relógio silencioso, Radar probabilístico, casca visual e demais adendos normativos continuam vigentes.
 
-A metáfora do jacaré é um andaime semântico da ficha. Não torná-la dependência cultural rígida da casca: a casca pode variar, mas a passagem **quantidade → relação → símbolo** deve sobreviver.
+A metáfora do jacaré é andaime semântico, não dependência cultural rígida da casca. A relação **quantidade → relação → símbolo** é o invariante.
 
-## 8. Próxima conversa — ponto exato de entrada
+## 8. Estratégia arquitetural preferida para iniciar W6
+
+Não começar criando um `groups` genérico.
+
+Preferência inicial, a ser validada por testes:
+
+1. ficha TS F29 com contrato explícito;
+2. `comparacaoSimbolicaContract/Procedure` ou nomenclatura equivalente;
+3. Stage especializado F29 que **compõe** dois `Grupo` nos níveis concretos e faz fading até símbolo puro;
+4. kind especializado apenas se necessário, com renderer explícito;
+5. builder especializado registrado no canário para `N2.03`;
+6. registro **inativo** primeiro;
+7. nenhuma alteração em F49/GM.01 nem nas outras fichas que nomeiam `Grupo` sem evidência própria.
+
+Se a implementação revelar uma abstração genérica legítima compartilhável, documentar primeiro os contratos das fichas afetadas; não generalizar retrospectivamente por conveniência de código.
+
+## 9. Próxima conversa — ponto exato de entrada
 
 **Não começar por código.** Reancorar primeiro:
 
@@ -163,45 +211,50 @@ A metáfora do jacaré é um andaime semântico da ficha. Não torná-la depend�
 3. confirmar branch `codex/integrar-bloco-f0` e HEAD remoto;
 4. conferir CI do HEAD e todos os jobs;
 5. conferir review threads;
-6. ler este checkpoint + `RETOMADA.md` + checkpoint da reconciliação + F29.
+6. ler este checkpoint + `RETOMADA.md` + checkpoint da reconciliação + F29 + `ficha_runtime_map.cjs` + `Grupo.tsx`.
 
 Se o remoto ainda concordar, iniciar W6 por:
 
-`regression-first N2.03 → ficha TS/contract/procedure/stage usando Grupo existente → registro INATIVO → suíte + Chrome real/sonda transversal dirigida → canário → Matrix observa → ledger → checkpoint`.
+`regression-first N2.03 → contrato/procedure/Stage especializado e local → ficha TS → registro INATIVO → suíte + Chrome real/sonda dirigida → canário → Matrix observa → ledger → checkpoint`.
 
 Antes da implementação, escrever testes que provem pelo menos:
 
+- paridade/rollback do legado enquanto canário inativo;
 - progressão L1→L5 e transição quantidade→símbolo;
+- L1 realmente mostra duas quantidades comparáveis, não só dois numerais;
+- L2 contém uma representação quantitativa e uma simbólica;
 - orientação correta de `>`/`<`/`=`;
 - igualdade real;
 - L5 compara valores de expressões, não strings;
-- nenhuma resposta correta é revelada visualmente antes da ação;
+- resposta correta não é revelada antes da ação;
 - diagnóstico `INVERTE_SIMBOLO` e `NAO_COMPARA_SIMBOLO` quando aplicável;
-- tap/área motora/acessibilidade;
-- fallback/rollback permanecem íntegros enquanto o canário está inativo;
+- área motora, teclado/leitor e acessibilidade;
+- Stage especializado não altera F49 nem outras fichas `Grupo`;
 - Matrix só muda após ativação real.
 
-## 9. Proibições durante a W6
+## 10. Proibições durante a W6
 
 - não tocar main;
 - não criar branch auxiliar;
 - não tocar Creature Engine;
 - não ativar Thinking Engine;
 - não aproveitar a onda para resolver bundle, Foundry archive, mascotes ou `Moedas`;
-- não introduzir `Quadrado100`/`VisualAddition`/`LinkingCubes` só porque aparecem nos contrafactuais;
+- não introduzir `Quadrado100`/`VisualAddition`/`LinkingCubes` por carona;
+- não criar `groups` genérico sem reconciliar consumers;
 - não alterar pré-requisitos para fazer a escolha parecer melhor;
 - não editar snapshots históricos da Matrix;
 - não considerar “teste verde” suficiente sem tela/experiência e Matrix do mesmo HEAD.
 
-## 10. Regra de parada
+## 11. Regra de parada
 
 Este checkpoint encerra **seleção**, não implementação.
 
-O estado correto ao fim desta conversa é:
+Estado correto ao fim desta conversa:
 
 - W5 fechada;
 - reconciliação pós-W5/pré-W6 fechada;
-- **W6 = N2.03 / F29 selecionada**;
+- **W6 = N2.03 / F29 selecionada com condição de invalidação explícita**;
 - W6 runtime **não iniciado**;
 - PR continua draft/unmerged;
-- próxima conversa pode começar diretamente pela regressão da F29 depois da reancoragem obrigatória.
+- manutenção P2 fica fora da onda;
+- próxima conversa começa pela regressão da F29 após reancoragem obrigatória.
