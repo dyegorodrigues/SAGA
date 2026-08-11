@@ -51,6 +51,49 @@ function stopGroup(proc) {
   try { process.kill(-proc.pid, "SIGTERM"); } catch {}
 }
 
+async function waitForStableGeometry(page, context) {
+  const deadline = Date.now() + 2_500;
+  let previous = null;
+  let stableSamples = 0;
+
+  while (Date.now() < deadline) {
+    const signature = await page.evaluate(() => {
+      const round = value => Math.round(value * 10) / 10;
+      const tracked = [...document.querySelectorAll(
+        "[data-regua-probe], [data-regua-stage], [data-regua-draggable], [data-regua], [data-regua-object]",
+      )].map(el => {
+        const r = el.getBoundingClientRect();
+        return [
+          el.getAttribute("data-regua-stage") ?? "",
+          el.getAttribute("data-regua") ?? "",
+          round(r.left),
+          round(r.right),
+          round(r.top),
+          round(r.bottom),
+          round(r.width),
+          round(r.height),
+        ];
+      });
+
+      return JSON.stringify({
+        innerWidth: window.innerWidth,
+        docScrollWidth: document.documentElement.scrollWidth,
+        bodyScrollWidth: document.body?.scrollWidth ?? 0,
+        tracked,
+      });
+    });
+
+    if (signature === previous) stableSamples += 1;
+    else stableSamples = 0;
+
+    if (stableSamples >= 2) return;
+    previous = signature;
+    await page.waitForTimeout(50);
+  }
+
+  throw new Error(`${context}: geometria não estabilizou em 2,5s`);
+}
+
 async function prepareLevel(page, level, r = 0.5) {
   await page.goto(`${BASE}?level=${level}&r=${r}`, { waitUntil: "networkidle" });
   await page.locator("[data-regua-probe]").waitFor();
@@ -59,6 +102,7 @@ async function prepareLevel(page, level, r = 0.5) {
     await page.locator("[data-regua-estimate-phase] button").first().click();
     await page.locator("[data-regua-draggable]").waitFor();
   }
+  await waitForStableGeometry(page, `F61 L${level}`);
 }
 
 async function alignedGeometry(page) {
@@ -296,6 +340,8 @@ async function exerciseEstimate(page) {
   assert(await page.locator("[data-regua-estimate-phase]").count() === 1, "F61 L5 não começou pela estimativa");
   assert(await page.locator("[data-regua-draggable]").count() === 0, "F61 L5 expôs régua antes da estimativa");
   await page.locator("[data-regua-estimate-phase] button").first().click();
+  await page.locator("[data-regua-tap-align]").waitFor();
+  await waitForStableGeometry(page, "F61 L5 estimativa→medição");
   assert(await page.locator("[data-regua-answer-buttons]").count() === 0, "F61 L5 liberou leitura antes de alinhar após estimar");
   await page.locator("[data-regua-tap-align]").click();
   await assertAlignedGeometry(page, "F61 L5 estimar→alinhar");
