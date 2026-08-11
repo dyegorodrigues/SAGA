@@ -36,6 +36,7 @@ import { TouchPlaceStage } from './primitives/TouchPlaceStage';
 import { CenaDePosicaoStage } from './primitives/CenaDePosicaoStage';
 import { FormaStage } from './primitives/FormaStage';
 import { GrandezaStage } from './primitives/GrandezaStage';
+import { ComparacaoSimbolicaStage } from './primitives/ComparacaoSimbolicaStage';
 import { MedidasStage } from './primitives/MedidasStage';
 import { MolduraStage } from './primitives/MolduraStage';
 import { AudioChoiceStage } from './primitives/AudioChoiceStage';
@@ -48,6 +49,7 @@ import {
 import { Reta20Spec } from '../curriculum/procedimentos/reta20Contract';
 import { diagnosticarReta20, evidenciasReta20 } from '../curriculum/procedimentos/reta20Procedure';
 import { ReguaSpec } from '../curriculum/procedimentos/reguaContract';
+import { ComparacaoSimbolicaSpec } from '../curriculum/procedimentos/comparacaoSimbolicaContract';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -188,6 +190,8 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
       return <MolduraStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
     case 'grandeza':
       return <GrandezaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
+    case 'comparacao-simbolica':
+      return <ComparacaoSimbolicaStage spec={uiProps as ComparacaoSimbolicaSpec} onAnswer={(valor, meta) => handleInteract(valor, meta)} disabled={Boolean(disabled)} />;
     case 'medidas':
       return <MedidasStage spec={uiProps as never} onAnswer={(valor, meta) => onAnswer(valor, evaluate?.(valor) ?? false, meta)} disabled={Boolean(disabled)} />;
     case 'fileira':

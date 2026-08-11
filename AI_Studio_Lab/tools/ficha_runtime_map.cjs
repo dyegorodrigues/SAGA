@@ -59,11 +59,12 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "Grupo",
-    kinds: ["groups", "grandeza"],
-    componentFiles: [component("Grupo"), component("GrandezaStage")],
+    kinds: ["groups", "grandeza", "comparacao-simbolica"],
+    componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage")],
     builderKinds: ["grandeza"],
-    rendererKinds: ["grandeza"],
-    note: "F49/GM.01 nomeia Grupo no cânone, mas o runtime substitui deliberadamente o Grupo genérico por grandeza/GrandezaStage para alinhar as bases e não ensinar comparação visual errada. Grupo.tsx permanece não ligado diretamente.",
+    specializedBuilderIds: ["N2.03"],
+    rendererKinds: ["grandeza", "comparacao-simbolica"],
+    note: "F49/GM.01 continua em grandeza/GrandezaStage. W6/F29/N2.03 reutiliza o mesmo Grupo por builder especializado local e emite comparacao-simbolica; não existe dispatch genérico `groups` novo.",
   },
   {
     primitive: "InteractiveNumberLine",

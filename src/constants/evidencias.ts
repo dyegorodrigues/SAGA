@@ -119,6 +119,14 @@ export const Evidencia = {
    * Régua já alinhada pelo app não satisfaz esta evidência.
    */
   ALINHOU_ZERO: "alinhou-zero",
+
+  /**
+   * F29 (N2.03): um acerto simbólico no L3+ sem objetos de apoio.
+   *
+   * É a retirada verificável do andaime concreto: comparar grupos não basta
+   * para provar que >, < e = foram compreendidos como registro da relação.
+   */
+  COMPARACAO_SIMBOLICA_SEM_OBJETOS: "comparacao-simbolica-sem-objetos",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

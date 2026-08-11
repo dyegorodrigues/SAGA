@@ -154,7 +154,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
-  "touchplace", "shapecanvas", "grandeza", "medidas", "moldura", "material-dourado",
+  "touchplace", "shapecanvas", "grandeza", "comparacao-simbolica", "medidas", "moldura", "material-dourado",
   "numberline-f19", "regua-f61",
 ]);
 

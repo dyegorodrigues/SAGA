@@ -20,6 +20,7 @@ import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_12 } from "../fichas/jornada/N1.12";
 import { N1_13 } from "../fichas/jornada/N1.13";
 import { N2_01 } from "../fichas/jornada/N2.01";
+import { N2_03 } from "../fichas/jornada/N2.03";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
 import { GM_01 } from "../fichas/jornada/GM.01";
@@ -31,6 +32,7 @@ import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
+import { construirComparacaoSimbolicaQuestion } from "../procedimentos/comparacaoSimbolicaContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
 import { construirReta20Question } from "../procedimentos/reta20Contract";
 import { construirReguaQuestion } from "../procedimentos/reguaContract";
@@ -89,6 +91,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
 
   "N2.01": N2_01,
 
+  // W6: F29 registrada, mas INATIVA. Reusa Grupo aprendido em N1.05 e só
+  // será promovida após suíte, a11y e Chrome real no mesmo contrato.
+  "N2.03": N2_03,
+
   "AL.01": AL_01,
   "AL.02": AL_02,
 
@@ -112,6 +118,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N1.09": construirContagem20Question,
   "N1.12": construirReta20Question,
   "N2.01": construirDezenaUnidadesQuestion,
+  "N2.03": construirComparacaoSimbolicaQuestion,
   "GM.02": construirTempoCotidianoQuestion,
   "GM.05": construirReguaQuestion,
 };
@@ -124,6 +131,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
 const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N1.12": "numberline-f19",
   "N2.01": "material-dourado",
+  "N2.03": "comparacao-simbolica",
   "GM.05": "regua-f61",
 };
 
