@@ -8,7 +8,19 @@ import type { AnswerMeta } from "../src/types";
 const params = new URLSearchParams(location.search);
 const level = Math.max(1, Math.min(5, Number(params.get("level") ?? 3) || 3));
 const raw = Math.max(0, Math.min(0.999, Number(params.get("r") ?? 0.5) || 0.5));
-const spec = construirReguaSpec(level, () => raw);
+const objectParam = params.get("obj");
+const objectRaw = objectParam === null
+  ? null
+  : Math.max(0, Math.min(0.999, Number(objectParam) || 0));
+
+// Para QA visual, `obj` permite variar somente a segunda chamada do sorteio —
+// a escolha do objeto nos níveis simples — sem mudar o comprimento testado.
+let sorteioCall = 0;
+const spec = construirReguaSpec(level, () => {
+  sorteioCall += 1;
+  if (objectRaw !== null && sorteioCall === 2) return objectRaw;
+  return raw;
+});
 
 interface Receipt {
   value: string;
@@ -29,6 +41,7 @@ function Probe() {
         data-offset={spec.offsetInicialCm}
         data-correct={spec.resposta}
         data-value={spec.valorCerto ?? ""}
+        data-object-kind={spec.itens[0]?.id.replace(/-(?:a|b)$/, "") ?? ""}
         data-answer={receipt?.value ?? ""}
         data-misconception={receipt?.meta.misconception ?? ""}
         data-evidencias={(receipt?.meta.evidencias ?? []).join("|")}
