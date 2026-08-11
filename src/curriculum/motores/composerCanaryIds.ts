@@ -44,6 +44,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // inativo passar suíte completa + Chrome real 320/390/900, L1–L5, tap/drag.
   "GM.05",
 
+  // W6 — F29: comparação simbólica Grupo-backed. N1.05/W2 é pré-requisito
+  // direto; promoção somente após suíte e Chrome real da ficha registrada/inativa.
+  "N2.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
