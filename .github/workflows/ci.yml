@@ -239,6 +239,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Sonda real F13 — VisualAddition registrado e inativo
+        run: npm run sonda:visual-addition
+
+      - name: Evidências da sonda F13
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f13-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-visual-addition/
+          if-no-files-found: warn
+          retention-days: 14
+
   higiene-diff:
     name: Higiene do diff
     runs-on: ubuntu-latest
