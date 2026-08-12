@@ -51,6 +51,8 @@ export function Quadrado100({
           const isTarget = targetNumber === n;
           const isHidden = hiddenNumbers.includes(n) && !revealedNumbers.includes(n);
           const isIncorrect = incorrectNumber === n;
+          const linha = Math.floor(i / 10) + 1;
+          const coluna = (i % 10) + 1;
 
           let bgColor = tokens.cor.superficie.cartao;
           let textColor = tokens.cor.texto.principal;
@@ -74,7 +76,10 @@ export function Quadrado100({
               animate={isIncorrect ? { x: [0, -3, 3, -3, 0] } : { x: 0 }}
               onClick={() => handleToggle(n)}
               disabled={!interactive}
-              aria-label={isHidden ? `Casa vazia na posição ${n}` : `Número ${n}`}
+              // A casa oculta não pode anunciar o próprio numeral no leitor de
+              // tela; isso entregaria a resposta. Linha/coluna preservam a mesma
+              // estrutura espacial que a criança vidente recebe pelo quadro.
+              aria-label={isHidden ? `Casa vazia, linha ${linha}, coluna ${coluna}` : `Número ${n}`}
               data-quadrado100-cell={n}
               data-hidden={isHidden ? 'true' : 'false'}
               className={`flex items-center justify-center font-bold text-[10px] min-[360px]:text-xs sm:text-sm ${interactive ? 'cursor-pointer' : ''} disabled:cursor-default`}
