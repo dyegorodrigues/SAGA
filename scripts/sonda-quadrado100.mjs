@@ -98,8 +98,12 @@ function assertContract(data, width, level) {
   const hiddenSet = new Set(data.hidden);
   for (const cell of data.cells.filter(cell => cell.hidden)) {
     assert(hiddenSet.has(cell.n), `F36 L${level} ocultou casa fora do contrato: ${cell.n}`);
-    assert(!cell.text.includes(String(cell.n)), `F36 L${level} vazou ${cell.n} no texto visível`);
-    assert(!cell.aria.includes(String(cell.n)), `F36 L${level} vazou ${cell.n} no nome acessível`);
+    assert(cell.text.trim() === "•", `F36 L${level} vazou ${cell.n} no texto visível`);
+    // Linha/coluna são informação espacial legítima e podem coincidir por acaso
+    // com o numeral escondido (ex.: casa 7 na linha 1, coluna 7). O vazamento
+    // real é nomear a casa como "Número N" enquanto ela está oculta.
+    assert(!cell.aria.includes(`Número ${cell.n}`), `F36 L${level} vazou ${cell.n} como resposta no nome acessível`);
+    assert(cell.aria.startsWith("Casa vazia"), `F36 L${level} perdeu o nome acessível de casa vazia`);
   }
 
   if (level === 1) {
