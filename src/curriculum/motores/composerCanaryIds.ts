@@ -62,6 +62,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // 320/390/900 ficaram verdes no SHA inativo 4218ac68 antes da promoção.
   "N3.02",
 
+  // W10 — F14: counting on por estratégia. O Stage composto LinkingCubes +
+  // NumberLine, diagnóstico da partida e resolução R0-A passaram suíte + Chrome
+  // 320/390/900 + transversal 390×8 no SHA inativo 8ee8cad1 antes da promoção.
+  "N3.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
