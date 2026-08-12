@@ -16,8 +16,10 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "DragGroup: executável | kinds=draggroup+pareamento+classificacao | builder=draggroup+pareamento+classificacao | renderer=draggroup+pareamento+classificacao",
     );
+    // W9/F15: continua sendo a MESMA primitiva EmojiRow. O modo riscar ganha
+    // owner especializado local e kind autoral sem abrir um builder genérico novo.
     expect(output).toContain(
-      "EmojiRow: executável | kinds=emojirow+fileira+moldura | builder=emojirow+fileira+moldura | renderer=emojirow+fileira+moldura",
+      "EmojiRow: executável | kinds=emojirow+fileira+moldura+emojirow-riscar-f15 | builder=emojirow+fileira+moldura+special:N3.02 | renderer=emojirow+fileira+moldura+emojirow-riscar-f15",
     );
     expect(output).toContain(
       "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica | builder=grandeza+special:N2.03 | renderer=grandeza+comparacao-simbolica",
@@ -44,7 +46,7 @@ describe("mapa autoral de fichas para o runtime", () => {
       "VisualAddition: executável | kinds=visual-addition+visual-addition-f13+subvis | builder=special:N3.01 | renderer=visual-addition+visual-addition-f13",
     );
 
-    // Lacunas reais permanecem visíveis: W8 não inventa builder para os demais.
+    // Lacunas reais permanecem visíveis: W8/W9 não inventam builder para os demais.
     expect(output).toContain("LinkingCubes: renderer-sem-builder");
     expect(output).toContain("Moedas: renderer-sem-builder");
     expect(output).toContain("SingaporeBars: renderer-sem-builder");
