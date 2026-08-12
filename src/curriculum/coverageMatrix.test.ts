@@ -18,45 +18,18 @@ describe("Coverage Matrix executável", () => {
       divergences: 21,
     });
     expect(COVERAGE_MIGRATIONS).toEqual([
-      expect.objectContaining({
-        id: "W1-N1.04",
-        competence: "N1.04",
-        delta: { divergences: -1 },
-      }),
-      expect.objectContaining({
-        id: "W2-N1.05",
-        competence: "N1.05",
-        delta: { composer: 1, legacy: -1, divergences: -1 },
-      }),
-      expect.objectContaining({
-        id: "W3-N2.01",
-        competence: "N2.01",
-        delta: { composer: 1, legacy: -1, divergences: -1 },
-      }),
-      expect.objectContaining({
-        id: "W4-N1.12",
-        competence: "N1.12",
-        delta: { composer: 1, legacy: -1, divergences: -1 },
-      }),
-      expect.objectContaining({
-        id: "W5-GM.05",
-        competence: "GM.05",
-        delta: { composer: 1, fallback: -1, served: 1 },
-      }),
-      expect.objectContaining({
-        id: "W6-N2.03",
-        competence: "N2.03",
-        delta: { composer: 1, legacy: -1, divergences: -1 },
-      }),
-      expect.objectContaining({
-        id: "W7-N2.02",
-        competence: "N2.02",
-        delta: { composer: 1, legacy: -1 },
-      }),
+      expect.objectContaining({ id: "W1-N1.04", competence: "N1.04", delta: { divergences: -1 } }),
+      expect.objectContaining({ id: "W2-N1.05", competence: "N1.05", delta: { composer: 1, legacy: -1, divergences: -1 } }),
+      expect.objectContaining({ id: "W3-N2.01", competence: "N2.01", delta: { composer: 1, legacy: -1, divergences: -1 } }),
+      expect.objectContaining({ id: "W4-N1.12", competence: "N1.12", delta: { composer: 1, legacy: -1, divergences: -1 } }),
+      expect.objectContaining({ id: "W5-GM.05", competence: "GM.05", delta: { composer: 1, fallback: -1, served: 1 } }),
+      expect.objectContaining({ id: "W6-N2.03", competence: "N2.03", delta: { composer: 1, legacy: -1, divergences: -1 } }),
+      expect.objectContaining({ id: "W7-N2.02", competence: "N2.02", delta: { composer: 1, legacy: -1 } }),
+      expect.objectContaining({ id: "W8-N3.01", competence: "N3.01", delta: { composer: 1, legacy: -1 } }),
     ]);
     expect(COVERAGE_BASELINE).toMatchObject({
-      composer: 32,
-      legacy: 20,
+      composer: 33,
+      legacy: 19,
       fallback: 38,
       served: 52,
       divergences: 16,
