@@ -151,7 +151,7 @@ jobs:
   sonda-sensei-dojo:
     name: Sonda real Sensei
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     if: github.event_name == 'pull_request'
 
     steps:
@@ -224,6 +224,18 @@ jobs:
         with:
           name: sonda-f29-${{ github.event.pull_request.head.sha }}
           path: .artifacts/sonda-comparacao/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F36 — Quadrado100 registrado e inativo
+        run: npm run sonda:quadrado100
+
+      - name: Evidências da sonda F36
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f36-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-quadrado100/
           if-no-files-found: warn
           retention-days: 14
 
