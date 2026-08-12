@@ -1,74 +1,113 @@
 # Estado do Fechamento Curricular — SAGA
 
 **Data de abertura desta linha:** 11/08/2026  
-**Última atualização:** 12/08/2026 — fechamento final da W8 / abertura regression-first da W9  
+**Última atualização:** 12/08/2026 — W9 fechada / contrato de resolução costurado antes da W10  
 **Branch:** `codex/fechamento-curricular`  
-**PR:** #35 — draft  
-**Fonte de verdade:** GitHub remoto + gates executáveis. Este arquivo é um checkpoint de retomada, não substitui evidência remota.
+**PR:** #35 — draft, open, unmerged  
+**Fonte de verdade:** GitHub remoto + gates executáveis. Este arquivo é checkpoint de retomada; a evidência remota do mesmo SHA prevalece.
 
 ## Estado operacional
 
-HEAD comprovado antes deste checkpoint: `46dd06d40bec980e25ec87a3581e9e95f2710d02`; o próprio checkpoint/regression-first cria o SHA seguinte.  
-CI comprovado desse HEAD: #1163 / run `31590118288` — **success em 6/6 jobs**, incluindo Gates, Sensei real, 320/900 e transversal `390px × 8 sementes`.  
+HEAD de produto comprovado antes deste checkpoint: `4dec3ad576d8ae57490f535b58bd9103282758d9`.  
+CI desse HEAD: #1177 / run `31628659208` — **success em 6/6 jobs**, incluindo Gates do SAGA, Sensei/F13/F15 em Chrome real, transversal 320/900 e transversal `390px × 8 sementes`.  
 Bloco 0 — **CONCLUÍDO**.  
-Bloco 1 — **EM EXECUÇÃO**. W7 e W8 fechadas; W9 selecionada e iniciada por regression-first.  
-Matrix após W8: `33 Composer / 19 legado / 38 fallback / 52 servidas / 16 divergências / 12 swaps / 44 estreias`.  
-Ondas fechadas nesta linha: W7 `N2.02/F36`; W8 `N3.01/F13`.  
-Próxima sequência autorizada: W9 `N3.02/F15` → W10 `N3.03/F14` → W11 `AL.03/F30` → W12 `N4.01/F97`, sem consulta intermediária salvo condição de parada.
+Bloco 1 — **EM EXECUÇÃO**. W7, W8 e W9 fechadas.  
+Matrix pós-W9: `34 Composer / 18 legado / 38 fallback / 52 servidas / 15 divergências / 12 swaps / 44 estreias`.  
+Ondas fechadas nesta linha: W7 `N2.02/F36`; W8 `N3.01/F13`; W9 `N3.02/F15`.  
+Próxima sequência operacional: **R0-A (Contrato de Resolução, sem delta de Matrix) → W10 `N3.03/F14` → W11 `AL.03/F30` → W12 `N4.01/F97`**.
 
 ## Recibo do Bloco 0
 
-1. PR #29 foi reancorado no remoto ainda `open + draft + unmerged`, com head exato `5d3daa1b5735be725319e0d463af13f0f5d17fce`.
-2. CI #1085 / run `31548303226` do head tinha `success` em 6/6 jobs, incluindo transversal `390px × 8 sementes`.
-3. Review threads abertas: `0`; reviews submetidas: `0`.
-4. W6 `N2.03 / F29` estava fechada e o checkpoint de retificação pós-auditoria estava presente. A retificação observada no código preservava L2 até 10, L5 com parcela compartilhada e posição da parcela compartilhada sorteada, RT silencioso de 8 s e nenhum delta de Matrix.
-5. `main` permanecia em `68fad4c575e28959b2ca4776e9a541d6828b63f3`; a branch estava `964` commits à frente e `0` atrás.
-6. `firestore.rules` tinha o mesmo blob SHA `fab313c11e0d3f1a55aa568818625e372bf40fa9` em `main` e na branch. O único workflow de publicação é `deploy-rules.yml`, condicionado a push em `main` com mudança em `firestore.rules` ou no próprio workflow. O merge não alterou esses arquivos.
-7. O autor autorizou expressamente o portão humano do Bloco 0 nesta retomada e os documentos de Claude Code de 11/08/2026 mandavam, sob essas precondições, merge por **merge commit**, sem squash.
-8. PR #29 foi retirado de draft e mesclado com `expected_head_sha=5d3daa1b...`. Merge commit: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`.
-9. A branch histórica `codex/integrar-bloco-f0` foi preservada.
-10. `codex/fechamento-curricular` foi criada exatamente de `106dfe0d...`.
-11. O novo PR não pôde ser aberto enquanto a branch era idêntica à `main`; não foi criado commit vazio artificial.
-12. O primeiro CI pós-merge em `main` (#1086) expôs flake em `reta20Boundary.test.tsx`: F19 nível 3 podia sortear `1 → 0`, deixando o helper do teste sem vizinho ±1 distinto da origem. A causa era fixture aleatória do gate, não runtime nem expectativa pedagógica.
-13. O reparo foi feito apenas na nova branch em `102699fb`: a fixture do teste foi tornada determinística com `Math.random = 0.5` via spy local; runtime e contrato F19 ficaram intocados.
-14. A reexecução do mesmo SHA da `main` passou no Gates, confirmando a natureza amostral do defeito. O reparo determinístico permanece na linha nova para remover a recorrência.
-15. Com o primeiro diff real, o PR #35 foi aberto em draft para `main`.
+1. PR #29 foi reancorado no remoto em `5d3daa1b5735be725319e0d463af13f0f5d17fce` com CI #1085 / run `31548303226` integralmente verde.
+2. W6 `N2.03/F29` estava fechada e retificada; nenhum review thread permanecia aberto.
+3. O merge do PR #29 foi autorizado pelo autor e executado por merge commit, com `expected_head_sha`; merge commit `106dfe0d796babebe40ebc36e5a84d4a80b9a858`.
+4. A branch histórica `codex/integrar-bloco-f0` foi preservada e `codex/fechamento-curricular` nasceu exatamente do merge.
+5. O flake pós-merge da fixture F19 foi reparado somente na nova branch, sem alterar runtime ou expectativa pedagógica.
+6. O PR #35 foi aberto em draft no primeiro diff legítimo e continua sendo a única linha desta fábrica.
 
 ## W7 — N2.02 / F36 — FECHADA
 
-- `Quadrado100` ganhou owner executável por specialized builder local e `Quadrado100Stage`, sem criar dispatch genérico morto.
-- A estreia visual recebeu onboarding explícito e a ficha preservou +1 horizontal, +10 vertical, +5, vizinhos e lacunas, com evidência de percurso vertical.
-- O legado saiu de produção somente após suíte completa, Chrome 320/390/900 e transversal 390×8 verdes.
-- Recibo final: HEAD `88fbeb40…`, CI #1129 **6/6 verde**.
-- Delta observado e registrado no ledger: `{ composer: +1, legacy: -1 }`.
+- `Quadrado100` ganhou owner executável por specialized builder local e `Quadrado100Stage`.
+- Onboarding explícito; +1 horizontal, +10 vertical, +5, vizinhos e lacunas preservados.
+- Promoção somente após suíte, Chrome 320/390/900 e transversal 390×8 verdes.
+- Recibo: HEAD `88fbeb40…`, CI #1129 verde.
+- Delta: `{ composer: +1, legacy: -1 }`.
 - Matrix pós-W7: `32 / 20 / 38 / 52 / 16`.
 
 ## W8 — N3.01 / F13 — FECHADA
 
-- `VisualAddition` foi mantida como superfície compartilhada; F13 ganhou specialized builder e `VisualAdditionStage` próprios. Não houve promoção mecânica do renderer legado.
-- Escada autoral comprovada: objetos+numerais → numerais nos contêineres no L4 → símbolo puro no L5; L4 emite evidência `adicao-sem-objetos`; L5 usa relógio silencioso de 5 s.
-- O onboarding da estreia foi validado em Chrome real. Uma duplicação visual da equação em L5 foi descoberta por screenshot e corrigida antes da promoção.
-- A cadeia inativa passou 6/6. Depois da promoção, o gate genérico detectou que `visual-addition-f13` possuía teclado autoral mas não estava declarado em `PALCOS_QUE_RESPONDEM`, permitindo uma segunda superfície genérica de resposta. Foi corrigida a **fonte**, adicionando o kind autoral ao boundary, sem afrouxar o teste.
-- O teste regression-first da W8 foi então convertido em contrato pós-promoção, pois a expectativa de canário inativo havia cumprido sua função e se tornara historicamente obsoleta.
-- Recibo final: HEAD `46dd06d40bec980e25ec87a3581e9e95f2710d02`, CI #1163 / run `31590118288` — **6/6 verde**.
-- Delta observado e registrado no ledger: `{ composer: +1, legacy: -1 }`.
-- Matrix pós-W8: `33 Composer / 19 legado / 38 fallback / 52 servidas / 16 divergências / 12 swaps / 44 estreias`.
+- F13 ganhou specialized builder e `VisualAdditionStage` próprios, mantendo `VisualAddition` como superfície compartilhada.
+- Escada: objetos+numerais → numerais nos contêineres no L4 → símbolo puro no L5; evidência `adicao-sem-objetos`; RT silencioso de 5 s no L5.
+- Screenshots descobriram duplicação visual no L5 e o gate pós-promoção descobriu duplicidade de superfície de resposta; ambas foram corrigidas na fonte.
+- Recibo final: HEAD `46dd06d40bec980e25ec87a3581e9e95f2710d02`, CI #1163 / run `31590118288` — 6/6.
+- Delta: `{ composer: +1, legacy: -1 }`.
+- Matrix pós-W8: `33 / 19 / 38 / 52 / 16`.
 
-## W9 — N3.02 / F15 — SELEÇÃO E PRECEDENTE
+## W9 — N3.02 / F15 — FECHADA
 
-- Seleção causal confirmada: `N3.02` depende diretamente de `N3.01`; W8 precisa estar fechada antes da promoção de W9.
-- F15 exige `EmojiRow#riscar`, enquanto o legado `subvis` apresenta a leitura pronta em vez de fazer a criança executar o ato de tirar.
-- Esta é a primeira **troca de modo visual** tratada como precedente: o gate de estreia de ferramenta não basta, porque um `tutorial` genérico pode existir sem ensinar o significado novo do X.
-- Regra dura desta onda: o primeiro degrau do modo `riscar` precisa ensinar que **X = saiu / foi removido**, mantendo o item marcado no mesmo lugar, **antes** de existir cobrança de conteúdo ou superfície de resposta.
-- O acerto corrigido depois de `RESPONDE_O_REMOVIDO` continua sendo tentativa real e continua alimentando feedback/Radar, mas não pode comprar a sequência 3/3 de domínio da ficha.
-- Implementação prevista: `EmojiRow` estendido de forma retrocompatível + `EmojiRowRiscarStage` autoral + specialized builder local + runtime kind próprio. N3.02 permanece fora do canário durante todo o portão inativo.
-- O regression-first desta atualização deve ficar vermelho apenas porque ficha/owner especializado ainda não existem; nenhuma expectativa funcional será relaxada para torná-lo verde.
+### Contrato pedagógico preservado
+
+- F15 usa `EmojiRow#riscar`: a criança executa a retirada em vez de receber leitura pronta.
+- O primeiro degrau alfabetiza explicitamente **X = saiu / foi removido** antes de cobrança de conteúdo.
+- O objeto riscado permanece no mesmo slot; a marcação não pode deslocar o objeto.
+- O acerto corrigido após `RESPONDE_O_REMOVIDO` continua sendo tentativa real e alimenta feedback/Radar, mas não compra independência/domínio.
+- O palco autoral responde no próprio `EmojiRowRiscarStage`; `q.options` permanece catálogo diagnóstico, não é a grade visual do teclado.
+
+### Recibo técnico
+
+1. Implementação inativa: ficha N3.02, specialized builder, runtime kind `emojirow-riscar-f15`, Stage, contrato procedural, semântica, mastery correction, a11y e sonda Chrome.
+2. CI #1168 identificou deslocamento real do slot fantasma (`dx=2`, `dw/dh=4`) causado por borda; a fonte foi corrigida para `outline` no commit `4218ac68…`.
+3. CI #1169 / run `31597318974` comprovou a cadeia inativa verde, incluindo F15 em Chrome real (`15 cenários + 12 passos`).
+4. Promoção declarativa de `N3.02` entrou no canário; o gate genérico passou a registrar a ficha no contrato e o teste regression-first foi convertido em pós-promoção.
+5. A primeira execução pós-promoção fez a Matrix ficar vermelha em `34 Composer / 18 legado`: isto foi tratado como **observação**, não como erro a esconder.
+6. O auditor da Coverage Matrix ainda achatava `emojirow-riscar-f15 + modo=riscar` para `EmojiRow`; a ponte de observabilidade foi corrigida para qualificar `EmojiRow#riscar`.
+7. Ledger W9 registrado com delta `{ composer: +1, legacy: -1, divergences: -1 }`; snapshot P21.1 permaneceu imutável.
+8. O canary contract revelou que F15 usa teclado autoral 0–10 enquanto `q.options` guarda alternativas diagnósticas. O gate foi especializado para validar **as duas superfícies**, sem relaxamento de cobertura.
+9. A sonda F13 apresentou 404 anônimo num run pós-promoção; o portão foi fortalecido para registrar URL/status HTTP e localização de `console.error`. No HEAD final F13 e F15 passaram em sequência.
+10. Recibo de produto: HEAD `4dec3ad576d8ae57490f535b58bd9103282758d9`, CI #1177 / run `31628659208` — **6/6 verde**.
+
+### Matrix pós-W9
+
+`34 Composer / 18 legado / 38 fallback / 52 servidas / 15 divergências / 12 swaps / 44 estreias`.
+
+## Costura nova — Motor de Resolução
+
+Os documentos `MOTOR_DE_RESOLUCAO.md`, `MOTOR_DE_RESOLUCAO_PARTE_2_DESIGN.md` e `MENSAGEM_PARA_O_CODEX.md` foram auditados no checkpoint correto da W9, como solicitado pelo próprio pacote.
+
+A análise completa e as correções ao plano estão em:
+
+`AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`
+
+Decisão de ordem:
+
+- **não** retroagir W7/W8/W9 agora;
+- **não** começar pela conta armada;
+- inserir **R0-A — Contrato de Resolução** imediatamente antes da W10;
+- R0-A é infraestrutura técnica, **não** uma migração de Coverage Matrix e não ganha delta fictício no ledger curricular;
+- a W10/N3.03/F14 será a primeira competência nova obrigada a nascer emitindo `resolucao()` tipada; W11 e W12 herdam o contrato;
+- comportamento runtime do tutor (player manual, pausa de RT, faixa do tutor, item espelho) fica fora de R0-A e entra em fase posterior, depois que o contrato de dados estiver provado.
+
+## R0-A — critérios antes de W10
+
+R0-A deve seguir regression-first, mas sem promover competência:
+
+1. consolidar `TutStep` em uma única definição de tipo e evitar um terceiro dialeto de tutorial;
+2. criar `PassoDeResolucao<TShow>` e `Question.resolucao` sem React/DOM;
+3. criar utilitários puros de entrada por equívoco e estado visual anterior ao passo;
+4. preferir `show` como snapshot declarativo tipado por família/palco, não sequência imperativa dependente de timing;
+5. `corrige` é índice semântico; `parcial` é invariante/estado, não substituto de diagnóstico;
+6. teste universal: caminho declarado termina na resposta quando a família possuir resposta escalar/validável;
+7. teste: misconceptions geráveis pela família que declara resolução têm ao menos um passo corretivo ou fallback explícito;
+8. portões de dependência: procedimento não importa React; primitives/Stages não importam currículo para interpretar resolução;
+9. **nenhuma alteração em GameLoop/UI na R0-A**;
+10. Matrix permanece exatamente `34/18/38/52/15` após R0-A.
 
 ## Ordem causal restante do Bloco 1
 
-- W10 `N3.03/F14` — `LinkingCubes + NumberLine`; deve declarar builder e owner de `LinkingCubes`.
-- W11 `AL.03/F30` — `InteractiveNumberLine + Quadrado100`; herda a infraestrutura comprovada na W7. Neste mesmo escopo, reconciliar os falsos negativos de observabilidade de `Quadrado100` já renderizado em N4.03/N4.07, se a prova runtime confirmar no HEAD da onda.
-- W12 `N4.01/F97` — `Grupo ×N`; só pode fechar depois de N3.03 + AL.03 porque ambos são pré-requisitos diretos no DAG.
+- R0-A — contrato técnico de resolução; sem Coverage delta.
+- W10 `N3.03/F14` — `LinkingCubes + NumberLine`; primeira adoção obrigatória de `resolucao()` tipada e owner de `LinkingCubes`.
+- W11 `AL.03/F30` — `InteractiveNumberLine + Quadrado100`; nasce sob o mesmo contrato.
+- W12 `N4.01/F97` — `Grupo ×N`; só fecha depois de N3.03 + AL.03 e também nasce sob o contrato.
 
 ## Critério de saída do Bloco 1
 
@@ -77,30 +116,25 @@ Próxima sequência autorizada: W9 `N3.02/F15` → W10 `N3.03/F14` → W11 `AL.0
 - divergências ≤ 10;
 - `Quadrado100`, `VisualAddition` e `LinkingCubes` com builder e owner declarados;
 - nenhuma promoção sem portão inativo + Chrome real + CI do mesmo SHA;
-- snapshots históricos permanecem imutáveis; somente o ledger registra deltas observados.
+- snapshots históricos permanecem imutáveis; somente o ledger registra deltas observados;
+- R0-A não falsifica Matrix nem conta como competência fechada.
 
-## Decisões autônomas
+## Decisões autônomas vigentes
 
-- **Merge do Bloco 0 executado** sob autorização humana, por merge commit e `expected_head_sha`.
-- **Nenhum patch direto na `main`**; toda correção desta linha vive em `codex/fechamento-curricular`.
-- **Flake tratado como defeito da fixture**, sem mudar runtime ou expectativa pedagógica.
-- **W8 corrigiu a fonte, não a expectativa:** a duplicidade de superfície de resposta foi eliminada no boundary de autoria.
-- **Modo visual ≠ ferramenta nova:** W9 cria um gate de alfabetização de modo em vez de reutilizar silenciosamente o onboarding genérico.
-- **Creature Engine e Thinking Engine runtime continuam fora do escopo.**
-
-## Discordâncias / correções ao plano externo
-
-1. `PLANO_ATE_O_FIM.md` agrupava `ShapeCanvas` entre primitivas "renderer sem builder". O remoto contradiz essa classificação: `ShapeCanvas` já possui builder/renderer executável e atende F47/GE.01 e F48/GE.02. No Bloco 2, as seis competências GE pendentes são conteúdo/contrato, não criação de primitiva.
-2. Os renderer-sem-builder reais antes destas ondas eram `VisualAddition`, `LinkingCubes`, `SingaporeBars` e `Moedas`; W8 resolveu `VisualAddition` por owner especializado local.
-3. Em CI de `push` para `main`, não declarar 6/6 quando os jobs condicionados a PR são `skipped`. Em PR, o recibo 6/6 exige efetivamente os seis jobs concluídos em `success`.
+- Nenhum patch direto na `main`; trabalho somente em `codex/fechamento-curricular`.
+- PR #35 permanece draft; nenhum merge sem nova autorização humana explícita.
+- Creature Engine continua fora do escopo desta linha.
+- Thinking Engine runtime continua não autorizado.
+- Gate vermelho é evidência: corrigir fonte/observabilidade/contrato, não diminuir a expectativa.
+- Nenhuma faxina P2 oportunista; limpeza do legado vertical só no escopo em que a resolução vertical for atacada.
 
 ## Condições de parada
 
-Só escalar ao autor antes do fechamento do Bloco 1 se ocorrer uma destas condições:
+Escalar ao autor antes do fechamento do Bloco 1 somente se ocorrer:
 
 1. rejeição humana de versão visual;
 2. necessidade real de afrouxar um gate;
-3. condição de invalidação do plano;
-4. decisão que altere arquitetura ou pré-requisitos.
+3. invalidação do plano/DAG;
+4. decisão que altere arquitetura ou pré-requisitos fora da costura já registrada.
 
-Fora disso, decidir localmente, registrar aqui, provar no remoto e seguir a próxima onda.
+Fora disso: decidir localmente, registrar, provar no remoto e seguir R0-A → W10 → W11 → W12.
