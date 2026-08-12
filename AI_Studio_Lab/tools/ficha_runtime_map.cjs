@@ -104,11 +104,12 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "NumberLine", kinds: ["numberline"], componentFiles: [component("NumberLine")], builderKinds: ["numberline"], rendererKinds: ["numberline"] },
   {
     primitive: "Quadrado100",
-    kinds: ["hundred-chart", "frac-shade"],
-    componentFiles: [component("Quadrado100")],
+    kinds: ["hundred-chart", "frac-shade", "quadrado100-f36"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage")],
     builderKinds: [],
-    rendererKinds: [],
-    note: "Componente existe, porém nenhum builder Composer nem dispatch hundred-chart/frac-shade foi comprovado; importar o componente sem case não conta como runtime executável.",
+    specializedBuilderIds: ["N2.02"],
+    rendererKinds: ["quadrado100-f36"],
+    note: "W7/F36/N2.02 torna o antigo componente isolado executável por builder especializado local e Quadrado100Stage. Não existe dispatch genérico hundred-chart/frac-shade: as outras fichas que nomeiam Quadrado100 continuam exigindo contrato próprio.",
   },
   {
     primitive: "Regua",
