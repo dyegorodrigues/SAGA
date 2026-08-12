@@ -25,6 +25,7 @@ import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { N1_12 } from "../fichas/jornada/N1.12";
 import { N2_01 } from "../fichas/jornada/N2.01";
+import { N2_02 } from "../fichas/jornada/N2.02";
 import { N2_03 } from "../fichas/jornada/N2.03";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
@@ -69,7 +70,7 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  *
  * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
  * porta que `selectGenerator` usa em produção. Assim builders procedimentais
- * especializados (como N1.09, N2.01, N2.03, GM.02 e GM.05) não ganham caminho de teste paralelo.
+ * especializados (como N1.09, N2.01, N2.02, N2.03, GM.02 e GM.05) não ganham caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
@@ -106,6 +107,9 @@ const REGISTRO: Record<string, FichaCompetencia> = {
 
   // W3 — F21: substituição do legado pela experiência autoral de agrupamento.
   "N2.01": N2_01,
+
+  // W7 — F36: substituição do legado pela leitura/produção autoral no Quadrado100.
+  "N2.02": N2_02,
 
   // W6 — F29: substituição do legado por comparação simbólica Grupo-backed.
   "N2.03": N2_03,
