@@ -99,6 +99,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F36 materializada no specialized builder local Quadrado100-backed: +1 horizontal, +10 vertical, +5, vizinhos e lacunas, com onboarding explícito da estreia visual, processo no AnswerMeta e evidência de percurso vertical. O legado saiu de produção somente após suíte, Chrome 320/390/900 e transversal 390×8 verdes. A Matrix observou 32 Composer, 20 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
     delta: { composer: 1, legacy: -1 },
   },
+  {
+    id: "W8-N3.01",
+    competence: "N3.01",
+    rationale: "F13 materializada no specialized builder local VisualAddition-backed: juntar preserva as parcelas até a fusão, a escada retira objetos no L4 e chega a símbolo puro no L5, com onboarding explícito da estreia, evidência ADICAO_SEM_OBJETOS, a11y e Chrome 320/390/900. O legado saiu de produção somente após suíte completa e transversal 390×8 verdes. A Matrix observou 33 Composer, 19 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
+    delta: { composer: 1, legacy: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
