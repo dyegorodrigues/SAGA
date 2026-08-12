@@ -105,6 +105,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F13 materializada no specialized builder local VisualAddition-backed: juntar preserva as parcelas até a fusão, a escada retira objetos no L4 e chega a símbolo puro no L5, com onboarding explícito da estreia, evidência ADICAO_SEM_OBJETOS, a11y e Chrome 320/390/900. O legado saiu de produção somente após suíte completa e transversal 390×8 verdes. A Matrix observou 33 Composer, 19 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
     delta: { composer: 1, legacy: -1 },
   },
+  {
+    id: "W9-N3.02",
+    competence: "N3.02",
+    rationale: "F15 materializada no specialized builder local EmojiRow#riscar: alfabetiza X=saiu antes da cobrança, preserva o objeto riscado no mesmo slot, separa gesto de retirada da resposta e impede correção pós-RESPONDE_O_REMOVIDO de comprar domínio. O canário inativo passou suíte completa, Chrome 320/390/900 e transversal 390×8; após a promoção a Matrix observou 34 Composer, 18 legado e a reconciliação explícita do modo riscar fechou a divergência ficha↔screen.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
@@ -280,7 +286,13 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   const rawMode = kind === "pareamento" ? "parear" : kind === "classificacao" ? "caixas/laços" : q?.uiProps?.modo;
 
   let qualified = [...bases];
-  if (kind === "area") {
+  // W9/F15 é um kind autoral especializado e o próprio spec declara modo
+  // `riscar`. A tabela histórica de conformidade ainda é a fonte dos modos
+  // legados; aqui a ponte explícita impede o auditor de achatar a nova linguagem
+  // visual para EmojiRow puro e acusar uma divergência que o Chrome já refutou.
+  if (kind === "emojirow-riscar-f15" && rawMode === "riscar") {
+    qualified = bases.map(base => base === "EmojiRow" ? "EmojiRow#riscar" : base);
+  } else if (kind === "area") {
     qualified = bases.map(base => base === "ArrayGrid" ? "ArrayGrid#área" : base);
   } else if (kind === "moldura" && rawMode === "faltam") {
     qualified = bases.map(base => base === "TenFrame" ? "TenFrame#flash" : base);
