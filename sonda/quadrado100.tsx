@@ -9,6 +9,7 @@ import type { AnswerMeta } from "../src/types";
 const params = new URLSearchParams(location.search);
 const level = Math.max(1, Math.min(5, Number(params.get("level") ?? 2) || 2));
 const seed = Number(params.get("seed") ?? 36) || 36;
+const requestedTutorialStep = params.has("tutorialStep") ? Number(params.get("tutorialStep")) : null;
 
 function seededRandom(initial: number): () => number {
   let state = initial >>> 0;
@@ -23,6 +24,13 @@ Math.random = seededRandom(seed + level * 1009);
 const question = generateRegisteredFichaQuestion("N2.02", level);
 Math.random = originalRandom;
 const spec = question.uiProps as Quadrado100Spec;
+const tutorialStep = requestedTutorialStep != null
+  && Number.isInteger(requestedTutorialStep)
+  && requestedTutorialStep >= 0
+  && requestedTutorialStep < (question.tutorial?.length ?? 0)
+    ? requestedTutorialStep
+    : null;
+const tutorialAtivo = tutorialStep == null ? null : question.tutorial?.[tutorialStep] ?? null;
 
 interface Receipt {
   value: number;
@@ -45,12 +53,16 @@ function Probe() {
         data-path={JSON.stringify(spec.caminho)}
         data-hidden={JSON.stringify(spec.casasOcultas)}
         data-tutorial={question.tutorial?.length ?? 0}
+        data-tutorial-step={tutorialStep ?? ""}
+        data-tutorial-fala={tutorialAtivo?.fala ?? ""}
+        data-tutorial-show={JSON.stringify(tutorialAtivo?.show ?? null)}
         data-rt={question.rt_max_s ?? ""}
         data-receipts={JSON.stringify(receipts)}
       >
         <p className="mb-3 text-center text-lg font-black text-slate-800">{question.prompt}</p>
         <FichaRenderer
           question={question}
+          mostrar={tutorialAtivo?.show}
           onAnswer={(value, correct, meta) => setReceipts(current => [
             ...current,
             { value: Number(value), correct, meta: meta as Receipt["meta"] },
