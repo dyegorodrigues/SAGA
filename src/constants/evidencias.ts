@@ -127,6 +127,13 @@ export const Evidencia = {
    * para provar que >, < e = foram compreendidos como registro da relação.
    */
   COMPARACAO_SIMBOLICA_SEM_OBJETOS: "comparacao-simbolica-sem-objetos",
+
+  /**
+   * F36 (N2.02): a criança concluiu corretamente um percurso vertical de +10
+   * no Quadrado100. Três acertos apenas horizontais não provam que ela leu a
+   * estrutura decimal da coluna.
+   */
+  PERCURSO_VERTICAL_QUADRADO100: "percurso-vertical-quadrado100",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
