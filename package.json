@@ -27,6 +27,7 @@
     "sonda:regua": "node scripts/sonda-regua.mjs",
     "sonda:comparacao-simbolica": "node scripts/sonda-comparacao.mjs",
     "sonda:quadrado100": "node scripts/sonda-quadrado100.mjs",
+    "sonda:visual-addition": "node scripts/sonda-visual-addition.mjs",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
