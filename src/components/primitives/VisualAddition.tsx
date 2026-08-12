@@ -72,7 +72,7 @@ export function VisualAddition({
           =
         </div>
         <div className="flex flex-col items-center gap-4">
-          <div className="border-4 border-dashed border-slate-300 rounded-2xl w-24 h-24 md:w-32 md:h-32 flex items-center justify-center bg-slate-50/50 md:mb-[52px]" aria-label="Resposta ainda vazia">
+          <div className="border-4 border-dashed border-slate-300 rounded-2xl w-24 h-24 md:w-32 md:h-32 flex items-center justify-center bg-slate-50/50 md:mb-[52px]" role="img" aria-label="Resposta ainda vazia">
             <span className="text-3xl md:text-4xl text-slate-500 font-black" aria-hidden>?</span>
           </div>
         </div>
