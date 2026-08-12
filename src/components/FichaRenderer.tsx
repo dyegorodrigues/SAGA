@@ -14,6 +14,7 @@ import { InteractiveNumberLine } from './primitives/InteractiveNumberLine';
 import { Reta20Stage } from './primitives/Reta20Stage';
 import { ReguaStage } from './primitives/ReguaStage';
 import { Quadrado100 } from './primitives/Quadrado100';
+import { Quadrado100Stage } from './primitives/Quadrado100Stage';
 import { ShapeCanvas } from './primitives/ShapeCanvas';
 import { Relogio } from './primitives/Relogio';
 import { Balanca } from './primitives/Balanca';
@@ -50,6 +51,12 @@ import { Reta20Spec } from '../curriculum/procedimentos/reta20Contract';
 import { diagnosticarReta20, evidenciasReta20 } from '../curriculum/procedimentos/reta20Procedure';
 import { ReguaSpec } from '../curriculum/procedimentos/reguaContract';
 import { ComparacaoSimbolicaSpec } from '../curriculum/procedimentos/comparacaoSimbolicaContract';
+import { Quadrado100Spec } from '../curriculum/procedimentos/quadrado100Contract';
+import {
+  AcaoQuadrado100,
+  diagnosticarQuadrado100,
+  evidenciasQuadrado100,
+} from '../curriculum/procedimentos/quadrado100Procedure';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -75,10 +82,10 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
   switch (kind) {
     case 'emojirow':
       return <div className="flex justify-center"><EmojiRow {...uiProps} onItemTouch={handleInteract} disabled={disabled} promptDone={promptDone} /></div>;
-      
+
     case 'bond':
       return <div className="flex justify-center"><NumberBond {...uiProps} /></div>;
-      
+
     case 'numberline':
       return <InteractiveNumberLine {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
 
@@ -105,6 +112,32 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
       );
     }
 
+    case 'quadrado100-f36': {
+      const spec = uiProps as Quadrado100Spec;
+      return (
+        <Quadrado100Stage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          falar={falar}
+          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as Record<string, unknown> : null}
+          onAnswer={(valor, acao) => {
+            const manipulacao = acao.completo ? undefined : { precisoEmDestinoErrado: true };
+            const misconception = podeGerarDiagnostico(manipulacao)
+              ? diagnosticarQuadrado100(acao, spec)
+              : undefined;
+            const evidencias = evidenciasQuadrado100(acao, spec);
+            const meta: AnswerMeta & { quadrado100: AcaoQuadrado100 } = {
+              quadrado100: acao,
+              ...(manipulacao ? { manipulacao } : {}),
+              ...(misconception ? { misconception } : {}),
+              ...(evidencias.length ? { evidencias } : {}),
+            };
+            handleInteract(valor, meta);
+          }}
+        />
+      );
+    }
+
     case 'regua':
     case 'regua-f61': {
       const spec = uiProps as ReguaSpec;
@@ -118,7 +151,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
         />
       );
     }
-      
+
     case 'tens':
       // Contrato estático legado/genérico. F21 usa kind próprio para não esconder
       // a diferença semântica do auditor nem sequestrar usos antigos.
@@ -143,13 +176,13 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
         />
       );
     }
-      
+
     case 'relogio':
       return <Relogio {...uiProps} />;
-      
+
     case 'balanca':
       return <Balanca {...uiProps} />;
-      
+
     case 'draggroup':
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
     case 'vertical':
@@ -210,7 +243,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
       return <TakeApart total={question.n!} knownSplit={{ a: question.a!, b: question.b! }} {...uiProps} />;
     case 'plain':
       return <div className="flex justify-center text-4xl font-black text-slate-800 py-8">{uiProps.text}</div>;
-      
+
     default:
       return <div className="p-4 border border-rose-300 text-rose-500 rounded text-center font-bold">Ficha não implementada: {kind}</div>;
   }
