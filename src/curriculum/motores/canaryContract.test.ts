@@ -9,6 +9,7 @@ import {
   generateRegisteredFichaQuestion,
 } from "./composerCanary";
 import { N3_01 } from "../fichas/jornada/N3.01";
+import { N3_02 } from "../fichas/jornada/N3.02";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
@@ -71,12 +72,17 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  *
  * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
  * porta que `selectGenerator` usa em produção. Assim builders procedimentais
- * especializados (como N1.09, N2.01, N2.02, N2.03, N3.01, GM.02 e GM.05) não ganham caminho de teste paralelo.
+ * especializados (como N1.09, N2.01, N2.02, N2.03, N3.01, N3.02, GM.02 e GM.05) não ganham caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   // W8 — F13: VisualAddition autoral, substituindo o legado sem sequestrar
   // o renderer visual-addition usado por outras superfícies.
   "N3.01": N3_01,
+
+  // W9 — F15: EmojiRow#riscar autoral, substituindo `subvis` sem perder o
+  // gesto de retirada, a alfabetização X=saiu e a telemetria de misconception.
+  "N3.02": N3_02,
+
   "N3.09": N3_09,
   "N3.10": N3_10,
   "N4.03": N4_03,
