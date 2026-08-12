@@ -6,10 +6,10 @@ import {
 } from "./composerCanary";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
-describe("W8 — N3.01 / F13 regression-first", () => {
-  it("a ficha autoral existe, mas continua inativa até o portão de promoção", () => {
+describe("W8 — N3.01 / F13 pós-promoção", () => {
+  it("a ficha autoral existe e permanece ativa depois do portão de promoção", () => {
     expect(hasComposerFicha("N3.01")).toBe(true);
-    expect(DEFAULT_COMPOSER_CANARY_IDS).not.toContain("N3.01");
+    expect(DEFAULT_COMPOSER_CANARY_IDS).toContain("N3.01");
   });
 
   it("usa kind especializado em vez de sequestrar visual-addition legado", () => {
