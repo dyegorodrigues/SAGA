@@ -18,9 +18,10 @@ import type { Question } from "../types";
  *    registrado em `composerCanary.ts`.
  *
  * O segundo caso existe para contratos deliberadamente ficha-específicos, como
- * F61/GM.05: criar um `case "regua"` genérico que só aceita GM.05 seria uma
- * segunda porta morta para a mesma implementação. A prova especializada continua
- * estrita: kind sem consumidor, consumidor sem builder ou ID divergente falha.
+ * F61/GM.05 e F13/N3.01: criar um case genérico que só aceita uma competência
+ * seria uma segunda porta morta para a mesma implementação. A prova
+ * especializada continua estrita: kind sem consumidor, consumidor sem builder
+ * ou ID divergente falha.
  */
 
 const LEGADO_OU_FUTURO_FORA_DA_API_AUTORAL = [
@@ -32,7 +33,6 @@ const LEGADO_OU_FUTURO_FORA_DA_API_AUTORAL = [
   "singaporebars",
   "subvis",
   "take-apart",
-  "visual-addition",
 ] as const;
 
 function kindsComBuilderGenerico(): Set<string> {
@@ -88,8 +88,10 @@ describe("P18 — todo KindType autoral tem caminho de builder real", () => {
     expect(todos).toContain("moldura");
     expect(todos).toContain("medidas");
     expect(todos).toContain("regua");
+    expect(todos).toContain("visual-addition");
     expect(genericos).toContain("touchplace");
     expect(especializados).toContain("GM.05");
+    expect(especializados).toContain("N3.01");
   });
 
   it("todo kind tem builder genérico ou é usado só por fichas com builder especializado", () => {
@@ -105,10 +107,14 @@ describe("P18 — todo KindType autoral tem caminho de builder real", () => {
       .toEqual([]);
   });
 
-  it("o builder especializado F61 é executável pela porta registrada", () => {
-    const q = generateRegisteredFichaQuestion("GM.05", 3);
-    expect(q.kind).toBe("regua-f61");
-    expect(q.uiProps).toEqual(expect.objectContaining({ modo: "alinhar", unidade: "cm" }));
+  it("builders especializados recentes são executáveis pela porta registrada", () => {
+    const f61 = generateRegisteredFichaQuestion("GM.05", 3);
+    expect(f61.kind).toBe("regua-f61");
+    expect(f61.uiProps).toEqual(expect.objectContaining({ modo: "alinhar", unidade: "cm" }));
+
+    const f13 = generateRegisteredFichaQuestion("N3.01", 4);
+    expect(f13.kind).toBe("visual-addition-f13");
+    expect(f13.uiProps).toEqual(expect.objectContaining({ nivel: 4, representacao: "numerais" }));
   });
 
   it("legado e contratos futuros não vazam de volta para KindType", () => {
