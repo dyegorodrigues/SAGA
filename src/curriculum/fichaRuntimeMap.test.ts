@@ -13,62 +13,47 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain("Primitivas declaradas: 26");
     expect(output).toContain("[MAPA FICHA → RUNTIME]");
 
-    // P21.2: nomes autorais que foram especializadas no runtime precisam
-    // continuar declarando a cadeia builder → kind final → renderer.
     expect(output).toContain(
       "DragGroup: executável | kinds=draggroup+pareamento+classificacao | builder=draggroup+pareamento+classificacao | renderer=draggroup+pareamento+classificacao",
     );
     expect(output).toContain(
       "EmojiRow: executável | kinds=emojirow+fileira+moldura | builder=emojirow+fileira+moldura | renderer=emojirow+fileira+moldura",
     );
-    // W6/F29: Grupo continua com o builder genérico de grandeza e ganha apenas
-    // o builder especializado local de N2.03; não existe dispatch genérico groups.
     expect(output).toContain(
       "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica | builder=grandeza+special:N2.03 | renderer=grandeza+comparacao-simbolica",
     );
     expect(output).toContain(
       "StoryPanel: executável | kinds=story+scene+storypanel+story-bars | builder=storypanel | renderer=story-bars",
     );
-    // W3/F21 compõe MaterialDourado + TenFrame no palco especializado. O alias
-    // `material-dourado` precisa continuar visível nos DOIS componentes reais;
-    // retirar daqui esconderia uma regressão do mapa, não uma mudança cosmética.
     expect(output).toContain(
       "MaterialDourado: executável | kinds=tens+material-dourado | builder=tens | renderer=tens+material-dourado",
     );
     expect(output).toContain(
       "TenFrame: executável | kinds=tenframe+moldura+bond+plain+material-dourado | builder=tenframe+moldura+bond+plain | renderer=tenframe+moldura+bond+plain+material-dourado",
     );
-
-    // W5/F61: infraestrutura pode ficar pronta ANTES do canário. O mapa precisa
-    // provar builder especializado + renderer sem confundir isso com ativação
-    // curricular de GM.05 (que continua governada por composerCanaryIds/Matrix).
     expect(output).toContain(
       "Regua: executável | kinds=measure+regua+regua-f61 | builder=special:GM.05 | renderer=regua+regua-f61",
     );
-
-    // W7/F36: Quadrado100 deixa de ser "componente isolado" quando ganha o
-    // builder especializado local de N2.02 + kind final + renderer. Isto prova
-    // infraestrutura executável, NÃO promoção curricular — a ativação continua
-    // separada em composerCanaryIds/Matrix.
     expect(output).toContain(
       "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36 | builder=special:N2.02 | renderer=quadrado100-f36",
     );
 
-    // Lacunas reais permanecem visíveis: reconciliar o mapa não significa
-    // fabricar builder/componente só para deixar a tabela verde.
+    // W8/F13: a superfície já existia, mas agora há owner especializado e Stage
+    // real. O kind legado continua disponível sem virar uma segunda porta genérica.
+    expect(output).toContain(
+      "VisualAddition: executável | kinds=visual-addition+visual-addition-f13+subvis | builder=special:N3.01 | renderer=visual-addition+visual-addition-f13",
+    );
+
+    // Lacunas reais permanecem visíveis: W8 não inventa builder para os demais.
     expect(output).toContain("LinkingCubes: renderer-sem-builder");
     expect(output).toContain("Moedas: renderer-sem-builder");
     expect(output).toContain("SingaporeBars: renderer-sem-builder");
-    expect(output).toContain("VisualAddition: renderer-sem-builder");
 
-    expect(output).toContain("- executável: 22");
-    expect(output).toContain("- renderer-sem-builder: 4");
+    expect(output).toContain("- executável: 23");
+    expect(output).toContain("- renderer-sem-builder: 3");
     expect(output).toContain("- componente-isolado: 0");
     expect(output).toContain("- ausente: 0");
 
-    // A quantidade de fichas cresce quando lacunas curriculares são fechadas;
-    // este teste protege o MAPA de runtime, não uma fotografia histórica do
-    // catálogo. O auditor específico é a autoridade para contagem/cobertura.
     expect(output).toContain("[RESULTADO]");
     expect(output).toContain("fichas válidas, nove seções presentes");
   });
