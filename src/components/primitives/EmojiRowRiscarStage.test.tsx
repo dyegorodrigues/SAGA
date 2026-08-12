@@ -47,6 +47,12 @@ describe("EmojiRowRiscarStage — F15", () => {
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
 
+  it("mostra a mão fantasma que executou o primeiro risco do L1", () => {
+    const { container } = render(<EmojiRowRiscarStage spec={base} onAnswer={() => {}} />);
+    expect(container.querySelector('[data-mao-fantasma]')).toBeInTheDocument();
+    expect(screen.getByText("Eu risquei o primeiro. Continue daqui.")).toBeInTheDocument();
+  });
+
   it("mantém o removido no mesmo slot e só libera a equação 600ms depois da retirada pedida", () => {
     vi.useFakeTimers();
     const { container } = render(<EmojiRowRiscarStage spec={base} onAnswer={() => {}} />);

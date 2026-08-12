@@ -251,6 +251,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Sonda real F15 — EmojiRow#riscar registrado e inativo
+        run: npm run sonda:emojirow-riscar
+
+      - name: Evidências da sonda F15
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f15-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-emojirow-riscar/
+          if-no-files-found: warn
+          retention-days: 14
+
   higiene-diff:
     name: Higiene do diff
     runs-on: ubuntu-latest
