@@ -57,6 +57,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // + Chrome 320/390/900 + transversal 390×8 verdes no SHA inativo final.
   "N3.01",
 
+  // W9 — F15: EmojiRow#riscar autoral. A alfabetização explícita de X=saiu,
+  // preservação geométrica do slot, domínio sem crédito por correção e Chrome
+  // 320/390/900 ficaram verdes no SHA inativo 4218ac68 antes da promoção.
+  "N3.02",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
