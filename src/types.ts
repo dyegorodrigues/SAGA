@@ -1,4 +1,5 @@
 import type { EventoManipulacao } from "./curriculum/procedimentos/filtroMotor";
+import type { ResolucaoDeclarativa, TutStep } from "./contracts/pedagogySteps";
 
 export interface Kid {
   id: string;
@@ -113,7 +114,10 @@ export interface Question {
   audioPrompt?: string;
   /** Array de falas em estágios, quando o jogo narra passo-a-passo (ex: I-do/We-do) */
   audioSteps?: string[];
-  tutorial?: { say: string; show?: Record<string, any> | string | number; ms?: number }[];
+  /** Onboarding/coreografia da FICHA; não é solução calculada do item atual. */
+  tutorial?: TutStep[];
+  /** Solução calculada do item atual, como snapshots declarativos idempotentes. */
+  resolucao?: ResolucaoDeclarativa;
   excecaoCPA?: boolean | "perceptual" | "espacial";
   isFallback?: boolean;
   kind: string;
@@ -216,8 +220,6 @@ export interface BankItem {
 }
 
 export interface Progress {
-  /** Janela rolante de erros recentes. O Radar avalia isso. */
-  misconceptions?: { tag: string; ts: number }[];
   lvl: number;
   streak: number;
   bad: number;
