@@ -150,7 +150,7 @@ export function EmojiRow({
                 } : {})}
                 data-marked={isMarked ? 'true' : 'false'}
                 data-mark-style={isMarked ? markStyle : undefined}
-                className={`${pontos ? 'absolute' : 'relative'} inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''} ${markInteractive ? 'cursor-pointer' : ''} ${isMarked && markStyle === 'ghost' ? 'rounded-xl border-2 border-dashed border-slate-500' : ''}`}
+                className={`${pontos ? 'absolute' : 'relative'} inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''} ${markInteractive ? 'cursor-pointer' : ''} ${isMarked && markStyle === 'ghost' ? 'rounded-xl outline outline-2 outline-dashed outline-slate-500' : ''}`}
                 style={{
                   zIndex: isHighlighted ? 20 : 1,
                   fontSize: small ? '24px' : tokens.tamanho.base,
