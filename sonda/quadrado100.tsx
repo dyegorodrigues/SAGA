@@ -54,7 +54,7 @@ function Probe() {
         data-hidden={JSON.stringify(spec.casasOcultas)}
         data-tutorial={question.tutorial?.length ?? 0}
         data-tutorial-step={tutorialStep ?? ""}
-        data-tutorial-fala={tutorialAtivo?.fala ?? ""}
+        data-tutorial-fala={tutorialAtivo?.say ?? ""}
         data-tutorial-show={JSON.stringify(tutorialAtivo?.show ?? null)}
         data-rt={question.rt_max_s ?? ""}
         data-receipts={JSON.stringify(receipts)}
