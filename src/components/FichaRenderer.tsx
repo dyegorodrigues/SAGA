@@ -5,6 +5,7 @@ import { AnswerMeta, Question } from '../types';
 import { EmojiRow } from './primitives/EmojiRow';
 import { TenFrame } from './primitives/TenFrame';
 import { VisualAddition } from './primitives/VisualAddition';
+import { VisualAdditionStage } from './primitives/VisualAdditionStage';
 import { ScatteredItems } from './primitives/ScatteredItems';
 import { LinkingCubes } from './primitives/LinkingCubes';
 import { TakeApart } from './primitives/TakeApart';
@@ -57,6 +58,8 @@ import {
   diagnosticarQuadrado100,
   evidenciasQuadrado100,
 } from '../curriculum/procedimentos/quadrado100Procedure';
+import { VisualAdditionSpec } from '../curriculum/procedimentos/visualAdditionContract';
+import { metaVisualAddition } from '../curriculum/procedimentos/visualAdditionProcedure';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -134,6 +137,18 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
             };
             handleInteract(valor, meta);
           }}
+        />
+      );
+    }
+
+    case 'visual-addition-f13': {
+      const spec = uiProps as VisualAdditionSpec;
+      return (
+        <VisualAdditionStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          mostrar={mostrar}
+          onAnswer={(valor, acao) => handleInteract(valor, metaVisualAddition(acao, spec))}
         />
       );
     }
