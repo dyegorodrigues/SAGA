@@ -52,6 +52,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // direto; promoção após suíte + onboarding visual + Chrome 320/390/900 + 390×8.
   "N2.02",
 
+  // W8 — F13: VisualAddition autoral com ação de juntar, retirada progressiva
+  // de objetos e prova L4 sem suporte concreto. Promoção após suíte + onboarding
+  // + Chrome 320/390/900 + transversal 390×8 verdes no SHA inativo final.
+  "N3.01",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
