@@ -6,6 +6,7 @@ import { EmojiRow } from './primitives/EmojiRow';
 import { TenFrame } from './primitives/TenFrame';
 import { VisualAddition } from './primitives/VisualAddition';
 import { VisualAdditionStage } from './primitives/VisualAdditionStage';
+import { EmojiRowRiscarStage } from './primitives/EmojiRowRiscarStage';
 import { ScatteredItems } from './primitives/ScatteredItems';
 import { LinkingCubes } from './primitives/LinkingCubes';
 import { TakeApart } from './primitives/TakeApart';
@@ -60,6 +61,8 @@ import {
 } from '../curriculum/procedimentos/quadrado100Procedure';
 import { VisualAdditionSpec } from '../curriculum/procedimentos/visualAdditionContract';
 import { metaVisualAddition } from '../curriculum/procedimentos/visualAdditionProcedure';
+import { EmojiRowRiscarSpec } from '../curriculum/procedimentos/emojiRowRiscarContract';
+import { metaEmojiRowRiscar } from '../curriculum/procedimentos/emojiRowRiscarProcedure';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -149,6 +152,20 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
           disabled={Boolean(disabled)}
           mostrar={mostrar}
           onAnswer={(valor, acao) => handleInteract(valor, metaVisualAddition(acao, spec))}
+        />
+      );
+    }
+
+    case 'emojirow-riscar-f15': {
+      const spec = uiProps as EmojiRowRiscarSpec;
+      return (
+        <EmojiRowRiscarStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          promptDone={promptDone}
+          mostrar={mostrar}
+          falar={falar}
+          onAnswer={(valor, acao) => handleInteract(valor, metaEmojiRowRiscar(acao, spec))}
         />
       );
     }

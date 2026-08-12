@@ -51,11 +51,12 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "EmojiRow",
-    kinds: ["emojirow", "fileira", "moldura"],
-    componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage")],
+    kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"],
+    componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage")],
     builderKinds: ["emojirow", "fileira", "moldura"],
-    rendererKinds: ["emojirow", "fileira", "moldura"],
-    note: "JD1/N1.03, JD2/N1.08 e F52/AL.02 realizam EmojiRow via fileira; JD5/N1.10 usa moldura como palco composto. O alias é por ficha-fonte, não por semelhança de nome.",
+    specializedBuilderIds: ["N3.02"],
+    rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"],
+    note: "JD1/N1.03, JD2/N1.08 e F52/AL.02 realizam EmojiRow via fileira; JD5/N1.10 usa moldura como palco composto. W9/F15/N3.02 reutiliza a mesma primitiva em modo riscar por builder especializado local; o primeiro degrau alfabetiza X=saiu antes de cobrar conteúdo.",
   },
   {
     primitive: "Grupo",

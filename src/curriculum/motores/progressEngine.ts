@@ -1,5 +1,6 @@
 import { MasteryEvidence, MasteryRule, Progress } from "../../types";
 import { calendarDayDistance, normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
+import { isMasteryDisqualifier } from "../masterySignals";
 import { consumeAulaSourceProgress, markAulaSourceProgress } from "./aulaProgressContext";
 import { consumeSenseiDojoTerminal } from "./senseiDojoProgressContext";
 
@@ -278,6 +279,9 @@ function updateMasteryEvidence(
     : Array(Math.min(anterior?.comprehensionStreak || 0, rule.de)).fill(true);
   const passedDays = [...(anterior?.passedSessionDays
     ?? (anterior?.candidateDay ? [anterior.candidateDay] : []))];
+  const masteryDisqualified = (attempt.evidencias || []).some(isMasteryDisqualifier);
+  const evidenciasDaFicha = (attempt.evidencias || []).filter(evidencia => !isMasteryDisqualifier(evidencia));
+  const masteryRight = right && !masteryDisqualified;
 
   const evidence: MasteryEvidence = {
     schemaVersion: 1,
@@ -295,8 +299,8 @@ function updateMasteryEvidence(
     passedSessionDays: passedDays,
   };
 
-  if (right && attempt.evidencias?.length) {
-    for (const nome of attempt.evidencias) {
+  if (masteryRight && evidenciasDaFicha.length) {
+    for (const nome of evidenciasDaFicha) {
       if (!evidence.evidenciasVistas!.includes(nome)) evidence.evidenciasVistas!.push(nome);
     }
   }
@@ -314,12 +318,12 @@ function updateMasteryEvidence(
     evidence.fluencyStreak = 0;
   }
 
-  evidence.comprehensionWindow = [...(evidence.comprehensionWindow || []), right].slice(-rule.de);
-  evidence.comprehensionStreak = right ? Math.min(rule.de, evidence.comprehensionStreak + 1) : 0;
-  evidence.independenceStreak = right && !attempt.helpUsed
+  evidence.comprehensionWindow = [...(evidence.comprehensionWindow || []), masteryRight].slice(-rule.de);
+  evidence.comprehensionStreak = masteryRight ? Math.min(rule.de, evidence.comprehensionStreak + 1) : 0;
+  evidence.independenceStreak = masteryRight && !attempt.helpUsed
     ? Math.min(3, evidence.independenceStreak + 1)
     : 0;
-  evidence.fluencyStreak = right
+  evidence.fluencyStreak = masteryRight
     && attempt.targetRtMs !== undefined
     && attempt.durationMs <= attempt.targetRtMs
       ? Math.min(3, evidence.fluencyStreak + 1)

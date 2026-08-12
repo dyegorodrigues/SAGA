@@ -1,6 +1,7 @@
 import { Composer } from "../Composer";
 import { FichaCompetencia } from "../schema";
 import { N3_01 } from "../fichas/jornada/N3.01";
+import { N3_02 } from "../fichas/jornada/N3.02";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
@@ -42,6 +43,7 @@ import { construirDezenaUnidadesQuestion } from "../procedimentos/materialDourad
 import { construirQuadrado100Question } from "../procedimentos/quadrado100Contract";
 import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { construirVisualAdditionQuestion } from "../procedimentos/visualAdditionContract";
+import { construirEmojiRowRiscarQuestion } from "../procedimentos/emojiRowRiscarContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -58,9 +60,12 @@ export type GeneratorSource = NonNullable<Track["generatorSource"]>;
  * `COMPOSER_CANARIES` abaixo.
  */
 const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
-  // W8: F13 registrada e INATIVA. VisualAddition só ganha owner de produção
-  // depois de Stage, onboarding, a11y e Chrome real no mesmo contrato.
   "N3.01": N3_01,
+
+  // W9: F15 registrada e INATIVA. O modo riscar só substitui `subvis` depois
+  // de alfabetização do X, Stage autoral, domínio limpo, a11y e Chrome real.
+  "N3.02": N3_02,
+
   "N3.09": N3_09,
   "N3.10": N3_10,
   "N4.03": N4_03,
@@ -132,6 +137,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N2.02": construirQuadrado100Question,
   "N2.03": construirComparacaoSimbolicaQuestion,
   "N3.01": construirVisualAdditionQuestion,
+  "N3.02": construirEmojiRowRiscarQuestion,
   "GM.02": construirTempoCotidianoQuestion,
   "GM.05": construirReguaQuestion,
 };
@@ -147,6 +153,7 @@ const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N2.02": "quadrado100-f36",
   "N2.03": "comparacao-simbolica",
   "N3.01": "visual-addition-f13",
+  "N3.02": "emojirow-riscar-f15",
   "GM.05": "regua-f61",
 };
 
