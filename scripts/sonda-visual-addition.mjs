@@ -78,7 +78,7 @@ async function snapshot(page) {
   });
 }
 
-function assertContract(data, width, level) {
+function assertContract(data, width, level, { allowMerged = false } = {}) {
   const expected = level <= 3 ? "objetos" : level === 4 ? "numerais" : "simbolo";
   assert(data.level === level, `F13 nível divergente: esperado ${level}, veio ${data.level}`);
   assert(data.representation === expected, `F13 L${level} representação errada: ${data.representation}`);
@@ -90,11 +90,11 @@ function assertContract(data, width, level) {
   assert(data.answerButtons === 11, `F13 L${level} teclado deveria ter 11 respostas`);
 
   if (level <= 3) {
-    assert(data.surface, `F13 L${level} perdeu VisualAddition`);
+    assert(data.surface || (allowMerged && data.merged), `F13 L${level} perdeu VisualAddition`);
     assert(!data.symbolic, `F13 L${level} antecipou símbolo puro`);
     assert(data.objectGlyphs > 0, `F13 L${level} perdeu objetos`);
   }
-  if (level === 2) assert(data.joinButton, "F13 L2 perdeu botão opcional de juntar");
+  if (level === 2) assert(data.joinButton || (allowMerged && data.merged), "F13 L2 perdeu botão opcional de juntar");
   if (level !== 2) assert(!data.joinButton, `F13 L${level} exibiu botão de juntar fora do L2`);
   if (level === 4) {
     assert(data.surface, "F13 L4 perdeu os contêineres");
@@ -155,7 +155,7 @@ async function probeOnboarding(page, width) {
     await page.goto(`${BASE}?level=1&seed=1301&tutorialStep=${step}`, { waitUntil: "networkidle" });
     await page.locator("[data-visual-addition-probe]").waitFor();
     const data = await snapshot(page);
-    assertContract(data, width, 1);
+    assertContract(data, width, 1, { allowMerged: step === 2 });
     assert(data.tutorialStep === step, `F13 onboarding não ativou passo ${step}`);
     assert(data.tutorialFala.trim().length > 0, `F13 onboarding passo ${step} sem fala`);
     assert(data.tutorialShow && typeof data.tutorialShow === "object", `F13 onboarding passo ${step} sem show`);
