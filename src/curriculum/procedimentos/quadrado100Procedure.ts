@@ -9,7 +9,10 @@ export interface AcaoQuadrado100 {
   modo: Quadrado100Spec["modo"];
   inicio: number;
   caminho: number[];
+  /** Todos os toques, corretos e incorretos, em ordem temporal. */
   toques: number[];
+  /** Apenas destinos incorretos, preservados para diagnóstico longitudinal. */
+  erros: number[];
   esperado: number;
   ultimoToque: number;
   acertosParciais: number;
@@ -22,9 +25,9 @@ function origemAtual(acao: AcaoQuadrado100): number {
   return acao.caminho[Math.min(acao.acertosParciais - 1, acao.caminho.length - 1)] ?? acao.inicio;
 }
 
-function ultimosPassosUmAUm(acao: AcaoQuadrado100): boolean {
-  if (acao.toques.length < 2) return false;
-  const dois = acao.toques.slice(-2);
+function errosConsecutivosUmAUm(acao: AcaoQuadrado100): boolean {
+  if (acao.erros.length < 2) return false;
+  const dois = acao.erros.slice(-2);
   return Math.abs(dois[1] - dois[0]) === 1;
 }
 
@@ -43,9 +46,9 @@ export function diagnosticarQuadrado100(
   const deltaEscolhido = acao.ultimoToque - origem;
 
   if (spec.modo === "vertical") {
-    // Repetir passos horizontais sucessivos mostra uma estratégia diferente de
-    // um único engano de direção: está contando um-a-um em vez de usar a dezena.
-    if (ultimosPassosUmAUm(acao)) return Quadrado100Misconception.SO_CONTA_UM_A_UM;
+    // Dois destinos errados consecutivos andando de um em um sustentam uma
+    // hipótese de estratégia; um único erro lateral continua sendo só direção.
+    if (errosConsecutivosUmAUm(acao)) return Quadrado100Misconception.SO_CONTA_UM_A_UM;
     if (Math.abs(deltaEscolhido) === 1) return Quadrado100Misconception.CONFUNDE_DIRECAO;
     return Quadrado100Misconception.NAO_VE_PADRAO_DEZENA;
   }
