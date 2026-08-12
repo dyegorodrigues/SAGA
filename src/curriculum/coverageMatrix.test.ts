@@ -48,10 +48,15 @@ describe("Coverage Matrix executável", () => {
         competence: "N2.03",
         delta: { composer: 1, legacy: -1, divergences: -1 },
       }),
+      expect.objectContaining({
+        id: "W7-N2.02",
+        competence: "N2.02",
+        delta: { composer: 1, legacy: -1 },
+      }),
     ]);
     expect(COVERAGE_BASELINE).toMatchObject({
-      composer: 31,
-      legacy: 21,
+      composer: 32,
+      legacy: 20,
       fallback: 38,
       served: 52,
       divergences: 16,
