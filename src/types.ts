@@ -220,6 +220,8 @@ export interface BankItem {
 }
 
 export interface Progress {
+  /** Janela rolante de erros recentes. O Radar avalia isso. */
+  misconceptions?: { tag: string; ts: number }[];
   lvl: number;
   streak: number;
   bad: number;
