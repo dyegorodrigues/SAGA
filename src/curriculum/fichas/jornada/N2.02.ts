@@ -26,7 +26,11 @@ export const N2_02: FichaCompetencia = {
     2: { primitiva: "quadrado100", micro: "coluna_dez_em_dez", andaime: "medio" },
     3: { primitiva: "quadrado100", micro: "padrao_cinco", andaime: "minimo" },
     4: { primitiva: "quadrado100", micro: "vizinhos", andaime: "nenhum" },
-    5: { primitiva: "quadrado100", micro: "lacunas_espalhadas", andaime: "nenhum" },
+    // O cânone F36 não fixa um número de segundos próprio. O catálogo, porém,
+    // exige rt_alvo positivo no L5 de toda ficha de Jornada. Usamos 10 s como
+    // alvo observacional conservador, alinhado ao N2.01: relógio silencioso para
+    // fluência/Dojo, nunca critério de acerto, mastery ou recompensa.
+    5: { primitiva: "quadrado100", micro: "lacunas_espalhadas", andaime: "nenhum", rt_alvo: 10000 },
   },
 
   micros: [
