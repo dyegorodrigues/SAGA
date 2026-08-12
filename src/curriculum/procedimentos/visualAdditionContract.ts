@@ -59,7 +59,9 @@ export function construirVisualAdditionSpec(
     maoFantasma: clamped === 1,
     // 0..10: teclado fechado e previsível; o relógio L5 continua silencioso.
     tecladoAte: 11,
-    enunciado: representacao === "simbolo" ? `${a} + ${b} = ?` : "Junte os dois grupos. Quantos ficam?",
+    // No L5 a equação pertence ao Stage. O shell só introduz a ação para não
+    // duplicar a mesma expressão em telas estreitas.
+    enunciado: representacao === "simbolo" ? "Resolva:" : "Junte os dois grupos. Quantos ficam?",
     falado: `Junte ${a} e ${b}. Quantos ficam?`,
   };
 }
