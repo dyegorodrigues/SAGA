@@ -183,14 +183,23 @@ let vite;
 let browser;
 const consoleErrors = [];
 const pageErrors = [];
+const failedResponses = [];
 const results = [];
 const onboarding = [];
 try {
   vite = await startVite();
   browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ["--no-sandbox"] });
   const page = await browser.newPage();
-  page.on("console", message => { if (message.type() === "error") consoleErrors.push(message.text()); });
+  page.on("console", message => {
+    if (message.type() !== "error") return;
+    const location = message.location();
+    consoleErrors.push(location?.url ? `${message.text()} @ ${location.url}` : message.text());
+  });
   page.on("pageerror", error => pageErrors.push(String(error)));
+  page.on("response", response => {
+    if (response.status() < 400) return;
+    failedResponses.push(`${response.status()} ${response.url()}`);
+  });
 
   for (const width of WIDTHS) {
     for (let level = 1; level <= 5; level += 1) results.push(await probe(page, width, level));
@@ -198,12 +207,13 @@ try {
   }
 
   assert(pageErrors.length === 0, `F13 gerou pageerror: ${pageErrors.join(" | ")}`);
+  assert(failedResponses.length === 0, `F13 recebeu HTTP >=400: ${failedResponses.join(" | ")}`);
   const actionableConsole = consoleErrors.filter(text => !text.includes("favicon"));
   assert(actionableConsole.length === 0, `F13 gerou console.error: ${actionableConsole.join(" | ")}`);
   fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: true, results, onboarding }, null, 2));
   console.log(`Sonda F13 OK — ${results.length} cenários + ${onboarding.length * 3} passos de onboarding em Chrome real.`);
 } catch (error) {
-  fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: false, error: String(error), results, onboarding, consoleErrors, pageErrors }, null, 2));
+  fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: false, error: String(error), results, onboarding, consoleErrors, pageErrors, failedResponses }, null, 2));
   throw error;
 } finally {
   if (browser) await browser.close();
