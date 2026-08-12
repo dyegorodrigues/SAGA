@@ -172,11 +172,12 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "VisualAddition",
-    kinds: ["visual-addition", "subvis"],
-    componentFiles: [component("VisualAddition")],
+    kinds: ["visual-addition", "visual-addition-f13", "subvis"],
+    componentFiles: [component("VisualAddition"), component("VisualAdditionStage")],
     builderKinds: [],
-    rendererKinds: ["visual-addition"],
-    note: "Renderer visual-addition existe, mas não há builder Composer comprovado para F13/N3.01; subvis continua um kind legado separado.",
+    specializedBuilderIds: ["N3.01"],
+    rendererKinds: ["visual-addition", "visual-addition-f13"],
+    note: "W8/F13/N3.01 usa builder especializado local e VisualAdditionStage sobre a superfície existente. O kind visual-addition legado permanece intacto, e subvis continua uma mecânica separada.",
   },
   { primitive: "plain", kinds: ["plain"], componentFiles: [], builtin: true, builderKinds: ["plain"], rendererKinds: ["plain"] },
 ];
