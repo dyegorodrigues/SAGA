@@ -1,48 +1,40 @@
 import { Question, Track } from "../../../../types";
 import { ri, pick } from "../../../../utils/generators";
+import { stampSenseiDojoQuestion } from "../../../motores/senseiDojoPolicy";
 
 export const gDojoDiv = (lvl: number): Question => {
-  let a = 0, b = 0; // a / b = ans
+  const step = Math.min(10, Math.max(1, Math.round(lvl)));
+  let a = 0, b = 0;
   let ans = 0;
-  
-  if (lvl === 1) {
-    // Lvl 1: Divisão por 2
+
+  if (step === 1) {
     b = 2;
     ans = ri(1, 9);
-  } else if (lvl === 2) {
-    // Lvl 2: Divisão por 3
+  } else if (step === 2) {
     b = 3;
     ans = ri(1, 9);
-  } else if (lvl === 3) {
-    // Lvl 3: Divisão por 4
+  } else if (step === 3) {
     b = 4;
     ans = ri(1, 9);
-  } else if (lvl === 4) {
-    // Lvl 4: Divisão por 5
+  } else if (step === 4) {
     b = 5;
     ans = ri(1, 9);
-  } else if (lvl === 5) {
-    // Lvl 5: Misto 2 ao 5
+  } else if (step === 5) {
     b = ri(2, 5);
     ans = ri(1, 9);
-  } else if (lvl === 6) {
-    // Lvl 6: Divisão por 6 e 7
+  } else if (step === 6) {
     b = pick([6, 7]);
     ans = ri(1, 9);
-  } else if (lvl === 7) {
-    // Lvl 7: Divisão por 8 e 9
+  } else if (step === 7) {
     b = pick([8, 9]);
     ans = ri(1, 9);
-  } else if (lvl === 8) {
-    // Lvl 8: Misto 6 ao 9
+  } else if (step === 8) {
     b = ri(6, 9);
     ans = ri(1, 9);
-  } else if (lvl === 9) {
-    // Lvl 9: Divisão por 10
+  } else if (step === 9) {
     b = 10;
     ans = ri(1, 10);
   } else {
-    // Lvl 10: Divisão de dezenas exatas
     b = ri(2, 5);
     ans = ri(1, 9) * 10;
   }
@@ -52,25 +44,24 @@ export const gDojoDiv = (lvl: number): Question => {
   const false1 = ans + ri(1, 2);
   const false2 = ans > 2 ? ans - ri(1, 2) : ans + 3;
   let false3 = ans + b;
-  if (ans >= 10 && ans % 10 === 0) {
-    false3 = ans + 10;
-  }
+  if (ans >= 10 && ans % 10 === 0) false3 = ans + 10;
 
   const opts = [
     { label: `${ans}`, value: ans },
     { label: `${false1}`, value: false1 },
     { label: `${false2}`, value: false2 },
-    { label: `${false3}`, value: false3 }
+    { label: `${false3}`, value: false3 },
   ].sort(() => Math.random() - 0.5);
 
-  return {
-    kind: "rapid-fire", prompt: "",
+  return stampSenseiDojoQuestion("dojo_div", step, {
+    kind: "rapid-fire",
+    prompt: "",
     expr: `${a} ÷ ${b} = ?`,
     options: opts,
     answer: ans,
     explain: `${a} ÷ ${b} = ${ans}`,
-    rt_max_s: lvl <= 5 ? 10 : 15
-  };
+    rt_max_s: step <= 5 ? 10 : 15,
+  });
 };
 
 export const dojo_div: Track = {
@@ -80,6 +71,7 @@ export const dojo_div: Track = {
   color: "#a7f3d0",
   dark: "#047857",
   gen: gDojoDiv,
+  totalQ: 10,
   lvlSkills: [
     "Dividir por 2",
     "Dividir por 3",
@@ -90,8 +82,8 @@ export const dojo_div: Track = {
     "Dividir por 8 e 9",
     "Misto 6 ao 9",
     "Dividir por 10",
-    "Dezenas Exatas"
+    "Dezenas Exatas",
   ],
   prereqs: [],
-  dominio: "2 rounds seguidos ≥80% sobe de faixa, <60% desce"
+  dominio: "automaticidade separada: 2 rounds ≥80% de precisão E fluência para subir; <60% de precisão em 2 rounds recua só o treino",
 };

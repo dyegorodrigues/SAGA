@@ -82,7 +82,8 @@ export interface AreaSpec {
    * criança responde. Ver `algoritmoSoNaAula` e Bíblia §12.3-bis.
    */
   algoritmoSoNaAula: boolean;
-  alternativas: { valor: number; tag: string }[];
+  /** Só distratores possuem tag; o gabarito não é uma misconception. */
+  alternativas: { valor: number; tag?: string }[];
   resposta: number;
   /** A conta fechada — só depois de responder. */
   recapitulacao: string;
@@ -150,7 +151,7 @@ export function construirAreaSpec(c: Conta, nivel: number): AreaSpec {
     corte: comArea ? falaDoCorte(c) : null,
     algoritmo: mostraAlgoritmo(nivel) ? montarAlgoritmo(c) : null,
     algoritmoSoNaAula: algoritmoSoNaAula(nivel),
-    alternativas: alternativas(c).map(a => ({ valor: a.valor, tag: a.tag })),
+    alternativas: alternativas(c).map(a => ({ valor: a.valor, ...(a.tag ? { tag: a.tag } : {}) })),
     resposta: resolver(c),
     recapitulacao: `${c.a} × ${c.b} = ${resolver(c)}`,
   };

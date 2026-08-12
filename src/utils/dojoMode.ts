@@ -3,10 +3,19 @@ type ProgOf = (trackId: string) => Progress;
 import { Question, Track } from "../types";
 import { FLUENCY_IDS } from "../curriculum/motores/composer";
 
+/**
+ * @deprecated Rota genérica de free-play mantida apenas por compatibilidade com
+ * telas/links antigos que ainda apontem para `track="dojo"`.
+ *
+ * NÃO é autoridade curricular, NÃO implementa a prescrição do Sensei e NÃO
+ * pode mover o ponteiro adaptativo dos templos. A inteligência atual vive em
+ * `senseiDojoPrescription` + `senseiDojoSession`; a porta livre canônica usa os
+ * templos `dojo_add/sub/mul/div` com `source="manual"`.
+ */
 export function buildDojoTrack(tracks: Track[], progOf: ProgOf): Track {
-  // Apenas trilhas de fluência (soma, subtração) que possuem rapid-fire
+  // Heurística histórica. Mantida somente para compatibilidade do free-play.
   const fluPool = tracks.filter((t) => FLUENCY_IDS.includes(t.id));
-  const activeTracks = fluPool.length > 0 ? fluPool : tracks; // fallback
+  const activeTracks = fluPool.length > 0 ? fluPool : tracks;
 
   return {
     id: "dojo",
@@ -16,15 +25,10 @@ export function buildDojoTrack(tracks: Track[], progOf: ProgOf): Track {
     dark: "#9F1239", // Rose 800
     totalQ: 10,
     gen: (lvl: number) => {
-      // Força a geração de exercícios rapid-fire se possível
+      // Compatibilidade histórica: gera rapid-fire quando o tipo permite.
       const track = activeTracks[Math.floor(Math.random() * activeTracks.length)];
-      
-      // Tentamos gerar a questão até vir um rapid-fire (alguns geradores dependem do level)
-      // Level 4 e 5 costumam ser rapid-fire para soma/sub.
-      const q = track.gen(Math.max(4, lvl)); 
-      
-      // Força o tipo como rapid-fire para garantir que use o layout Dojo (sem frescura)
-      // if it's already an equation. Se for count, não faz sentido.
+      const q = track.gen(Math.max(4, lvl));
+
       if (q.expr) {
          return { ...q, kind: "rapid-fire", rt_max_s: 5 };
       }

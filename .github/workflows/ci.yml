@@ -21,7 +21,71 @@ jobs:
     timeout-minutes: 15
 
     steps:
+      - name: Checkout do HEAD do PR
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Checkout do push
+        if: github.event_name != 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Buscar a base do PR
+        run: git fetch origin main --depth=1
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Auditoria do catálogo
+        run: npm run auditar
+
+      - name: Auditoria das fichas
+        run: npm run fichas:auditar
+
+      - name: Conformidade das fichas
+        run: npm run fichas:conferir
+
+      - name: Sincronia do grafo
+        run: npm run grafo:check
+
+      - name: TypeScript
+        run: npx tsc --noEmit
+
+      - name: Testes
+        run: npm test -- --run
+
+      - name: Build
+        run: npm run build
+
+      - name: Guarda textual do PR
+        env:
+          PR_BASE: origin/main
+        run: npm run pr:check
+
+  # Em 11/08/2026 o contrato completo foi executado em um único job de 30m:
+  # 390px × 8 sementes terminou limpo (~27m30s), mas o job expirou já em 320px.
+  # Os dois jobs abaixo preservam exatamente o contrato de scripts/sonda-layout.mjs
+  # e apenas paralelizam as larguras: 390/8 sementes + 320/900/1 semente.
+  sonda-transversal-portao:
+    name: Sonda transversal — 390px × 8 sementes
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    if: github.event_name == 'pull_request'
+
+    steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
 
       - uses: actions/setup-node@v4
         with:
@@ -31,27 +95,157 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      # Invariantes curriculares: contagem canônica, IDs rejeitados, geradores
-      # órfãos e deriva de nomenclatura.
-      - name: Auditoria do catálogo
-        run: npm run auditar
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
 
-      - name: Auditoria das fichas
-        run: npm run fichas:auditar
+      - name: Sonda transversal — portão canônico
+        env:
+          SONDA_LARGURAS: '390'
+        run: npm run sonda
 
-      # O grafo é artefato derivado; o modo --check falha se alguém editar o
-      # gerado sem regerar a partir do YAML canônico.
-      - name: Sincronia do grafo
-        run: npm run grafo:check
+  sonda-transversal-responsiva:
+    name: Sonda transversal — 320/900px × 1 semente
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name == 'pull_request'
 
-      - name: TypeScript
-        run: npm run lint
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
 
-      - name: Testes
-        run: npm test -- --run
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
 
-      - name: Build
-        run: npm run build
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Sonda transversal — larguras responsivas
+        env:
+          SONDA_LARGURAS: '320,900'
+          SONDA_SEMENTES: '1'
+        run: npm run sonda
+
+  sonda-sensei-dojo:
+    name: Sonda real Sensei
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Sonda real das rotas prescritas do Sensei
+        run: npm run sonda:sensei-dojo
+
+      - name: Evidências da sonda Sensei
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-sensei-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-sensei-dojo/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F19 — reta numérica
+        run: npm run sonda:reta20
+
+      - name: Evidências da sonda F19
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f19-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-reta20/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F61 — régua
+        run: npm run sonda:regua
+
+      - name: Evidências da sonda F61
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f61-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-regua/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F29 — comparação simbólica registrada e inativa
+        run: npm run sonda:comparacao-simbolica
+
+      - name: Evidências da sonda F29
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f29-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-comparacao/
+          if-no-files-found: warn
+          retention-days: 14
+
+  higiene-diff:
+    name: Higiene do diff
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+
+      - name: Buscar a base do PR
+        run: git fetch origin ${{ github.base_ref }} --depth=1
+
+      - name: Verificar whitespace do diff
+        run: >-
+          git diff --check origin/${{ github.base_ref }}...HEAD -- .
+          ':(exclude)**/*.md' ':(exclude)*.md'
 
   guarda-textual:
     name: Guarda de binários
@@ -62,10 +256,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Por padrão o Actions confere um merge commit sintético do PR, o que
-          # distorceria o diff. Aqui o alvo é o head real da branch.
           ref: ${{ github.event.pull_request.head.sha }}
-          # A guarda compara com a base do PR; precisa do histórico.
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -75,8 +266,6 @@ jobs:
       - name: Buscar a base do PR
         run: git fetch origin ${{ github.base_ref }} --depth=1
 
-      # O criador de PR deste ambiente não aceita binários no diff textual.
-      # Falhar aqui é mais barato que descobrir na hora de publicar.
       - name: Verificar ausência de binários no diff
         env:
           PR_BASE: origin/${{ github.base_ref }}

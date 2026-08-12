@@ -180,6 +180,12 @@ describe("§6 — o diagnóstico", () => {
 });
 
 describe("§7 — as falas são as da ficha, letra por letra", () => {
+  it("o prompt normal é pós-audição: não manda apertar depois do autoplay", () => {
+    expect(FALAS.audioPrompt).toBe("Que número você ouviu?");
+    expect(FALAS.audioPrompt.toLowerCase()).not.toContain("aperte");
+    expect(FALAS.howto.toLowerCase()).toContain("aperte");
+  });
+
   it.each([
     ["audioPrompt", FALAS.audioPrompt],
     ["howto", FALAS.howto],

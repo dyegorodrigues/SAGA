@@ -1,173 +1,188 @@
 # 🧱 INVENTÁRIO DE PRIMITIVAS SAGA
-**Versão 1.1 · Agosto 2026 · o que existe, o que está ligado, o que falta construir**
+**Versão 1.4 · Agosto 2026 · estado medido da cadeia ficha → Composer → renderer**
 
-> **Para que serve.** A pergunta "as primitivas já foram criadas ou faltam?" precisava de uma
-> resposta medida, não de impressão. Este documento é o mapa: cada `kind` do catálogo §9 da Bíblia,
-> o componente que o desenha, e o estado real no repositório.
->
-> **Como foi medido:** listagem de `src/components/primitives/`, extração dos `case` do
-> `Composer.ts`, e extração dos kinds da §9 da Bíblia. Reprodutível.
-
----
-
-# §1. O RESULTADO EM UMA LINHA
-
-| | Quantos |
-|---|---:|
-| Kinds no catálogo §9 da Bíblia | **47** |
-| Componentes de primitiva já escritos | **24** |
-| Kinds efetivamente **ligados** ao Composer | **11** |
-
-**A leitura correta disso não é "faltam 36".** É:
-
-> **Metade das primitivas já está construída. O gargalo não é construir — é LIGAR.**
-> Há 13 componentes prontos no disco que o Composer não sabe chamar. Ligar um componente pronto é
-> trabalho de horas; construir do zero é trabalho de dias.
+> **Fonte executável de verdade:** `AI_Studio_Lab/tools/ficha_runtime_map.cjs`.
+> Este documento explica o mapa; não substitui o mapa. O auditor
+> `AI_Studio_Lab/tools/ficha_catalog_auditor.cjs` valida os dois sentidos da
+> integração: o que o mapa declara precisa existir **e** um kind convencional que
+> já ganhou builder + renderer não pode continuar documentado como “isolado”.
 
 ---
 
-# §2. AS TRÊS PILHAS
+# §1. O RESULTADO QUE IMPORTA
 
-## 2.1 🟢 PRONTO E LIGADO — funciona hoje *(11)*
+O catálogo autoral F0–F4 usa **26 primitivas mapeadas**. No estado atual da branch
+cumulativa, com a infraestrutura da F61/GM.05 implementada mas o canário ainda
+inativo:
 
-| Kind | Componente | Onde aparece |
-|---|---|---|
-| `emojirow` | `EmojiRow` | contar, agrupar, subitizar |
-| `numberline` | `NumberLine` / `InteractiveNumberLine` | reta numérica, saltos, arredondamento |
-| `tenframe` | `TenFrame` | moldura de dez, amigos do 10 |
-| `bond` | `NumberBond` | parte-todo, família de fatos |
-| `draggroup` | `DragGroup` | arrastar para grupos |
-| `scattered` | `ScatteredItems` | contagem dispersa, conservação |
-| `tens` | `MaterialDourado` | dezena, centena, trocas |
-| `relogio` | `Relogio` | horas, minutos |
-| `balanca` | `Balanca` | igualdade, equação |
-| `plain` | — | conta simbólica pura |
-| `intruso_math` | — *(mapeia para `plain`)* | o intruso |
-
-## 2.2 🟡 COMPONENTE EXISTE, FALTA LIGAR — o trabalho barato *(13)*
-
-**Esta é a lista mais importante do documento.** Cada linha aqui é um componente já escrito,
-testado ou não, esperando um `case` no Composer.
-
-| Componente | Kind(s) que ele destrava | Por que importa |
-|---|---|---|
-| **`InteractiveVertical`** | `vertical` | **A CONTA ARMADA.** É a primitiva mais crítica de F2-F4. Estava na lista de "buracos P1" das auditorias — mas o componente **existe**. Sem ligar, F2 inteiro fica travado. |
-| **`ArrayGrid`** | `array`, `area-model` | arranjo retangular, modelo de área, volume. É a ferramenta persistente que atravessa N4.02 → N4.09 → GM.11. |
-| **`Quadrado100`** | `hundred-chart`, `frac-shade` | centena, décimos, centésimos, porcentagem. A mesma figura em três idades. |
-| **`SingaporeBars`** | `singapore-bars`, `ratio-table` | método de barras, razão e proporção |
-| **`TraceCanvas`** | `trace` | traçado — **e é a base da Prancheta (§9.3 da Bíblia)** |
-| **`ShapeCanvas`** | `shapes`, `symmetry`, `geo-transform` | formas, simetria, transformações |
-| **`StoryPanel`** | `story`, `scene` | problemas em painéis, histórias |
-| **`SentenceBuilder`** | `math`, `sum` | montar a sentença matemática |
-| **`TakeApart`** | `part-whole` | decompor quantidade |
-| **`LinkingCubes`** | `bar-build` | cubinhos que encaixam, barras |
-| **`VisualAddition`** | `subvis` | soma visual |
-| **`TouchPlace`** | `count` | tocar para contar |
-| **`AudioChoice`** | *(áudio)* | escolha por som — a base do F0 não leitor |
-| **`Grupo`** | `groups` | grupos iguais |
-
-## 2.3 🔴 NÃO EXISTE — precisa ser construído
-
-| Kind | O que desenha | Prioridade | Onde trava sem ele |
-|---|---|---|---|
-| `money` | moedas e notas do Real | **P1** | GM.03 dinheiro e troco — F1, os filhos chegam nisso já |
-| `measure` | régua, fita, alinhamento no zero | **P1** | GM.05 medidas padronizadas, F2 |
-| `picto` | pictograma, gráfico de barras | **P1** | PE.01 e PE.02 — dados, F1 e F2 |
-| `pattern` | sequência de padrão | **P1** | AL.02 padrões (F0!) e AL.04 sequências |
-| `grid` | malha, mapa, coordenadas | P2 | GE.05 mapas (F2), GE.08 plano cartesiano (F3) |
-| `angle` | transferidor, giro | P2 | GE.06 ângulos, F3 |
-| `chip-model` | fichas de sinal (positivo/negativo) | P2 | N7.01 e N7.02 negativos, F4 |
-| `blocks-3d` | sólidos, vistas | P2 | GE.04 sólidos, GE.10 volume e vistas |
-| `daypart` | partes do dia | P3 | GM.02 tempo cotidiano, F0 |
-| `journey` | mapa da jornada | P3 | navegação, não é exercício |
-| `build-number` | compor número por ordens | P3 | N2.02, tem alternativa com `tens` |
-| `order` | ordenar sequência | P3 | N1.07, tem alternativa com `numberline` |
-| `conserv` | conservação lado a lado | P3 | N1.05, hoje resolvido com `scattered` |
-| `flash` | modo flash | — | **é um MODO do `EmojiRow` e do `TenFrame`, não componente próprio** — usado por JD1, JD2, JD3 |
-| `rapid-fire` | round cronometrado do Dojo | 🟢 | `RapidFire.tsx` **existe** em `components/exercises/` |
-| `drag-match` | ligar par a par | 🟡 | é variação do `DragGroup` |
-| `clock-set` | ajustar ponteiros | 🟡 | é modo do `Relogio` |
-| `fact-family` | triângulo de fatos | 🟡 | é modo do `NumberBond` |
-| `count`, `groups`, `sum`, `subvis`, `part-whole` | — | 🟡 | cobertos pelos componentes de §2.2 |
-
-## 2.4 Mapa medido das 25 primitivas autorais
-
-O catálogo F0–F4 usa nomes autorais de componente, enquanto o runtime despacha por
-`kind`. O mapa executável e auditado mora em
-`AI_Studio_Lab/tools/ficha_runtime_map.cjs`; ele impede considerar igualdade de nome
-como prova de integração.
-
-| Estado comprovado | Total | Significado |
+| Estado comprovado | Total | O que significa |
 |---|---:|---|
-| Executável | **13** | há builder e renderer comprovados |
-| Renderer sem builder | **5** | a tela sabe desenhar, mas o Composer ainda não gera os dados |
-| Componente isolado | **6** | componente existe, mas não está na cadeia builder/renderer |
-| Ausente | **1** | não existe componente, builder nem renderer |
+| **Executável** | **21** | ficha pode chegar a builder — genérico ou especializado — e renderer reais |
+| **Renderer sem builder** | **4** | app sabe desenhar, Composer ainda não produz o contrato |
+| **Componente isolado** | **1** | componente existe, mas ainda não forma cadeia executável |
+| **Ausente** | **0** | nenhuma primitiva autoral usada pelas fichas está sem componente/cadeia suficiente |
 
-As três divergências de nome foram resolvidas semanticamente:
+A leitura correta não é “faltam dezenas de primitivas”. O gargalo real é misto:
+algumas peças precisam apenas de ligação, outras precisam de contrato novo, e
+várias que antes constavam como “faltando ligar” **já foram ligadas**.
 
-- `TouchCount` não é uma primitiva ausente: usa `EmojiRow`/`emojirow`, que já oferece
-  contagem por toque e áudio;
-- `Moedas` já possui `MoneyCoin`/`MoneyNote` e renderer inline de `money`, mas ainda
-  precisa de contrato extraído e builder;
-- `Regua`/`measure` é a única lacuna realmente ausente entre as 25 primitivas usadas
-  pelas fichas recebidas.
+Importante: **primitive executável não significa competência ativada**. `Regua`
+já existe e possui builder especializado + Stage, mas GM.05 continua em fallback
+enquanto o canário W5 estiver inativo. Infraestrutura e entrega curricular são
+estados diferentes e a Coverage Matrix os mede separadamente.
 
-O primeiro desbloqueio após o inventário foi concluído: `vertical` agora possui
-builder tipado, geração opcional com reagrupamento e contrato de resposta única para
-o `InteractiveVertical`.
+---
 
-**Primitiva nova declarada na Bíblia v3.2 e ainda não construída:**
+# §2. MAPA AUTORAL → RUNTIME
 
-| Primitiva | Kind | Estado |
+## 2.1 🟢 Executáveis — 21
+
+| Primitiva autoral | Dispatch/runtime | Observação |
 |---|---|---|
-| **Prancheta** | `prancheta` *(camada, não kind de exercício)* | 🔴 a construir — base é o `TraceCanvas` que já existe |
-| **Mão Fantasma** | `<GhostHand/>` *(camada)* | 🔴 a construir — spec em §7.1-bis, com o contrato de esmaecimento |
+| `ArrayGrid` | `arraygrid` → `array` | arranjos/área |
+| `AudioChoice` | `audiochoice` | **F05/N1.06**; autoplay, retry e feedback temporal autoral |
+| `Balanca` | `balanca` | igualdade |
+| `Recipientes` | `medidas` | **F50/GM.12**; capacidade sem unidade: fontes cheias → despejo → recipientes iguais de referência |
+| `DragGroup` | `draggroup` | agrupamento por arrasto |
+| `EmojiRow` | `emojirow` | contagem/subitização |
+| `Grupo` | `grandeza` → `GrandezaStage` | F49/GM.01; cadeia autoral especializada substitui o grupo genérico para manter bases alinhadas |
+| `InteractiveNumberLine` | `numberline` / `numberline-f19` | reta interativa compartilhada; F19 usa builder especializado |
+| `InteractiveVertical` | `vertical` | algoritmo vertical |
+| `MaterialDourado` | `tens` / `material-dourado` | valor posicional; F21 usa Stage manipulativo especializado |
+| `NumberBond` | `bond` | parte–todo |
+| `NumberLine` | `numberline` | reta numérica |
+| `Regua` | `regua-f61` | **F61/GM.05**; alinhamento no zero, drag + alternativa por toque, filtro motor e sonda Chrome |
+| `Relogio` | `relogio` | tempo |
+| `ScatteredItems` | `scattered` | conservação/contagem dispersa |
+| `ShapeCanvas` | `shapecanvas` | **F47/GE.01 + F48/GE.02**; despacha para Stage específico |
+| `StoryPanel` | `storypanel` → `story-bars` | F20/N3.10; builder e Stage narrativo especializados |
+| `TenFrame` | `tenframe` | moldura de dez |
+| `TouchCount` | `touchcount` | **F27/N1.02 + F01/N1.04**; primitiva própria de contagem por toque |
+| `TouchPlace` | `touchplace` | **F04/N1.13**; produção de quantidade, arrasto, retry autoral |
+| `plain` | `plain` | alternativa/simbólico básico |
 
----
+### Ligações que não podem voltar a aparecer como “faltando”
 
-# §3. A ORDEM QUE EU FARIA
+- **`AudioChoice`** já possui builder, renderer e Stage executável. O fluxo F05 foi
+  auditado em Chromium, inclusive abertura → primeira audição → opções → erro →
+  retry → fecho.
+- **`TouchCount`** não é apenas alias de `EmojiRow`: existe `TouchCount.tsx`,
+  builder `touchcount`, renderer `touchcount` e contrato próprio. Ele compartilha
+  gramática visual com a fileira, mas mede outra ação.
+- **`TouchPlace`** já possui builder, renderer e Stage executável. O gesto canônico
+  é arrasto real com alternativa por toque; o ghost sai do `PalcoEscalado` por
+  portal para continuar sob o dedo.
+- **`ShapeCanvas`** já possui builder `shapecanvas` e renderer. O mesmo contrato é
+  especializado por `CenaDePosicaoStage` (F47) e `FormaStage` (F48).
+- **`Regua`** deixou de ser lacuna estrutural na W5. `Regua.tsx` é a superfície
+  visual, `ReguaStage.tsx` governa a interação e `reguaContract.ts` é o builder
+  especializado da GM.05. O canário curricular continua independente desse fato.
 
-Ordenada por **desbloqueio por hora de trabalho**, não por elegância.
+## 2.2 🟡 Renderer existe, builder falta — 4
 
-| # | O quê | Custo | Desbloqueia |
-|---|---|---|---|
-| 1 | Ligar `InteractiveVertical` → `vertical` | horas | **conta armada** — F2 inteiro |
-| 2 | Ligar `ArrayGrid` → `array`, `area-model` | horas | multiplicação, área, volume — F2 a F4 |
-| 3 | Ligar `Quadrado100` → `hundred-chart`, `frac-shade` | horas | centena, decimais, porcentagem |
-| 4 | Ligar `SingaporeBars`, `ShapeCanvas`, `StoryPanel`, `SentenceBuilder` | 1 dia | frações, geometria, problemas |
-| 5 | Construir `money`, `measure`, `picto`, `pattern` | dias | fecha F1 e boa parte de F2 |
-| 6 | Construir a **Prancheta** sobre o `TraceCanvas` | 1-2 dias | conta armada usável de verdade |
-| 7 | Construir a **Mão Fantasma** com o contrato esmaecido | 2 dias | o ensino do nível 1 em toda competência |
-| 8 | Construir `grid`, `angle`, `chip-model`, `blocks-3d` | dias | F3 e F4 |
+| Primitiva | Runtime já existente | Dívida real |
+|---|---|---|
+| `LinkingCubes` | `linking-cubes` | Composer ainda não constrói o contrato |
+| `Moedas` | `money` | extrair contrato/builder; render inline já existe |
+| `SingaporeBars` | `singapore-bars` | renderer legado existe; builder autoral ainda não é geral |
+| `VisualAddition` | `visual-addition` | `subvis`/variação ainda não entra pelo Composer |
 
-**Os passos 1 a 4 são 13 componentes prontos ganhando um `case`.** É o maior retorno por hora do
-projeto inteiro, e é o que estava sendo contado como "buraco crítico" nas auditorias.
+## 2.3 🟠 Componente isolado — 1
 
----
-
-# §4. A REGRA PARA NÃO BAGUNÇAR
-
-> **Primitiva é infraestrutura, não conteúdo.** Ela não sabe qual competência está sendo ensinada,
-> não sabe o tema, não sabe a idade. Recebe dados e desenha.
-
-| Regra | Bíblia |
+| Primitiva | Estado |
 |---|---|
-| A primitiva **não escolhe cor, emoji nem tema** — recebe do skin | §10.11, camada visual |
-| O gerador **não desenha** — produz dados puros | §10.11 |
-| Uma primitiva serve **muitas** competências; nunca criar primitiva para uma competência só | §12.6 |
-| Toda primitiva publica sua **API visual** para a coreografia | §7.4 |
-| Kind novo passa pelo **§15.4 (TIPO C — mecânica nova)** | §15 |
-| Toda mecânica de arrasto oferece **alternativa por toque** e snap | §8.3-bis |
+| `Quadrado100` | componente existe; falta builder/renderer autoral para os kinds declarados |
 
-**Antes de criar primitiva nova, o teste obrigatório:** existe componente que já faz isso com outro
-nome? Este documento existe justamente porque `InteractiveVertical` e `TraceCanvas` estavam
-construídos e sendo listados como "faltando".
+## 2.4 🔴 Ausentes — 0
+
+Nenhuma das 26 primitivas autorais mapeadas está atualmente sem componente ou
+cadeia suficiente para ser classificada acima. Isso **não** elimina dívida de
+builder: `Moedas`, `LinkingCubes`, `SingaporeBars` e `VisualAddition` continuam
+sem builder autoral, e `Quadrado100` continua isolado.
 
 ---
 
-*Changelog: v1.1 (ago/2026) — adiciona mapa autoral→runtime auditável e resolve semanticamente
-`TouchCount`, `Moedas` e `Regua`. v1.0 — inventário inaugural, medido diretamente do repositório no branch
-`codex/realizar-auditoria-completa-do-repositorio-saga-fovec6`. Corrige a percepção de que faltavam
-primitivas críticas: `InteractiveVertical` (conta armada), `TraceCanvas` (traçado) e `RapidFire`
-(Dojo) já existem — não estão ligados ao Composer.*
+# §3. KINDS MAIS AMPLOS DA BÍBLIA
+
+A Bíblia também nomeia modos/kinds que não correspondem 1:1 às 26 primitivas
+autorais acima. Não contar cada nome como “um componente faltando”. Antes de
+construir, classificar em uma destas categorias:
+
+1. **alias** de primitiva existente;
+2. **modo** de componente existente (`flash`, `clock-set`, `fact-family`);
+3. **renderer legado** que precisa de builder;
+4. **mecânica realmente nova**.
+
+Exemplos de mecânicas relevantes fora do mapa autoral atual:
+
+| Kind/mecânica | Situação |
+|---|---|
+| `measure` | realizado pela `Regua`/F61 na cadeia especializada GM.05; não criar segundo componente homônimo |
+| `picto` | requer primitiva de dados/gráfico |
+| `pattern` | requer contrato próprio ou reutilização comprovada |
+| `grid` | malha/mapa; prioridade para GE.05/GE.08 |
+| `angle` | ângulos/transferidor |
+| `chip-model` | inteiros positivos/negativos |
+| `blocks-3d` | sólidos/vistas |
+| `flash` | **modo**, não componente independente |
+| `rapid-fire` | já existe em `components/exercises/` |
+| `drag-match` | verificar reutilização de `DragGroup` antes de criar algo novo |
+| `clock-set` | modo do `Relogio` |
+| `fact-family` | modo do `NumberBond` |
+
+---
+
+# §4. REGRA DE ENGENHARIA
+
+> **Primitiva é infraestrutura, não conteúdo.** Ela recebe contrato e desenha;
+> quem decide competência, nível, diagnóstico e progressão são as camadas
+> curriculares/orquestradoras apropriadas.
+
+| Regra | Consequência |
+|---|---|
+| builder produz dados puros | React não decide currículo |
+| Stage possui apenas a interação que a ficha lhe delega | GameLoop não fala por cima de feedback autoral |
+| uma primitiva serve várias competências | evitar componente “da competência X” sem necessidade mecânica |
+| arrasto sempre tem alternativa por toque e snap generoso | acessibilidade motora §8.3-bis |
+| API visual explícita | microaula/Mão Fantasma não depende de seletor improvisado |
+| kind novo exige auditoria de cadeia inteira | ficha → contrato → builder → renderer → Stage → Radar/evidência |
+| builder especializado conta como cadeia real quando o auditor prova ID→builder→renderer | evitar `case` genérico morto apenas para satisfazer inventário |
+
+Antes de criar primitiva nova, responder obrigatoriamente:
+
+1. já existe componente que faz a mesma mecânica com outro nome?
+2. já existe renderer legado sem builder?
+3. é apenas um modo de componente existente?
+4. a ficha precisa mesmo de mecânica nova ou apenas de composição de primitivas?
+
+---
+
+# §5. PORTÃO CONTRA DERIVA DOCUMENTAL
+
+O problema histórico era unilateral: o auditor verificava “o que o mapa declara
+existe”, mas não verificava “o código evoluiu e o mapa ficou velho”. Por isso
+`AudioChoice`, `TouchCount`, `TouchPlace` e `ShapeCanvas` puderam evoluir enquanto
+a documentação ainda descrevia estados anteriores.
+
+A partir da v1.2, `ficha_catalog_auditor.cjs` também faz a checagem reversa para
+kinds convencionais. Na W5 o gate ganhou ainda a noção explícita de **builder
+especializado por competência**, para não forçar um builder genérico morto quando
+uma primitive possui um único consumidor autoral real.
+
+Se Composer/builder especializado + renderer já provam a cadeia e o mapa não a
+reconhece, **o gate falha**.
+
+Isso transforma este inventário de memória humana em contrato verificável.
+
+---
+
+*Changelog: v1.4 (ago/2026) — W5/F61 implementa `Regua` com builder especializado,
+Stage responsivo, filtro motor, alternativa por toque e sonda Chrome; estado
+medido passa a 21 executáveis / 4 renderer-sem-builder / 1 isolada / 0 ausentes,
+sem confundir primitive pronta com canário GM.05 ativo. v1.3 — adiciona
+`Recipientes` como a 26ª primitiva mapeada e 18ª executável após F50/GM.12
+validada em Chromium e por inspeção visual; mantém unidades padronizadas fora de
+F0. v1.2 — sincroniza `AudioChoice`, `TouchCount`, `TouchPlace` e `ShapeCanvas`
+com o runtime real; adiciona guarda reversa no auditor. v1.1 — introduziu o mapa
+autoral→runtime auditável e resolveu semanticamente `Moedas` e `Regua`. v1.0 —
+inventário inaugural.*

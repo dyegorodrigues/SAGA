@@ -8,12 +8,14 @@ const FICHAS_DIR = path.join(ROOT, "AI_Studio_Lab/pedagogia/fichas");
 const GRAPH_PATH = path.join(ROOT, "curriculum/grafo_saga.yaml");
 const COMPONENTS_DIR = path.join(ROOT, "src/components");
 const COMPOSER_PATH = path.join(ROOT, "src/curriculum/Composer.ts");
+const COMPOSER_CANARY_PATH = path.join(ROOT, "src/curriculum/motores/composerCanary.ts");
 const RENDERER_PATHS = [
   path.join(ROOT, "src/components/FichaRenderer.tsx"),
   path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
 ];
-const EXPECTED_FICHAS = 92;
-const EXPECTED_COMPETENCIES = 88;
+// P21/P22: o número de fichas é métrica derivada. Cobertura canônica, IDs,
+// nove seções e o mapa runtime são os invariantes — não uma fotografia 93/94.
+const EXPLICIT_MISSING_FICHA_EXCEPTIONS = new Map([]);
 const REJECTED_IDS = new Set(["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"]);
 
 const failures = [];
@@ -30,7 +32,18 @@ const componentNames = new Set(
 );
 const builtInPrimitives = new Set(["plain"]);
 const composerSource = fs.readFileSync(COMPOSER_PATH, "utf8");
+const composerCanarySource = fs.readFileSync(COMPOSER_CANARY_PATH, "utf8");
 const rendererSource = RENDERER_PATHS.map((file) => fs.readFileSync(file, "utf8")).join("\n");
+
+const composerTem = (kind) => composerSource.includes(`case "${kind}"`) || composerSource.includes(`case '${kind}'`);
+const specializedBuilderTem = (id) => {
+  const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`["']${escaped}["']\\s*:\\s*construir[A-Za-z0-9_]+`).test(composerCanarySource);
+};
+const rendererTem = (kind) => rendererSource.includes(`kind === "${kind}"`)
+  || rendererSource.includes(`kind === '${kind}'`)
+  || rendererSource.includes(`case "${kind}"`)
+  || rendererSource.includes(`case '${kind}'`);
 
 function parseFichaFile(file) {
   const source = fs.readFileSync(path.join(FICHAS_DIR, file), "utf8");
@@ -57,12 +70,8 @@ const fichaIds = fichas.map((ficha) => ficha.fichaId);
 const competenceIds = fichas.map((ficha) => ficha.competenceId).filter(Boolean);
 const uniqueCompetenceIds = new Set(competenceIds);
 
-check(fichas.length === EXPECTED_FICHAS, `esperava ${EXPECTED_FICHAS} fichas; encontrou ${fichas.length}`);
+check(fichas.length > 0, "catálogo autoral não contém nenhuma ficha");
 check(new Set(fichaIds).size === fichaIds.length, "há IDs de ficha duplicados");
-check(
-  uniqueCompetenceIds.size === EXPECTED_COMPETENCIES,
-  `esperava cobertura autoral de ${EXPECTED_COMPETENCIES} competências; encontrou ${uniqueCompetenceIds.size}`
-);
 
 for (const ficha of fichas) {
   check(Boolean(ficha.competenceId), `${ficha.fichaId} não declara competência e primitiva na identidade`);
@@ -77,6 +86,33 @@ for (const ficha of fichas) {
 }
 
 const missingCompetenceFichas = [...graphIds].filter((id) => !uniqueCompetenceIds.has(id));
+const unexpectedMissingCompetences = missingCompetenceFichas
+  .filter((id) => !EXPLICIT_MISSING_FICHA_EXCEPTIONS.has(id));
+const staleMissingExceptions = [...EXPLICIT_MISSING_FICHA_EXCEPTIONS.keys()]
+  .filter((id) => !missingCompetenceFichas.includes(id));
+const unknownMissingExceptions = [...EXPLICIT_MISSING_FICHA_EXCEPTIONS.keys()]
+  .filter((id) => !graphIds.has(id));
+const unjustifiedMissingExceptions = [...EXPLICIT_MISSING_FICHA_EXCEPTIONS]
+  .filter(([, reason]) => typeof reason !== "string" || reason.trim().length < 20)
+  .map(([id]) => id);
+
+check(
+  unexpectedMissingCompetences.length === 0,
+  `grafo possui competências sem ficha e sem exceção explícita: ${unexpectedMissingCompetences.join(", ")}`
+);
+check(
+  staleMissingExceptions.length === 0,
+  `remova exceções de ficha que já não são lacunas: ${staleMissingExceptions.join(", ")}`
+);
+check(
+  unknownMissingExceptions.length === 0,
+  `exceções de ficha apontam para IDs fora do grafo: ${unknownMissingExceptions.join(", ")}`
+);
+check(
+  unjustifiedMissingExceptions.length === 0,
+  `exceções de ficha precisam de justificativa explícita: ${unjustifiedMissingExceptions.join(", ")}`
+);
+
 const primitiveUsage = new Map();
 for (const ficha of fichas) {
   for (const primitive of ficha.primitives) {
@@ -93,10 +129,12 @@ check(runtimeMapByPrimitive.size === FICHA_RUNTIME_MAP.length, "o mapa runtime p
 for (const primitive of primitiveUsage.keys()) {
   check(runtimeMapByPrimitive.has(primitive), `primitiva autoral ${primitive} não está no mapa runtime`);
 }
+
 for (const entry of FICHA_RUNTIME_MAP) {
   check(primitiveUsage.has(entry.primitive), `mapa runtime contém primitiva não usada ${entry.primitive}`);
   check(entry.kinds.length > 0, `${entry.primitive} não declara kind semântico`);
   check(entry.builtin || entry.componentFiles.length > 0 || entry.note, `${entry.primitive} não documenta componente nem lacuna`);
+
   for (const file of entry.componentFiles) {
     const absoluteFile = path.join(ROOT, file);
     check(fs.existsSync(absoluteFile), `${entry.primitive} aponta para componente inexistente ${file}`);
@@ -107,19 +145,40 @@ for (const entry of FICHA_RUNTIME_MAP) {
       }
     }
   }
+
   for (const kind of entry.builderKinds) {
-    check(composerSource.includes(`case "${kind}"`) || composerSource.includes(`case '${kind}'`), `${entry.primitive} declara builder ausente para ${kind}`);
+    check(composerTem(kind), `${entry.primitive} declara builder ausente para ${kind}`);
+  }
+  for (const id of entry.specializedBuilderIds || []) {
+    check(graphIds.has(id), `${entry.primitive} declara builder especializado para ID fora do grafo: ${id}`);
+    check(specializedBuilderTem(id), `${entry.primitive} declara builder especializado ausente para ${id}`);
   }
   for (const kind of entry.rendererKinds) {
-    const doubleQuoted = `kind === "${kind}"`;
-    const singleQuoted = `case '${kind}'`;
-    check(rendererSource.includes(doubleQuoted) || rendererSource.includes(singleQuoted), `${entry.primitive} declara renderer ausente para ${kind}`);
+    check(rendererTem(kind), `${entry.primitive} declara renderer ausente para ${kind}`);
+  }
+
+  /**
+   * Guarda REVERSA contra documentação atrasada.
+   *
+   * Para primitivas cujo nome autoral vira naturalmente o dispatch kind, se
+   * código e renderer já provam a cadeia, o mapa é obrigado a reconhecê-la.
+   */
+  const kindConvencional = entry.primitive.replace(/[^A-Za-z0-9]/g, "").toLowerCase();
+  if (composerTem(kindConvencional) && rendererTem(kindConvencional)) {
+    check(
+      entry.builderKinds.includes(kindConvencional),
+      `${entry.primitive}: Composer já possui ${kindConvencional}, mas builderKinds do mapa está atrasado`
+    );
+    check(
+      entry.rendererKinds.includes(kindConvencional),
+      `${entry.primitive}: renderer já possui ${kindConvencional}, mas rendererKinds do mapa está atrasado`
+    );
   }
 }
 
 function runtimeStatus(entry) {
   const hasComponent = entry.builtin || entry.componentFiles.length > 0;
-  const hasBuilder = entry.builderKinds.length > 0;
+  const hasBuilder = entry.builderKinds.length > 0 || (entry.specializedBuilderIds || []).length > 0;
   const hasRenderer = entry.rendererKinds.length > 0;
   if (hasBuilder && hasRenderer) return "executável";
   if (hasComponent && hasRenderer) return "renderer-sem-builder";
@@ -141,8 +200,14 @@ for (const file of files) {
   console.log(`- ${file}: ${fichas.filter((ficha) => ficha.file === file).length} fichas`);
 }
 
-console.log("\n[COMPETÊNCIAS SEM FICHA AUTORAL]");
-console.log(missingCompetenceFichas.join(", ") || "Nenhuma");
+console.log("\n[COMPETÊNCIAS SEM FICHA AUTORAL — EXCEÇÕES EXPLÍCITAS]");
+if (missingCompetenceFichas.length) {
+  for (const id of missingCompetenceFichas) {
+    console.log(`- ${id}: ${EXPLICIT_MISSING_FICHA_EXCEPTIONS.get(id) || "SEM EXCEÇÃO — FALHA"}`);
+  }
+} else {
+  console.log("Nenhuma");
+}
 
 console.log("\n[PRIMITIVAS SEM COMPONENTE HOMÔNIMO]");
 for (const { primitive, usedBy } of unavailablePrimitives) {
@@ -153,9 +218,13 @@ if (!unavailablePrimitives.length) console.log("Nenhuma");
 console.log("\n[MAPA FICHA → RUNTIME]");
 for (const entry of FICHA_RUNTIME_MAP) {
   const usage = primitiveUsage.get(entry.primitive) || [];
+  const builders = [
+    ...entry.builderKinds,
+    ...(entry.specializedBuilderIds || []).map(id => `special:${id}`),
+  ];
   console.log(
     `- ${entry.primitive}: ${runtimeStatuses.get(entry.primitive)} | ` +
-    `kinds=${entry.kinds.join("+")} | builder=${entry.builderKinds.join("+") || "—"} | ` +
+    `kinds=${entry.kinds.join("+")} | builder=${builders.join("+") || "—"} | ` +
     `renderer=${entry.rendererKinds.join("+") || "—"} | fichas=${usage.length}`
   );
 }
@@ -170,5 +239,9 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;
 } else {
-  console.log("\n[RESULTADO] 92 fichas válidas, nove seções presentes e 88 competências cobertas.");
+  console.log(
+    `\n[RESULTADO] ${fichas.length} fichas válidas, nove seções presentes e ` +
+    `${uniqueCompetenceIds.size}/${graphIds.size} competências cobertas; ` +
+    `${missingCompetenceFichas.length} lacuna(s) canônica(s) explícita(s).`
+  );
 }

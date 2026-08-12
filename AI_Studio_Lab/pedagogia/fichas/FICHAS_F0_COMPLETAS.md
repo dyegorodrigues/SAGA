@@ -46,11 +46,11 @@
 | 14 | **F47** — Onde está? | GE.01 | posição no espaço | ✅ |
 | 15 | **F48** — Que forma é essa? | GE.02 | reconhecer forma mesmo girada | ✅ |
 | 16 | **F49** — Maior, menor, mais alto | GM.01 | comparar grandezas com base alinhada | ✅ |
-| 17 | **F50** — Cabe mais ou menos? | GM.02 | peso e capacidade independem do tamanho | ✅ |
+| 17 | **F50** — Cabe mais ou menos? | GM.12 | peso e capacidade independem do tamanho | ✅ |
 | 18 | **F51** — Separar por atributo | AL.01 | classificar — e o "não pertence" | ✅ |
 | 19 | **F52** — O que vem depois? | AL.02 | padrões — a regra geral | ✅ |
 
-**Legenda de progresso:** ✅ **21 fichas · 15 competências · bloco F0 COMPLETO** *(v3.1: JD2 e JD3 escritas — o Jardim do Dojo fica completo, JD1 a JD5)*
+**Legenda de progresso:** ✅ **21 fichas autorais completas neste bloco.** A ficha autoral de **GM.02 (tempo cotidiano)** existe separadamente em `FICHA_P22_GM_02_TEMPO_COTIDIANO.md`. No catálogo canônico vigente, o SAGA fecha **90 competências / 94 fichas autorais**. *(JD1 a JD5 permanecem completos.)*
 
 *Três fichas deste bloco (JD5, F28, F19) tratam competências que **pertencem à faixa F1** no grafo (N1.10, N1.11, N1.12). Estão aqui porque a criança as encontra antes — o número da faixa indica a complexidade do conceito, não a ordem de contato.*
 
@@ -805,7 +805,7 @@ Aperte e escute. Que numero voce ouviu?
 
 ## 7. Falas
 
-**audioPrompt:** *"Aperte e escute. Que número você ouviu?"*
+**audioPrompt (após a primeira audição automática):** *"Que número você ouviu?"*
 **howto:** *"Aperte o botão azul. Escute bem. Depois toque no número que você ouviu."*
 **explain:** *"Aperte de novo e escute com atenção. Eu vou falar devagar."*
 
@@ -829,11 +829,13 @@ Aperte e escute. Que numero voce ouviu?
 *O sucessor: a semente de toda a adição.*
 
 ## 1. Identidade
-**Competência:** N1.07 (sucessor e antecessor) · **Primitiva:** `AudioChoice` + `NumberLine` · **Faixa:** F0 · **Também é trilha do Dojo (JD4)**
+**Competência:** N1.07 (ordem, sucessor e antecessor) · **Primitiva:** `NumberLine` + `plain` · **Faixa:** F0 · **JD4 é a trilha posterior de automaticidade**
 
 ## 2. Fundamento
 
 **O que a criança aprende:** que cada número tem um **próximo fixo** — e que "próximo" significa "mais um".
+
+**Escopo da Jornada N1.07:** a competência canônica inclui **sucessor, antecessor e ordenação de 3–4 numerais**. A Jornada observa os três componentes. JD4 automatiza a vizinhança numérica depois; não substitui compreensão nem concede domínio da Jornada.
 
 **Por que trava:** a criança recita a sequência inteira para descobrir o que vem depois do 6. Ela precisa "correr" do 1 até chegar lá. Enquanto o sucessor não for **acesso direto**, somar será sempre contar tudo de novo.
 
@@ -881,7 +883,7 @@ Escute e diga o que vem DEPOIS.
 |---|---|---|---|
 | **1** | sucessor | sim, com marcador | até 5 |
 | **2** | sucessor | sim | até 10 |
-| **3** | sucessor | **não** | até 10 |
+| **3** | sucessor | **não** | até 20 |
 | **4** | **antecessor** ("o que vem antes") | não | até 10 |
 | **5** | alternando os dois, mais rápido | não | até 20 |
 
@@ -898,9 +900,9 @@ Escute e diga o que vem DEPOIS.
 
 ## 7. Falas
 
-**audioPrompt:** *"Escute e diga o que vem depois."*
-**howto:** *"Pense na sequência. Depois do cinco vem sempre o mesmo número."*
-**explain:** *"Olhe a reta: o próximo é o vizinho da direita, um passinho à frente."*
+**audioPrompt:** *"Escute e responda o vizinho pedido."*
+**howto:** *"Pense na sequência sem voltar ao um. Depois e antes têm vizinhos fixos."*
+**explain:** *"Na reta, o sucessor é o vizinho da direita e o antecessor é o vizinho da esquerda."*
 
 ## 8. Coreografia (nível 1)
 
@@ -913,8 +915,8 @@ Escute e diga o que vem DEPOIS.
 ]
 ```
 
-## 9. Domínio
-`{ acertos: 3, de: 3, sessoes: 2 }` — e **regra extra**: os acertos precisam ser **sem recitar** (medido pelo tempo de resposta: abaixo de 4 segundos indica acesso direto, acima indica contagem).
+## 9. Domínio / automaticidade
+Na **Jornada N1.07**, domínio conceitual exige evidência de sucessor, antecessor e ordenação e **nunca depende de velocidade**. No **JD4**, `{ acertos: 3, de: 3, sessoes: 2 }` e o tempo descrevem automaticidade/fluência, sem coroar a competência-mãe.
 
 ---
 ---
@@ -1389,7 +1391,9 @@ Salte 3 casas a partir do 4.
 *A mesma contagem, três dificuldades. O arranjo é o degrau escondido.*
 
 ## 1. Identidade
-**Competência:** N1.04 (contagem — aprofundamento) · **Primitiva:** `EmojiRow` / `ScatteredItems` · **Faixa:** F0 · **Campo-chave:** `arranjo`
+**Competência:** N1.04 (contagem — aprofundamento) · **Primitiva:** `TouchCount` · **Faixa:** F0 · **Campo-chave:** `arranjo`
+
+> **Retificação W1 — ago/2026.** A declaração antiga `EmojiRow / ScatteredItems` contradizia a própria F03 §2/§4, que exige a marcação por toque da F01 e diz explicitamente: “igual à F01: toque acende, numeral salta, voz conta”. F03 reutiliza `TouchCount`; o degrau novo é o `arranjo`, não uma segunda gramática de interação.
 
 ## 2. Fundamento
 
@@ -1591,21 +1595,23 @@ Qual objeto esta EMBAIXO da mesa?
 | 2 | formas **giradas** |
 | 3 | formas de tamanhos e cores diferentes |
 | 4 | **no mundo real** (roda = círculo, janela = retângulo) |
-| 5 | **formas 3D** (cubo, esfera, cilindro) |
+| 5 | **mistura de representações planas** — formas puras e formas dentro de objetos, com giro, cor e tamanho já conhecidos |
+
+> **Retificação GE.02 × GE.04 — ago/2026.** A versão anterior colocava cubo, esfera e cilindro no nível 5. O grafo, porém, define `GE.02` como **formas planas básicas** e reserva `GE.04`/F59 para **sólidos geométricos**. Manter os sólidos aqui duplicava a competência sucessora e saltava a fronteira do grafo. O nível 5 passa a testar transferência/invariância combinando apenas representações 2D já ensinadas; os sólidos permanecem integralmente em GE.04.
 
 ## 6. Diagnóstico
 `SO_ORIENTACAO_PADRAO` (não reconhece girado — **o alvo**) · `CONFUNDE_QUADRADO_RETANGULO` · `IGNORA_LADOS` (escolhe pela aparência geral)
 
 ## 7. Falas
-**howto:** *"Conte os lados. O triângulo sempre tem três, esteja em qualquer posição."*
+**howto:** *"Olhe o contorno. Se houver lados, conte; mesmo virada, a forma continua a mesma."*
 **explain:** *"Não olhe a posição. Conte quantos lados a forma tem."*
 
 ## 8. Coreografia (nível 2)
 ```
 [
-  { fala: "Procuramos o triângulo.",  mostra: { destacarTodas: true },   sync: "junto" },
-  { fala: "Ele tem três lados.",      mostra: { contarLados: 3 },        sync: "junto" },
-  { fala: "Mesmo virado, é triângulo!", mostra: { girarForma: 360 },     sync: "depois" }
+  { fala: "Procure a forma que eu pedi.", mostra: { destacarTodas: true },      sync: "junto" },
+  { fala: "Conte os lados da forma certa.", mostra: { contarLadosAlvo: true }, sync: "junto" },
+  { fala: "Mesmo virada, ela continua sendo a mesma forma!", mostra: { girarAlvo: true }, sync: "depois" }
 ]
 ```
 
@@ -1626,6 +1632,8 @@ Qual objeto esta EMBAIXO da mesa?
 
 **⚠️ A regra pedagógica que quase todo material erra:** as **bases precisam estar alinhadas na mesma linha horizontal**. Comparar altura com objetos flutuando em posições diferentes ensina errado — é o equivalente visual de comparar quantidade pelo espaço ocupado.
 
+**A mesma regra vale girada em 90° para comprimento:** os dois objetos começam na **mesma linha vertical**. Comparar “comprido/curto” com pontos de partida diferentes é uma comparação injusta pelo mesmo motivo. A referência muda de eixo; o princípio pedagógico não muda.
+
 **Por que trava:** a criança julga pelo que "parece maior" sem critério. Um objeto mais próximo ou mais colorido parece maior.
 
 ## 3. Estrutura da tela
@@ -1645,7 +1653,7 @@ Qual dinossauro e MAIS ALTO?
 ## 4. Roteiro cinematográfico
 | Momento | O que acontece | Tempo |
 |---|---|---|
-| **Abertura** | uma **linha de chão** se desenha atravessando os dois contêineres. Os objetos "pousam" nela. | 1,2s |
+| **Abertura** | a **referência comum** se desenha: linha de chão na altura; linha de início no comprimento. Os objetos pousam/encostam nela. | 1,2s |
 | **Instrução** | a voz fala, enfatizando o atributo (**mais alto**) | 1,3s |
 | **Ajuda: a régua fantasma** *(nível 3+)* | uma linha horizontal tracejada **sobe do chão até o topo do menor** — mostra visualmente a diferença | 1,5s |
 | **Acerto** | o objeto maior **cresce ligeiramente** e uma seta vertical mede sua altura | 1,8s |
@@ -1659,7 +1667,7 @@ Qual dinossauro e MAIS ALTO?
 | 2 | comprido/curto | clara |
 | 3 | **diferença pequena** | exige comparar com cuidado |
 | 4 | **objetos diferentes** (comparar altura de coisas distintas) | ignora o tipo |
-| 5 | **ordenar três ou mais** por tamanho | seriação |
+| 5 | **ordenar três ou mais** por tamanho | seriação — mesma identidade visual, escalada proporcionalmente |
 
 **O nível 5 é seriação** — ordenar três objetos exige comparações encadeadas, e é um marco cognitivo próprio.
 
@@ -1689,7 +1697,9 @@ Qual dinossauro e MAIS ALTO?
 *Capacidade e peso — as grandezas que não se veem.*
 
 ## 1. Identidade
-**Competência:** GM.02 (capacidade e massa) · **Primitiva:** `Balanca` + `ShapeCanvas` · **Faixa:** F0
+**Competência:** GM.12 (massa e capacidade: comparação e conservação) · **Primitiva:** `Balanca` + `Recipientes` · **Faixa:** F0
+
+> **Retificação P15 — ago/2026.** A ficha antiga dizia GM.02, mas esse ID pertence a **tempo cotidiano**. A tentativa posterior de usar GM.05 também foi rejeitada porque GM.05 já é **medidas padronizadas**. F50 recebe o novo ID estável GM.12. A criança aprende primeiro a comparar/conservar massa e capacidade sem unidade; g/kg e mL/L ficam para GM.05.
 
 ## 2. Fundamento
 **O que a criança aprende:** que peso e capacidade são grandezas **independentes do tamanho aparente**.
@@ -1700,7 +1710,7 @@ Qual dinossauro e MAIS ALTO?
 
 ## 3. Estrutura da tela
 **Modo peso:** balança de dois pratos com os objetos.
-**Modo capacidade:** dois recipientes de formatos diferentes, com líquido, e um botão de "despejar" para comparar.
+**Modo capacidade:** recipientes **cheios até a borda** e um botão de "despejar" para comparar. No nível 2 eles têm a mesma forma e tamanhos diferentes; no nível 3+ os formatos também mudam.
 
 ## 4. Roteiro cinematográfico
 | Momento | O que acontece | Tempo |
@@ -1708,18 +1718,18 @@ Qual dinossauro e MAIS ALTO?
 | **Abertura (peso)** | a balança entra vazia. Os objetos caem nos pratos, e ela **pende** com física realista | 1,5s |
 | **Instrução** | a voz fala. O prato mais baixo pulsa | 1,3s |
 | **Acerto** | o objeto certo brilha, e a balança **oscila e estabiliza** mostrando claramente o desnível | 1,8s |
-| **Abertura (capacidade)** | dois recipientes de formatos diferentes com a mesma cor de líquido | 1,2s |
-| **A verificação** | botão "despejar": o líquido de um **é transferido para um recipiente-padrão graduado**, depois o outro. As alturas ficam comparáveis. | 2,5s |
+| **Abertura (capacidade)** | os recipientes-fonte aparecem **cheios até a borda**. Em L2 têm a mesma forma; em L3 a altura/formato vira a armadilha | 1,2s |
+| **A verificação** | botão "despejar": a quantidade que **cabia até a borda** em cada fonte é transferida para recipientes-padrão **iguais**, transparentes e sem marcações numéricas. As alturas passam a representar a comparação sob a mesma referência. | 2,5s |
 | **Erro suave** | o despejo acontece automaticamente, mostrando a verdade | 2,5s |
 
-**O despejo no recipiente-padrão é o que ensina.** Comparar formatos diferentes é impossível; comparar no mesmo recipiente é trivial.
+**O despejo no recipiente-padrão é o que ensina.** Em F0 esse recipiente NÃO tem números nem unidade: ele só coloca as duas capacidades sob a mesma referência. **A pergunta é quanto CABE, por isso os recipientes-fonte começam cheios até a borda**; comparar recipientes parcialmente cheios mediria a quantidade de líquido presente, não a capacidade. Graduação em mL/L pertence a GM.05.
 
 ## 5. Os 5 níveis
 | Nível | Conteúdo |
 |---|---|
 | 1 | peso, diferença óbvia (pena vs pedra) |
-| 2 | capacidade, recipientes de mesmo formato |
-| 3 | **capacidade com formatos diferentes** (a armadilha) |
+| 2 | capacidade, **mesmo formato, tamanhos diferentes e ambos cheios** |
+| 3 | **capacidade com formatos diferentes, ambos cheios** (altura externa é a armadilha) |
 | 4 | **peso contraintuitivo** (objeto pequeno mais pesado) |
 | 5 | ordenar três por peso ou capacidade |
 
@@ -1727,15 +1737,25 @@ Qual dinossauro e MAIS ALTO?
 `JULGA_PELO_TAMANHO` (**o erro central**) · `CONFUNDE_PESO_VOLUME` · `IGNORA_FORMATO`
 
 ## 7. Falas
-**howto:** *"Coloque na balança. O lado que descer é o mais pesado."*
-**explain:** *"O tamanho engana. Use a balança para descobrir."*
+**Peso — howto:** *"Olhe a balança. O lado que desce é o mais pesado."*
+**Peso — explain:** *"O tamanho pode enganar. Compare pelo que a balança faz."*
+**Capacidade — howto:** *"Os recipientes estão cheios. Em qual cabe mais?"*
+**Capacidade — explain:** *"O formato pode enganar. Despeje em recipientes iguais e compare as quantidades."*
 
 ## 8. Coreografia
+**Primeiro contato com peso (nível 1):**
 ```
 [
-  { fala: "Vamos pesar.",             mostra: { colocarNaBalanca: true },  sync: "junto" },
-  { fala: "Olha, este lado desceu.",  mostra: { destacarPratoBaixo: true },sync: "junto" },
-  { fala: "Ele é mais pesado!",       mostra: { destacarObjeto: 0 },       sync: "depois" }
+  { fala: "Vamos pesar. A balança mostra o que os olhos não mostram." },
+  { fala: "Veja qual lado desce. Esse lado está mais pesado.", mostra: { destacarCerto: true } }
+]
+```
+
+**Primeiro contato com capacidade (nível 2):**
+```
+[
+  { fala: "Os recipientes estão cheios. Queremos descobrir em qual cabe mais." },
+  { fala: "Despeje em recipientes iguais. Agora dá para comparar sem o formato enganar.", mostra: { verificar: true } }
 ]
 ```
 

@@ -34,8 +34,9 @@ import path from "node:path";
 
 const PORTA = 5199;
 const BASE = `http://localhost:${PORTA}/sonda/`;
-const CHROME = process.env.SONDA_CHROME
-  || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+// O Playwright conhece a revisão compatível com a própria versão. Congelar
+// `/opt/.../chromium-1194` fez a sonda quebrar quando playwright-core evoluiu.
+const CHROME = process.env.SONDA_CHROME || chromium.executablePath();
 const SALVAR_FOTOS = process.argv.includes("--fotos");
 
 /**
@@ -212,7 +213,19 @@ function medir({ largura, folga, invasaoMinima }) {
     const cx = r.left + r.width / 2;
     const cy = r.top + r.height / 2;
     if (cx < 0 || cy < 0 || cx > largura) continue;
+    // `elementFromPoint` ignora elementos com pointer-events:none. Isso é
+    // correto para clique, mas errado para VISIBILIDADE: texto decorativo pode
+    // estar perfeitamente pintado e ainda assim o hit-test devolver o desenho
+    // que está atrás. Tornamos apenas o próprio texto hit-testável durante a
+    // leitura do pixel, sem mudar layout, pintura nem o runtime da aplicação.
+    const pointerInline = el.style.pointerEvents;
+    const ignoradoPeloHitTest = getComputedStyle(el).pointerEvents === "none";
+    if (ignoradoPeloHitTest) el.style.pointerEvents = "auto";
     const dono = document.elementFromPoint(cx, cy);
+    if (ignoradoPeloHitTest) {
+      if (pointerInline) el.style.pointerEvents = pointerInline;
+      else el.style.removeProperty("pointer-events");
+    }
     if (!dono) continue;
     if (dono === el || el.contains(dono) || dono.contains(el)) continue;
     achados.push({

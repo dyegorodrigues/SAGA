@@ -31,6 +31,15 @@ import { FichaCompetencia } from "../../schema";
  *   antes correspondia a ele
  *
  * Ver `AI_Studio_Lab/codex/PLANO_DO_BLOCO_F0.md` §5.
+ *
+ * ### F01 + F03 — duas fichas, uma competência
+ *
+ * N1.04 também é aprofundada pela F03 (fila → grade → disperso). A F03 não
+ * introduz outra interação: a própria ficha manda que, durante a contagem, o
+ * comportamento seja **igual à F01** — toque acende, numeral salta e a voz
+ * conta. Por isso a escada inteira continua em `TouchCount`; o que muda a partir
+ * da grade é a estratégia espacial e a voz pedagógica. Cada micro declara
+ * `fonte` para impedir que F01 e F03 falem com a mesma boca em silêncio.
  */
 
 const dominio = {
@@ -68,6 +77,16 @@ const tutorial = [
   { fala: "Agora você conta!", show: { pulsarRestantes: true } },
 ];
 
+const FALAS_F01 = {
+  howto: "Toque um de cada vez. Quando tocar, fale o número comigo.",
+  explain: "Toque devagar, um por um. Os que já brilharam, você já contou.",
+} as const;
+
+const FALAS_F03 = {
+  howto: "Comece por um canto e vá seguindo. Toque em cada um para marcar.",
+  explain: "Escolha um para começar e vá tocando de um lado para o outro, sem pular nenhum.",
+} as const;
+
 export const N1_04: FichaCompetencia = {
   id: "N1.04",
   nome: "Contar tocando (cardinalidade)",
@@ -76,9 +95,9 @@ export const N1_04: FichaCompetencia = {
   prereqs: ["N1.01", "N1.02"],
   bncc: "EI03ET07",
 
-  howto: "Toque um de cada vez. Quando tocar, fale o número comigo.",
-  // Aponta o caminho sem entregar o número. E não elogia.
-  explain: "Toque devagar, um por um. Os que já brilharam, você já contou.",
+  // A voz-base é F01. Micros cuja fonte é F03 sobrescrevem a voz em `params`.
+  howto: FALAS_F01.howto,
+  explain: FALAS_F01.explain,
   // Ficha de PRODUÇÃO: o diagnóstico vem da ação — de quantos alvos ela marcou e
   // de ela ter voltado a contar para responder —, não de alternativas fabricadas.
   distratores: [],
@@ -94,37 +113,70 @@ export const N1_04: FichaCompetencia = {
   micros: [
     {
       id: "fila_com_mao",
+      fonte: "F01",
       alvo: "aprender o gesto: um toque, um número — com a Mão Fantasma começando",
       kinds: ["touchcount"],
-      params: { modo: "toque", audio_prompt: "Conte comigo, toque em cada um.", tutorial },
+      params: {
+        modo: "toque",
+        audio_prompt: "Conte comigo, toque em cada um.",
+        howto: FALAS_F01.howto,
+        explain: FALAS_F01.explain,
+        tutorial,
+      },
       dominio,
     },
     {
       id: "fila_sozinha",
+      fonte: "F01",
       alvo: "contar sozinha em fila e responder quantos foram",
       kinds: ["touchcount"],
-      params: { modo: "toque", audio_prompt: "Conte e me diga quantos foram." },
+      params: {
+        modo: "toque",
+        audio_prompt: "Conte e me diga quantos foram.",
+        howto: FALAS_F01.howto,
+        explain: FALAS_F01.explain,
+      },
       dominio,
     },
     {
       id: "grade",
+      fonte: "F03",
       alvo: "contar em linhas e colunas, sem perder o fio",
       kinds: ["touchcount"],
-      params: { modo: "toque", audio_prompt: "Conte e me diga quantos foram." },
+      params: {
+        modo: "toque",
+        audio_prompt: "Conte e me diga quantos foram.",
+        howto: FALAS_F03.howto,
+        explain: FALAS_F03.explain,
+      },
       dominio,
     },
     {
       id: "disperso",
+      fonte: "F03",
       alvo: "contar sem apoio espacial — o degrau que exige estratégia",
       kinds: ["touchcount"],
-      params: { modo: "toque", audio_prompt: "Eles estão espalhados. Conte todos." },
+      params: {
+        modo: "toque",
+        audio_prompt: "Eles estão espalhados. Conte todos.",
+        howto: FALAS_F03.howto,
+        explain: FALAS_F03.explain,
+      },
       dominio,
     },
     {
       id: "sem_marcacao",
+      fonte: "F03",
       alvo: "contar SEM o objeto mudar de cor: segurar mentalmente quais já contou",
       kinds: ["touchcount"],
-      params: { modo: "toque", audio_prompt: "Agora sem pista. Conte com atenção." },
+      params: {
+        modo: "toque",
+        audio_prompt: "Agora sem pista. Conte com atenção.",
+        // F03 manda criar um caminho. No nível 5 o caminho deixa de ser marcado
+        // por cor, então a fala não pode prometer uma marca visual inexistente.
+        howto: "Comece por um canto e siga um caminho mental. Toque uma vez em cada um, sem voltar.",
+        explain: FALAS_F03.explain,
+      },
       // A F01 §9 pede uma regra extra: pelo menos um acerto no arranjo disperso.
       // Contar em fila não prova cardinalidade — prova que ela segue um caminho.
       dominio: { acertos: 3, de: 3, sessoes: 2 },

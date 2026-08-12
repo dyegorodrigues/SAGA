@@ -7,25 +7,52 @@ import { N1_01 } from './jornada/N1.01';
 import { N1_02 } from './jornada/N1.02';
 import { N1_03 } from './jornada/N1.03';
 import { N1_04 } from './jornada/N1.04';
+import { N1_05 } from './jornada/N1.05';
 import { N1_06 } from './jornada/N1.06';
 import { N1_07 } from './jornada/N1.07';
 import { N1_08 } from './jornada/N1.08';
-import { N1_13 } from './jornada/N1.13';
+import { N1_09 } from './jornada/N1.09';
 import { N1_10 } from './jornada/N1.10';
+import { N1_11 } from './jornada/N1.11';
+import { N1_12 } from './jornada/N1.12';
+import { N1_13 } from './jornada/N1.13';
 import { N2_01 } from './jornada/N2.01';
-import { GM_04 } from './jornada/GM.04';
-import { AL_05 } from './jornada/AL.05';
-import { AL_01 } from './jornada/AL.01';
-import { AL_02 } from './jornada/AL.02';
-import { JARDIM_FICHAS } from './dojo/jardim';
+import { N2_03 } from './jornada/N2.03';
 import { N3_09 } from './jornada/N3.09';
 import { N3_10 } from './jornada/N3.10';
 import { N3_11 } from './jornada/N3.11';
 import { N4_02 } from './jornada/N4.02';
+import { N4_03 } from './jornada/N4.03';
+import { N4_04 } from './jornada/N4.04';
+import { N4_06 } from './jornada/N4.06';
+import { N4_07 } from './jornada/N4.07';
+import { N4_08 } from './jornada/N4.08';
+import { N4_09 } from './jornada/N4.09';
+import { AL_01 } from './jornada/AL.01';
+import { AL_02 } from './jornada/AL.02';
+import { AL_05 } from './jornada/AL.05';
+import { GE_01 } from './jornada/GE.01';
+import { GE_02 } from './jornada/GE.02';
+import { GM_01 } from './jornada/GM.01';
+import { GM_02 } from './jornada/GM.02';
+import { GM_04 } from './jornada/GM.04';
+import { GM_05 } from './jornada/GM.05';
+import { GM_12 } from './jornada/GM.12';
+import { JARDIM_FICHAS } from './dojo/jardim';
+
+export const JOURNEY_FICHAS = [
+  N1_01, N1_02, N1_03, N1_04, N1_05, N1_06, N1_07, N1_08, N1_09, N1_10, N1_11, N1_12, N1_13,
+  N2_01, N2_03,
+  N3_09, N3_10, N3_11,
+  N4_02, N4_03, N4_04, N4_06, N4_07, N4_08, N4_09,
+  AL_01, AL_02, AL_05,
+  GE_01, GE_02,
+  GM_01, GM_02, GM_04, GM_05, GM_12,
+];
 
 export const AllFichas = [
   dojo_add, dojo_sub, dojo_mul, dojo_div,
-  N1_01, N1_02, N1_03, N1_04, N1_06, N1_07, N1_08, N1_13, N1_10, N2_01, N3_09, N3_10, N3_11, N4_02, GM_04, AL_01, AL_02, AL_05,
+  ...JOURNEY_FICHAS,
   // O Jardim do Dojo: trilhas de automaticidade, não nós do grafo. Entram aqui
   // (a Oficina e o Sandbox precisam encontrá-las) e NÃO em `JOURNEY_FICHAS`,
   // que é a lista de competências da Jornada. Ver `dojo/jardim/index.ts`.
@@ -33,8 +60,3 @@ export const AllFichas = [
 ];
 
 export { JARDIM, JARDIM_FICHAS } from './dojo/jardim';
-
-export const JOURNEY_FICHAS = [
-  N1_01, N1_02, N1_03, N1_04, N1_06, N1_07, N1_08, N1_13, N1_10,
-  N2_01, N3_09, N3_10, N3_11, N4_02, GM_04, AL_01, AL_02, AL_05,
-];

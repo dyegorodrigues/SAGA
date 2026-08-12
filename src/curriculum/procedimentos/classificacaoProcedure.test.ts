@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { Evidencia } from "../../constants/evidencias";
 import { MisconceptionTag } from "../../constants/misconceptions";
 import {
   Criterio,
@@ -250,9 +251,13 @@ describe("§7 — as falas são as da ficha, letra por letra", () => {
 });
 
 describe("§9 — o domínio e a ficha", () => {
-  it("3 de 3 em 2 sessões, em toda micro", () => {
+  it("3 de 3 em 2 sessões, com prova do NÃO PERTENCE em toda micro", () => {
     for (const m of AL_01.micros) {
-      expect(m.dominio, m.id).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+      expect(m.dominio, m.id).toMatchObject({ acertos: 3, de: 3, sessoes: 2 });
+      expect(m.dominio.exige, m.id).toEqual({
+        evidencia: Evidencia.NAO_PERTENCE,
+        descricao: "Deixar corretamente fora pelo menos uma peça que não pertence ao grupo.",
+      });
     }
   });
 

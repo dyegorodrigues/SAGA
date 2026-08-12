@@ -1,9 +1,13 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Composer } from "../Composer";
 import { geradorLegadoDe, getTrackById } from "./curriculum";
 import { applyJourneyAnswer } from "./progressEngine";
 import { trackMisconception } from "./radarEngine";
-import { COMPOSER_CANARIES, rollbackComposerCanary, enableComposerCanary } from "./composerCanary";
+import {
+  COMPOSER_CANARIES,
+  rollbackComposerCanary,
+  enableComposerCanary,
+  generateRegisteredFichaQuestion,
+} from "./composerCanary";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
@@ -11,13 +15,28 @@ import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
+import { N4_09 } from "../fichas/jornada/N4.09";
 import { N1_03 } from "../fichas/jornada/N1.03";
+import { N1_05 } from "../fichas/jornada/N1.05";
 import { N1_07 } from "../fichas/jornada/N1.07";
 import { N1_08 } from "../fichas/jornada/N1.08";
+import { N1_09 } from "../fichas/jornada/N1.09";
 import { N1_10 } from "../fichas/jornada/N1.10";
+import { N1_11 } from "../fichas/jornada/N1.11";
+import { N1_12 } from "../fichas/jornada/N1.12";
+import { N2_01 } from "../fichas/jornada/N2.01";
+import { N2_03 } from "../fichas/jornada/N2.03";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { N1_04 } from "../fichas/jornada/N1.04";
+import { N1_06 } from "../fichas/jornada/N1.06";
+import { N1_13 } from "../fichas/jornada/N1.13";
+import { GE_01 } from "../fichas/jornada/GE.01";
+import { GE_02 } from "../fichas/jornada/GE.02";
+import { GM_01 } from "../fichas/jornada/GM.01";
+import { GM_02 } from "../fichas/jornada/GM.02";
+import { GM_05 } from "../fichas/jornada/GM.05";
+import { GM_12 } from "../fichas/jornada/GM.12";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_01 } from "../fichas/jornada/N1.01";
 import { Progress, Question } from "../../types";
@@ -32,8 +51,8 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  * diferentes é dívida silenciosa: o mais fraco só aparece quando quebra.
  *
  * A suíte **enumera `COMPOSER_CANARIES`** em vez de listar nós à mão. Promover
- * um nó novo sem registrar seu legado e sua ficha aqui falha imediatamente, de
- * modo que o padrão não depende de alguém lembrar de aplicá-lo.
+ * um nó novo sem registrar sua ficha aqui falha imediatamente, de modo que o
+ * padrão não depende de alguém lembrar de aplicá-lo.
  */
 
 /**
@@ -48,8 +67,9 @@ import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
  * - **Estreia** — o nó caía no placeholder "Em construção!". Paridade não quer
  *   dizer nada; o que importa é que ele deixou de ser um placeholder.
  *
- * Os 46 nós ainda em fallback são todos estreias. O contrato original só previa
- * substituição porque os dois primeiros canários por acaso eram desse tipo.
+ * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
+ * porta que `selectGenerator` usa em produção. Assim builders procedimentais
+ * especializados (como N1.09, N2.01, N2.03, GM.02 e GM.05) não ganham caminho de teste paralelo.
  */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.09": N3_09,
@@ -59,23 +79,45 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.07": N4_07,
   "N4.06": N4_06,
   "N4.08": N4_08,
+  "N4.09": N4_09,
 
-  // Bloco F0. Estes seis já eram servidos por ficha em produção, mas por fora
-  // do mecanismo — chamavam `Composer.generate` de dentro do gerador legado.
-  // Regularizá-los os traz, pela primeira vez, para debaixo deste contrato.
+  // Bloco F0. Estes nós são servidos por ficha autoral de produção sob o
+  // mesmo contrato, inclusive os builders procedimentais especializados.
   "N1.03": N1_03,
+  "N1.05": N1_05,
   "N1.07": N1_07,
   "N1.08": N1_08,
+  "N1.09": N1_09,
   "N1.10": N1_10,
+  "N1.11": N1_11,
   "AL.01": AL_01,
 
-  // A ativação do bloco F0: as quatro que passaram o intervalo inteiro
-  // desligadas, escritas nos passos 0 a 2 e olhadas print a print.
-  //   N1.01 pareamento (F07) · N1.02 canhão (F27)
-  //   N1.04 contar tocando (F01) · AL.02 padrões (F52)
   "N1.01": N1_01,
   "N1.02": N1_02,
   "N1.04": N1_04,
+  "N1.06": N1_06,
+
+  "N1.13": N1_13,
+  "GE.01": GE_01,
+  "GE.02": GE_02,
+  "GM.01": GM_01,
+  "GM.02": GM_02,
+  "GM.12": GM_12,
+
+  // W3 — F21: substituição do legado pela experiência autoral de agrupamento.
+  "N2.01": N2_01,
+
+  // W6 — F29: substituição do legado por comparação simbólica Grupo-backed.
+  "N2.03": N2_03,
+
+  // W4 — F19: substituição do legado pela reta interativa autoral. O rollback
+  // continua descoberto por `geradorLegadoDe`, como em toda substituição.
+  "N1.12": N1_12,
+
+  // W5 — F61: estreia real. Antes da promoção GM.05 era fallback; por isso o
+  // próprio contrato deve provar rollback→placeholder e reativação→Composer.
+  "GM.05": GM_05,
+
   "AL.02": AL_02,
 };
 
@@ -97,9 +139,9 @@ describe("contrato do canário do Composer", () => {
   });
 
   describe.each(CANARIOS)("%s", id => {
-    const ficha = REGISTRO[id];
     const legado = geradorLegadoDe(id);
     const ehEstreia = legado === undefined;
+    const gerarAutoral = (lvl: number): Question => generateRegisteredFichaQuestion(id, lvl);
 
     it("é servido pelo Composer com proveniência observável", () => {
       expect(getTrackById(id)?.generatorSource).toBe("composer");
@@ -108,8 +150,6 @@ describe("contrato do canário do Composer", () => {
 
     it("o rollback devolve o nó ao que havia antes, e a reativação o traz de volta", () => {
       rollbackComposerCanary(id);
-      // Numa substituição volta o gerador legado; numa estreia volta o
-      // placeholder. Nos dois casos o que importa é que SAI do Composer.
       expect(getTrackById(id)?.generatorSource).toBe(ehEstreia ? "fallback" : "legacy");
 
       enableComposerCanary(id);
@@ -119,19 +159,10 @@ describe("contrato do canário do Composer", () => {
     it("a ficha autoral produz questão utilizável nos cinco níveis", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 20; i += 1) {
-          const autoral = Composer.generate(ficha, lvl);
+          const autoral = gerarAutoral(lvl);
           expect(autoral.evaluate?.(autoral.answer), `${id} autoral L${lvl}`).toBe(true);
           expect(autoral.isFallback, `${id} L${lvl} devolveu placeholder`).toBeFalsy();
 
-          // "Utilizável" era verificado como `Number(answer) >= 0`, o que
-          // supunha que todo canário é aritmético — verdade enquanto os sete
-          // primeiros eram contas. AL.01 é classificação: a resposta é o emoji
-          // intruso, e `Number("🚗")` é NaN. N1.01 será "sobra"/"exato"/"falta".
-          //
-          // O que a asserção realmente queria dizer é o que está escrito agora:
-          // a resposta existe e a criança consegue escolhê-la. É mais forte que
-          // a versão numérica — esta pega gabarito fora das alternativas, que
-          // aquela deixava passar.
           expect(autoral.answer, `${id} autoral L${lvl}: sem gabarito`)
             .not.toBeUndefined();
           expect(String(autoral.answer ?? "").length, `${id} autoral L${lvl}: gabarito vazio`)
@@ -153,8 +184,6 @@ describe("contrato do canário do Composer", () => {
       ? "estreia: o nó deixou de ser placeholder"
       : "paridade: o gerador legado continua produzindo questão válida", () => {
       if (ehEstreia) {
-        // Não há com o que comparar. O que se verifica é que o rollback devolve
-        // ao placeholder — e portanto que a promoção trocou algo de verdade.
         rollbackComposerCanary(id);
         expect(getTrackById(id)?.gen(1).isFallback,
           `${id} não era placeholder antes: isto deveria ser substituição, não estreia`).toBe(true);
@@ -188,7 +217,7 @@ describe("contrato do canário do Composer", () => {
 
     it("telemetria: a resposta certa não gera diagnóstico", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
-        const q = Composer.generate(ficha, lvl);
+        const q = gerarAutoral(lvl);
         expect(misconceptionForAnswer(q, q.answer), `${id} L${lvl}`).toBeUndefined();
       }
     });
@@ -197,7 +226,7 @@ describe("contrato do canário do Composer", () => {
       const progresso = progressoInicial();
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 10; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           const errada = (q.options ?? []).find(o => o.value !== q.answer && o.misconception);
           if (!errada) continue;
           const tag = misconceptionForAnswer(q, errada.value);
@@ -209,7 +238,7 @@ describe("contrato do canário do Composer", () => {
 
     it("Jornada: a questão traz tudo que o GameLoop exige", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
-        const q = Composer.generate(ficha, lvl);
+        const q = gerarAutoral(lvl);
         expect(q.kind, `${id} L${lvl}`).toBeTruthy();
         expect(q.uiProps, `${id} L${lvl}`).toBeDefined();
         expect(q.prompt, `${id} L${lvl}`).toBeTruthy();
@@ -220,7 +249,7 @@ describe("contrato do canário do Composer", () => {
     it("erro: a resposta correta aparece exatamente uma vez quando há alternativas", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           if (!q.options?.length) continue;
           const certas = q.options.filter(o => o.value === q.answer);
           expect(certas, `${id} L${lvl}`).toHaveLength(1);
@@ -229,25 +258,11 @@ describe("contrato do canário do Composer", () => {
     });
 
     it("a tela nunca oferece mais de quatro alternativas", () => {
-      // §9.1 do cânone: 3 a 4 opções tocáveis. Cinco apareceram de verdade em
-      // N4.07 e só a captura de tela mostrou — excesso de escolha vira ruído
-      // para quem tem 8 anos, não dificuldade. A guarda vale para TODO canário,
-      // presente e futuro, em vez de ficar só na ficha que errou.
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 40; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           if (!q.options) continue;
 
-          // Teclado não é leque de alternativas. O cânone §9.1 fixa "3 a 4
-          // opções tocáveis" para o kind `plain` — escolher entre distratores —
-          // e lista `count` ("tocar objetos 1 a 1") como mecânica distinta. A
-          // F01 §5 manda um teclado 1-3, 1-5 ou 1-10, escalado ao escopo: com
-          // quatro teclas, chutar acertaria em 25% e a cardinalidade deixaria de
-          // ser observável.
-          //
-          // Isto NÃO é isenção: o teclado troca uma guarda por outra igualmente
-          // estrita — ele tem de bater exatamente com o escopo que a ficha
-          // declarou, e conter a resposta.
           const teclado = (q.uiProps as { tecladoAte?: number } | undefined)?.tecladoAte;
           if (typeof teclado === "number" && teclado > 0) {
             expect(q.options.length, `${id} L${lvl}: teclado fora do escopo`).toBe(teclado);
@@ -266,7 +281,7 @@ describe("contrato do canário do Composer", () => {
     it("erro: nenhuma alternativa numérica é negativa", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
-          const q = Composer.generate(ficha, lvl);
+          const q = gerarAutoral(lvl);
           for (const o of q.options ?? []) {
             if (typeof o.value !== "number") continue;
             expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(0);
@@ -277,7 +292,7 @@ describe("contrato do canário do Composer", () => {
 
     it("erro: 500 amostras sem laço infinito nem exceção", () => {
       expect(() => {
-        for (let i = 0; i < 500; i += 1) Composer.generate(ficha, (i % 5) + 1);
+        for (let i = 0; i < 500; i += 1) gerarAutoral((i % 5) + 1);
       }).not.toThrow();
     });
   });

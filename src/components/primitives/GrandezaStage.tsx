@@ -2,194 +2,315 @@ import React from "react";
 import { motion } from "motion/react";
 import { Grupo } from "./Grupo";
 import { PalcoEscalado } from "./PalcoEscalado";
+import { ComparacaoQuantidadeStage } from "./ComparacaoQuantidadeStage";
+import { ComparacaoQuantidadeSpec } from "../../curriculum/procedimentos/comparacaoQuantidadeContract";
 import {
   ALTURA_DA_CAIXA,
   GrandezaSpec,
   LARGURA_DA_CAIXA,
+  LINHA_DE_INICIO,
   LINHA_DO_CHAO,
+  ObjetoDeGrandeza,
+  valorComparado,
 } from "../../curriculum/procedimentos/grandezaContract";
 import { AcaoDeGrandeza, FALAS } from "../../curriculum/procedimentos/grandezaProcedure";
 
-/**
- * `GrandezaStage` — a tela de GM.01, ficha F49.
- *
- * Composta a partir do `Grupo` em **modo comparação**, que é a primitiva que a
- * §1 nomeia — com a base alinhada que a §2 exige e que o modo padrão do `Grupo`
- * não dava.
- *
- * ---
- *
- * ### A linha de chão é o conteúdo, não a moldura
- *
- * §4, abertura: *"uma **linha de chão** se desenha atravessando os dois
- * contêineres. Os objetos 'pousam' nela."*
- *
- * Ela é o instrumento da comparação. Por isso duas coisas dependem dela:
- * o palco só aceita resposta **depois** que ela termina de se desenhar sem
- * penalizar quem tocou antes (a §4 dá 1,2s), e responder antes é a única
- * assinatura observável de `BASE_DESALINHADA` (ver o procedimento).
- *
- * ### A régua fantasma
- *
- * §4, do nível 3 em diante: *"uma linha horizontal tracejada sobe do chão até o
- * topo do menor — mostra visualmente a diferença"*. Com diferença de 14%, olhar
- * não basta; a régua é o que transforma "parece" em "é".
- */
+const ABERTURA_MS = 1200;
+const ERRO_MS = 2200;
+const ACERTO_MS = 1800;
+const BASE_OBJETO = 84;
 
-/** §4: a linha de chão leva 1,2s para se desenhar. */
-const DESENHO_DO_CHAO = 1200;
+type Fase = "idle" | "erro" | "acerto" | "fecho";
 
 interface Props {
-  spec: GrandezaSpec;
-  onAnswer?: (valor: number, acao: AcaoDeGrandeza) => void;
+  spec: GrandezaSpec | ComparacaoQuantidadeSpec;
+  onAnswer?: (valor: number, acao?: AcaoDeGrandeza) => void;
   disabled?: boolean;
-  /** A voz do app. §4: ela enfatiza o atributo e nomeia o que a linha mostra. */
   falar?: (texto: string) => void;
-  /** O passo da micro-aula (§8). */
   mostrar?: {
-    /** §8: "Os dois estão no chão." */
     destacarLinhaBase?: boolean;
-    /** §8: "Veja qual sobe mais." */
     subirLinhaTracejada?: boolean;
-    /** §8: "Este é mais alto!" */
     destacarMaior?: boolean;
+    // F06 / comparação de quantidades — mesmo canal, outra semântica.
+    destacarAmbos?: boolean;
+    parear?: number;
+    pulsarGrupos?: boolean;
   } | null;
 }
 
-export function GrandezaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
+interface DimensionalProps extends Omit<Props, "spec"> {
+  spec: GrandezaSpec;
+}
+
+function ObjetoVisual({ o, eixo, destaque, erro, delay }: {
+  o: ObjetoDeGrandeza;
+  eixo: GrandezaSpec["eixo"];
+  destaque: boolean;
+  erro: boolean;
+  delay: number;
+}) {
+  const sx = o.comprimento / BASE_OBJETO;
+  const sy = o.altura / BASE_OBJETO;
+  return (
+    <motion.span
+      data-grandeza-object
+      data-grandeza-altura={o.altura}
+      data-grandeza-comprimento={o.comprimento}
+      className="relative z-10 flex h-[84px] w-[84px] items-center justify-center"
+      initial={{ opacity: 0, x: eixo === "horizontal" ? -24 : 0, y: eixo === "horizontal" ? 0 : -28, scale: 0.94 }}
+      animate={{
+        opacity: 1,
+        x: erro ? [0, -5, 5, 0] : 0,
+        y: 0,
+        scale: destaque ? 1.08 : 1,
+      }}
+      transition={erro ? { duration: 0.4 } : { duration: 0.7, delay }}
+    >
+      <span
+        aria-hidden
+        className="block text-[68px] leading-none"
+        style={{
+          transform: `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`,
+          transformOrigin: eixo === "horizontal" ? "left center" : "center bottom",
+        }}
+      >
+        {o.emoji}
+      </span>
+    </motion.span>
+  );
+}
+
+function Guia({ spec, objeto, de, para }: {
+  spec: GrandezaSpec;
+  objeto: ObjetoDeGrandeza;
+  de?: number;
+  para?: number;
+}) {
+  const vertical = spec.eixo !== "horizontal";
+  const alvo = vertical ? objeto.altura : objeto.comprimento;
+  const inicio = de ?? alvo;
+  const fim = para ?? alvo;
+  if (vertical) {
+    return (
+      <motion.span
+        data-grandeza-guide
+        aria-hidden
+        className="pointer-events-none absolute inset-x-2 z-30 border-t-[3px] border-dashed border-blue-600"
+        initial={{ top: LINHA_DO_CHAO - inicio, opacity: 0 }}
+        animate={{ top: LINHA_DO_CHAO - fim, opacity: 1 }}
+        transition={{ duration: de == null ? 0.55 : 0.8, ease: "easeInOut" }}
+      />
+    );
+  }
+  return (
+    <motion.span
+      data-grandeza-guide
+      aria-hidden
+      className="pointer-events-none absolute inset-y-3 z-30 border-l-[3px] border-dashed border-blue-600"
+      initial={{ left: LINHA_DE_INICIO + inicio, opacity: 0 }}
+      animate={{ left: LINHA_DE_INICIO + fim, opacity: 1 }}
+      transition={{ duration: de == null ? 0.55 : 0.8, ease: "easeInOut" }}
+    />
+  );
+}
+
+function SetaMedida({ spec, objeto }: { spec: GrandezaSpec; objeto: ObjetoDeGrandeza }) {
+  if (spec.eixo === "horizontal") {
+    return (
+      <span
+        data-grandeza-measure-arrow
+        aria-hidden
+        className="pointer-events-none absolute z-40 flex items-center text-blue-700"
+        style={{ left: LINHA_DE_INICIO, top: 10, width: objeto.comprimento }}
+      >
+        <span className="text-lg leading-none">◀</span>
+        <span className="h-[3px] flex-1 bg-blue-600" />
+        <span className="text-lg leading-none">▶</span>
+      </span>
+    );
+  }
+  return (
+    <span
+      data-grandeza-measure-arrow
+      aria-hidden
+      className="pointer-events-none absolute z-40 flex flex-col items-center text-blue-700"
+      style={{ left: 7, top: LINHA_DO_CHAO - objeto.altura, height: objeto.altura }}
+    >
+      <span className="text-lg leading-none">▲</span>
+      <span className="w-[3px] flex-1 bg-blue-600" />
+      <span className="text-lg leading-none">▼</span>
+    </span>
+  );
+}
+
+function GrandezaDimensionalStage({ spec, onAnswer, disabled, falar, mostrar }: DimensionalProps) {
+  const [fase, setFase] = React.useState<Fase>("idle");
   const [escolhido, setEscolhido] = React.useState<number | null>(null);
   const [ordem, setOrdem] = React.useState<number[]>([]);
-  const [chaoPronto, setChaoPronto] = React.useState(false);
+  const [referenciaPronta, setReferenciaPronta] = React.useState(false);
+  const [entradaSeq, setEntradaSeq] = React.useState(0);
+  const timers = React.useRef<number[]>([]);
 
-  const emAula = mostrar != null && Object.keys(mostrar).length > 0;
+  const limparTimers = React.useCallback(() => {
+    timers.current.forEach(t => window.clearTimeout(t));
+    timers.current = [];
+  }, []);
+  const agendar = React.useCallback((fn: () => void, ms: number) => {
+    const t = window.setTimeout(fn, ms);
+    timers.current.push(t);
+  }, []);
 
   React.useEffect(() => {
-    setChaoPronto(false);
-    const t = window.setTimeout(() => setChaoPronto(true), DESENHO_DO_CHAO);
-    return () => window.clearTimeout(t);
-  }, [spec]);
+    limparTimers();
+    setFase("idle");
+    setEscolhido(null);
+    setOrdem([]);
+    setReferenciaPronta(false);
+    setEntradaSeq(n => n + 1);
+    const t = window.setTimeout(() => setReferenciaPronta(true), ABERTURA_MS);
+    timers.current.push(t);
+    return limparTimers;
+  }, [spec, limparTimers]);
 
-  const respondeu = escolhido !== null;
-  const travado = disabled || respondeu || emAula;
+  const emAula = mostrar != null && Object.keys(mostrar).length > 0;
+  const travado = Boolean(disabled) || fase !== "idle" || emAula;
 
-  function tocar(i: number) {
-    if (travado) return;
-
-    // §5, nível 5: seriação. Ela toca em ordem, e a cena só julga no fim.
-    if (spec.seria) {
-      if (ordem.includes(i)) return;
-      const nova = [...ordem, i];
-      setOrdem(nova);
-      if (nova.length < spec.objetos.length) return;
-      const certo = nova.every((v, k) => v === spec.ordemCerta[k]);
-      setEscolhido(certo ? spec.resposta : nova[0]);
-      falar?.(certo
-        ? FALAS.acerto(spec.atributo, spec.polo)
-        : FALAS.erroSuave(spec.atributo, spec.polo));
-      onAnswer?.(certo ? spec.resposta : nova[0], leitura(certo ? spec.resposta : nova[0]));
-      return;
-    }
-
-    setEscolhido(i);
-    falar?.(i === spec.resposta
-      ? FALAS.acerto(spec.atributo, spec.polo)
-      : FALAS.erroSuave(spec.atributo, spec.polo));
-    onAnswer?.(i, leitura(i));
-  }
-
-  function leitura(i: number): AcaoDeGrandeza {
+  function leitura(valor: number, ordemProduzida?: number[]): AcaoDeGrandeza {
     return {
-      escolhido: i,
+      escolhido: valor,
       certo: spec.resposta,
       vencedorDoOutroAtributo: spec.vencedorDoOutroAtributo,
       diferencaPequena: spec.pequena,
-      // A §4 dá 1,2s para o chão se desenhar. Tocar antes é decidir sem a
-      // referência — a única assinatura possível de `BASE_DESALINHADA`.
-      antesDoChao: !chaoPronto,
+      antesDaReferencia: !referenciaPronta,
+      atributo: spec.atributo,
+      ...(ordemProduzida ? { ordemProduzida } : {}),
     };
   }
 
-  /** O topo do MENOR, medido do chão — onde a régua fantasma para (§4). */
-  const topoDoMenor = Math.min(...spec.objetos.map(o => o.altura));
+  function resolver(valor: number, certo: boolean, ordemProduzida?: number[]) {
+    setEscolhido(valor >= 0 ? valor : ordemProduzida?.[ordemProduzida.length - 1] ?? null);
+    if (!certo) {
+      setFase("erro");
+      falar?.(FALAS.erroSuave(spec.atributo, spec.polo));
+      onAnswer?.(valor, leitura(valor, ordemProduzida));
+      agendar(() => {
+        setFase("idle");
+        setEscolhido(null);
+        setOrdem([]);
+      }, ERRO_MS);
+      return;
+    }
+    setFase("acerto");
+    falar?.(FALAS.acerto(spec.atributo, spec.polo));
+    onAnswer?.(valor, leitura(valor, ordemProduzida));
+    agendar(() => setFase("fecho"), ACERTO_MS);
+  }
+
+  function tocar(i: number) {
+    if (travado) return;
+    if (!spec.seria) {
+      resolver(i, i === spec.resposta);
+      return;
+    }
+    if (ordem.includes(i)) return;
+    const nova = [...ordem, i];
+    setOrdem(nova);
+    if (nova.length < spec.objetos.length) return;
+    const certo = nova.every((v, k) => v === spec.ordemCerta[k]);
+    // Nunca reutilize o primeiro item como valor de erro: uma ordem errada pode começar certo.
+    resolver(certo ? spec.resposta : -1, certo, nova);
+  }
+
+  const medidas = spec.objetos.map(o => valorComparado(o, spec.atributo));
+  const menorIdx = medidas.indexOf(Math.min(...medidas));
+  const objetoMenor = spec.objetos[menorIdx];
+  const mostrarGuiaNormal = referenciaPronta && fase !== "erro" && (
+    spec.reguaFantasma || fase === "fecho" || Boolean(emAula && mostrar?.subirLinhaTracejada)
+  );
+  const escolhidoObj = escolhido != null && escolhido >= 0 ? spec.objetos[escolhido] : null;
+  const corretoObj = spec.objetos[spec.resposta];
 
   return (
     <PalcoEscalado>
-    <div className="flex flex-col items-center gap-2 select-none">
-      <div className="flex items-end justify-center" style={{ gap: 14 }}>
-        {spec.objetos.map((o, i) => {
-          const certo = respondeu && i === spec.resposta;
-          const errado = respondeu && i === escolhido && i !== spec.resposta;
-          const naOrdem = spec.seria ? ordem.indexOf(i) : -1;
-          return (
-            <div key={`${o.nome}-${i}`} className="relative">
-              <Grupo
-                disabled={travado}
-                onClick={() => tocar(i)}
-                selected={certo || naOrdem >= 0}
-                rotulo={`${o.nome} ${i + 1}`}
-                chao={{
-                  linha: LINHA_DO_CHAO,
-                  largura: LARGURA_DA_CAIXA,
-                  altura: ALTURA_DA_CAIXA,
-                  destacada: emAula ? mostrar?.destacarLinhaBase === true : false,
-                }}
-                items={[
-                  <motion.span
-                    key="obj"
-                    aria-hidden
-                    style={{
-                      // A altura desenhada É a grandeza comparada. Ela vem do
-                      // contrato, e a largura anda ao contrário — é o que faz
-                      // "escolher o maiorzão" ser uma resposta diferente de
-                      // "escolher o mais alto".
-                      fontSize: o.altura,
-                      lineHeight: 1,
-                      display: "block",
-                      transform: `scaleX(${(o.largura / 58).toFixed(3)})`,
-                      transformOrigin: "bottom center",
-                    }}
-                    // §4, acerto: "o objeto maior cresce ligeiramente".
-                    animate={{
-                      scale: certo || (emAula && mostrar?.destacarMaior && i === spec.resposta) ? 1.08 : 1,
-                      x: errado ? [0, -5, 5, 0] : 0,
-                    }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    {o.emoji}
-                  </motion.span>,
-                ]}
-              />
-
-              {/* §4, a régua fantasma: sobe do chão até o topo do MENOR, e é
-                  contra ela que a criança vê quem passa. Só do nível 3, onde a
-                  diferença deixa de ser óbvia. */}
-              {(spec.reguaFantasma && (respondeu || (emAula && mostrar?.subirLinhaTracejada))) && (
-                <motion.span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-x-2"
-                  style={{ top: LINHA_DO_CHAO - topoDoMenor, borderTop: "3px dashed #2563EB" }}
-                  initial={{ opacity: 0, scaleX: 0.2 }}
-                  animate={{ opacity: 1, scaleX: 1 }}
-                  transition={{ duration: 0.6 }}
+      <div className="flex flex-col items-center gap-2 select-none" data-grandeza-stage data-grandeza-eixo={spec.eixo}>
+        <div className="flex items-end justify-center" style={{ gap: 14 }}>
+          {spec.objetos.map((o, i) => {
+            const naOrdem = spec.seria ? ordem.indexOf(i) : -1;
+            const certoVisual = fase === "acerto" && i === spec.resposta;
+            const erroVisual = fase === "erro" && escolhido === i;
+            const destaqueAula = Boolean(emAula && mostrar?.destacarMaior && i === spec.resposta);
+            const ref = {
+              largura: LARGURA_DA_CAIXA,
+              altura: ALTURA_DA_CAIXA,
+              destacada: Boolean(emAula && mostrar?.destacarLinhaBase),
+            };
+            const grupo = spec.eixo === "horizontal"
+              ? { inicio: { ...ref, linha: LINHA_DE_INICIO } }
+              : { chao: { ...ref, linha: LINHA_DO_CHAO } };
+            return (
+              <div key={`${entradaSeq}-${i}-${o.nome}`} className="relative" style={{ width: LARGURA_DA_CAIXA, height: ALTURA_DA_CAIXA }}>
+                <Grupo
+                  {...grupo}
+                  disabled={travado}
+                  onClick={() => tocar(i)}
+                  selected={certoVisual || naOrdem >= 0}
+                  rotulo={`${o.nome} ${i + 1}`}
+                  items={[
+                    <ObjetoVisual
+                      key="obj"
+                      o={o}
+                      eixo={spec.eixo}
+                      destaque={certoVisual || destaqueAula}
+                      erro={erroVisual}
+                      delay={0.25 + i * 0.18}
+                    />,
+                  ]}
                 />
-              )}
 
-              {/* Na seriação, a ordem em que ela tocou fica visível: sem isso
-                  ela não tem como saber onde parou numa lista de três. */}
-              {naOrdem >= 0 && (
-                <span
-                  aria-hidden
-                  className="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full text-sm font-black"
-                  style={{ backgroundColor: "#2563EB", color: "#FFF" }}
-                >
-                  {naOrdem + 1}
-                </span>
-              )}
-            </div>
-          );
-        })}
+                {mostrarGuiaNormal && <Guia spec={spec} objeto={objetoMenor} />}
+                {fase === "erro" && escolhidoObj && (
+                  <Guia
+                    key={`erro-${escolhido}`}
+                    spec={spec}
+                    objeto={corretoObj}
+                    de={spec.eixo === "horizontal" ? escolhidoObj.comprimento : escolhidoObj.altura}
+                    para={spec.eixo === "horizontal" ? corretoObj.comprimento : corretoObj.altura}
+                  />
+                )}
+                {certoVisual && <SetaMedida spec={spec} objeto={o} />}
+
+                {naOrdem >= 0 && (
+                  <span
+                    data-grandeza-order={naOrdem + 1}
+                    aria-hidden
+                    className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white shadow"
+                  >{naOrdem + 1}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
     </PalcoEscalado>
   );
+}
+
+/**
+ * O canal `grandeza` é um palco composto por Grupo. GM.01 usa comparação
+ * dimensional; N1.05 usa comparação de numerosidade. O discriminante impede
+ * que uma semântica vaze para a outra e evita criar um segundo primitive Grupo.
+ */
+export function GrandezaStage(props: Props) {
+  if ("grupos" in props.spec) {
+    return (
+      <ComparacaoQuantidadeStage
+        spec={props.spec}
+        disabled={props.disabled}
+        falar={props.falar}
+        mostrar={props.mostrar}
+        onAnswer={valor => props.onAnswer?.(valor)}
+      />
+    );
+  }
+  return <GrandezaDimensionalStage {...props} spec={props.spec} />;
 }

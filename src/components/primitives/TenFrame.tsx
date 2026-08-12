@@ -204,6 +204,17 @@ function Moldura({
   const porLinha = 5;
   const linhas = Math.ceil(casas / porLinha);
 
+  if (semMoldura) {
+    return (
+      <ConjuntoSolto
+        ocupadas={soAMoldura ? [] : ocupadas}
+        tapadas={tapadas}
+        revelados={revelados}
+        emoji={emoji}
+      />
+    );
+  }
+
   return (
     <div
       role="group"
@@ -334,6 +345,113 @@ function Moldura({
       )}
     </div>
   );
+}
+
+/**
+ * JD5 nível 5 — retirada REAL da moldura.
+ *
+ * Esconder só a borda e manter os pontos em `grid-cols-5` era um falso fade de
+ * andaime: a criança ainda recebia a geometria 5x2. Aqui não há casas vazias nem
+ * colunas implícitas; só os objetos que realmente existem, em um percurso
+ * irregular estável (estável para a memória, irregular para não virar ten-frame).
+ */
+const PONTOS_SOLTOS = [
+  { x: 24, y: 34 }, { x: 88, y: 12 }, { x: 154, y: 42 }, { x: 222, y: 20 }, { x: 292, y: 46 },
+  { x: 304, y: 112 }, { x: 238, y: 132 }, { x: 168, y: 104 }, { x: 98, y: 134 }, { x: 30, y: 110 },
+] as const;
+
+function ConjuntoSolto({
+  ocupadas,
+  tapadas,
+  revelados,
+  emoji,
+}: {
+  ocupadas: number[];
+  tapadas: number[];
+  revelados: number[];
+  emoji?: string;
+}) {
+  const tampas = retangulosDaTampaSolta(tapadas);
+  return (
+    <div
+      role="group"
+      aria-label={`conjunto solto com ${ocupadas.length} objetos`}
+      className="relative select-none"
+      style={{ width: 340, height: 170 }}
+    >
+      {ocupadas.filter(i => !tapadas.includes(i)).map(i => {
+        const ponto = PONTOS_SOLTOS[i];
+        return (
+          <motion.span
+            key={i}
+            data-testid="objeto-solto"
+            aria-hidden
+            className="absolute flex items-center justify-center"
+            initial={{ scale: 0.4, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            style={{ left: ponto.x, top: ponto.y, width: 34, height: 34 }}
+          >
+            {emoji ? (
+              <span style={{ fontSize: 30, lineHeight: 1 }}>{emoji}</span>
+            ) : (
+              <span
+                className="block rounded-full"
+                style={{
+                  width: 30,
+                  height: 30,
+                  backgroundColor: revelados.includes(i) ? "#D97706" : tokens.cor.elementos.base_A,
+                }}
+              />
+            )}
+          </motion.span>
+        );
+      })}
+
+      {tampas.map((tampa, i) => (
+        <motion.div
+          key={i}
+          data-testid="tampa-solta"
+          role="img"
+          aria-label="a tampa"
+          className="absolute pointer-events-none"
+          style={{
+            left: tampa.x,
+            top: tampa.y,
+            width: tampa.w,
+            height: tampa.h,
+            borderRadius: 18,
+            backgroundColor: "#64748B",
+          }}
+          initial={{ x: 38, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.7 }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * A tampa continua sendo uma superfície, nunca um quadradinho por objeto — se
+ * cada escondido ganhasse sua própria tampa, bastaria contar as tampas. Quando o
+ * grupo cruza a curva do percurso, usamos no máximo duas faixas amplas.
+ */
+export function retangulosDaTampaSolta(tapadas: number[]): { x: number; y: number; w: number; h: number }[] {
+  const grupos = [tapadas.filter(i => i <= 4), tapadas.filter(i => i >= 5)].filter(g => g.length > 0);
+  return grupos.map(grupo => {
+    const pontos = grupo.map(i => PONTOS_SOLTOS[i]);
+    const minX = Math.min(...pontos.map(p => p.x));
+    const maxX = Math.max(...pontos.map(p => p.x));
+    const minY = Math.min(...pontos.map(p => p.y));
+    const maxY = Math.max(...pontos.map(p => p.y));
+    const pad = 12;
+    return {
+      x: Math.max(0, minX - pad),
+      y: Math.max(0, minY - pad),
+      w: Math.max(62, maxX - minX + 34 + pad * 2),
+      h: Math.max(58, maxY - minY + 34 + pad * 2),
+    };
+  });
 }
 
 /**

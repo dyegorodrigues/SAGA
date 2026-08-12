@@ -29,16 +29,22 @@ import {
  * ------------------------------------------------------------------ */
 
 /**
- * As três portas legítimas, e por que cada uma é legítima.
+ * Portas legítimas e por que cada uma é legítima.
  *
  * Qualquer arquivo fora desta lista que chame `Composer.generate` está servindo
- * ficha autoral por fora do canário — que é exatamente o defeito.
+ * ficha autoral por fora do mecanismo declarado. Para nós do DAG isso significa
+ * furar canário/rollback. Para consumidores que deliberadamente NÃO são nós do
+ * DAG, como as trilhas JD do Jardim, a exceção precisa ficar nomeada aqui —
+ * nunca escondida por alias ou wrapper.
  */
 const PORTAS_LEGITIMAS: Record<string, string> = {
   "src/curriculum/Composer.ts":
     "é a própria implementação",
   "src/curriculum/motores/composerCanary.ts":
-    "é A ponte: o único caminho de produção da ficha até a tela",
+    "é A ponte dos nós da Jornada: canário e rollback escolhem a ficha do DAG",
+  "src/curriculum/motores/jardimSession.ts":
+    "é a ponte deliberada das fichas JD de automaticidade: JD não é nó do DAG " +
+    "nem substitui gerador legado, por isso não participa de COMPOSER_CANARIES",
   "src/components/admin/SandboxModal.tsx":
     "é a pré-visualização administrativa, cujo trabalho é justamente mostrar a " +
     "ficha independentemente do canário. Não é caminho de criança.",

@@ -1,4 +1,7 @@
-import { MasteryEvidence, Progress } from "../../types";
+import { MasteryEvidence, MasteryRule, Progress } from "../../types";
+import { calendarDayDistance, normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
+import { consumeAulaSourceProgress, markAulaSourceProgress } from "./aulaProgressContext";
+import { consumeSenseiDojoTerminal } from "./senseiDojoProgressContext";
 
 export type ProgressTransition =
   | { type: "level-up"; level: number }
@@ -14,20 +17,10 @@ export interface MasteryAttempt {
   isReview: boolean;
   practiceDay: string;
   previousPracticeDay?: string;
-  /**
-   * As condições que ESTA resposta satisfez — a §9 da ficha (P13).
-   *
-   * Vem do palco, que é o único que sabe: nem o valor da resposta nem o nível
-   * dizem se a criança acertou na primeira audição ou sem vaga fantasma.
-   */
   evidencias?: string[];
-  /**
-   * A condição que a ficha EXIGE ter visto pelo menos uma vez.
-   *
-   * `undefined` numa ficha que não declara nada — e aí a dimensão não bloqueia,
-   * exatamente como não bloqueava antes de existir.
-   */
   exigeEvidencia?: string;
+  gateEvidenceBeforeAdvance?: string;
+  masteryRule?: MasteryRule;
 }
 
 export interface AnswerProgressResult {
@@ -41,11 +34,74 @@ export interface ProgressionMode {
 }
 
 /**
+ * Instala o boundary de `lastDay` sem inventar uma chave serializável quando o
+ * progresso ainda nunca foi praticado. Antes da primeira escrita a propriedade
+ * existe apenas como interceptor não-enumerável; ao receber uma data válida, ela
+ * se torna enumerável e passa a sobreviver normalmente a spread/JSON/save.
+ */
+function protectLocalPracticeDay(progress: Progress): void {
+  let practiceDay = progress.lastDay;
+
+  const install = (enumerable: boolean) => {
+    Object.defineProperty(progress, "lastDay", {
+      enumerable,
+      configurable: true,
+      get: () => practiceDay,
+      set: (value: string | undefined) => {
+        practiceDay = normalizeLegacyRuntimeDay(value) ?? value;
+        if (!enumerable && practiceDay !== undefined) install(true);
+      },
+    });
+  };
+
+  install(practiceDay !== undefined);
+}
+
+/**
+ * A escada conceitual tem um único escritor: `applyJourneyAnswer`.
+ *
+ * Há código de UI legado que ainda tenta dar bônus de velocidade com mutação
+ * direta de `p.streak`. Em vez de permitir que uma camada de recompensa ganhe
+ * autoridade curricular, o objeto devolvido pelo motor expõe o valor calculado
+ * normalmente, mas ignora escritas externas até a próxima transição do motor.
+ *
+ * O mesmo boundary normaliza escritas legadas de `lastDay`: se a UI entregar o
+ * dia UTC do instante atual, ele vira a data LOCAL antes de persistir. Datas
+ * históricas/injetadas permanecem válidas. Campos ausentes continuam ausentes
+ * no shape serializável até sua primeira escrita real.
+ */
+export function protectConceptualStreak(progress: Progress): Progress {
+  const conceptualStreak = progress.streak || 0;
+  Object.defineProperty(progress, "streak", {
+    enumerable: true,
+    configurable: true,
+    get: () => conceptualStreak,
+    set: () => {
+      // Intencional: RT/estrela/UI não escrevem na progressão conceitual.
+    },
+  });
+  protectLocalPracticeDay(progress);
+  return progress;
+}
+
+function rescueTargetRecovered(before: Progress, after: Progress, mode: ProgressionMode): boolean {
+  if (mode.kind !== "rescue" || !mode.requiredLevel) return false;
+  // No nível 5 não existe novo degrau para sinalizar a saída. Mantemos a regra
+  // já usada pelo GameLoop: quem entrou no resgate já no 5 precisa confirmar
+  // dois acertos conceituais; quem chega de 4→5 pode sair na própria transição.
+  if (mode.requiredLevel === 5 && (before.lvl || 1) === 5) return (after.streak || 0) >= 2;
+  return (after.lvl || 1) >= mode.requiredLevel;
+}
+
+/**
  * Transição pura da escada de proficiência da Jornada.
  *
- * Centraliza a semântica que antes vivia duplicada no GameLoop e no antigo
- * progressEngine. Saves coroados continuam válidos, mas novas coroas só nascem
- * quando compreensão, independência, fluência e retenção estão maduras.
+ * O Dojo Sensei atravessa a mesma casca visual do GameLoop, mas é interceptado
+ * ANTES desta escada. Uma resposta de `dojo_add/sub/mul/div` vira evento de
+ * fluência para `dojoTracks`; não altera lvl/dom/mastery da Jornada.
+ *
+ * Na Aula do Dia, `current` pode ser o envelope sintético `aula`. Depois da
+ * exclusão do Dojo, o boundary resolve a competência-fonte normalmente.
  */
 export function applyJourneyAnswer(
   current: Progress,
@@ -54,15 +110,28 @@ export function applyJourneyAnswer(
   masteryAttempt?: MasteryAttempt,
   mode: ProgressionMode = { kind: "journey" },
 ): AnswerProgressResult {
+  const normalizedAttempt = masteryAttempt
+    ? {
+        ...masteryAttempt,
+        practiceDay: normalizeLegacyRuntimeDay(masteryAttempt.practiceDay) ?? masteryAttempt.practiceDay,
+      }
+    : undefined;
+
+  const dojo = consumeSenseiDojoTerminal(current, right, normalizedAttempt);
+  if (dojo.handled) return { progress: dojo.progress, transition: null };
+
+  const routed = consumeAulaSourceProgress(current);
+  const base = routed.progress;
   const progress: Progress = {
-    ...current,
-    bank: [...(current.bank || [])],
-    tot: (current.tot || 0) + 1,
-    ok: current.ok || 0,
-    streak: current.streak || 0,
-    bad: current.bad || 0,
-    lvl: current.lvl || 1,
-    maxLvl: current.maxLvl || current.lvl || 1,
+    ...base,
+    bank: [...(base.bank || [])],
+    tot: (base.tot || 0) + 1,
+    ok: base.ok || 0,
+    streak: base.streak || 0,
+    bad: base.bad || 0,
+    lvl: base.lvl || 1,
+    maxLvl: base.maxLvl || base.lvl || 1,
+    ...(normalizedAttempt ? { lastDay: normalizedAttempt.practiceDay } : {}),
   };
   let transition: ProgressTransition = null;
 
@@ -92,25 +161,46 @@ export function applyJourneyAnswer(
     }
   }
 
-  if (masteryAttempt) {
-    if (masteryAttempt.helpUsed) {
-      progress.helpClicks = (current.helpClicks || 0) + 1;
-    }
-    const mastery = updateMasteryEvidence(current, right, masteryAttempt);
+  if (normalizedAttempt) {
+    if (normalizedAttempt.helpUsed) progress.helpClicks = (base.helpClicks || 0) + 1;
+    const mastery = updateMasteryEvidence(base, right, normalizedAttempt);
     progress.masteryEvidence = mastery;
+
+    if (
+      transition?.type === "level-up"
+      && normalizedAttempt.gateEvidenceBeforeAdvance
+      && !(mastery.evidenciasVistas || []).includes(normalizedAttempt.gateEvidenceBeforeAdvance)
+    ) {
+      progress.lvl = base.lvl;
+      progress.maxLvl = base.maxLvl || base.lvl;
+      progress.streak = Math.max(progress.streak, mode.kind === "rescue" ? 2 : 3);
+      transition = null;
+    }
+
     if (!progress.dom && mastery.crownedBy === "multidimensional") {
       progress.dom = true;
       transition = { type: "multidimensional-crown" };
     }
   } else if (progress.streak >= 3 && progress.lvl === 5 && !progress.dom) {
-    // Compatibilidade para consumidores antigos durante a migração. O GameLoop
-    // sempre fornece MasteryAttempt e, portanto, nunca usa este caminho.
     progress.dom = true;
     progress.masteryEvidence = legacyMasteryEvidence();
     transition = { type: "legacy-crown" };
   }
 
-  return { progress, transition };
+  // Uma Oficina bem-sucedida precisa ter saída. `current/base` é sempre o
+  // progresso da competência-alvo da missão: portanto limpar aqui resolve
+  // somente misconceptions desse alvo. Em resgate de pré-requisito, a causa
+  // original vive em outro nó e permanece intacta até ser reavaliada lá.
+  if (rescueTargetRecovered(base, progress, mode)) {
+    progress.misconceptions = [];
+    progress.rescueAttempts = 0;
+  }
+
+  const routedProgress = markAulaSourceProgress(progress, routed.sourceTrackId);
+  return {
+    progress: protectConceptualStreak(routedProgress),
+    transition,
+  };
 }
 
 export function legacyMasteryEvidence(): MasteryEvidence {
@@ -124,24 +214,48 @@ export function legacyMasteryEvidence(): MasteryEvidence {
   };
 }
 
-/**
- * O que ainda falta para a coroa, em português — para o painel dos pais.
- *
- * Existe porque a dimensão nova é a única que uma criança pode não alcançar
- * **sem errar nada**: ela acerta tudo, sempre com andaime, e a coroa não vem.
- * Sem uma frase que diga o quê, isso vira "o app travou".
- */
+const REGRA_PADRAO: MasteryRule = { acertos: 3, de: 3, sessoes: 2 };
+
+function regraValida(rule?: MasteryRule): MasteryRule {
+  const acertos = Math.max(1, Math.floor(rule?.acertos ?? REGRA_PADRAO.acertos));
+  const de = Math.max(acertos, Math.floor(rule?.de ?? REGRA_PADRAO.de));
+  const sessoes = Math.max(1, Math.floor(rule?.sessoes ?? REGRA_PADRAO.sessoes));
+  return { acertos, de, sessoes };
+}
+
+function compreensaoDaSessaoPronta(evidence: MasteryEvidence): boolean {
+  const rule = regraValida(evidence.masteryRule);
+  const janela = evidence.comprehensionWindow ?? [];
+  return janela.length >= rule.de && janela.filter(Boolean).length >= rule.acertos;
+}
+
+function sessoesPassadas(evidence: MasteryEvidence): string[] {
+  if (evidence.passedSessionDays?.length) return evidence.passedSessionDays;
+  return evidence.candidateDay ? [evidence.candidateDay] : [];
+}
+
 export function faltaParaCoroa(
   evidence: MasteryEvidence | undefined,
   descricaoDaEvidencia?: string,
 ): string | null {
   if (!evidence || evidence.crownedBy) return null;
-  if (evidence.comprehensionStreak < 3) return "Acertar três seguidas no último nível.";
-  if (evidence.independenceStreak < 3) return "Conseguir sem pedir dica.";
-  if (evidence.evidenciaDaFicha === false) {
-    return descricaoDaEvidencia ?? "Acertar uma vez na condição mais difícil da competência.";
+  const rule = regraValida(evidence.masteryRule);
+  if (!compreensaoDaSessaoPronta(evidence)) {
+    return rule.acertos === rule.de
+      ? `Acertar ${rule.acertos} seguidas no ultimo nivel, na mesma sessao.`
+      : `Acertar ${rule.acertos} de ${rule.de} tentativas recentes no ultimo nivel.`;
   }
-  if (evidence.retentionPasses < 1) return "Voltar a acertar depois de alguns dias.";
+  if (evidence.independenceStreak < Math.min(3, rule.acertos)) return "Conseguir sem pedir dica.";
+  if (evidence.evidenciaDaFicha === false) {
+    return descricaoDaEvidencia ?? "Acertar uma vez na condicao mais dificil da competencia.";
+  }
+  const requeridas = Math.max(2, rule.sessoes);
+  const faltam = requeridas - sessoesPassadas(evidence).length;
+  if (faltam > 0) {
+    return faltam === 1
+      ? "Confirmar o dominio em mais uma sessao, depois de alguns dias."
+      : `Confirmar o dominio em mais ${faltam} sessoes espacadas.`;
+  }
   return null;
 }
 
@@ -150,46 +264,37 @@ export function migrateLegacyCrown(progress: Progress): Progress {
   return { ...progress, masteryEvidence: legacyMasteryEvidence() };
 }
 
-function dayDistance(from?: string, to?: string): number {
-  if (!from || !to) return 0;
-  const start = Date.parse(`${from}T00:00:00Z`);
-  const end = Date.parse(`${to}T00:00:00Z`);
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return 0;
-  return Math.max(0, Math.floor((end - start) / 86400000));
-}
-
 function updateMasteryEvidence(
   before: Progress,
   right: boolean,
   attempt: MasteryAttempt,
 ): MasteryEvidence {
-  if (before.dom) {
-    return before.masteryEvidence || legacyMasteryEvidence();
-  }
+  if (before.dom) return before.masteryEvidence || legacyMasteryEvidence();
+
+  const anterior = before.masteryEvidence;
+  const rule = regraValida(attempt.masteryRule ?? anterior?.masteryRule);
+  const janelaHerdada = anterior?.comprehensionWindow
+    ? [...anterior.comprehensionWindow]
+    : Array(Math.min(anterior?.comprehensionStreak || 0, rule.de)).fill(true);
+  const passedDays = [...(anterior?.passedSessionDays
+    ?? (anterior?.candidateDay ? [anterior.candidateDay] : []))];
 
   const evidence: MasteryEvidence = {
     schemaVersion: 1,
-    comprehensionStreak: before.masteryEvidence?.comprehensionStreak || 0,
-    independenceStreak: before.masteryEvidence?.independenceStreak || 0,
-    fluencyStreak: before.masteryEvidence?.fluencyStreak || 0,
-    retentionPasses: before.masteryEvidence?.retentionPasses || 0,
-    candidateDay: before.masteryEvidence?.candidateDay,
-    evidenciaDaFicha: before.masteryEvidence?.evidenciaDaFicha,
-    evidenciasVistas: [...(before.masteryEvidence?.evidenciasVistas || [])],
+    comprehensionStreak: anterior?.comprehensionStreak || 0,
+    independenceStreak: anterior?.independenceStreak || 0,
+    fluencyStreak: anterior?.fluencyStreak || 0,
+    retentionPasses: Math.max(0, passedDays.length - 1),
+    candidateDay: anterior?.candidateDay,
+    crownedBy: anterior?.crownedBy,
+    evidenciaDaFicha: anterior?.evidenciaDaFicha,
+    evidenciasVistas: [...(anterior?.evidenciasVistas || [])],
+    masteryRule: rule,
+    comprehensionWindow: janelaHerdada,
+    sessionDay: anterior?.sessionDay,
+    passedSessionDays: passedDays,
   };
 
-  /**
-   * ⚠️ A evidência da ficha é colhida em QUALQUER nível, não só no 5.
-   *
-   * As três primeiras dimensões medem o desempenho no topo da escada, e por
-   * isso vivem atrás do `lvl !== 5`. A da ficha é outra coisa: é um FATO
-   * histórico — *"ela já fez isto uma vez"* —, e várias das condições da §9 só
-   * acontecem fora do nível 5.
-   *
-   * O caso que obriga: a F48 pede um acerto com a **forma girada**, e o nível 5
-   * dela é o dos sólidos, onde giro não existe. Colhida só no topo, essa
-   * evidência seria impossível e a competência jamais coroaria.
-   */
   if (right && attempt.evidencias?.length) {
     for (const nome of attempt.evidencias) {
       if (!evidence.evidenciasVistas!.includes(nome)) evidence.evidenciasVistas!.push(nome);
@@ -197,50 +302,43 @@ function updateMasteryEvidence(
   }
   evidence.evidenciaDaFicha = attempt.exigeEvidencia
     ? evidence.evidenciasVistas!.includes(attempt.exigeEvidencia)
-    // Ficha que não declara condição extra não é bloqueada por ela — é o mesmo
-    // comportamento de antes de o campo existir.
     : true;
 
   if (before.lvl !== 5) return evidence;
 
-  if (!right) {
+  if (evidence.sessionDay !== attempt.practiceDay) {
+    evidence.sessionDay = attempt.practiceDay;
+    evidence.comprehensionWindow = [];
     evidence.comprehensionStreak = 0;
     evidence.independenceStreak = 0;
     evidence.fluencyStreak = 0;
-    evidence.retentionPasses = 0;
-    evidence.candidateDay = undefined;
-    // `evidenciasVistas` NÃO é zerada: ela é histórico, não sequência. A §9 diz
-    // "pelo menos um acerto" naquela condição — errar depois não desfaz o que
-    // ela demonstrou uma vez.
-    return evidence;
   }
 
-  evidence.comprehensionStreak = Math.min(3, evidence.comprehensionStreak + 1);
-  evidence.independenceStreak = attempt.helpUsed
-    ? 0
-    : Math.min(3, evidence.independenceStreak + 1);
-  // Continua sendo medida — é telemetria e é o que a trilha do Dojo consome —,
-  // mas não coroa mais. Ver o comentário em `MasteryEvidence.fluencyStreak`.
-  evidence.fluencyStreak = attempt.targetRtMs !== undefined && attempt.durationMs <= attempt.targetRtMs
-    ? Math.min(3, evidence.fluencyStreak + 1)
+  evidence.comprehensionWindow = [...(evidence.comprehensionWindow || []), right].slice(-rule.de);
+  evidence.comprehensionStreak = right ? Math.min(rule.de, evidence.comprehensionStreak + 1) : 0;
+  evidence.independenceStreak = right && !attempt.helpUsed
+    ? Math.min(3, evidence.independenceStreak + 1)
     : 0;
+  evidence.fluencyStreak = right
+    && attempt.targetRtMs !== undefined
+    && attempt.durationMs <= attempt.targetRtMs
+      ? Math.min(3, evidence.fluencyStreak + 1)
+      : 0;
 
-  const coreReady = evidence.comprehensionStreak >= 3 &&
-    evidence.independenceStreak >= 3 && evidence.evidenciaDaFicha === true;
-  if (!coreReady) {
-    evidence.retentionPasses = 0;
-    evidence.candidateDay = undefined;
-  } else if (!evidence.candidateDay) {
-    evidence.candidateDay = attempt.practiceDay;
+  const sessaoMadura = compreensaoDaSessaoPronta(evidence)
+    && evidence.independenceStreak >= Math.min(3, rule.acertos)
+    && evidence.evidenciaDaFicha === true;
+
+  if (sessaoMadura && !passedDays.includes(attempt.practiceDay)) {
+    const ultima = passedDays.at(-1);
+    if (!ultima || calendarDayDistance(ultima, attempt.practiceDay) >= 2) passedDays.push(attempt.practiceDay);
   }
 
-  const retainedAfterInterval = attempt.isReview && coreReady &&
-    dayDistance(evidence.candidateDay, attempt.practiceDay) >= 2 &&
-    dayDistance(attempt.previousPracticeDay, attempt.practiceDay) >= 2;
-  if (retainedAfterInterval) evidence.retentionPasses += 1;
+  evidence.passedSessionDays = passedDays;
+  evidence.candidateDay = passedDays[0];
+  evidence.retentionPasses = Math.max(0, passedDays.length - 1);
 
-  if (coreReady && evidence.retentionPasses >= 1) {
-    evidence.crownedBy = "multidimensional";
-  }
+  const sessoesNecessarias = Math.max(2, rule.sessoes);
+  if (passedDays.length >= sessoesNecessarias) evidence.crownedBy = "multidimensional";
   return evidence;
 }

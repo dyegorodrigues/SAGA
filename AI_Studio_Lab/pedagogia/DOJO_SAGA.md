@@ -1,6 +1,8 @@
 # 🥋 DOJO SAGA — A Academia de Fluência
-**Versão 1.4 · Agosto 2026 · Especificação completa do pilar de fluência**
+**Versão 1.6 · Agosto 2026 · Especificação completa do pilar de fluência**
 > *O número acima acompanha SEMPRE a última entrada do changelog no fim do arquivo. Cabeçalho e changelog divergentes = documento inválido (Bíblia §1).*
+*v1.6 (ago/2026) — P22.3B: JD4 entra no runtime como automaticidade exclusiva de N1.07. A referência histórica N1.07/N1.09 é desfeita após a separação curricular de N1.09; contar de 2 em 2 deixa de ocupar JD4 e aguarda destino curricular próprio. O Jardim é majoritariamente pré-simbólico, mas JD4 é uma ponte oral→simbólica inicial deliberada. Cinco degraus: sucessor até 5/10 com reta, sucessor até 20 sem reta, antecessor até 10 e alternância até 20. `dojoTracks` continua separado da Jornada e tempo nunca concede domínio conceitual.*
+*v1.5 (ago/2026) — reconciliação P17/P8 do Jardim. JD5 deixa a definição antiga de “chegaram mais 2” e passa a refletir a ficha canônica completa: mãe `N1.10`, relação parte-todo com uma parte escondida e treino da imagem mental; o conteúdo antigo de soma mental não é apagado conceitualmente, mas deixa de ocupar o id JD5 e só pode voltar com destino curricular próprio. O unlock do Jardim fica explicitamente em NÍVEL 3 da mãe e não herda por engano a regra histórica de FD; a promoção de um round JD exige precisão E fluência no `rt_alvo`, mantendo acerto lento como compreensão preservada. `DojoTrackState`/`DojoSession` passam a admitir família `JD`, estado de degrau e rounds. O motor P8 mantém JD fora do DAG e salva automaticidade em `dojoTracks`, enquanto erros conceituais reais alimentam o Radar da competência-mãe.*
 *v1.4 (ago/2026) — documento-irmão criado: `DOJO_TRILHAS_COMPLETAS.md`, com as 5 trilhas de operação × 10 faixas, a janelinha de faixas, os distratores tagueados, o `DojoErrorEvent` que liga o Dojo ao Radar, o inventário de fatos gerado e o protocolo de alteração de faixa. Resolvida a contradição do §3-A × §4-bis.2 sobre o registro comutativo: o `FactStrength` é compartilhado, mas guarda `rt_direto` e `rt_invertido` separados — sem isso não havia como medir se a comutatividade pegou. Regra de áudio do Dojo Sensei explicitada: praticamente nenhum (só tick de acerto, tom de erro e jingle de faixa); o áudio obrigatório é do Jardim, que é outro lugar.*
 *v1.3 (ago/2026) — Jardim do Dojo COMPLETO: JD2 (A Mão Relâmpago, mãe N1.08) e JD3 (Moldura Relâmpago, mãe N1.11) ganharam ficha completa de 9 seções em `FICHAS_F0_COMPLETAS.md` — antes existiam só como duas linhas de especificação aqui, e eram as duas únicas ausências reais do cânone. Alinhamento com a Bíblia v3.1: o cronômetro visível continua proibido antes dos 7 anos, e agora a regra é simétrica na Jornada — §5.1-bis, o relógio é silencioso e nenhuma ficha usa tempo como critério de domínio conceitual; o `rt_alvo` da ficha alimenta o `rt_max_s` da trilha FD, nunca reprova na Academia.*
 
@@ -31,7 +33,7 @@ O método Kumon acertou coisas que quase ninguém acerta. E errou coisas que só
 
 **Fraquezas do Kumon (corrigidas):**
 1. **Repetição cega e tediosa** — a folha não sabe QUAIS fatos você erra; repete tudo. → Dojo: rastreio POR FATO (§3): treina o que está fraco, não o que está forte. É a vantagem estrutural que papel nunca terá.
-2. **Zero ensino conceitual** — Kumon treina, não explica; a criança automatiza sem entender. → Dojo: **nenhuma trilha FD abre antes da competência-mãe estar em nível ≥ 4 nas aulas** (a compreensão SEMPRE vem primeiro — regra de desbloqueio do Grafo, Apêndice A).
+2. **Zero ensino conceitual** — Kumon treina, não explica; a criança automatiza sem entender. → Dojo: **nenhuma trilha abre antes do limiar conceitual da sua competência-mãe**. Para o Jardim, o contrato canônico é NÍVEL 3 (§3-bis e §7); FD/PD obedecem aos pré-requisitos/limiares de suas trilhas canônicas e nunca sobrepõem a compreensão. A regra antiga “FD só em nível ≥4” não deve ser aplicada ao Jardim.
 3. **Sequência fixa e igual pra todos** — ignora o padrão individual de erro. → Dojo: o Treino do Mestre monta cada sessão do estado real da criança (§5).
 4. **Feedback binário e tardio** — certo/errado corrigido depois, sem estratégia. → Dojo: erro dispara a estratégia do fato na hora (o "quebra o bloco" do 7×6, a "ponte" do 8+5 — as MESMAS estratégias do Manual, agora em velocidade).
 5. **Volume que esmaga** — folhas longas geram choro e desistência. → Dojo: rounds de 10-20 itens, término SEMPRE em vitória, sem lição de casa.
@@ -45,7 +47,7 @@ O Dojo tem **quatro modos**. Nos dois primeiros o algoritmo decide tudo; nos doi
 
 **🥋 Jornada (o treino diário padrão).** O Treino do Mestre monta o bloco do dia (§5) — equilibrado: um pouco de fronteira, revisão intercalada, fila quente. É o que entra na sessão da Academia (Bíblia §6) e o que a criança faz ao abrir o Dojo sem pedir nada. Senta e treina, como no tatame.
 
-**🎯 Reforço (só os pontos fracos).** O algoritmo puxa APENAS as trilhas/itens de menor força — se a subtração está em 42%, vem subtração. É o modo para afiar o que está frágil, sem diluir com o que já é forte. Pode ser sugerido pelo Motor ou escolhido pela criança.
+**🎯 Reforço (só os pontos fracos).** O algoritmo puxa APENAS as trilhas/itens de menor força — se a subtração está em 42%, vem subtração. É o modo para afiar o que está frágil, sem diluir com o que já está forte. Pode ser sugerido pelo Motor ou escolhido pela criança.
 
 **⚡ Livre (a criança escolhe).** Ela pega qualquer trilha destravada, de qualquer família ("hoje quero tabuada do 7" ou "quero treinar divisão armada"). Autonomia real: dá senso de controle e serve para treinar para o "teste de amanhã". Dentro da trilha escolhida, o algoritmo ainda escolhe os itens (os fracos dela). Escolha do quê; ciência do como.
 
@@ -119,10 +121,10 @@ Os "degraus" deste documento (FD3.1...FD3.10, PD-D.1...PD-D.10) são chamados of
 | Mede | proficiência — o quanto entende | dificuldade — o tamanho/tipo do número |
 | Eixo | Y, abstração (concreto→abstrato) | X, magnitude (2+3 → 27+35 → ÷2díg com ajuste) |
 | Muda o quê | a REPRESENTAÇÃO na tela | os PARÂMETROS numéricos |
-| Sobe quando | domina 3/3 em 2 sessões (Jornada) | 2 rounds seguidos ≥ 80% de precisão |
-| Desce quando | nunca (maxLvl não regride) | 2 rounds seguidos < 60% (recuo sem cerimônia, §4) |
+| Sobe quando | domínio da ficha (regra `acertos/de/sessoes`) | regra própria da família de treino |
+| Desce quando | nunca (maxLvl não regride) | treino pode recuar sem retirar conquista/faixa |
 
-**Uma trilha de Dojo só abre quando a competência-mãe atinge NÍVEL 3 na Jornada** (entendeu o suficiente) — a partir daí ela sobe sozinha pelas 10 FAIXAS, independente do nível de proficiência continuar subindo em paralelo na Jornada.
+**O Jardim abre quando a competência-mãe atinge NÍVEL 3 na Jornada** (ou já está dominada). A partir daí, seu treino de automaticidade progride em estado próprio e não cria nó `JD*` no Grafo. FD/PD continuam obedecendo aos limiares e pré-requisitos de suas trilhas canônicas; não inferir regra de uma família para outra.
 
 ---
 
@@ -233,7 +235,7 @@ Ao montar um treino, o Mestre decide em ordem:
 
 1. **Qual família e qual trilha?** Primeiro a família com maior necessidade (uma trilha FD ou PD com fila quente não zerada tem prioridade), depois a trilha mais "necessitada" dentro dela, por prioridade: (a) fila quente não zerada → ela; (b) senão, a mais enferrujada (maior tempo sem treino × mais itens decaídos); (c) senão, a mais avançada ativa (progresso). Alterna para nunca abandonar trilha velha (máx 3 treinos seguidos na mesma) e equilibra as famílias ao longo da semana (não deixa PD parada enquanto só treina FD). No Treino Livre, a criança escolhe a trilha; o Mestre ainda escolhe os itens dentro dela.
 2. **Quais itens?** A receita do §4 (FD ou PD conforme a trilha), escolhendo dentro de cada fatia os de MENOR força (o oposto exato do papel: o Kumon repete o que você já sabe; o Mestre caça o que você não sabe). Em PD, a fila quente entra **pelo passo fraco** registrado.
-3. **Que formato?** Em FD, rotação de formatos para o mesmo fato (7×6 direto · 42÷7 · 7×__=42 · o array relâmpago) — fluência é reconhecer o fato de qualquer ângulo. Em PD, a conta armada no formato canônico, ocasionalmente com um passo pré-preenchido para isolar o passo que falha.
+3. **Que formato?** Em FD, rotação de formatos para o mesmo fato (7×6 direto · 42÷7 · 7×__=42 · o array relâmpago) — fluência é reconhecer o fato de qualquer ângulo. Em PD, a conta armada no formato canônico, ocasionalmente com um passo pré-preenchido para isolar o passo que falhou.
 4. **Que ritmo?** rt/tempo-alvo do degrau; sem cronômetro VISÍVEL antes dos 7 anos (a pressa visual gera pânico motor — o tempo é medido em silêncio). 7+ anos: o cronômetro é opcional e a criança escolhe ligá-lo (muitos ADORAM — mas é escolha).
 
 **O erro isolado é toque leve** (o mesmo modelo de duas camadas da Bíblia §8, na velocidade do Dojo): um item errado apenas volta pra fila quente e reaparece adiante — sem parar o round, sem aula. Só o PADRÃO merece intervenção. **Quando um item erra 2× na mesma sessão:** o Dojo pausa a velocidade e injeta a ESTRATÉGIA daquele item (10-15s) — **a mesma do Manual, encurtada**. Em FD: o 7×6 abre no quebra-bloco 5×6+2×6; o 8+5 abre na ponte do 10. Em PD: abre no PASSO exato que falhou (a subtração trava na troca → a barra de dezena explode em 10 cubinhos; a divisão engole o zero do quociente → a Chave Viva mostra a casa vazia). Depois, o item volta em velocidade. Se a estratégia-mãe também falhar, o problema não é de fluência: o Mestre encerra o treino da trilha e sinaliza a competência-mãe como frágil (vira resgate na próxima aula — Bíblia §11). O Dojo NUNCA vira aula à força; ele devolve pra aula.
@@ -254,34 +256,44 @@ O Dojo usa a metáfora até o fim — treino é identidade, não obrigação:
 
 ## §7. O JARDIM DO DOJO — fluência para quem não lê nem conta (4-6 anos)
 
-A resposta ao "e o meu filho de 4?": fluência pré-simbólica existe, e é a MAIS importante — é o alicerce perceptual de todo cálculo mental futuro (a linhagem do soroban/anzan: primeiro o olho, depois a imagem mental, por último o símbolo). Trilhas do Jardim (destravam pelas competências N1, como as FD):
+A resposta ao "e o meu filho de 4?": fluência pré-simbólica existe, e é a MAIS importante — é o alicerce perceptual de todo cálculo mental futuro (a linhagem do soroban/anzan: primeiro o olho, depois a imagem mental, por último o símbolo). Trilhas do Jardim (destravam quando a competência-mãe chega ao NÍVEL 3 ou já está dominada):
 
 - **JD1 · Olhômetro Relâmpago** (mãe: N1.03): bolinhas piscam 1,5s → some → toca a quantidade (respostas como conjuntos de bolinhas, depois numerais quando N1.06 ≥ 3). Progressão: 1-3 → 1-5 → arranjos de dado → arranjos irregulares → **flash de 0,8s** (o olho ficando anzan).
-- **JD2 · A Mão Relâmpago** (mãe: N1.08): mãos/dedos piscam → quanto? (a sub-base 5 virando reflexo: 4 é "mão sem polegar" SEM contar). **Ficha completa de 9 seções escrita em ago/2026 — `FICHAS_F0_COMPLETAS.md`.**
-- **JD3 · Moldura Relâmpago** (mãe: N1.11): a moldura de 10 pisca com 7 → *"quantos FALTAM pra encher?"* — os amigos do 10 nascendo como percepção de vazio, não como conta. **Ficha completa de 9 seções escrita em ago/2026 — `FICHAS_F0_COMPLETAS.md`.** É a porta de entrada da trilha FD1.
-- **JD4 · O Passo Seguinte** (mãe: N1.07/N1.09): "cinco!" (áudio) → toca o que vem depois, cada vez mais rápido; depois contar de 2 em 2 no ritmo do tambor (semente de AL.03 e das tabuadas).
-- **JD5 · Ver e Imaginar** (mãe: N1.08, o degrau anzan): mostra 3 bolinhas, esconde, *"chegaram mais 2"* (só áudio + som de plim-plim) → quanto tem AGORA atrás da cortina? A criança opera sobre a IMAGEM MENTAL — o começo do cálculo de cabeça de verdade, aos 5 anos, sem um símbolo na tela.
+- **JD2 · A Mão Relâmpago** (mãe: N1.08): mãos/dedos piscam → quanto? (a sub-base 5 virando reflexo: 4 é "mão sem polegar" SEM contar). **Ficha completa de 9 seções em `FICHAS_F0_COMPLETAS.md`.**
+- **JD3 · Moldura Relâmpago** (mãe: N1.11): a moldura de 10 pisca com 7 → *"quantos FALTAM pra encher?"* — os amigos do 10 como percepção de vazio, não como conta. **Ficha completa de 9 seções em `FICHAS_F0_COMPLETAS.md`.** É ponte perceptual da F28.
+- **JD4 · O Passo Seguinte** (mãe: **N1.07**): áudio/estímulo numérico → sucessor com apoio, depois sem reta, antecessor e finalmente alternância até 20. É a exceção de transição oral→simbólica do Jardim. **Não usa N1.09 como segunda mãe e não treina contagem de 2 em 2**; essa ideia histórica permanece válida como conteúdo, mas exige destino curricular próprio. **Runtime P22.3B ativo em `dojoTracks`.**
+- **JD5 · Ver e Imaginar** (mãe: **N1.10 Parte-todo**): a criança vê um total, uma parte é escondida e ela infere **quantos ficaram ocultos**, mantendo todo e parte na imagem mental. A escada vai de total pequeno com contagem falada até objetos soltos/sem moldura. A Jornada N1.10 instala essa estrutura e faz a ponte para o `NumberBond`; o Jardim preserva os cinco degraus perceptuais para automaticidade. **Ficha canônica completa em `FICHAS_F0_COMPLETAS.md`; decisão arquitetural em `DECISAO_P17_N110.md`.**
 
-Regras do Jardim: tudo áudio-first, rounds de 6-10 itens, 2-3 min, zero cronômetro visível, o flash é o único relógio. Erro → a cena reaparece parada para contar com o dedo (o concreto sempre disponível como rede).
+> **Retificação v1.5 — conteúdo antigo de JD5.** A versão inaugural descrevia “mostra 3, esconde, chegaram mais 2 → quanto tem agora”, que é soma mental sobre uma imagem oculta. É uma ideia pedagogicamente aproveitável, mas **não é a mesma competência** que a JD5 parte-todo consolidada nas fichas F0/P17. Ela não é apagada da história: simplesmente deixa de usar o id JD5. Se voltar ao produto, precisa receber destino no grafo/ficha própria antes de virar runtime.
+
+**Regras do Jardim:** tudo áudio-first · rounds de **6-10 itens** (o runtime P8 usa 8) · 2-3 min · zero cronômetro visível · o flash/`rt_alvo` é relógio silencioso. Acerto dentro do alvo fortalece automaticidade; acerto lento **mantém** (compreensão preservada, reflexo ainda não); erro enfraquece e pode alimentar o Radar da competência-mãe se houver hipótese cognitiva. Para subir um degrau de treino: **2 rounds consecutivos com ≥80% de precisão E ≥80% de respostas corretas dentro do `rt_alvo`**. Dois rounds <60% recuam o próximo treino um degrau, sem retirar a maior conquista/faixa já alcançada. Lentidão nunca vira `misconception`.
+
+**Separação Jornada × Jardim:** `JD*` não é nó do DAG e não escreve `state.progress[JD*]`. O estado de automaticidade vive em `state.dojoTracks`; o desbloqueio é recalculado a partir da competência-mãe. Erros conceituais reais do Jardim são atribuídos à mãe no Radar. A primeira resposta cognitiva mede a precisão do round: errar, receber dica e depois recuperar rende feedback/recompensa gentil, mas não transforma o item em acerto de automaticidade.
 
 ---
 
 ## §8. NA TELA E NOS DADOS
 
-**UI:** o Dojo é um LUGAR no mapa (o templo no topo da montanha) que a criança **entra direto e treina o quanto quiser** — não depende de estar numa aula. Dentro: as duas alas (Fatos e Procedimentos), o pergaminho de faixas por trilha, o botão único "Treinar" (Mestre monta) e a estante de trilhas (Livre). Métricas visíveis para a criança: faixa, chama, recorde. Métricas do painel dos pais: força média por trilha nas duas famílias, os itens mais fracos nominalmente (os "7×8 da vida" dela nos fatos; "trava na troca com zero" nos procedimentos), minutos treinados, gráfico de rt/tempo caindo — a prova visual da fluência chegando.
+**UI:** o Dojo é um LUGAR no mapa (o templo no topo da montanha) que a criança **entra direto e treina o quanto quiser** — não depende de estar numa aula. Dentro: Jardim pré-simbólico quando aplicável, alas de Fatos e Procedimentos, pergaminho de faixas por trilha, botão "Treinar" e estante de trilhas. Métricas visíveis para a criança: conquista/faixa, chama, recorde; nunca precisão clínica ou cronômetro obrigatório. Métricas do painel dos pais: força/automaticidade por trilha, itens/padrões frágeis, minutos treinados e curva de rt/tempo.
 
-**Contratos de dados (novos, a implementar):**
+**Contratos de dados:**
 ```
-FactStrength     (§3-A — por fato:      fact_id, forca, rt_medio, ultima_vez, erros_seguidos)
+FactStrength     (§3-A — por fato: fact_id, forca, rt_medio, ultima_vez, erros_seguidos)
 ProcStrength     (§3-B — por procedimento: proc_id, precisao, passo_fraco, tempo_medio, forca, ultima_vez)
-DojoTrackState   { track_id, familia: "FD"|"PD", degrau_atual, faixa, ultima_prova }
-DojoSession      { track_id, familia, itens[], acertos, rt_ou_tempo_medio, fila_quente_restante }
+DojoTrackState   { familia: "JD"|"FD"|"PD", unlocked, mastered,
+                   currentStep?, highestStep?, goodRounds?, weakRounds?, rounds?,
+                   attempts?, correct?, avgCorrectRtMs?, lastDay?, facts?, procs? }
+DojoSession      { track_id, familia, itens[], acertos_medidos, acertos_recuperados,
+                   rt_ou_tempo_medio, resultado_do_round }
 ```
-O composer da aula (Bíblia §6) pede ao Dojo 1 bloco pronto (secundário); o principal é o treino avulso no templo. O Dojo lê o Grafo (unlocks das FD/PD/JD — Apêndice A) e escreve telemetria que o motor adaptativo consome (§11 da Bíblia) — itens cronicamente fracos (fato ou passo de procedimento) são sinal de competência-mãe frágil.
 
-**O que o Dojo NUNCA faz:** não abre trilha (FD ou PD) sem a mãe dominada nas aulas · não mostra cronômetro antes dos 7 · não compara crianças · não tira faixa · não passa de 5 min por bloco · não substitui a aula (devolve pra ela quando o problema é conceito).
+Para `JD`, `unlocked` salvo é apenas cache/apresentação: a autoridade é sempre a competência-mãe. `currentStep` pode recuar; `highestStep`/conquista nunca regride. O round é a unidade atômica de progressão: abandonar um round no meio não promove faixa. O composer da aula (Bíblia §6) pode pedir ao Dojo um bloco pronto; o treino avulso no templo continua sendo o uso principal. O Dojo lê o Grafo para unlocks e escreve telemetria que o motor adaptativo consome (§11 da Bíblia).
+
+**O que o Dojo NUNCA faz:** não abre treino antes do limiar da mãe · não cria nós `JD*` no Grafo · não chama lentidão de erro conceitual · não mostra cronômetro obrigatório antes dos 7 · não compara crianças · não tira a maior faixa/conquista · não substitui a aula (devolve para ela quando o problema é conceito).
 
 *Changelog: v1.0 (jul/2026) — especificação inaugural: análise Kumon, força por fato, degraus FD, Treino do Mestre, faixas, Jardim do Dojo (JD1-JD5), contratos de dados.*
-*v1.1 (jul/2026) — segunda família de fluência: trilhas de PROCEDIMENTO (PD-A/S/M/D/Dec) para os algoritmos armados multi-dígito (a espinha do Kumon), com modelo ProcStrength (precisão + passo fraco + tempo) e intervenção pelo passo exato que falha; Dojo reafirmado como pilar autônomo (entra-se direto, treina-se à vontade), não apêndice da aula; três camadas explícitas (Jardim → Fato → Procedimento).*
-*v1.3 (ago/2026) — Jardim do Dojo COMPLETO: JD2 e JD3 ganharam ficha de 9 seções (antes existiam só como duas linhas de spec no §7). Alinhamento com a Bíblia v3.1 §5.1-bis: o relógio é silencioso também na Jornada; nenhuma ficha usa tempo como critério de domínio conceitual; o `rt_alvo` da ficha alimenta o `rt_max_s` da trilha FD e nada além disso. Cabeçalho de versão acrescentado.*
-*v1.2 (jul/2026) — QUATRO modos (§2): Jornada (diário), Reforço (só fracos), Livre (criança escolhe), Mestre (desafio cronometrado). Alinhado à Bíblia §3.1 (Dojo como uma das três funções).*
+*v1.1 (jul/2026) — segunda família de fluência: trilhas de PROCEDIMENTO (PD-A/S/M/D/Dec) para os algoritmos armados multi-dígito, com ProcStrength; Dojo reafirmado como pilar autônomo; três camadas explícitas (Jardim → Fato → Procedimento).*
+*v1.2 (jul/2026) — QUATRO modos (§2); §4-bis acrescenta degrau zero, comutatividade explícita e eixo Y/socorro visual; vocabulário FAIXA × NÍVEL formalizado.*
+*v1.3 (ago/2026) — JD2 e JD3 ganham fichas completas; relógio da Jornada passa a ser silencioso/telemetria e não critério conceitual.*
+*v1.4 (ago/2026) — `DOJO_TRILHAS_COMPLETAS.md`, faixas completas, DojoErrorEvent/Radar, inventário de fatos, comutatividade com rt direto/invertido e regra de áudio Sensei × Jardim.*
+*v1.5 (ago/2026) — P17/P8: JD5 reconciliada com N1.10 parte-todo; unlock JD no nível 3; progressão JD por precisão + fluência; família JD formalizada nos dados; estado em `dojoTracks`, Radar na mãe, JD fora do DAG. Conteúdo antigo “chegaram mais” fica histórico e exige destino próprio se reaproveitado.*

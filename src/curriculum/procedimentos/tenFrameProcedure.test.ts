@@ -223,6 +223,24 @@ describe("a cena da moldura", () => {
     }
   });
 
+  it("JD5 distingue escala >5 de retirada da moldura", () => {
+    const comMoldura = construirMolduraSpec("escondidos", 4, semente(7));
+    const semMoldura = construirMolduraSpec("escondidos", 5, semente(7));
+    const acao = (spec: typeof comMoldura): AcaoDaMoldura => ({
+      modo: "escondidos",
+      nivel: spec.nivel,
+      resposta: spec.resposta,
+      alvo: spec.resposta,
+      cheias: spec.cheias,
+      casas: spec.casas,
+      visiveis: spec.visiveis,
+      total: spec.total,
+      semMoldura: spec.semMoldura,
+    });
+    expect(evidenciasDe(acao(comMoldura))).not.toContain(Evidencia.SEM_MOLDURA);
+    expect(evidenciasDe(acao(semMoldura))).toContain(Evidencia.SEM_MOLDURA);
+  });
+
   it("a JD5 sempre deixa alguém à mostra e alguém escondido", () => {
     // Tapar tudo é "quantos eram?", e tapar nada é "quantos você vê?": duas
     // outras fichas.

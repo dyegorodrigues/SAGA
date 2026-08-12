@@ -1,90 +1,148 @@
-# Handoff de continuidade — estado após a correção do canário
+# Handoff de continuidade — SAGA
 
-> ## ⛔ SUPERADO EM 7/AGO/2026 — leia a [`RETOMADA.md`](./RETOMADA.md)
->
-> **Este arquivo descreve o repositório de 3/ago e não vale mais como estado.**
-> A afirmação *"N3.09 segue como único canário"* estava certa naquele dia e hoje
-> são **treze** canários ativos; o "Lote D não implementado" também foi
-> ultrapassado pelo bloco F0.
->
-> Fica no repositório porque o **raciocínio** dele continua válido — em especial
-> por que não republicar um commit local antigo sobre uma base superada. Mas
-> nenhum número aqui deve ser usado para decidir nada.
+> **VIGENTE em 11/ago/2026.** W1–W5 estão fechadas. A reconciliação pós-W5/pré-W6 está em **validação final**. **Não selecionar nem implementar W6 até o PR #29 registrar a receita verde do HEAD corrente.**
 
-## Base e publicação
+## Regra de ouro
 
-- Base desta atualização: `origin/main = 3c9acbd` (`Revise AGENTS.md with new SAGA guidelines`).
-- Os Lotes A, B e C estão na `main`. O PR #19 foi mesclado; o Lote C
-  (F98/N4.02 e ArrayGrid autoral) está incorporado, não mais "sendo salvo".
-- O Lote D **não foi implementado**. Não publicar `e03f187` diretamente: aquele
-  commit local antigo partia de `b56f5a6` e reapresentaria uma base superada.
-- `gN4_02` e `gN3_10` permanecem em produção. N3.09 segue como único canário.
+- repo `dyegorodrigues/SAGA`;
+- branch única `codex/integrar-bloco-f0`;
+- PR #29 **open + draft + unmerged**;
+- main protegida `68fad4c575e28959b2ca4776e9a541d6828b63f3`;
+- não merge/rebase/ready/auto-merge;
+- não criar branch auxiliar;
+- Creature Engine fora desta fila;
+- Thinking Engine continua DEFERRED;
+- GitHub remoto é a fonte da verdade.
 
-## Ponto exato de parada
+## Ordem de retomada
 
-O mecanismo de canário do Composer foi corrigido e comprovado pelo caminho de
-produção. O Lote D continua **não iniciado**: nenhum `StoryPanel`, nenhum
-`SingaporeBars` estendido e nenhuma ficha N3.10 autoral foram criados.
+1. PR #29: estado, HEAD, jobs e corpo do PR;
+2. `CHECKPOINT_RECONCILIACAO_POS_W5_PRE_W6_2026-08-11.md`;
+3. `RETOMADA.md`;
+4. `BRIEFING_CODEX.md`;
+5. checkpoint W5 + retificação F61 + errata N4.09;
+6. cânone pedagógico + `curriculum/grafo_saga.yaml`.
 
-## Correções recentes que mudam o plano
+`FLUXO_GIT_SEM_BUG.md` é proveniência histórica e está marcado como superado para o protocolo cumulativo atual.
 
-### Canário do Composer — corrigido
+## Estado curricular
 
-O rollback documentado no Lote B não funcionava em produção, apesar de o teste
-passar. `CURRICULUM` congelava a decisão na carga do módulo, e o curriculum só
-consultava a ponte para `N3.09` e `N3.11`; qualquer outro id no conjunto de
-canários era ignorado em silêncio.
+Baseline observada após W5:
 
-`verticalMigration.ts` foi substituído por `composerCanary.ts`:
+- **30 Composer**;
+- **22 legado**;
+- **38 fallback**;
+- **52 servidas**;
+- **17 divergências**;
+- **12 swaps**;
+- **44 estreias**;
+- blocker restante: **`Moedas`**.
 
-- a origem do gerador é resolvida a cada questão, não na carga do módulo;
-- `generatorSource` é getter e acompanha o rollback;
-- não existe lista de ids privilegiados no curriculum;
-- `enableComposerCanary` recusa nó sem ficha registrada;
-- há testes de regressão que provam rollback e ativação via `getTrackById`.
+W5 = `GM.05 / F61 / Regua`; prereqs `GM.12 + N2.02`.
 
-Consequência para o Andar 4: promover N3.10 a canário agora exige apenas registrar
-a ficha em `COMPOSER_FICHAS` e ativar o id — sem editar `curriculum.ts`.
+## Estado da reconciliação
 
-### Lote D — arquitetura corrigida
+### Produto
 
-A ficha canônica **F20** define `StoryPanel` como primitiva **principal** de N3.10.
-O `SingaporeBars` existente representa apenas `A + B = total` e precisa ser
-estendido para separar, comparar, completar e incógnita variável. O passo antigo
-"ligar SingaporeBars ao builder" produziria uma ficha pedagogicamente incorreta e
-foi substituído no `PLANO_MESTRE_SAGA.md`.
+- `gates` e sondas usam PR head explícito;
+- `src/curriculum/visualOnboardingGate.test.ts` baselineia a dívida Gold de §6.36: `N1.07,N1.09,N3.10,N4.03,N4.06`;
+- suíte comprovada: **172 arquivos / 2.516 testes**;
+- N4.09 já possui onboarding real e a pendência histórica foi corrigida por errata;
+- mascote runtime registry é PNG-only; JPG histórico `_nobg_` não entra mais como arte definitiva; fallback SVG é o caminho seguro;
+- chroma-key/canvas morto foi removido;
+- os ~5,4 MB de JPGs deixaram de ser emitidos pelo build por esse caminho;
+- chunk JS continua dívida ~2,349 MB / ~664,6 kB gzip;
+- F61 ganhou espera de estabilidade geométrica na sonda, sem relaxar tolerância nem alterar UI/pedagogia.
 
-## Ordem segura de retomada
+### Sonda transversal
 
-1. Criar branch inédita da `origin/main` atualizada.
-2. Tipar `StorySpec` e `SingaporeBarSpec` e escrever o procedimento puro das quatro
-   estruturas, com testes, antes de qualquer componente visual.
-3. Implementar `StoryPanel` como primitiva principal e estender `SingaporeBars`.
-4. Compor as duas em uma única tela: uma pergunta, uma ação dominante.
-5. Exercitar `join`, `separate`, `compare` e `complete` no Sandbox, com incógnita
-   variável no nível 5.
-6. Validar acessibilidade, áudio, viewport infantil e paridade.
-7. Encerrar o lote com `gN3_10` ainda em produção; o canário pertence a outro PR.
+O portão completo continua semanticamente o mesmo:
 
-## Roteiro completo
+- 390px com 8 sementes;
+- 320px com 1 semente;
+- 900px com 1 semente.
 
-O roteiro por andares, o sistema de design, o motor de mascotes, as regras de
-animação e o pipeline de áudio/TTS estão em
-[`ROTEIRO_DE_CONSTRUCAO_ANDARES.md`](./ROTEIRO_DE_CONSTRUCAO_ANDARES.md).
+No CI ele é paralelizado em dois jobs:
 
-## Validação reproduzível completa
+1. `Sonda transversal — 390px × 8 sementes`;
+2. `Sonda transversal — 320/900px × 1 semente`.
+
+No run `31494057998`, HEAD `153634079b7af77415ebb9cfea77e0c144cb2025`, 390×8 terminou integralmente limpa. O job único expirou somente depois, já medindo 320px, por timeout de 30 min. Sensei/F19/F61 ficaram verdes nesse mesmo HEAD.
+
+A receita final deve ser a do HEAD corrente do PR, após a paralelização e documentação reconciliada.
+
+### Foundry
+
+A auditoria externa estava certa sobre a quebra de integridade do archive transport, mas exagerou a perda: **10/10 arquivos-fonte estão localizados individualmente**, inclusive os dois protótipos considerados perdidos.
+
+A Foundry agora:
+
+- declara archive transport como `unverified`;
+- possui manifesto/verificador dedicado aos originais;
+- possui workflow de integridade;
+- preserva plano futuro em `DEFERRED_IMPLEMENTATION_PLAN.md` sem autorizar runtime;
+- possui Evidence Ledger melhorado;
+- separa namespaces de IDs e universos de inventário;
+- mantém recuperação byte-a-byte no Issue #1.
+
+Não copiar protótipos `.ts` recuperados para `src/` do SAGA.
+
+## Dívida controlada, não apagar do radar
+
+- 22 legados;
+- 38 fallbacks;
+- 17 divergências;
+- `Moedas` blocker;
+- cinco dívidas Gold de onboarding baselineadas;
+- bundle JS grande;
+- Foundry Issue #1;
+- condição morta `.jpg` em `MascotRenderer.tsx`, hoje inalcançável;
+- warnings de runtime das GitHub Actions;
+- ruído `canvas.getContext()` do harness axe/jsdom, sem falha funcional conhecida.
+
+## Fechamento da reconciliação
+
+O corpo do PR #29 é o recibo final. Ele precisa registrar, no **mesmo HEAD**:
+
+- PR open + draft + unmerged;
+- Gates verdes;
+- 172 arquivos / 2.516 testes ou contagem superior coerente;
+- Sensei/F19/F61 verdes;
+- transversal 390×8 verde;
+- transversal 320/900×1 verde;
+- W6 ainda não selecionada.
+
+Quando isso ocorrer, considerar `CHECKPOINT_RECONCILIACAO_POS_W5_PRE_W6_2026-08-11.md` **FECHADO operacionalmente** pela condição que ele próprio define.
+
+## Próxima tarefa após o fechamento
+
+**Selecionar W6**, ainda sem implementar.
+
+Gerar Matrix+DAG atual e documentar ranking/contrafactual usando:
+
+`profundidade/descendentes + legado/fallback + divergência + blocker + onboarding + motor/a11y + risco pedagógico + reuso de primitive + custo/evidência`.
+
+Downstream deve estar explícito, mas não domina sozinho. `Moedas/GM.03` merece peso pelo último blocker, sem seleção hardcoded.
+
+Depois de registrar a decisão:
+
+`regressão → implementação inativa → gates → browser → canário → Matrix observa → ledger → checkpoint`.
+
+## Gates permanentes
 
 ```bash
 npm run auditar
 npm run fichas:auditar
+npm run fichas:conferir
 npm run grafo:check
-npm run lint
+npx tsc --noEmit
 npm test -- --run
 npm run build
 npm run pr:check
-git diff --check
-git status --short --branch
-git rev-parse HEAD
-git rev-parse origin/main
-git merge-base HEAD origin/main
+npm run sonda:sensei-dojo
+npm run sonda:reta20
+npm run sonda:regua
+npm run sonda
 ```
+
+**Nenhum agente deve “continuar a fábrica” a partir deste arquivo sem reancorar o PR #29 primeiro.**

@@ -7,6 +7,8 @@
  */
 
 import { Progress } from "../../types";
+import { MisconceptionTag, type MisconceptionTagType } from "../../constants/misconceptions";
+import { calendarDayDistance, dayKeyFromNowInput, localDay } from "../../utils/calendarDay";
 
 export const SPACING_INTERVALS: Record<number, number> = {
   1: 1,
@@ -18,6 +20,18 @@ export const SPACING_INTERVALS: Record<number, number> = {
 
 /** Janela máxima de tempo para 2 erros da mesma tag serem considerados o mesmo padrão (10 min) */
 const MAX_MISCONCEPTION_INTERVAL_MS = 10 * 60 * 1000;
+const CANONICAL_MISCONCEPTION_TAGS = new Set<string>(Object.values(MisconceptionTag));
+
+/**
+ * O Radar conceitual aceita somente o catálogo canônico.
+ *
+ * Sinais de automaticidade/fluência (por exemplo o legado `LENTO_DEDOS`) não
+ * são misconceptions matemáticas e não podem abrir Oficina. A validação também
+ * protege saves antigos que já carreguem strings históricas fora do catálogo.
+ */
+export function isCanonicalMisconceptionTag(tag: string): tag is MisconceptionTagType {
+  return CANONICAL_MISCONCEPTION_TAGS.has(tag);
+}
 
 /**
  * Registra uma misconception na janela rolante de até 15 eventos por nó.
@@ -33,7 +47,7 @@ export function trackMisconception(
   if (typeof pOrKidId === "object" && pOrKidId !== null) {
     targetProgress = pOrKidId;
     const tag = nodeOrTag;
-    if (!tag) return;
+    if (!tag || !isCanonicalMisconceptionTag(tag)) return;
     if (!targetProgress.misconceptions) {
       targetProgress.misconceptions = [];
     }
@@ -44,7 +58,7 @@ export function trackMisconception(
   } else if (typeof pOrKidId === "string") {
     const node = nodeOrTag;
     const tag = tagArg;
-    if (!node || !tag) return;
+    if (!node || !tag || !isCanonicalMisconceptionTag(tag)) return;
 
     if (pMapArg && pMapArg[node]) {
       targetProgress = pMapArg[node];
@@ -80,13 +94,20 @@ export function trackMisconception(
  * Regra do Radar (Bíblia §11.4 e §8.1): 2 ocorrências da MESMA tag em até 5 erros recentes
  * E dentro da janela temporal de sessão (≤ 10 min) = misconception ativa.
  * Erros distantes no tempo ou isolados NUNCA disparam resgate.
+ *
+ * PÓS-P22 — identidade do resgate:
+ * a misconception pertence ao NÓ EM QUE FOI OBSERVADA. O Radar não possui uma
+ * segunda árvore curricular tag→nó. Depois que o padrão é confirmado, o
+ * `rescuePlanner` recebe esse nó-fonte e, usando o DAG canônico, decide se deve
+ * tratá-lo ali ou descer para um pré-requisito ainda imaturo.
+ *
+ * A tabela histórica `TAG_TO_NODE` foi removida porque tinha três problemas:
+ * - `OFF_BY_ONE` esperava uppercase, mas a tag canônica emitida é `off-by-one`;
+ * - `LENTO_DEDOS` podia nascer em qualquer rapid-fire/Dojo e era forçado para N1.03;
+ * - `ERRO_POSICIONAL` não possuía emissor canônico no runtime atual.
+ * Esse roteamento paralelo podia tanto nunca disparar quanto sequestrar um erro
+ * de outra competência para um nó sem relação com o contexto observado.
  */
-const TAG_TO_NODE: Record<string, string> = {
-  "LENTO_DEDOS": "N1.03", // Subitização
-  "OFF_BY_ONE": "N1.02", // Canto Numérico
-  "ERRO_POSICIONAL": "N2.01", // Sistema Decimal
-};
-
 export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): string[] {
   if (!pMap) return [];
   const rescueNodes: Set<string> = new Set();
@@ -97,19 +118,18 @@ export function getRescueItems(_kidId: string, pMap: Record<string, Progress>): 
 
     for (let i = 0; i < events.length; i++) {
       const current = events[i];
+      if (!isCanonicalMisconceptionTag(current.tag)) continue;
       const window = events.slice(Math.max(0, i - 4), i + 1);
 
       const closeMatches = window.filter(
-        (e) => e.tag === current.tag && Math.abs(current.ts - e.ts) <= MAX_MISCONCEPTION_INTERVAL_MS
+        (e) => isCanonicalMisconceptionTag(e.tag)
+          && e.tag === current.tag
+          && Math.abs(current.ts - e.ts) <= MAX_MISCONCEPTION_INTERVAL_MS
       );
 
       if (closeMatches.length >= 2) {
-        if (TAG_TO_NODE[current.tag]) {
-          rescueNodes.add(TAG_TO_NODE[current.tag]);
-        } else {
-          rescueNodes.add(node);
-        }
-        break; // Achou pelo menos uma misconception ativa, avança para o próximo nó
+        rescueNodes.add(node);
+        break;
       }
     }
   }
@@ -151,7 +171,7 @@ export function evaluateSpacedRepetition(
 
   if (pMap && pMap[trackId]) {
     pMap[trackId].reviewForce = newForce;
-    pMap[trackId].lastDay = new Date().toISOString().slice(0, 10);
+    pMap[trackId].lastDay = localDay();
   }
 
   const nextReviewDays = SPACING_INTERVALS[newForce] || 1;
@@ -160,7 +180,9 @@ export function evaluateSpacedRepetition(
 }
 
 /**
- * Retorna os IDs dos nós cuja data da última prática (`lastDay`) ultrapassou o intervalo da força de revisão Leitner.
+ * Retorna os IDs dos nós cuja data da última prática (`lastDay`) ultrapassou o
+ * intervalo da força de revisão Leitner. A comparação é por dias CIVIS, não por
+ * blocos de 24h; DST e horário da prática não podem antecipar/adiar revisão.
  */
 export function getDueReviews(
   pMap: Record<string, Progress>,
@@ -168,24 +190,14 @@ export function getDueReviews(
 ): string[] {
   if (!pMap) return [];
   const dueNodes: string[] = [];
-
-  const nowMs = typeof nowIsoOrMs === "number"
-    ? nowIsoOrMs
-    : typeof nowIsoOrMs === "string"
-      ? new Date(nowIsoOrMs).getTime()
-      : Date.now();
+  const today = dayKeyFromNowInput(nowIsoOrMs);
 
   for (const [node, progress] of Object.entries(pMap)) {
     if (!progress.lastDay) continue;
 
-    const lastDayMs = new Date(progress.lastDay).getTime();
-    if (isNaN(lastDayMs)) continue;
-
     const force = progress.reviewForce || 1;
     const intervalDays = SPACING_INTERVALS[force] || 1;
-    const intervalMs = intervalDays * 24 * 60 * 60 * 1000;
-
-    if (nowMs - lastDayMs >= intervalMs) {
+    if (calendarDayDistance(progress.lastDay, today) >= intervalDays) {
       dueNodes.push(node);
     }
   }
@@ -199,5 +211,3 @@ export const RadarEngine = {
   trackMisconception,
   getDueReviews,
 };
-
-

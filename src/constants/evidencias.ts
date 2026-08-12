@@ -5,8 +5,8 @@
  *
  * ### Por que existe um catálogo (pendência P13)
  *
- * Seis fichas do bloco F0 escrevem, na §9, uma segunda condição além da
- * contagem de acertos. Todas dizem a mesma coisa com palavras diferentes:
+ * Algumas fichas escrevem, na §9, uma segunda condição além da contagem de
+ * acertos. Todas dizem a mesma coisa com palavras diferentes:
  *
  * > *acertar não basta; é preciso ter acertado uma vez **na condição que prova
  * > a competência**.*
@@ -26,6 +26,13 @@
  * garante, e todo campo que se verifica sozinho vira ruído.
  */
 export const Evidencia = {
+  /**
+   * F51 (AL.01): uma peça que não satisfaz o critério foi **corretamente deixada
+   * fora**. Este é o coração da ficha: "não pertence" é uma decisão certa, não
+   * ausência de resposta.
+   */
+  NAO_PERTENCE: "nao-pertence",
+
   /**
    * F01 (N1.04): um acerto no arranjo **disperso**.
    *
@@ -65,6 +72,12 @@ export const Evidencia = {
   DIFERENCA_PEQUENA: "diferenca-pequena",
 
   /**
+   * F50 (GM.12): um acerto em caso **contraintuitivo** — formato/tamanho aponta para o lado errado.
+   * A competência é conservação; sem este caso, três acertos óbvios não a provam.
+   */
+  CASO_CONTRAINTUITIVO: "caso-contraintuitivo",
+
+  /**
    * F02 (N1.08): um acerto com quantidade **entre 6 e 10**.
    *
    * É o que exige usar a estrutura das DUAS fileiras — abaixo de seis, a
@@ -79,6 +92,41 @@ export const Evidencia = {
    * real"*. Guardar três na cabeça é subitização; guardar oito é memória.
    */
   TOTAL_ALEM_DE_CINCO: "total-alem-de-cinco",
+
+  /**
+   * JD5 (N1.10): um acerto com os objetos realmente SOLTOS, sem a geometria
+   * residual da moldura. É a prova de retirada do andaime antes da notação.
+   */
+  SEM_MOLDURA: "sem-moldura",
+
+  /**
+   * F21 (N2.01): no nível 4, a criança recebeu o NUMERAL e construiu o material
+   * correto a partir dele. É a prova bidirecional explícita da §9: reconhecer
+   * material pronto não basta; precisa saber produzir dezenas/unidades.
+   */
+  MONTOU_DO_NUMERAL: "montou-do-numeral",
+
+  /**
+   * F19 (N1.12): pelo menos um acerto em um salto para trás.
+   * A §9 exige esta direção explicitamente para impedir que três acertos só
+   * avançando sejam confundidos com domínio bidirecional da reta.
+   */
+  SALTO_PARA_TRAS: "salto-para-tras",
+
+  /**
+   * F61 (GM.05): a criança posicionou a régua — por arrasto ou pela alternativa
+   * motora equivalente — com a marca ZERO na ponta do objeto antes de ler.
+   * Régua já alinhada pelo app não satisfaz esta evidência.
+   */
+  ALINHOU_ZERO: "alinhou-zero",
+
+  /**
+   * F29 (N2.03): um acerto simbólico no L3+ sem objetos de apoio.
+   *
+   * É a retirada verificável do andaime concreto: comparar grupos não basta
+   * para provar que >, < e = foram compreendidos como registro da relação.
+   */
+  COMPARACAO_SIMBOLICA_SEM_OBJETOS: "comparacao-simbolica-sem-objetos",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

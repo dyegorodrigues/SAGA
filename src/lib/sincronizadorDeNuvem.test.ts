@@ -4,10 +4,9 @@ import { ATRASO_PADRAO_MS, criarSincronizador } from "./sincronizadorDeNuvem";
 
 const save = (marca: string): State => ({
   schemaVersion: 1, updatedAt: marca,
-  kids: [], progress: {}, coins: {}, album: {}, log: {}, sound: true,
+  kids: [], progress: {}, dojoTracks: {}, coins: {}, album: {}, log: {}, sound: true,
 });
 
-/** Relógio manual: nada aqui depende de tempo real passar. */
 function relogio() {
   let proximo = 1;
   const tarefas = new Map<number, { fn: () => void; quando: number }>();
@@ -21,92 +20,133 @@ function relogio() {
     cancelar: (h: unknown) => { tarefas.delete(h as number); },
     avancar(ms: number) {
       agora += ms;
-      for (const [id, t] of [...tarefas]) {
-        if (t.quando <= agora) { tarefas.delete(id); t.fn(); }
-      }
+      for (const [id, t] of [...tarefas]) if (t.quando <= agora) { tarefas.delete(id); t.fn(); }
     },
     pendentes: () => tarefas.size,
   };
 }
 
 describe("amortecedor de gravações na nuvem", () => {
-  it("dez questões viram UMA gravação, com o estado final", async () => {
+  it("dez questões viram uma gravação, com o estado final", async () => {
     const gravar = vi.fn().mockResolvedValue(undefined);
     const t = relogio();
     const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
-
     for (let i = 1; i <= 10; i++) s.agendar(save(`q${i}`));
-    expect(gravar, "nada sobe durante a missão").not.toHaveBeenCalled();
-
+    expect(gravar).not.toHaveBeenCalled();
     t.avancar(ATRASO_PADRAO_MS);
     await Promise.resolve();
-
-    // O ganho inteiro do amortecedor: 10 gravações do save completo viram 1.
     expect(gravar).toHaveBeenCalledTimes(1);
     expect(gravar.mock.calls[0][0].updatedAt).toBe("q10");
   });
 
-  it("descarregar sobe na hora, sem esperar a janela", async () => {
+  it("mantém o UID junto do estado que venceu o debounce", async () => {
     const gravar = vi.fn().mockResolvedValue(undefined);
     const t = relogio();
-    const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
-
-    s.agendar(save("fim-de-missao"));
-    await s.descarregar();
-
-    expect(gravar).toHaveBeenCalledTimes(1);
-    expect(gravar.mock.calls[0][0].updatedAt).toBe("fim-de-missao");
-    expect(t.pendentes(), "o timer foi cancelado, não vai gravar de novo").toBe(0);
+    const s = criarSincronizador<string>({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("a"), "uid-a");
+    s.agendar(save("b"), "uid-b");
+    t.avancar(ATRASO_PADRAO_MS);
+    await Promise.resolve();
+    expect(gravar).toHaveBeenCalledWith(expect.objectContaining({ updatedAt: "b" }), "uid-b");
   });
 
-  it("descarregar sem pendência não grava nada", async () => {
+  it("cancelarPendencia numa troca de conta elimina trabalho antigo", async () => {
     const gravar = vi.fn().mockResolvedValue(undefined);
-    const s = criarSincronizador({ gravar, ...relogio() });
-
-    await s.descarregar();
-    await s.descarregar();
-
+    const t = relogio();
+    const s = criarSincronizador<string>({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("a"), "uid-a");
+    s.cancelarPendencia();
+    t.avancar(ATRASO_PADRAO_MS * 2);
+    await Promise.resolve();
     expect(gravar).not.toHaveBeenCalled();
+    expect(s.temPendencia()).toBe(false);
   });
 
-  it("não grava duas vezes o mesmo estado", async () => {
+  it("descarregar sobe na hora e mantém contexto", async () => {
     const gravar = vi.fn().mockResolvedValue(undefined);
     const t = relogio();
-    const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
-
-    s.agendar(save("unico"));
+    const s = criarSincronizador<string>({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+    s.agendar(save("fim"), "uid-a");
     await s.descarregar();
-    t.avancar(ATRASO_PADRAO_MS * 3);
-    await s.descarregar();
-
-    expect(gravar).toHaveBeenCalledTimes(1);
+    expect(gravar).toHaveBeenCalledWith(expect.objectContaining({ updatedAt: "fim" }), "uid-a");
+    expect(t.pendentes()).toBe(0);
   });
 
-  it("falha de rede não derruba a aula e não some com o estado seguinte", async () => {
-    const gravar = vi.fn()
-      .mockRejectedValueOnce(new Error("offline"))
-      .mockResolvedValue(undefined);
+  it("falha não marcada para retry não derruba a aula e o estado seguinte ainda sobe", async () => {
+    const gravar = vi.fn().mockRejectedValueOnce(new Error("erro-permanente")).mockResolvedValue(undefined);
     const t = relogio();
     const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
-
     s.agendar(save("tentativa-1"));
     await expect(s.descarregar()).resolves.toBeUndefined();
-
-    // O save local já tem o progresso; a próxima gravação sobe o acumulado.
     s.agendar(save("tentativa-2"));
     await s.descarregar();
     expect(gravar).toHaveBeenCalledTimes(2);
-    expect(gravar.mock.calls[1][0].updatedAt).toBe("tentativa-2");
   });
 
-  it("relata pendência com honestidade", async () => {
+  it("H6: falha offline permanece pendente por padrão e volta sozinha após reconexão", async () => {
+    const gravar = vi.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValue(undefined);
     const t = relogio();
-    const s = criarSincronizador({ gravar: async () => {}, agendar: t.agendar, cancelar: t.cancelar });
+    const s = criarSincronizador({ gravar, agendar: t.agendar, cancelar: t.cancelar });
+
+    s.agendar(save("offline"));
+    await s.descarregar();
+
+    expect(s.temPendencia()).toBe(true);
+    expect(t.pendentes()).toBe(1);
+
+    t.avancar(ATRASO_PADRAO_MS);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(gravar).toHaveBeenCalledTimes(2);
+    expect(s.temPendencia()).toBe(false);
+  });
+
+  it("write novo agendado durante falha suplanta o retry antigo", async () => {
+    let rejeitar!: (erro: unknown) => void;
+    const primeiro = new Promise<void>((_resolve, reject) => { rejeitar = reject; });
+    const gravar = vi.fn()
+      .mockImplementationOnce(() => primeiro)
+      .mockResolvedValue(undefined);
+    const t = relogio();
+    const s = criarSincronizador({
+      gravar,
+      agendar: t.agendar,
+      cancelar: t.cancelar,
+      deveRepetir: () => true,
+    });
+
+    s.agendar(save("antigo"));
+    const emVoo = s.descarregar();
+    s.agendar(save("novo"));
+    rejeitar(new Error("offline"));
+    await emVoo;
+
+    expect(s.temPendencia()).toBe(true);
+    expect(t.pendentes()).toBe(1);
+    await s.descarregar();
+    expect(gravar.mock.calls[1][0].updatedAt).toBe("novo");
+  });
+
+  it("troca de UID enquanto write está em voo impede retry ressuscitar", async () => {
+    let rejeitar!: (erro: unknown) => void;
+    const primeiro = new Promise<void>((_resolve, reject) => { rejeitar = reject; });
+    const gravar = vi.fn().mockImplementationOnce(() => primeiro);
+    const t = relogio();
+    const s = criarSincronizador<string>({
+      gravar,
+      agendar: t.agendar,
+      cancelar: t.cancelar,
+      deveRepetir: () => true,
+    });
+
+    s.agendar(save("uid-a"), "uid-a");
+    const emVoo = s.descarregar();
+    s.cancelarPendencia();
+    rejeitar(new Error("offline"));
+    await emVoo;
 
     expect(s.temPendencia()).toBe(false);
-    s.agendar(save("x"));
-    expect(s.temPendencia()).toBe(true);
-    await s.descarregar();
-    expect(s.temPendencia()).toBe(false);
+    expect(t.pendentes()).toBe(0);
   });
 });

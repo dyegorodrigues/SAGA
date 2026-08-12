@@ -87,6 +87,62 @@ export const MisconceptionTag = {
   /** Pareamento: disse que sobrou quando não sobrou — julgou pela aparência, não pelo pareamento */
   COMPARACAO_VISUAL: "comparacao-visual",
 
+  /* --- comparação de quantidades (ficha F06 / N1.05) --------------- */
+
+  /** F06: julgou o tamanho físico dos itens como se fosse quantidade. */
+  CONFUNDE_TAMANHO_QUANTIDADE: "confunde-tamanho-quantidade",
+
+  /** F06: julgou a área ocupada/espalhamento como se fosse quantidade. */
+  CONSERVACAO_ESPACO: "conservacao-espaco",
+
+  /** F06: escolheu pela impressão global sem contar ou parear quando a diferença deixou de ser óbvia. */
+  COMPARA_SEM_CONTAR: "compara-sem-contar",
+
+  /* --- comparação simbólica (ficha F29 / N2.03) -------------------- */
+
+  /** F29: identificou os lados, mas inverteu a direção de > ou <. */
+  INVERTE_SIMBOLO: "inverte-simbolo",
+
+  /** F29: usou igualdade apesar de os dois lados terem valores diferentes. */
+  IGNORA_DIFERENCA: "ignora-diferenca",
+
+  /** F29: sem objetos, escolheu o sinal sem comparar corretamente os valores. */
+  NAO_COMPARA_SIMBOLO: "nao-compara-simbolo",
+
+  /* --- sistema decimal (ficha F21 / N2.01) -------------------------- */
+
+  /** F21 canônica: contou barra e cubinho como se tivessem o mesmo valor. */
+  IGNORA_VALOR: "ignora-valor",
+
+  /** F21 canônica: inverteu a ordem das dezenas e unidades (23 ↔ 32). */
+  INVERTE_ORDENS: "inverte-ordens",
+
+  /** F21 canônica: não adotou a dezena como unidade e seguiu contando um a um. */
+  NAO_AGRUPA: "nao-agrupa",
+
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
+  IGNORA_DEZENA: "ignora-dezena",
+
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
+  CONCATENA: "concatena-dezena-unidade",
+
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
+  CONTA_TUDO: "conta-tudo-material-dourado",
+
+  /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
+  TROCA_DU: "troca-dezenas-unidades",
+
+  /* --- reta numérica (ficha F19 / N1.12) ---------------------------- */
+
+  /** F19: saltou para o lado oposto ao pedido. */
+  INVERTE_DIRECAO: "inverte-direcao",
+
+  /** F19: contou marcas/casas em vez dos intervalos entre elas. */
+  CONTA_MARCAS: "conta-marcas",
+
+  /** F19 L4: com numerais parciais, posicionou longe da região proporcional esperada. */
+  SEM_SENSO_ESPACIAL: "sem-senso-espacial",
+
   /* --- contagem (fichas F01 e F27) ---------------------------------- */
 
   /** Contar tocando: contou o mesmo objeto duas vezes — o dedo não marcou o que já passou */
@@ -275,6 +331,28 @@ export const MisconceptionTag = {
   /** Grandezas: acerta a diferença gritante e erra a pequena — enxerga, não compara */
   SO_DIFERENCA_GRANDE: "so-diferenca-grande",
 
+  /* --- massa e capacidade (ficha F50 / GM.12) ----------------------- */
+
+  /** Massa/capacidade: julgou pela aparência mesmo quando a referência contradizia. */
+  JULGA_PELO_TAMANHO: "julga-pelo-tamanho",
+
+  /** Massa: usou volume/tamanho aparente como substituto do peso. */
+  CONFUNDE_PESO_VOLUME: "confunde-peso-volume",
+
+  /** Capacidade: comparou a altura do líquido sem neutralizar o formato do recipiente. */
+  IGNORA_FORMATO: "ignora-formato",
+
+  /* --- medida padronizada com régua (ficha F61 / GM.05) ------------- */
+
+  /** F61: tratou a marca 1 como origem e mediu a partir dela, ignorando o zero. */
+  COMECA_NO_UM: "comeca-no-um",
+
+  /** F61: posicionou deliberadamente outra marca como origem da medição. */
+  REGUA_DESALINHADA: "regua-desalinhada",
+
+  /** F61: leu o valor mas atribuiu uma unidade incompatível com a escala. */
+  CONFUNDE_UNIDADE: "confunde-unidade",
+
   /* --- a moldura de dez (fichas F02, JD3 e JD5) ---------------------- */
 
   /** Moldura: somou as casas vazias às cheias — não distingue ocupado de vago */
@@ -295,6 +373,15 @@ export const MisconceptionTag = {
    * exatamente o que o olho pede"*. O olho é treinado para contar o que está
    * lá; contar o que não está é uma inversão perceptual.
    */
+  /** Parte-todo/amigos do 10: repetiu a parte que ja estava dada. */
+  REPETE_A_PARTE: "repete-a-parte",
+
+  /**
+   * Amigos do 10: funciona em material/diagrama, mas ainda nao transferiu para
+   * a sentenca simbolica. E diagnostico longitudinal, nunca de um clique so.
+   */
+  SO_FUNCIONA_VISUAL: "so-funciona-visual",
+
   RESPONDE_O_CHEIO: "responde-o-cheio",
 
   /** Moldura relâmpago: erra quando faltam mais de 5 — não usa a fileira como unidade */

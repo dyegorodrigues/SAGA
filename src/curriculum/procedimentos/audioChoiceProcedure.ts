@@ -206,7 +206,8 @@ export function diagnosticar(r: RespostaOuvida): MisconceptionTagType | undefine
  * ------------------------------------------------------------------ */
 
 export const FALAS = {
-  audioPrompt: "Aperte e escute. Que número você ouviu?",
+  // A primeira audição normal é automática; quando este prompt aparece, ela já ouviu.
+  audioPrompt: "Que número você ouviu?",
   howto: "Aperte o botão azul. Escute bem. Depois toque no número que você ouviu.",
   explain: "Aperte de novo e escute com atenção. Eu vou falar devagar.",
   /**

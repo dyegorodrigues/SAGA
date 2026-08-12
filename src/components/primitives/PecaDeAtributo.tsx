@@ -41,6 +41,12 @@ interface Props {
   brilhando?: boolean;
   onClick?: () => void;
   disabled?: boolean;
+  /**
+   * Força representação estática quando o chamador sabe que a peça já está
+   * resolvida. Na prática, `disabled` sem `onClick` também é estático: não há
+   * ação para executar e manter um `<button>` ali só cria semântica falsa.
+   */
+  statico?: boolean;
 }
 
 /** O lado do desenho. Grande e pequeno precisam ser óbvios de longe. */
@@ -71,9 +77,41 @@ export function nomeDaPeca(p: Peca): string {
   return `${NOME_DA_FORMA[p.forma]} ${cor} ${p.tamanho}`;
 }
 
-export function PecaDeAtributo({ peca, selecionada, brilhando, onClick, disabled }: Props) {
+export function PecaDeAtributo({ peca, selecionada, brilhando, onClick, disabled, statico }: Props) {
   const lado = LADO[peca.tamanho];
   const cor = TINTA[peca.cor];
+  const className = "flex items-center justify-center rounded-xl transition-all";
+  const style: React.CSSProperties = {
+    width: 52,
+    height: 52,
+    background: selecionada ? "#EEF2FF" : "transparent",
+    outline: selecionada ? "3px solid #4F46E5" : brilhando ? "3px solid #16A34A" : "none",
+    outlineOffset: -2,
+  };
+  const desenho = (
+    <svg width={lado} height={lado} viewBox="0 0 40 40" aria-hidden>
+      {peca.forma === "circulo" && (
+        <circle cx={20} cy={20} r={17} fill={cor} stroke="#1E293B" strokeWidth={2.5} />
+      )}
+      {peca.forma === "quadrado" && (
+        <rect x={4} y={4} width={32} height={32} rx={4} fill={cor} stroke="#1E293B" strokeWidth={2.5} />
+      )}
+      {peca.forma === "triangulo" && (
+        <polygon points="20,3 37,36 3,36" fill={cor} stroke="#1E293B" strokeWidth={2.5} strokeLinejoin="round" />
+      )}
+    </svg>
+  );
+
+  // Peça sem ação, já resolvida, é conteúdo — não outro botão. Isso evita o
+  // `<button>` dentro de `<button>` que o React sinalizou em AL.01 e mantém a
+  // peça acessível pelo nome sem criar um alvo de toque falso.
+  if (statico || (disabled && !onClick)) {
+    return (
+      <span role="img" aria-label={nomeDaPeca(peca)} className={className} style={style}>
+        {desenho}
+      </span>
+    );
+  }
 
   return (
     <button
@@ -85,26 +123,10 @@ export function PecaDeAtributo({ peca, selecionada, brilhando, onClick, disabled
       // A área de toque é sempre 48px, mesmo para a peça pequena: §8.3-bis
       // manda alvo ≥ 80px onde há arrasto, e aqui não há arrasto — mas dedo de
       // criança de 4 anos não acerta 26px, e errar o alvo viraria erro dela.
-      className="flex items-center justify-center rounded-xl transition-all"
-      style={{
-        width: 52,
-        height: 52,
-        background: selecionada ? "#EEF2FF" : "transparent",
-        outline: selecionada ? "3px solid #4F46E5" : brilhando ? "3px solid #16A34A" : "none",
-        outlineOffset: -2,
-      }}
+      className={className}
+      style={style}
     >
-      <svg width={lado} height={lado} viewBox="0 0 40 40" aria-hidden>
-        {peca.forma === "circulo" && (
-          <circle cx={20} cy={20} r={17} fill={cor} stroke="#1E293B" strokeWidth={2.5} />
-        )}
-        {peca.forma === "quadrado" && (
-          <rect x={4} y={4} width={32} height={32} rx={4} fill={cor} stroke="#1E293B" strokeWidth={2.5} />
-        )}
-        {peca.forma === "triangulo" && (
-          <polygon points="20,3 37,36 3,36" fill={cor} stroke="#1E293B" strokeWidth={2.5} strokeLinejoin="round" />
-        )}
-      </svg>
+      {desenho}
     </button>
   );
 }

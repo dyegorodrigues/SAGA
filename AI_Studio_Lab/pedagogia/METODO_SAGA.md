@@ -58,29 +58,27 @@ O ensino tradicional trata dificuldade como uma linha reta: números maiores, co
 
 O Método SAGA separa **dois eixos independentes**:
 
-| | **Eixo da abstração** | **Eixo da magnitude** |
+| | **Eixo da abstração** | **Eixo da automaticidade/magnitude** |
 |---|---|---|
-| Pergunta | *ela entende?* | *até que tamanho ela dá conta?* |
-| Progressão | concreto → pictórico → abstrato | 2+3 → 27+35 → 738÷23 |
-| Onde vive | a **Jornada** (5 níveis) | o **Dojo** (10 faixas) |
+| Pergunta | *ela entende?* | *o que já compreendido está estável, rápido e recuperável em qual faixa?* |
+| Progressão | concreto → pictórico → abstrato → generalização | fatos/procedimentos seguros → faixas progressivas de prática |
+| Onde vive | progresso curricular por competência | estado separado do **Dojo** (`dojoTracks`) |
 
-Uma criança pode estar **abstrata com números pequenos** (faz 7+8 de cabeça) e **concreta com números grandes** (precisa de material para 45+23). São coisas diferentes, e o sistema move os dois eixos separadamente.
+Uma criança pode estar **abstrata com números pequenos** (faz 7+8 de cabeça) e ainda precisar de apoio concreto quando encontra uma estrutura nova com números maiores. Também pode **entender perfeitamente** uma estratégia e ainda não tê-la automatizado. São coisas diferentes, e o sistema mede e move esses eixos separadamente.
 
-*Por que importa:* tratar como escada única força a criança a "voltar do zero" quando o número cresce, ou a avançar em magnitude sem ter compreendido. Os dois eixos permitem que ela avance no que domina e receba apoio no que não domina — **ao mesmo tempo**.
+*Por que importa:* tratar como escada única faz a velocidade parecer compreensão e mistura aquisição conceitual com treino. No SAGA, o domínio conceitual pode avançar quando a evidência da competência está madura; a automaticidade continua sendo fortalecida no Dojo sem rebaixar nem coroar a compreensão.
 
-## 4. Entender e automatizar são lugares diferentes
+## 4. Entender, automatizar e recuperar são funções diferentes
 
-O método separa três funções, e elas não se misturam:
+O método separa três funções, e elas não se misturam. Acima delas está o **Sensei/Tutor**, que lê o Learner Model e prescreve o que a criança deve fazer agora. A criança pode explorar e treinar livremente; quando segue o Sensei, **não escolhe a própria sequência curricular**.
 
-**🎓 Jornada (Academia)** — onde a criança **entende**. Leva do nível 1 ao 3. É lenta, explicativa, com demonstração e andaime.
+**🎓 Jornada (Academia)** — é o **mapa do conhecimento** e a superfície das experiências conceituais. Torna visíveis competências, pré-requisitos, fronteira e conquistas. A proficiência conceitual 1→5 pertence à competência curricular; a Jornada não é uma grade rígida de aulas e não disputa com o Sensei o papel de sequenciador.
 
-**🥋 Dojo** — onde a criança **automatiza**. Leva do nível 3 ao 5. É rápido, curto, sem tutorial no meio — rodadas de 60 a 90 segundos.
+**🥋 Dojo** — onde conhecimento **já compreendido** ganha automaticidade. Possui estado próprio de fatos/procedimentos, força, precisão, RT e **10 faixas por templo aritmético**. Não move `lvl`, `maxLvl`, `dom` nem a coroa conceitual. Pode ser **prescrito pelo Sensei** ou acessado **livremente** dentro do repertório pedagogicamente seguro.
 
-**🔧 Oficina** — onde a criança **recupera**. Só abre quando o sistema detecta um padrão de erro, nunca por um erro isolado.
+**🔧 Oficina** — onde uma base é **recuperada causalmente**. Abre quando o Radar/Learner Model encontra evidência suficiente de uma lacuna, com alvo, dose e critério de saída; não é castigo nem depósito de erros. Uma lacuna de pré-requisito pode transformar a própria missão prescrita do dia em uma Missão de Resgate.
 
-*Por que importa:* se a Jornada tivesse que consolidar sozinha, ela precisaria repetir até a exaustão — e viraria a monotonia que faz criança abandonar. Separando, a criança **avança e consolida ao mesmo tempo, em lugares diferentes.**
-
-E há uma consequência importante: **a próxima competência abre quando os pré-requisitos chegam ao nível 3, não ao 5.** A criança segue para conteúdo novo enquanto ainda aperfeiçoa o anterior no Dojo.
+*Por que importa:* separar aquisição, automaticidade e recuperação impede que a aula conceitual vire repetição exaustiva e impede que velocidade seja usada como atalho de mastery. A próxima competência abre pela política de pré-requisitos/evidência do grafo — hoje, `maxLvl ≥ 3` ou `dom` nos pré-requisitos — enquanto a fluência amadurece em paralelo no Dojo.
 
 ## 5. O diagnóstico é por concepção, não por acerto
 
@@ -103,11 +101,17 @@ Cada opção errada é um erro documentado, com uma etiqueta. **O currículo tem
 
 # A ARQUITETURA
 
+## O Sensei orquestra; o grafo governa a dependência
+
+A rota principal é o **Sensei/Aula do Dia**. Ele consulta o Learner Model, o DAG completo, revisão, evidências, misconceptions, necessidade de Oficina e estado separado de fluência para escolher **uma meta dominante** e a próxima experiência. Depois das evidências produzidas, a decisão é recalculada; não existe fila fixa de aulas por idade.
+
+A **Jornada** traduz esse continuum em mapa navegável. O **Dojo** automatiza repertório já seguro. A **Oficina** reconstrói a causa de uma lacuna. Nenhum desses painéis substitui a autoridade prescritiva do Sensei quando a criança segue a rota principal.
+
 ## O grafo, não a série
 
-O currículo não é organizado por ano escolar. É um **grafo de 89 competências** ligadas por pré-requisitos reais.
+O currículo não é organizado por ano escolar. É um **grafo de 90 competências** ligadas por pré-requisitos reais.
 
-**A idade nunca decide.** O que decide é: *os pré-requisitos estão firmes?*
+**A idade nunca decide.** O que decide é: *os pré-requisitos e as evidências estão firmes?*
 
 Isso significa que uma criança de 6 anos que domina os fundamentos avança; e uma de 9 que tem lacuna no valor posicional recebe apoio ali — sem constrangimento, porque ninguém está "atrasado em relação à turma". Não há turma.
 
@@ -126,22 +130,24 @@ São os maiores candidatos a travamento, e por isso têm regras próprias:
 
 ## As fichas
 
-Cada competência é descrita por uma **ficha** com nove seções obrigatórias: identidade, fundamento pedagógico, estrutura da tela, **roteiro cinematográfico**, os cinco níveis, diagnóstico com etiquetas, falas, coreografia e critério de domínio.
+Cada competência é descrita por **uma ou mais fichas autorais** com nove seções obrigatórias: identidade, fundamento pedagógico, estrutura da tela, **roteiro cinematográfico**, os cinco níveis, diagnóstico com etiquetas, falas, coreografia e critério de domínio.
 
 O roteiro cinematográfico é o que diferencia: ele especifica **o que acontece, quando, e por quanto tempo**. Exemplo, da ficha de contar tocando:
 
 > *Ao tocar: três coisas simultâneas — o objeto ganha cor (200ms), cresce e volta (scale 1.0→1.3→1.0, 250ms), e o numeral salta acima dele. A voz fala o número no mesmo instante do salto.*
 
-**São 92 fichas cobrindo as 89 competências.**
+**São 94 fichas autorais cobrindo as 90 competências do grafo.** A contagem de fichas é derivada: pode haver mais de uma ficha para uma competência e fichas especializadas de treino; cobertura 90/90 é o invariante curricular.
 
 ## O domínio é multidimensional
 
-Acertar não é dominar. O critério de domínio exige **acertos em sessões diferentes** — o que força o espaçamento — e frequentemente uma condição extra:
+Acertar não é dominar. O critério de domínio exige **evidência de compreensão e independência em sessões diferentes** — o que força o espaçamento — e frequentemente uma condição autoral extra:
 
 - contar objetos: pelo menos um acerto com os objetos **espalhados** (contar em fila não prova cardinalidade)
 - comparar quantidades: pelo menos um com quantidades **próximas** (acertar 2 vs 8 não prova nada)
 - divisão: **dois acertos de cada sentido** (repartir e medir são cognitivamente diferentes)
-- counting on: tempo de resposta abaixo de 8 segundos (acertar contando tudo não é dominar a estratégia)
+- counting on: demonstrar a estratégia exigida sem depender de contar tudo desde o início; **tempo de resposta não é critério de domínio conceitual**. RT é telemetria de fluência e pode justificar treino no Dojo, nunca reprovar compreensão.
+
+No runtime atual, a coroa multidimensional depende da janela de compreensão no último nível, independência, evidência autoral quando exigida e confirmação em sessões espaçadas. `fluencyStreak` continua registrado, mas **não participa da decisão da coroa conceitual**.
 
 ---
 
@@ -149,14 +155,15 @@ Acertar não é dominar. O critério de domínio exige **acertos em sessões dif
 
 | | Ensino tradicional | Método SAGA |
 |---|---|---|
-| Organização | por série e idade | por pré-requisito |
+| Organização | por série e idade | por pré-requisito e evidência |
+| Sequenciamento | grade/aula fixa | **Sensei recalcula pelo Learner Model** |
 | Progressão | turma inteira junta | cada criança no seu ponto |
 | Representações | substituídas a cada etapa | **permanentes, crescem junto** |
 | Erro | penalizado, contado | **diagnosticado e usado para ensinar** |
-| Dificuldade | uma escada só | **dois eixos independentes** |
+| Dificuldade | uma escada só | **conceito e automaticidade em estados separados** |
 | Fluência | repetição na mesma aula | **lugar separado (Dojo)** |
 | Símbolo | apresentado primeiro | **registra uma experiência anterior** |
-| Domínio | acertou a prova | multidimensional, com espaçamento |
+| Domínio | acertou a prova | multidimensional, com evidência e espaçamento |
 
 ---
 
@@ -172,9 +179,9 @@ O método não inventa pedagogia. Ele **organiza e implementa** princípios já 
 
 **A subitização** — reconhecer quantidades pequenas sem contar. Tratada como competência separada, com exposição cronometrada (o objeto aparece e some), porque se ele permanecer na tela a criança conta e a competência não é treinada.
 
-**A prática espaçada e o sistema de repetição por intervalos** (Leitner) — implementados no Dojo, com força de memória por fato e intervalos crescentes.
+**A prática espaçada e o sistema de repetição por intervalos** (Leitner) — implementados na revisão e no Dojo, com força de memória por fato/procedimento e intervalos crescentes.
 
-**A carga cognitiva** (Sweller) — a razão de a fluência importar: quem calcula 7+8 nos dedos não tem memória de trabalho sobrando para o problema. O Dojo existe para liberar essa memória.
+**A carga cognitiva** (Sweller) — a razão de a fluência importar: quem calcula 7+8 nos dedos pode gastar memória de trabalho que faria falta num problema mais complexo. O Dojo existe para liberar essa memória **depois que a estratégia está compreendida**.
 
 **O modelo de barras** (Singapura) — usado para fração, razão, proporção e problemas, com a regra de que as barras têm sempre o mesmo comprimento total, para permitir comparação direta.
 
@@ -208,13 +215,16 @@ A mesma balança volta. Agora um dos pratos tem um saco fechado. Para descobrir 
 
 | | |
 |---|---|
-| Competências mapeadas | **89** |
-| Fichas completas | **90** |
-| Faixas de desenvolvimento | 5 (dos 4 aos 12 anos) |
+| Competências mapeadas | **90** |
+| Fichas autorais | **94** |
+| Cobertura autoral | **90 de 90 competências** |
+| Faixas de desenvolvimento | 5 (dos 4 aos 12 anos; contexto, não catraca curricular) |
 | Etiquetas de diagnóstico | **251** |
-| Níveis de proficiência por competência | 5 |
-| Faixas de dificuldade no Dojo | 10 |
+| Níveis conceituais por competência | 5 |
+| Faixas de automaticidade por templo do Dojo | 10 |
 | Roteiros cinematográficos | 90 |
+
+**Estado canônico (ago/2026): 90 competências, 94 fichas autorais e cobertura 90/90. O Sensei é o orquestrador prescritivo; Jornada é mapa; Dojo é automaticidade em estado separado; Oficina é recuperação causal; RT informa fluência e nunca coroa compreensão.**
 
 ---
 

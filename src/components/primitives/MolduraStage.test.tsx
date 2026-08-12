@@ -8,6 +8,7 @@ import { Composer } from "../../curriculum/Composer";
 import { N1_08 } from "../../curriculum/fichas/jornada/N1.08";
 import { N1_10 } from "../../curriculum/fichas/jornada/N1.10";
 import { N1_11 } from "../../curriculum/fichas/jornada/N1.11";
+import { JD3, JD5 } from "../../curriculum/fichas/dojo/jardim";
 import { FichaCompetencia } from "../../curriculum/schema";
 import { MolduraSpec, TEMAS_DA_MOLDURA } from "../../curriculum/procedimentos/tenFrameContract";
 import { MisconceptionTag } from "../../constants/misconceptions";
@@ -76,7 +77,7 @@ describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
     // as dez casas à vista, a criança conta as vazias uma a uma — que é o que a
     // §7 proíbe o `explain` de sugerir e o que a ficha existe para dispensar.
     // Vale também para o nível 4 da F02: "flash de 2 segundos (a moldura some)".
-    for (const [ficha, nivel] of [[N1_11, 1], [N1_11, 5], [N1_08, 4]] as const) {
+    for (const [ficha, nivel] of [[N1_11, 1], [N1_11, 2], [JD3, 5], [N1_08, 4]] as const) {
       const { container, unmount } = render(
         <MolduraStage spec={spec(ficha, nivel)} fase="perguntando" />);
       expect(casas(container).length, `${ficha.id} n${nivel}`).toBe(0);
@@ -164,6 +165,18 @@ describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
     expect(container.querySelectorAll('[aria-label="a tampa"]')).toHaveLength(2);
   });
 
+  it("JD5 L5 não deixa uma grade 5x2 invisível: renderiza só objetos soltos", () => {
+    const q = Composer.generate(JD5, 5);
+    const spec5 = q.uiProps as MolduraSpec;
+    const { container, rerender } = render(<MolduraStage spec={spec5} fase="mostrando" />);
+    expect(container.querySelector('[aria-label^="conjunto solto"]')).toBeTruthy();
+    expect(container.querySelectorAll('[data-testid="objeto-solto"]')).toHaveLength(spec5.ocupadas.length);
+
+    rerender(<MolduraStage spec={spec5} fase="perguntando" />);
+    expect(container.querySelectorAll('[data-testid="objeto-solto"]')).toHaveLength(spec5.visiveis);
+    expect(container.querySelectorAll('[data-testid="tampa-solta"]').length).toBeLessThanOrEqual(2);
+  });
+
   it("⚠️ a tampa LEVANTA na revelação, mesmo quando ela errou", () => {
     // §4, erro suave: "a tampa levanta devagar, revelando um por um, e a voz
     // conta os escondidos". Mantê-la fechada esconderia exatamente a
@@ -235,7 +248,7 @@ describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
   it("a ação da JD3 leva o `disperso`: é a assinatura do DEPENDE_DE_FORMATO", () => {
     const onAnswer = vi.fn();
     const { container } = render(
-      <MolduraStage spec={spec(N1_11, 5)} onAnswer={onAnswer} fase="perguntando" />);
+      <MolduraStage spec={spec(JD3, 5)} onAnswer={onAnswer} fase="perguntando" />);
     fireEvent.click(botoes(container)[0]);
     expect(onAnswer.mock.calls[0][1]).toMatchObject({ modo: "faltam", disperso: true });
   });
@@ -258,7 +271,7 @@ describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
   });
 
   it("⚠️ a resposta certa aparece uma vez só entre os botões", () => {
-    for (const [ficha, nivel] of [[N1_08, 3], [N1_08, 5], [N1_10, 4], [N1_11, 5]] as const) {
+    for (const [ficha, nivel] of [[N1_08, 3], [N1_08, 5], [N1_10, 4], [N1_11, 2], [JD3, 5]] as const) {
       const s = spec(ficha, nivel);
       const { container, unmount } = render(<MolduraStage spec={s} fase="perguntando" />);
       const certos = botoes(container).filter(b => b.textContent === String(s.resposta));
@@ -285,8 +298,8 @@ describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
 
   it("axe não acusa violação, nas três fichas e nas fases que a criança vê", async () => {
     const casos: [FichaCompetencia, number][] = [
-      [N1_08, 3], [N1_08, 4], [N1_08, 5], [N1_10, 1], [N1_10, 4], [N1_10, 5],
-      [N1_11, 1], [N1_11, 3], [N1_11, 5],
+      [N1_08, 3], [N1_08, 4], [N1_08, 5], [N1_10, 1], [N1_10, 4],
+      [N1_11, 1], [N1_11, 2], [JD3, 3], [JD3, 5],
     ];
     for (const [ficha, nivel] of casos) {
       for (const fase of ["mostrando", "perguntando", "revelando"] as const) {

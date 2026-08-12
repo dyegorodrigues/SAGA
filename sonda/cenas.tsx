@@ -43,10 +43,13 @@ import { N1_13 } from "../src/curriculum/fichas/jornada/N1.13";
 import { GE_01 } from "../src/curriculum/fichas/jornada/GE.01";
 import { GE_02 } from "../src/curriculum/fichas/jornada/GE.02";
 import { GM_01 } from "../src/curriculum/fichas/jornada/GM.01";
+import { GM_12 } from "../src/curriculum/fichas/jornada/GM.12";
 import { N1_10 } from "../src/curriculum/fichas/jornada/N1.10";
 import { N1_11 } from "../src/curriculum/fichas/jornada/N1.11";
+import { JD3, JD4, JD5 } from "../src/curriculum/fichas/dojo/jardim";
 import { Fase } from "../src/components/primitives/EmojiRowStage";
 import { FaseDaMoldura } from "../src/components/primitives/MolduraStage";
+import { DojoTab } from "../src/components/home/DojoTab";
 
 /**
  * A largura do aparelho da criança.
@@ -153,14 +156,19 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
   ficha: FichaCompetencia; lvl: number; semente: number; mostrar?: unknown;
   fase?: Fase | FaseDaMoldura;
 }) {
-  const q = comSemente(semente, () => Composer.generate(ficha, lvl));
+  const q = React.useMemo(
+    () => comSemente(semente, () => Composer.generate(ficha, lvl)),
+    [ficha, lvl, semente],
+  );
+  const [audioPromptVisible, setAudioPromptVisible] = React.useState(false);
+  React.useEffect(() => setAudioPromptVisible(false), [ficha.id, lvl, semente]);
   return (
     <>
       {/* A caixa do enunciado que o app desenha ACIMA do palco (GameLoop.tsx).
           Ela faltava aqui, e a falta escondeu o enunciado saindo DUAS vezes em
           todo palco que imprimia o próprio: o palco só, sem o enquadramento do
           app, é o print errado da RETOMADA §7.4. */}
-      {q.prompt && (
+      {q.prompt && (q.kind !== "audiochoice" || audioPromptVisible) && (
         <div className="mx-3 mb-2 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
           style={{ borderColor: "#D9E5F8", color: "#22315C", background: "#fff", borderWidth: 3 }}>
           {q.prompt}
@@ -176,8 +184,75 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
       orderTaps={[]} handleOrderTap={nada} orderShake={null} hiddenOpts={[]}
       armedOpt={null} setArmedOpt={nada}
       faseDaCena={fase}
+      onFirstAuditionComplete={() => setAudioPromptVisible(true)}
     />
     </>
+  );
+}
+
+
+function progressoP8(lvl: number, maxLvl = lvl) {
+  return {
+    lvl, maxLvl, streak: 0, bad: 0, stars: 0, ok: 0, tot: 0, bank: [], mast: 0,
+  };
+}
+
+function JardimProbe({ modo }: { modo: "locked" | "partial" | "advanced" }) {
+  const prog = modo === "locked" ? {} : modo === "partial" ? {
+    "N1.03": progressoP8(1, 3),
+    "N1.08": progressoP8(3, 3),
+    "N1.11": progressoP8(2, 2),
+    "N1.10": progressoP8(2, 2),
+  } : {
+    "N1.03": progressoP8(3, 5),
+    "N1.08": progressoP8(4, 5),
+    "N1.11": progressoP8(3, 3),
+    "N1.07": progressoP8(3, 4),
+    "N1.10": progressoP8(3, 4),
+  };
+
+  const dojoTracks = modo === "locked" ? {} : modo === "partial" ? {
+    JD1: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 2, highestStep: 3,
+      goodRounds: 1, weakRounds: 0, rounds: 3, attempts: 24, correct: 20,
+    },
+    JD2: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 1, highestStep: 1,
+      goodRounds: 0, weakRounds: 0, rounds: 1, attempts: 8, correct: 6,
+    },
+  } : {
+    JD1: {
+      unlocked: true, mastered: true, family: "JD", currentStep: 4, highestStep: 5,
+      goodRounds: 0, weakRounds: 1, rounds: 12, attempts: 96, correct: 87,
+    },
+    JD2: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 3, highestStep: 4,
+      goodRounds: 1, weakRounds: 0, rounds: 7, attempts: 56, correct: 48,
+    },
+    JD3: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 2, highestStep: 2,
+      goodRounds: 0, weakRounds: 0, rounds: 4, attempts: 32, correct: 26,
+    },
+    JD4: {
+      unlocked: true, mastered: false, family: "JD", currentStep: 4, highestStep: 4,
+      goodRounds: 1, weakRounds: 0, rounds: 6, attempts: 48, correct: 41,
+    },
+    JD5: {
+      unlocked: true, mastered: true, family: "JD", currentStep: 3, highestStep: 5,
+      goodRounds: 0, weakRounds: 0, rounds: 10, attempts: 80, correct: 70,
+    },
+  };
+
+  return (
+    <div className="p-3" style={{ background: "#F8FAFC" }}>
+      <DojoTab
+        prog={prog as never}
+        dojoTracks={dojoTracks as never}
+        onGardenTrack={nada}
+        onMixed={nada}
+        onOpenPicker={nada}
+      />
+    </div>
   );
 }
 
@@ -186,6 +261,26 @@ function ExercicioDaFicha({ ficha, lvl, semente, mostrar, fase }: {
  * vale olhar, não uma por competência.
  */
 export const CENAS: Cena[] = [
+  {
+    nome: "P8 Jardim home — todas as trilhas bloqueadas",
+    render: () => <JardimProbe modo="locked" />,
+  },
+  {
+    nome: "P8 Jardim home — JD1 e JD2 abertas",
+    render: () => <JardimProbe modo="partial" />,
+  },
+  {
+    nome: "P22.3B JD4 Jardim home — cinco trilhas e progresso avançado",
+    render: () => <JardimProbe modo="advanced" />,
+  },
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `P22.3B JD4 exercício (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={JD4} lvl={lvl} semente={s} />,
+  })),
+  ...[1, 2, 3, 4, 5].map(lvl => ({
+    nome: `GM.12 F50 massa/capacidade (nível ${lvl})`,
+    render: (s: number) => <ExercicioDaFicha ficha={GM_12} lvl={lvl} semente={s} />,
+  })),
   // N1.01 pelo `track.gen`: é a tela em ROLLBACK — a ficha congelada de
   // draggroup que a produção serve enquanto o pareamento não é ativado. Medir
   // o alvo de rollback importa: uma tela de emergência quebrada não socorre.
@@ -362,14 +457,20 @@ export const CENAS: Cena[] = [
     render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={lvl} semente={s} />,
   })),
   {
-    nome: "GE.02 micro-aula: mesmo virado é triângulo",
-    render: (s: number) => (
-      <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarForma: 360 }} />
-    ),
+    nome: "GE.02 micro-aula: procurar a forma",
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ destacarTodas: true }} />,
+  },
+  {
+    nome: "GE.02 micro-aula: contar os lados do alvo",
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ contarLadosAlvo: true }} />,
+  },
+  {
+    nome: "GE.02 micro-aula: girar somente o alvo",
+    render: (s: number) => <ExercicioDaFicha ficha={GE_02} lvl={2} semente={s} mostrar={{ girarAlvo: true }} />,
   },
   // GM.01 — maior, menor, mais alto (F49), implementada e NÃO ativada. Não há
   // cena de rollback: o nó não tinha gerador nenhum.
-  ...[1, 3, 4, 5].map(lvl => ({
+  ...[1, 2, 3, 4, 5].map(lvl => ({
     nome: `GM.01 comparar grandeza (nível ${lvl})`,
     render: (s: number) => <ExercicioDaFicha ficha={GM_01} lvl={lvl} semente={s} />,
   })),
@@ -377,6 +478,18 @@ export const CENAS: Cena[] = [
     nome: "GM.01 micro-aula: os dois estão no chão",
     render: (s: number) => (
       <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarLinhaBase: true }} />
+    ),
+  },
+  {
+    nome: "GM.01 micro-aula: veja qual sobe mais",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GM_01} lvl={3} semente={s} mostrar={{ subirLinhaTracejada: true }} />
+    ),
+  },
+  {
+    nome: "GM.01 micro-aula: este é mais alto",
+    render: (s: number) => (
+      <ExercicioDaFicha ficha={GM_01} lvl={1} semente={s} mostrar={{ destacarMaior: true }} />
     ),
   },
   // ---- A moldura de dez: três fichas, uma primitiva ------------------------
@@ -408,53 +521,71 @@ export const CENAS: Cena[] = [
       <ExercicioDaFicha ficha={N1_08} lvl={3} semente={s} mostrar={{ moldura: { vazia: true } }} />
     ),
   },
-  // N1.11 (JD3) — a moldura relâmpago. Competência que NÃO tinha ficha nenhuma;
-  // implementada e NÃO ativada. O estado `vazio` é a ficha inteira: são os 300ms
-  // em que só a moldura vazia fica na tela, e é o que a criança leva para a
-  // resposta.
+  // N1.11 — uma competência, duas fontes. A Jornada instala a percepção com
+  // JD3 e depois TRANSFERE para F28: moldura -> number bond -> símbolo. A escada
+  // perceptual completa continua no Jardim, e também é fotografada aqui.
   { nome: "N1.11 rollback: amigos do 10 legados (nível 2)", render: (s) => <Exercicio id="N1.11" lvl={2} semente={s} /> },
-  ...[1, 3, 5].flatMap(lvl => ([
+  ...[1, 2].flatMap(lvl => ([
     {
-      nome: `N1.11 moldura relâmpago mostrando (nível ${lvl})`,
+      nome: `N1.11 JD3 mostrando (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={lvl} semente={s} fase="mostrando" />,
     },
     {
-      nome: `N1.11 moldura relâmpago pergunta (nível ${lvl})`,
+      nome: `N1.11 JD3 pergunta (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={lvl} semente={s} fase="perguntando" />,
     },
   ])),
   {
-    nome: "N1.11 o vazio sozinho (os 300ms que são a ficha)",
+    nome: "N1.11 JD3 vazio sozinho (nível 2)",
     render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={2} semente={s} fase="vazio" />,
   },
   {
-    nome: "N1.11 regressiva: três pulsos sem número",
-    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={1} semente={s} fase="regressiva" />,
+    nome: "N1.11 F28 number bond (nível 3)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={3} semente={s} />,
   },
   {
-    nome: "N1.11 revelação do erro: as vazias piscando em bloco",
-    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={4} semente={s} fase="revelando" />,
+    nome: "N1.11 F28 símbolo (nível 4)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={4} semente={s} />,
   },
   {
-    nome: "N1.11 micro-aula: as que faltavam se preenchem",
-    render: (s: number) => (
-      <ExercicioDaFicha ficha={N1_11} lvl={1} semente={s} mostrar={{ preencherFaltantes: 2 }} />
-    ),
+    nome: "N1.11 F28 símbolo automático (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_11} lvl={5} semente={s} />,
   },
-  // N1.10 (JD5) — ver e imaginar. Estava ATIVA servindo o `bond` simbólico; a
-  // ficha foi reescrita e o nó saiu dos canários, então o rollback é o bond, e
-  // ele também é medido: tela de emergência quebrada não socorre.
-  { nome: "N1.10 rollback: o number bond simbólico (nível 2)", render: (s) => <Exercicio id="N1.10" lvl={2} semente={s} /> },
-  ...[1, 4, 5].flatMap(lvl => ([
+  {
+    nome: "JD3 Jardim topo mostrando (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD3} lvl={5} semente={s} fase="mostrando" />,
+  },
+  {
+    nome: "JD3 Jardim topo pergunta (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD3} lvl={5} semente={s} fase="perguntando" />,
+  },
+
+  // N1.10 — a JD5 instala a relação parte-todo na cabeça; só depois o L5 dá
+  // nome/forma à mesma relação com o NumberBond. O Jardim guarda a JD5 inteira,
+  // inclusive o topo sem moldura, sem criar outro nó no DAG.
+  { nome: "N1.10 rollback: parte-todo legado (nível 2)", render: (s) => <Exercicio id="N1.10" lvl={2} semente={s} /> },
+  ...[1, 4].flatMap(lvl => ([
     {
-      nome: `N1.10 ver e imaginar antes da tampa (nível ${lvl})`,
+      nome: `N1.10 JD5 antes da tampa (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={lvl} semente={s} fase="mostrando" />,
     },
     {
-      nome: `N1.10 ver e imaginar com a tampa (nível ${lvl})`,
+      nome: `N1.10 JD5 com a tampa (nível ${lvl})`,
       render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={lvl} semente={s} fase="perguntando" />,
     },
   ])),
+  {
+    nome: "N1.10 formalização NumberBond (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={N1_10} lvl={5} semente={s} />,
+  },
+  {
+    nome: "JD5 Jardim topo sem moldura mostrando (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD5} lvl={5} semente={s} fase="mostrando" />,
+  },
+  {
+    nome: "JD5 Jardim topo sem moldura pergunta (nível 5)",
+    render: (s: number) => <ExercicioDaFicha ficha={JD5} lvl={5} semente={s} fase="perguntando" />,
+  },
   {
     nome: "N1.10 micro-aula: vou esconder um",
     render: (s: number) => (

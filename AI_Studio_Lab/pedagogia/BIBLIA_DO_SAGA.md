@@ -1,5 +1,5 @@
 # 📖 A BÍBLIA DO SAGA
-**Versão 3.2 · Agosto 2026 · Fonte única de verdade do projeto**
+**Versão 3.6 · Agosto 2026 · Fonte única de verdade do projeto**
 > *O número acima acompanha SEMPRE a última entrada do changelog no fim do arquivo. Cabeçalho e changelog divergentes = documento inválido.*
 
 > **Cláusula de supremacia.** Este documento + `GRAFO_DE_CONHECIMENTO_SAGA.md` + `MANUAL_DIDATICO_SAGA.md` + `DOJO_SAGA.md` + `grafo_saga.yaml` substituem TODOS os anteriores: `BIBLE_PEDAGOGICA_UNIFICADA.md`, `MAB_CONSTITUICAO_MESTRE.md`, `MANUAL_PEDAGOGICO_MESTRE.md`, `biblia-do-matemagica.md`, `curriculo-mestre.md`, `mapa-mestre.md`, `grafo_competencias.md`, `catalogo-atividades.md`, os 8 docs de didática soltos (`adicao.md`, `subtracao.md`, `multiplicacao.md`, `divisao.md`, `fracoes.md`, `geometria.md`, `medidas.md`, `logica-e-padroes.md` — absorvidos e costurados ao Grafo pelo Manual) e variantes espalhadas em `AI_Studio_Lab/`. Os antigos viram **arquivo histórico** (mover para `AI_Studio_Lab/arquivo_morto/`), nunca mais fonte. Nenhuma IA cria documento paralelo: se falta algo, **edita-se AQUI**.
@@ -40,11 +40,13 @@ GRAFO DE COMPETÊNCIAS  →  MOTOR PEDAGÓGICO  →  MOTOR DE GERAÇÃO  →  MO
                          feedback, dose)       dentro dos contratos) revisão, destrava nós)
 ```
 
-**Camada narrativa (a "SAGA"):** por cima dos motores, o mundo do jogo. Mapeamento fixo: **Mundo = strand** (N1, N3, GE… cada um com bioma e cor próprios) · **Ilha = competência** · **Missão = sessão** · **Chefão = checkpoint de domínio (nível 5 + coroa 👑)**. O mapa mostra vários mundos abertos ao mesmo tempo — a criança VÊ que nunca está presa. Mascote, economia dupla (⭐ XP / 🪙 moedas), álbum e evolução permanecem como estão (funcionam e estão documentados no código).
+**Camada narrativa (a "SAGA"):** por cima dos motores, o mundo do jogo. Mapeamento fixo: **Mundo = strand** (N1, N3, GE… cada um com bioma e cor próprios) · **Ilha = competência** · **Missão = sessão** · **Chefão = checkpoint de domínio (nível 5 + coroa 👑)**. O mapa mostra vários mundos abertos ao mesmo tempo — a criança VÊ que nunca está presa.
+
+**O meta-jogo não é uma quinta fonte de verdade pedagógica.** A partir da v3.5, três progressões ficam separadas por contrato: **(A) learner state** responde *o que a criança sabe* e é a única autoridade para `lvl`, `dom`, mastery, unlock, Oficina e prescrição; **(B) perfil/jogador** responde *quanto a criança já viveu/construiu no SAGA*, com **Nível SAGA 1–100** derivado de XP vitalício — trocar mascote/skin não troca esse nível, e XP nunca compra competência; **(C) companheiro** responde *como o personagem cresce e reage*, com fantasia, vínculo, emoção, cosméticos e futura evolução própria, sem escrever mastery. 🪙 **moedas são gastáveis**; ⭐ **XP é vitalício**. O **Atlas de Habilidades/insígnias curriculares deriva do Curriculum Graph + learner state**, nunca de XP ou compra. O álbum atual é consumidor provisório da economia, não fundamento do motor. Velocidade/RT permanece sinal de automaticidade no Dojo e **não multiplica XP de perfil nem autoridade conceitual**. Visão futura detalhada: `AI_Studio_Lab/codex/VISAO_METAJOGO_PERFIL_CONQUISTAS_COMPANHEIRO_2026-08-09.md`.
 
 ### §3.1 As TRÊS funções (onde a criança está) — e o Motor acima de todas
 
-Os 4 motores acima são a máquina interna. Para a criança e para os pais, a experiência se organiza em **três funções distintas**, e o **Motor Adaptativo fica ACIMA das três, decidindo quando a criança faz cada uma** (ela nunca precisa escolher; o sistema roteia — embora possa escolher treinar por conta própria):
+Os 4 motores acima são a máquina interna. Para a criança e para os pais, a experiência se organiza em **três funções distintas**, e o **Motor Adaptativo fica ACIMA das três, decidindo quando a criança faz cada uma** (ela nunca precisa escolher a própria sequência curricular; embora possa escolher treinar por conta própria):
 
 ```
                     MOTOR ADAPTATIVO  (decide o que, quando, quanto)
@@ -54,16 +56,18 @@ Os 4 motores acima são a máquina interna. Para a criança e para os pais, a ex
      (aprender)          (treinar)          (recuperar)
 ```
 
-- **🎓 ACADEMIA — aprender.** Onde a competência NOVA é ensinada pela primeira vez: trilha, missão do dia, CRA, microtutoria, animação, o "bizu" da conta, o conceito. É o modo Tutor. A criança progride por competência, e dentro de cada uma sobe a proficiência 1→5. Aqui o filho de 6 anos passa por TODAS as etapas para atingir domínio máximo — mesmo as fáceis que ele "já sabe", para consolidar e o sistema medir a proficiência real.
-- **🥋 DOJO — treinar.** Onde o que já foi aprendido vira reflexo. NÃO ensina — mede, fortalece, mistura, automatiza, revisa, acelera. Duas famílias (fatos FD + procedimentos PD) e o Jardim do Dojo pré-simbólico. É o coração do uso diário: é onde a criança passa a maior parte do tempo. Spec: `DOJO_SAGA.md`.
+- **🎓 ACADEMIA — aprender.** Onde a competência NOVA é ensinada pela primeira vez: trilha, missão do dia, CRA, microtutoria, animação, o "bizu" da conta, o conceito. É o modo Tutor. A criança progride por competência, e dentro de cada uma sobe a proficiência conceitual 1→5. **A Bússola/evidência pode reconhecer o que ela já sabe; ninguém é obrigado a refazer degraus por idade ou ritual.**
+- **🥋 DOJO — treinar.** Onde o que já foi aprendido vira reflexo. NÃO ensina — mede, fortalece, mistura, automatiza, revisa, acelera. Duas famílias (fatos FD + procedimentos PD) e o Jardim do Dojo pré-simbólico. **Tem estado próprio de automaticidade (`dojoTracks`) e não move `lvl`, `maxLvl`, `dom` nem a coroa conceitual.** Spec: `DOJO_SAGA.md`.
 - **🔧 OFICINA — recuperar.** Onde uma lacuna REAL é reconstruída, devagar e no concreto. É a "casa" da remediação profunda (Camada 2). **Ela é híbrida (§8.4):** para tropeço pequeno, é um ESTADO invisível — o exercício só fica mais concreto e lento dentro da própria tela, a criança não percebe "lugar" nenhum; para lacuna teimosa, vira um LUGAR visível e positivo — a Missão de Resgate ("o Guardião da Ponte precisa de você!"), uma ilha antiga com recompensa própria, nunca cara de castigo. Sempre visível no painel dos pais, mesmo quando invisível para a criança.
 
 **A navegação tem CINCO abas.** As três funções continuam sendo o modelo mental; a quinta aba é a porta de entrada:
 🦊 **Sensei** (a missão do dia — **aba inicial**, o app abre nela) · 🎓 **Jornada** (Academia) · 🥋 **Dojo** (treino) · 🔧 **Oficina** (só acende com resgate aberto) · 👤 **Perfil**.
 O Sensei não é uma quarta função: é a **apresentação** do que o Motor Adaptativo montou para hoje. A criança abre o app e vê "sua missão", não um mapa.
 
-**As três funções são também a NAVEGAÇÃO do app.** Nada de lista vertical infinita dentro do perfil: a casca do aplicativo (app shell) tem uma barra fixa embaixo com as funções como abas — 🎓 **Jornada** (Academia, o caminho guiado do dia) · 🥋 **Dojo** (treino livre, revisão e o Desafio Misto) · 🔧 **Oficina** (só acende quando há resgate aberto) · 👤 **Perfil** (mascote, cenários, trocar de criança). O motor de jogo é renderizado *dentro* da aba em que a criança entrou e não sabe em qual está — ele só recebe questões. Assim se acrescenta ou reordena aba sem tocar em pedagogia.
-- **Onde foram parar os modos antigos:** a "Jornada Mágica" **é** a Academia (mesmo conceito, nome de tela). O "Desafio Misto" **é** o Dojo no modo Mestre (§2 do `DOJO_SAGA.md`: tudo misturado, mais difícil, cronometrado). Nada se perde — deixam de ser itens soltos numa lista e viram lugares com identidade.
+**A rota principal é prescrita pelo Sensei.** A **Jornada é o mapa do conhecimento**, não o sequenciador principal; o Dojo pode ser prescrito pelo Sensei ou aberto manualmente dentro de repertório seguro; a Oficina é recuperação causal. A criança continua livre para explorar/treinar, mas treino livre não redefine o que o Tutor deve ensinar.
+
+**As três funções aparecem dentro de uma NAVEGAÇÃO de cinco abas.** A casca do aplicativo (app shell) mantém uma barra fixa: 🦊 **Sensei** (entrada e prescrição do dia) · 🎓 **Jornada** (Academia/mapa do conhecimento) · 🥋 **Dojo** (treino livre, revisão e Desafio Misto) · 🔧 **Oficina** (acende quando há resgate aberto) · 👤 **Perfil** (Nível SAGA/Atlas/companheiro/coleção/trocar de criança). O motor de jogo é renderizado *dentro* da rota em que a criança entrou e recebe questões/contratos, sem acoplar pedagogia à navegação. Assim se acrescenta ou reorganiza apresentação sem criar uma segunda lógica curricular.
+- **Onde foram parar os modos antigos:** a "Jornada Mágica" **é** a Academia (mesmo conceito, nome de tela). O "Desafio Misto" vive como retrieval/interleaving opcional dentro do ecossistema de treino; nunca vira autoridade curricular. Nada se perde — deixam de ser itens soltos numa lista e viram lugares com identidade.
 
 **Por que três e não dois:** separar "treinar" de "recuperar" impede o Dojo de perder o ritmo parando para dar aula a cada erro. O Dojo continua veloz; quem ensina é a Academia (primeira vez) e quem conserta é a Oficina (quando há lacuna). O Motor é quem manda a criança de um para o outro — a criança só sente o jogo fluindo.
 
@@ -73,7 +77,7 @@ O Sensei não é uma quarta função: é a **apresentação** do que o Motor Ada
 
 `Domínio → Strand → Competência → Microcompetência → Experiência → Sessão`
 
-- **IDs novos:** `STRAND.NN` e `STRAND.NNx` para micros (`N3.07b`). Esquema completo, tabela de migração dos IDs velhos e as 89 competências: `GRAFO_DE_CONHECIMENTO_SAGA.md`. **IDs antigos (C0001, C_LOG2…) ficam proibidos em código novo** — só aparecem na tabela de migração.
+- **IDs novos:** `STRAND.NN` e `STRAND.NNx` para micros (`N3.07b`). Esquema completo, tabela de migração dos IDs velhos e as 90 competências: `GRAFO_DE_CONHECIMENTO_SAGA.md`. **IDs antigos (C0001, C_LOG2…) ficam proibidos em código novo** — só aparecem na tabela de migração.
 - **Experiência** = um tipo de encontro com a competência: `tutor` (microtutoria), `guiada`, `autonoma`, `dojo`, `revisao`, `historia`, `chefao`. A mesma competência gera experiências diferentes conforme o nível.
 - **Track (código)** passa a ser: *a materialização de UMA competência* — nunca mais um saco de 3 competências espremidas em 5 níveis (o defeito do "Contar" atual, corrigido na migração).
 
@@ -81,7 +85,7 @@ O Sensei não é uma quarta função: é a **apresentação** do que o Motor Ada
 
 ## §5. A ESCADA DE PROFICIÊNCIA (5 níveis por competência)
 
-Unifica o CRA com o que o `progressEngine` já faz:
+Unifica o CRA com o que o `progressEngine` já faz, **sem usar velocidade/Dojo como degrau de domínio conceitual**:
 
 | Nível | Nome | Natureza | Quem faz |
 |---|---|---|---|
@@ -89,31 +93,36 @@ Unifica o CRA com o que o `progressEngine` já faz:
 | 2 | Concreto | Manipulável com apoio (WE DO): dicas ativas, dedo-guia disponível | Juntos |
 | 3 | Pictórico | Representações estruturadas (moldura, barra, reta), apoio só ao errar | A criança |
 | 4 | Abstrato | Símbolos; sem apoio visual por padrão (YOU DO) | A criança |
-| 5 | Fluência | Dojo: velocidade sobre precisão já consolidada | A criança, veloz |
+| 5 | Consolidação / generalização | Abstrato independente, variação/transferência e evidência autoral; **RT não é gate** | A criança |
 
 **Regras de movimento (mantidas do código, agora canônicas):**
-- Sobe: 3 acertos seguidos (streak) — com bônus de velocidade (rt < 3s conta +1 no streak).
-- Desce: 2 erros seguidos (nunca no aquecimento). Piso: nível 1.
+- Sobe na Jornada: 3 acertos seguidos. **RT não acrescenta streak nem acelera nível conceitual.**
+- Desce: **3 erros** seguidos (nunca no aquecimento). Piso: nível 1.
 - `maxLvl` (bolinhas) só sobe com **acerto no nível** — conquista nunca regride.
-- **Domínio 👑 (`dom`)**: 3 acertos seguidos no nível 5 **e** `helpClicks = 0` no nível **e** rt dentro da meta da trilha de fluência. (A regra completa da Bíblia antiga, agora obrigatória no código — hoje só o streak é checado.)
+- **Domínio 👑 (`dom`) multidimensional:** no último nível, a janela de compreensão precisa satisfazer a regra autoral (`acertos/de`), com independência sem ajuda, a evidência específica da ficha quando exigida e confirmação em sessões espaçadas (`sessoes`, mínimo de 2 no runtime atual). **RT/`fluencyStreak` não participa da coroa conceitual.** A rota `legacy-crown` existe apenas para compatibilidade de saves/fluxos antigos sem `masteryAttempt`, não como norma nova de autoria.
 - **Desbloqueio de nó do grafo:** todos os pré-reqs com `maxLvl ≥ 3` ou `dom` (igual ao `dominated()` do composer — uma regra só, em um lugar só: o futuro `unlock_engine`).
 
-**O andaime desaparece conforme a criança sobe (regra do fading — evita a aula chata para quem já sabe).** A quantidade de ensino é função inversa da proficiência, e isso está embutido nos próprios níveis: no nível 1-2 há Mão Fantasma e apoio ativo (a criança está aprendendo); no nível 3 o apoio só aparece ao errar; no nível 4 é execução limpa sem apoio; no nível 5 é prática fluida e veloz, sem ensino nenhum — só revisão espaçada de vez em quando para não enferrujar. **Quantos "níveis" tem uma conta? DUAS escadas, não uma (a dúvida clássica).** Não existe uma lista única de 5 ou 7 níveis para "adição". Existem duas escadas que se cruzam:
+**O andaime desaparece conforme a criança sobe (regra do fading — evita a aula chata para quem já sabe).** A quantidade de ensino é função inversa da proficiência, e isso está embutido nos próprios níveis: no nível 1-2 há Mão Fantasma e apoio ativo (a criança está aprendendo); no nível 3 o apoio só aparece ao errar; no nível 4 é execução limpa sem apoio; no nível 5 é consolidação/generalização independente. **Fluência/automaticidade amadurece em paralelo no Dojo, em estado próprio.**
+
+**Quantos "níveis" tem uma conta? DUAS estruturas pedagógicas que não compartilham a mesma escala.** Não existe uma lista única de 5 ou 7 níveis para "adição". Existem duas estruturas pedagógicas que se cruzam:
 1. **A escada de COMPETÊNCIAS (os degraus de dificuldade real).** É a sequência de nós do Grafo, do fácil ao difícil. Para adição/subtração, por exemplo: juntar concreto → counting-on → amigos do 10 → ponte do 10 → decomposição mental → 2 dígitos sem reserva → 2 díg com reserva → 3 díg → 4 díg. Cada um é um NÓ separado (N3.01, N3.03, N3.07…), destravado por pré-requisito. É aqui que mora o "do 1+0 até 4 algarismos" — são ~13 degraus de conteúdo, não 5.
-2. **A escada de PROFICIÊNCIA (1→5), DENTRO de cada competência.** Em cada degrau de conteúdo, a criança sobe do concreto guiado (1) à fluência veloz (5), pela tabela acima.
+2. **A escada de PROFICIÊNCIA (1→5), DENTRO de cada competência.** Em cada degrau de conteúdo, a criança sobe do concreto guiado à consolidação/generalização conceitual. **Separadamente**, o Dojo usa faixas/força próprias para automaticidade.
 
-**Como isso responde à sua pergunta:** um filho de 7 anos pode estar no degrau "2 dígitos com reserva" em proficiência 3, enquanto o degrau "4 dígitos" ainda está 🔒 travado (pré-requisito não cumprido) — e isso é normal e correto. O sistema SEMPRE sabe em que degrau × que proficiência a criança está, destrava o próximo só quando o atual amadurece, e continua puxando os degraus fáceis já dominados para o aquecimento (§6) — a "ginástica leve" que aquece a mente sem entediar. Um de 4 anos nem chega perto do degrau de 4 dígitos; o grafo o segura pelo pré-requisito, não pela idade. A progressão de procedimento no Dojo (trilhas PD) espelha exatamente esses degraus (Grafo, Apêndice A).
+**Há ainda uma terceira escala chamada Nível SAGA 1–100, mas ela NÃO é pedagógica.** É meta-progressão do perfil/jogador por XP vitalício (§3; §12.2-bis). Não abre competência, não substitui `lvl`, não mede matemática e não se mistura com faixa do Dojo.
 
-### 5.1-bis O RELÓGIO É SILENCIOSO NA JORNADA — velocidade não tranca compreensão *(v3.1)*
+**Como isso responde à sua pergunta:** um filho de 7 anos pode estar no degrau "2 dígitos com reserva" em proficiência 3, enquanto o degrau "4 dígitos" ainda está 🔒 travado (pré-requisito não cumprido) — e isso é normal e correto. O sistema SEMPRE sabe em que degrau × que proficiência a criança está, destrava o próximo só quando o atual amadurece, e pode continuar puxando degraus fáceis já dominados como aquecimento/revisão quando isso tiver função pedagógica. Um de 4 anos nem chega perto do degrau de 4 dígitos se os pré-requisitos ainda não existem; se uma criança pequena excepcionalmente demonstrar toda a cadeia, a idade não a segura. A progressão de procedimento no Dojo espelha repertórios seguros sem alterar o mastery conceitual.
 
-O `rt` (tempo de resposta) é medido em **toda** resposta, sempre. Mas na Jornada ele alimenta **apenas a dimensão *fluência*** do domínio multidimensional (§11.9). Ele **nunca**:
+### 5.1-bis O RELÓGIO É SILENCIOSO NA JORNADA — velocidade não tranca compreensão *(v3.1; reafirmado v3.4/v3.5)*
+
+O `rt` (tempo de resposta) é medido em **toda** resposta, sempre. Mas na Jornada ele alimenta **apenas a dimensão *fluência*** e a prescrição de treino. Ele **nunca**:
 
 - bloqueia a subida de nível;
 - bloqueia a abertura da competência seguinte;
 - aparece como cronômetro visível;
-- conta como erro.
+- conta como erro;
+- participa da coroa conceitual.
 
-**Uma criança que resolve pela estratégia certa, devagar, DOMINOU o conceito.** Ela pode estar processando, ouvindo o áudio, com ansiedade, com dificuldade motora, ou simplesmente ser mais reflexiva. Nenhuma dessas coisas é falta de compreensão.
+**Uma criança que resolve pela estratégia certa, devagar, DOMINOU o conceito.** Ela pode estar processando, ouvindo o áudio, com dificuldade motora, ou simplesmente ser mais reflexiva. Nenhuma dessas coisas é falta de compreensão.
 
 | Onde | O relógio | Cronômetro visível |
 |---|---|---|
@@ -128,9 +137,24 @@ O `rt` (tempo de resposta) é medido em **toda** resposta, sempre. Mas na Jornad
 
 ---
 
-## §6. ANATOMIA DA SESSÃO
+## §6. ANATOMIA DA SESSÃO — política atual pós-P22
 
-A receita do composer atual ("▶️ Minha Aula") é canonizada como estrutura oficial, com dose por idade:
+**Norma atual:** a Aula do Dia tem **uma meta conceitual dominante** e a dose é decidida pelo Learner Model/Sensei conforme estado, fricção, revisão vencida, lacuna causal e evidência recente. **Idade/série não escolhem a dose nem podam o currículo**; servem apenas a UX, linguagem e limites confortáveis de sessão. Um bloco de fluência só entra quando houver prescrição de Dojo pedagogicamente segura — não existe quota obrigatória.
+
+| Bloco possível | Função | Regra pós-P22 |
+|---|---|---|
+| 🔥 Aquecimento | ativar repertório forte / vitória inicial | curto e opcional, quando útil |
+| 🧠 Revisão | retenção espaçada realmente vencida | entra por evidência, não por receita fixa |
+| ⚔️ Fronteira | **meta conceitual dominante** | núcleo quando o estado pede ensino/continuidade |
+| 🔧 Resgate/Oficina | reconstruir causa provada | pode ser micro-resgate ou **converter a própria Aula do Dia em Oficina** |
+| 🥋 Fluência | automatizar fato/procedimento já seguro | só com prescrição explícita do Sensei/Dojo |
+| 🎉 Fecho | encerrar com sucesso apropriado | preserva arco emocional sem criar currículo paralelo |
+
+- **Se a Fronteira é uma competência em nível 1:** a sessão ABRE com a microtutoria (§7) antes de exigir execução autônoma — nunca jogar a criança num conceito virgem sem o I DO.
+- **Baixa precisão conceitual não vira cronômetro.** O Sensei reduz representação, sonda pré-requisito ou abre Oficina. **Alta precisão + RT lento** é sinal de fluência e pode gerar Dojo prescrito sem reprovar domínio.
+- **Fadiga/fricção alta reduz dose.** Domínio rápido pode aumentar variação/transferência em vez de simplesmente aumentar quantidade.
+
+**Registro histórico da receita pré-P22 — preservado, mas NÃO normativo:**
 
 | Bloco | O quê | F0 (4-5) | F1-F2 | F3-F4 |
 |---|---|---|---|---|
@@ -141,11 +165,9 @@ A receita do composer atual ("▶️ Minha Aula") é canonizada como estrutura o
 | 🎉 Fecho | lógica/padrões — sair sorrindo | 1 | 1 | 1 |
 | **Total** | | **7 (~5-8 min)** | **10 (~10-12 min)** | **11-12 (~15 min)** |
 
-- Ordem fixa com arco emocional (fácil → forja → fecho). Nunca embaralhar.
-- **Se a Fronteira é uma competência em nível 1:** a sessão ABRE com a microtutoria (§7) antes do aquecimento — nunca jogar a criança num conceito virgem sem o I DO.
-- Sessão de F0 nunca mistura mais de 2 competências além do fecho.
+A tabela acima documenta a arquitetura que originou o composer e ajuda a entender seus blocos, mas **não governa mais quantidade por idade**. Também não autoriza misturar objetivos: o Sensei recalcula a missão por estado.
 
-**A aula é feita de PRÁTICA, não de palestra.** Dos blocos acima, só a Fronteira é "aprender"; o resto é a criança FAZENDO. E mesmo na Fronteira, a explicação aparece na dose certa: microtutoria completa só quando a competência é virgem (nível 1); nos níveis seguintes, a criança resolve e a ajuda entra pontual (Camada 1, §8) — o Tutor vai sumindo conforme ela sobe (fading, §5). O padrão é fluxo de exercícios; o ensino é a exceção oportuna.
+**A aula é feita de PRÁTICA, não de palestra.** Dos blocos possíveis, a Fronteira é o principal lugar de aprender; o resto existe quando tem função explícita. E mesmo na Fronteira, a explicação aparece na dose certa: microtutoria completa só quando a competência é virgem (nível 1) ou a Oficina a exige; nos níveis seguintes, a criança resolve e a ajuda entra pontual (Camada 1, §8) — o Tutor vai sumindo conforme ela sobe (fading, §5). O padrão é fluxo de exercícios; o ensino é a exceção oportuna.
 
 **O Plano do Dia (o pai não precisa organizar nada).** Ao abrir, a criança encontra a missão do dia já montada pelo Motor — ela só toca em "Jogar". Nenhum adulto precisa escolher o que ela estuda; o sistema decide pela telemetria. O painel dos pais mostra, em uma linha, o que foi feito e o que vem — para acompanhar, não para operar.
 
@@ -199,7 +221,7 @@ tutorial: [
 
 **2. Toda primitiva publica sua API VISUAL** — a lista fechada de comandos que aceita, documentada no próprio componente e visível na galeria. Exemplos: TenFrame → `destacarFileira`, `destacarCelula`, `preencherAte`; InteractiveVertical → `destacarColuna`, `explodirDezena`, `mostrarVaiUm`; NumberLine → `saltarDe/Para`, `marcarPonto`; DragGroup → `piscarOrigem`, `piscarDestino`. É o equivalente visual do vocabulário de estados (§10.11): sem API declarada, cada exercício improvisa e nada é reaproveitável.
 
-**3. Um único player executa todas as coreografias.** Ele lê o timeline, dispara o áudio e envia os comandos à primitiva. Uma implementação só, usada pelos 84 exercícios — nunca lógica de tutorial dentro da primitiva (ela é "burra" de propósito) nem espalhada pelo GameLoop.
+**3. Um único player executa todas as coreografias.** Ele lê o timeline, dispara o áudio e envia os comandos à primitiva. Uma implementação só, usada por todas as fichas/exercícios autorais — nunca lógica de tutorial dentro da primitiva (ela é "burra" de propósito) nem espalhada pelo GameLoop.
 
 **4. Teste que impede a regressão silenciosa (obrigatório, entra na suíte §12.7):** para cada passo de cada coreografia, a chave usada em `show` **tem de existir na API visual da primitiva alvo**. Se alguém refatorar e derrubar `destacarFileira`, o teste quebra o build na hora, em vez da explicação sumir sem aviso. *(Foi exatamente essa a causa do sumiço do destaque da Caixa Mágica — a coreografia continuava mandando o sinal e a primitiva refatorada estava surda.)*
 
@@ -224,7 +246,7 @@ No máximo dois toques antes de seguir; a criança fica no comando o tempo todo:
    > **`explain` é DICA DE ERRO, não mensagem de acerto.** Ele só toca quando a criança errou. Portanto: nunca começa com elogio ("Muito bem!", "Você acertou!", "Isso!") e **nunca entrega a resposta**. ❌ *"Você acertou! Tínhamos 9, com mais 1 a caixa fechou 10."* (elogia quem errou e dá o resultado) · ✅ *"Olha os quadradinhos vazios da caixa e conte quantos faltam."* (aponta a estratégia, a criança conclui). O elogio pertence ao feedback de acerto, que é outro campo e outro momento.
 3. **Ainda errou** → mostra a resposta com uma frase de porquê, marca o item/fato como frágil e **AVANÇA na hora**. Nada de demonstração longa no meio do fluxo. Nunca trava.
 
-*Deslize vs. dificuldade (o motor decide o peso do toque):* erro rápido (`rt` baixo) num distrator qualquer = provável deslize → toque mínimo. Erro lento OU num distrator com tag de misconception = dificuldade real → a dica do passo 2 já é a específica daquela confusão.
+*Deslize vs. dificuldade (o motor decide o peso do toque):* erro rápido (`rt` baixo) num distrator qualquer = provável deslize → toque mínimo. **Lentidão isolada não é erro conceitual.** Distrator com tag de misconception repetida/padrão confirmado = dificuldade real → a dica do passo 2 já é a específica daquela confusão.
 
 ### 8.2 Camada 2 — remediação profunda (por PADRÃO, no momento certo)
 A demonstração narrada, a Mão Fantasma (fazer junto) e o microtutorial vivem AQUI — e **não disparam na questão isolada**. Disparam quando o Radar de Lacunas (§11.4) detecta padrão, e são entregues no momento que respeita o fluxo: **numa pausa natural, no fim da sessão, ou como Missão de Resgate na sessão seguinte** — jamais engasgando a criança no meio de uma questão. É o "depois de alguns exercícios, verificar os erros e aí trabalhar pontualmente".
@@ -295,15 +317,18 @@ Kind = o "molde de interação". Regra viva: **kind novo só com 2+ usos previst
 | `rapid-fire` | dojo cronometrado | todas as FD |
 | `singapore-bars` | barras de Singapura | N3.10, N5, N6.04 |
 
-### 9.2 Novos necessários (o backlog oficial, por prioridade)
-**P1 — destravam F1-F2 (construir primeiro):**
-- `numberline` — reta interativa com saltos animados. Serve 10+ competências (N1.12, N3.03-08, N6.01, N7.01-02…). **É o buraco mais grave do motor atual.**
+### 9.2 Registro histórico do backlog de kinds (não normativo para status atual)
+
+> **Snapshot histórico.** A priorização P1–P3 abaixo registra o backlog que guiou a construção das primitives. Ela não declara o estado executável vigente. `numberline` e `vertical` já existem no runtime. O status atual de primitives deve vir da auditoria executável/Coverage Matrix e do inventário `PRIMITIVAS_SAGA.md`, nunca desta lista manual.
+
+**P1 — histórico: destravavam F1-F2:**
+- `numberline` — reta interativa com saltos animados. Serve 10+ competências (N1.12, N3.03-08, N6.01, N7.01-02…). **Era, neste snapshot, o buraco mais grave do motor.**
 - `vertical` — conta armada interativa, dígito a dígito, com reagrupamento animado e vírgula (N3.11-12, N4.08-10, N4.12, N6.02).
 
-**P2 — destravam o mundo multiplicativo e frações:**
+**P2 — histórico: destravavam o mundo multiplicativo e frações:**
 - `array` (arranjo retangular giratório; N4.02-08, GM.08) · `drag-group` (arrastar para repartir/classificar; N4.05, AL.01d) · `frac-shade` (partir/pintar frações; N5.*, N6.01, N6.03) · `balance` (balança da igualdade; AL.05, AL.08, GM.01c) · `part-whole`/`fact-family` (variações do bond) · `build-number` (compor números com placas/barras/vírgula) · `trace` (traçado do numeral com guia) · `drag-match` (parear).
 
-**P3 — F3-F4 e medidas:**
+**P3 — histórico: F3-F4 e medidas:**
 - `grid` (malha/plano cartesiano) · `measure` (régua arrastável) · `clock-set` (arrastar ponteiros) · `hundred-chart` · `bar-build` · `angle` (transferidor) · `area-model` · `ratio-table` · `chip-model` (fichas ±) · `geo-transform` · `blocks-3d` · `symmetry` · `input` (**teclado numérico para resposta aberta** — a partir de F2 nem tudo pode ser múltipla escolha; distratores viram análise do valor digitado).
 
 ---
@@ -374,31 +399,31 @@ Objetivo: poder mudar paleta, fonte, elementos e o estilo inteiro do app (ex.: v
 
 **Animação é token, não improviso.** Duração e easing entram no dicionário (`movimento.rapido: 150ms`, `movimento.suave: 300ms`, `movimento.entrada`, `movimento.saida`). Cada componente que inventa seu próprio tempo faz o app parecer feito por cinco pessoas diferentes. Regras técnicas duras: animar **somente `transform` e `opacity`** (nunca `width`, `height`, `top`, `left` — causam travamento em tablet barato); nada de animação dirigida por frame no JavaScript enquanto a criança pode tocar; a meta é 60fps **no tablet real que as crianças usam**, não no desktop do desenvolvedor. E há duas classes de animação que não podem ser confundidas: **decorativa** (pode ser cortada sem perda) e **pedagógica** (a dezena explodindo, a fileira acendendo — carrega significado, é intocável e testada).
 
-**Mascotes seguem a mesma lei das primitivas.** Cada mascote é uma pasta própria com suas partes em SVG parametrizado (cor vinda de token, nunca fixa), registrado num **registro único** — adicionar mascote novo = adicionar pasta + uma linha no registro, sem tocar em componente. E ele publica seu **vocabulário de expressões** (`ocioso · comemorando · pensando · encorajando · demonstrando`), do mesmo jeito que as primitivas publicam estados: o motor pedagógico comanda a expressão, o mascote só obedece. Assim, trocar toda a arte dos mascotes (inclusive para pixel-art) não toca em uma linha de lógica.
+**Mascotes seguem a mesma lei de desacoplamento das primitivas, mas o formato do asset NÃO é canônico.** Cada personagem vive num **registro único** e publica ações/expressões semânticas (`ocioso`, `comemorando`, `pensando`, `encorajando`, `demonstrando` e, futuramente, `walk`, `run`, `eat`, `sleep`, `guard`, `punch_*`, `kick_*`, `special_*` etc.). O renderer pode usar SVG parametrizado, sprite sheets/atlas em pixel art, animação skeletal ou outro backend — o motor pedagógico só emite intenção semântica e **não conhece formato de arte**. Adicionar/trocar personagem significa registrar assets/metadados compatíveis, nunca alterar mastery, grafo ou gerador. Assim a arte atual pode ser substituída por HD pixel art/animais lutadores ou outra direção futura sem reescrever pedagogia.
 
 **O mascote VIVE no cenário — palco em camadas, nunca "bolinha".** Errado: fundo com `border-radius: 50%` atrás do personagem, que fica boiando num escudo redondo. Certo: o quadro do mascote é um **palco de três camadas** — (0) **fundo**: a arte do cenário preenchendo o quadro inteiro; (1) **ator**: o mascote com fundo transparente, ancorado no "chão" do cenário, livre para andar; (2) **frente**: elementos que passam na frente dele (morcego voando, confete de vitória). O cenário é o mundo, não um adesivo atrás da cabeça. Cada cenário é declarado no registro com suas três camadas.
 
 **Enquadramento do mascote — especificação fechada (§14.7).** O mascote vive numa **telinha retangular de cantos arredondados**, como a tela de um videogame portátil. Dentro dela: o **cenário preenche o fundo inteiro da telinha** (não é círculo, não é adesivo, não é "bolinha" atrás do personagem) e o **mascote fica solto por cima**, inteiro no quadro, ancorado no chão do cenário, com margem — nunca cortado nem com zoom estourado. Em repouso ele fica parado (estado ocioso); movimento acontece só em acerto, alimentação, interação ou evolução — nada de flutuar/balançar permanentemente. Efeitos e partículas acompanham o personagem, e são a única coisa que pode aparecer "atrás" dele. Qualquer alteração aqui exige atualizar esta linha primeiro.
 
-**Catálogo de exercícios (gerado, nunca escrito à mão).** Um script varre o `GENERATOR_MAP` e produz a tabela: competência → nível → kind → primitiva → skin → tem coreografia? → tem áudio? Essa tabela alimenta o painel Admin, onde cada linha é clicável e leva ao exercício rodando com suas anotações. **O catálogo é também um detector de entulho** e deve sinalizar três patologias: **duplicatas** (dois exercícios distintos fazendo a mesma coisa para a mesma competência), **órfãos** (exercício ou asset alcançável que não pertence a competência nenhuma — inclusive cenário de mascote fora do registro de temas), **buracos** (competência cujo único exercício é o fallback) e **deriva de nomenclatura** (gerador servindo um nó sob nome herdado — ex.: `gA1Dez` servindo `N2.01`). O nome da função geradora espelha o ID do nó (`gN2_01` → `N2.01`); nomes antigos só sobrevivem numa tabela de equivalência explícita, com data de aposentadoria. Sem essa varredura o conteúdo apodrece em silêncio. É o que permite enxergar as 88 competências de cima, achar buracos (exercício sem coreografia, kind repetido nos 5 níveis) e editar com segurança sem caçar arquivo.
+**Catálogo de exercícios (gerado, nunca escrito à mão).** Um script varre o `GENERATOR_MAP` e produz a tabela: competência → nível → kind → primitiva → skin → tem coreografia? → tem áudio? Essa tabela alimenta o painel Admin, onde cada linha é clicável e leva ao exercício rodando com suas anotações. **O catálogo é também um detector de entulho** e deve sinalizar três patologias: **duplicatas** (dois exercícios distintos fazendo a mesma coisa para a mesma competência), **órfãos** (exercício ou asset alcançável que não pertence a competência nenhuma — inclusive cenário de mascote fora do registro de temas), **buracos** (competência cujo único exercício é o fallback) e **deriva de nomenclatura** (gerador servindo um nó sob nome herdado — ex.: `gA1Dez` servindo `N2.01`). O nome da função geradora espelha o ID do nó (`gN2_01` → `N2.01`); nomes antigos só sobrevivem numa tabela de equivalência explícita, com data de aposentadoria. Sem essa varredura o conteúdo apodrece em silêncio. É o que permite enxergar as 90 competências de cima, achar buracos (exercício sem coreografia, kind repetido nos 5 níveis) e editar com segurança sem caçar arquivo.
 
 ---
 
 ## §11. O MOTOR ADAPTATIVO
 
 ### 11.1 O que ele lê (telemetria — campos já existentes)
-`lvl, maxLvl, dom, streak, bad, ok/tot, rt` (média móvel 70/30), `helpClicks`, `skips`, `lastDay`, banco de erros (`bank`). Novo campo por implementar: `errKind` (qual distrator-tipo a criança escolhe — alimenta §8.3).
+`lvl, maxLvl, dom, streak, bad, ok/tot, rt` (média móvel 70/30), `helpClicks`, `skips`, `lastDay`, banco de erros (`bank`). Novo campo por implementar: `errKind` (qual distrator-tipo a criança escolhe — alimenta §8.3). **No estado pós-P22, o Learner Model também materializa evidência multidimensional e `dojoTracks`; RT permanece sinal de fluência, não de compreensão.**
 
 ### 11.2 O que ele decide
 1. **Desbloqueio** (unlock_engine): regra única do §5. O mapa pinta ilhas: 🔒 travada · 🌱 aberta · 🔥 fronteira ativa · 👑 dominada.
 2. **Seleção da fronteira** (composer, mantido): entre abertas e não dominadas, a de pior precisão; se tudo dominado, a próxima virgem do grafo.
 3. **Revisão espaçada** (review_planner): intervalos **2 → 4 → 7 → 12 → 21 → 45 dias** por competência dominada (já especificados no código — agora executados de verdade). Falhou na revisão? Recolocar na fila de resgate e, se falhar 2×, reabrir como fronteira (decair `dom` visualmente é proibido — a coroa fica, o treino volta).
-4. **Dojo:** pilar autônomo (a criança entra direto e treina à vontade) que também cede 1 bloco diário à aula; treina DUAS famílias de fluência — fatos (FD) e procedimentos armados multi-dígito (PD) — mais o Jardim do Dojo pré-simbólico. Spec completa em `DOJO_SAGA.md`.
+4. **Dojo:** pilar autônomo (a criança entra direto e treina à vontade) **e também prescritível pelo Sensei quando o estado de fluência pedir**; treina famílias de fluência/fatos/procedimentos e Jardim pré-simbólico. **Não existe quota diária obrigatória e o estado do Dojo não concede domínio conceitual.** Spec completa em `DOJO_SAGA.md`.
 5. **Anti-travamento (a resposta ao teu medo):**
    - Sempre ≥ 3 strands com ilha aberta. Se o grafo afunilar, abrir a próxima raiz de outra strand.
    - Frustração detectada (2 sessões seguidas com precisão < 50% na mesma fronteira, ou `skips` ≥ 2) → trocar a fronteira de strand na próxima sessão + injetar microtutoria do pré-req mais frágil (menor `maxLvl` entre os pré-reqs).
    - **Nunca** exigir nível 5 para destravar o próximo nó (3 basta) — fluência amadurece em paralelo no Dojo, não segura a fila.
-6. **Modo Gênio (existente como ideia):** o seletor de nível 🎯 permite pular com honestidade (bolinha só pinta com acerto — regra mantida). Para o pai destravar faixas acima da idade: liberar por strand, nunca global.
+6. **Modo Gênio (existente como ideia):** o seletor de nível 🎯 permite pular com honestidade (bolinha só pinta com acerto — regra mantida). Para o pai explorar faixas acima da idade: liberar por strand, nunca global. **Isso não cria teto etário; é apenas atalho de exploração.**
 
 ### 11.3 A Bússola de Posicionamento (onde a criança COMEÇA)
 O problema real: um filho de 6-7 anos entra no app — por qual competência começar? Perguntar a idade e chutar a faixa erra pros dois lados (quem tem lacunas afoga; quem está adiantado boceja). A resposta: **a idade dá o palpite inicial; a evidência decide.**
@@ -414,7 +439,7 @@ O motor não pergunta "quantos erros?"; pergunta **"qual é o PADRÃO do erro?"*
 
 1. **Tag de misconception no distrator (o sensor de ouro).** Todo distrator gerado carrega a tag do erro que representa (o Grafo define os "Erros" de cada competência; o gerador etiqueta: `off-by-one`, `soma-em-cima-e-embaixo`, `inverte-coluna`, `pensamento-aditivo`…). **2× a mesma tag em 5 questões = misconception ATIVA** → dispara o microtutorial específico daquela confusão (não o genérico da competência). É a diferença entre "errou divisão" e "está somando denominadores".
 2. **Erro na competência ≠ lacuna na competência.** 2 erros no mesmo micro → o motor testa a HIPÓTESE pré-requisito: injeta 1-2 questões-sonda do pré-req mais frágil (menor maxLvl) **dentro da própria aula** (os slots de resgate do composer, §6 — já existem, agora com este gatilho). Sonda falhou → a lacuna é lá atrás: nasce uma **Missão de Resgate**.
-3. **rt e ajuda como sismógrafo:** acerto com rt 3× acima do padrão da criança = domínio frágil (conta como meio-erro para revisão); helpClicks repetidos no mesmo tipo = pedir o microtutorial antes que o erro aconteça.
+3. **Ajuda como sismógrafo; RT como fluência:** `helpClicks` repetidos no mesmo tipo podem pedir microtutorial antes que o erro aconteça. **Acerto lento não conta como meio-erro conceitual e não alimenta o Radar por si só:** RT alto com compreensão correta alimenta fluência/Dojo. RT baixo combinado com erro pode ajudar a distinguir chute/deslize, mas não substitui a evidência causal da misconception.
 4. **Ferrugem programada:** a revisão espaçada (11.2.3) é o radar do esquecimento — falha na revisão reabre treino, nunca rebaixa coroa.
 
 **A Missão de Resgate (como o "voltar" funciona):** a competência frágil vira uma missão especial na ilha antiga — *"o Guardião da Ponte precisa de você de novo!"* — com 4-6 questões + microtutorial. **Enquanto isso a fronteira atual NÃO fecha:** a criança segue avançando em outra strand em paralelo (anti-travamento, 11.2.5). Resgate concluído → a competência de cima destrava de novo o degrau que tinha ficado difícil. Na prática: o app volta SEM a criança sentir que voltou.
@@ -427,7 +452,7 @@ Uma tag não é um fato sobre a criança; é uma **hipótese que acumula força*
 |---|---:|
 | erro isolado | 0.2 |
 | mesmo erro em **duas fichas diferentes** | 0.5 |
-| erro com `rt` muito curto (chute, ou automatismo errado já consolidado) | 0.7 |
+| erro com `rt` muito curto (chute provável ou automatismo errado a confirmar por padrão) | 0.7 |
 | erro com padrão consistente dentro da mesma sessão | 0.9 |
 | erro que **persiste depois da dica** (`explain` já foi dado e a criança repete) | 1.0 |
 
@@ -446,9 +471,9 @@ Uma tag não é um fato sobre a criança; é uma **hipótese que acumula força*
 *(Esta seção substitui a aplicação de tag por evento único. Combina com o filtro motor do §8.3-bis: erro motor nem chega a gerar peso.)*
 
 ### 11.5 IDADE NUNCA TRAVA (a regra de ouro da progressão)
-As faixas F0-F4 do Grafo são **calibragem, não catraca**: elas ajustam o palpite da Bússola, a duração da sessão, o tom narrativo e o tamanho dos alvos — e NADA mais. O que abre e fecha competência é uma única coisa: **pré-requisito dominado (regra do §5)**. Consequências explícitas:
+As faixas F0-F4 do Grafo são **calibragem, não catraca**: elas ajustam o palpite da Bússola, a duração confortável da sessão, o tom narrativo e o tamanho dos alvos — e NADA mais. O que abre e fecha competência é uma única coisa: **pré-requisito/evidência pela regra do grafo (§5)**. Consequências explícitas:
 - O filho de 7 com lacunas de F0 treina competências de F0 — apresentadas com narrativa da idade dele (o resgate é missão de herói, não "voltinha pro jardim"; os temas visuais são por idade, o conteúdo é por evidência).
-- A criança de 6 que voa entra em F2-F3 sem nenhuma trava etária. O sistema **nunca segura** por "não é da sua série": se os pré-reqs estão 👑, abre. (O Modo Gênio de 11.2.6 vira só um atalho de exploração para o pai — a progressão normal já não conhece teto de idade.)
+- A criança de 6 que voa entra em F2-F3 sem nenhuma trava etária. O sistema **nunca segura** por "não é da sua série": se os pré-reqs estão prontos, abre. (O Modo Gênio de 11.2.6 vira só um atalho de exploração para o pai — a progressão normal já não conhece teto de idade.)
 - Estar "adiantado" ou "atrasado" não existe no vocabulário do app — nem nas telas, nem no painel dos pais. Existe fronteira: onde a criança está aprendendo AGORA. O painel dos pais mostra o mapa por strand (pode estar em F3 de números e F1 de geometria — e isso é NORMAL e dito assim).
 
 ### 11.6 Como tudo isso APARECE NA TELA
@@ -458,28 +483,34 @@ As faixas F0-F4 do Grafo são **calibragem, não catraca**: elas ajustam o palpi
 - **O tutor fala o diagnóstico como convite:** *"percebi que os amigos do 10 estão escorregadios — bora afiar eles rapidinho?"* (nomeia a lacuna com carinho e já oferece o caminho).
 
 ### 11.7 O que ele NUNCA faz
-Não pune, não rebaixa `maxLvl`, não tranca tudo atrás de uma competência, não decide com IA em tempo real (determinismo, §2.9).
+Não pune, não rebaixa `maxLvl`, não tranca tudo atrás de uma competência, não decide com IA em tempo real (determinismo, §2.9), não usa RT para reprovar compreensão e não usa idade como teto curricular.
 
 ### 11.8 Como funciona na prática (a jornada que o esquema produz)
 
-Para ver o esquema vivo — as três funções, as duas escadas e o fading operando juntos ao longo do tempo. Dois personagens: **Téo, 4 anos** (não sabe nada) e **Rocha, 6 anos** (já faz continhas fáceis).
+Para ver o esquema vivo — as três funções, as duas estruturas e o fading operando juntos ao longo do tempo. Dois personagens: **Téo, 4 anos** (não sabe nada) e **Rocha, 6 anos** (já faz continhas fáceis).
 
 **Téo — dia 1.** Cria o aventureiro (nome, idade, mascote). Uma "expedição do mapa" curtinha, disfarçada de brincadeira, descobre que ele está em F0 puro. O mapa abre com a Ilha das Quantidades 🌱. **Academia:** primeira missão — dar um osso para cada cachorro (N1.01), o Canhão de Balões para contar (N1.02), o Olhômetro piscando (N1.03). Tudo som e imagem, zero leitura, 6 minutos, fecha em festa. **Dojo:** ainda quase não aparece — no nível dele, o Jardim do Dojo traz só o Olhômetro-relâmpago, 2 minutos. Sem Oficina (não há lacuna, ele está aprendendo do zero).
 
-**Téo — semanas depois.** Ele domina contagem e cardinalidade (👑), o grafo destrava os Amigos do 10 e a soma concreta. A Academia agora ensina "juntar" com rosquinhas; o número e o símbolo aparecem JUNTO das rosquinhas (concreto+abstrato sincronizado) e vão desbotando ao longo dos dias até sobrar só `2+1`. O Dojo começa a crescer: trilha FD de amigos do 10, blocos de 3 minutos. Um dia ele erra "qual tem mais" três vezes seguidas por causa da ilusão piagetiana → **Oficina invisível**: os próximos itens ficam lentos e concretos, com o gesto de parear, sem ele perceber que "mudou de lugar". Volta ao fluxo sozinho.
+**Téo — semanas depois.** Ele domina contagem e cardinalidade (👑), o grafo destrava os Amigos do 10 e a soma concreta. A Academia agora ensina "juntar" com rosquinhas; o número e o símbolo aparecem JUNTO das rosquinhas (concreto+abstrato sincronizado) e vão desbotando ao longo dos dias até sobrar só `2+1`. O Dojo começa a crescer: trilha FD de amigos do 10, blocos de 3 minutos quando o Sensei prescreve ou a criança escolhe treinar. Um dia ele erra "qual tem mais" três vezes seguidas por causa da ilusão piagetiana → **Oficina invisível**: os próximos itens ficam lentos e concretos, com o gesto de parear, sem ele perceber que "mudou de lugar". Volta ao fluxo sozinho.
 
-**Rocha — dia 1.** A expedição descobre que ele já conta, já soma até 10, mas conta nos dedos e não sabe os amigos do 10. O mapa abre já adiantado — várias ilhas de F0/F1 saem marcadas 👑 (ele provou que sabe), a fronteira 🔥 fica em "amigos do 10" e "ponte do 10". **Ele NÃO precisa refazer o bebê:** a idade não trava, mas a proficiência também não o obriga a repetir o que dominou. Onde ficou coroa cinza (presumido), a Academia testa de verdade uma vez; se passa, segue. Nos degraus que ele tem frágeis, a Academia ensina e o Dojo treina até virar reflexo.
+**Rocha — dia 1.** A expedição descobre que ele já conta, já soma até 10, mas conta nos dedos e não sabe os amigos do 10. O mapa abre já adiantado — várias ilhas de F0/F1 saem marcadas 👑 (ele provou que sabe), a fronteira 🔥 fica em "amigos do 10" e "ponte do 10". **Ele NÃO precisa refazer o bebê:** a idade não trava, mas a proficiência também não o obriga a repetir o que dominou. Onde ficou coroa cinza (presumido), a Academia testa de verdade uma vez; se passa, segue. Nos degraus que ele tem frágeis, a Academia ensina e o Dojo treina quando há necessidade de automaticidade.
 
-**Rocha — curto/médio/longo prazo.** *Curto:* a ponte do 10 destrava a soma de 2 dígitos; a Academia ensina a conta armada com o bloco de dezena que explode; o Dojo (trilha PD-A) treina o procedimento até sair liso. *Médio:* multiplicação começa por "grupos de", vira array, vira tabuada; a fluência da tabuada acontece no Dojo (FD4→FD5), não na aula. Ele fica forte em multiplicação e fraco em subtração com troca — o Motor **não trava tudo:** avança na multiplicação e, em paralelo, abre Missão de Resgate 🔧 na subtração. *Longo:* divisão, frações, decimais — sempre o mesmo ciclo (aprende na Academia, automatiza no Dojo, conserta na Oficina), com o degrau de 4 dígitos abrindo só quando os pré-requisitos amadurecem. Aos 4 dígitos ele pode ter 9 anos; Téo, na mesma idade, estará onde a proficiência dele permitir — cada um no seu degrau × proficiência, nunca comparados.
+**Rocha — curto/médio/longo prazo.** *Curto:* a ponte do 10 destrava a soma de 2 dígitos; a Academia ensina a conta armada com o bloco de dezena que explode; o Dojo (trilha PD-A) pode treinar o procedimento até sair liso. *Médio:* multiplicação começa por "grupos de", vira array, vira tabuada; a fluência da tabuada acontece no Dojo (FD4→FD5), não na aula. Ele fica forte em multiplicação e fraco em subtração com troca — o Motor **não trava tudo:** avança na multiplicação e, em paralelo, abre Missão de Resgate 🔧 na subtração. *Longo:* divisão, frações, decimais — sempre o mesmo ciclo (aprende na Academia, automatiza no Dojo quando necessário, conserta na Oficina), com o degrau de 4 dígitos abrindo só quando os pré-requisitos amadurecem. Aos 4 dígitos ele pode ter 9 anos; Téo, na mesma idade, estará onde a proficiência dele permitir — cada um no seu degrau × proficiência, nunca comparados.
 
-**O aquecimento nunca some.** Todo dia, mesmo o Rocha avançado começa a sessão com um degrau fácil já dominado (§6) — a ginástica leve que aquece a mente e dá a vitória inicial. Fácil demais entedia se for a sessão inteira; fácil no aquecimento acalma e prepara. É pedagogia, não enchimento.
+**O aquecimento nunca vira catraca.** Todo dia pode começar com um degrau fácil já dominado quando o Sensei julgar útil — a ginástica leve que aquece a mente e dá a vitória inicial. Fácil demais entedia se for a sessão inteira; fácil no aquecimento acalma e prepara. É pedagogia, não enchimento — e não uma quota fixa por idade.
 
 **O que os pais veem, sem precisar operar nada.** O Plano do Dia já vem montado; o painel mostra, por strand, onde cada filho está (Rocha pode estar em F3 de números e F1 de geometria — e isso é dito como normal), os fatos/passos frágeis pelo nome, e as dimensões de domínio (§11.9). O pai acompanha; o app conduz.
 
-### 11.9 O estado de domínio é multidimensional (não é só "acertou")
-"Dominou" não é um sim/não. O Motor modela cada microcompetência em dimensões que ele já coleta em cru — só as torna explícitas no painel:
-- **Compreensão** (acerta com apoio? entende o porquê?) · **Fluência** (velocidade + precisão — o `rt` e a força do Dojo) · **Retenção** (sobrevive à revisão espaçada dias depois?) · **Independência** (precisa de `helpClicks`?).
-A coroa 👑 exige as quatro maduras (é o que a regra de `dom` já pede: streak no nível 5 + helpClicks 0 + rt na meta + sobreviver à revisão). Isso mata o "acertou uma vez = aprendeu": uma criança pode ter compreensão alta e fluência baixa (entende mas é lenta → mais Dojo), ou fluência alta e retenção baixa (rápido hoje, esquece semana que vem → mais revisão espaçada). O painel dos pais mostra as quatro barras por competência.
+### 11.9 O estado de domínio conceitual é multidimensional; fluência é paralela
+"Dominou" não é um sim/não. O Motor modela cada microcompetência em evidências que o runtime já coleta:
+- **Compreensão** — janela de acertos no último nível segundo a regra autoral (`acertos/de`);
+- **Independência** — sequência válida sem `helpClicks`;
+- **Evidência da ficha** — condição específica quando a competência exige uma prova particular;
+- **Retenção/estabilidade** — confirmação em sessões separadas pelo espaçamento exigido.
+
+A coroa 👑 multidimensional exige essas dimensões conceituais maduras. **Fluência (velocidade + precisão + força do Dojo) é estado paralelo e NÃO participa da decisão da coroa.** O runtime ainda registra `fluencyStreak`, mas `updateMasteryEvidence` coroa por compreensão + independência + evidência autoral + sessões espaçadas.
+
+Isso mata dois falsos diagnósticos: uma criança pode ter compreensão alta e fluência baixa (**entende mas é lenta → mais Dojo, sem reprová-la**), ou pode responder rápido sem evidência de conceito (**velocidade nunca compra mastery**). O painel dos pais mostra o estado conceitual e a fluência separadamente.
 
 ---
 
@@ -517,24 +548,22 @@ Algumas competências são **valiosas mas não são pré-requisito de nada** (ex
 
 ---
 
-### 11.12 PRIMEIRO CONTATO POR IDADE — a mesma competência, entradas diferentes
+### 11.12 PRIMEIRO CONTATO — a mesma competência, entradas de UX diferentes; domínio nunca reservado por idade
 
-Uma competência disponível cedo (relógio, dinheiro) pode ser encontrada por uma criança de 5 anos e por uma de 8. **A mesma ficha, no mesmo nível 1, não serve às duas.**
+Uma competência disponível cedo (relógio, dinheiro) pode ser encontrada por uma criança de 5 anos e por uma de 8. **A mesma matemática e os mesmos pré-requisitos valem para as duas.** O que pode variar é a porta de entrada: linguagem, skin, ritmo, tamanho dos alvos, quantidade inicial de andaime e escopo da primeira exposição conforme o Learner Model — nunca uma catraca etária de domínio.
 
-**A regra:** o nível 1 de toda competência tem **duas entradas**, escolhidas pela faixa da criança, não pelo nível da competência:
-
-| | Entrada F0/F1 (4-6 anos) | Entrada F2+ (7+ anos) |
+| | Entrada mais concreta/assistida | Entrada mais enxuta |
 |---|---|---|
-| Escopo | mínimo absoluto (horas exatas; uma moeda) | escopo normal do nível 1 |
-| Andaime | Mão Fantasma obrigatória, narração completa | demonstração breve |
-| Ritmo | mais lento, mais repetição | ritmo padrão |
-| Objetivo | **familiaridade** — reconhecer, nomear | domínio do nível |
+| Escopo | começa pelo mínimo conceitual que a evidência pede | pode entrar no escopo normal se a evidência sustenta |
+| Andaime | Mão Fantasma/narração quando necessária | demonstração breve ou nenhuma |
+| Ritmo | mais pausado quando o estado pede | ritmo padrão |
+| Objetivo | **evidência real da competência** | **evidência real da competência** |
 
-**Exemplo — o relógio (GM.04):** a criança de 5 anos encontra só horas exatas, com o ponteiro dos minutos sempre no 12, e o objetivo é reconhecer "três horas". A de 8 anos entra direto no nível 1 completo e progride para meia-hora na mesma sessão.
+**Exemplo — o relógio (GM.04):** uma criança que ainda está construindo a ideia de hora encontra primeiro horas exatas, com o ponteiro dos minutos no 12. Outra que já demonstra isso pode avançar para meia-hora. A decisão vem da evidência/pré-requisitos, não do aniversário.
 
-**Exemplo — o dinheiro (GM.03):** a de 5 anos só **reconhece** moedas (qual é a de 1 real?). Somar valores só entra quando ela já soma — o que o pré-requisito N3.09 garante.
+**Exemplo — o dinheiro (GM.03):** reconhecer moedas pode ser o primeiro contato; somar valores entra quando a criança já soma — o que o pré-requisito N3.09 garante.
 
-**A regra dura:** se a criança está em faixa abaixo da faixa nominal da competência, ela **só acessa a entrada reduzida**, e o domínio pleno fica reservado para quando ela chegar na faixa. Ela ganha contato e vocabulário; a fluência vem depois.
+**A regra dura:** idade escolhe apresentação e conforto de UX; **não reserva domínio pleno para o futuro**. Se a criança demonstrar os pré-requisitos e as evidências da ficha, pode dominar a competência. Uma criança mais velha em conteúdo inicial recebe a mesma matemática em uma casca apropriada à idade (§12.5-ter).
 
 ## §12. CONTRATOS DE GERAÇÃO (a IA preenche, não inventa)
 
@@ -569,24 +598,24 @@ tutorial: [ ...TutSteps... ]
 ### 12.2 Contrato do gerador (imutável — §2.8)
 `gen(lvl 1-5) → Question` com: `kind` do catálogo §9; params dentro do micro ativo; resposta exatamente 1× nas options; distratores = `erros_tipicos` (aleatório só completa); `howto` + `explain` sempre; `prompt` ≤ 12 palavras faladas (F0-F1); nunca valores negativos antes de N7; função pura ~30 linhas com helpers (`ri`, `pick`, `numOpts`).
 
-### 12.2-bis VOCABULÁRIO: NÍVEL (Jornada) × FAIXA (Dojo) — não confundir
+### 12.2-bis VOCABULÁRIO: NÍVEL curricular × FAIXA do Dojo × NÍVEL SAGA — não confundir
 
-Duas escadas coexistem no sistema e medem coisas diferentes. Usar a mesma palavra para as duas foi fonte real de confusão; ficam nomes distintos:
+Três escalas coexistem no produto, mas só **duas são pedagógicas**. Usar a palavra “nível” sem qualificador foi fonte real de confusão; fica proibido presumir que elas formam uma escada compartilhada:
 
-| | **NÍVEL** — Jornada/Academia | **FAIXA** — Dojo |
-|---|---|---|
-| Quantos | **1 a 5** | **1 a 10** |
-| Mede | **proficiência** — o quanto a criança entende | **dificuldade** — o tamanho do número |
-| Eixo | **Y (abstração)**: concreto → pictórico → abstrato | **X (magnitude)**: 2+3 → 27+35 |
-| Pergunta | *"ela ENTENDE somar?"* | *"até que número ela dá conta?"* |
-| Onde vive | campo `niveis` da ficha | `lvlSkills` da trilha de Dojo |
+| | **NÍVEL CURRICULAR** — competência/Jornada | **FAIXA** — Dojo | **NÍVEL SAGA** — perfil/jogador |
+|---|---|---|---|
+| Quantos | **1 a 5** por competência | **1 a 10** | **1 a 100** |
+| Mede | proficiência conceitual/representação | dificuldade + automaticidade do repertório seguro | meta-progressão/identidade por XP vitalício |
+| Eixo | concreto → pictórico → abstrato → generalização | magnitude/família + FactStrength/ProcStrength/RT | experiência acumulada no ecossistema SAGA |
+| Pergunta | *“ela ENTENDE e demonstra esta competência?”* | *“o que já entendeu está automático em qual faixa?”* | *“quanto já viveu/construiu no SAGA?”* |
+| Estado | `Progress.lvl/maxLvl/dom/masteryEvidence` | `dojoTracks` e forças do Dojo | derivado de XP vitalício; **sem autoridade curricular** |
 
-**São independentes.** Uma criança pode estar no nível 5 de proficiência (entende somar de cabeça) e na faixa 3 do Dojo (só somas até 10). Progredir num eixo não move o outro.
+**São independentes.** Uma criança pode estar no nível curricular 5 de uma competência, ter fluência baixa numa faixa do Dojo e, ao mesmo tempo, ser Nível SAGA 37. Nenhuma dessas escalas converte automaticamente na outra.
 
-**Divisão de trabalho:** a **Jornada** leva do nível 1 ao 3 (entender); o **Dojo** leva do 3 ao 5 (automatizar). Por isso o Dojo é pilar separado — sem ele, a Jornada teria que repetir até a exaustão.
+**Divisão de trabalho:** a **Jornada** mostra o mapa e oferece experiências conceituais; o **Sensei** prescreve o próximo passo; o **Dojo** automatiza em estado separado; a **Oficina** recupera a causa de uma lacuna; o **Perfil/Nível SAGA** celebra a jornada sem decidir o que a criança sabe. Dojo nunca “leva do nível 3 ao 5” da escala curricular; XP nunca compra coroa, unlock ou faixa.
 
 ### 12.3 O nível dita a REPRESENTAÇÃO, não só o tamanho do número
-Erro clássico de implementação: tratar `lvl` apenas como "números maiores". Isso destrói o CPA e deixa o fading (§5) sem nada para operar. **O nível muda primeiro COMO o conteúdo aparece, e só depois a magnitude:**
+Erro clássico de implementação: tratar `lvl` apenas como "números maiores". Isso destrói o CPA e deixa o fading (§5) sem nada para operar. **O nível muda primeiro COMO o conteúdo aparece, e só depois a magnitude; velocidade é dimensão separada do Dojo:**
 
 | lvl | Representação (o que muda na tela) | Magnitude |
 |---|---|---|
@@ -594,11 +623,11 @@ Erro clássico de implementação: tratar `lvl` apenas como "números maiores". 
 | 2 | Concreto autônomo — objetos manipuláveis, dica ativa | pequena |
 | 3 | Pictórico — representação estruturada (moldura, barra, reta), sem objeto solto | média |
 | 4 | Abstrato — só símbolos, sem apoio visual por padrão | cheia |
-| 5 | Fluência — abstrato + velocidade (rt no alvo) | cheia |
+| 5 | Consolidação/generalização — abstrato independente, variação/transferência, evidência autoral | cheia |
 
 Todo gerador declara qual `kind`/primitiva usar **por nível** (pode ser a mesma primitiva com props diferentes). Um gerador que devolve o mesmo `kind` nos 5 níveis está errado, salvo justificativa explícita.
 
-**Nem toda competência tem forma abstrata — e forçar uma é pior que não ter.** Competências **perceptuais/fundacionais** (correspondência 1-a-1, subitização, canto numérico) não possuem versão simbólica: nelas os níveis 4-5 significam **automaticidade** (mais itens, mais rápido, sem apoio), não "virar símbolo". Nessas, o gerador declara `excecaoCPA: "perceptual"` com uma linha de justificativa, e a suíte aceita — em vez de exigir uma variação falsa.
+**Nem toda competência tem forma abstrata — e forçar uma é pior que não ter.** Competências **perceptuais/fundacionais** (correspondência 1-a-1, subitização, canto numérico) não possuem versão simbólica: nelas os níveis 4-5 significam **independência, estabilidade e transferência dentro da própria habilidade perceptual**, não "virar símbolo" e nem "mais rápido". Nessas, o gerador declara `excecaoCPA: "perceptual"` com uma linha de justificativa, e a suíte aceita. Automaticidade/RT, quando pertinente, fica no Jardim/Dojo.
 
 **Aviso contra a variação de fachada (armadilha da métrica).** O teste verifica que o `kind` varia; um script pode satisfazer isso mecanicamente e **destruir a pedagogia ao mesmo tempo** — por exemplo, saltar de `count` (concreto) direto para `plain` (abstrato) pulando o degrau pictórico. Isso passa no teste e quebra a escada. **A progressão de cada competência vem da escada CPA daquele assunto no `MANUAL_DIDATICO_SAGA.md`, nunca de uma regra mecânica.** Correção em lote por script é permitida para campos repetitivos (`howto`, `explain`, `audioPrompt`); a escolha de `kind` por nível é decisão pedagógica e passa por revisão humana contra o Manual.
 
@@ -616,7 +645,7 @@ Há fichas que reúnem **três ou mais representações simultâneas** — mater
 | 4 | a conta, com o material só como apoio consultável |
 | 5 | só a conta |
 
-**A escada de revelação é INDEPENDENTE da escada de níveis.** Uma criança no nível 4 que volta pela Oficina reentra no degrau de revelação apropriado à dificuldade, sem perder o nível conquistado. São dois eixos, como NÍVEL × FAIXA (§12.2-bis).
+**A escada de revelação é INDEPENDENTE da escada de níveis.** Uma criança no nível 4 que volta pela Oficina reentra no degrau de revelação apropriado à dificuldade, sem perder o nível conquistado. São dois eixos, e ambos continuam separados da faixa do Dojo (§12.2-bis).
 
 **Fichas obrigadas a declarar a escada de revelação:** F35, F39, F40, F68, F69, F76 — e qualquer ficha nova que empilhe 3+ representações.
 
@@ -667,22 +696,26 @@ Reutilizar sempre; criar primitiva nova só quando a interação é genuinamente
 | Repartir (partição) / laçar (medida) | N4.05, N5.01 | DragGroup (2 modos) |
 | Arranjo retangular, comutatividade, área | N4.02, N4.09 | ArrayGrid |
 | Comparação por barras, diferença, Bar Model / CUBOS | N3.04, N3.10, N5.*, N6.04 | SingaporeBars |
-| Balança / igualdade / incógnita | AL.05–AL.08 | **Balança** (criar) |
-| Relógio, horas e minutos | GM.04, GM.06 | **Relógio** (criar) |
-| Centena, centésimos, porcentagem | N2.04, N6.01, N6.03 | **Quadrado100** (criar) |
-| Formas, giro, Tangram, simetria | GE.* | **ShapeCanvas** (criar) |
+| Balança / igualdade / incógnita | AL.05–AL.08 | **Balança** |
+| Relógio, horas e minutos | GM.04, GM.06 | **Relógio** |
+| Centena, centésimos, porcentagem | N2.04, N6.01, N6.03 | **Quadrado100** |
+| Formas, giro, Tangram, simetria | GE.* | **ShapeCanvas** |
 | Tally, pictograma, barras de dados | PE.01, PE.02 | SingaporeBars (modo vertical) |
 
-Faltam 4 primitivas: **Balança, Relógio, Quadrado100, ShapeCanvas.** Nenhuma trava N3 — dá para massificar N3 com o que já existe.
+**A tabela acima é mapa semântico, não declaração de que a implementação está pronta.** O estado real vem da auditoria executável/Coverage Matrix.
+
+> **Snapshot histórico — CI #812.** Naquele CI, a dívida bloqueadora/incompleta conhecida incluía **`LinkingCubes`, `Moedas`, `SingaporeBars`, `VisualAddition`, `Quadrado100` e `Regua`**; `Moedas` bloqueava GM.03 e `Regua` bloqueava GM.05. Este snapshot é preservado como registro histórico e não deve ser reescrito para imitar o runtime atual.
+
+A **Coverage Matrix já é executável**. O estado vigente evolui a partir do snapshot imutável P21.1 por migrações explícitas em `COVERAGE_MIGRATIONS`; W1–W4 já foram reconciliadas pelo ledger. Portanto o status atual de primitive/runtime deve ser lido da projeção viva + auditoria executável + ledger, nunca inferido desta tabela nem do CI #812.
 
 ### 12.7 Testes de contrato (obrigatório antes de massificar)
-Com 88 geradores × 5 níveis, inspeção manual não escala. Uma suíte automática varre **todos** e falha se: a resposta não aparece exatamente 1× nas `options` (kinds de seleção); houver opções duplicadas; algum valor sair dos `params` do micro; faltar `howto`, `explain` ou `audioPrompt`; alguma tag não vier do registro `MisconceptionTag`; o `kind` não existir no catálogo §9; o `prompt` passar de 12 palavras em F0-F1; aparecer negativo antes de N7; ou o gerador devolver o mesmo `kind` nos 5 níveis. Um gerador que não passa não entra no `GENERATOR_MAP`.
+Com 90 competências × 5 níveis, inspeção manual não escala. Uma suíte automática varre **todos** e falha se: a resposta não aparece exatamente 1× nas `options` (kinds de seleção); houver opções duplicadas; algum valor sair dos `params` do micro; faltar `howto`, `explain` ou `audioPrompt`; alguma tag não vier do registro `MisconceptionTag`; o `kind` não existir no catálogo §9; o `prompt` passar de 12 palavras em F0-F1; aparecer negativo antes de N7; ou o gerador devolver o mesmo `kind` nos 5 níveis. Um gerador que não passa não entra no `GENERATOR_MAP`.
 
 ### 12.8 DESCOBERTA EM LOTE (as 4 ferramentas que quebram o ciclo de tentativa e erro)
 
 Sintoma a evitar: descobrir problemas **um de cada vez**, por acaso, olhando a criança usar. Isso é lento, caro e desmoralizante. As quatro ferramentas abaixo transformam descoberta acidental em descoberta **em lote**, antes de qualquer criança tocar na tela. Nenhuma produção em massa começa sem elas.
 
-**1. Definição de Pronto (DoD) por competência.** Uma competência só é considerada pronta quando: tem gerador nos 5 níveis **com kinds variando** conforme o CPA (§12.3); tem `howto`, `explain` e `audioPrompt` em todos; tem distratores com tag do registro (seleção) ou `misconceptionFrom` (produção, §12.4); tem **coreografia declarada no nível 1** (§7.4); os params ficam dentro do YAML; e passa a suíte inteira. Sem DoD explícito, produzem-se 88 competências pela metade e ninguém sabe quais.
+**1. Definição de Pronto (DoD) por competência.** Uma competência só é considerada pronta quando: tem gerador nos 5 níveis **com kinds variando** conforme o CPA (§12.3); tem `howto`, `explain` e `audioPrompt` em todos; tem distratores com tag do registro (seleção) ou `misconceptionFrom` (produção, §12.4); tem **coreografia declarada no nível 1** (§7.4); os params ficam dentro do YAML; e passa a suíte inteira. Sem DoD explícito, produzem-se 90 competências pela metade e ninguém sabe quais.
 
 **2. Snapshot dourado (anti-regressão).** Cada gerador tem sua saída congelada com semente fixa. Qualquer alteração futura aparece como **diff visível** em vez de mudança silenciosa. É a vacina direta contra o caso do destaque da Caixa Mágica: o que funcionava e sumiu passa a quebrar o teste na hora.
 
@@ -694,12 +727,12 @@ Sintoma a evitar: descobrir problemas **um de cada vez**, por acaso, olhando a c
 
 **3-quater. O simulador precisa de LINHA DE BASE de plausibilidade.** Número de simulação só vale depois de comparado com o que se espera do mundo real. Se o resultado contraria a realidade pedagógica — ou oscila em ordem de grandeza entre versões — a conclusão não é "o motor é assim", é **"o simulador está errado OU o ritmo do produto está errado"**, e é obrigatório descobrir qual antes de decidir qualquer coisa com aquele dado. Dois sinais de alarme: **(a) incoerência interna** — um perfil COM lacuna dominar mais rápido que um perfil sem lacuna indica métrica medindo trajetos diferentes ou perfis mal configurados; **(b) deriva entre versões** — a mesma medida saltar de 18 → 55 → 73 → 367 sessões significa que ela nunca foi calibrada. Toda métrica declara **o que está medindo** (trajeto completo? só o nó final?) e sua **faixa plausível esperada**; fora da faixa, investiga-se antes de reportar.
 
-**4. Invariantes do sistema (asserções que valem sempre).** Testes que rodam sobre estados aleatórios de progresso e falham se qualquer regra do cânone for violada: a criança **nunca fica sem nada para fazer** (§11.5); a sessão **sempre termina em item fácil** (§6); o Radar **não dispara em erro isolado**, só em padrão (§8.2); o Composer pega **uma única fronteira**; nenhum nó abre com pré-requisito abaixo do limiar; nenhuma trilha de fluência abre sem a mãe em nível 4.
+**4. Invariantes do sistema (asserções que valem sempre).** Testes que rodam sobre estados aleatórios de progresso e falham se qualquer regra do cânone for violada: a criança **nunca fica sem nada para fazer** (§11.5); a sessão **sempre termina em item fácil** (§6); o Radar **não dispara em erro isolado**, só em padrão (§8.2); o Composer pega **uma única fronteira**; nenhum nó abre com pré-requisito abaixo do limiar; nenhuma trilha de fluência abre sem repertório conceitual seguro. **Prática manual no Dojo nunca move o ponteiro adaptativo do Tutor.**
 
 **Regra contra o falso verde:** todo teste deve verificar **presença**, não apenas validade. Um teste de coreografia que passa porque *nenhum* gerador declara coreografia não está passando — está cego. Se a competência exige coreografia no nível 1, a ausência é falha, não silêncio.
 
 ### 12.9 Prompt-contrato para a IA de autoria
-Ao pedir conteúdo novo a qualquer IA (Gemini/Claude), o prompt é sempre: *"Preencha o contrato YAML da competência X seguindo a Bíblia §12 e o Grafo. NÃO crie competências, IDs, kinds ou faixas de parâmetros novos. Se algo parecer faltar no grafo, PARE e reporte a lacuna."* — a IA como operária do contrato, jamais arquiteta improvisada. (As skills `.claude/skills/nova-trilha` e `nova-materia` devem ser atualizadas para apontar para este documento.)
+Ao pedir conteúdo novo a qualquer IA (Gemini/Claude), o prompt é sempre: *"Preencha o contrato YAML da competência X seguindo a Bíblia §12 e o Grafo. NÃO crie competências, IDs, kinds ou faixas de parâmetros novos. Se algo parecer faltar no grafo, PARE e reporte a lacuna."* — a IA como operária do contrato, jamais arquiteta improvisada. (As skills `.claude/skills/nova-trilha` e `nova-materia` devem ser atualizadas para apontarem para este documento.)
 
 ---
 
@@ -719,7 +752,7 @@ O princípio §2.9 (determinismo na aula, IA na autoria) continua valendo — ma
 
 ### 12.11 ENTRADA POSICIONAL — quando o LUGAR da resposta é o conteúdo
 
-Em 28 das 92 fichas a resposta não é um valor: é **um valor num lugar** (conta armada, divisão longa, number bond, coordenadas, decimais com vírgula). Nessas fichas, o método de entrada **é decisão pedagógica**, não detalhe de interface.
+Em 28 das 92 fichas históricas mapeadas nesta seção a resposta não é um valor: é **um valor num lugar** (conta armada, divisão longa, number bond, coordenadas, decimais com vírgula). A contagem global atual de fichas é 94; este número de 28 descreve a classe posicional levantada quando a seção foi criada. Nessas fichas, o método de entrada **é decisão pedagógica**, não detalhe de interface.
 
 **A regra: a granularidade da resposta segue o que está sendo ensinado.**
 
@@ -727,11 +760,11 @@ Em 28 das 92 fichas a resposta não é um valor: é **um valor num lugar** (cont
 |---|---|---|
 | **1-2 concreto** | *a troca* — dez unidades viram uma dezena | **manipular o material.** A criança agrupa e troca com as mãos; o resultado emerge da ação. Não há digitação. |
 | **3-4 abstrato** | *o procedimento* — coluna por coluna, direita→esquerda | **opções por coluna.** A coluna ativa acende e mostra 3 opções embaixo. Ela toca. Auto-avança para a próxima coluna. |
-| **5 fluência** | *velocidade* | **resposta inteira em opções**, rápida. |
+| **5 consolidação/generalização** | *o procedimento independente* e sua transferência | **resposta inteira/opções quando isso prova a ficha**, sem RT como gate conceitual. Prática cronometrada pertence ao Dojo. |
 
 **Por que opções por coluna, e não digitação:**
 - digitar dígito a dígito exige selecionar campo, e **campo selecionado é a maior fonte de bug** desta classe de exercício
-- digitação é lenta e imprecisa no tablet, e atrapalha justamente onde o tempo importa
+- digitação é lenta e imprecisa no tablet, e pode contaminar a medida do procedimento
 - **as opções exigem atenção real**: com distratores bem construídos (12 · 11 · 13), a criança precisa verificar de fato — não é chute
 - cada opção errada carrega **tag de misconception** — o que a digitação livre não permite diagnosticar com precisão
 
@@ -740,7 +773,7 @@ No nível 3-4, a competência **é o procedimento**. Responder o resultado intei
 
 **O vai-um / empréstimo:** também por toque, numa célula **acima e à esquerda** da coluna ativa, visivelmente **menor** (cerca de 60% do tamanho dos dígitos principais). O tamanho menor não é estética — sinaliza *"isto é anotação de trabalho, não parte do resultado"*, a mesma convenção do caderno.
 
-**Regra de ouro desta seção:** nenhuma ficha exige que a criança **digite** algarismo por algarismo. Ou ela manipula (concreto), ou ela toca em opções (abstrato).
+**Regra de ouro desta seção:** nenhuma ficha exige que a criança **digite** algarismo por algarismo. Ou ela manipula (concreto), ou ela toca em opções (abstrato). **Se a meta for velocidade, a sessão é Dojo e usa estado/política próprios; o nível 5 conceitual não se torna cronômetro.**
 
 ### 12.11-bis MODO CANETA — direção futura documentada
 
@@ -750,7 +783,7 @@ A solução ideal para algoritmos armados é a criança **escrever à mão** na 
 
 **Por que NÃO agora:** reconhecimento de escrita infantil é problema difícil (traçado instável, números espelhados, dígitos ambíguos), e um falso negativo é devastador — a criança acertou e o app disse que errou. Implementar mal é pior que não ter.
 
-**Fica registrado como expansão planejada**, não como pendência. Quando entrar, será **um modo adicional** nas fichas de algoritmo armado (F35, F39, F40, F69, F71, F76), sem substituir o modo por opções — que continua servindo aos níveis de fluência, onde velocidade importa mais que traçado.
+**Fica registrado como expansão planejada**, não como pendência. Quando entrar, será **um modo adicional** nas fichas de algoritmo armado (F35, F39, F40, F69, F71, F76), sem substituir o modo por opções — que continua servindo ao Dojo quando a fluência exigir resposta rápida.
 
 ### 12.11-ter MODO DE RESPOSTA — alternativas hoje, escrita amanhã *(v3.2)*
 
@@ -779,14 +812,22 @@ Como a criança **entrega** a resposta é uma dimensão separada do que ela resp
 ### 13.1 O que a auditoria encontrou (julho/2026)
 1. **Cinco+ "fontes únicas de verdade" concorrentes**, com currículos que se contradizem, e três cópias da árvore de docs (`AI_Studio_Lab/`, `backup_legado/`, `backup_repo/docs/`). O sintoma clássico de autoria multi-IA sem contrato.
 2. **IDs incoerentes e colidentes:** `C0001` = Subitização no doc legado, mas = Contar 1-a-1 no código; `C0003` = Cardinalidade no doc, = Caixa Mágica no código. Cinco esquemas de ID convivendo. *(Resolvido: esquema novo + tabela de migração no Grafo §3.)*
-3. **Grafo sem arestas:** `Track.prereqs` existe mas está vazio em quase tudo (3 trilhas de ~35 declaram pré-req); o `GraphValidator`/inter-ilhas admitidamente não existe. A "adaptatividade" real hoje é só o ZDP por trilha. *(Resolvido no papel: 88 nós com arestas; falta o unlock_engine.)*
+3. **Grafo sem arestas:** `Track.prereqs` existe mas está vazio em quase tudo (3 trilhas de ~35 declaram pré-req); o `GraphValidator`/inter-ilhas admitidamente não existe. A "adaptatividade" real hoje é só o ZDP por trilha. *(Registro histórico da auditoria: resolvido no papel inicialmente em 88 nós; o grafo canônico atual fecha em 90 — §15.8.)*
 4. **Trilhas-sanfona:** uma trilha comprime várias competências nos seus 5 níveis (Contar = 1-a-1 + cardinalidade + subitização + até 20), quebrando a semântica dos níveis CRA. *(Resolvido: 1 track = 1 competência; migração abaixo.)*
 5. **Cobertura para até ~7 anos:** `grade: "pre" | "ano1"` no tipo `Kid`; nada de reagrupamento, multiplicação, divisão, frações, decimais (C0106/C0206 declarados e nunca implementados). *(Resolvido no papel: F2-F4 no Grafo.)*
 6. **Tudo é múltipla escolha** e falta o kind mais importante da aritmética (reta numérica) e o da conta armada. *(Backlog §9.2, P1.)*
 7. **Regra de domínio incompleta no código** (só streak; a Bíblia antiga exigia helpClicks=0 + latência — nunca implementado).
-8. **Riqueza real a preservar:** composer com receita de aula excelente, ZDP com bônus de latência, telemetria já nos tipos, howto/explain, TutSteps, cenas vivas, economia dupla, mascote, skills de autoria, ritual de fechamento, lições de segurança do Firestore. **A fundação é boa — o problema era organização da autoria, não pedagogia.**
+8. **Riqueza real a preservar:** composer com receita de aula excelente, ZDP com bônus de latência, telemetria já nos tipos, howto/explain, TutSteps, cenas vivas, economia dupla, mascote, skills de autoria, ritual de fechamento, lições de segurança do Firestore. **A fundação é boa — o problema era organização da autoria, não pedagogia.** *(Registro histórico: economia/meta-jogo foram posteriormente reconciliados pela v3.5, não usar esta linha como contrato atual.)*
 
-### 13.2 Migração em 6 fases (cada uma cabe em 1-3 sessões de trabalho)
+### 13.2 Migração em 6 fases — registro histórico; fila operacional atual é outra
+
+A lista M1–M6 abaixo documenta o plano que guiou a migração inicial e é preservada para explicar decisões. **Ela não é a fila vigente.** Em 9/ago/2026, após P17–P22, Cloud Reconciliation, Simulação Longitudinal e Gamificação/Economia/Meta-jogo, a execução passa a ser:
+
+`Coverage Matrix → fábrica curricular → mega auditoria integrada → hardening/performance → release`.
+
+**Não iniciar a fábrica antes de fechar a Coverage Matrix.** Creature Engine/arte definitiva/widget/jogo ficam em trilha futura separada.
+
+Plano histórico M1–M6:
 - **M1 — Congelar e limpar.** Mover docs antigos para `arquivo_morto/`; commitar Bíblia+Grafo+YAML como únicos; atualizar CLAUDE.md e as skills para apontarem para cá. *Critério: grep por "fonte da verdade" retorna 1 lugar.*
 - **M2 — Grafo executável.** Criar `curriculum/*.yaml` a partir do `grafo_saga.yaml` (F0-F1 primeiro); escrever `unlock_engine.ts` (regra §5) + testes; `graphId` novo em todas as tracks via tabela de migração (saves antigos migram por de-para).
 - **M3 — Desfazer as trilhas-sanfona de F0.** Contar → N1.01/N1.04; canto → N1.02; etc. Progresso existente herda pelo de-para (nível atual vira nível da competência mais avançada da antiga trilha).
@@ -984,7 +1025,7 @@ Qualquer adição só é considerada concluída quando:
 
 1. **Contagem cruzada.** `count(grafo_saga.yaml.nodes)` = `count(GRAFO_DE_CONHECIMENTO_SAGA.md)` = `count(.json)` = `count(.ts)`. Divergência de um único nó = build vermelho.
    > **Convenção obrigatória para o parser.** IDs citados em texto histórico (candidatas rejeitadas, tabelas de migração, exemplos) ficam entre os marcadores `<!-- IDS_REJEITADOS_INICIO -->` e `<!-- IDS_REJEITADOS_FIM -->` e são **excluídos da contagem**. Sem essa convenção, a própria nota que documenta a rejeição faz o auditor recontar os nós rejeitados — foi o que aconteceu na primeira tentativa de escrever esta seção. Todo ID mencionado fora de uma linha de declaração de nó deve estar dentro do marcador ou escrito com tachado (`~~N5.07~~`).
-2. **Prosa × realidade.** O número declarado no corpo desta Bíblia, do Manual, do Método e da Arquitetura Cognitiva tem de bater com a contagem real. Um documento que diz "84" num grafo de 88 é um documento inválido, exatamente como cabeçalho divergente de changelog (§1).
+2. **Prosa × realidade.** O número declarado no corpo desta Bíblia, do Manual, do Método e da Arquitetura Cognitiva tem de bater com a contagem real. **Trechos históricos explicitamente marcados preservam a contagem de sua época; afirmação corrente divergente é inválida.**
 3. **Duplicata por assinatura.** Dois nós com **sobreposição semântica no nome** *e* **o mesmo conjunto de pré-requisitos** são duplicata presumida. O auditor lista e falha.
 4. **Pré-requisito que contém o próprio nome.** Um nó cujo pré-requisito tem nome contido no seu (`N7.04 Porcentagem` ← `N6.03 Porcentagem`) é ciclo semântico disfarçado: IDs diferentes, mesma competência. O detector de ciclos do DAG não pega isso — este teste pega.
 5. **Nó órfão de ficha.** Todo nó do grafo tem exatamente uma ficha responsável; toda ficha aponta para nó existente. Cobertura tem de ser 100%, nos dois sentidos.
@@ -1013,7 +1054,7 @@ Qualquer adição só é considerada concluída quando:
 
 **Saldo: 84 + 4 = 88 competências.** *(Este era o número até a retificação de ago/2026 logo abaixo — ver P12.)*
 
-#### Retificação de ago/2026 — o grafo fecha em **89**
+#### Retificação de ago/2026 — o grafo passa a **89** na P12
 
 A ficha **F04** ("Produzir Quantidade") declarava na §1 dela ser a `N1.09`. Não
 é. Quatro arestas do grafo — `N1.12`, `N2.01`, `N3.03` e `AL.03` — dependem de a
@@ -1028,11 +1069,18 @@ F04 faria as quatro arestas mentirem em silêncio.
 Cada uma ganhou seu nó: a `N1.09` continua sendo a contagem, e a F04 passou a ser
 a **`N1.13` — Produzir quantidade** (F0, pré-req `N1.02` e `N1.04`).
 
-> **Saldo: 88 + 1 = 89 competências.** Este é o número. Nenhuma ficha foi
+> **Saldo histórico da P12: 88 + 1 = 89 competências.** Nenhuma ficha foi
 > removida, nenhuma foi renumerada, e nenhuma aresta existente mudou de
 > significado — o grafo **ganhou** um nó que já estava descrito no cânone sem ter
 > casa. Registro completo em `codex/PLANO_DO_BLOCO_F0.md §13.1` (P12).
 
+#### Retificação de ago/2026 — o grafo fecha em **90** na P15/P22
+
+A auditoria do bloco F0 encontrou a colisão de IDs de F50: `GM.02` já era **Tempo cotidiano** e `GM.05` já era **Medidas padronizadas**. Massa/capacidade sem unidades era uma competência real sem casa própria.
+
+Foi criado **`GM.12 — Massa e capacidade: comparação e conservação`** (F0, pré-req `GM.01`). `GM.05` passa a depender de `GM.12 + N2.02`. A sequência canônica vira: comparação visível → massa/capacidade sem unidades → medição padronizada.
+
+> **Saldo atual: 89 + 1 = 90 competências. Este é o número canônico vigente.** Grafo/YAML/JSON/TS e cobertura autoral fecham em 90/90; as contagens 88 e 89 acima permanecem como registro histórico explícito.
 
 #### Candidatas em lista de espera *(não são competências — não criar sem passar pelo §15.3)*
 
@@ -1065,3 +1113,22 @@ Levantadas nas auditorias externas de ago/2026, ainda **sem** teste de duplicaç
 *v1.3 (jul/2026) — regra do FADING (§5): o andaime some conforme a proficiência sobe (aula é exceção, não enfeite). §6: aula é feita de prática, não palestra; distinção entender-a-matéria vs entender-o-exercício com gatilhos separados. §11.2.4: Dojo como pilar autônomo com DUAS famílias de fluência (FD fatos + PD procedimentos armados).*
 *v1.2 (jul/2026) — modelo de erro reformulado para DUAS CAMADAS (§8): resposta imediata leve na questão (preserva o fluxo, nunca trava) + remediação profunda disparada por PADRÃO via Radar (§11.4), entregue em pausa/fim de sessão/resgate. Princípio 5 refinado ("o fluxo é sagrado"). Correção da rigidez do escalonamento E1→E2→E3 por questão.*
 *v1.1 (jul/2026) — §11 expandido: Bússola de Posicionamento (11.3), Radar de Lacunas com tags de misconception e Missões de Resgate (11.4), regra Idade Nunca Trava (11.5), representação na tela (11.6); Dojo promovido a documento próprio (`DOJO_SAGA.md`); Manual Didático v2 completo integrado ao cânone.*
+
+
+---
+
+### v3.3 — GM.12 separa massa/capacidade de tempo e de unidades
+
+A auditoria do bloco F0 encontrou uma colisão de IDs: F50 dizia GM.02 embora GM.02 seja **Tempo cotidiano**, e a P15 posterior tentou movê-la para GM.05 embora GM.05 já fosse **Medidas padronizadas**. A matriz passa a ter **90 competências** com o novo `GM.12 — Massa e capacidade: comparação e conservação` (F0, pré-req GM.01). `GM.05` passa a depender de GM.12 + N2.02. A progressão canônica é: comparação visível → massa/capacidade sem unidades → medição padronizada. Ver `AI_Studio_Lab/codex/DECISAO_P15_F50.md`.
+
+### v3.4 — Sensei orquestra; Jornada mapeia; Dojo automatiza em estado separado
+
+Reconciliação canônica pós-P22, sem alterar topologia do grafo: §5 remove a associação normativa “nível 5 = Fluência/Dojo”, alinha a descida ao runtime vigente (3 erros) e registra a coroa multidimensional real de `progressEngine` (compreensão + independência + evidência autoral + sessões espaçadas, sem RT); §6 troca dose fixa por idade por política adaptativa por estado, preservando a tabela antiga como registro histórico explícito; §11.4 impede RT lento de virar meio-erro; §11.9 separa mastery conceitual de `dojoTracks`; §11.12 elimina a reserva etária de domínio; §12.2-bis/§12.3/§12.11 separam nível conceitual de faixa/automaticidade do Dojo. Manual fecha em 90/90 com GM.12 e Método em 90 competências/94 fichas. Changelog e diagnóstico históricos foram preservados sem condensação.
+
+### v3.5 — learner state, Nível SAGA e companheiro deixam de compartilhar significado
+
+Reconciliação canônica pós-fechamento de Gamificação/Economia/Meta-jogo. §3 separa formalmente **progressão do aprendiz** (única autoridade de mastery/unlock), **progressão do perfil/jogador** (Nível SAGA 1–100 por XP vitalício) e **progressão do companheiro** (fantasia/vínculo sem autoridade curricular); XP deixa de ser descrito como moeda e velocidade não multiplica meta-progressão. §3.1 elimina a contradição de navegação e fixa as cinco abas com Sensei como entrada. §5 e §12.2-bis registram a terceira escala, não pedagógica, para impedir confusão entre nível curricular 1–5, faixa do Dojo 1–10 e Nível SAGA 1–100. §10.12 torna o contrato de mascote **renderer-agnostic** (SVG, sprite/atlas pixel art ou backend futuro atrás de ações semânticas). §12.6 substitui o antigo “faltam quatro primitivas” pelo baseline auditado no CI #812 e remete a verdade de cobertura à Coverage Matrix. §13.2 fica explicitamente histórico e a fila vigente passa a `Coverage Matrix → fábrica curricular → mega auditoria integrada → hardening/performance → release`. A visão futura de NPC/widget/animais lutadores/beat ’em up/Thinking Lab fica registrada sem autorizar Creature Engine nesta fila.
+
+### v3.6 — reconciliação documental pré-W5
+
+§9.2 passa a identificar explicitamente P1–P3 como **snapshot histórico**, retirando `numberline` e `vertical` da condição de backlog futuro vigente. §12.6 mantém CI #812 como fotografia histórica e registra o mecanismo vigente: Coverage Matrix executável, snapshot P21.1 imutável e evolução por `COVERAGE_MIGRATIONS`, com W1–W4 reconciliadas pelo ledger. Nenhum runtime funcional foi alterado.

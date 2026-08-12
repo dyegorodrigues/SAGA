@@ -1,0 +1,576 @@
+import { readFileSync, readdirSync } from "node:fs";
+import { createRequire } from "node:module";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import YAML from "yaml";
+import { JOURNEY_FICHAS } from "../../src/curriculum/fichas";
+import { ALL_MATH_TRACKS } from "../../src/curriculum/motores/curriculum";
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const read = (path: string) => readFileSync(join(ROOT, path), "utf8");
+const require = createRequire(import.meta.url);
+const uniq = <T>(items: Iterable<T>) => [...new Set(items)];
+const sorted = <T extends string>(items: Iterable<T>) => [...items].sort((a, b) => a.localeCompare(b));
+
+interface RuntimeMapEntry {
+  primitive: string;
+  kinds: string[];
+  componentFiles: string[];
+  builderKinds: string[];
+  specializedBuilderIds?: string[];
+  rendererKinds: string[];
+  note?: string;
+}
+const { FICHA_RUNTIME_MAP } = require("./ficha_runtime_map.cjs") as { FICHA_RUNTIME_MAP: RuntimeMapEntry[] };
+
+/**
+ * Snapshot imutável do fechamento da Coverage Matrix (P21.1).
+ * Nunca reescrever estes números para acomodar trabalho posterior: a fábrica
+ * curricular avança por migrações nomeadas, auditáveis e causalmente justificadas.
+ */
+export const COVERAGE_CLOSED_BASELINE = {
+  competencies: 90,
+  authoredFichas: 94,
+  composer: 26,
+  legacy: 25,
+  fallback: 39,
+  served: 51,
+  divergences: 21,
+  modeSwaps: 12,
+  toolIntroductions: 44,
+  missingPrimitives: ["Moedas", "Regua"],
+} as const;
+
+type CoverageDelta = Partial<Record<
+  "composer" | "legacy" | "fallback" | "served" | "divergences" | "modeSwaps" | "toolIntroductions",
+  number
+>>;
+interface CoverageMigration {
+  id: string;
+  competence: string;
+  rationale: string;
+  delta: CoverageDelta;
+}
+
+/**
+ * Ledger da fábrica curricular. Cada delta só entra depois de a fonte real ter
+ * mudado e a Matrix ter ficado vermelha mostrando o novo valor observado.
+ */
+export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
+  {
+    id: "W1-N1.04",
+    competence: "N1.04",
+    rationale: "F03 reconciliada com TouchCount e proveniência/voz F01+F03 explicitadas no runtime.",
+    delta: { divergences: -1 },
+  },
+  {
+    id: "W2-N1.05",
+    competence: "N1.05",
+    rationale: "F06 materializada no specialized builder Grupo-backed; o legado abstrato saiu de produção e a divergência ficha↔screen foi fechada.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "W3-N2.01",
+    competence: "N2.01",
+    rationale: "F21 materializada como agrupamento manual 10U→1D com MaterialDourado + TenFrame, montagem inversa no L4 e decomposição mental no L5; o legado estático saiu de produção e a divergência ficha↔screen foi fechada.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "W4-N1.12",
+    competence: "N1.12",
+    rationale: "F19 materializada na InteractiveNumberLine compartilhada com reta responsiva, tap/drag filtrados por geometria motora, salto e som sincronizados, arcos somente no L2 e sonda Chrome 320/390/900; o legado saiu de produção e a divergência ficha↔screen foi fechada.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "W5-GM.05",
+    competence: "GM.05",
+    rationale: "F61 materializada com Regua especializada: medida informal→leitura→alinhamento do zero→comparação→estimativa, filtro motor e evidência ALINHOU_ZERO; canário inativo passou suíte completa e Chrome 320/390/900 antes da promoção. A Matrix observou 30 Composer, 38 fallback e 52 servidas após a ativação.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
+  {
+    id: "W6-N2.03",
+    competence: "N2.03",
+    rationale: "F29 materializada no specialized builder local Grupo-backed: quantidade→comparação→símbolo, com N1.05/W2 como pré-requisito direto; o legado saiu de produção e a divergência ficha↔screen foi fechada. A Matrix observou 31 Composer, 21 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+] as const;
+
+const migrationDelta = (key: keyof CoverageDelta) =>
+  COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
+
+export const COVERAGE_BASELINE = {
+  ...COVERAGE_CLOSED_BASELINE,
+  composer: COVERAGE_CLOSED_BASELINE.composer + migrationDelta("composer"),
+  legacy: COVERAGE_CLOSED_BASELINE.legacy + migrationDelta("legacy"),
+  fallback: COVERAGE_CLOSED_BASELINE.fallback + migrationDelta("fallback"),
+  served: COVERAGE_CLOSED_BASELINE.served + migrationDelta("served"),
+  divergences: COVERAGE_CLOSED_BASELINE.divergences + migrationDelta("divergences"),
+  modeSwaps: COVERAGE_CLOSED_BASELINE.modeSwaps + migrationDelta("modeSwaps"),
+  toolIntroductions: COVERAGE_CLOSED_BASELINE.toolIntroductions + migrationDelta("toolIntroductions"),
+} as const;
+
+type Status = "padrao-ouro" | "legado" | "fallback";
+type OnboardingStatus = "n/a" | "presente" | "nao-comprovado" | "pendente-com-implementacao";
+
+interface GraphNode {
+  id: string;
+  nome: string;
+  strand: string;
+  faixa: string;
+  prereqs?: string[];
+}
+interface CanonicalFicha {
+  ficha: string;
+  file: string;
+  competence: string;
+  primitives: string[];
+}
+interface RuntimeSample {
+  kinds: string[];
+  delivered: string[];
+  unknownKinds: string[];
+  error?: string;
+}
+export interface CoverageMatrixRow {
+  id: string;
+  name: string;
+  strand: string;
+  faixa: string;
+  prereqs: string[];
+  canonicalFichas: string[];
+  canonicalFichaFiles: string[];
+  canonicalPrimitives: string[];
+  implementation: string;
+  generatorSource: string;
+  runtimeKinds: string[];
+  runtimePrimitives: string[];
+  composerSensei: string;
+  tests: string[];
+  audits: string[];
+  status: Status;
+  divergence: string[];
+  modeSwaps: string[];
+  toolIntroductions: string[];
+  visualOnboarding: OnboardingStatus;
+  visualOnboardingEvidence: string;
+  missingPrimitives: string[];
+  debt: string[];
+  action: string;
+  causalWave: number;
+  downstream: number;
+  causalOrder: string;
+}
+export interface CoverageMatrixCounts {
+  competencies: number;
+  authoredFichas: number;
+  composer: number;
+  legacy: number;
+  fallback: number;
+  served: number;
+  divergences: number;
+  modeSwaps: number;
+  toolIntroductions: number;
+  missingPrimitives: string[];
+}
+export interface CoverageMatrixResult {
+  rows: CoverageMatrixRow[];
+  counts: CoverageMatrixCounts;
+  failures: string[];
+}
+
+const graph = YAML.parse(read("curriculum/grafo_saga.yaml")) as { nodes: GraphNode[] };
+const nodes = graph.nodes ?? [];
+const ids = nodes.map(node => node.id);
+const graphIds = new Set(ids);
+const trackById = new Map(ALL_MATH_TRACKS.map(track => [track.id, track]));
+const runtimeFichaById = new Map(JOURNEY_FICHAS.map(ficha => [ficha.id, ficha]));
+
+function walkFiles(dir: string, predicate: (path: string) => boolean): string[] {
+  const out: string[] = [];
+  for (const entry of readdirSync(join(ROOT, dir), { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkFiles(path, predicate));
+    else if (predicate(path)) out.push(path);
+  }
+  return out;
+}
+
+/** Mesmo formato canônico usado por ficha_catalog_auditor.cjs. */
+function readCanonicalFichas(): { entries: CanonicalFicha[]; blockCount: number } {
+  const entries: CanonicalFicha[] = [];
+  for (const file of readdirSync(join(ROOT, "AI_Studio_Lab/pedagogia/fichas")).filter(name => name.endsWith(".md")).sort()) {
+    const relativeFile = join("AI_Studio_Lab/pedagogia/fichas", file);
+    const source = read(relativeFile);
+    const headings = [...source.matchAll(/^# FICHA\s+(\S+)\s+—\s+(.+)$/gm)];
+    for (let i = 0; i < headings.length; i += 1) {
+      const body = source.slice(headings[i].index, headings[i + 1]?.index ?? source.length);
+      const identity = body.match(/^\*\*Competência:\*\*\s+((?:N[1-7]|AL|GE|GM|PE)\.\d{2})\b.*?\*\*Primitiva:\*\*\s+(.+?)(?:\s+·|$)/m);
+      if (!identity) continue;
+      const primitives = [...identity[2].matchAll(/`([A-Za-z][A-Za-z0-9]*)`\s*(?:\(modo ([^)]+)\))?/g)]
+        .map(match => match[2] ? `${match[1]}#${match[2].trim()}` : match[1])
+        .filter(primitive => primitive !== "plain");
+      entries.push({ ficha: headings[i][1], file: relativeFile, competence: identity[1], primitives });
+    }
+  }
+  return { entries, blockCount: entries.length };
+}
+
+const canonical = readCanonicalFichas();
+const fichaByCompetence = new Map<string, CanonicalFicha[]>();
+for (const ficha of canonical.entries) {
+  if (!graphIds.has(ficha.competence)) continue;
+  fichaByCompetence.set(ficha.competence, [...(fichaByCompetence.get(ficha.competence) ?? []), ficha]);
+}
+const canonicalPrimitives = (id: string) => uniq((fichaByCompetence.get(id) ?? []).flatMap(ficha => ficha.primitives));
+
+const primitiveFiles = new Set(
+  readdirSync(join(ROOT, "src/components/primitives"))
+    .filter(name => name.endsWith(".tsx") && !name.includes(".test."))
+    .map(name => name.replace(".tsx", "")),
+);
+
+/**
+ * A conformidade existente é a fonte observacional dos kinds legados. Kinds
+ * novos, ainda não incorporados nela, caem na ponte explícita ficha→runtime.
+ */
+function observedKindMap(): Map<string, string[]> {
+  const source = read("src/curriculum/conformidadeDeFichas.test.ts");
+  const block = source.match(/const PRIMITIVA_DO_KIND:[\s\S]*?=\s*\{([\s\S]*?)\n\};/);
+  const map = new Map<string, string[]>();
+  for (const match of block?.[1].matchAll(/^\s*(?:"([^"]+)"|([A-Za-z0-9_-]+)):\s*\[([^\]]*)\],?/gm) ?? []) {
+    map.set(match[1] ?? match[2], [...match[3].matchAll(/"([^"]+)"/g)].map(item => item[1]));
+  }
+  const fallback = new Map<string, string[]>();
+  for (const entry of FICHA_RUNTIME_MAP) {
+    for (const kind of entry.rendererKinds) fallback.set(kind, uniq([...(fallback.get(kind) ?? []), entry.primitive]));
+  }
+  for (const [kind, primitives] of fallback) if (!map.has(kind)) map.set(kind, primitives);
+  return map;
+}
+
+function observedModeMap(): Map<string, string> {
+  const source = read("src/curriculum/conformidadeDeFichas.test.ts");
+  const block = source.match(/const MODO_DO_RUNTIME:[\s\S]*?=\s*\{([\s\S]*?)\n\};/);
+  const map = new Map<string, string>();
+  for (const match of block?.[1].matchAll(/^\s*(?:"([^"]+)"|([A-Za-z0-9_-]+)):\s*"([^"]+)",?/gm) ?? []) {
+    map.set(match[1] ?? match[2], match[3]);
+  }
+  return map;
+}
+
+const primitiveByKind = observedKindMap();
+const modeByRuntime = observedModeMap();
+
+function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: string } {
+  const kind = String(q?.kind ?? "");
+  const bases = primitiveByKind.get(kind);
+  if (!bases) return { primitives: [], unknownKind: kind || "<sem-kind>" };
+  const rawMode = kind === "pareamento" ? "parear" : kind === "classificacao" ? "caixas/laços" : q?.uiProps?.modo;
+
+  let qualified = [...bases];
+  if (kind === "area") {
+    qualified = bases.map(base => base === "ArrayGrid" ? "ArrayGrid#área" : base);
+  } else if (kind === "moldura" && rawMode === "faltam") {
+    qualified = bases.map(base => base === "TenFrame" ? "TenFrame#flash" : base);
+  } else {
+    const mode = rawMode ? modeByRuntime.get(String(rawMode)) : undefined;
+    if (mode && bases.length) qualified = [`${bases[0]}#${mode}`, ...bases.slice(1)];
+  }
+  return { primitives: uniq([...qualified, ...qualified.map(item => item.split("#")[0])]) };
+}
+
+function sampleRuntime(id: string): RuntimeSample {
+  const track: any = trackById.get(id);
+  if (!track) return { kinds: [], delivered: [], unknownKinds: [], error: "track ausente" };
+  if (track.contentStatus === "fallback") return { kinds: ["fallback"], delivered: [], unknownKinds: [] };
+  try {
+    const questions = [1, 2, 3, 4, 5].map(level => track.gen(level));
+    const delivered: string[] = [];
+    const unknownKinds: string[] = [];
+    for (const question of questions) {
+      const mapped = deliveredPrimitives(question);
+      delivered.push(...mapped.primitives);
+      if (mapped.unknownKind) unknownKinds.push(mapped.unknownKind);
+    }
+    return {
+      kinds: uniq(questions.map(question => String(question.kind))),
+      delivered: uniq(delivered),
+      unknownKinds: uniq(unknownKinds),
+    };
+  } catch (error) {
+    return { kinds: [], delivered: [], unknownKinds: [], error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+function missingPrimitives(id: string): string[] {
+  return uniq(canonicalPrimitives(id).map(item => item.split("#")[0])).filter(base => !primitiveFiles.has(base));
+}
+function runtimeDivergence(id: string, sample: RuntimeSample): string[] {
+  const track: any = trackById.get(id);
+  if (!track || track.contentStatus === "fallback" || sample.error || sample.unknownKinds.length) return [];
+  const delivered = new Set(sample.delivered);
+  return canonicalPrimitives(id).filter(item => !delivered.has(item));
+}
+
+const prereqsById = new Map(nodes.map(node => [node.id, node.prereqs ?? []]));
+const childrenById = new Map(nodes.map(node => [node.id, [] as string[]]));
+for (const node of nodes) for (const prereq of node.prereqs ?? []) childrenById.set(prereq, [...(childrenById.get(prereq) ?? []), node.id]);
+
+function closure(seed: string[], next: (id: string) => string[]): Set<string> {
+  const seen = new Set<string>();
+  const queue = [...seed];
+  while (queue.length) {
+    const id = queue.shift()!;
+    if (seen.has(id)) continue;
+    seen.add(id);
+    queue.push(...next(id));
+  }
+  return seen;
+}
+const ancestors = (id: string) => closure(prereqsById.get(id) ?? [], current => prereqsById.get(current) ?? []);
+const descendants = (id: string) => closure(childrenById.get(id) ?? [], current => childrenById.get(current) ?? []);
+const depthMemo = new Map<string, number>();
+function causalDepth(id: string): number {
+  if (depthMemo.has(id)) return depthMemo.get(id)!;
+  const prereqs = prereqsById.get(id) ?? [];
+  const depth = prereqs.length ? Math.max(...prereqs.map(causalDepth)) + 1 : 0;
+  depthMemo.set(id, depth);
+  return depth;
+}
+
+function visualIntroductions(id: string) {
+  const before = ancestors(id);
+  const exact = new Set([...before].flatMap(canonicalPrimitives));
+  const bases = new Set([...exact].map(item => item.split("#")[0]));
+  const modeSwaps: string[] = [];
+  const tools: string[] = [];
+  const roots: string[] = [];
+  for (const primitive of canonicalPrimitives(id).filter(item => !exact.has(item))) {
+    const [base, mode] = primitive.split("#");
+    if (!before.size) roots.push(primitive);
+    else if (mode && bases.has(base)) modeSwaps.push(`${base}→${mode}`);
+    else tools.push(primitive);
+  }
+  return { modeSwaps, tools, roots };
+}
+
+function onboardingFor(id: string, status: Status, hasVisualIntroduction: boolean): { status: OnboardingStatus; evidence: string } {
+  if (!hasVisualIntroduction) return { status: "n/a", evidence: "nenhuma estreia/troca visual nesta competência" };
+  if (status === "fallback") return { status: "pendente-com-implementacao", evidence: "conteúdo ainda não é servido" };
+  if (status === "legado") return { status: "nao-comprovado", evidence: "gerador legado não é governado pela ficha runtime autoral" };
+
+  const ficha: any = runtimeFichaById.get(id);
+  if (!ficha) return { status: "nao-comprovado", evidence: "Composer ativo sem ficha de Jornada inspecionável" };
+  const tutorialMicros = (ficha.micros ?? []).filter((micro: any) => Array.isArray(micro?.params?.tutorial) && micro.params.tutorial.length > 0);
+  if (tutorialMicros.length) {
+    return { status: "presente", evidence: `tutorial runtime em ${tutorialMicros.map((micro: any) => micro.id).join(", ")}` };
+  }
+  return { status: "nao-comprovado", evidence: "ficha runtime ativa não declara tutorial explícito para a estreia" };
+}
+
+function generatorMap(): Map<string, string> {
+  const source = read("src/curriculum/motores/curriculum.ts");
+  const block = source.match(/const GENERATOR_MAP[\s\S]*?=\s*\{([\s\S]*?)\n\};/);
+  return new Map(block ? [...block[1].matchAll(/"((?:N[1-7]|AL|GE|GM|PE)\.\d{2})"\s*:\s*([A-Za-z0-9_]+)/g)].map(match => [match[1], match[2]] as const) : []);
+}
+const legacyGeneratorById = generatorMap();
+
+const testFiles = walkFiles("src", path => /\.(?:test|spec)\.(?:ts|tsx|js|jsx)$/.test(path));
+const testsById = new Map<string, string[]>();
+for (const file of testFiles) {
+  const source = read(file);
+  for (const id of ids) if (source.includes(id)) testsById.set(id, [...(testsById.get(id) ?? []), file]);
+}
+
+const GLOBAL_AUDITS = ["npm run auditar", "npm run fichas:auditar", "npm run fichas:conferir", "npm run grafo:check"];
+function statusFor(id: string): Status {
+  const source = String((trackById.get(id) as any)?.generatorSource ?? "fallback");
+  return source === "composer" ? "padrao-ouro" : source === "legacy" ? "legado" : "fallback";
+}
+function implementationFor(id: string, status: Status): string {
+  const legacy = legacyGeneratorById.get(id);
+  if (status === "padrao-ouro") return legacy ? `Composer ativo; rollback legado ${legacy}` : "Composer ativo; estreia sem gerador legado";
+  if (status === "legado") return `gerador legado ${legacy ?? "<não identificado>"}`;
+  return "gFallback / placeholder Em construção";
+}
+function actionFor(row: Omit<CoverageMatrixRow, "action">): string {
+  if (row.missingPrimitives.length) return `construir ${row.missingPrimitives.join(" + ")} com builder/onboarding/teste; só depois alinhar/ativar a ficha`;
+  if (row.status === "fallback") return "fábrica curricular: materializar ficha no Composer/builder, validar screen, onboarding e regressões antes de ativar";
+  if (row.divergence.length) return `alinhar entrega real à ficha (${row.divergence.join(" + ")}); preservar proveniência e testar os 5 níveis`;
+  if (row.status === "legado") return "migrar legado para ficha/Composer por regression-first, com paridade ou divergência pedagógica explicitamente justificada";
+  if ((row.modeSwaps.length || row.toolIntroductions.length) && row.visualOnboarding !== "presente") return "criar/validar onboarding ou ponte visual para a estreia antes de tratá-la como continuidade";
+  if (row.tests.length === 0) return "preservar implementação; ao tocar neste nó, nascer teste nominal além dos gates globais";
+  return "preservar; nenhuma dívida objetiva detectada pela Coverage Matrix";
+}
+
+function buildRows(): CoverageMatrixRow[] {
+  return nodes.map(node => {
+    const status = statusFor(node.id);
+    const sample = sampleRuntime(node.id);
+    const visual = visualIntroductions(node.id);
+    const onboarding = onboardingFor(node.id, status, Boolean(visual.modeSwaps.length || visual.tools.length));
+    const divergence = runtimeDivergence(node.id, sample);
+    const missing = missingPrimitives(node.id);
+    const tests = sorted(testsById.get(node.id) ?? []);
+    const debt: string[] = [];
+    if (status === "fallback") debt.push("sem conteúdo real servido");
+    if (status === "legado") debt.push("ficha pronta ainda servida por legado");
+    if (sample.error) debt.push(`runtime não amostrado: ${sample.error}`);
+    if (sample.unknownKinds.length) debt.push(`kind sem tradução: ${sample.unknownKinds.join(", ")}`);
+    if (divergence.length) debt.push(`ficha↔screen diverge: faltam ${divergence.join(" + ")}`);
+    if (missing.length) debt.push(`primitiva bloqueadora ausente: ${missing.join(" + ")}`);
+    if (visual.modeSwaps.length) debt.push(`troca de linguagem visual: ${visual.modeSwaps.join(", ")}; onboarding=${onboarding.status}`);
+    if (visual.tools.length) debt.push(`ferramenta nova sem precedente: ${visual.tools.join(", ")}; onboarding=${onboarding.status}`);
+    if (tests.length === 0) debt.push("sem teste nominal por ID; apenas cobertura transversal dos gates");
+
+    const base: Omit<CoverageMatrixRow, "action"> = {
+      id: node.id,
+      name: node.nome,
+      strand: node.strand,
+      faixa: node.faixa,
+      prereqs: node.prereqs ?? [],
+      canonicalFichas: uniq((fichaByCompetence.get(node.id) ?? []).map(ficha => ficha.ficha)),
+      canonicalFichaFiles: uniq((fichaByCompetence.get(node.id) ?? []).map(ficha => ficha.file)),
+      canonicalPrimitives: canonicalPrimitives(node.id),
+      implementation: implementationFor(node.id, status),
+      generatorSource: String((trackById.get(node.id) as any)?.generatorSource ?? "fallback"),
+      runtimeKinds: sample.kinds,
+      runtimePrimitives: sample.delivered,
+      composerSensei: status === "fallback"
+        ? "conteúdo real ausente; não pode produzir evidência/recompensa como competência servida"
+        : status === "padrao-ouro"
+          ? "Composer ativo; elegibilidade continua vindo de learner state + DAG/Sensei"
+          : "Composer inativo; legado continua sujeito à elegibilidade de learner state + DAG/Sensei",
+      tests,
+      audits: GLOBAL_AUDITS,
+      status,
+      divergence,
+      modeSwaps: visual.modeSwaps,
+      toolIntroductions: visual.tools,
+      visualOnboarding: onboarding.status,
+      visualOnboardingEvidence: onboarding.evidence,
+      missingPrimitives: missing,
+      debt,
+      causalWave: causalDepth(node.id),
+      downstream: descendants(node.id).size,
+      causalOrder: `W${causalDepth(node.id)} · impacto ${descendants(node.id).size}`,
+    };
+    return { ...base, action: actionFor(base) };
+  });
+}
+
+function countRows(rows: CoverageMatrixRow[]): CoverageMatrixCounts {
+  return {
+    competencies: rows.length,
+    authoredFichas: canonical.blockCount,
+    composer: rows.filter(row => row.status === "padrao-ouro").length,
+    legacy: rows.filter(row => row.status === "legado").length,
+    fallback: rows.filter(row => row.status === "fallback").length,
+    served: rows.filter(row => row.status !== "fallback").length,
+    divergences: rows.filter(row => row.divergence.length).length,
+    modeSwaps: rows.reduce((sum, row) => sum + row.modeSwaps.length, 0),
+    toolIntroductions: rows.reduce((sum, row) => sum + row.toolIntroductions.length, 0),
+    missingPrimitives: sorted(new Set(rows.flatMap(row => row.missingPrimitives))),
+  };
+}
+
+function validate(rows: CoverageMatrixRow[], counts: CoverageMatrixCounts): string[] {
+  const failures: string[] = [];
+  const check = (ok: boolean, message: string) => { if (!ok) failures.push(message); };
+  check(nodes.length === COVERAGE_BASELINE.competencies, `grafo: ${nodes.length} vs ${COVERAGE_BASELINE.competencies}`);
+  check(new Set(ids).size === nodes.length, "grafo contém IDs duplicados");
+  check(rows.length === COVERAGE_BASELINE.competencies, `matriz: ${rows.length} vs ${COVERAGE_BASELINE.competencies}`);
+  check(canonical.blockCount === COVERAGE_BASELINE.authoredFichas, `fichas autorais: ${canonical.blockCount} vs ${COVERAGE_BASELINE.authoredFichas}`);
+  check(fichaByCompetence.size === COVERAGE_BASELINE.competencies, `cobertura de ficha: ${fichaByCompetence.size}/90`);
+  check(counts.composer === COVERAGE_BASELINE.composer, `Composer ativo divergiu: ${counts.composer} vs ${COVERAGE_BASELINE.composer}`);
+  check(counts.legacy === COVERAGE_BASELINE.legacy, `legado divergiu: ${counts.legacy} vs ${COVERAGE_BASELINE.legacy}`);
+  check(counts.fallback === COVERAGE_BASELINE.fallback, `fallback divergiu: ${counts.fallback} vs ${COVERAGE_BASELINE.fallback}`);
+  check(counts.served === COVERAGE_BASELINE.served, `servido divergiu: ${counts.served} vs ${COVERAGE_BASELINE.served}`);
+  check(counts.divergences === COVERAGE_BASELINE.divergences, `divergências ficha↔screen divergiram: ${counts.divergences} vs ${COVERAGE_BASELINE.divergences}`);
+  check(counts.modeSwaps === COVERAGE_BASELINE.modeSwaps, `trocas visuais divergiram: ${counts.modeSwaps} vs ${COVERAGE_BASELINE.modeSwaps}`);
+  check(counts.toolIntroductions === COVERAGE_BASELINE.toolIntroductions, `estreias divergiram: ${counts.toolIntroductions} vs ${COVERAGE_BASELINE.toolIntroductions}`);
+
+  // A lista P21.1 continua imutável no snapshot, mas a presença física de uma
+  // primitive é infraestrutura viva: ela pode ser resolvida enquanto a ficha
+  // ainda está registrada e INATIVA. O ledger governa entrega curricular; não
+  // deve fingir que um arquivo/renderer real continua ausente só para ficar verde.
+  const closedMissing = new Set<string>(COVERAGE_CLOSED_BASELINE.missingPrimitives);
+  for (const primitive of counts.missingPrimitives) {
+    check(closedMissing.has(primitive), `nova primitiva bloqueadora ausente: ${primitive}`);
+  }
+
+  check(new Set(COVERAGE_MIGRATIONS.map(migration => migration.id)).size === COVERAGE_MIGRATIONS.length, "ledger da Coverage Matrix contém IDs de migração duplicados");
+  for (const migration of COVERAGE_MIGRATIONS) check(graphIds.has(migration.competence), `${migration.id}: competência inexistente ${migration.competence}`);
+
+  for (const row of rows) {
+    const sample = sampleRuntime(row.id);
+    check(row.canonicalFichas.length > 0, `${row.id}: sem ficha canônica`);
+    check(Boolean(trackById.get(row.id)), `${row.id}: sem Track runtime`);
+    check(row.action.length > 0, `${row.id}: sem ação`);
+    check(!sample.error, `${row.id}: falha runtime: ${sample.error ?? "?"}`);
+    check(!sample.unknownKinds.length, `${row.id}: kind sem tradução: ${sample.unknownKinds.join(", ")}`);
+    if (row.status === "padrao-ouro") check(!row.missingPrimitives.length, `${row.id}: padrão-ouro exige ${row.missingPrimitives.join(", ")}`);
+    for (const prereq of row.prereqs) {
+      check(graphIds.has(prereq), `${row.id}: prereq inexistente ${prereq}`);
+      check(causalDepth(prereq) < row.causalWave, `${row.id}: ordem causal não põe ${prereq} antes`);
+    }
+  }
+  const moedas = rows.filter(row => row.missingPrimitives.includes("Moedas")).map(row => row.id);
+  const regua = rows.filter(row => row.missingPrimitives.includes("Regua")).map(row => row.id);
+  check(moedas.includes("GM.03"), `Moedas deveria bloquear GM.03; bloqueia ${moedas.join(", ") || "ninguém"}`);
+
+  // Enquanto a primitive ainda não existe, Regua precisa bloquear GM.05. A
+  // partir do instante em que o componente real nasce, o blocker estrutural
+  // desaparece mesmo com GM.05 em fallback; ativação e mastery continuam sob o
+  // canário/learner state. Depois que W5 entrar no ledger, a ausência volta a
+  // ser regressão permanente.
+  const gm05Migrated = COVERAGE_MIGRATIONS.some(migration => migration.competence === "GM.05");
+  if (gm05Migrated || primitiveFiles.has("Regua")) {
+    check(!regua.includes("GM.05"), `Regua já existe e não deveria bloquear GM.05; bloqueia ${regua.join(", ") || "ninguém"}`);
+  } else {
+    check(regua.includes("GM.05"), `Regua deveria bloquear GM.05; bloqueia ${regua.join(", ") || "ninguém"}`);
+  }
+  return failures;
+}
+
+export function buildCoverageMatrix(): CoverageMatrixResult {
+  const rows = buildRows().sort((a, b) => a.causalWave - b.causalWave || b.downstream - a.downstream || a.id.localeCompare(b.id));
+  const counts = countRows(rows);
+  return { rows, counts, failures: validate(rows, counts) };
+}
+
+const escapeCell = (value: string) => value.replace(/\|/g, "\\|").replace(/\n/g, " ");
+export function renderCoverageMatrixMarkdown(result = buildCoverageMatrix()): string {
+  const { rows, counts } = result;
+  const lines = [
+    "# Coverage Matrix — SAGA",
+    "",
+    "> Projeção gerada das fontes reais. O gate executável é a autoridade; divergência exige investigação.",
+    "",
+    "## Baseline reconciliado",
+    "",
+    `- ${counts.competencies} competências / ${counts.authoredFichas} fichas autorais;`,
+    `- Composer: ${counts.composer}; legado: ${counts.legacy}; fallback: ${counts.fallback}; servido: ${counts.served};`,
+    `- divergências ficha↔screen: ${counts.divergences}; trocas visuais: ${counts.modeSwaps}; estreias: ${counts.toolIntroductions};`,
+    `- primitivas bloqueadoras: ${counts.missingPrimitives.join(", ") || "nenhuma"}.`,
+    "",
+    "## Ordem causal",
+    "",
+    "Ondas W0→Wn seguem profundidade no DAG; dentro da onda, maior impacto vem primeiro. Primitiva ausente precede ativação e dependentes.",
+    "",
+    "| ID | Curriculum Graph | Ficha canônica | Implementação real | Screen/primitiva | Composer/Sensei | Testes/auditoria | Status | Onboarding | Dívida/bloqueio | Ação necessária | Ordem causal |",
+    "|---|---|---|---|---|---|---|---|---|---|---|---|",
+  ];
+  for (const row of rows) {
+    const graphCell = `${row.name}; pré: ${row.prereqs.join(", ") || "raiz"}`;
+    const fichaCell = `${row.canonicalFichas.join("+")} · ${row.canonicalPrimitives.join(", ") || "sem primitiva"}`;
+    const runtimeCell = `${row.runtimeKinds.join(", ") || "—"} → ${row.runtimePrimitives.join(", ") || "sem primitiva"}`;
+    const testsCell = row.tests.length ? `${row.tests.slice(0, 3).join(", ")}${row.tests.length > 3 ? ` +${row.tests.length - 3}` : ""}; gates globais` : "gates globais; sem teste nominal";
+    const onboardingCell = `${row.visualOnboarding}: ${row.visualOnboardingEvidence}`;
+    lines.push(`| ${row.id} | ${escapeCell(graphCell)} | ${escapeCell(fichaCell)} | ${escapeCell(row.implementation)} | ${escapeCell(runtimeCell)} | ${escapeCell(row.composerSensei)} | ${escapeCell(testsCell)} | ${row.status} | ${escapeCell(onboardingCell)} | ${escapeCell(row.debt.join("; ") || "nenhuma objetiva")} | ${escapeCell(row.action)} | ${row.causalOrder} |`);
+  }
+  return `${lines.join("\n")}\n`;
+}
+export function renderCoverageMatrixJson(result = buildCoverageMatrix()): string {
+  return JSON.stringify(result, null, 2);
+}

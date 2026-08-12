@@ -10,12 +10,12 @@ const sorted = (items) => [...items].sort((a, b) => a.localeCompare(b));
 
 const failures = [];
 const warnings = [];
-// 88 até ago/2026. A P12 separou "produzir quantidade" (F04) de "contar até
-// 20": duas competências disputavam a N1.09, e quatro arestas do grafo
-// dependiam do segundo significado. A F04 ganhou a N1.13. Ver §15.8 da Bíblia.
-const EXPECTED_COMPETENCIES = 89;
+// 88 no fechamento da reconciliação original. A P12 criou N1.13 ao separar
+// “produzir quantidade” de “contar até 20” (89). A auditoria P15 criou GM.12
+// ao separar massa/capacidade de GM.02 (tempo) e GM.05 (unidades) (90).
+// Ver Bíblia v3.3 e DECISAO_P15_F50.md.
+const EXPECTED_COMPETENCIES = 90;
 const EXPECTED_FLUENCY_TRACKS = 13;
-const EXPECTED_AUTHORED_FICHAS = 92;
 const REJECTED_DUPLICATE_IDS = ["N2.08", "N5.06", "N5.07", "N5.08", "N7.03", "N7.04", "PE.05"];
 // Progressões legítimas cujos nomes necessariamente contêm o conceito do pré-requisito.
 // Toda nova exceção exige decisão pedagógica explícita, não ajuste silencioso do teste.
@@ -59,6 +59,24 @@ check(
 for (const rejectedId of REJECTED_DUPLICATE_IDS) {
   check(!yamlIdSet.has(rejectedId), `${rejectedId} foi rejeitado por duplicação e reapareceu no grafo`);
 }
+
+// P15/GM.12: não basta contar 90. Protegemos a SEMÂNTICA da separação para
+// impedir que uma edição futura recicle um ID ocupado e volte a mascarar nós.
+const gm01 = yamlNodes.find((node) => node.id === "GM.01");
+const gm02 = yamlNodes.find((node) => node.id === "GM.02");
+const gm05 = yamlNodes.find((node) => node.id === "GM.05");
+const gm12 = yamlNodes.find((node) => node.id === "GM.12");
+check(Boolean(gm01), "GM.01 ausente — comparação direta é a base de grandezas");
+check(Boolean(gm12), "GM.12 ausente — F50 precisa de nó próprio para massa/capacidade");
+check(gm02?.nome === "Tempo cotidiano", "GM.02 foi sequestrado: deve continuar Tempo cotidiano");
+check(
+  JSON.stringify(gm12?.prereqs || []) === JSON.stringify(["GM.01"]),
+  `GM.12 deve depender apenas de GM.01; recebeu ${JSON.stringify(gm12?.prereqs || [])}`
+);
+check(
+  JSON.stringify(gm05?.prereqs || []) === JSON.stringify(["GM.12", "N2.02"]),
+  `GM.05 deve depender de GM.12 + N2.02; recebeu ${JSON.stringify(gm05?.prereqs || [])}`
+);
 
 for (const node of yamlNodes) {
   for (const prereq of node.prereqs || []) {
@@ -249,29 +267,137 @@ const importedFichaFiles = new Map(
   [...fichaIndex.matchAll(/import\s+\{\s*([A-Za-z0-9_]+)\s*\}\s+from\s+["'](.+?)["']/g)]
     .map((match) => [match[1], resolverModulo("src/curriculum/fichas", match[2])])
 );
-const allFichasBlock = fichaIndex.match(/export const AllFichas\s*=\s*\[([\s\S]*?)\]/);
-const registeredSymbols = allFichasBlock
-  ? allFichasBlock[1].match(/[A-Za-z_][A-Za-z0-9_]*/g) || []
-  : [];
+
+function fichaIdForSymbol(symbol) {
+  const file = importedFichaFiles.get(symbol);
+  if (!file) return undefined;
+  return read(file).match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2}|dojo_[a-z]+)["']/)?.[1];
+}
+
+function symbolsFromArray(block) {
+  const codeOnly = (block || "")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/.*$/gm, "");
+  return codeOnly.match(/[A-Za-z_][A-Za-z0-9_]*/g) || [];
+}
+
+const journeyRegistryBlock = fichaIndex.match(/export const JOURNEY_FICHAS\s*=\s*\[([\s\S]*?)\];/);
+const journeyRegistrySymbols = symbolsFromArray(journeyRegistryBlock?.[1]);
+const journeyRegistryIds = journeyRegistrySymbols
+  .map(fichaIdForSymbol)
+  .filter((id) => id && yamlIdSet.has(id));
+const journeyRegistryMissing = journeyFichaIds.filter((id) => !journeyRegistryIds.includes(id));
+const journeyRegistryExtra = journeyRegistryIds.filter((id) => !journeyFichaIds.includes(id));
+check(
+  new Set(journeyRegistryIds).size === journeyRegistryIds.length,
+  "JOURNEY_FICHAS contém competências duplicadas"
+);
+check(
+  journeyRegistryMissing.length === 0,
+  `fichas de Jornada no disco fora de JOURNEY_FICHAS: ${journeyRegistryMissing.join(", ")}`
+);
+check(
+  journeyRegistryExtra.length === 0,
+  `JOURNEY_FICHAS referencia fichas sem correspondente no disco: ${journeyRegistryExtra.join(", ")}`
+);
+
+const allFichasBlock = fichaIndex.match(/export const AllFichas\s*=\s*\[([\s\S]*?)\];/);
+const registeredSymbols = symbolsFromArray(allFichasBlock?.[1]);
 const registeredFichaIds = [];
 for (const symbol of registeredSymbols) {
-  const file = importedFichaFiles.get(symbol);
-  if (!file) continue;
-  const match = read(file).match(/\bid:\s*["']((?:N[1-7]|AL|GE|GM|PE)\.\d{2}|dojo_[a-z]+)["']/);
-  if (match) registeredFichaIds.push(match[1]);
+  if (symbol === "JOURNEY_FICHAS") {
+    registeredFichaIds.push(...journeyRegistryIds);
+    continue;
+  }
+  const id = fichaIdForSymbol(symbol);
+  if (id) registeredFichaIds.push(id);
 }
 const registeredJourneyFichaIds = registeredFichaIds.filter((id) => yamlIdSet.has(id));
 const unregisteredFichaIds = fichaIds.filter((id) => !registeredFichaIds.includes(id));
+const journeyMissingFromAllFichas = journeyRegistryIds.filter((id) => !registeredJourneyFichaIds.includes(id));
+check(
+  new Set(registeredJourneyFichaIds).size === registeredJourneyFichaIds.length,
+  "AllFichas expõe fichas de Jornada duplicadas"
+);
+check(
+  journeyMissingFromAllFichas.length === 0,
+  `JOURNEY_FICHAS não está integralmente exposta em AllFichas: ${journeyMissingFromAllFichas.join(", ")}`
+);
 
+const composerCanarySource = read("src/curriculum/motores/composerCanary.ts");
+const composerCanaryIdsSource = read("src/curriculum/motores/composerCanaryIds.ts");
+const composerRegistryBlock = composerCanarySource.match(/const COMPOSER_FICHAS[\s\S]*?=\s*\{([\s\S]*?)\n\};/);
+const composerRegisteredRaw = composerRegistryBlock
+  ? [...composerRegistryBlock[1].matchAll(/"((?:N[1-7]|AL|GE|GM|PE)\.\d{2})"\s*:/g)].map((match) => match[1])
+  : [];
+const composerActiveBlock = composerCanaryIdsSource.match(/export const DEFAULT_COMPOSER_CANARY_IDS\s*=\s*\[([\s\S]*?)\]\s+as const/);
+const composerActiveRaw = composerActiveBlock
+  ? [...composerActiveBlock[1].matchAll(/"((?:N[1-7]|AL|GE|GM|PE)\.\d{2})"/g)].map((match) => match[1])
+  : [];
+const composerRegisteredIds = unique(composerRegisteredRaw);
+const composerActiveIds = unique(composerActiveRaw);
+const composerRegisteredSet = new Set(composerRegisteredIds);
+const composerActiveSet = new Set(composerActiveIds);
+const composerRegisteredInactiveIds = composerRegisteredIds.filter((id) => !composerActiveSet.has(id));
+const activeWithoutRegistry = composerActiveIds.filter((id) => !composerRegisteredSet.has(id));
+const composerRegisteredOutsideGraph = composerRegisteredIds.filter((id) => !yamlIdSet.has(id));
+const composerActiveOutsideGraph = composerActiveIds.filter((id) => !yamlIdSet.has(id));
+check(
+  composerRegisteredRaw.length === composerRegisteredIds.length,
+  "COMPOSER_FICHAS contém IDs duplicados"
+);
+check(
+  composerActiveRaw.length === composerActiveIds.length,
+  "DEFAULT_COMPOSER_CANARY_IDS contém IDs duplicados"
+);
+check(
+  activeWithoutRegistry.length === 0,
+  `canários Composer ativos sem ficha registrada: ${activeWithoutRegistry.join(", ")}`
+);
+check(
+  composerRegisteredOutsideGraph.length === 0,
+  `COMPOSER_FICHAS contém IDs fora do grafo: ${composerRegisteredOutsideGraph.join(", ")}`
+);
+check(
+  composerActiveOutsideGraph.length === 0,
+  `canários Composer ativos fora do grafo: ${composerActiveOutsideGraph.join(", ")}`
+);
+
+// O auditor protege o estado CANÔNICO atual e não transforma texto histórico em
+// falso vermelho. Sentinelas positivas provam a reconciliação; regressões antigas
+// nas afirmações correntes mais perigosas são barradas explicitamente.
+const bibleText = read("AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md");
+const manualText = read("AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md");
+const methodText = read("AI_Studio_Lab/pedagogia/METODO_SAGA.md");
 const declaredCountSources = [
-  ["Bíblia", "AI_Studio_Lab/pedagogia/BIBLIA_DO_SAGA.md", /as 89 competências:/],
-  ["Grafo humano", "AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md", /\*\*Total: 89 competências\.\*\*/],
-  ["Manual", "AI_Studio_Lab/pedagogia/MANUAL_DIDATICO_SAGA.md", /89 de 89/],
-  ["Método", "AI_Studio_Lab/pedagogia/METODO_SAGA.md", /grafo de 89 competências/],
+  ["Bíblia", bibleText, /Saldo atual:[\s\S]{0,120}?90 competências/],
+  ["Grafo humano", read("AI_Studio_Lab/pedagogia/GRAFO_DE_CONHECIMENTO_SAGA.md"), /\*\*Total: 90 competências\.\*\*/],
+  ["Manual", manualText, /90 de 90/],
+  ["Método", methodText, /grafo de 90 competências/],
 ];
-for (const [label, file, pattern] of declaredCountSources) {
-  check(pattern.test(read(file)), `${label} não declara o invariante canônico de ${EXPECTED_COMPETENCIES} competências`);
+for (const [label, source, pattern] of declaredCountSources) {
+  check(pattern.test(source), `${label} não declara o invariante canônico de ${EXPECTED_COMPETENCIES} competências`);
 }
+// v3.6 é a reconciliação documental pré-W5. Ela preserva integralmente a v3.5
+// (meta-jogo) e só reclassifica snapshots históricos/estado vigente em §9.2/§12.6.
+check(/\*\*Versão 3\.6/.test(bibleText), "Bíblia precisa estar em v3.6 após a reconciliação documental pré-W5");
+check(/### v3\.6 — reconciliação documental pré-W5/.test(bibleText), "Bíblia v3.6 precisa registrar a reconciliação documental pré-W5 no changelog");
+check(/### v3\.5 —/.test(bibleText), "Bíblia v3.6 precisa preservar a reconciliação de meta-jogo v3.5 no changelog histórico");
+check(
+  /Registro histórico da receita pré-P22[^\n]*NÃO normativo/.test(bibleText),
+  "Bíblia precisa marcar a antiga dose por idade como histórica e não normativa"
+);
+check(
+  /Fluência\/automaticidade amadurece em paralelo no Dojo, em estado próprio/.test(bibleText),
+  "Bíblia precisa separar automaticidade do nível conceitual"
+);
+check(!/nenhuma das 89 competências[^\n]*89 de 89/i.test(manualText), "Manual regrediu para o fecho corrente 89/89");
+check(/GM\.12[^\n]*Massa e capacidade/i.test(manualText), "Manual não incorpora GM.12 na didática de grandezas");
+check(/94 fichas autorais cobrindo as 90 competências do grafo/.test(methodText), "Método não declara 94 fichas autorais cobrindo 90 competências");
+check(!/São 92 fichas cobrindo as 89 competências/.test(methodText), "Método regrediu para a contagem autoral 92/89");
+check(!/counting on:\s*tempo de resposta abaixo de 8 segundos/i.test(methodText), "Método voltou a usar RT como critério de domínio conceitual");
+check(!/Leva do nível 1 ao 3/i.test(methodText), "Método voltou a tratar Jornada como metade de uma escala compartilhada com o Dojo");
+check(!/Leva do nível 3 ao 5/i.test(methodText), "Método voltou a tratar Dojo como metade de uma escala conceitual compartilhada");
 
 const authoredFichaFiles = listFiles("AI_Studio_Lab/pedagogia/fichas", ".md");
 const authoredFichaSources = authoredFichaFiles.map(read);
@@ -279,10 +405,9 @@ const authoredFichaCount = authoredFichaSources.reduce(
   (total, source) => total + (source.match(/^# FICHA\s+/gm) || []).length,
   0
 );
-check(
-  authoredFichaCount === EXPECTED_AUTHORED_FICHAS,
-  `catálogo autoral deveria ter ${EXPECTED_AUTHORED_FICHAS} fichas; encontrou ${authoredFichaCount}`
-);
+// P21: a contagem de fichas é métrica derivada, não uma segunda fonte de verdade.
+// Cobertura, IDs desconhecidos e exceções explícitas são validados no auditor específico.
+check(authoredFichaCount >= 1, "catálogo autoral não contém nenhuma ficha");
 const authoredCompetenceIds = unique(
   authoredFichaSources.flatMap((source) =>
     [...source.matchAll(/^\*\*Competência:\*\*\s+((?:N[1-7]|AL|GE|GM|PE)\.\d{2})\b/gm)].map((match) => match[1])
@@ -291,7 +416,9 @@ const authoredCompetenceIds = unique(
 const authoredUnknownIds = authoredCompetenceIds.filter((id) => !yamlIdSet.has(id));
 check(authoredUnknownIds.length === 0, `fichas autorais referenciam IDs fora do grafo: ${authoredUnknownIds.join(", ")}`);
 
-const fallbackIds = yamlIds.filter((id) => !generatorMap.has(id));
+const legacyExplicitIds = yamlIds.filter((id) => generatorMap.has(id));
+const realFallbackIds = yamlIds.filter((id) => !generatorMap.has(id) && !composerActiveSet.has(id));
+const servedWithoutFallbackIds = yamlIds.filter((id) => generatorMap.has(id) || composerActiveSet.has(id));
 const orphanGenerators = sorted([...exportedGenerators].filter((name) => !mappedGenerators.has(name)));
 const nomenclatureDrift = generatorEntries
   .filter(([id, generator]) => generator !== `g${id.replace(".", "_")}`)
@@ -308,18 +435,29 @@ console.log(`- TypeScript runtime: ${tsIds.length} nós`);
 console.log(`- YAMLs por strand: ${strandIds.length} nós (${strandFiles.length} arquivos)\n`);
 console.log(`- Trilhas de fluência: ${(graphYaml.fluency || []).length}`);
 console.log(`- Fichas autorais documentadas: ${authoredFichaCount} (${authoredFichaFiles.length} blocos)\n`);
-console.log("[COBERTURA EXECUTÁVEL]");
-console.log(`- Nós com gerador explícito: ${generatorMap.size}/${yamlNodes.length}`);
-console.log(`- Nós no fallback \"Em construção\": ${fallbackIds.length}/${yamlNodes.length}`);
+console.log("[PROVENIÊNCIA EXECUTÁVEL]");
+console.log(`- Gerador legado explícito: ${legacyExplicitIds.length}/${yamlNodes.length}`);
+console.log(`- Composer registrado: ${composerRegisteredIds.length}/${yamlNodes.length}`);
+console.log(`- Composer ativo: ${composerActiveIds.length}/${yamlNodes.length}`);
+console.log(`- Composer registrado e inativo: ${composerRegisteredInactiveIds.length}/${yamlNodes.length}`);
+console.log(`- Servido sem placeholder (legado ∪ Composer ativo): ${servedWithoutFallbackIds.length}/${yamlNodes.length}`);
+console.log(`- Fallback real sem conteúdo servido: ${realFallbackIds.length}/${yamlNodes.length}\n`);
+console.log("[CATÁLOGOS DE FICHA]");
 console.log(`- Fichas de Jornada no disco: ${journeyFichaIds.length}/${yamlNodes.length}`);
-console.log(`- Fichas de Jornada registradas em AllFichas: ${registeredJourneyFichaIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada em JOURNEY_FICHAS: ${journeyRegistryIds.length}/${yamlNodes.length}`);
+console.log(`- Fichas de Jornada expostas em AllFichas: ${registeredJourneyFichaIds.length}/${yamlNodes.length}`);
 console.log(`- Fichas de Jornada com rt_alvo no nível 5: ${journeyFichasWithRtTarget.length}/${journeyFichaIds.length}`);
 console.log(`- Fichas de Dojo no disco/registradas: ${fichaIds.length - journeyFichaIds.length}/${registeredFichaIds.length - registeredJourneyFichaIds.length}`);
 console.log(`- Fichas no disco fora de AllFichas: ${unregisteredFichaIds.length}`);
 console.log(`- Geradores exportados sem uso no mapa: ${orphanGenerators.length}`);
 console.log(`- Mapeamentos com deriva de nome: ${nomenclatureDrift.length}\n`);
-console.log(`[FALLBACKS]\n${fallbackIds.join(", ") || "Nenhum"}\n`);
+console.log(`[LEGADO EXPLÍCITO]\n${sorted(legacyExplicitIds).join(", ") || "Nenhum"}\n`);
+console.log(`[COMPOSER REGISTRADO]\n${sorted(composerRegisteredIds).join(", ") || "Nenhum"}\n`);
+console.log(`[COMPOSER ATIVO]\n${sorted(composerActiveIds).join(", ") || "Nenhum"}\n`);
+console.log(`[COMPOSER REGISTRADO E INATIVO]\n${sorted(composerRegisteredInactiveIds).join(", ") || "Nenhum"}\n`);
+console.log(`[FALLBACK REAL]\n${sorted(realFallbackIds).join(", ") || "Nenhum"}\n`);
 console.log(`[FICHAS DE JORNADA]\n${sorted(journeyFichaIds).join(", ") || "Nenhuma"}\n`);
+console.log(`[FICHAS DE JORNADA FORA DE JOURNEY_FICHAS]\n${sorted(journeyRegistryMissing).join(", ") || "Nenhuma"}\n`);
 console.log(`[FICHAS FORA DE AllFichas]\n${sorted(unregisteredFichaIds).join(", ") || "Nenhuma"}\n`);
 console.log(`[GERADORES ÓRFÃOS]\n${orphanGenerators.join(", ") || "Nenhum"}\n`);
 console.log(`[DERIVA DE NOMENCLATURA]\n${nomenclatureDrift.join(", ") || "Nenhuma"}\n`);
@@ -335,5 +473,5 @@ if (failures.length) {
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exitCode = 1;
 } else {
-  console.log("[RESULTADO] Invariantes canônicos aprovados; lacunas de cobertura permanecem explicitadas acima.");
+  console.log("[RESULTADO] Invariantes canônicos aprovados; proveniência e lacunas de cobertura estão explicitadas acima.");
 }

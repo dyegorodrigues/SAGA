@@ -33,19 +33,13 @@ import { FichaCompetencia } from "../../schema";
  * linha de chão. Usá-lo como estava produziria exatamente a tela que a §2 manda
  * não produzir.
  *
- * ### ⚠️ Onde fica a F50 — pendência P15
+ * ### F50 / P15 — decisão retificada
  *
- * O `GRAFO_DE_CONHECIMENTO_SAGA.md` põe *"pesado/leve, cheio/vazio"* **dentro
- * da GM.01**, junto com comprido/curto e alto/baixo — ou seja, o conteúdo da
- * F50 (capacidade e massa) é desta competência. Mas os cinco degraus da §5 já
- * são da F49, e a F50 tem outros cinco.
- *
- * A F50 diz na §1 que é a GM.02. O grafo chama GM.02 de *"tempo cotidiano"*, é
- * isso que `gGM_02` serve hoje, e a `GM.04` (Horas) declara `GM.02` como
- * pré-requisito querendo dizer partes do dia. Reassinar GM.02 mataria uma
- * competência viva e quebraria essa aresta.
- *
- * Fica registrado: a F50 não tem nó com vaga. Decisão curricular.
+ * A F50 não divide mais este nó. A auditoria provou duas colisões históricas:
+ * GM.02 já é tempo cotidiano e GM.05 já é medidas padronizadas. F50 passa a
+ * `GM.12 — Massa e capacidade: comparação e conservação`, pré-requisito de
+ * GM.05. Assim esta ficha F49 permanece dona de UMA escada: dimensões
+ * diretamente visíveis; massa/capacidade ganham maestria e diagnóstico próprios.
  *
  * ### A escada da §5
  *
@@ -55,7 +49,7 @@ import { FichaCompetencia } from "../../schema";
  * | 2 | comprido/curto | clara |
  * | 3 | **diferença pequena** | exige comparar com cuidado |
  * | 4 | **objetos diferentes** | ignora o tipo |
- * | 5 | **ordenar três** | seriação |
+ * | 5 | **ordenar três cópias do mesmo objeto** | seriação sem pista de identidade |
  */
 
 const dominio = {
@@ -112,7 +106,11 @@ export const GM_01: FichaCompetencia = {
       fonte: "F49",
       alvo: "comprido/curto: o mesmo critério, outro eixo",
       kinds: ["grandeza"],
-      params: { audio_prompt: FALAS.howto },
+      params: {
+        audio_prompt: FALAS.howtoDoAtributo("comprimento"),
+        howto: FALAS.howtoDoAtributo("comprimento"),
+        explain: FALAS.explainDoAtributo("comprimento"),
+      },
       dominio,
     },
     {
@@ -143,8 +141,8 @@ export const GM_01: FichaCompetencia = {
       alvo: "ordenar três — comparações encadeadas, um marco cognitivo próprio",
       kinds: ["grandeza"],
       params: {
-        howto: "Toque em ordem: primeiro o maior, depois o do meio, depois o menor.",
-        explain: "Compare de dois em dois. Ache o maior de todos, depois o maior do que sobrou.",
+        howto: FALAS.howtoDoAtributo("tamanho"),
+        explain: FALAS.explainDoAtributo("tamanho"),
       },
       dominio,
     },

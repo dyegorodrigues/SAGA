@@ -1,4 +1,6 @@
 import { State } from "../types";
+import { materializeAulaProgress } from "../curriculum/motores/aulaProgressContext";
+import { materializeSenseiDojoProgress } from "../curriculum/motores/senseiDojoProgressContext";
 
 /**
  * Reconciliação entre dispositivos e entre sessões offline.
@@ -28,9 +30,32 @@ export interface EscolhaDeSave {
   houveConflito: boolean;
 }
 
-/** Carimba o estado com o instante da gravação. */
+/**
+ * Remove envelopes efêmeros sem alterar o relógio lógico do estado.
+ *
+ * Isto é deliberadamente separado de `carimbar`: bootstrap, migração e writers
+ * defensivos precisam materializar um estado já carimbado sem fazê-lo parecer
+ * mais novo só porque foi lido ou transportado outra vez.
+ */
+export function materializarEstadoParaPersistencia(estado: State): State {
+  const aulaMaterializada = materializeAulaProgress(estado);
+  return materializeSenseiDojoProgress(aulaMaterializada);
+}
+
+/**
+ * Carimba o estado com o instante da gravação.
+ *
+ * Antes do carimbo, dois envelopes transitórios são materializados:
+ *
+ * 1. Aula do Dia → a competência curricular que realmente gerou a questão;
+ * 2. Dojo aritmético → `dojoTracks`, onde automaticidade vive separada de mastery.
+ *
+ * Portanto nem `progress.aula` nem `progress.dojo_*` chegam a React/local/cloud
+ * como fontes curriculares de verdade.
+ */
 export function carimbar(estado: State, agora: Date = new Date()): State {
-  return { ...estado, updatedAt: agora.toISOString() };
+  const materializado = materializarEstadoParaPersistencia(estado);
+  return { ...materializado, updatedAt: agora.toISOString() };
 }
 
 function instanteDe(estado: State | null | undefined): number {

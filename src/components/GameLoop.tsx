@@ -1,13 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { AnswerMeta, Kid, Track, Question, Progress } from "../types";
+import { AnswerMeta, Kid, Track, Question, Progress, JardimTrackState } from "../types";
 import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
+import { applyJardimRound, type JardimAttempt, type JardimRoundResult } from "../curriculum/motores/jardimEngine";
+import { tentativaJardimDoTerminal, type JardimMissionSummary } from "../curriculum/motores/jardimSession";
 import { auth, logTelemetryToCloud } from "../lib/firebase";
+import { missionCoins, perfectMissionXpBonus, rewardForTerminalAnswer } from "../lib/rewardPolicy";
 import {
   C, FONT, BODY, Mascote, StarChip, ProgressBar, SoundBtn, Burst, sfx, speak, stopSpeak, pickVoice, applyTheme, pickPraise, PRAISE, OOPS, THEMES,
 } from "./Mascot";
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
-import { evidenciasDaResposta, isMotorSlip, isRetryableAnswer, misconceptionForAnswer } from "./gameloop/answerPolicy";
+import { QuestionPrompt } from "./gameloop/QuestionPrompt";
+import {
+  authorialFeedbackHoldMs,
+  evidenciasDaResposta,
+  isMotorSlip,
+  isRetryableAnswer,
+  misconceptionForAnswer,
+  ownsAuthorialFeedback,
+  ownsAuthorialRetry,
+} from "./gameloop/answerPolicy";
 import {
   createQuestionDiagnostics,
   recordQuestionAttempt,
@@ -28,6 +40,10 @@ interface GameProps {
   /** missão de nível escolhido no seletor 🎯: sem aquecimento e sem revisão do banco */
   exactLvl?: boolean;
   rescue?: { requiredLevel: number; questionBudget: number };
+  /** Jornada é o default; Jardim compartilha a casca, nunca o motor conceitual. */
+  progressionMode?: "journey" | "garden";
+  gardenState?: JardimTrackState;
+  onGardenRound?: (result: JardimRoundResult, summary: JardimMissionSummary) => void;
 }
 
 const TOTAL_Q = 8;
@@ -114,11 +130,20 @@ export function GameLoop({
   firstMissionToday = false,
   exactLvl = false,
   rescue,
+  progressionMode = "journey",
+  gardenState,
+  onGardenRound,
 }: GameProps) {
+  const gardenMode = progressionMode === "garden";
   const [idx, setIdx] = useState(0);
   const [t0, setT0] = useState(() => Date.now());
   const [prog, setProg] = useState<Progress>(() => ({ ...prog0 }));
-  const [q, setQ] = useState<Question>(() => drawQuestion(track, prog0, exactLvl ? prog0.lvl : warmupLvl(prog0.lvl), exactLvl));
+  const [q, setQ] = useState<Question>(() => drawQuestion(
+    track,
+    prog0,
+    (gardenMode || exactLvl) ? prog0.lvl : warmupLvl(prog0.lvl),
+    gardenMode || exactLvl,
+  ));
   const [status, setStatus] = useState<"right" | "wrong" | null>(null);
   const [sel, setSel] = useState<any>(null);
   const [stars, setStars] = useState(0);
@@ -131,13 +156,15 @@ export function GameLoop({
   const [done, setDone] = useState(false);
   const [bonus, setBonus] = useState(0);
   const [replays, setReplays] = useState(0);
+  // A condição de "primeira missão" pertence ao início da sessão. O commit final
+  // atualiza o log e pode mudar a prop antes da tela de resultado renderizar.
+  const firstMissionRewardRef = useRef(firstMissionToday);
   // Fluidez: guarda a transição pendente para a criança PULAR com um toque
   const advanceRef = useRef<null | (() => void)>(null);
   const lastSpokenPromptRef = useRef<string | null>(null);
   const lastSpokenKindRef = useRef<string | null>(null);
 
   // Pula na hora: corta a voz e vai para a próxima (criança no comando do ritmo)
-  
   const advanceNow = () => {
     if (!advanceRef.current) return;
     stopSpeak();
@@ -150,7 +177,7 @@ export function GameLoop({
   useEffect(() => () => stopSpeak(), []);
 
   // AI Tutor states
-    const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
+  const [guidedIdx, setGuidedIdx] = useState<number | null>(null);
   const [mockTutorialN, setMockTutorialN] = useState<number | null>(null);
 
   useEffect(() => {
@@ -161,7 +188,7 @@ export function GameLoop({
   const [showClockTutorial, setShowClockTutorial] = useState(false);
   // kind `order` (ordenar/sequenciar): a criança toca as cenas na ordem certa
   const [orderTaps, setOrderTaps] = useState<any[]>([]);
-    const [orderShake, setOrderShake] = useState<any>(null);
+  const [orderShake, setOrderShake] = useState<any>(null);
   // kind `flash` (subitização): o grupo aparece por ~2s e some — "quantos eram?"
   const [flashHidden, setFlashHidden] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
@@ -182,9 +209,12 @@ export function GameLoop({
   const aulaEndRef = useRef<null | (() => void)>(null);
   const qRef = useRef<Question>(q);
   const questionDiagnosticsRef = useRef(createQuestionDiagnostics());
+  const gardenAttemptsRef = useRef<JardimAttempt[]>([]);
+  const gardenDurationRef = useRef(0);
 
   useEffect(() => {
-    if (q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
+    // O Jardim mede RT em silêncio. `rt_alvo` nunca vira cronômetro visível.
+    if (!gardenMode && q.rt_max_s && !status && !done && (q.kind !== 'journey' || journeyDone)) {
       setTimeLeft(q.rt_max_s);
       const iv = setInterval(() => {
         setTimeLeft((v) => {
@@ -197,7 +227,7 @@ export function GameLoop({
     } else {
       setTimeLeft(null);
     }
-  }, [q, status, done, journeyDone]);
+  }, [q, status, done, journeyDone, gardenMode]);
 
   qRef.current = q;
   // timers das aulinhas: registrados aqui e LIMPOS ao trocar de questão (aula nunca
@@ -214,7 +244,8 @@ export function GameLoop({
   // criança nunca viu a aulinha deste kind (depois disso, só botão/algoritmo)
   const [autoAula, setAutoAula] = useState(() => hasAulinha(q) && !aulaSeen(kid.id, q.kind));
   const [promptDone, setPromptDone] = useState(!sound);
-  
+  const [audioChoicePromptVisible, setAudioChoicePromptVisible] = useState(false);
+
   // Update autoAula state on question change
   useEffect(() => {
     setAutoAula(idx === 0 ? (hasAulinha(q) && !aulaSeen(kid.id, q.kind)) : false);
@@ -233,6 +264,7 @@ export function GameLoop({
     setGuidedNarr(null);
     setTutShow(null);
     setJourneyDone(false);
+    setAudioChoicePromptVisible(false);
     stopAulaTimers();
     setGuidedIdx(null);
     setQErrors(0);
@@ -371,7 +403,7 @@ export function GameLoop({
       if (nt.length === seq.length) handlePick(value, true); // completou → resolve
     } else {
       // toque fora de ordem: sacode, marca erro (conta como bad) e recomeça — nunca trava
-            setOrderShake(value);
+      setOrderShake(value);
       if (sound) sfx.wrong();
       setTimeout(() => {
         setOrderTaps([]);
@@ -383,7 +415,7 @@ export function GameLoop({
   useEffect(() => {
     // journey narra sozinho; na 1ª visita com aulinha automática, a AULA vem primeiro
     // e o enunciado é falado ao fim dela (ver efeito da aulinha)
-    if (sound && !done && !status && q.kind !== "journey" && !autoAula) {
+    if (sound && !done && !status && q.kind !== "journey" && q.kind !== "audiochoice" && !autoAula) {
       const isFirstQ = idx === 0;
       const isNewKind = lastSpokenKindRef.current !== q.kind;
       const isNewPrompt = lastSpokenPromptRef.current !== q.prompt;
@@ -424,9 +456,17 @@ export function GameLoop({
     if (journeyDone && sound && !status) speak(q.prompt);
   }, [journeyDone]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 🪙 moedinhas da missão: 1 por acerto + 3 por completar + 5 na primeira do dia
-  // (no "jogar de novo" da mesma tela, o bônus de primeira missão não se repete)
-  const coinsEarned = ok + 3 + (firstMissionToday && replays === 0 ? 5 : 0);
+  // UI e persistência usam a mesma política. No replay o bônus da primeira missão
+  // não se repete; no Misto a tela mostra o mesmo 2× que o App credita.
+  const completionRewardMode = track.id === "mista" || track.id === "mixed"
+    ? "mixed"
+    : gardenMode
+      ? "garden"
+      : "journey";
+  const firstMissionReward = firstMissionRewardRef.current && replays === 0;
+  const coinsEarned = track.contentStatus === "fallback"
+    ? 0
+    : missionCoins(ok, completionRewardMode, firstMissionReward);
 
   useEffect(() => {
     if (sound && done) {
@@ -442,7 +482,7 @@ export function GameLoop({
   const handlePick = (val: any, forcedRight?: boolean, answerMeta?: AnswerMeta) => {
     if (val === "__timeout__") setIsTimeout(true);
     if (status || answeredRef.current) return;
-    
+
     // forcedRight: usado por interações que decidem o acerto por conta própria (ex.: `order`)
     const right = forcedRight !== undefined ? forcedRight : val === q.answer;
 
@@ -458,6 +498,11 @@ export function GameLoop({
 
     const attemptMisconception = misconceptionForAnswer(q, val, answerMeta);
     recordQuestionAttempt(questionDiagnosticsRef.current, right, attemptMisconception);
+    const feedbackAutoral = ownsAuthorialFeedback(q, answerMeta);
+
+    // Palco autoral: registra a tentativa no Radar, mas mantém o ciclo de erro
+    // dentro da própria primitiva. F05 exige repetições ilimitadas (§4).
+    if (!right && ownsAuthorialRetry(q, answerMeta)) return;
 
     // --- CAMADA 1 (Erro Suave) ---
     // Apenas se errou E for uma questão com opções simples (ou grupos)
@@ -482,34 +527,63 @@ export function GameLoop({
         return; // não avança, não marca answeredRef
       }
       // Se errou a 3ª vez, segue pro erro terminal e avança
-      
       // O resumo terminal abaixo publica as hipóteses deduplicadas no Radar.
     }
 
     answeredRef.current = true;
     const durationMs = Math.min(30000, Math.max(0, Date.now() - t0));
     const targetRtSeconds = q.rt_max_s ?? track.rt_max_s;
-    const progressResult = applyJourneyAnswer(prog, right, idx < WARMUP_QUESTIONS, {
-      durationMs,
-      targetRtMs: targetRtSeconds !== undefined ? targetRtSeconds * 1000 : undefined,
-      helpUsed: helpUsedRef.current,
-      // P13: o que ESTA resposta demonstrou, e o que a ficha exige ter visto.
-      evidencias: right ? evidenciasDaResposta(answerMeta) : undefined,
-      exigeEvidencia: q.exigeEvidencia,
-      isReview: q.review === true,
-      practiceDay: new Date().toISOString().slice(0, 10),
-      previousPracticeDay: prog.lastDay,
-    }, rescue ? { kind: "rescue", requiredLevel: rescue.requiredLevel } : undefined);
-    const p = progressResult.progress;
     const diagnostics = summarizeQuestionDiagnostics(questionDiagnosticsRef.current, right);
-    diagnostics.misconceptionTags.forEach(tag => trackMisconception(p, tag));
-    let currentToast = progressResult.transition?.type === "level-up"
-      ? `Subiu para o nível ${progressResult.transition.level}! 🚀`
-      : progressResult.transition?.type === "level-down"
-        ? "Vamos voltar um passinho para treinar! 💪"
-        : progressResult.transition?.type === "multidimensional-crown"
-          ? "DOMÍNIO ABSOLUTO! 👑✨"
-          : null;
+    let p: Progress;
+    let currentToast: string | null = null;
+
+    if (gardenMode) {
+      if (!gardenState || !onGardenRound) {
+        throw new Error(`Sessao do Jardim ${track.id} sem gardenState/onGardenRound.`);
+      }
+      const targetRtMs = targetRtSeconds !== undefined ? targetRtSeconds * 1000 : NaN;
+      if (!Number.isFinite(targetRtMs) || targetRtMs <= 0) {
+        throw new Error(`Questao ${track.id} sem rt_alvo valido no Jardim.`);
+      }
+      gardenAttemptsRef.current.push(tentativaJardimDoTerminal({
+        terminalRight: right,
+        attemptCount: diagnostics.attemptCount,
+        durationMs,
+        targetRtMs,
+        misconceptionTags: diagnostics.misconceptionTags,
+      }));
+      gardenDurationRef.current += durationMs;
+      p = {
+        ...prog,
+        lvl: gardenState.currentStep,
+        maxLvl: gardenState.highestStep,
+        streak: 0,
+        bad: 0,
+        bank: [],
+      };
+    } else {
+      const progressResult = applyJourneyAnswer(prog, right, idx < WARMUP_QUESTIONS, {
+        durationMs,
+        targetRtMs: targetRtSeconds !== undefined ? targetRtSeconds * 1000 : undefined,
+        helpUsed: helpUsedRef.current,
+        evidencias: right ? evidenciasDaResposta(answerMeta) : undefined,
+        exigeEvidencia: q.exigeEvidencia,
+        gateEvidenceBeforeAdvance: q.gateEvidenceBeforeAdvance,
+        masteryRule: q.masteryRule,
+        isReview: q.review === true,
+        practiceDay: new Date().toISOString().slice(0, 10),
+        previousPracticeDay: prog.lastDay,
+      }, rescue ? { kind: "rescue", requiredLevel: rescue.requiredLevel } : undefined);
+      p = progressResult.progress;
+      diagnostics.misconceptionTags.forEach(tag => trackMisconception(p, tag));
+      currentToast = progressResult.transition?.type === "level-up"
+        ? `Subiu para o nível ${progressResult.transition.level}! 🚀`
+        : progressResult.transition?.type === "level-down"
+          ? "Vamos voltar um passinho para treinar! 💪"
+          : progressResult.transition?.type === "multidimensional-crown"
+            ? "DOMÍNIO ABSOLUTO! 👑✨"
+            : null;
+    }
 
     // AULINHA 🎬: 2 erros seguidos na missão → o algoritmo re-oferece a mini-aula
     if (right) {
@@ -520,86 +594,91 @@ export function GameLoop({
       if (wrongStreakRef.current >= 2 && hasAulinha(q)) setAulaSuggest(true);
     }
 
-    // AI smart review: mastering a missed question after 2 hits
-    if (q.review) {
-      const bi = p.bank.findIndex((b) => b.sig === q.sig);
-      if (bi >= 0) {
-        if (right) {
-          const hits = (p.bank[bi].hits || 0) + 1;
-          if (hits >= 2) {
-            p.bank.splice(bi, 1);
-            p.mast = (p.mast || 0) + 1;
-            if (!currentToast) currentToast = "Você dominou essa! 🧠✨";
+    if (!gardenMode) {
+      // AI smart review: mastering a missed question after 2 hits
+      if (q.review) {
+        const bi = p.bank.findIndex((b) => b.sig === q.sig);
+        if (bi >= 0) {
+          if (right) {
+            const hits = (p.bank[bi].hits || 0) + 1;
+            if (hits >= 2) {
+              p.bank.splice(bi, 1);
+              p.mast = (p.mast || 0) + 1;
+              if (!currentToast) currentToast = "Você dominou essa! 🧠✨";
+            } else {
+              p.bank[bi] = { ...p.bank[bi], hits };
+            }
           } else {
-            p.bank[bi] = { ...p.bank[bi], hits };
+            p.bank[bi] = { ...p.bank[bi], hits: 0 };
           }
-        } else {
-          p.bank[bi] = { ...p.bank[bi], hits: 0 };
+        }
+      } else if (!right) {
+        const sig = qSig(q);
+        if (!p.bank.some((b) => b.sig === sig)) {
+          p.bank.push({ sig, hits: 0, q: sanitizeQ(q) });
+          if (p.bank.length > 10) p.bank.shift();
         }
       }
-    } else if (!right) {
-      const sig = qSig(q);
-      if (!p.bank.some((b) => b.sig === sig)) {
-        p.bank.push({ sig, hits: 0, q: sanitizeQ(q) });
-        if (p.bank.length > 10) p.bank.shift();
+
+      if (q.review) {
+        evaluateSpacedRepetition(
+          kid.id,
+          track.id,
+          right,
+          durationMs,
+          { [track.id]: p },
+          targetRtSeconds !== undefined ? targetRtSeconds * 1000 : 10000,
+        );
       }
     }
 
-    if (q.review) {
-      evaluateSpacedRepetition(
-        kid.id,
-        track.id,
-        right,
-        durationMs,
-        { [track.id]: p },
-        targetRtSeconds !== undefined ? targetRtSeconds * 1000 : 10000,
-      );
+    /**
+     * ⭐ XP de perfil: todo acerto terminal válido vale 1. Velocidade continua
+     * medindo automaticidade no Dojo, mas não compra nível SAGA nem autoridade
+     * conceitual. Fallback não é conteúdo real e portanto não paga meta-jogo.
+     */
+    const rewardMode = gardenMode
+      ? "garden"
+      : track.id === "mista" || track.id === "mixed"
+        ? "mixed"
+        : (q.kind === "rapid-fire" || track.id.startsWith("dojo"))
+          ? "dojo"
+          : rescue
+            ? "rescue"
+            : track.id === "matricula"
+              ? "placement"
+              : "journey";
+    const starGain = q.isFallback ? 0 : rewardForTerminalAnswer(right, rewardMode).xp;
+
+    // Lentidão no Dojo continua sendo sinal de automaticidade, não desconto de XP.
+    if (
+      right &&
+      !gardenMode &&
+      (q.kind === "rapid-fire" || track.id.startsWith("dojo")) &&
+      durationMs > 10000
+    ) {
+      trackMisconception(p, "LENTO_DEDOS");
     }
 
-    // ⭐ XP vitalício e Nivelamento por Velocidade (Dojo)
-    let starGain = 0;
-    if (right) {
-      if (q.kind === "rapid-fire" || track.id.startsWith("dojo")) {
-        if (durationMs <= 3000) starGain = 15; // Genialidade (Subitização mental)
-        else if (durationMs <= 10000) starGain = 5; // Mediano
-        else {
-          starGain = 2; // Contando nos dedos
-          // Se está muito lento na soma/subtração básica, loga misconception
-          trackMisconception(p, "LENTO_DEDOS");
-        }
-      } else {
-        starGain = 1;
-      }
-    }
-    
     const nextStars = stars + starGain;
     const nextOk = ok + (right ? 1 : 0);
-    const rescueRecovered = !!rescue && (
+    const rescueRecovered = !gardenMode && !!rescue && (
       p.lvl >= rescue.requiredLevel ||
       (rescue.requiredLevel === 5 && prog0.lvl === 5 && p.streak >= 2)
     );
     const isLast = idx === totalQFor(track) - 1 || rescueRecovered;
-    let nextBonus = 0;
+    const rewardEligible = !q.isFallback && track.contentStatus !== "fallback";
+    const nextBonus = isLast && rewardEligible ? perfectMissionXpBonus(nextOk, totalQFor(track)) : 0;
 
-    p.stars = (p.stars || 0) + starGain;
-
-    if (isLast && nextOk === totalQFor(track)) {
-      nextBonus = 5;
-      p.stars += 5;
-    }
+    p.stars = (p.stars || 0) + starGain + nextBonus;
 
     // E1 (Professor Mágico): telemetria da habilidade — quando praticou + fluência real.
     // O rt é média móvel (70% história, 30% agora): rápido = automatizado; lento = dedos.
-    p.lastDay = new Date().toISOString().slice(0, 10);
-    p.rt = Math.round(p.rt ? p.rt * 0.7 + durationMs * 0.3 : durationMs);
-    
-    // Fast level up for rapid-fire
-    if (right && q.kind === "rapid-fire" && durationMs <= 3000 && p.lvl < 5) {
-      // Speed bonus helps level up faster
-      if (p.streak < 3) p.streak = 3; 
+    if (!gardenMode) {
+      p.lastDay = new Date().toISOString().slice(0, 10);
+      p.rt = Math.round(p.rt ? p.rt * 0.7 + durationMs * 0.3 : durationMs);
     }
 
-    
     // FIREBASE ATOMIC TELEMETRY
     try {
       const qPromptText = q.kind === "story" ? String(q.story) : String(q.prompt || "") + (q.kind === "math" ? " " + String(q.expr) : "");
@@ -620,17 +699,27 @@ export function GameLoop({
         hintsUsed
       });
     } catch(e) {
-       console.warn("Failed to dispatch telemetry", e);
+      console.warn("Failed to dispatch telemetry", e);
     }
 
     if (isLast && rescue) {
       p.rescueAttempts = rescueRecovered ? 0 : (p.rescueAttempts || 0) + 1;
     }
-    if (!q.isFallback) {
+    if (gardenMode && isLast) {
+      if (!gardenState || !onGardenRound) throw new Error(`Sessao do Jardim ${track.id} terminou sem callback.`);
+      const result = applyJardimRound(gardenState, gardenAttemptsRef.current, new Date().toISOString().slice(0, 10));
+      onGardenRound(result, {
+        rewardedCorrect: nextOk,
+        measuredCorrect: gardenAttemptsRef.current.filter(a => a.right).length,
+        total: gardenAttemptsRef.current.length,
+        stars: nextStars + nextBonus,
+        durationMs: gardenDurationRef.current,
+      });
+    } else if (!gardenMode && !q.isFallback) {
       onCommit(p, right, starGain + nextBonus, durationMs, isLast);
     }
 
-    if (sound) {
+    if (sound && !feedbackAutoral) {
       if (right) sfx.right();
       else sfx.wrong();
       if (currentToast && currentToast.startsWith("Subiu")) sfx.level();
@@ -644,19 +733,17 @@ export function GameLoop({
     // Ao ERRAR: o momento de ensino — mostra/fala o PORQUÊ (explain).
     const SHORT_OK = ["Isso! 🎉", "Muito bem! ⭐", "Boa! 👏", "Acertou! 🌟", "Perfeito! ✨"];
     const firstOkOfMission = right && ok === 0;
-    const baseFb = right
+    const baseFb = feedbackAutoral ? "" : right
       ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])
       : OOPS[Math.floor(Math.random() * OOPS.length)];
-    const showExplain = !!q.explain && !right;
+    const showExplain = !feedbackAutoral && !!q.explain && !right;
     const fb = showExplain ? `${baseFb} ${q.explain}` : baseFb;
 
     setProg(p);
     setStatus(right ? "right" : "wrong");
     setSel(val);
     setToast(currentToast);
-    setMsg(fb);
-    
-
+    setMsg(feedbackAutoral ? null : fb);
     setOk(nextOk);
     setStars(nextStars);
 
@@ -675,7 +762,12 @@ export function GameLoop({
         const nextIdx = idx + 1;
         setIdx(nextIdx);
         setT0(Date.now());
-        setQ(drawQuestion(track, p, exactLvl ? p.lvl : nextIdx < WARMUP_QUESTIONS ? warmupLvl(p.lvl) : p.lvl, exactLvl));
+        const nextLevel = gardenMode
+          ? (gardenState?.currentStep ?? p.lvl)
+          : exactLvl
+            ? p.lvl
+            : nextIdx < WARMUP_QUESTIONS ? warmupLvl(p.lvl) : p.lvl;
+        setQ(drawQuestion(track, p, nextLevel, gardenMode || exactLvl));
         setStatus(null);
         setSel(null);
         setIsTimeout(false);
@@ -687,19 +779,18 @@ export function GameLoop({
     // A criança pode PULAR a qualquer momento clicando no botão 'Avançar' ou tocando na tela
     advanceRef.current = doTransition;
 
-    if (sound) {
+    if (sound && !feedbackAutoral) {
       speak(fb, {
         pitch: right ? 1.3 : 1.05,
       });
-      // Auto-avanço de segurança: 10 segundos se a criança não clicar no botão 'Avançar'
       if (val !== "__timeout__") {
         setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
       }
-    } else {
-      // Sem som: auto-avanço em 10s se não clicar no botão
-      if (val !== "__timeout__") {
-        setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, 10000);
-      }
+    } else if (val !== "__timeout__") {
+      // F05 §4 fecha a associação som-símbolo em 1,5s; os demais mantêm a
+      // janela de segurança histórica de 10s.
+      const espera = feedbackAutoral ? authorialFeedbackHoldMs(q, answerMeta) : 10000;
+      setTimeout(() => { if (advanceRef.current === doTransition) doTransition(); }, espera);
     }
   };
 
@@ -713,12 +804,12 @@ export function GameLoop({
     const q0 = qRef.current;
     setGuidedIdx(0);
     let current = 0;
-    
+
     // Se for um pedido de ajuda (não automático) E tiver mais de 2 itens,
     // o mascote só conta os dois primeiros (Scaffold) e encoraja a criança a continuar.
     const shouldScaffold = !isAuto && total > 2 && !isMock;
     const limit = (shouldScaffold && !isMock) ? 2 : total;
-    
+
     speak(`${intro} ... Um!`, {
       onEnd: () => {
         if (qRef.current !== q0) return; // a questão mudou no meio: aula morta
@@ -732,9 +823,9 @@ export function GameLoop({
             clearInterval(id);
             setGuidedIdx(null);
             if (shouldScaffold) {
-               aulaT(() => speak("Agora continue você!", { onEnd: fireAulaEnd }), 400);
+              aulaT(() => speak("Agora continue você!", { onEnd: fireAulaEnd }), 400);
             } else {
-               aulaT(() => speak(finale, { onEnd: fireAulaEnd }), 700);
+              aulaT(() => speak(finale, { onEnd: fireAulaEnd }), 700);
             }
           }
         }, 1150);
@@ -800,13 +891,16 @@ export function GameLoop({
     });
   };
 
-  
-
   const restart = () => {
+    gardenAttemptsRef.current = [];
+    gardenDurationRef.current = 0;
     setReplays((r) => r + 1);
     setIdx(0);
     setT0(Date.now());
-    setQ(drawQuestion(track, prog, exactLvl ? prog.lvl : warmupLvl(prog.lvl), exactLvl));
+    const restartLevel = gardenMode
+      ? (gardenState?.currentStep ?? prog.lvl)
+      : exactLvl ? prog.lvl : warmupLvl(prog.lvl);
+    setQ(drawQuestion(track, prog, restartLevel, gardenMode || exactLvl));
     setStatus(null);
     setSel(null);
     setStars(0);
@@ -815,7 +909,6 @@ export function GameLoop({
     setMsg(null);
     setDone(false);
     setBonus(0);
-    
   };
 
   if (done) {
@@ -832,7 +925,7 @@ export function GameLoop({
           +{stars} ⭐{bonus > 0 && <span style={{ fontSize: 16, color: C.mintDark }}> (bônus especial!)</span>}
         </div>
         <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 700, color: "#9A3412", marginTop: 4 }}>
-          +{coinsEarned} 🪙{firstMissionToday && <span style={{ fontSize: 14, color: C.mintDark }}> (primeira missão do dia! +5)</span>}
+          +{coinsEarned} 🪙{firstMissionReward && <span style={{ fontSize: 14, color: C.mintDark }}> (bônus da primeira missão do dia!)</span>}
         </div>
         <div style={{ color: C.sub, fontWeight: 800, fontSize: 16, marginTop: 6 }}>
           {ok} de {totalQFor(track)} acertos!
@@ -936,15 +1029,18 @@ export function GameLoop({
       </div>
 
       {/* Narrative Mascot Header Row */}
-      <div className="mb-4 flex-shrink-0 flex items-start gap-3">
+      <div
+        className="mb-4 flex-shrink-0 flex items-start gap-3"
+        style={q.kind === "audiochoice" ? { display: "none" } : undefined}
+      >
         <div className={`w-14 flex-shrink-0 cursor-pointer ${status === "right" ? "mk-bounce" : ""}`}>
-          <Mascote 
-            theme={kid.theme} 
-            stage={stage} 
-            size={54} 
-            kid={kid} 
+          <Mascote
+            theme={kid.theme}
+            stage={stage}
+            size={54}
+            kid={kid}
             animation={status === "right" ? "happy" : status === "wrong" ? "idle" : "walk"}
-            className="hover:scale-105 active:scale-95 transition-all" 
+            className="hover:scale-105 active:scale-95 transition-all"
           />
         </div>
         <div
@@ -966,25 +1062,34 @@ export function GameLoop({
             color: status === "right" ? C.mintDark : status === "wrong" ? C.melonDark : C.ink,
           }}
         >
-          {status ? msg : q.prompt}
+          {status ? msg : <QuestionPrompt q={q} />}
         </div>
-
-        
       </div>
 
-      {q.review && !status && (
+      {q.kind === "audiochoice" && audioChoicePromptVisible && !status && (
+        <div
+          data-audiochoice-prompt
+          className="mb-3 flex-shrink-0 rounded-2xl border-3 px-3.5 py-2.5 text-center text-[17px] font-bold"
+          style={{ borderColor: C.line, color: C.ink, background: C.card, fontFamily: FONT }}
+        >
+          {q.prompt}
+        </div>
+      )}
+
+      {q.kind !== "audiochoice" && q.review && !status && (
         <div className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-md text-xs font-bold mb-3">
           🧠 Prática Espaçada / Revisão Inteligente
         </div>
       )}
 
       <div className="flex-1 flex flex-col min-h-0 justify-center">
-      <GameLoopExerciseRenderer
-        q={q} status={status} idx={idx} handlePick={handlePick}
-        timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
-        mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
-        flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
-      />
+        <GameLoopExerciseRenderer
+          q={q} status={status} idx={idx} handlePick={handlePick}
+          timeLeft={timeLeft} promptDone={promptDone} guidedIdx={guidedIdx}
+          mockTutorialN={mockTutorialN} tutShow={tutShow} journeyDone={journeyDone}
+          flashHidden={flashHidden} sel={sel} totalQFor={totalQFor} track={track} aulaSuggest={aulaSuggest} guidedNarr={guidedNarr} playAulinha={playAulinha} setShowClockTutorial={setShowClockTutorial} sound={sound} peekAgain={peekAgain} setJourneyDone={setJourneyDone} orderTaps={orderTaps} handleOrderTap={handleOrderTap} orderShake={orderShake} hiddenOpts={hiddenOpts} armedOpt={armedOpt} setArmedOpt={setArmedOpt}
+          onFirstAuditionComplete={() => setAudioChoicePromptVisible(true)}
+        />
       </div>
       {/* Botão AVANÇAR — surge ao responder; deixa a criança seguir no ritmo dela */}
       {status && (
