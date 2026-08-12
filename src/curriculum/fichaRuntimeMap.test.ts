@@ -46,17 +46,24 @@ describe("mapa autoral de fichas para o runtime", () => {
       "Regua: executável | kinds=measure+regua+regua-f61 | builder=special:GM.05 | renderer=regua+regua-f61",
     );
 
+    // W7/F36: Quadrado100 deixa de ser "componente isolado" quando ganha o
+    // builder especializado local de N2.02 + kind final + renderer. Isto prova
+    // infraestrutura executável, NÃO promoção curricular — a ativação continua
+    // separada em composerCanaryIds/Matrix.
+    expect(output).toContain(
+      "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36 | builder=special:N2.02 | renderer=quadrado100-f36",
+    );
+
     // Lacunas reais permanecem visíveis: reconciliar o mapa não significa
     // fabricar builder/componente só para deixar a tabela verde.
     expect(output).toContain("LinkingCubes: renderer-sem-builder");
     expect(output).toContain("Moedas: renderer-sem-builder");
-    expect(output).toContain("Quadrado100: componente-isolado");
     expect(output).toContain("SingaporeBars: renderer-sem-builder");
     expect(output).toContain("VisualAddition: renderer-sem-builder");
 
-    expect(output).toContain("- executável: 21");
+    expect(output).toContain("- executável: 22");
     expect(output).toContain("- renderer-sem-builder: 4");
-    expect(output).toContain("- componente-isolado: 1");
+    expect(output).toContain("- componente-isolado: 0");
     expect(output).toContain("- ausente: 0");
 
     // A quantidade de fichas cresce quando lacunas curriculares são fechadas;
