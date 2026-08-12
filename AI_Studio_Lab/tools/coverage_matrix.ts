@@ -93,6 +93,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F29 materializada no specialized builder local Grupo-backed: quantidade→comparação→símbolo, com N1.05/W2 como pré-requisito direto; o legado saiu de produção e a divergência ficha↔screen foi fechada. A Matrix observou 31 Composer, 21 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W7-N2.02",
+    competence: "N2.02",
+    rationale: "F36 materializada no specialized builder local Quadrado100-backed: +1 horizontal, +10 vertical, +5, vizinhos e lacunas, com onboarding explícito da estreia visual, processo no AnswerMeta e evidência de percurso vertical. O legado saiu de produção somente após suíte, Chrome 320/390/900 e transversal 390×8 verdes. A Matrix observou 32 Composer, 20 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
+    delta: { composer: 1, legacy: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
