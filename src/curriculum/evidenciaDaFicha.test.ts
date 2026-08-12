@@ -18,6 +18,7 @@ import { evidenciasDaRegua as daRegua } from "./procedimentos/reguaProcedure";
 import { evidenciasComparacaoSimbolica as daComparacaoSimbolica } from "./procedimentos/comparacaoSimbolicaProcedure";
 import { construirQuadrado100Spec } from "./procedimentos/quadrado100Contract";
 import { evidenciasQuadrado100 as doQuadrado100 } from "./procedimentos/quadrado100Procedure";
+import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visualAdditionProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -154,6 +155,18 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       }, spec);
     },
   },
+  {
+    nome: "F13 (VisualAddition) — acerto L4 sem objetos",
+    evidencia: Evidencia.ADICAO_SEM_OBJETOS,
+    emitir: () => daAdicaoVisual({
+      nivel: 4,
+      resposta: 5,
+      correta: true,
+      juntou: true,
+      usouAjuda: false,
+      revisoes: 0,
+    }),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -261,5 +274,14 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       revisoes: 1,
       completo: false,
     }, quadrado)).toEqual([]);
+
+    expect(daAdicaoVisual({
+      nivel: 4,
+      resposta: 4,
+      correta: false,
+      juntou: false,
+      usouAjuda: false,
+      revisoes: 1,
+    })).toEqual([]);
   });
 });
