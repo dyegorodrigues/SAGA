@@ -163,7 +163,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
   "touchplace", "shapecanvas", "grandeza", "comparacao-simbolica", "medidas", "moldura", "material-dourado",
-  "numberline-f19", "regua-f61", "quadrado100-f36",
+  "numberline-f19", "regua-f61", "quadrado100-f36", "visual-addition-f13",
 ]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {
