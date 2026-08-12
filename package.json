@@ -26,6 +26,7 @@
     "sonda:reta20": "node scripts/sonda-reta20.mjs",
     "sonda:regua": "node scripts/sonda-regua.mjs",
     "sonda:comparacao-simbolica": "node scripts/sonda-comparacao.mjs",
+    "sonda:quadrado100": "node scripts/sonda-quadrado100.mjs",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
