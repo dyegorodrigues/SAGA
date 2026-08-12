@@ -1,3 +1,5 @@
+import { Evidencia } from "../../constants/evidencias";
+
 export type ModoQuadrado100 = "linha" | "vertical" | "cinco" | "vizinho" | "lacunas";
 
 /** Tags canônicas da F36, mantidas juntas para ficha, procedimento e Radar não divergirem. */
@@ -9,5 +11,5 @@ export const Quadrado100Misconception = {
 
 /** §9 da F36: domínio precisa incluir pelo menos um percurso +10 vertical. */
 export const Quadrado100Evidence = {
-  PERCURSO_VERTICAL: "percurso-vertical-quadrado100",
+  PERCURSO_VERTICAL: Evidencia.PERCURSO_VERTICAL_QUADRADO100,
 } as const;
