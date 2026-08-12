@@ -43,6 +43,7 @@ export function Quadrado100Stage({
   const [indice, setIndice] = useState(0);
   const [reveladas, setReveladas] = useState<number[]>([]);
   const [toques, setToques] = useState<number[]>([]);
+  const [erros, setErros] = useState<number[]>([]);
   const [revisoes, setRevisoes] = useState(0);
   const [errada, setErrada] = useState<number | null>(null);
   const [mensagem, setMensagem] = useState("");
@@ -52,6 +53,7 @@ export function Quadrado100Stage({
     setIndice(0);
     setReveladas([]);
     setToques([]);
+    setErros([]);
     setRevisoes(0);
     setErrada(null);
     setMensagem("");
@@ -59,7 +61,7 @@ export function Quadrado100Stage({
       for (const timer of timers.current) window.clearTimeout(timer);
       timers.current = [];
     };
-  }, [spec.nivel, spec.inicio, spec.alvo, spec.modo]);
+  }, [spec]);
 
   const esperado = spec.caminho[Math.min(indice, spec.caminho.length - 1)] ?? spec.alvo;
   const tutorial = useMemo(() => casasDoTutorial(mostrar), [mostrar]);
@@ -89,12 +91,19 @@ export function Quadrado100Stage({
     .map(p => `${p.x},${p.y}`)
     .join(" ");
 
-  const registrarResposta = (valor: number, completo: boolean, proximosToques: number[], proximasRevisoes: number) => {
+  const registrarResposta = (
+    valor: number,
+    completo: boolean,
+    proximosToques: number[],
+    proximosErros: number[],
+    proximasRevisoes: number,
+  ) => {
     const acao: AcaoQuadrado100 = {
       modo: spec.modo,
       inicio: spec.inicio,
       caminho: [...spec.caminho],
       toques: proximosToques,
+      erros: proximosErros,
       esperado,
       ultimoToque: valor,
       acertosParciais: completo ? spec.caminho.length : indice,
@@ -110,7 +119,9 @@ export function Quadrado100Stage({
     setToques(proximosToques);
 
     if (n !== esperado) {
+      const proximosErros = [...erros, n];
       const proximasRevisoes = revisoes + 1;
+      setErros(proximosErros);
       setRevisoes(proximasRevisoes);
       setErrada(n);
       setMensagem("Procure o padrão do quadro e tente outra vez.");
@@ -119,7 +130,7 @@ export function Quadrado100Stage({
           ? "Dez casas para cima ou para baixo ficam na mesma coluna."
           : "Olhe as casas vizinhas e tente outra vez.",
       );
-      registrarResposta(n, false, proximosToques, proximasRevisoes);
+      registrarResposta(n, false, proximosToques, proximosErros, proximasRevisoes);
       const timer = window.setTimeout(() => setErrada(null), 650);
       timers.current.push(timer);
       return;
@@ -138,7 +149,7 @@ export function Quadrado100Stage({
 
     setMensagem("Percurso completo!");
     const timer = window.setTimeout(
-      () => registrarResposta(n, true, proximosToques, revisoes),
+      () => registrarResposta(n, true, proximosToques, erros, revisoes),
       450,
     );
     timers.current.push(timer);
