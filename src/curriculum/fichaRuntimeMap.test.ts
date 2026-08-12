@@ -16,8 +16,6 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "DragGroup: executável | kinds=draggroup+pareamento+classificacao | builder=draggroup+pareamento+classificacao | renderer=draggroup+pareamento+classificacao",
     );
-    // W9/F15: continua sendo a MESMA primitiva EmojiRow. O modo riscar ganha
-    // owner especializado local e kind autoral sem abrir um builder genérico novo.
     expect(output).toContain(
       "EmojiRow: executável | kinds=emojirow+fileira+moldura+emojirow-riscar-f15 | builder=emojirow+fileira+moldura+special:N3.02 | renderer=emojirow+fileira+moldura+emojirow-riscar-f15",
     );
@@ -39,20 +37,22 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36 | builder=special:N2.02 | renderer=quadrado100-f36",
     );
-
-    // W8/F13: a superfície já existia, mas agora há owner especializado e Stage
-    // real. O kind legado continua disponível sem virar uma segunda porta genérica.
     expect(output).toContain(
       "VisualAddition: executável | kinds=visual-addition+visual-addition-f13+subvis | builder=special:N3.01 | renderer=visual-addition+visual-addition-f13",
     );
 
-    // Lacunas reais permanecem visíveis: W8/W9 não inventam builder para os demais.
-    expect(output).toContain("LinkingCubes: renderer-sem-builder");
+    // W10/F14: LinkingCubes deixa de ser renderer-sem-builder por um owner
+    // especializado local; o kind legado linking-cubes continua disponível.
+    expect(output).toContain(
+      "LinkingCubes: executável | kinds=linking-cubes+counting-on-f14 | builder=special:N3.03 | renderer=linking-cubes+counting-on-f14",
+    );
+
+    // Lacunas reais restantes continuam visíveis; W10 não inventa owner para elas.
     expect(output).toContain("Moedas: renderer-sem-builder");
     expect(output).toContain("SingaporeBars: renderer-sem-builder");
 
-    expect(output).toContain("- executável: 23");
-    expect(output).toContain("- renderer-sem-builder: 3");
+    expect(output).toContain("- executável: 24");
+    expect(output).toContain("- renderer-sem-builder: 2");
     expect(output).toContain("- componente-isolado: 0");
     expect(output).toContain("- ausente: 0");
 
