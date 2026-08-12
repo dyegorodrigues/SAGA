@@ -60,6 +60,7 @@ export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
   return q.kind === "material-dourado"
     || q.kind === "numberline-f19"
     || q.kind === "quadrado100-f36"
+    || q.kind === "counting-on-f14"
     || (q.kind === "regua-f61" && meta?.source === "medidas")
     || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
@@ -163,7 +164,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
   "touchplace", "shapecanvas", "grandeza", "comparacao-simbolica", "medidas", "moldura", "material-dourado",
-  "numberline-f19", "regua-f61", "quadrado100-f36", "visual-addition-f13", "emojirow-riscar-f15",
+  "numberline-f19", "regua-f61", "quadrado100-f36", "visual-addition-f13", "emojirow-riscar-f15", "counting-on-f14",
 ]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {

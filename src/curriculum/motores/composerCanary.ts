@@ -2,6 +2,7 @@ import { Composer } from "../Composer";
 import { FichaCompetencia } from "../schema";
 import { N3_01 } from "../fichas/jornada/N3.01";
 import { N3_02 } from "../fichas/jornada/N3.02";
+import { N3_03 } from "../fichas/jornada/N3.03";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
 import { N4_03 } from "../fichas/jornada/N4.03";
@@ -44,6 +45,7 @@ import { construirQuadrado100Question } from "../procedimentos/quadrado100Contra
 import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidianoContract";
 import { construirVisualAdditionQuestion } from "../procedimentos/visualAdditionContract";
 import { construirEmojiRowRiscarQuestion } from "../procedimentos/emojiRowRiscarContract";
+import { construirCountingOnQuestion } from "../procedimentos/countingOnContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -65,6 +67,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // W9: F15 registrada e INATIVA. O modo riscar só substitui `subvis` depois
   // de alfabetização do X, Stage autoral, domínio limpo, a11y e Chrome real.
   "N3.02": N3_02,
+
+  // W10: F14 registrada e INATIVA. É a primeira família de produção que nasce
+  // com `resolucao()` calculada do item sob o contrato R0-A.
+  "N3.03": N3_03,
 
   "N3.09": N3_09,
   "N3.10": N3_10,
@@ -138,6 +144,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N2.03": construirComparacaoSimbolicaQuestion,
   "N3.01": construirVisualAdditionQuestion,
   "N3.02": construirEmojiRowRiscarQuestion,
+  "N3.03": construirCountingOnQuestion,
   "GM.02": construirTempoCotidianoQuestion,
   "GM.05": construirReguaQuestion,
 };
@@ -154,6 +161,7 @@ const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N2.03": "comparacao-simbolica",
   "N3.01": "visual-addition-f13",
   "N3.02": "emojirow-riscar-f15",
+  "N3.03": "counting-on-f14",
   "GM.05": "regua-f61",
 };
 

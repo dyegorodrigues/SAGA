@@ -78,11 +78,12 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "InteractiveVertical", kinds: ["vertical"], componentFiles: [component("InteractiveVertical")], builderKinds: ["vertical"], rendererKinds: ["vertical"] },
   {
     primitive: "LinkingCubes",
-    kinds: ["linking-cubes"],
-    componentFiles: [component("LinkingCubes")],
+    kinds: ["linking-cubes", "counting-on-f14"],
+    componentFiles: [component("LinkingCubes"), component("CountingOnStage"), component("NumberLine")],
     builderKinds: [],
-    rendererKinds: ["linking-cubes"],
-    note: "Renderer existe no FichaRenderer/GameLoop, mas a cadeia autoral ainda não possui builder Composer comprovado.",
+    specializedBuilderIds: ["N3.03"],
+    rendererKinds: ["linking-cubes", "counting-on-f14"],
+    note: "W10/F14/N3.03 transforma LinkingCubes em owner executável por builder especializado local: CountingOnStage compõe o trem com NumberLine e registra a partida/saltos. O renderer linking-cubes legado permanece intacto.",
   },
   {
     primitive: "MaterialDourado",

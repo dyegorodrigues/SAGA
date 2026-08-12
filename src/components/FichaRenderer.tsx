@@ -7,6 +7,7 @@ import { TenFrame } from './primitives/TenFrame';
 import { VisualAddition } from './primitives/VisualAddition';
 import { VisualAdditionStage } from './primitives/VisualAdditionStage';
 import { EmojiRowRiscarStage } from './primitives/EmojiRowRiscarStage';
+import { CountingOnStage } from './primitives/CountingOnStage';
 import { ScatteredItems } from './primitives/ScatteredItems';
 import { LinkingCubes } from './primitives/LinkingCubes';
 import { TakeApart } from './primitives/TakeApart';
@@ -63,6 +64,8 @@ import { VisualAdditionSpec } from '../curriculum/procedimentos/visualAdditionCo
 import { metaVisualAddition } from '../curriculum/procedimentos/visualAdditionProcedure';
 import { EmojiRowRiscarSpec } from '../curriculum/procedimentos/emojiRowRiscarContract';
 import { metaEmojiRowRiscar } from '../curriculum/procedimentos/emojiRowRiscarProcedure';
+import { CountingOnSpec } from '../curriculum/procedimentos/countingOnContract';
+import { metaCountingOn } from '../curriculum/procedimentos/countingOnProcedure';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -166,6 +169,20 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
           mostrar={mostrar}
           falar={falar}
           onAnswer={(valor, acao) => handleInteract(valor, metaEmojiRowRiscar(acao, spec))}
+        />
+      );
+    }
+
+    case 'counting-on-f14': {
+      const spec = uiProps as CountingOnSpec;
+      return (
+        <CountingOnStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          promptDone={promptDone}
+          mostrar={mostrar}
+          falar={falar}
+          onAnswer={(valor, acao) => handleInteract(valor, metaCountingOn(acao, spec))}
         />
       );
     }

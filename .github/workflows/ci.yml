@@ -263,6 +263,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Sonda real F14 — counting on registrado e inativo
+        run: npm run sonda:counting-on
+
+      - name: Evidências da sonda F14
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f14-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-counting-on/
+          if-no-files-found: warn
+          retention-days: 14
+
   higiene-diff:
     name: Higiene do diff
     runs-on: ubuntu-latest
