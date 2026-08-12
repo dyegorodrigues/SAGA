@@ -48,6 +48,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // direto; promoção somente após suíte e Chrome real da ficha registrada/inativa.
   "N2.03",
 
+  // W7 — F36: Quadrado100 10×10 com percurso autoral. N2.01/W3 é pré-requisito
+  // direto; promoção após suíte + onboarding visual + Chrome 320/390/900 + 390×8.
+  "N2.02",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
