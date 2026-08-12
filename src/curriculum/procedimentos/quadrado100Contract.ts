@@ -181,6 +181,7 @@ export function construirQuadrado100Question(
   if (ficha.id !== "N2.02") throw new Error(`quadrado100Contract recebeu ${ficha.id}.`);
   const spec = construirQuadrado100Spec(level);
   const micro = microDoNivel(ficha, spec.nivel);
+  const rtAlvoMs = ficha.niveis?.[spec.nivel]?.rt_alvo;
 
   return {
     kind: "quadrado100-f36",
@@ -195,6 +196,7 @@ export function construirQuadrado100Question(
       sessoes: micro.dominio.sessoes,
     },
     ...(micro.dominio.exige ? { exigeEvidencia: micro.dominio.exige.evidencia } : {}),
+    ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
     uiProps: spec,
     answer: spec.alvo,
     evaluate: answer => Number(answer) === spec.alvo,
