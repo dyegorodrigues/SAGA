@@ -60,10 +60,12 @@ async function snapshot(page) {
         hidden: el.getAttribute("data-hidden") === "true",
         text: el.textContent ?? "",
         aria: el.getAttribute("aria-label") ?? "",
+        background: getComputedStyle(el).backgroundColor,
         width: r.width,
         height: r.height,
       };
     });
+    const tutorialStepRaw = probe?.getAttribute("data-tutorial-step") ?? "";
     return {
       innerWidth: window.innerWidth,
       scrollWidth: document.documentElement.scrollWidth,
@@ -74,6 +76,10 @@ async function snapshot(page) {
       path: JSON.parse(probe?.getAttribute("data-path") ?? "[]"),
       hidden: JSON.parse(probe?.getAttribute("data-hidden") ?? "[]"),
       tutorial: Number(probe?.getAttribute("data-tutorial") ?? 0),
+      tutorialStep: tutorialStepRaw === "" ? null : Number(tutorialStepRaw),
+      tutorialFala: probe?.getAttribute("data-tutorial-fala") ?? "",
+      tutorialShow: JSON.parse(probe?.getAttribute("data-tutorial-show") ?? "null"),
+      tutorialLines: document.querySelectorAll("svg polyline").length,
       rt: probe?.getAttribute("data-rt") ?? "",
       receipts: JSON.parse(probe?.getAttribute("data-receipts") ?? "[]"),
       stage: stage ? { left: stage.left, right: stage.right, width: stage.width } : null,
@@ -181,6 +187,43 @@ async function probe(page, width, level) {
   };
 }
 
+async function probeOnboarding(page, width) {
+  const steps = [];
+  await page.setViewportSize({ width, height: 900 });
+  for (let step = 0; step < 3; step += 1) {
+    await page.goto(`${BASE}?level=1&seed=3607&tutorialStep=${step}`, { waitUntil: "networkidle" });
+    await page.locator("[data-quadrado100-probe]").waitFor();
+    const data = await snapshot(page);
+    assertContract(data, width, 1);
+    assert(data.tutorial === 3, `F36 onboarding deveria ter 3 passos, veio ${data.tutorial}`);
+    assert(data.tutorialStep === step, `F36 onboarding não ativou passo ${step}`);
+    assert(data.tutorialFala.trim().length > 0, `F36 onboarding passo ${step} sem fala`);
+    assert(data.tutorialShow && typeof data.tutorialShow === "object", `F36 onboarding passo ${step} sem show`);
+
+    const byNumber = new Map(data.cells.map(cell => [cell.n, cell]));
+    const normal = byNumber.get(33)?.background;
+    if (step === 0) {
+      assert(data.tutorialShow.destacarCasa === 34, "F36 onboarding passo 0 não destaca a casa 34");
+      assert(byNumber.get(34)?.background !== normal, "F36 onboarding passo 0 não alterou visualmente a casa 34");
+    } else {
+      const pair = data.tutorialShow.ligarCasas;
+      assert(Array.isArray(pair) && pair.length === 2, `F36 onboarding passo ${step} não trouxe par de casas`);
+      assert(pair.every(n => byNumber.get(n)?.background !== normal), `F36 onboarding passo ${step} não destacou as duas casas`);
+      assert(data.tutorialLines >= 1, `F36 onboarding passo ${step} não desenhou a ligação visual`);
+    }
+
+    const shot = path.join(ARTIFACTS, `f36-${width}px-onboarding-${step + 1}.png`);
+    await page.screenshot({ path: shot, fullPage: true });
+    steps.push({
+      step,
+      fala: data.tutorialFala,
+      show: data.tutorialShow,
+      screenshot: path.relative(process.cwd(), shot),
+    });
+  }
+  return { width, steps };
+}
+
 fs.rmSync(ARTIFACTS, { recursive: true, force: true });
 fs.mkdirSync(ARTIFACTS, { recursive: true });
 
@@ -189,6 +232,7 @@ let browser;
 const consoleErrors = [];
 const pageErrors = [];
 const results = [];
+const onboarding = [];
 try {
   vite = await startVite();
   browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ["--no-sandbox"] });
@@ -202,15 +246,16 @@ try {
     for (let level = 1; level <= 5; level += 1) {
       results.push(await probe(page, width, level));
     }
+    onboarding.push(await probeOnboarding(page, width));
   }
 
   assert(pageErrors.length === 0, `F36 gerou pageerror: ${pageErrors.join(" | ")}`);
   const actionableConsole = consoleErrors.filter(text => !text.includes("favicon"));
   assert(actionableConsole.length === 0, `F36 gerou console.error: ${actionableConsole.join(" | ")}`);
-  fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: true, results }, null, 2));
-  console.log(`Sonda F36 OK — ${results.length} cenários em Chrome real.`);
+  fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: true, results, onboarding }, null, 2));
+  console.log(`Sonda F36 OK — ${results.length} cenários + ${onboarding.length * 3} passos de onboarding em Chrome real.`);
 } catch (error) {
-  fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: false, error: String(error), results, consoleErrors, pageErrors }, null, 2));
+  fs.writeFileSync(path.join(ARTIFACTS, "report.json"), JSON.stringify({ ok: false, error: String(error), results, onboarding, consoleErrors, pageErrors }, null, 2));
   throw error;
 } finally {
   if (browser) await browser.close();
