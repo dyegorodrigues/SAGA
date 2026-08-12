@@ -41,8 +41,9 @@ export function Quadrado100({
       <div
         className="grid grid-cols-10 gap-0.5 p-1 rounded-lg shadow-sm w-full"
         style={{ backgroundColor: tokens.cor.elementos.borda }}
-        role="grid"
+        role="group"
         aria-label="Quadro de números de 1 a 100"
+        data-quadrado100-grid
       >
         {Array.from({ length: 100 }).map((_, i) => {
           const n = i + 1;
@@ -71,7 +72,6 @@ export function Quadrado100({
             <motion.button
               type="button"
               key={n}
-              role="gridcell"
               whileTap={interactive ? { scale: 0.9 } : undefined}
               animate={isIncorrect ? { x: [0, -3, 3, -3, 0] } : { x: 0 }}
               onClick={() => handleToggle(n)}
