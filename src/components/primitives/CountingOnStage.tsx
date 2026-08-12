@@ -7,7 +7,10 @@ import {
   CountingOnMisconception,
   type CountingOnMisconception as CountingOnMisconceptionTag,
 } from "../../curriculum/procedimentos/countingOnSemantics";
-import type { AcaoCountingOn } from "../../curriculum/procedimentos/countingOnProcedure";
+import type {
+  AcaoCountingOn,
+  EstrategiaDePartidaCountingOn,
+} from "../../curriculum/procedimentos/countingOnProcedure";
 import { LinkingCubes } from "./LinkingCubes";
 import { NumberLine } from "./NumberLine";
 
@@ -93,17 +96,26 @@ export function CountingOnStage({
     setErrosConceituais(current => unique([...current, tag]));
   };
 
-  const escolherPartida = (valor: number) => {
+  const escolherPartida = (valor: number, estrategia: EstrategiaDePartidaCountingOn) => {
     if (disabled || !promptDone || modoDemonstracao) return;
     if (valor !== spec.maior) {
-      const tag = valor === 1 ? CountingOnMisconception.CONTA_TUDO : CountingOnMisconception.NAO_ESCOLHE_MAIOR;
+      const tag = estrategia === "um"
+        ? CountingOnMisconception.CONTA_TUDO
+        : CountingOnMisconception.NAO_ESCOLHE_MAIOR;
       registrarErro(tag);
       const texto = tag === CountingOnMisconception.CONTA_TUDO
         ? `${spec.maior} já está pronto. Não volte para o um.`
         : `Comece pelo maior, ${spec.maior}. Assim são menos pulos.`;
       setAviso(texto);
       falar?.(texto);
-      onAnswer(-1, { tipo: "partida", correta: false, valor, esperado: spec.maior, errosConceituais: [tag] });
+      onAnswer(-1, {
+        tipo: "partida",
+        correta: false,
+        valor,
+        esperado: spec.maior,
+        estrategiaPartida: estrategia,
+        errosConceituais: [tag],
+      });
       return;
     }
 
@@ -207,9 +219,9 @@ export function CountingOnStage({
         <div className="space-y-3" data-start-choice>
           <p className="text-base font-extrabold text-slate-800">De onde é melhor começar?</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <button type="button" disabled={disabled || !promptDone} onClick={() => escolherPartida(spec.maior)} className="min-h-14 rounded-2xl border-2 border-slate-300 bg-white px-3 text-lg font-black disabled:opacity-50">Do {spec.maior}</button>
-            <button type="button" disabled={disabled || !promptDone} onClick={() => escolherPartida(spec.menor)} className="min-h-14 rounded-2xl border-2 border-slate-300 bg-white px-3 text-lg font-black disabled:opacity-50">Do {spec.menor}</button>
-            <button type="button" disabled={disabled || !promptDone} onClick={() => escolherPartida(1)} className="min-h-14 rounded-2xl border-2 border-slate-300 bg-white px-3 text-lg font-black disabled:opacity-50">Contar do 1</button>
+            <button type="button" disabled={disabled || !promptDone} onClick={() => escolherPartida(spec.maior, "maior")} className="min-h-14 rounded-2xl border-2 border-slate-300 bg-white px-3 text-lg font-black disabled:opacity-50">Do {spec.maior}</button>
+            <button type="button" disabled={disabled || !promptDone} onClick={() => escolherPartida(spec.menor, "menor")} className="min-h-14 rounded-2xl border-2 border-slate-300 bg-white px-3 text-lg font-black disabled:opacity-50">Do {spec.menor}</button>
+            <button type="button" disabled={disabled || !promptDone} onClick={() => escolherPartida(1, "um")} className="min-h-14 rounded-2xl border-2 border-slate-300 bg-white px-3 text-lg font-black disabled:opacity-50">Contar do 1</button>
           </div>
         </div>
       )}
