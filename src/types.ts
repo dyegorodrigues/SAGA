@@ -106,6 +106,17 @@ export interface MasteryRule {
   de: number;
   /** Quantas sessoes maduras e espacadas a ficha exige. */
   sessoes: number;
+  /**
+   * Algumas fichas exigem variedade de processo, não apenas uma condição
+   * binária. A família é identificada por prefixo das evidências históricas e
+   * só amadurece quando `minimo` valores distintos tiverem sido demonstrados.
+   * RT/velocidade não participa desta contagem.
+   */
+  evidenciasDistintas?: {
+    prefixo: string;
+    minimo: number;
+    descricao?: string;
+  };
 }
 
 export interface Question {
