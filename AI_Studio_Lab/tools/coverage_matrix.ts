@@ -135,6 +135,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F97 materializada no specialized builder EqualGroupsStage-backed: reutiliza Grupo, preserva a frase N grupos de M e a escada 3×3→5×3→5×5→10×5→10×10, com total=grupos×porGrupo e resolucao() R0-A declarativa. O canário inativo 3c80162716c40117e1faf5583fb33fe7ec23013b passou CI #1256 / run 31701736784 6/6, inclusive Chrome real F97 e 390×8; após a promoção 0452b2ed16c67ac32cc30e25ee59bfec46356264 a Matrix observou 37 Composer, 15 legado, 38 fallback, 52 servidas e 11 divergências.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W13-GE.03",
+    competence: "GE.03",
+    rationale: "F58 materializada no specialized builder DetetiveFormasStage-backed, reutilizando ShapeCanvas em vez de abrir segunda linguagem visual: escada contar lados → cantos quadrados → curvos vs retos → eixo de simetria → completar a metade, com resolucao() R0-A declarativa. A §9 exige o eixo no L4 — contar lados é leitura de atributo, achar o eixo é a única dobra mental da ficha —, e a condição foi publicada no catálogo central como Evidencia.SIMETRIA_EIXO com emissor puro em detetiveFormasProcedure, verificável sem tela. O canário inativo 6092da5acad1bdb3cd8aec4a0f6c8afe21ab3546 passou os DOIS workflows integralmente verdes no mesmo SHA — CI run 31735133641 e Certificação transversal run 31735133586.\n\nPRIMEIRA onda sob o critério fallback-first, e o delta observado prova a diferença: GE.03 não vinha de gerador legado, vinha de placeholder Em construção. Por isso o fallback cai pela primeira vez desde a abertura desta linha, em vez de apenas trocar a proveniência de uma tela que já existia.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
