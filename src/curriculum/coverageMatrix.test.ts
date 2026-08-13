@@ -31,12 +31,16 @@ describe("Coverage Matrix executável", () => {
       expect.objectContaining({ id: "OBS-COMPOSITE-N4.03", competence: "N4.03", delta: { divergences: -1 } }),
       expect.objectContaining({ id: "W11-AL.03", competence: "AL.03", delta: { composer: 1, legacy: -1, divergences: -1 } }),
       expect.objectContaining({ id: "W12-N4.01", competence: "N4.01", delta: { composer: 1, legacy: -1, divergences: -1 } }),
+      // W13 é a primeira sob o critério fallback-first: o delta drena `fallback`
+      // em vez de trocar `legacy`, porque GE.03 vinha de placeholder, não de
+      // gerador legado. A forma do delta é a prova de que o critério mudou.
+      expect.objectContaining({ id: "W13-GE.03", competence: "GE.03", delta: { composer: 1, fallback: -1, served: 1 } }),
     ]);
     expect(COVERAGE_BASELINE).toMatchObject({
-      composer: 37,
-      legacy: 15,
-      fallback: 38,
-      served: 52,
+      composer: 38,
+      legacy: 15,   // intocado: a W13 não migrou legado, drenou placeholder
+      fallback: 37, // primeira queda desde a abertura desta linha
+      served: 53,
       divergences: 11,
       modeSwaps: 12,
       toolIntroductions: 44,
