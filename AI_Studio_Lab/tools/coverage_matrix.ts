@@ -120,7 +120,7 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
   {
     id: "OBS-COMPOSITE-N4.03",
     competence: "N4.03",
-    rationale: "Delta exclusivamente de observabilidade, sem mudança de runtime pedagógico: TabuadaStage já renderizava Arranjo (realização física do ArrayGrid canônico), Quadrado100 e NumberLine. No SHA d64a6ad02da6c1800ef1c54ab4fe145f2951df9b, CI #1191, o novo gate de palcos compostos passou e a Matrix reobservou 13 divergências, removendo a falsa divergência de N4.03.",
+    rationale: "Delta exclusivamente de observabilidade, sem mudança de runtime pedagógico: TabuadaStage já renderizava Arranjo (realização física do ArrayGrid canônico), Quadrado100 e NumberLine. No SHA 0b4a5b0dbe26a2c321d7bbb23124cb81681fdcd5, CI #1195 / run 31655630072, o novo gate de palcos compostos passou e a Matrix reobservou 13 divergências, removendo a falsa divergência de N4.03.",
     delta: { divergences: -1 },
   },
 ] as const;
@@ -537,7 +537,6 @@ function validate(rows: CoverageMatrixRow[], counts: CoverageMatrixCounts): stri
 
   check(new Set(COVERAGE_MIGRATIONS.map(migration => migration.id)).size === COVERAGE_MIGRATIONS.length, "ledger da Coverage Matrix contém IDs de migração duplicados");
   for (const migration of COVERAGE_MIGRATIONS) check(graphIds.has(migration.competence), `${migration.id}: competência inexistente ${migration.competence}`);
-
   for (const row of rows) {
     const sample = sampleRuntime(row.id);
     check(row.canonicalFichas.length > 0, `${row.id}: sem ficha canônica`);
