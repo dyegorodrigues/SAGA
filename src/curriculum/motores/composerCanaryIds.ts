@@ -79,6 +79,15 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // incluindo F97 em Chrome real e o portão transversal 390×8, antes da promoção.
   "N4.01",
 
+  // W13 — F58: o Detetive de Formas, e a PRIMEIRA estreia sob o critério
+  // fallback-first: GE.03 não vinha de gerador legado, vinha de placeholder
+  // "Em construção". DetetiveFormasStage reutiliza ShapeCanvas em vez de abrir
+  // segunda linguagem visual, e a §9 exige o eixo de simetria no L4 — contar
+  // lados é atributo, achar o eixo é a única dobra mental da ficha.
+  // O canário inativo 6092da5a passou os DOIS workflows integralmente verdes:
+  // CI run 31735133641 e Certificação transversal run 31735133586.
+  "GE.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
