@@ -188,7 +188,7 @@ export function construirDetetiveFormasResolucao(spec: DetetiveFormasF58Spec): R
         parcial: spec.resposta,
       },
     ],
-    fallback: "",
+    fallback: 0,
   };
 }
 
