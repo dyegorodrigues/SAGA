@@ -67,6 +67,12 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // 320/390/900 + transversal 390×8 no SHA inativo 8ee8cad1 antes da promoção.
   "N3.03",
 
+  // W11 — F30: contagem por saltos. SkipCountStage reutiliza a mesma
+  // InteractiveNumberLineSurface, compõe Quadrado100 no L3, generaliza no L4/L5
+  // e exige dois saltos distintos para mastery. O canário inativo 5988403f passou
+  // CI #1219 / run 31662349768 integralmente verde antes desta promoção.
+  "AL.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
