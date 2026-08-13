@@ -13,7 +13,7 @@
     "coverage:matrix": "vitest run src/curriculum/coverageMatrix.test.ts --silent=false",
     "coverage:matrix:markdown": "SAGA_COVERAGE_FORMAT=markdown vitest run src/curriculum/coverageMatrix.test.ts --silent=false",
     "coverage:matrix:json": "SAGA_COVERAGE_FORMAT=json vitest run src/curriculum/coverageMatrix.test.ts --silent=false",
-    "auditar": "node AI_Studio_Lab/tools/catalog_auditor.cjs && node AI_Studio_Lab/tools/canonical_doc_guard.cjs && npm run coverage:matrix",
+    "auditar": "node AI_Studio_Lab/tools/catalog_auditor.cjs && node AI_Studio_Lab/tools/canonical_doc_guard.cjs && node AI_Studio_Lab/tools/composite_stage_auditor.cjs && npm run coverage:matrix",
     "fichas:auditar": "node AI_Studio_Lab/tools/ficha_catalog_auditor.cjs",
     "grafo:gerar": "node scripts/generate-graph-artifacts.cjs",
     "grafo:check": "node scripts/generate-graph-artifacts.cjs --check",
