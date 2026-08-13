@@ -7,15 +7,11 @@ export const SkipCountMisconception = {
 
 export type SkipCountMisconception = typeof SkipCountMisconception[keyof typeof SkipCountMisconception];
 
+/**
+ * Vocabulário da evidência produzida pelo palco F30. A REGRA de domínio que
+ * consome este prefixo mora na própria ficha AL.03 (`FichaDominio`), não aqui.
+ */
 export const SKIP_COUNT_STEP_EVIDENCE_PREFIX = "contagem-saltos-passo-";
-
-export const SkipCountMastery = {
-  evidenciasDistintas: {
-    prefixo: SKIP_COUNT_STEP_EVIDENCE_PREFIX,
-    minimo: 2,
-    descricao: "Demonstrar pelo menos dois saltos diferentes.",
-  },
-} as const;
 
 export const SkipCountEvidence = {
   SEM_MANIPULAVEL: "contagem-saltos-sem-manipulavel",
