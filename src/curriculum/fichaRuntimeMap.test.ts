@@ -22,20 +22,34 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica | builder=grandeza+special:N2.03 | renderer=grandeza+comparacao-simbolica",
     );
+
+    // Palcos compostos ficam explícitos nas linhas de TODAS as primitivas
+    // canônicas que realmente carregam. O observador faz a união; não escolhe a
+    // primeira e não promove helper físico (Arranjo) a vocabulário da ficha.
+    expect(output).toContain(
+      "ArrayGrid: executável | kinds=array+area+area-model+tabuada+decomposicao+ancora | builder=arraygrid+area+tabuada+decomposicao+ancora | renderer=array+area+tabuada+decomposicao+ancora",
+    );
     expect(output).toContain(
       "StoryPanel: executável | kinds=story+scene+storypanel+story-bars | builder=storypanel | renderer=story-bars",
     );
     expect(output).toContain(
-      "MaterialDourado: executável | kinds=tens+material-dourado | builder=tens | renderer=tens+material-dourado",
+      "SingaporeBars: executável | kinds=singapore-bars+ratio-table+story-bars | builder=storypanel | renderer=singapore-bars+story-bars",
+    );
+    expect(output).toContain(
+      "MaterialDourado: executável | kinds=tens+material-dourado+vertical+deslocamento | builder=tens+vertical+deslocamento | renderer=tens+material-dourado+vertical+deslocamento",
     );
     expect(output).toContain(
       "TenFrame: executável | kinds=tenframe+moldura+bond+plain+material-dourado | builder=tenframe+moldura+bond+plain | renderer=tenframe+moldura+bond+plain+material-dourado",
     );
     expect(output).toContain(
-      "Regua: executável | kinds=measure+regua+regua-f61 | builder=special:GM.05 | renderer=regua+regua-f61",
+      "NumberLine: executável | kinds=numberline+counting-on-f14+tabuada | builder=numberline+tabuada+special:N3.03 | renderer=numberline+counting-on-f14+tabuada",
     );
     expect(output).toContain(
-      "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36 | builder=special:N2.02 | renderer=quadrado100-f36",
+      "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36+tabuada | builder=tabuada+special:N2.02 | renderer=quadrado100-f36+tabuada",
+    );
+
+    expect(output).toContain(
+      "Regua: executável | kinds=measure+regua+regua-f61 | builder=special:GM.05 | renderer=regua+regua-f61",
     );
     expect(output).toContain(
       "VisualAddition: executável | kinds=visual-addition+visual-addition-f13+subvis | builder=special:N3.01 | renderer=visual-addition+visual-addition-f13",
@@ -47,12 +61,12 @@ describe("mapa autoral de fichas para o runtime", () => {
       "LinkingCubes: executável | kinds=linking-cubes+counting-on-f14 | builder=special:N3.03 | renderer=linking-cubes+counting-on-f14",
     );
 
-    // Lacunas reais restantes continuam visíveis; W10 não inventa owner para elas.
+    // Lacuna real restante continua visível. SingaporeBars saiu desta classe
+    // somente porque story-bars prova uma cadeia builder→renderer composta.
     expect(output).toContain("Moedas: renderer-sem-builder");
-    expect(output).toContain("SingaporeBars: renderer-sem-builder");
 
-    expect(output).toContain("- executável: 24");
-    expect(output).toContain("- renderer-sem-builder: 2");
+    expect(output).toContain("- executável: 25");
+    expect(output).toContain("- renderer-sem-builder: 1");
     expect(output).toContain("- componente-isolado: 0");
     expect(output).toContain("- ausente: 0");
 
