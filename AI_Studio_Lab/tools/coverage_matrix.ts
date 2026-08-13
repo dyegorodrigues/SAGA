@@ -123,6 +123,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "Delta exclusivamente de observabilidade, sem mudança de runtime pedagógico: TabuadaStage já renderizava Arranjo (realização física do ArrayGrid canônico), Quadrado100 e NumberLine. No SHA 0b4a5b0dbe26a2c321d7bbb23124cb81681fdcd5, CI #1195 / run 31655630072, o novo gate de palcos compostos passou e a Matrix reobservou 13 divergências, removendo a falsa divergência de N4.03.",
     delta: { divergences: -1 },
   },
+  {
+    id: "W11-AL.03",
+    competence: "AL.03",
+    rationale: "F30 materializada no specialized builder local SkipCountStage-backed: reutiliza InteractiveNumberLineSurface, compõe Quadrado100 no L3, retira os manipuláveis no L4/L5, generaliza saltos 2..10 com início deslocado e nasce com resolucao() R0-A + evidência de processo. O mastery exige dois saltos distintos por evidências históricas e RT permanece apenas telemetria. O canário inativo 5988403f91a66919463ea478492560c54a8a051d passou CI #1219 / run 31662349768 6/6; após a promoção 7052c93b909883a671e6555e413a6992d4c5e8db a Matrix observou 36 Composer, 16 legado, 38 fallback, 52 servidas, 12 divergências, 12 swaps e 44 estreias, sem reconciliação adicional de observabilidade.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
