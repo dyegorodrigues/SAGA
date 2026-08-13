@@ -3,6 +3,7 @@ import type { Question } from "../../types";
 import { normalizeFichaTutorial } from "../fichaQuestionContract";
 import type { FichaCompetencia, FichaMicro } from "../schema";
 import {
+  SkipCountMastery,
   SkipCountMisconception,
   type SkipCountMisconception as SkipCountMisconceptionTag,
 } from "./skipCountSemantics";
@@ -37,6 +38,8 @@ export interface SkipCountResolutionShow {
   multiplosDestacados: number[];
 }
 
+const SALTOS_DE_GENERALIZACAO = [2, 3, 4, 5, 6, 7, 8, 9, 10] as const;
+
 function inteiro(min: number, max: number, sorteio: () => number): number {
   const raw = sorteio();
   const bounded = Number.isFinite(raw) ? Math.max(0, Math.min(0.999999999, raw)) : 0;
@@ -51,11 +54,16 @@ function parametrosDoNivel(nivel: number, sorteio: () => number) {
   if (nivel === 1) return { salto: 2, inicio: 0, apoio: "reta-arcos" as const, limite: 10 };
   if (nivel === 2) return { salto: 10, inicio: 0, apoio: "reta" as const, limite: 100 };
   if (nivel === 3) return { salto: 5, inicio: 0, apoio: "reta-quadrado100" as const, limite: 50 };
-  const salto = escolher([2, 5, 10] as const, sorteio);
+
+  // A §4 da F30 muda de treino dos saltos-âncora para GENERALIZAÇÃO: L4 diz
+  // "qualquer" e L5 dá explicitamente o exemplo 3 em 3 a partir de 6. Em F1,
+  // 2..10 mantém a tarefa legível e permite provar que o padrão, não a tabuada
+  // decorada de 2/5/10, é o objeto de aprendizagem.
+  const salto = escolher(SALTOS_DE_GENERALIZACAO, sorteio);
   if (nivel === 4) return { salto, inicio: 0, apoio: "sequencia" as const, limite: 100 };
-  // F30 L5 cobra independência do ponto zero. Mantemos o alvo curricular 2/5/10
-  // (identidade da ficha + grafo) e deslocamos a congruência do início.
-  const inicio = inteiro(1, Math.max(1, salto - 1), sorteio);
+
+  const maxInicio = Math.max(1, Math.min(20, 100 - salto * 3));
+  const inicio = inteiro(1, maxInicio, sorteio);
   return { salto, inicio, apoio: "mental" as const, limite: 100 };
 }
 
@@ -205,6 +213,7 @@ export function construirSkipCountF30Question(ficha: FichaCompetencia, level: nu
       acertos: micro.dominio.acertos,
       de: micro.dominio.de,
       sessoes: micro.dominio.sessoes,
+      evidenciasDistintas: { ...SkipCountMastery.evidenciasDistintas },
     },
     ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
     uiProps: spec,
