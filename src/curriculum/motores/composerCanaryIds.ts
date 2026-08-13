@@ -73,6 +73,12 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // CI #1219 / run 31662349768 integralmente verde antes desta promoção.
   "AL.03",
 
+  // W12 — F97: multiplicação como grupos iguais. EqualGroupsStage reutiliza
+  // Grupo e preserva a leitura "N grupos de M" da ficha canônica. O canário
+  // inativo 3c801627 passou CI #1256 / run 31701736784 integralmente verde,
+  // incluindo F97 em Chrome real e o portão transversal 390×8, antes da promoção.
+  "N4.01",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
