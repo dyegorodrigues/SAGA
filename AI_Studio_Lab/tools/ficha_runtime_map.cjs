@@ -46,7 +46,15 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Balanca", kinds: ["balanca", "medidas"], componentFiles: [component("Balanca"), component("MedidasStage")], builderKinds: ["balanca", "medidas"], rendererKinds: ["balanca", "medidas"] },
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
   { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
-  { primitive: "EmojiRow", kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"], componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage")], builderKinds: ["emojirow", "fileira", "moldura"], specializedBuilderIds: ["N3.02"], rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"] },
+  {
+    primitive: "EmojiRow",
+    kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15", "regra-sequencia-f57"],
+    componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage"), component("RegraSequenciaStage")],
+    builderKinds: ["emojirow", "fileira", "moldura"],
+    specializedBuilderIds: ["N3.02", "AL.04"],
+    rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15", "regra-sequencia-f57"],
+    note: "W14/F57 usa RegraSequenciaStage para realizar a fileira numérica canônica e compõe NumberLine nos dois primeiros degraus; o owner especializado é AL.04.",
+  },
   {
     primitive: "Grupo",
     kinds: ["groups", "grandeza", "comparacao-simbolica", "equal-groups-f97"],
@@ -92,12 +100,12 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "NumberLine",
-    kinds: ["numberline", "counting-on-f14", "tabuada"],
-    componentFiles: [component("NumberLine"), component("CountingOnStage"), component("TabuadaStage")],
+    kinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57"],
+    componentFiles: [component("NumberLine"), component("CountingOnStage"), component("TabuadaStage"), component("RegraSequenciaStage")],
     builderKinds: ["numberline", "tabuada"],
-    specializedBuilderIds: ["N3.03"],
-    rendererKinds: ["numberline", "counting-on-f14", "tabuada"],
-    note: "W10/F14 renderiza NumberLine dentro de CountingOnStage. F42/N4.03 também renderiza NumberLine para os saltos do primeiro degrau; é entrega física adicional, embora a identidade canônica F42 nomeie ArrayGrid + Quadrado100."
+    specializedBuilderIds: ["N3.03", "AL.04"],
+    rendererKinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57"],
+    note: "W10/F14 renderiza NumberLine dentro de CountingOnStage. F42/N4.03 também renderiza NumberLine para os saltos do primeiro degrau. W14/F57 compõe NumberLine como andaime apenas nos níveis 1–2 e o retira nos níveis 3–5.",
   },
   {
     primitive: "Quadrado100",
