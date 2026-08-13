@@ -537,6 +537,7 @@ function validate(rows: CoverageMatrixRow[], counts: CoverageMatrixCounts): stri
 
   check(new Set(COVERAGE_MIGRATIONS.map(migration => migration.id)).size === COVERAGE_MIGRATIONS.length, "ledger da Coverage Matrix contém IDs de migração duplicados");
   for (const migration of COVERAGE_MIGRATIONS) check(graphIds.has(migration.competence), `${migration.id}: competência inexistente ${migration.competence}`);
+
   for (const row of rows) {
     const sample = sampleRuntime(row.id);
     check(row.canonicalFichas.length > 0, `${row.id}: sem ficha canônica`);
