@@ -38,6 +38,19 @@ export interface FichaDominio {
    */
   exige?: { evidencia: string; descricao: string };
   /**
+   * Variedade histórica de processo — OPT-IN por micro/ficha.
+   *
+   * Ausente = sem efeito: a regra de domínio continua exatamente `acertos/de`,
+   * independência, `exige` quando houver e sessões espaçadas. Presente = a
+   * sessão só amadurece depois de existirem pelo menos `minimo` evidências
+   * históricas distintas cujo nome começa com `prefixo`.
+   *
+   * A condição nunca é inferida globalmente pelo motor e RT/velocidade jamais
+   * contam como diversidade. Isso preserva as competências já fechadas e deixa
+   * a autoria da exigência no lugar certo: a própria ficha.
+   */
+  evidenciasDistintas?: { prefixo: string; minimo: number; descricao?: string };
+  /**
    * Ponte representacional: impede subir de nível enquanto uma condição desta
    * micro ainda não foi demonstrada. Útil quando o próximo nível troca de
    * linguagem (concreto/perceptual -> diagrama -> símbolo).
