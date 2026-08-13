@@ -68,6 +68,8 @@ import { metaEmojiRowRiscar } from '../curriculum/procedimentos/emojiRowRiscarPr
 import { CountingOnSpec } from '../curriculum/procedimentos/countingOnContract';
 import { metaCountingOn } from '../curriculum/procedimentos/countingOnProcedure';
 import { SkipCountF30Spec } from '../curriculum/procedimentos/skipCountContract';
+import { EqualGroupsF97Spec } from '../curriculum/procedimentos/equalGroupsContract';
+import { EqualGroupsStage } from '../curriculum/procedimentos/equalGroupsStage';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -198,6 +200,18 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
           promptDone={promptDone}
           mostrar={mostrar}
           falar={falar}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
+        />
+      );
+    }
+
+    case 'equal-groups-f97': {
+      const spec = uiProps as EqualGroupsF97Spec;
+      return (
+        <EqualGroupsStage
+          spec={spec}
+          options={question.options ?? []}
+          disabled={Boolean(disabled)}
           onAnswer={(valor, meta) => handleInteract(valor, meta)}
         />
       );
