@@ -141,6 +141,16 @@ export const Evidencia = {
    * puro: a operação precisa sobreviver sem o suporte concreto.
    */
   ADICAO_SEM_OBJETOS: "adicao-sem-objetos",
+
+  /**
+   * F58 (GE.03): a criança encontrou corretamente o eixo de simetria no L4.
+   *
+   * Contar lados e cantos é leitura de atributo — a figura fica parada e basta
+   * olhar. O eixo é o único degrau da ficha em que ela precisa dobrar a figura
+   * mentalmente e conferir se cada ponto encontra o seu reflexo. Três acertos
+   * distribuídos pelos níveis de atributo não provam essa passagem.
+   */
+  SIMETRIA_EIXO: "detetive-formas-simetria-nivel-4",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
