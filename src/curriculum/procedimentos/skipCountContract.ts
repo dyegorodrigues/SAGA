@@ -54,10 +54,6 @@ function parametrosDoNivel(nivel: number, sorteio: () => number) {
   if (nivel === 2) return { salto: 10, inicio: 0, apoio: "reta" as const, limite: 100 };
   if (nivel === 3) return { salto: 5, inicio: 0, apoio: "reta-quadrado100" as const, limite: 50 };
 
-  // A §4 da F30 muda de treino dos saltos-âncora para GENERALIZAÇÃO: L4 diz
-  // "qualquer" e L5 dá explicitamente o exemplo 3 em 3 a partir de 6. Em F1,
-  // 2..10 mantém a tarefa legível e permite provar que o padrão, não a tabuada
-  // decorada de 2/5/10, é o objeto de aprendizagem.
   const salto = escolher(SALTOS_DE_GENERALIZACAO, sorteio);
   if (nivel === 4) return { salto, inicio: 0, apoio: "sequencia" as const, limite: 100 };
 
@@ -88,11 +84,13 @@ function opcoesDoItem(
   const porValor = new Map<number, SkipCountF30Option>();
   for (const candidato of candidatos) {
     if (candidato.valor < 0 || candidato.valor > limite) continue;
-    const existente = porValor.get(candidato.valor);
-    if (!existente || (!existente.misconception && candidato.misconception)) porValor.set(candidato.valor, candidato);
+    if (candidato.valor === resposta) {
+      porValor.set(resposta, { valor: resposta });
+      continue;
+    }
+    if (!porValor.has(candidato.valor)) porValor.set(candidato.valor, candidato);
   }
 
-  // Degenerações de borda não podem apagar a superfície de resposta.
   for (let delta = 1; porValor.size < 3 && delta <= salto + 3; delta += 1) {
     const valor = resposta - delta >= 0 ? resposta - delta : resposta + delta;
     if (valor >= 0 && valor <= limite && valor !== resposta && !porValor.has(valor)) {
@@ -193,7 +191,6 @@ export function construirSkipCountF30Resolucao(
   return { estadoInicial, passos, fallback: 0 };
 }
 
-/** Builder especializado W11. O palco compõe a reta compartilhada e Quadrado100. */
 export function construirSkipCountF30Question(ficha: FichaCompetencia, level: number): Question {
   if (ficha.id !== "AL.03") throw new Error(`skipCountContract recebeu ${ficha.id}.`);
   const spec = construirSkipCountF30Spec(level);
