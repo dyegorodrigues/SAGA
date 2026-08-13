@@ -8,6 +8,7 @@ import { N3_02 } from "../fichas/jornada/N3.02";
 import { N3_03 } from "../fichas/jornada/N3.03";
 import { N3_09 } from "../fichas/jornada/N3.09";
 import { N3_10 } from "../fichas/jornada/N3.10";
+import { N4_01 } from "../fichas/jornada/N4.01";
 import { N4_03 } from "../fichas/jornada/N4.03";
 import { N4_04 } from "../fichas/jornada/N4.04";
 import { N4_07 } from "../fichas/jornada/N4.07";
@@ -55,6 +56,8 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.03": N3_03,
   "N3.09": N3_09,
   "N3.10": N3_10,
+  // W12 — F97: grupos iguais sob R0-A; promovida após CI inativo 6/6.
+  "N4.01": N4_01,
   "N4.03": N4_03,
   "N4.04": N4_04,
   "N4.07": N4_07,
