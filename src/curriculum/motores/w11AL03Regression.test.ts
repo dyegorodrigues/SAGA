@@ -1,12 +1,14 @@
 import { afterEach, describe, expect, it } from "vitest";
-import type { Progress } from "../../types";
+import type { MasteryRule, Progress } from "../../types";
+import { AL_03 } from "../fichas/jornada/AL.03";
 import {
   COMPOSER_CANARIES,
   enableComposerCanary,
+  generateRegisteredFichaQuestion,
   rollbackComposerCanary,
 } from "./composerCanary";
 import { getTrackById } from "./curriculum";
-import { applyJourneyAnswer } from "./progressEngine";
+import { applyJourneyAnswer, legacyMasteryEvidence } from "./progressEngine";
 import {
   construirSkipCountF30Spec,
 } from "../procedimentos/skipCountContract";
@@ -23,6 +25,7 @@ import { resolucaoTerminaNaResposta } from "../procedimentos/resolutionProcedure
  * implementação registrada/inativa deve satisfazer antes de qualquer promoção.
  */
 const CANARIOS_ORIGINAIS = [...COMPOSER_CANARIES];
+const FECHADAS_ANTES_DA_W11 = ["N2.02", "N3.01", "N3.02", "N3.03"] as const;
 
 type ApoioF30 = "reta-arcos" | "reta" | "reta-quadrado100" | "sequencia" | "mental";
 interface SkipCountF30Spec {
@@ -50,7 +53,7 @@ function sorteio(...valores: number[]) {
   return () => valores[Math.min(indice++, valores.length - 1)] ?? 0;
 }
 
-function progressoL5(): Progress {
+function progressoL5(overrides: Partial<Progress> = {}): Progress {
   return {
     lvl: 5,
     maxLvl: 5,
@@ -61,7 +64,30 @@ function progressoL5(): Progress {
     tot: 0,
     bank: [],
     mast: 0,
+    ...overrides,
   };
+}
+
+function regraSemDiversidade(rule: MasteryRule): MasteryRule {
+  return { acertos: rule.acertos, de: rule.de, sessoes: rule.sessoes };
+}
+
+function duasSessoes(rule: MasteryRule): Progress {
+  let atual = progressoL5();
+  for (const dia of ["2026-08-10", "2026-08-12"]) {
+    for (let i = 0; i < rule.de; i += 1) {
+      atual = applyJourneyAnswer(atual, true, false, {
+        durationMs: 20_000,
+        targetRtMs: 1_000,
+        helpUsed: false,
+        isReview: dia !== "2026-08-10",
+        practiceDay: dia,
+        evidencias: ["evidencia-neutra"],
+        masteryRule: rule,
+      }).progress;
+    }
+  }
+  return atual;
 }
 
 describe("W11 AL.03 — contagem por saltos F30", () => {
@@ -191,5 +217,92 @@ describe("W11 AL.03 — contagem por saltos F30", () => {
     expect(diverso.masteryEvidence?.passedSessionDays).toEqual(["2026-08-10", "2026-08-12"]);
     expect(diverso.masteryEvidence?.fluencyStreak).toBe(0);
     expect(diverso.dom).toBe(true);
+  });
+});
+
+describe("contrato transversal — diversidade histórica de evidências", () => {
+  it("é opt-in por ficha: F30 declara a condição; W7-W10 não a herdam", () => {
+    const diversidadeDaFicha = AL_03.micros[0].dominio.evidenciasDistintas;
+    expect(diversidadeDaFicha).toEqual({
+      prefixo: "contagem-saltos-passo-",
+      minimo: 2,
+      descricao: "Demonstrar pelo menos dois saltos diferentes.",
+    });
+    expect(generateRegisteredFichaQuestion("AL.03", 5).masteryRule?.evidenciasDistintas)
+      .toEqual(diversidadeDaFicha);
+
+    for (const id of FECHADAS_ANTES_DA_W11) {
+      expect(
+        generateRegisteredFichaQuestion(id, 5).masteryRule?.evidenciasDistintas,
+        `${id} ganhou diversidade sem opt-in`,
+      ).toBeUndefined();
+    }
+  });
+
+  it("W7-W10 preservam exatamente o comportamento da regra anterior", () => {
+    for (const id of FECHADAS_ANTES_DA_W11) {
+      const q = generateRegisteredFichaQuestion(id, 5);
+      expect(q.masteryRule, `${id} sem masteryRule`).toBeDefined();
+      const comExtensaoOpcional = duasSessoes(q.masteryRule!);
+      const regraAnterior = duasSessoes(regraSemDiversidade(q.masteryRule!));
+      expect(comExtensaoOpcional, `${id} mudou por causa da extensão opcional`)
+        .toEqual(regraAnterior);
+    }
+  });
+
+  it("save já coroado em W7-W10 não perde nem ganha domínio por causa da extensão", () => {
+    for (const id of FECHADAS_ANTES_DA_W11) {
+      const q = generateRegisteredFichaQuestion(id, 5);
+      const evidence = legacyMasteryEvidence();
+      const salvo = progressoL5({ dom: true, masteryEvidence: evidence });
+      const depois = applyJourneyAnswer(salvo, true, false, {
+        durationMs: 100,
+        targetRtMs: 1_000,
+        helpUsed: false,
+        isReview: false,
+        practiceDay: "2026-08-13",
+        evidencias: ["evidencia-que-nao-pertence-a-ficha"],
+        masteryRule: q.masteryRule,
+      }).progress;
+
+      expect(depois.dom, `${id} perdeu domínio`).toBe(true);
+      expect(depois.masteryEvidence, `${id} reclassificou save já coroado`).toEqual(evidence);
+    }
+  });
+
+  it("a mesma trajetória só é bloqueada quando a própria regra opta pela diversidade", () => {
+    const base: MasteryRule = { acertos: 3, de: 3, sessoes: 2 };
+    const optIn: MasteryRule = {
+      ...base,
+      evidenciasDistintas: {
+        prefixo: "passo-",
+        minimo: 2,
+        descricao: "Demonstrar dois passos diferentes.",
+      },
+    };
+
+    const executar = (rule: MasteryRule) => {
+      let p = progressoL5();
+      for (const dia of ["2026-08-10", "2026-08-12"]) {
+        for (let i = 0; i < 3; i += 1) {
+          p = applyJourneyAnswer(p, true, false, {
+            durationMs: 100,
+            targetRtMs: 1_000,
+            helpUsed: false,
+            isReview: dia !== "2026-08-10",
+            practiceDay: dia,
+            evidencias: ["passo-2"],
+            masteryRule: rule,
+          }).progress;
+        }
+      }
+      return p;
+    };
+
+    expect(executar(base).dom).toBe(true);
+    const bloqueado = executar(optIn);
+    expect(bloqueado.dom).not.toBe(true);
+    expect(bloqueado.masteryEvidence?.evidenciaDaFicha).toBe(false);
+    expect(bloqueado.masteryEvidence?.passedSessionDays).toEqual([]);
   });
 });
