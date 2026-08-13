@@ -47,7 +47,15 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
   { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
   { primitive: "EmojiRow", kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"], componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage")], builderKinds: ["emojirow", "fileira", "moldura"], specializedBuilderIds: ["N3.02"], rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"] },
-  { primitive: "Grupo", kinds: ["groups", "grandeza", "comparacao-simbolica"], componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage")], builderKinds: ["grandeza"], specializedBuilderIds: ["N2.03"], rendererKinds: ["grandeza", "comparacao-simbolica"] },
+  {
+    primitive: "Grupo",
+    kinds: ["groups", "grandeza", "comparacao-simbolica", "equal-groups-f97"],
+    componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage"), "src/curriculum/procedimentos/equalGroupsStage.ts"],
+    builderKinds: ["grandeza"],
+    specializedBuilderIds: ["N2.03", "N4.01"],
+    rendererKinds: ["grandeza", "comparacao-simbolica", "equal-groups-f97"],
+    note: "W12/F97 reutiliza a primitiva física Grupo em equalGroupsStage; a linguagem visual canônica não é duplicada.",
+  },
   {
     primitive: "InteractiveNumberLine",
     kinds: ["numberline", "numberline-f19", "skip-count-f30"],
