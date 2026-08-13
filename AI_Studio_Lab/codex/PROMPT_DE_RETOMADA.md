@@ -41,7 +41,7 @@ Este commit foi feito **enquanto o run `31719520999` (Certificação transversal
 
 1. este arquivo
 2. `AI_Studio_Lab/codex/RETOMADA.md`
-3. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W12_N4_01_F97_FECHADA_2026-08-13.md`
+3. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W13_GE03_F58_FECHADA_2026-08-13.md`
 4. `AI_Studio_Lab/codex/DEFINICAO_DE_PRONTO.md`
 5. `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`
 6. `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`
@@ -50,13 +50,23 @@ Este commit foi feito **enquanto o run `31719520999` (Certificação transversal
 
 Documentos antigos são históricos. Em conflito valem: **GitHub remoto atual → gates executáveis → checkpoint mais novo → documentos anteriores**.
 
-## 4. Estado curricular após W12
+## 4. Estado curricular após W13
 
-Fechadas: **W7, W8, W9, R0-A, W10, W11, W12**.
+Fechadas: **W7, W8, W9, R0-A, W10, W11, W12, W13**.
 
-Matrix observada após a promoção da W12:
+Matrix observada após a promoção da W13:
 
-`37 Composer / 15 legado / 38 fallback / 52 servidas / 11 divergências / 12 swaps / 44 estreias`
+`38 Composer / 15 legado / 37 fallback / 53 servidas / 11 divergências / 12 swaps / 44 estreias`
+
+### W13 `GE.03 / F58` — a primeira sob o critério fallback-first
+
+Checkpoint: `CHECKPOINT_FABRICA_CURRICULAR_W13_GE03_F58_FECHADA_2026-08-13.md`.
+
+O delta observado foi **`{ composer:+1, fallback:−1, served:+1 }`** — assinatura de dreno de placeholder, diferente das doze migrações anteriores, que todas trocavam `legacy` sem mexer no `fallback`. É a primeira vez nesta linha que uma criança deixa de encontrar `Em construção`. O `legacy` fica intocado de propósito.
+
+Portão inativo certificado em `6092da5acad1bdb3cd8aec4a0f6c8afe21ab3546` — `CI` run `31735133641` e `Certificação transversal` run `31735133586`, os dois verdes no mesmo SHA. Promoção isolada em `09efe1e`.
+
+**Restam 37 fallbacks.**
 
 Marcos da W12 para conferência:
 
@@ -69,22 +79,11 @@ Marcos da W12 para conferência:
 
 A definição de pronto aceita **legado como servido**. Migração legado → Composer que não destrava fallback é dívida separada, fora do caminho crítico.
 
-## 5. Pendência aberta — falha do `CI` no HEAD `94d9075`
+## 5. Pendências abertas
 
-O run `31719520955` (`CI`) falhou. Gates, Higiene e Binários passaram; a **`Sonda real Sensei` falhou em `scripts/sonda-matricula.mjs`** porque o navegador recebeu **HTTP 404 de um `.woff2` do Google Fonts**.
+Nenhuma falha de CI aberta. A quebra da `Sonda real Sensei` por 404 de fonte do Google foi corrigida na paridade do filtro de ruído externo (`sonda-matricula.mjs`).
 
-Contexto para o diagnóstico, já verificado no código:
-
-- `src/index.css:1` faz `@import url('https://fonts.googleapis.com/css2?...')` — o app depende de rede externa para tipografia;
-- `scripts/sonda-sensei-dojo.mjs` **já possui** o filtro que classifica `fonts.gstatic.com` como ruído externo não funcional (ver linhas ~137–143);
-- `scripts/sonda-matricula.mjs` aparentemente **não possui** esse filtro.
-
-Trate como defeito real, não como flake. Duas rotas possíveis, a decidir com evidência:
-
-1. **paridade de sonda** — levar o mesmo filtro de ruído externo já existente para `sonda-matricula.mjs`, mantendo a falha para qualquer 404 que não seja de fonte externa;
-2. **remover a dependência externa** — hospedar a tipografia localmente, o que também elimina a fragilidade offline do app para a criança.
-
-A rota 2 é a correção da fonte do problema; a rota 1 é a correção do instrumento. Se escolher a 1, registre a 2 como dívida nomeada.
+**Dívida nomeada, não urgente:** `src/index.css` ainda faz `@import` do Google Fonts, ou seja, o app depende de rede externa para a tipografia. As sondas hoje filtram esse ruído — o instrumento está corrigido, a fonte do problema não. Hospedar a tipografia localmente elimina a fragilidade e faz o app funcionar offline para a criança. Fora do caminho crítico da fábrica; registrar antes de esquecer.
 
 ## 6. Critério de seleção de onda — vigente da W13 em diante
 
@@ -94,9 +93,9 @@ A rota 2 é a correção da fonte do problema; a rota 1 é a correção do instr
 4. legado só passa à frente quando for pré-requisito bloqueante de uma fallback, ou quando não houver fallback elegível;
 5. recalcule a fila pela Matrix/DAG depois de **cada** onda; lista histórica nunca vence estado vivo.
 
-Fila registrada no pós-W12: `GE.03 (3)`, `AL.04 (2)`, `GE.04 (1)`, `GE.05 (1)`, `N2.06 (1)`.
+Fila registrada no pós-W12, já sem a `GE.03`: `AL.04 (2)`, `GE.04 (1)`, `GE.05 (1)`, `N2.06 (1)`.
 
-Próxima onda: **W13 = `GE.03 / F58`**, salvo deriva comprovada no remoto antes da edição.
+**Recalcule a fila pela Matrix/DAG antes de fixar a W14** — fechar a `GE.03` pode ter tornado elegíveis fallbacks que estavam bloqueados. Lista histórica não vence estado vivo.
 
 `ROTEIRO_ATE_O_FIM.md` não tem precedência sobre este critério.
 
@@ -120,7 +119,7 @@ Próxima onda: **W13 = `GE.03 / F58`**, salvo deriva comprovada no remoto antes 
 
 ## 8. Medição ainda devida
 
-Falta entregar: **horas por onda de FALLBACK (construir) contra onda de LEGADO (migrar)**, medidas no histórico real de commits, não estimadas. É o que transforma o prazo até `fallback = 0` em conta em vez de chute. Entregar no fechamento da próxima onda.
+Falta entregar: **horas por onda de FALLBACK (construir) contra onda de LEGADO (migrar)**, medidas no histórico real de commits, não estimadas. É o que transforma o prazo até `fallback = 0` em conta em vez de chute. Agora existe base real para os dois lados: doze ondas de legado e uma de fallback. Entregar no fechamento da W14.
 
 ## 9. Definição de pronto
 
