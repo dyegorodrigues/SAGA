@@ -68,7 +68,7 @@ export const AL_03: FichaCompetencia = {
     {
       id: "sequencia_escrita",
       fonte: "F30",
-      alvo: "continuar saltos de 2, 5 ou 10 sem reta nem manipulável",
+      alvo: "generalizar o mesmo salto em sequência escrita, inclusive além dos saltos-âncora 2, 5 e 10",
       kinds: ["plain"],
       params: {},
       dominio,
@@ -76,7 +76,7 @@ export const AL_03: FichaCompetencia = {
     {
       id: "inicio_deslocado",
       fonte: "F30",
-      alvo: "manter o tamanho do salto quando a sequência não começa no zero",
+      alvo: "manter qualquer salto de 2 a 10 quando a sequência começa em outro número",
       kinds: ["plain"],
       params: {},
       dominio,
