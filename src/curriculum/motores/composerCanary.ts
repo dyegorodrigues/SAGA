@@ -28,6 +28,7 @@ import { N2_02 } from "../fichas/jornada/N2.02";
 import { N2_03 } from "../fichas/jornada/N2.03";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
+import { GE_03 } from "../fichas/jornada/GE.03";
 import { GM_01 } from "../fichas/jornada/GM.01";
 import { GM_02 } from "../fichas/jornada/GM.02";
 import { GM_05 } from "../fichas/jornada/GM.05";
@@ -50,6 +51,7 @@ import { construirEmojiRowRiscarQuestion } from "../procedimentos/emojiRowRiscar
 import { construirCountingOnQuestion } from "../procedimentos/countingOnContract";
 import { construirSkipCountF30Question } from "../procedimentos/skipCountContract";
 import { construirEqualGroupsQuestion } from "../procedimentos/equalGroupsContract";
+import { construirDetetiveFormasQuestion } from "../procedimentos/detetiveFormasContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -120,6 +122,9 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // F47/F48 — geometrias F0 corrigidas e observadas antes de promoção.
   "GE.01": GE_01,
   "GE.02": GE_02,
+  // W13: F58 registrada e INATIVA. Atributos + simetria reutilizam ShapeCanvas;
+  // a promoção ocorre isoladamente só após gates, Chrome real e transversal.
+  "GE.03": GE_03,
   // Grandezas F0: comparação, tempo cotidiano e conservação sem unidade.
   "GM.01": GM_01,
   "GM.02": GM_02,
@@ -142,6 +147,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N3.03": construirCountingOnQuestion,
   "N4.01": construirEqualGroupsQuestion,
   "AL.03": construirSkipCountF30Question,
+  "GE.03": construirDetetiveFormasQuestion,
   "GM.02": construirTempoCotidianoQuestion,
   "GM.05": construirReguaQuestion,
 };
@@ -161,6 +167,7 @@ const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N3.03": "counting-on-f14",
   "N4.01": "equal-groups-f97",
   "AL.03": "skip-count-f30",
+  "GE.03": "detetive-formas-f58",
   "GM.05": "regua-f61",
 };
 
