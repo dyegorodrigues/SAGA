@@ -1,10 +1,15 @@
 import { afterEach, describe, expect, it } from "vitest";
+import type { Progress } from "../../types";
 import {
   COMPOSER_CANARIES,
   enableComposerCanary,
   rollbackComposerCanary,
 } from "./composerCanary";
 import { getTrackById } from "./curriculum";
+import { applyJourneyAnswer } from "./progressEngine";
+import {
+  construirSkipCountF30Spec,
+} from "../procedimentos/skipCountContract";
 import { resolucaoTerminaNaResposta } from "../procedimentos/resolutionProcedure";
 
 /**
@@ -40,6 +45,25 @@ function spec(nivel: number): SkipCountF30Spec {
   return questao(nivel).uiProps as SkipCountF30Spec;
 }
 
+function sorteio(...valores: number[]) {
+  let indice = 0;
+  return () => valores[Math.min(indice++, valores.length - 1)] ?? 0;
+}
+
+function progressoL5(): Progress {
+  return {
+    lvl: 5,
+    maxLvl: 5,
+    streak: 0,
+    bad: 0,
+    stars: 0,
+    ok: 0,
+    tot: 0,
+    bank: [],
+    mast: 0,
+  };
+}
+
 describe("W11 AL.03 — contagem por saltos F30", () => {
   afterEach(() => {
     COMPOSER_CANARIES.clear();
@@ -70,6 +94,15 @@ describe("W11 AL.03 — contagem por saltos F30", () => {
     expect(l5.inicio).toBeGreaterThan(0);
   });
 
+  it("generaliza além de 2/5/10 e materializa o exemplo canônico 3 em 3 a partir de 6", () => {
+    const l4 = construirSkipCountF30Spec(4, sorteio(0.13, 0));
+    expect(l4).toMatchObject({ nivel: 4, salto: 3, inicio: 0, apoio: "sequencia" });
+
+    const l5 = construirSkipCountF30Spec(5, sorteio(0.13, 0.27, 0));
+    expect(l5).toMatchObject({ nivel: 5, salto: 3, inicio: 6, apoio: "mental" });
+    expect(l5.sequencia.slice(0, 3)).toEqual([6, 9, 12]);
+  });
+
   it("gera progressão ascendente uniforme e resposta calculada do próprio item", () => {
     enableComposerCanary("AL.03");
     for (let nivel = 1; nivel <= 5; nivel += 1) {
@@ -77,6 +110,8 @@ describe("W11 AL.03 — contagem por saltos F30", () => {
         const q = questao(nivel);
         const s = q.uiProps as SkipCountF30Spec;
         expect(s.sequencia.length).toBeGreaterThanOrEqual(3);
+        if (nivel >= 4) expect(s.salto).toBeGreaterThanOrEqual(2);
+        if (nivel >= 4) expect(s.salto).toBeLessThanOrEqual(10);
         for (let i = 1; i < s.sequencia.length; i += 1) {
           expect(s.sequencia[i] - s.sequencia[i - 1]).toBe(s.salto);
         }
@@ -101,12 +136,60 @@ describe("W11 AL.03 — contagem por saltos F30", () => {
     expect(tags).toEqual(new Set(["PERDE_O_SALTO", "SALTO_DUPLO", "SO_DEZENAS", "NAO_PARTE_DE"]));
   });
 
-  it("preserva domínio canônico 3/3 em 2 sessões e não usa velocidade como critério de resposta", () => {
+  it("preserva 3/3 em 2 sessões, exige dois saltos e impede RT de comprar a coroa", () => {
     enableComposerCanary("AL.03");
-    for (let nivel = 1; nivel <= 5; nivel += 1) {
-      const q = questao(nivel);
-      expect(q.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
-      expect(q.evaluate?.(q.answer)).toBe(true);
+    const q = questao(5);
+    expect(q.masteryRule).toEqual({
+      acertos: 3,
+      de: 3,
+      sessoes: 2,
+      evidenciasDistintas: {
+        prefixo: "contagem-saltos-passo-",
+        minimo: 2,
+        descricao: "Demonstrar pelo menos dois saltos diferentes.",
+      },
+    });
+    expect(q.rt_max_s).toBe(8);
+    expect(q.evaluate?.(q.answer)).toBe(true);
+
+    const tentativa = (dia: string, salto: number, durationMs: number) => ({
+      durationMs,
+      targetRtMs: 8000,
+      helpUsed: false,
+      isReview: false,
+      practiceDay: dia,
+      evidencias: [`contagem-saltos-passo-${salto}`],
+      masteryRule: q.masteryRule,
+    });
+
+    // Seis acertos instantâneos, em duas datas, mas todos no mesmo salto: sem
+    // diversidade não existe sessão madura nem coroa.
+    let rapido = progressoL5();
+    for (const dia of ["2026-08-10", "2026-08-12"]) {
+      for (let i = 0; i < 3; i += 1) {
+        rapido = applyJourneyAnswer(rapido, true, false, tentativa(dia, 2, 100)).progress;
+      }
     }
+    expect(rapido.masteryEvidence?.fluencyStreak).toBe(3);
+    expect(rapido.masteryEvidence?.evidenciaDaFicha).toBe(false);
+    expect(rapido.masteryEvidence?.passedSessionDays).toEqual([]);
+    expect(rapido.dom).not.toBe(true);
+
+    // O caminho lento, ao demonstrar dois saltos, amadurece a primeira sessão;
+    // uma segunda sessão espaçada coroa mesmo com RT acima do alvo.
+    let diverso = progressoL5();
+    for (let i = 0; i < 3; i += 1) {
+      diverso = applyJourneyAnswer(diverso, true, false, tentativa("2026-08-10", 2, 20_000)).progress;
+    }
+    diverso = applyJourneyAnswer(diverso, true, false, tentativa("2026-08-10", 5, 20_000)).progress;
+    expect(diverso.masteryEvidence?.passedSessionDays).toEqual(["2026-08-10"]);
+    expect(diverso.masteryEvidence?.fluencyStreak).toBe(0);
+
+    for (let i = 0; i < 3; i += 1) {
+      diverso = applyJourneyAnswer(diverso, true, false, tentativa("2026-08-12", 3, 20_000)).progress;
+    }
+    expect(diverso.masteryEvidence?.passedSessionDays).toEqual(["2026-08-10", "2026-08-12"]);
+    expect(diverso.masteryEvidence?.fluencyStreak).toBe(0);
+    expect(diverso.dom).toBe(true);
   });
 });
