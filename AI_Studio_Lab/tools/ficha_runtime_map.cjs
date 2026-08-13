@@ -48,7 +48,14 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
   { primitive: "EmojiRow", kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"], componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage")], builderKinds: ["emojirow", "fileira", "moldura"], specializedBuilderIds: ["N3.02"], rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"] },
   { primitive: "Grupo", kinds: ["groups", "grandeza", "comparacao-simbolica"], componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage")], builderKinds: ["grandeza"], specializedBuilderIds: ["N2.03"], rendererKinds: ["grandeza", "comparacao-simbolica"] },
-  { primitive: "InteractiveNumberLine", kinds: ["numberline", "numberline-f19"], componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage")], builderKinds: ["numberline"], rendererKinds: ["numberline", "numberline-f19"] },
+  {
+    primitive: "InteractiveNumberLine",
+    kinds: ["numberline", "numberline-f19", "skip-count-f30"],
+    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage")],
+    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03"],
+    rendererKinds: ["numberline", "numberline-f19", "skip-count-f30"],
+    note: "W11/F30 reutiliza InteractiveNumberLineSurface dentro de SkipCountStage; não existe uma segunda reta paralela."
+  },
   { primitive: "InteractiveVertical", kinds: ["vertical"], componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage")], builderKinds: ["vertical"], rendererKinds: ["vertical"], note: "VerticalPlaceValueStage compõe InteractiveVertical + MaterialDourado; vertical aparece também na linha MaterialDourado." },
   {
     primitive: "LinkingCubes",
@@ -86,11 +93,11 @@ const FICHA_RUNTIME_MAP = [
   },
   {
     primitive: "Quadrado100",
-    kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada"],
-    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage")],
-    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02"],
-    rendererKinds: ["quadrado100-f36", "tabuada"],
-    note: "W7/F36 usa builder especializado. F42/N4.03 compõe Quadrado100 dentro de TabuadaStage; tabuada aparece também nas linhas ArrayGrid e NumberLine."
+    kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03"],
+    rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30"],
+    note: "W7/F36 usa builder especializado. F42/N4.03 compõe Quadrado100 dentro de TabuadaStage. W11/F30 compõe Quadrado100 com a reta compartilhada no L3; skip-count-f30 aparece também em InteractiveNumberLine."
   },
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
