@@ -151,7 +151,7 @@ jobs:
   sonda-sensei-dojo:
     name: Sonda real Sensei
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     if: github.event_name == 'pull_request'
 
     steps:
@@ -272,6 +272,18 @@ jobs:
         with:
           name: sonda-f14-${{ github.event.pull_request.head.sha }}
           path: .artifacts/sonda-counting-on/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F30 — contagem por saltos registrada e inativa
+        run: npm run sonda:skip-count
+
+      - name: Evidências da sonda F30
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f30-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-skip-count/
           if-no-files-found: warn
           retention-days: 14
 
