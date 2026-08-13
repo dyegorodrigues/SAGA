@@ -132,6 +132,17 @@ export const MisconceptionTag = {
   /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
   TROCA_DU: "troca-dezenas-unidades",
 
+  /* --- quadro de cem (ficha F36 / N2.02) ---------------------------- */
+
+  /** F36: moveu para o lado quando a relação pedida era vertical, ou vice-versa. */
+  QUADRADO100_CONFUNDE_DIRECAO: "confunde-direcao-quadrado100",
+
+  /** F36: não preservou a coluna/unidade ao variar uma dezena. */
+  QUADRADO100_NAO_VE_PADRAO_DEZENA: "nao-ve-padrao-dezena",
+
+  /** F36: substituiu o salto de dez por uma sequência de passos de um em um. */
+  QUADRADO100_SO_CONTA_UM_A_UM: "so-conta-um-a-um-quadrado100",
+
   /* --- reta numérica (ficha F19 / N1.12) ---------------------------- */
 
   /** F19: saltou para o lado oposto ao pedido. */

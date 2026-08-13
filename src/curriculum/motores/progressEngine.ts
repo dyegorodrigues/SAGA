@@ -1,5 +1,6 @@
 import { MasteryEvidence, MasteryRule, Progress } from "../../types";
 import { calendarDayDistance, normalizeLegacyRuntimeDay } from "../../utils/calendarDay";
+import { isMasteryDisqualifier } from "../masterySignals";
 import { consumeAulaSourceProgress, markAulaSourceProgress } from "./aulaProgressContext";
 import { consumeSenseiDojoTerminal } from "./senseiDojoProgressContext";
 
@@ -220,7 +221,23 @@ function regraValida(rule?: MasteryRule): MasteryRule {
   const acertos = Math.max(1, Math.floor(rule?.acertos ?? REGRA_PADRAO.acertos));
   const de = Math.max(acertos, Math.floor(rule?.de ?? REGRA_PADRAO.de));
   const sessoes = Math.max(1, Math.floor(rule?.sessoes ?? REGRA_PADRAO.sessoes));
-  return { acertos, de, sessoes };
+  const diversidade = rule?.evidenciasDistintas;
+  const prefixo = diversidade?.prefixo?.trim();
+  const minimo = diversidade ? Math.max(1, Math.floor(diversidade.minimo)) : 0;
+  return {
+    acertos,
+    de,
+    sessoes,
+    ...(prefixo && minimo > 0
+      ? {
+          evidenciasDistintas: {
+            prefixo,
+            minimo,
+            ...(diversidade?.descricao ? { descricao: diversidade.descricao } : {}),
+          },
+        }
+      : {}),
+  };
 }
 
 function compreensaoDaSessaoPronta(evidence: MasteryEvidence): boolean {
@@ -232,6 +249,12 @@ function compreensaoDaSessaoPronta(evidence: MasteryEvidence): boolean {
 function sessoesPassadas(evidence: MasteryEvidence): string[] {
   if (evidence.passedSessionDays?.length) return evidence.passedSessionDays;
   return evidence.candidateDay ? [evidence.candidateDay] : [];
+}
+
+function cumpreDiversidadeDeEvidencias(rule: MasteryRule, vistas: string[]): boolean {
+  const requisito = rule.evidenciasDistintas;
+  if (!requisito) return true;
+  return new Set(vistas.filter(nome => nome.startsWith(requisito.prefixo))).size >= requisito.minimo;
 }
 
 export function faltaParaCoroa(
@@ -247,7 +270,9 @@ export function faltaParaCoroa(
   }
   if (evidence.independenceStreak < Math.min(3, rule.acertos)) return "Conseguir sem pedir dica.";
   if (evidence.evidenciaDaFicha === false) {
-    return descricaoDaEvidencia ?? "Acertar uma vez na condicao mais dificil da competencia.";
+    return rule.evidenciasDistintas?.descricao
+      ?? descricaoDaEvidencia
+      ?? "Acertar uma vez na condicao mais dificil da competencia.";
   }
   const requeridas = Math.max(2, rule.sessoes);
   const faltam = requeridas - sessoesPassadas(evidence).length;
@@ -278,6 +303,9 @@ function updateMasteryEvidence(
     : Array(Math.min(anterior?.comprehensionStreak || 0, rule.de)).fill(true);
   const passedDays = [...(anterior?.passedSessionDays
     ?? (anterior?.candidateDay ? [anterior.candidateDay] : []))];
+  const masteryDisqualified = (attempt.evidencias || []).some(isMasteryDisqualifier);
+  const evidenciasDaFicha = (attempt.evidencias || []).filter(evidencia => !isMasteryDisqualifier(evidencia));
+  const masteryRight = right && !masteryDisqualified;
 
   const evidence: MasteryEvidence = {
     schemaVersion: 1,
@@ -295,14 +323,16 @@ function updateMasteryEvidence(
     passedSessionDays: passedDays,
   };
 
-  if (right && attempt.evidencias?.length) {
-    for (const nome of attempt.evidencias) {
+  if (masteryRight && evidenciasDaFicha.length) {
+    for (const nome of evidenciasDaFicha) {
       if (!evidence.evidenciasVistas!.includes(nome)) evidence.evidenciasVistas!.push(nome);
     }
   }
-  evidence.evidenciaDaFicha = attempt.exigeEvidencia
+  const evidenciaExataCumprida = attempt.exigeEvidencia
     ? evidence.evidenciasVistas!.includes(attempt.exigeEvidencia)
     : true;
+  evidence.evidenciaDaFicha = evidenciaExataCumprida
+    && cumpreDiversidadeDeEvidencias(rule, evidence.evidenciasVistas!);
 
   if (before.lvl !== 5) return evidence;
 
@@ -314,12 +344,12 @@ function updateMasteryEvidence(
     evidence.fluencyStreak = 0;
   }
 
-  evidence.comprehensionWindow = [...(evidence.comprehensionWindow || []), right].slice(-rule.de);
-  evidence.comprehensionStreak = right ? Math.min(rule.de, evidence.comprehensionStreak + 1) : 0;
-  evidence.independenceStreak = right && !attempt.helpUsed
+  evidence.comprehensionWindow = [...(evidence.comprehensionWindow || []), masteryRight].slice(-rule.de);
+  evidence.comprehensionStreak = masteryRight ? Math.min(rule.de, evidence.comprehensionStreak + 1) : 0;
+  evidence.independenceStreak = masteryRight && !attempt.helpUsed
     ? Math.min(3, evidence.independenceStreak + 1)
     : 0;
-  evidence.fluencyStreak = right
+  evidence.fluencyStreak = masteryRight
     && attempt.targetRtMs !== undefined
     && attempt.durationMs <= attempt.targetRtMs
       ? Math.min(3, evidence.fluencyStreak + 1)

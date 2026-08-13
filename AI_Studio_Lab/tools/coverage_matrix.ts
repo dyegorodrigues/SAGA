@@ -93,6 +93,48 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F29 materializada no specialized builder local Grupo-backed: quantidade→comparação→símbolo, com N1.05/W2 como pré-requisito direto; o legado saiu de produção e a divergência ficha↔screen foi fechada. A Matrix observou 31 Composer, 21 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W7-N2.02",
+    competence: "N2.02",
+    rationale: "F36 materializada no specialized builder local Quadrado100-backed: +1 horizontal, +10 vertical, +5, vizinhos e lacunas, com onboarding explícito da estreia visual, processo no AnswerMeta e evidência de percurso vertical. O legado saiu de produção somente após suíte, Chrome 320/390/900 e transversal 390×8 verdes. A Matrix observou 32 Composer, 20 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
+    delta: { composer: 1, legacy: -1 },
+  },
+  {
+    id: "W8-N3.01",
+    competence: "N3.01",
+    rationale: "F13 materializada no specialized builder local VisualAddition-backed: juntar preserva as parcelas até a fusão, a escada retira objetos no L4 e chega a símbolo puro no L5, com onboarding explícito da estreia, evidência ADICAO_SEM_OBJETOS, a11y e Chrome 320/390/900. O legado saiu de produção somente após suíte completa e transversal 390×8 verdes. A Matrix observou 33 Composer, 19 legado, 38 fallback, 52 servidas e 16 divergências antes deste ledger.",
+    delta: { composer: 1, legacy: -1 },
+  },
+  {
+    id: "W9-N3.02",
+    competence: "N3.02",
+    rationale: "F15 materializada no specialized builder local EmojiRow#riscar: alfabetiza X=saiu antes da cobrança, preserva o objeto riscado no mesmo slot, separa gesto de retirada da resposta e impede correção pós-RESPONDE_O_REMOVIDO de comprar domínio. O canário inativo passou suíte completa, Chrome 320/390/900 e transversal 390×8; após a promoção a Matrix observou 34 Composer, 18 legado e a reconciliação explícita do modo riscar fechou a divergência ficha↔screen.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "W10-N3.03",
+    competence: "N3.03",
+    rationale: "F14 materializada no specialized builder local CountingOnStage-backed: escolha explícita da parcela maior, sincronização LinkingCubes↔NumberLine, retirada progressiva de andaimes e resolucao() tipada calculada do item. O canário inativo passou CI #1185 6/6 no SHA 8ee8cad13a9542f7bb7f8ed5ce4eafae5efb9ffa; após promoção e observabilidade da composição, a Matrix observou 35 Composer, 17 legado, 38 fallback, 52 servidas e removeu N3.03 das divergências.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "OBS-COMPOSITE-N4.03",
+    competence: "N4.03",
+    rationale: "Delta exclusivamente de observabilidade, sem mudança de runtime pedagógico: TabuadaStage já renderizava Arranjo (realização física do ArrayGrid canônico), Quadrado100 e NumberLine. No SHA 0b4a5b0dbe26a2c321d7bbb23124cb81681fdcd5, CI #1195 / run 31655630072, o novo gate de palcos compostos passou e a Matrix reobservou 13 divergências, removendo a falsa divergência de N4.03.",
+    delta: { divergences: -1 },
+  },
+  {
+    id: "W11-AL.03",
+    competence: "AL.03",
+    rationale: "F30 materializada no specialized builder local SkipCountStage-backed: reutiliza InteractiveNumberLineSurface, compõe Quadrado100 no L3, retira os manipuláveis no L4/L5, generaliza saltos 2..10 com início deslocado e nasce com resolucao() R0-A + evidência de processo. O mastery exige dois saltos distintos por evidências históricas e RT permanece apenas telemetria. O canário inativo 5988403f91a66919463ea478492560c54a8a051d passou CI #1219 / run 31662349768 6/6; após a promoção 7052c93b909883a671e6555e413a6992d4c5e8db a Matrix observou 36 Composer, 16 legado, 38 fallback, 52 servidas, 12 divergências, 12 swaps e 44 estreias, sem reconciliação adicional de observabilidade.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "W12-N4.01",
+    competence: "N4.01",
+    rationale: "F97 materializada no specialized builder EqualGroupsStage-backed: reutiliza Grupo, preserva a frase N grupos de M e a escada 3×3→5×3→5×5→10×5→10×10, com total=grupos×porGrupo e resolucao() R0-A declarativa. O canário inativo 3c80162716c40117e1faf5583fb33fe7ec23013b passou CI #1256 / run 31701736784 6/6, inclusive Chrome real F97 e 390×8; após a promoção 0452b2ed16c67ac32cc30e25ee59bfec46356264 a Matrix observou 37 Composer, 15 legado, 38 fallback, 52 servidas e 11 divergências.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
@@ -268,7 +310,13 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   const rawMode = kind === "pareamento" ? "parear" : kind === "classificacao" ? "caixas/laços" : q?.uiProps?.modo;
 
   let qualified = [...bases];
-  if (kind === "area") {
+  // W9/F15 é um kind autoral especializado e o próprio spec declara modo
+  // `riscar`. A tabela histórica de conformidade ainda é a fonte dos modos
+  // legados; aqui a ponte explícita impede o auditor de achatar a nova linguagem
+  // visual para EmojiRow puro e acusar uma divergência que o Chrome já refutou.
+  if (kind === "emojirow-riscar-f15" && rawMode === "riscar") {
+    qualified = bases.map(base => base === "EmojiRow" ? "EmojiRow#riscar" : base);
+  } else if (kind === "area") {
     qualified = bases.map(base => base === "ArrayGrid" ? "ArrayGrid#área" : base);
   } else if (kind === "moldura" && rawMode === "faltam") {
     qualified = bases.map(base => base === "TenFrame" ? "TenFrame#flash" : base);

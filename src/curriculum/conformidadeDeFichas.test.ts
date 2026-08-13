@@ -171,7 +171,9 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   math: [],
   money: [],
   // Os palcos do Padrão Ouro carregam a primitiva por dentro.
-  tabuada: ["ArrayGrid"],
+  // F42 é composto: Arranjo realiza o ArrayGrid canônico, Quadrado100 é a
+  // segunda primitiva exigida e NumberLine é entrega física adicional no L1.
+  tabuada: ["ArrayGrid", "Quadrado100", "NumberLine"],
   decomposicao: ["ArrayGrid"],
   ancora: ["ArrayGrid"],
   familia: ["NumberBond"],
@@ -412,8 +414,6 @@ describe("conformidade entre as fichas e o que o app serve", () => {
         const [base, modo] = p.split("#");
         const linha = `${id}\t${p}\t(${antes.size} pré-requisitos)`;
         if (antes.size === 0) { raizes.push(linha); continue; }
-        // A classe perigosa: a criança JÁ CONHECE a ferramenta e o desenho
-        // mudou de idioma sem aviso. Ela acha que sabe ler, e não sabe.
         if (modo && basesVistas.has(base)) trocaDeModo.push(`${id}\t${base} vira "${modo}"\t(vinha de ${antes.size} nós usando ${base})`);
         else ferramentaNova.push(linha);
       }

@@ -16,6 +16,9 @@ import { evidenciasReta20 as daReta } from "./procedimentos/reta20Procedure";
 import { construirReguaSpec } from "./procedimentos/reguaContract";
 import { evidenciasDaRegua as daRegua } from "./procedimentos/reguaProcedure";
 import { evidenciasComparacaoSimbolica as daComparacaoSimbolica } from "./procedimentos/comparacaoSimbolicaProcedure";
+import { construirQuadrado100Spec } from "./procedimentos/quadrado100Contract";
+import { evidenciasQuadrado100 as doQuadrado100 } from "./procedimentos/quadrado100Procedure";
+import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visualAdditionProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -133,6 +136,37 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       correta: true,
     }),
   },
+  {
+    nome: "F36 (Quadrado100) — percurso vertical +10 completo",
+    evidencia: Evidencia.PERCURSO_VERTICAL_QUADRADO100,
+    emitir: () => {
+      const spec = construirQuadrado100Spec(2, () => 0.4);
+      return doQuadrado100({
+        modo: spec.modo,
+        inicio: spec.inicio,
+        caminho: [...spec.caminho],
+        toques: [...spec.caminho],
+        erros: [],
+        esperado: spec.alvo,
+        ultimoToque: spec.alvo,
+        acertosParciais: spec.caminho.length,
+        revisoes: 0,
+        completo: true,
+      }, spec);
+    },
+  },
+  {
+    nome: "F13 (VisualAddition) — acerto L4 sem objetos",
+    evidencia: Evidencia.ADICAO_SEM_OBJETOS,
+    emitir: () => daAdicaoVisual({
+      nivel: 4,
+      resposta: 5,
+      correta: true,
+      juntou: true,
+      usouAjuda: false,
+      revisoes: 0,
+    }),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -225,6 +259,29 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       revisoesDeSimbolo: 1,
       escolha: "<",
       correta: false,
+    })).toEqual([]);
+
+    const quadrado = construirQuadrado100Spec(2, () => 0.4);
+    expect(doQuadrado100({
+      modo: quadrado.modo,
+      inicio: quadrado.inicio,
+      caminho: [...quadrado.caminho],
+      toques: [quadrado.inicio + 1],
+      erros: [quadrado.inicio + 1],
+      esperado: quadrado.caminho[0],
+      ultimoToque: quadrado.inicio + 1,
+      acertosParciais: 0,
+      revisoes: 1,
+      completo: false,
+    }, quadrado)).toEqual([]);
+
+    expect(daAdicaoVisual({
+      nivel: 4,
+      resposta: 4,
+      correta: false,
+      juntou: false,
+      usouAjuda: false,
+      revisoes: 1,
     })).toEqual([]);
   });
 });

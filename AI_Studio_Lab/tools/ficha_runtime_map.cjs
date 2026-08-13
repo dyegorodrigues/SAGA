@@ -5,178 +5,132 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
 /**
  * Ponte explícita entre a nomenclatura autoral das fichas e o runtime.
  *
- * `builderKinds` são cases comprovados em src/curriculum/Composer.ts.
- * `specializedBuilderIds` são competências comprovadamente ligadas a um builder
- * especializado em composerCanary.ts — caminho legítimo quando uma primitive
- * existe para UMA ficha e um case genérico só criaria implementação morta.
- * `rendererKinds` são kinds comprovados em FichaRenderer ou GameLoopExerciseRenderer.
- * Uma primitiva autoral pode ser realizada por um Stage mais específico do que o
- * componente que herdou seu nome. Nesses casos o alias/substituição fica listado
- * aqui, com nota de proveniência; arrays vazios continuam sendo lacunas reais,
- * nunca inferências silenciosas.
+ * `primitive` é SEMPRE vocabulário canônico das fichas. Um helper físico como
+ * `Arranjo` pode aparecer em `componentFiles` para provar como `ArrayGrid` é
+ * realizado, mas não ganha uma falsa linha canônica só porque existe no DOM.
+ *
+ * `builderKinds` são cases comprovados em src/curriculum/Composer.ts. Em palco
+ * composto, o MESMO builder kind pode aparecer nas linhas de todas as primitivas
+ * que ele realmente carrega. `specializedBuilderIds` segue a mesma regra para
+ * builders locais de composerCanary.ts.
+ *
+ * `rendererKinds` são kinds comprovados em FichaRenderer ou
+ * GameLoopExerciseRenderer. A convenção de composição é deliberadamente
+ * redundante: se um Stage renderiza A + B, o mesmo renderer kind aparece na
+ * linha de A e na linha de B. O observador deve unir essas linhas; nunca escolher
+ * apenas a primeira. Essa é a "segunda entrada por composição" usada por
+ * CountingOnStage e pelos demais palcos compostos abaixo.
+ *
+ * Uma primitiva autoral pode ser realizada por um Stage/helper com outro nome.
+ * Nesses casos o alias/substituição fica provado em `componentFiles` e explicado
+ * em `note`. Componentes auxiliares que NÃO correspondem a uma primitiva da ficha
+ * não viram primitiva por inferência.
+ *
+ * **Regra de integridade:** arrays vazios continuam sendo lacunas reais, nunca
+ * inferências silenciosas. O mapa descreve cadeia comprovada; não fabrica
+ * builder, renderer, primitiva ou alias para fazer a Matrix ficar verde.
  */
 const FICHA_RUNTIME_MAP = [
   {
     primitive: "ArrayGrid",
-    kinds: ["array", "area", "area-model"],
-    componentFiles: [component("ArrayGrid"), component("AreaStage")],
-    builderKinds: ["arraygrid", "area"],
-    rendererKinds: ["array", "area"],
-    note: "F68/N4.09: a ficha nomeia ArrayGrid em modo área; o Composer emite kind area e o renderer entrega AreaStage. O array direto continua atendido por ArrayGrid.",
+    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora"],
+    componentFiles: [
+      component("ArrayGrid"), component("AreaStage"), component("Arranjo"),
+      component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"),
+    ],
+    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"],
+    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora"],
+    note: "F68/N4.09 usa AreaStage. F42/N4.03, F43/N4.04 e F44/N4.07 realizam o vocabulário canônico ArrayGrid pelo helper físico Arranjo; Arranjo não é promovido artificialmente a primitiva canônica.",
   },
-  {
-    primitive: "AudioChoice",
-    kinds: ["audiochoice"],
-    componentFiles: [component("AudioChoice"), component("AudioChoiceStage")],
-    builderKinds: ["audiochoice"],
-    rendererKinds: ["audiochoice"],
-    note: "F05/N1.06: som→símbolo; Stage possui autoplay/retry/feedback temporal e GameLoop mantém autoria única do enunciado.",
-  },
+  { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
   { primitive: "Balanca", kinds: ["balanca", "medidas"], componentFiles: [component("Balanca"), component("MedidasStage")], builderKinds: ["balanca", "medidas"], rendererKinds: ["balanca", "medidas"] },
-  {
-    primitive: "Recipientes",
-    kinds: ["containers", "medidas"],
-    componentFiles: [component("Recipientes"), component("MedidasStage")],
-    builderKinds: ["medidas"],
-    rendererKinds: ["medidas"],
-    note: "F50/GM.12: conservação/comparação sem unidades; o mesmo componente poderá receber graduação apenas em GM.05.",
-  },
-  {
-    primitive: "DragGroup",
-    kinds: ["draggroup", "pareamento", "classificacao"],
-    componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")],
-    builderKinds: ["draggroup", "pareamento", "classificacao"],
-    rendererKinds: ["draggroup", "pareamento", "classificacao"],
-    note: "A primitiva autoral foi especializada no runtime: F07/N1.01 usa pareamento (produção um-pra-cada sem numerais) e F51/AL.01 usa classificacao; draggroup permanece disponível para o contrato direto legado.",
-  },
-  {
-    primitive: "EmojiRow",
-    kinds: ["emojirow", "fileira", "moldura"],
-    componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage")],
-    builderKinds: ["emojirow", "fileira", "moldura"],
-    rendererKinds: ["emojirow", "fileira", "moldura"],
-    note: "JD1/N1.03, JD2/N1.08 e F52/AL.02 realizam EmojiRow via fileira; JD5/N1.10 usa moldura como palco composto. O alias é por ficha-fonte, não por semelhança de nome.",
-  },
+  { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
+  { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
+  { primitive: "EmojiRow", kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"], componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage")], builderKinds: ["emojirow", "fileira", "moldura"], specializedBuilderIds: ["N3.02"], rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15"] },
   {
     primitive: "Grupo",
-    kinds: ["groups", "grandeza", "comparacao-simbolica"],
-    componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage")],
+    kinds: ["groups", "grandeza", "comparacao-simbolica", "equal-groups-f97"],
+    componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage"), "src/curriculum/procedimentos/equalGroupsStage.ts"],
     builderKinds: ["grandeza"],
-    specializedBuilderIds: ["N2.03"],
-    rendererKinds: ["grandeza", "comparacao-simbolica"],
-    note: "F49/GM.01 continua em grandeza/GrandezaStage. W6/F29/N2.03 reutiliza o mesmo Grupo por builder especializado local e emite comparacao-simbolica; não existe dispatch genérico `groups` novo.",
+    specializedBuilderIds: ["N2.03", "N4.01"],
+    rendererKinds: ["grandeza", "comparacao-simbolica", "equal-groups-f97"],
+    note: "W12/F97 reutiliza a primitiva física Grupo em equalGroupsStage; a linguagem visual canônica não é duplicada.",
   },
   {
     primitive: "InteractiveNumberLine",
-    kinds: ["numberline", "numberline-f19"],
-    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage")],
-    builderKinds: ["numberline"],
-    rendererKinds: ["numberline", "numberline-f19"],
-    note: "F19/N1.12 usa specialized builder e emite numberline-f19 sobre a mesma superfície InteractiveNumberLine; o wrapper numberline legado permanece intacto para N1.07 e demais consumidores.",
+    kinds: ["numberline", "numberline-f19", "skip-count-f30"],
+    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage")],
+    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03"],
+    rendererKinds: ["numberline", "numberline-f19", "skip-count-f30"],
+    note: "W11/F30 reutiliza InteractiveNumberLineSurface dentro de SkipCountStage; não existe uma segunda reta paralela."
   },
-  { primitive: "InteractiveVertical", kinds: ["vertical"], componentFiles: [component("InteractiveVertical")], builderKinds: ["vertical"], rendererKinds: ["vertical"] },
+  { primitive: "InteractiveVertical", kinds: ["vertical"], componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage")], builderKinds: ["vertical"], rendererKinds: ["vertical"], note: "VerticalPlaceValueStage compõe InteractiveVertical + MaterialDourado; vertical aparece também na linha MaterialDourado." },
   {
     primitive: "LinkingCubes",
-    kinds: ["linking-cubes"],
-    componentFiles: [component("LinkingCubes")],
-    builderKinds: [],
-    rendererKinds: ["linking-cubes"],
-    note: "Renderer existe no FichaRenderer/GameLoop, mas a cadeia autoral ainda não possui builder Composer comprovado.",
+    kinds: ["linking-cubes", "counting-on-f14"],
+    componentFiles: [component("LinkingCubes"), component("CountingOnStage")],
+    builderKinds: [], specializedBuilderIds: ["N3.03"],
+    rendererKinds: ["linking-cubes", "counting-on-f14"],
+    note: "W10/F14: CountingOnStage compõe LinkingCubes + NumberLine; owner especializado N3.03."
   },
   {
     primitive: "MaterialDourado",
-    kinds: ["tens", "material-dourado"],
-    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage")],
-    builderKinds: ["tens"],
-    rendererKinds: ["tens", "material-dourado"],
-    note: "F21/N2.01 usa specialized builder registrado no canário e emite material-dourado: palco manipulativo sobre o MaterialDourado existente. O kind tens permanece o contrato estático legado/genérico.",
+    kinds: ["tens", "material-dourado", "vertical", "deslocamento"],
+    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage"), component("VerticalPlaceValueStage"), component("DeslocamentoStage")],
+    builderKinds: ["tens", "vertical", "deslocamento"],
+    rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento"],
+    note: "MaterialDouradoStage compõe MaterialDourado + TenFrame; VerticalPlaceValueStage compõe MaterialDourado + InteractiveVertical. DeslocamentoStage usa MaterialDourado e PromocaoDeOrdem, mas PromocaoDeOrdem é helper da cena, não primitiva canônica adicional."
+  },
+  { primitive: "Moedas", kinds: ["money"], componentFiles: ["src/components/Mascot.tsx"], componentExports: ["MoneyCoin", "MoneyNote"], builderKinds: [], rendererKinds: ["money"] },
+  {
+    primitive: "NumberBond",
+    kinds: ["bond", "familia"],
+    componentFiles: [component("NumberBond"), component("FamiliaStage"), component("TrianguloDeFatos")],
+    builderKinds: ["bond", "familia"],
+    rendererKinds: ["bond", "familia"],
+    note: "F96/N4.06 realiza NumberBond em linguagem triangular pelo helper TrianguloDeFatos; o modo multiplicativo continua uma exigência separada da ficha, não é inferido só pela presença do helper."
   },
   {
-    primitive: "Moedas",
-    kinds: ["money"],
-    componentFiles: ["src/components/Mascot.tsx"],
-    componentExports: ["MoneyCoin", "MoneyNote"],
-    builderKinds: [],
-    rendererKinds: ["money"],
-    note: "Renderização existente é inline no GameLoop; falta builder Composer/contrato autoral comprovado.",
+    primitive: "NumberLine",
+    kinds: ["numberline", "counting-on-f14", "tabuada"],
+    componentFiles: [component("NumberLine"), component("CountingOnStage"), component("TabuadaStage")],
+    builderKinds: ["numberline", "tabuada"],
+    specializedBuilderIds: ["N3.03"],
+    rendererKinds: ["numberline", "counting-on-f14", "tabuada"],
+    note: "W10/F14 renderiza NumberLine dentro de CountingOnStage. F42/N4.03 também renderiza NumberLine para os saltos do primeiro degrau; é entrega física adicional, embora a identidade canônica F42 nomeie ArrayGrid + Quadrado100."
   },
-  { primitive: "NumberBond", kinds: ["bond"], componentFiles: [component("NumberBond")], builderKinds: ["bond"], rendererKinds: ["bond"] },
-  { primitive: "NumberLine", kinds: ["numberline"], componentFiles: [component("NumberLine")], builderKinds: ["numberline"], rendererKinds: ["numberline"] },
   {
     primitive: "Quadrado100",
-    kinds: ["hundred-chart", "frac-shade"],
-    componentFiles: [component("Quadrado100")],
-    builderKinds: [],
-    rendererKinds: [],
-    note: "Componente existe, porém nenhum builder Composer nem dispatch hundred-chart/frac-shade foi comprovado; importar o componente sem case não conta como runtime executável.",
+    kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03"],
+    rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30"],
+    note: "W7/F36 usa builder especializado. F42/N4.03 compõe Quadrado100 dentro de TabuadaStage. W11/F30 compõe Quadrado100 com a reta compartilhada no L3; skip-count-f30 aparece também em InteractiveNumberLine."
   },
-  {
-    primitive: "Regua",
-    kinds: ["measure", "regua", "regua-f61"],
-    componentFiles: [component("Regua"), component("ReguaStage")],
-    builderKinds: [],
-    specializedBuilderIds: ["GM.05"],
-    rendererKinds: ["regua", "regua-f61"],
-    note: "W5/F61/GM.05: builder especializado único produz regua-f61; ReguaStage mede/alinha no zero com drag e alternativa por toque. Não há case genérico morto porque nenhuma outra ficha usa Regua.",
-  },
+  { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
-  {
-    primitive: "ShapeCanvas",
-    kinds: ["shapes", "symmetry", "geo-transform"],
-    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage")],
-    builderKinds: ["shapecanvas"],
-    rendererKinds: ["shapecanvas"],
-    note: "F47/GE.01 e F48/GE.02 compartilham o ShapeCanvas; Composer seleciona modo cena/formas e o renderer despacha ao Stage correspondente.",
-  },
+  { primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform"], componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage")], builderKinds: ["shapecanvas"], rendererKinds: ["shapecanvas"] },
   {
     primitive: "SingaporeBars",
-    kinds: ["singapore-bars", "ratio-table"],
-    componentFiles: [component("SingaporeBars")],
-    builderKinds: [],
-    rendererKinds: ["singapore-bars"],
-    note: "GameLoop renderiza singapore-bars, mas não há case Composer comprovado para as fichas autorais que o nomeiam.",
+    kinds: ["singapore-bars", "ratio-table", "story-bars"],
+    componentFiles: [component("SingaporeBars"), component("SingaporeBarsStage"), component("StoryBarsStage")],
+    builderKinds: ["storypanel"],
+    rendererKinds: ["singapore-bars", "story-bars"],
+    note: "N3.10/F20: StoryBarsStage compõe StoryPanelStage + SingaporeBarsStage; story-bars aparece nas duas linhas canônicas."
   },
   {
     primitive: "StoryPanel",
     kinds: ["story", "scene", "storypanel", "story-bars"],
-    componentFiles: [component("StoryPanel"), component("StoryBarsStage")],
+    componentFiles: [component("StoryPanel"), component("StoryPanelStage"), component("StoryBarsStage")],
     builderKinds: ["storypanel"],
     rendererKinds: ["story-bars"],
-    note: "F20/N3.10: Composer constrói storypanel e normaliza o kind final para story-bars; FichaRenderer/GameLoop entregam StoryBarsStage. StoryPanel.tsx não é o dispatch final desta ficha.",
+    note: "N3.10/F20: Composer constrói storypanel e o renderer final story-bars compõe StoryPanel + SingaporeBars."
   },
-  {
-    primitive: "TenFrame",
-    kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"],
-    componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage")],
-    builderKinds: ["tenframe", "moldura", "bond", "plain"],
-    rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"],
-    note: "F02/JD3/JD5 realizam a moldura autoral pelo MolduraStage; F28/N1.11 usa bond/plain. F21/N2.01 usa TenFrame como organizador explícito da troca 10 unidades→1 dezena dentro de MaterialDouradoStage.",
-  },
-  {
-    primitive: "TouchCount",
-    kinds: ["touchcount"],
-    componentFiles: [component("TouchCount")],
-    builderKinds: ["touchcount"],
-    rendererKinds: ["touchcount"],
-    note: "N1.02/F27 e N1.04/F01: primitiva própria de contagem por toque; compartilha gramática visual com EmojiRow, mas possui contrato/runtime distintos.",
-  },
-  {
-    primitive: "TouchPlace",
-    kinds: ["touchplace"],
-    componentFiles: [component("TouchPlace"), component("TouchPlaceStage")],
-    builderKinds: ["touchplace"],
-    rendererKinds: ["touchplace"],
-    note: "F04/N1.13: produção de quantidade; Stage possui gesto, feedback e retry autoral, GameLoop registra progresso/Radar.",
-  },
-  {
-    primitive: "VisualAddition",
-    kinds: ["visual-addition", "subvis"],
-    componentFiles: [component("VisualAddition")],
-    builderKinds: [],
-    rendererKinds: ["visual-addition"],
-    note: "Renderer visual-addition existe, mas não há builder Composer comprovado para F13/N3.01; subvis continua um kind legado separado.",
-  },
+  { primitive: "TenFrame", kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage")], builderKinds: ["tenframe", "moldura", "bond", "plain"], rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], note: "MaterialDouradoStage compõe MaterialDourado + TenFrame; MolduraStage realiza diretamente TenFrame em seus modos autorais." },
+  { primitive: "TouchCount", kinds: ["touchcount"], componentFiles: [component("TouchCount")], builderKinds: ["touchcount"], rendererKinds: ["touchcount"] },
+  { primitive: "TouchPlace", kinds: ["touchplace"], componentFiles: [component("TouchPlace"), component("TouchPlaceStage")], builderKinds: ["touchplace"], rendererKinds: ["touchplace"] },
+  { primitive: "VisualAddition", kinds: ["visual-addition", "visual-addition-f13", "subvis"], componentFiles: [component("VisualAddition"), component("VisualAdditionStage")], builderKinds: [], specializedBuilderIds: ["N3.01"], rendererKinds: ["visual-addition", "visual-addition-f13"] },
   { primitive: "plain", kinds: ["plain"], componentFiles: [], builtin: true, builderKinds: ["plain"], rendererKinds: ["plain"] },
 ];
 

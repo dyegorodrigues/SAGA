@@ -48,6 +48,37 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // direto; promoção somente após suíte e Chrome real da ficha registrada/inativa.
   "N2.03",
 
+  // W7 — F36: Quadrado100 10×10 com percurso autoral. N2.01/W3 é pré-requisito
+  // direto; promoção após suíte + onboarding visual + Chrome 320/390/900 + 390×8.
+  "N2.02",
+
+  // W8 — F13: VisualAddition autoral com ação de juntar, retirada progressiva
+  // de objetos e prova L4 sem suporte concreto. Promoção após suíte + onboarding
+  // + Chrome 320/390/900 + transversal 390×8 verdes no SHA inativo final.
+  "N3.01",
+
+  // W9 — F15: EmojiRow#riscar autoral. A alfabetização explícita de X=saiu,
+  // preservação geométrica do slot, domínio sem crédito por correção e Chrome
+  // 320/390/900 ficaram verdes no SHA inativo 4218ac68 antes da promoção.
+  "N3.02",
+
+  // W10 — F14: counting on por estratégia. O Stage composto LinkingCubes +
+  // NumberLine, diagnóstico da partida e resolução R0-A passaram suíte + Chrome
+  // 320/390/900 + transversal 390×8 no SHA inativo 8ee8cad1 antes da promoção.
+  "N3.03",
+
+  // W11 — F30: contagem por saltos. SkipCountStage reutiliza a mesma
+  // InteractiveNumberLineSurface, compõe Quadrado100 no L3, generaliza no L4/L5
+  // e exige dois saltos distintos para mastery. O canário inativo 5988403f passou
+  // CI #1219 / run 31662349768 integralmente verde antes desta promoção.
+  "AL.03",
+
+  // W12 — F97: multiplicação como grupos iguais. EqualGroupsStage reutiliza
+  // Grupo e preserva a leitura "N grupos de M" da ficha canônica. O canário
+  // inativo 3c801627 passou CI #1256 / run 31701736784 integralmente verde,
+  // incluindo F97 em Chrome real e o portão transversal 390×8, antes da promoção.
+  "N4.01",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",

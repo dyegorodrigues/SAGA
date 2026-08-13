@@ -127,6 +127,20 @@ export const Evidencia = {
    * para provar que >, < e = foram compreendidos como registro da relação.
    */
   COMPARACAO_SIMBOLICA_SEM_OBJETOS: "comparacao-simbolica-sem-objetos",
+
+  /**
+   * F36 (N2.02): a criança concluiu corretamente um percurso vertical de +10
+   * no Quadrado100. Três acertos apenas horizontais não provam que ela leu a
+   * estrutura decimal da coluna.
+   */
+  PERCURSO_VERTICAL_QUADRADO100: "percurso-vertical-quadrado100",
+
+  /**
+   * F13 (N3.01): pelo menos um acerto no L4, quando os objetos já saíram e os
+   * contêineres preservam apenas os numerais. É a ponte exigida antes do símbolo
+   * puro: a operação precisa sobreviver sem o suporte concreto.
+   */
+  ADICAO_SEM_OBJETOS: "adicao-sem-objetos",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

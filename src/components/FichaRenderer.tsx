@@ -5,6 +5,10 @@ import { AnswerMeta, Question } from '../types';
 import { EmojiRow } from './primitives/EmojiRow';
 import { TenFrame } from './primitives/TenFrame';
 import { VisualAddition } from './primitives/VisualAddition';
+import { VisualAdditionStage } from './primitives/VisualAdditionStage';
+import { EmojiRowRiscarStage } from './primitives/EmojiRowRiscarStage';
+import { CountingOnStage } from './primitives/CountingOnStage';
+import { SkipCountStage } from './primitives/SkipCountStage';
 import { ScatteredItems } from './primitives/ScatteredItems';
 import { LinkingCubes } from './primitives/LinkingCubes';
 import { TakeApart } from './primitives/TakeApart';
@@ -14,7 +18,9 @@ import { InteractiveNumberLine } from './primitives/InteractiveNumberLine';
 import { Reta20Stage } from './primitives/Reta20Stage';
 import { ReguaStage } from './primitives/ReguaStage';
 import { Quadrado100 } from './primitives/Quadrado100';
+import { Quadrado100Stage } from './primitives/Quadrado100Stage';
 import { ShapeCanvas } from './primitives/ShapeCanvas';
+import { DetetiveFormasStage } from './primitives/DetetiveFormasStage';
 import { Relogio } from './primitives/Relogio';
 import { Balanca } from './primitives/Balanca';
 import { MaterialDourado } from './primitives/MaterialDourado';
@@ -50,6 +56,22 @@ import { Reta20Spec } from '../curriculum/procedimentos/reta20Contract';
 import { diagnosticarReta20, evidenciasReta20 } from '../curriculum/procedimentos/reta20Procedure';
 import { ReguaSpec } from '../curriculum/procedimentos/reguaContract';
 import { ComparacaoSimbolicaSpec } from '../curriculum/procedimentos/comparacaoSimbolicaContract';
+import { Quadrado100Spec } from '../curriculum/procedimentos/quadrado100Contract';
+import {
+  AcaoQuadrado100,
+  diagnosticarQuadrado100,
+  evidenciasQuadrado100,
+} from '../curriculum/procedimentos/quadrado100Procedure';
+import { VisualAdditionSpec } from '../curriculum/procedimentos/visualAdditionContract';
+import { metaVisualAddition } from '../curriculum/procedimentos/visualAdditionProcedure';
+import { EmojiRowRiscarSpec } from '../curriculum/procedimentos/emojiRowRiscarContract';
+import { metaEmojiRowRiscar } from '../curriculum/procedimentos/emojiRowRiscarProcedure';
+import { CountingOnSpec } from '../curriculum/procedimentos/countingOnContract';
+import { metaCountingOn } from '../curriculum/procedimentos/countingOnProcedure';
+import { SkipCountF30Spec } from '../curriculum/procedimentos/skipCountContract';
+import { EqualGroupsF97Spec } from '../curriculum/procedimentos/equalGroupsContract';
+import { EqualGroupsStage } from '../curriculum/procedimentos/equalGroupsStage';
+import { DetetiveFormasF58Spec } from '../curriculum/procedimentos/detetiveFormasContract';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -75,10 +97,10 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
   switch (kind) {
     case 'emojirow':
       return <div className="flex justify-center"><EmojiRow {...uiProps} onItemTouch={handleInteract} disabled={disabled} promptDone={promptDone} /></div>;
-      
+
     case 'bond':
       return <div className="flex justify-center"><NumberBond {...uiProps} /></div>;
-      
+
     case 'numberline':
       return <InteractiveNumberLine {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
 
@@ -105,6 +127,110 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
       );
     }
 
+    case 'quadrado100-f36': {
+      const spec = uiProps as Quadrado100Spec;
+      return (
+        <Quadrado100Stage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          falar={falar}
+          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as Record<string, unknown> : null}
+          onAnswer={(valor, acao) => {
+            const manipulacao = acao.completo ? undefined : { precisoEmDestinoErrado: true };
+            const misconception = podeGerarDiagnostico(manipulacao)
+              ? diagnosticarQuadrado100(acao, spec)
+              : undefined;
+            const evidencias = evidenciasQuadrado100(acao, spec);
+            const meta: AnswerMeta & { quadrado100: AcaoQuadrado100 } = {
+              quadrado100: acao,
+              ...(manipulacao ? { manipulacao } : {}),
+              ...(misconception ? { misconception } : {}),
+              ...(evidencias.length ? { evidencias } : {}),
+            };
+            handleInteract(valor, meta);
+          }}
+        />
+      );
+    }
+
+    case 'visual-addition-f13': {
+      const spec = uiProps as VisualAdditionSpec;
+      return (
+        <VisualAdditionStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          mostrar={mostrar}
+          onAnswer={(valor, acao) => handleInteract(valor, metaVisualAddition(acao, spec))}
+        />
+      );
+    }
+
+    case 'emojirow-riscar-f15': {
+      const spec = uiProps as EmojiRowRiscarSpec;
+      return (
+        <EmojiRowRiscarStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          promptDone={promptDone}
+          mostrar={mostrar}
+          falar={falar}
+          onAnswer={(valor, acao) => handleInteract(valor, metaEmojiRowRiscar(acao, spec))}
+        />
+      );
+    }
+
+    case 'counting-on-f14': {
+      const spec = uiProps as CountingOnSpec;
+      return (
+        <CountingOnStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          promptDone={promptDone}
+          mostrar={mostrar}
+          falar={falar}
+          onAnswer={(valor, acao) => handleInteract(valor, metaCountingOn(acao, spec))}
+        />
+      );
+    }
+
+    case 'skip-count-f30': {
+      const spec = uiProps as SkipCountF30Spec;
+      return (
+        <SkipCountStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          promptDone={promptDone}
+          mostrar={mostrar}
+          falar={falar}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
+        />
+      );
+    }
+
+    case 'equal-groups-f97': {
+      const spec = uiProps as EqualGroupsF97Spec;
+      return (
+        <EqualGroupsStage
+          spec={spec}
+          options={question.options ?? []}
+          disabled={Boolean(disabled)}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
+        />
+      );
+    }
+
+    case 'detetive-formas-f58': {
+      const spec = uiProps as DetetiveFormasF58Spec;
+      return (
+        <DetetiveFormasStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          mostrar={mostrar}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
+        />
+      );
+    }
+
     case 'regua':
     case 'regua-f61': {
       const spec = uiProps as ReguaSpec;
@@ -118,7 +244,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
         />
       );
     }
-      
+
     case 'tens':
       // Contrato estático legado/genérico. F21 usa kind próprio para não esconder
       // a diferença semântica do auditor nem sequestrar usos antigos.
@@ -143,13 +269,13 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
         />
       );
     }
-      
+
     case 'relogio':
       return <Relogio {...uiProps} />;
-      
+
     case 'balanca':
       return <Balanca {...uiProps} />;
-      
+
     case 'draggroup':
       return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
     case 'vertical':
@@ -210,7 +336,7 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
       return <TakeApart total={question.n!} knownSplit={{ a: question.a!, b: question.b! }} {...uiProps} />;
     case 'plain':
       return <div className="flex justify-center text-4xl font-black text-slate-800 py-8">{uiProps.text}</div>;
-      
+
     default:
       return <div className="p-4 border border-rose-300 text-rose-500 rounded text-center font-bold">Ficha não implementada: {kind}</div>;
   }
