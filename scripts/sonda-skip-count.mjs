@@ -70,7 +70,7 @@ function checkBase(data, width, level) {
   assert(data.level === level, `F30 nível esperado ${level}, veio ${data.level}`);
   assert(data.support === expectedSupport, `F30 L${level} apoio ${data.support}`);
   if (expectedStep != null) assert(data.step === expectedStep, `F30 L${level} salto ${data.step}`);
-  else assert([2, 5, 10].includes(data.step), `F30 L${level} salto fora de 2/5/10: ${data.step}`);
+  else assert(data.step >= 2 && data.step <= 10, `F30 L${level} salto fora da generalização 2..10: ${data.step}`);
   assert(data.start === (level === 5 ? data.start : 0), `F30 L${level} início inesperado`);
   if (level === 5) assert(data.start > 0, "F30 L5 não deslocou o início");
   assert(data.sequence.length >= 3, `F30 L${level} sequência curta`);
@@ -120,7 +120,7 @@ async function exercise(page, width, level) {
   await page.waitForFunction(() => JSON.parse(document.querySelector("[data-skip-count-probe]")?.getAttribute("data-receipts") ?? "[]").length >= 2);
   const after = await state(page);
   assert(after.receipts.at(-1)?.correct === true, `F30 L${level} acerto final perdido`);
-  assert((after.receipts.at(-1)?.meta?.evidencias ?? []).includes(`contagem-saltos-${data.step}`), `F30 L${level} não registrou evidência do salto ${data.step}`);
+  assert((after.receipts.at(-1)?.meta?.evidencias ?? []).includes(`contagem-saltos-passo-${data.step}`), `F30 L${level} não registrou evidência do salto ${data.step}`);
   if (level >= 4) assert((after.receipts.at(-1)?.meta?.evidencias ?? []).includes("contagem-saltos-sem-manipulavel"), `F30 L${level} perdeu evidência sem manipulável`);
   if (level === 5) assert((after.receipts.at(-1)?.meta?.evidencias ?? []).includes("contagem-saltos-inicio-deslocado"), "F30 L5 perdeu evidência de início deslocado");
 
