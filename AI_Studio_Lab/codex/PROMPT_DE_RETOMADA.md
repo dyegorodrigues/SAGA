@@ -28,8 +28,10 @@ Antes de qualquer edição:
 - HEAD **inativo** da implementação F97 comprovado: `3c80162716c40117e1faf5583fb33fe7ec23013b`.
 - CI inativo de referência: **CI #1256 / run `31701736784` — 6/6 SUCCESS**, incluindo F97 em Chrome real e `390 px × 8 sementes`.
 - commit de promoção de `N4.01`: `0452b2ed16c67ac32cc30e25ee59bfec46356264`.
+- HEAD funcional final certificado da W12 antes do handoff documental: `d902ba9e7ea198ab424ea572b70e6c4edf1a9c93`.
+- CI funcional final de referência: **CI #1262 / run `31712225756` — 6/6 SUCCESS no próprio SHA `d902ba9e7ea198ab424ea572b70e6c4edf1a9c93`**.
 
-O HEAD de fechamento documental é o HEAD remoto que contém este `PROMPT_DE_RETOMADA.md`; ele deve ser reobtido no GitHub em vez de ser hardcoded aqui, porque este arquivo faz parte do próprio commit que o contém. Verde de SHA anterior nunca vale por procuração para o HEAD remoto atual.
+O HEAD documental atual contém este próprio `PROMPT_DE_RETOMADA.md` e pode ser posterior ao SHA funcional acima. Por isso ele deve ser reobtido no GitHub e possuir seu próprio CI integralmente verde antes de ser tratado como checkpoint final. O SHA `d902ba9e...` + CI #1262 é o recibo funcional imediatamente anterior ao handoff documental, não procuração para um HEAD mais novo.
 
 ## 2. Ordem de leitura
 
