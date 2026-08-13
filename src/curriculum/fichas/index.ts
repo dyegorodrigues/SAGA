@@ -39,6 +39,7 @@ import { AL_03 } from './jornada/AL.03';
 import { AL_05 } from './jornada/AL.05';
 import { GE_01 } from './jornada/GE.01';
 import { GE_02 } from './jornada/GE.02';
+import { GE_03 } from './jornada/GE.03';
 import { GM_01 } from './jornada/GM.01';
 import { GM_02 } from './jornada/GM.02';
 import { GM_04 } from './jornada/GM.04';
@@ -52,7 +53,7 @@ export const JOURNEY_FICHAS = [
   N3_01, N3_02, N3_03, N3_09, N3_10, N3_11,
   N4_01, N4_02, N4_03, N4_04, N4_06, N4_07, N4_08, N4_09,
   AL_01, AL_02, AL_03, AL_05,
-  GE_01, GE_02,
+  GE_01, GE_02, GE_03,
   GM_01, GM_02, GM_04, GM_05, GM_12,
 ];
 

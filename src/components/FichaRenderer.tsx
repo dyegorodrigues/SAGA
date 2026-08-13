@@ -20,6 +20,7 @@ import { ReguaStage } from './primitives/ReguaStage';
 import { Quadrado100 } from './primitives/Quadrado100';
 import { Quadrado100Stage } from './primitives/Quadrado100Stage';
 import { ShapeCanvas } from './primitives/ShapeCanvas';
+import { DetetiveFormasStage } from './primitives/DetetiveFormasStage';
 import { Relogio } from './primitives/Relogio';
 import { Balanca } from './primitives/Balanca';
 import { MaterialDourado } from './primitives/MaterialDourado';
@@ -70,6 +71,7 @@ import { metaCountingOn } from '../curriculum/procedimentos/countingOnProcedure'
 import { SkipCountF30Spec } from '../curriculum/procedimentos/skipCountContract';
 import { EqualGroupsF97Spec } from '../curriculum/procedimentos/equalGroupsContract';
 import { EqualGroupsStage } from '../curriculum/procedimentos/equalGroupsStage';
+import { DetetiveFormasF58Spec } from '../curriculum/procedimentos/detetiveFormasContract';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -212,6 +214,18 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
           spec={spec}
           options={question.options ?? []}
           disabled={Boolean(disabled)}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
+        />
+      );
+    }
+
+    case 'detetive-formas-f58': {
+      const spec = uiProps as DetetiveFormasF58Spec;
+      return (
+        <DetetiveFormasStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          mostrar={mostrar}
           onAnswer={(valor, meta) => handleInteract(valor, meta)}
         />
       );
