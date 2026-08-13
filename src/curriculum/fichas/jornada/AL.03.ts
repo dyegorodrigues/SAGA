@@ -1,5 +1,8 @@
-import { FichaCompetencia } from "../../schema";
-import { SkipCountMisconception } from "../../procedimentos/skipCountSemantics";
+import { FichaCompetencia, FichaDominio } from "../../schema";
+import {
+  SKIP_COUNT_STEP_EVIDENCE_PREFIX,
+  SkipCountMisconception,
+} from "../../procedimentos/skipCountSemantics";
 
 /**
  * F30 — Contagem por saltos.
@@ -8,7 +11,18 @@ import { SkipCountMisconception } from "../../procedimentos/skipCountSemantics";
  * por linguagem, não por números maiores: reta com arcos → reta → composição
  * reta + Quadrado100 → sequência escrita → início deslocado mental.
  */
-const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominio: FichaDominio = {
+  acertos: 3,
+  de: 3,
+  sessoes: 2,
+  // F30 §9: a criança precisa demonstrar variedade real de salto. Esta é uma
+  // regra autoral OPT-IN desta ficha; o motor não a injeta em outras competências.
+  evidenciasDistintas: {
+    prefixo: SKIP_COUNT_STEP_EVIDENCE_PREFIX,
+    minimo: 2,
+    descricao: "Demonstrar pelo menos dois saltos diferentes.",
+  },
+};
 
 export const AL_03: FichaCompetencia = {
   id: "AL.03",
