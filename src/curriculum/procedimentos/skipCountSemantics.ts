@@ -7,8 +7,18 @@ export const SkipCountMisconception = {
 
 export type SkipCountMisconception = typeof SkipCountMisconception[keyof typeof SkipCountMisconception];
 
+export const SKIP_COUNT_STEP_EVIDENCE_PREFIX = "contagem-saltos-passo-";
+
+export const SkipCountMastery = {
+  evidenciasDistintas: {
+    prefixo: SKIP_COUNT_STEP_EVIDENCE_PREFIX,
+    minimo: 2,
+    descricao: "Demonstrar pelo menos dois saltos diferentes.",
+  },
+} as const;
+
 export const SkipCountEvidence = {
   SEM_MANIPULAVEL: "contagem-saltos-sem-manipulavel",
   INICIO_DESLOCADO: "contagem-saltos-inicio-deslocado",
-  salto: (valor: number) => `contagem-saltos-${valor}`,
+  salto: (valor: number) => `${SKIP_COUNT_STEP_EVIDENCE_PREFIX}${valor}`,
 } as const;
