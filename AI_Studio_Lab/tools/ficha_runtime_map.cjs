@@ -110,7 +110,15 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
-  { primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform"], componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage")], builderKinds: ["shapecanvas"], rendererKinds: ["shapecanvas"] },
+  {
+    primitive: "ShapeCanvas",
+    kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58"],
+    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage")],
+    builderKinds: ["shapecanvas"],
+    specializedBuilderIds: ["GE.03"],
+    rendererKinds: ["shapecanvas", "detetive-formas-f58"],
+    note: "W13/F58: DetetiveFormasStage desenha por FiguraDesenhada do próprio ShapeCanvas — uma primitiva só, sem composição. Owner especializado GE.03."
+  },
   {
     primitive: "SingaporeBars",
     kinds: ["singapore-bars", "ratio-table", "story-bars"],
