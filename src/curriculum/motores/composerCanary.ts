@@ -38,6 +38,7 @@ import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { AL_03 } from "../fichas/jornada/AL.03";
+import { AL_04 } from "../fichas/jornada/AL.04";
 import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
 import { construirComparacaoSimbolicaQuestion } from "../procedimentos/comparacaoSimbolicaContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
@@ -52,6 +53,7 @@ import { construirCountingOnQuestion } from "../procedimentos/countingOnContract
 import { construirSkipCountF30Question } from "../procedimentos/skipCountContract";
 import { construirEqualGroupsQuestion } from "../procedimentos/equalGroupsContract";
 import { construirDetetiveFormasQuestion } from "../procedimentos/detetiveFormasContract";
+import { construirRegraSequenciaQuestion } from "../procedimentos/regraSequenciaContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -119,6 +121,9 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   // degraus iniciais; L3 compõe Quadrado100 e a promoção só ocorre após gates
   // + Chrome real no mesmo SHA.
   "AL.03": AL_03,
+  // W14: F57 registrada e INATIVA. Sequência numérica reutiliza a linguagem
+  // da fileira e a reta como apoio; promoção só após os dois workflows verdes.
+  "AL.04": AL_04,
   // F47/F48 — geometrias F0 corrigidas e observadas antes de promoção.
   "GE.01": GE_01,
   "GE.02": GE_02,
@@ -147,6 +152,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N3.03": construirCountingOnQuestion,
   "N4.01": construirEqualGroupsQuestion,
   "AL.03": construirSkipCountF30Question,
+  "AL.04": construirRegraSequenciaQuestion,
   "GE.03": construirDetetiveFormasQuestion,
   "GM.02": construirTempoCotidianoQuestion,
   "GM.05": construirReguaQuestion,
@@ -167,6 +173,7 @@ const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N3.03": "counting-on-f14",
   "N4.01": "equal-groups-f97",
   "AL.03": "skip-count-f30",
+  "AL.04": "regra-sequencia-f57",
   "GE.03": "detetive-formas-f58",
   "GM.05": "regua-f61",
 };

@@ -27,11 +27,7 @@ interface SpecF57 {
   termos: Array<number | null>;
   indiceLacuna: number;
   resposta: number;
-  regra: {
-    operacao: OperacaoF57;
-    valor: number;
-    rotulo: string;
-  };
+  regra: { operacao: OperacaoF57; valor: number; rotulo: string };
   diferencasVisiveis: boolean;
 }
 
@@ -56,11 +52,9 @@ describe("W14 regression-first — AL.04/F57", () => {
 
   it("materializa os cinco degraus canônicos F57 pela porta registrada e inativa", () => {
     expect(() => enableComposerCanary("AL.04")).not.toThrow();
-
     for (let nivel = 1; nivel <= 5; nivel += 1) {
       const q = generateRegisteredFichaQuestion("AL.04", nivel);
       const spec = q.uiProps as SpecF57;
-
       expect(q.kind).toBe("regra-sequencia-f57");
       expect(q.isFallback).not.toBe(true);
       expect(spec.nivel).toBe(nivel);
@@ -70,7 +64,16 @@ describe("W14 regression-first — AL.04/F57", () => {
       expect(q.answer).toBe(String(spec.resposta));
       expect(q.evaluate?.(String(spec.resposta))).toBe(true);
       expect(q.evaluate?.(String(spec.resposta + 1))).toBe(false);
-      expect(q.masteryRule).toEqual({ acertos: 3, de: 3, sessoes: 2 });
+      expect(q.masteryRule).toEqual({
+        acertos: 3,
+        de: 3,
+        sessoes: 2,
+        evidenciasDistintas: {
+          prefixo: "regra-sequencia-desafio:",
+          minimo: 1,
+          descricao: "Resolver pelo menos uma sequência decrescente ou com lacuna no meio.",
+        },
+      });
       expect(q.resolucao?.passos.at(-1)?.parcial).toBe(String(spec.resposta));
       expect(shouldRenderQuestionOptions(q)).toBe(false);
     }
@@ -78,7 +81,6 @@ describe("W14 regression-first — AL.04/F57", () => {
 
   it("mantém a progressão da ficha: arcos nos níveis 1-2 e retirada do andaime depois", () => {
     enableComposerCanary("AL.04");
-
     for (let nivel = 1; nivel <= 5; nivel += 1) {
       const spec = generateRegisteredFichaQuestion("AL.04", nivel).uiProps as SpecF57;
       expect(spec.diferencasVisiveis).toBe(nivel <= 2);
@@ -87,12 +89,9 @@ describe("W14 regression-first — AL.04/F57", () => {
 
   it("nível 4 coloca a lacuna no meio e exige aplicar a mesma regra dos dois lados", () => {
     enableComposerCanary("AL.04");
-    const q = generateRegisteredFichaQuestion("AL.04", 4);
-    const spec = q.uiProps as SpecF57;
-
+    const spec = generateRegisteredFichaQuestion("AL.04", 4).uiProps as SpecF57;
     expect(spec.indiceLacuna).toBeGreaterThan(0);
     expect(spec.indiceLacuna).toBeLessThan(spec.termos.length - 1);
-
     const anterior = spec.termos[spec.indiceLacuna - 1];
     const seguinte = spec.termos[spec.indiceLacuna + 1];
     expect(anterior).not.toBeNull();
@@ -103,9 +102,7 @@ describe("W14 regression-first — AL.04/F57", () => {
 
   it("nível 5 é multiplicativo, não uma soma inferida só do último par", () => {
     enableComposerCanary("AL.04");
-    const q = generateRegisteredFichaQuestion("AL.04", 5);
-    const spec = q.uiProps as SpecF57;
-
+    const spec = generateRegisteredFichaQuestion("AL.04", 5).uiProps as SpecF57;
     expect(spec.regra.operacao).toBe("multiplicar");
     expect(spec.regra.valor).toBeGreaterThan(1);
     expect(spec.indiceLacuna).toBe(spec.termos.length - 1);
@@ -114,18 +111,12 @@ describe("W14 regression-first — AL.04/F57", () => {
   it("mantém os três diagnósticos canônicos alcançáveis pela resolução R0-A", () => {
     enableComposerCanary("AL.04");
     const corrigidos = new Set<string>();
-
     for (let nivel = 1; nivel <= 5; nivel += 1) {
       const q = generateRegisteredFichaQuestion("AL.04", nivel);
       for (const passo of q.resolucao?.passos ?? []) {
         for (const tag of passo.corrige ?? []) corrigidos.add(tag);
       }
     }
-
-    expect(corrigidos).toEqual(new Set([
-      "so-ultimo-par",
-      "soma-quando-multiplica",
-      "ignora-direcao",
-    ]));
+    expect(corrigidos).toEqual(new Set(["so-ultimo-par", "soma-quando-multiplica", "ignora-direcao"]));
   });
 });
