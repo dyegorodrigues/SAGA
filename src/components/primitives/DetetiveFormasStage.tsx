@@ -2,11 +2,15 @@ import React, { useMemo, useState } from "react";
 import type { AnswerMeta } from "../../types";
 import { FiguraDesenhada } from "./ShapeCanvas";
 import {
-  DetetiveFormasEvidence,
   DetetiveFormasMisconception,
   type DetetiveFormasEixo,
   type DetetiveFormasF58Spec,
 } from "../../curriculum/procedimentos/detetiveFormasContract";
+import {
+  acertouDetetiveFormas,
+  diagnosticarDetetiveFormas,
+  evidenciasDetetiveFormas,
+} from "../../curriculum/procedimentos/detetiveFormasProcedure";
 
 interface DetetiveFormasStageProps {
   spec: DetetiveFormasF58Spec;
@@ -120,16 +124,15 @@ function SymmetryAxisMode({ spec, onAnswer, disabled }: DetetiveFormasStageProps
 
   const fold = () => {
     if (disabled || !spec.eixoCorreto) return;
-    const correto = selectedAxis === spec.eixoCorreto;
-    const misconception = correto
-      ? undefined
-      : selectedAxis === "vertical" && spec.eixoCorreto !== "vertical"
-        ? DetetiveFormasMisconception.SO_EIXO_VERTICAL
-        : DetetiveFormasMisconception.EIXO_ERRADO;
+    const acao = { nivel: spec.nivel, eixoEscolhido: selectedAxis, eixoCorreto: spec.eixoCorreto };
+    const correto = acertouDetetiveFormas(acao);
+    const evidencias = evidenciasDetetiveFormas(acao);
+    const misconception = diagnosticarDetetiveFormas(acao);
     setFeedback(correto ? "As duas metades coincidem!" : "A dobra não coincide. Ajuste o eixo.");
-    onAnswer(selectedAxis, correto
-      ? { evidencias: [DetetiveFormasEvidence.SIMETRIA_NIVEL_4] }
-      : { misconception });
+    onAnswer(selectedAxis, {
+      ...(evidencias.length ? { evidencias } : {}),
+      ...(misconception ? { misconception } : {}),
+    });
   };
 
   return (

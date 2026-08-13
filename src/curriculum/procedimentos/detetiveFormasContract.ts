@@ -1,3 +1,4 @@
+import { Evidencia } from "../../constants/evidencias";
 import type { ResolucaoDeclarativa } from "../../contracts/pedagogySteps";
 import type { Question } from "../../types";
 import { normalizeFichaTutorial } from "../fichaQuestionContract";
@@ -12,8 +13,15 @@ export const DetetiveFormasMisconception = {
 
 export type DetetiveFormasMisconceptionTag = typeof DetetiveFormasMisconception[keyof typeof DetetiveFormasMisconception];
 
+/**
+ * Apelido local do catálogo central, nunca uma segunda string.
+ *
+ * O nome da condição vive em `constants/evidencias.ts` porque ficha e emissor
+ * moram longe um do outro: declarar aqui um literal próprio é exatamente a
+ * divergência silenciosa que o catálogo existe para impedir.
+ */
 export const DetetiveFormasEvidence = {
-  SIMETRIA_NIVEL_4: "detetive-formas-simetria-nivel-4",
+  SIMETRIA_NIVEL_4: Evidencia.SIMETRIA_EIXO,
 } as const;
 
 export type DetetiveFormasModo =

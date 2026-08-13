@@ -19,6 +19,7 @@ import { evidenciasComparacaoSimbolica as daComparacaoSimbolica } from "./proced
 import { construirQuadrado100Spec } from "./procedimentos/quadrado100Contract";
 import { evidenciasQuadrado100 as doQuadrado100 } from "./procedimentos/quadrado100Procedure";
 import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visualAdditionProcedure";
+import { evidenciasDetetiveFormas as daSimetria } from "./procedimentos/detetiveFormasProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -167,6 +168,15 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       revisoes: 0,
     }),
   },
+  {
+    nome: "F58 (DetetiveFormas) — acerto do eixo de simetria no L4",
+    evidencia: Evidencia.SIMETRIA_EIXO,
+    emitir: () => daSimetria({
+      nivel: 4,
+      eixoEscolhido: "horizontal",
+      eixoCorreto: "horizontal",
+    }),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -283,5 +293,10 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       usouAjuda: false,
       revisoes: 1,
     })).toEqual([]);
+
+    // O eixo errado não emite, e o eixo certo fora do L4 também não: a evidência
+    // é do degrau da dobra, não de qualquer acerto da ficha.
+    expect(daSimetria({ nivel: 4, eixoEscolhido: "vertical", eixoCorreto: "horizontal" })).toEqual([]);
+    expect(daSimetria({ nivel: 3, eixoEscolhido: "horizontal", eixoCorreto: "horizontal" })).toEqual([]);
   });
 });
