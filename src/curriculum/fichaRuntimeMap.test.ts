@@ -44,8 +44,14 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "NumberLine: executável | kinds=numberline+counting-on-f14+tabuada | builder=numberline+tabuada+special:N3.03 | renderer=numberline+counting-on-f14+tabuada",
     );
+    // W11/F30 não cria uma segunda reta: o owner especializado aparece na linha
+    // da InteractiveNumberLine compartilhada e, por composição, também na linha
+    // do Quadrado100 usado somente no L3.
     expect(output).toContain(
-      "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36+tabuada | builder=tabuada+special:N2.02 | renderer=quadrado100-f36+tabuada",
+      "InteractiveNumberLine: executável | kinds=numberline+numberline-f19+skip-count-f30 | builder=numberline+special:AL.03 | renderer=numberline+numberline-f19+skip-count-f30",
+    );
+    expect(output).toContain(
+      "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36+tabuada+skip-count-f30 | builder=tabuada+special:N2.02+special:AL.03 | renderer=quadrado100-f36+tabuada+skip-count-f30",
     );
 
     expect(output).toContain(
