@@ -129,6 +129,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F30 materializada no specialized builder local SkipCountStage-backed: reutiliza InteractiveNumberLineSurface, compõe Quadrado100 no L3, retira os manipuláveis no L4/L5, generaliza saltos 2..10 com início deslocado e nasce com resolucao() R0-A + evidência de processo. O mastery exige dois saltos distintos por evidências históricas e RT permanece apenas telemetria. O canário inativo 5988403f91a66919463ea478492560c54a8a051d passou CI #1219 / run 31662349768 6/6; após a promoção 7052c93b909883a671e6555e413a6992d4c5e8db a Matrix observou 36 Composer, 16 legado, 38 fallback, 52 servidas, 12 divergências, 12 swaps e 44 estreias, sem reconciliação adicional de observabilidade.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W12-N4.01",
+    competence: "N4.01",
+    rationale: "F97 materializada no specialized builder EqualGroupsStage-backed: reutiliza Grupo, preserva a frase N grupos de M e a escada 3×3→5×3→5×5→10×5→10×10, com total=grupos×porGrupo e resolucao() R0-A declarativa. O canário inativo 3c80162716c40117e1faf5583fb33fe7ec23013b passou CI #1256 / run 31701736784 6/6, inclusive Chrome real F97 e 390×8; após a promoção 0452b2ed16c67ac32cc30e25ee59bfec46356264 a Matrix observou 37 Composer, 15 legado, 38 fallback, 52 servidas e 11 divergências.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
