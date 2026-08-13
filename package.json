@@ -31,7 +31,7 @@
     "sonda:emojirow-riscar": "node scripts/sonda-emojirow-riscar.mjs",
     "sonda:counting-on": "node scripts/sonda-counting-on.mjs",
     "sonda:skip-count": "node scripts/sonda-skip-count.mjs",
-    "sonda:equal-groups": "node scripts/sonda-equal-groups.mjs",
+    "sonda:equal-groups": "sh -c 'npx vite --host 127.0.0.1 --port 5212 --strictPort >/tmp/f97-vite.log 2>&1 & sleep 2; node scripts/sonda-equal-groups.mjs'",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
