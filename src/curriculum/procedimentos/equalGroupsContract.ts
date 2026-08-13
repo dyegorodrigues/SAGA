@@ -18,7 +18,8 @@ export interface EqualGroupsResolutionShow {
 }
 
 function ri(min: number, max: number, rng: () => number): number {
-  const n = Number.isFinite(rng()) ? Math.max(0, Math.min(0.999999999, rng())) : 0;
+  const raw = rng();
+  const n = Number.isFinite(raw) ? Math.max(0, Math.min(0.999999999, raw)) : 0;
   return min + Math.floor(n * (max - min + 1));
 }
 
