@@ -35,6 +35,7 @@ import { N1_10 } from "../fichas/jornada/N1.10";
 import { N1_11 } from "../fichas/jornada/N1.11";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
+import { AL_03 } from "../fichas/jornada/AL.03";
 import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparacaoQuantidadeContract";
 import { construirComparacaoSimbolicaQuestion } from "../procedimentos/comparacaoSimbolicaContract";
 import { construirContagem20Question } from "../procedimentos/contagem20Contract";
@@ -46,6 +47,7 @@ import { construirTempoCotidianoQuestion } from "../procedimentos/tempoCotidiano
 import { construirVisualAdditionQuestion } from "../procedimentos/visualAdditionContract";
 import { construirEmojiRowRiscarQuestion } from "../procedimentos/emojiRowRiscarContract";
 import { construirCountingOnQuestion } from "../procedimentos/countingOnContract";
+import { construirSkipCountF30Question } from "../procedimentos/skipCountContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -120,6 +122,11 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "AL.01": AL_01,
   "AL.02": AL_02,
 
+  // W11: F30 registrada e INATIVA. A mesma reta compartilhada sustenta os
+  // degraus iniciais; L3 compõe Quadrado100 e a promoção só ocorre após gates
+  // + Chrome real no mesmo SHA.
+  "AL.03": AL_03,
+
   // F47/F48 — geometrias F0 corrigidas e observadas antes de promoção.
   "GE.01": GE_01,
   "GE.02": GE_02,
@@ -145,6 +152,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N3.01": construirVisualAdditionQuestion,
   "N3.02": construirEmojiRowRiscarQuestion,
   "N3.03": construirCountingOnQuestion,
+  "AL.03": construirSkipCountF30Question,
   "GM.02": construirTempoCotidianoQuestion,
   "GM.05": construirReguaQuestion,
 };
@@ -162,6 +170,7 @@ const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N3.01": "visual-addition-f13",
   "N3.02": "emojirow-riscar-f15",
   "N3.03": "counting-on-f14",
+  "AL.03": "skip-count-f30",
   "GM.05": "regua-f61",
 };
 
