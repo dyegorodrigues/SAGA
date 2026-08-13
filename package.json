@@ -30,6 +30,7 @@
     "sonda:visual-addition": "node scripts/sonda-visual-addition.mjs",
     "sonda:emojirow-riscar": "node scripts/sonda-emojirow-riscar.mjs",
     "sonda:counting-on": "node scripts/sonda-counting-on.mjs",
+    "sonda:skip-count": "node scripts/sonda-skip-count.mjs",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
   },
   "dependencies": {
