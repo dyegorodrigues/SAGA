@@ -8,6 +8,7 @@ import { VisualAddition } from './primitives/VisualAddition';
 import { VisualAdditionStage } from './primitives/VisualAdditionStage';
 import { EmojiRowRiscarStage } from './primitives/EmojiRowRiscarStage';
 import { CountingOnStage } from './primitives/CountingOnStage';
+import { SkipCountStage } from './primitives/SkipCountStage';
 import { ScatteredItems } from './primitives/ScatteredItems';
 import { LinkingCubes } from './primitives/LinkingCubes';
 import { TakeApart } from './primitives/TakeApart';
@@ -66,6 +67,7 @@ import { EmojiRowRiscarSpec } from '../curriculum/procedimentos/emojiRowRiscarCo
 import { metaEmojiRowRiscar } from '../curriculum/procedimentos/emojiRowRiscarProcedure';
 import { CountingOnSpec } from '../curriculum/procedimentos/countingOnContract';
 import { metaCountingOn } from '../curriculum/procedimentos/countingOnProcedure';
+import { SkipCountF30Spec } from '../curriculum/procedimentos/skipCountContract';
 import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
 
 interface FichaRendererProps {
@@ -183,6 +185,20 @@ export function FichaRenderer({ question, onAnswer, disabled, promptDone = true,
           mostrar={mostrar}
           falar={falar}
           onAnswer={(valor, acao) => handleInteract(valor, metaCountingOn(acao, spec))}
+        />
+      );
+    }
+
+    case 'skip-count-f30': {
+      const spec = uiProps as SkipCountF30Spec;
+      return (
+        <SkipCountStage
+          spec={spec}
+          disabled={Boolean(disabled)}
+          promptDone={promptDone}
+          mostrar={mostrar}
+          falar={falar}
+          onAnswer={(valor, meta) => handleInteract(valor, meta)}
         />
       );
     }
