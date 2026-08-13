@@ -287,6 +287,9 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+      - name: Sonda real F97 — grupos iguais registrada e inativa
+        run: npm run sonda:equal-groups
+
   higiene-diff:
     name: Higiene do diff
     runs-on: ubuntu-latest
