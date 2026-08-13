@@ -111,6 +111,18 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F15 materializada no specialized builder local EmojiRow#riscar: alfabetiza X=saiu antes da cobrança, preserva o objeto riscado no mesmo slot, separa gesto de retirada da resposta e impede correção pós-RESPONDE_O_REMOVIDO de comprar domínio. O canário inativo passou suíte completa, Chrome 320/390/900 e transversal 390×8; após a promoção a Matrix observou 34 Composer, 18 legado e a reconciliação explícita do modo riscar fechou a divergência ficha↔screen.",
     delta: { composer: 1, legacy: -1, divergences: -1 },
   },
+  {
+    id: "W10-N3.03",
+    competence: "N3.03",
+    rationale: "F14 materializada no specialized builder local CountingOnStage-backed: escolha explícita da parcela maior, sincronização LinkingCubes↔NumberLine, retirada progressiva de andaimes e resolucao() tipada calculada do item. O canário inativo passou CI #1185 6/6 no SHA 8ee8cad13a9542f7bb7f8ed5ce4eafae5efb9ffa; após promoção e observabilidade da composição, a Matrix observou 35 Composer, 17 legado, 38 fallback, 52 servidas e removeu N3.03 das divergências.",
+    delta: { composer: 1, legacy: -1, divergences: -1 },
+  },
+  {
+    id: "OBS-COMPOSITE-N4.03",
+    competence: "N4.03",
+    rationale: "Delta exclusivamente de observabilidade, sem mudança de runtime pedagógico: TabuadaStage já renderizava Arranjo (realização física do ArrayGrid canônico), Quadrado100 e NumberLine. No SHA d64a6ad02da6c1800ef1c54ab4fe145f2951df9b, CI #1191, o novo gate de palcos compostos passou e a Matrix reobservou 13 divergências, removendo a falsa divergência de N4.03.",
+    delta: { divergences: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>
