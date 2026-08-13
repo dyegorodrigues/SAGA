@@ -178,3 +178,9 @@ O prompt é autossuficiente e deve sempre mandar reancorar no GitHub remoto ante
 O critério histórico de sequência por blocos em `ROTEIRO_ATE_O_FIM.md` não tem precedência sobre a regra nova. A partir da W13 a seleção operacional é a Matrix/DAG viva, fallback-first.
 
 Restrições continuam: não tocar na `main`, não fazer merge/ready/auto-merge, não tocar no Creature Engine, não ativar Thinking Engine runtime, não reabrir W7–W11 e não enfraquecer gates.
+
+## 11. Recibo funcional final e handoff documental
+
+O fechamento funcional final da W12 foi certificado no SHA `d902ba9e7ea198ab424ea572b70e6c4edf1a9c93` pelo **CI #1262 / run `31712225756` — 6/6 SUCCESS no próprio SHA**, incluindo Gates, Sensei/F97, `390 px × 8 sementes`, `320/900 px`, higiene e guarda de binários.
+
+Depois desse recibo foram feitos apenas ajustes documentais de handoff para registrar nominalmente o próprio recibo no checkpoint e no `PROMPT_DE_RETOMADA.md`. Esses commits documentais também precisam de CI verde no HEAD exato antes de este checkpoint ser considerado o ponto final para abrir conversa nova; verde de `d902ba9e...` não vale por procuração para HEAD posterior.
