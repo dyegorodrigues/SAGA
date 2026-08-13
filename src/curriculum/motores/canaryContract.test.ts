@@ -34,6 +34,7 @@ import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_13 } from "../fichas/jornada/N1.13";
 import { GE_01 } from "../fichas/jornada/GE.01";
 import { GE_02 } from "../fichas/jornada/GE.02";
+import { GE_03 } from "../fichas/jornada/GE.03";
 import { GM_01 } from "../fichas/jornada/GM.01";
 import { GM_02 } from "../fichas/jornada/GM.02";
 import { GM_05 } from "../fichas/jornada/GM.05";
@@ -89,6 +90,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.12": N1_12,
   "GM.05": GM_05,
   "AL.02": AL_02,
+  "GE.03": GE_03,
 };
 
 const CANARIOS = [...COMPOSER_CANARIES];
