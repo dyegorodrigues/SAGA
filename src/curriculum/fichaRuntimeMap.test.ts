@@ -20,12 +20,9 @@ describe("mapa autoral de fichas para o runtime", () => {
       "EmojiRow: executável | kinds=emojirow+fileira+moldura+emojirow-riscar-f15 | builder=emojirow+fileira+moldura+special:N3.02 | renderer=emojirow+fileira+moldura+emojirow-riscar-f15",
     );
     expect(output).toContain(
-      "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica | builder=grandeza+special:N2.03 | renderer=grandeza+comparacao-simbolica",
+      "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica+equal-groups-f97 | builder=grandeza+special:N2.03+special:N4.01 | renderer=grandeza+comparacao-simbolica+equal-groups-f97",
     );
 
-    // Palcos compostos ficam explícitos nas linhas de TODAS as primitivas
-    // canônicas que realmente carregam. O observador faz a união; não escolhe a
-    // primeira e não promove helper físico (Arranjo) a vocabulário da ficha.
     expect(output).toContain(
       "ArrayGrid: executável | kinds=array+area+area-model+tabuada+decomposicao+ancora | builder=arraygrid+area+tabuada+decomposicao+ancora | renderer=array+area+tabuada+decomposicao+ancora",
     );
@@ -44,38 +41,27 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain(
       "NumberLine: executável | kinds=numberline+counting-on-f14+tabuada | builder=numberline+tabuada+special:N3.03 | renderer=numberline+counting-on-f14+tabuada",
     );
-    // W11/F30 não cria uma segunda reta: o owner especializado aparece na linha
-    // da InteractiveNumberLine compartilhada e, por composição, também na linha
-    // do Quadrado100 usado somente no L3.
     expect(output).toContain(
       "InteractiveNumberLine: executável | kinds=numberline+numberline-f19+skip-count-f30 | builder=numberline+special:AL.03 | renderer=numberline+numberline-f19+skip-count-f30",
     );
     expect(output).toContain(
       "Quadrado100: executável | kinds=hundred-chart+frac-shade+quadrado100-f36+tabuada+skip-count-f30 | builder=tabuada+special:N2.02+special:AL.03 | renderer=quadrado100-f36+tabuada+skip-count-f30",
     );
-
     expect(output).toContain(
       "Regua: executável | kinds=measure+regua+regua-f61 | builder=special:GM.05 | renderer=regua+regua-f61",
     );
     expect(output).toContain(
       "VisualAddition: executável | kinds=visual-addition+visual-addition-f13+subvis | builder=special:N3.01 | renderer=visual-addition+visual-addition-f13",
     );
-
-    // W10/F14: LinkingCubes deixa de ser renderer-sem-builder por um owner
-    // especializado local; o kind legado linking-cubes continua disponível.
     expect(output).toContain(
       "LinkingCubes: executável | kinds=linking-cubes+counting-on-f14 | builder=special:N3.03 | renderer=linking-cubes+counting-on-f14",
     );
 
-    // Lacuna real restante continua visível. SingaporeBars saiu desta classe
-    // somente porque story-bars prova uma cadeia builder→renderer composta.
     expect(output).toContain("Moedas: renderer-sem-builder");
-
     expect(output).toContain("- executável: 25");
     expect(output).toContain("- renderer-sem-builder: 1");
     expect(output).toContain("- componente-isolado: 0");
     expect(output).toContain("- ausente: 0");
-
     expect(output).toContain("[RESULTADO]");
     expect(output).toContain("fichas válidas, nove seções presentes");
   });
