@@ -46,6 +46,12 @@ const composites = [
     primitives: ["LinkingCubes", "NumberLine"],
   },
   {
+    kind: "skip-count-f30",
+    stage: "src/components/primitives/SkipCountStage.tsx",
+    imports: ["./InteractiveNumberLine", "./Quadrado100"],
+    primitives: ["InteractiveNumberLine", "Quadrado100"],
+  },
+  {
     kind: "material-dourado",
     stage: "src/components/primitives/MaterialDouradoStage.tsx",
     imports: ["./MaterialDourado", "./TenFrame"],
