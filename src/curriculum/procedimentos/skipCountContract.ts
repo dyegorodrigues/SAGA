@@ -3,7 +3,6 @@ import type { Question } from "../../types";
 import { normalizeFichaTutorial } from "../fichaQuestionContract";
 import type { FichaCompetencia, FichaMicro } from "../schema";
 import {
-  SkipCountMastery,
   SkipCountMisconception,
   type SkipCountMisconception as SkipCountMisconceptionTag,
 } from "./skipCountSemantics";
@@ -200,6 +199,7 @@ export function construirSkipCountF30Question(ficha: FichaCompetencia, level: nu
   const spec = construirSkipCountF30Spec(level);
   const micro = microDoNivel(ficha, spec.nivel);
   const rtAlvoMs = ficha.niveis?.[spec.nivel]?.rt_alvo;
+  const diversidade = micro.dominio.evidenciasDistintas;
 
   return {
     kind: "skip-count-f30",
@@ -213,7 +213,7 @@ export function construirSkipCountF30Question(ficha: FichaCompetencia, level: nu
       acertos: micro.dominio.acertos,
       de: micro.dominio.de,
       sessoes: micro.dominio.sessoes,
-      evidenciasDistintas: { ...SkipCountMastery.evidenciasDistintas },
+      ...(diversidade ? { evidenciasDistintas: { ...diversidade } } : {}),
     },
     ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
     uiProps: spec,
