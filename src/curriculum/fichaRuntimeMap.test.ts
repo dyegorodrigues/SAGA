@@ -17,7 +17,7 @@ describe("mapa autoral de fichas para o runtime", () => {
       "DragGroup: executável | kinds=draggroup+pareamento+classificacao | builder=draggroup+pareamento+classificacao | renderer=draggroup+pareamento+classificacao",
     );
     expect(output).toContain(
-      "EmojiRow: executável | kinds=emojirow+fileira+moldura+emojirow-riscar-f15 | builder=emojirow+fileira+moldura+special:N3.02 | renderer=emojirow+fileira+moldura+emojirow-riscar-f15",
+      "EmojiRow: executável | kinds=emojirow+fileira+moldura+emojirow-riscar-f15+regra-sequencia-f57 | builder=emojirow+fileira+moldura+special:N3.02+special:AL.04 | renderer=emojirow+fileira+moldura+emojirow-riscar-f15+regra-sequencia-f57",
     );
     expect(output).toContain(
       "Grupo: executável | kinds=groups+grandeza+comparacao-simbolica+equal-groups-f97 | builder=grandeza+special:N2.03+special:N4.01 | renderer=grandeza+comparacao-simbolica+equal-groups-f97",
@@ -39,7 +39,7 @@ describe("mapa autoral de fichas para o runtime", () => {
       "TenFrame: executável | kinds=tenframe+moldura+bond+plain+material-dourado | builder=tenframe+moldura+bond+plain | renderer=tenframe+moldura+bond+plain+material-dourado",
     );
     expect(output).toContain(
-      "NumberLine: executável | kinds=numberline+counting-on-f14+tabuada | builder=numberline+tabuada+special:N3.03 | renderer=numberline+counting-on-f14+tabuada",
+      "NumberLine: executável | kinds=numberline+counting-on-f14+tabuada+regra-sequencia-f57 | builder=numberline+tabuada+special:N3.03+special:AL.04 | renderer=numberline+counting-on-f14+tabuada+regra-sequencia-f57",
     );
     expect(output).toContain(
       "InteractiveNumberLine: executável | kinds=numberline+numberline-f19+skip-count-f30 | builder=numberline+special:AL.03 | renderer=numberline+numberline-f19+skip-count-f30",
