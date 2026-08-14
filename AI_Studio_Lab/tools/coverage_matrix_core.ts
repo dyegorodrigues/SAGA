@@ -75,6 +75,7 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
   { id: "W22-N6.03", competence: "N6.03", rationale: "F87 materializada no palco composto Quadrado100 + SingaporeBars: parte de cem → âncoras → percentual de quantidade → desconto/acréscimo → percentual inverso, com resolucao R0-A e diagnósticos canônicos. O portão inativo eed2b8ab passou CI 31820722322 + transversal 31820722277. Promoção e ledger entraram atomicamente; nenhum delta de divergência foi presumido.", delta: { composer: 1, fallback: -1, served: 1 } },
   { id: "W23-GE.06", competence: "GE.06", rationale: "F78 materializada no AngulosStage como realização explícita do ShapeCanvas em modo ângulo: abertura dinâmica, comparação independente do comprimento dos lados, graus e polígonos, com resolucao R0-A. Promoção e ledger entram atomicamente neste SHA após o portão inativo exato; nenhum delta de divergência é presumido.", delta: { composer: 1, fallback: -1, served: 1 } },
   { id: "W24-N7.01", competence: "N7.01", rationale: "F84 materializada como extensão da InteractiveNumberLine para negativos, comparação, ordenação, distância e módulo. O portão inativo 1f912c8f passou CI 31825522496 + transversal 31825522510; promoção e ledger entram atomicamente neste SHA, sem antecipar número de Matrix.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W25-PE.02", competence: "PE.02", rationale: "F64 materializada no JornalTurmaStage como realização explícita do SingaporeBars em modo vertical: tabela → barras → comparação → construção → linguagem de probabilidade. O portão inativo 748724d0 passou CI 31842370575 + transversal 31842370542; promoção e ledger entram atomicamente neste SHA, sem antecipar número de Matrix.", delta: { composer: 1, fallback: -1, served: 1 } },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
@@ -176,6 +177,7 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   else if (kind === "moldura" && rawMode === "faltam") qualified = bases.map(base => base === "TenFrame" ? "TenFrame#flash" : base);
   else if (kind === "partes-iguais-f45") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#partição" : base);
   else if (kind === "angulos-f78") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#ângulo" : base);
+  else if (kind === "jornal-turma-f64") qualified = bases.map(base => base === "SingaporeBars" ? "SingaporeBars#vertical" : base);
   else {
     const mode = rawMode ? modeByRuntime.get(String(rawMode)) : undefined;
     if (mode && bases.length) qualified = [`${bases[0]}#${mode}`, ...bases.slice(1)];
