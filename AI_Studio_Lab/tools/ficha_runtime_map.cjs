@@ -5,9 +5,8 @@ const { FICHA_RUNTIME_MAP: BASE } = require("./ficha_runtime_map_core.cjs");
  *
  * A regra de composição permanece a mesma: o mesmo renderer kind aparece em
  * cada primitiva que o palco carrega — esta é a segunda entrada por composição;
- * o observador deve unir essas linhas. Helpers não são promovidos a primitivas
- * canônicas; arrays vazios continuam sendo lacunas reais, nunca inferências
- * silenciosas para deixar a Matrix verde.
+ * o observador deve unir essas linhas. Helpers não são promovidos a primitivas.
+ * arrays vazios continuam sendo lacunas reais, nunca inferências silenciosas.
  */
 const FICHA_RUNTIME_MAP = BASE.map(entry => {
   if (entry.primitive === "Quadrado100") {
