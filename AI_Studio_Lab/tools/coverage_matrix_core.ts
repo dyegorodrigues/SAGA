@@ -66,6 +66,10 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F45 materializada no PartesIguaisStage, compondo FiguraDesenhada de ShapeCanvas + SingaporeFractionBar da SingaporeBars. L4 produz equipartição com deslizar ou toque equivalente; evidência só nasce quando os intervalos são matematicamente iguais. O canário inativo b32bee4c passou CI 31760839221 + transversal 31760839210. Após a promoção baa382a0, a Matrix observou 40 Composer, 15 legado, 35 fallback, 55 servidas e uma falsa divergência de modo ShapeCanvas#partição, reconciliada explicitamente abaixo.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  { id: "W16-N5.02", competence: "N5.02", rationale: "F72 materializada compondo SingaporeBars + InteractiveNumberLine. A promoção foi observada pela Matrix como +1 Composer, -1 fallback e +1 servida.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W17-N6.01", competence: "N6.01", rationale: "F75 materializada relendo Quadrado100 como um inteiro em décimos e centésimos. A promoção foi observada pela Matrix como +1 Composer, -1 fallback e +1 servida.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W18-N5.03", competence: "N5.03", rationale: "F73 materializada com SingaporeBars de mesmo comprimento para equivalência e comparação. A promoção isolada ecdecfec foi observada antes do ledger: 43 Composer, 15 legado, 32 fallback, 58 servidas e 11 divergências.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W19-N4.10", competence: "N4.10", rationale: "F69 materializada no palco composto ArrayGrid + InteractiveVertical, com revelação progressiva, resto válido e zero posicional no quociente. O portão inativo 4ed4858d passou CI 31798437057 + transversal 31798437091. A promoção 056c19e3 fez a Matrix observar 44 Composer, 15 legado, 31 fallback, 59 servidas e 11 divergências antes deste ledger.", delta: { composer: 1, fallback: -1, served: 1 } },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
