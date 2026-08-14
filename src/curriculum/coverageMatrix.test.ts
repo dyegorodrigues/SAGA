@@ -10,13 +10,7 @@ import {
 
 describe("Coverage Matrix executável", () => {
   it("preserva o fechamento P21.1 e deriva o baseline vigente por migrações nomeadas", () => {
-    expect(COVERAGE_CLOSED_BASELINE).toMatchObject({
-      composer: 26,
-      legacy: 25,
-      fallback: 39,
-      served: 51,
-      divergences: 21,
-    });
+    expect(COVERAGE_CLOSED_BASELINE).toMatchObject({ composer: 26, legacy: 25, fallback: 39, served: 51, divergences: 21 });
     expect(COVERAGE_MIGRATIONS).toEqual([
       expect.objectContaining({ id: "W1-N1.04", competence: "N1.04", delta: { divergences: -1 } }),
       expect.objectContaining({ id: "W2-N1.05", competence: "N1.05", delta: { composer: 1, legacy: -1, divergences: -1 } }),
@@ -31,16 +25,15 @@ describe("Coverage Matrix executável", () => {
       expect.objectContaining({ id: "OBS-COMPOSITE-N4.03", competence: "N4.03", delta: { divergences: -1 } }),
       expect.objectContaining({ id: "W11-AL.03", competence: "AL.03", delta: { composer: 1, legacy: -1, divergences: -1 } }),
       expect.objectContaining({ id: "W12-N4.01", competence: "N4.01", delta: { composer: 1, legacy: -1, divergences: -1 } }),
-      // W13 inaugura o critério fallback-first; W14 confirma que o mecanismo
-      // continua drenando placeholder, sem trocar uma proveniência legado.
       expect.objectContaining({ id: "W13-GE.03", competence: "GE.03", delta: { composer: 1, fallback: -1, served: 1 } }),
       expect.objectContaining({ id: "W14-AL.04", competence: "AL.04", delta: { composer: 1, fallback: -1, served: 1 } }),
+      expect.objectContaining({ id: "W15-N5.01", competence: "N5.01", delta: { composer: 1, fallback: -1, served: 1 } }),
     ]);
     expect(COVERAGE_BASELINE).toMatchObject({
-      composer: 39,
+      composer: 40,
       legacy: 15,
-      fallback: 36,
-      served: 54,
+      fallback: 35,
+      served: 55,
       divergences: 11,
       modeSwaps: 12,
       toolIntroductions: 44,
