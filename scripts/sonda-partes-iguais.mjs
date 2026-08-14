@@ -84,11 +84,9 @@ try {
         assert(await page.locator("[data-f45-nudge]").count() >= 2, `F45 L4/${width}: toque alternativo ausente`);
         for (let i = 0; i < before.targets.length; i += 1) {
           const alvo = Math.round(before.targets[i] * 12);
-          await ranges.nth(i).evaluate((el, value) => {
-            el.value = String(value);
-            el.dispatchEvent(new Event("input", { bubbles: true }));
-            el.dispatchEvent(new Event("change", { bubbles: true }));
-          }, alvo);
+          const range = ranges.nth(i);
+          await range.fill(String(alvo));
+          await range.dispatchEvent("change");
         }
         await page.locator("[data-f45-submit]").click();
       } else {
