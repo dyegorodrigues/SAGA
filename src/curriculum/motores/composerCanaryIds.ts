@@ -94,6 +94,12 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // O canário inativo b32bee4c passou CI 31760839221 + transversal 31760839210.
   "N5.01",
 
+  // W16 — F72: fração como número. O palco compõe SingaporeBars +
+  // InteractiveNumberLine e só emite a prova de domínio quando a criança acerta
+  // efetivamente na reta (L3+). O canário inativo 4789636c passou CI
+  // 31764367753 + Certificação transversal 31764367742 no mesmo SHA.
+  "N5.02",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
