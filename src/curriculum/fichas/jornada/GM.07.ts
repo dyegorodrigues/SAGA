@@ -1,10 +1,9 @@
 import { FichaCompetencia } from "../../schema";
 import { PerimetroEvidence, PerimetroMisconception } from "../../procedimentos/perimetroContract";
 
-const dominio = {
-  acertos: 3,
-  de: 3,
-  sessoes: 2,
+const dominio = { acertos: 3, de: 3, sessoes: 2 };
+const dominioComEvidencia = {
+  ...dominio,
   exige: {
     evidencia: PerimetroEvidence.COMPAROU_PERIMETRO_AREA,
     descricao: "Distinguir corretamente a volta (perímetro) do chão interno (área) no L4.",
@@ -72,7 +71,7 @@ export const GM_07: FichaCompetencia = {
       alvo: "distinguir comprimento da borda de quantidade de quadrados internos",
       kinds: ["shapecanvas", "arraygrid"],
       params: { modo: "perimetro-vs-area" },
-      dominio,
+      dominio: dominioComEvidencia,
     },
     {
       id: "lado-faltante",
