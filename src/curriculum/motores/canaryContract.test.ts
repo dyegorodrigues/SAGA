@@ -15,6 +15,7 @@ import { N4_07 } from "../fichas/jornada/N4.07";
 import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
 import { N4_09 } from "../fichas/jornada/N4.09";
+import { N5_01 } from "../fichas/jornada/N5.01";
 import { N1_03 } from "../fichas/jornada/N1.03";
 import { N1_05 } from "../fichas/jornada/N1.05";
 import { N1_07 } from "../fichas/jornada/N1.07";
@@ -46,19 +47,12 @@ import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
 
-/**
- * Registro espelho usado APENAS pelo gate genérico: se um id é promovido mas
- * não entra aqui, a suíte para imediatamente em vez de deixá-lo escapar dos
- * contratos comuns. A fonte de ativação continua sendo composerCanaryIds.ts.
- */
 const REGISTRO: Record<string, FichaCompetencia> = {
   "N3.01": N3_01,
   "N3.02": N3_02,
-  // W10 — F14: primeiro canário nascido sob o contrato R0-A de resolução.
   "N3.03": N3_03,
   "N3.09": N3_09,
   "N3.10": N3_10,
-  // W12 — F97: grupos iguais sob R0-A; promovida após CI inativo 6/6.
   "N4.01": N4_01,
   "N4.03": N4_03,
   "N4.04": N4_04,
@@ -66,6 +60,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N4.06": N4_06,
   "N4.08": N4_08,
   "N4.09": N4_09,
+  "N5.01": N5_01,
   "N1.03": N1_03,
   "N1.05": N1_05,
   "N1.07": N1_07,
