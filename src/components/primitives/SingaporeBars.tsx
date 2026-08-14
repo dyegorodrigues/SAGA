@@ -11,13 +11,11 @@ interface Props {
 }
 
 export function SingaporeBars({ q, onAnswer, disabled, state = 'ocioso' }: Props) {
-  // A = base block, B = draggable block
   const [snapped, setSnapped] = useState(false);
   const blockA = q.a || 3;
   const blockB = q.b || 2;
   const total = blockA + blockB;
-  
-  const unitWidth = parseInt(tokens.tamanho.base) || 40; // width per unit of magnitude
+  const unitWidth = parseInt(tokens.tamanho.base) || 40;
 
   const handleDragEnd = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     if (info.offset.x > unitWidth * blockA * 0.4) {
@@ -29,12 +27,11 @@ export function SingaporeBars({ q, onAnswer, disabled, state = 'ocioso' }: Props
   return (
     <div className={`flex flex-col items-center justify-center py-10 ${tokens.estado[state]}`}>
       <div className="relative flex items-center w-full justify-center" style={{ height: tokens.tamanho.grande }}>
-        {/* Base Block A */}
-        <div 
+        <div
           className="absolute left-1/2 flex items-center justify-center font-bold text-2xl shadow-sm z-10"
-          style={{ 
-            width: blockA * unitWidth, 
-            height: tokens.tamanho.grande, 
+          style={{
+            width: blockA * unitWidth,
+            height: tokens.tamanho.grande,
             backgroundColor: tokens.cor.elementos.base_A,
             borderColor: tokens.cor.elementos.borda,
             borderWidth: 2,
@@ -42,55 +39,52 @@ export function SingaporeBars({ q, onAnswer, disabled, state = 'ocioso' }: Props
             borderTopLeftRadius: tokens.tamanho.raio,
             borderBottomLeftRadius: tokens.tamanho.raio,
             color: tokens.cor.texto.inverso,
-            transform: 'translateX(-100%)' // align right edge to center
+            transform: 'translateX(-100%)'
           }}
         >
           {blockA}
         </div>
-        
-        {/* Drop Zone (Ghost Block) */}
+
         {!snapped && (
-           <div 
-             className="absolute left-1/2 border-dashed"
-            style={{ 
-               width: blockB * unitWidth, 
-               height: tokens.tamanho.grande,
-               backgroundColor: tokens.cor.superficie.fundo,
-               borderColor: tokens.cor.elementos.borda,
-               borderWidth: 2,
-               borderTopRightRadius: tokens.tamanho.raio,
-               borderBottomRightRadius: tokens.tamanho.raio,
-             }}
+          <div
+            className="absolute left-1/2 border-dashed"
+            style={{
+              width: blockB * unitWidth,
+              height: tokens.tamanho.grande,
+              backgroundColor: tokens.cor.superficie.fundo,
+              borderColor: tokens.cor.elementos.borda,
+              borderWidth: 2,
+              borderTopRightRadius: tokens.tamanho.raio,
+              borderBottomRightRadius: tokens.tamanho.raio,
+            }}
           />
         )}
 
-        {/* Draggable Block B */}
-        <motion.div 
+        <motion.div
           drag={!snapped && !disabled ? "x" : false}
           dragConstraints={{ left: 0, right: blockA * unitWidth }}
           dragElastic={0.1}
           onDragEnd={handleDragEnd}
           animate={snapped ? { x: 0 } : {}}
-          className={`absolute flex items-center justify-center font-bold text-2xl shadow-md cursor-grab active:cursor-grabbing`}
-          style={{ 
-             width: blockB * unitWidth, 
-             height: tokens.tamanho.grande, 
-             backgroundColor: tokens.cor.elementos.base_B,
-             borderColor: tokens.cor.elementos.borda,
-             borderWidth: 2,
-             borderTopRightRadius: tokens.tamanho.raio,
-             borderBottomRightRadius: tokens.tamanho.raio,
-             borderTopLeftRadius: snapped ? 0 : tokens.tamanho.raio,
-             borderBottomLeftRadius: snapped ? 0 : tokens.tamanho.raio,
-             color: tokens.cor.texto.inverso,
-             left: `calc(50% + ${snapped ? 0 : 80}px)`, 
-             zIndex: 20
+          className="absolute flex items-center justify-center font-bold text-2xl shadow-md cursor-grab active:cursor-grabbing"
+          style={{
+            width: blockB * unitWidth,
+            height: tokens.tamanho.grande,
+            backgroundColor: tokens.cor.elementos.base_B,
+            borderColor: tokens.cor.elementos.borda,
+            borderWidth: 2,
+            borderTopRightRadius: tokens.tamanho.raio,
+            borderBottomRightRadius: tokens.tamanho.raio,
+            borderTopLeftRadius: snapped ? 0 : tokens.tamanho.raio,
+            borderBottomLeftRadius: snapped ? 0 : tokens.tamanho.raio,
+            color: tokens.cor.texto.inverso,
+            left: `calc(50% + ${snapped ? 0 : 80}px)`,
+            zIndex: 20
           }}
         >
           {blockB}
         </motion.div>
-        
-        {/* Result Block (Appears after snap) */}
+
         {snapped && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -101,6 +95,48 @@ export function SingaporeBars({ q, onAnswer, disabled, state = 'ocioso' }: Props
             {blockA} + {blockB} = {total}
           </motion.div>
         )}
+      </div>
+    </div>
+  );
+}
+
+export interface SingaporeFractionBarProps {
+  denominador: number;
+  /** Posições normalizadas 0..1 das divisões internas. */
+  marcas?: number[];
+  destacarPrimeira?: boolean;
+  rotulo?: string;
+}
+
+/**
+ * A mesma linguagem de barra de Singapura, agora exposta como inteiro
+ * particionado. Não resolve a ficha: apenas desenha as partes que o palco F45
+ * calcula, mantendo a representação canônica compartilhada com frações futuras.
+ */
+export function SingaporeFractionBar({ denominador, marcas, destacarPrimeira = true, rotulo }: SingaporeFractionBarProps) {
+  const internas = [...(marcas ?? Array.from({ length: denominador - 1 }, (_, i) => (i + 1) / denominador))]
+    .filter(v => Number.isFinite(v) && v > 0 && v < 1)
+    .sort((a, b) => a - b);
+  const bordas = [0, ...internas, 1];
+  const larguras = bordas.slice(1).map((fim, i) => Math.max(0.02, fim - bordas[i]));
+
+  return (
+    <div className="mx-auto w-full max-w-xl" data-singapore-fraction-bar data-denominator={denominador}>
+      <div
+        role="img"
+        aria-label={`barra dividida em ${denominador} partes${rotulo ? `; uma parte é ${rotulo}` : ""}`}
+        className="flex h-24 w-full overflow-hidden rounded-2xl border-3 border-slate-700 bg-white shadow-sm"
+      >
+        {larguras.map((largura, index) => (
+          <div
+            key={`${index}-${largura}`}
+            className={`flex items-center justify-center border-r-2 border-slate-700 text-lg font-black last:border-r-0 ${destacarPrimeira && index === 0 ? "bg-sky-300 text-slate-900" : "bg-sky-50 text-slate-500"}`}
+            style={{ width: `${largura * 100}%` }}
+            data-fraction-part={index}
+          >
+            {destacarPrimeira && index === 0 && rotulo ? rotulo : ""}
+          </div>
+        ))}
       </div>
     </div>
   );
