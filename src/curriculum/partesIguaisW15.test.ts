@@ -1,19 +1,36 @@
 import { describe, expect, it } from "vitest";
 import { getTrackById } from "./motores/curriculum";
-import { generateRegisteredFichaQuestion, hasComposerFicha } from "./motores/composerCanary";
+import {
+  enableComposerCanary,
+  generateRegisteredFichaQuestion,
+  hasComposerFicha,
+  rollbackComposerCanary,
+} from "./motores/composerCanary";
 
 const EVIDENCIA_L4 = "partes-iguais-corte-nivel-4";
 
-describe("W15 regression-first — N5.01/F45 partes iguais", () => {
-  it("parte do fallback real com o prerequisito servido do DAG", () => {
-    const track = getTrackById("N5.01");
-    expect(track?.generatorSource).toBe("fallback");
-    expect(track?.contentStatus).toBe("fallback");
-    expect(track?.prereqs).toEqual(["N4.05"]);
+describe("W15 — N5.01/F45 partes iguais", () => {
+  it("preserva a origem fallback como rollback explícito depois da promoção", () => {
+    const ativo = getTrackById("N5.01");
+    expect(ativo?.generatorSource).toBe("composer");
+    expect(ativo?.contentStatus).toBe("explicit");
+    expect(ativo?.prereqs).toEqual(["N4.05"]);
+
+    rollbackComposerCanary("N5.01");
+    try {
+      const rollback = getTrackById("N5.01");
+      expect(rollback?.generatorSource).toBe("fallback");
+      expect(rollback?.contentStatus).toBe("fallback");
+      expect(rollback?.prereqs).toEqual(["N4.05"]);
+    } finally {
+      enableComposerCanary("N5.01");
+    }
+
+    expect(getTrackById("N5.01")?.generatorSource).toBe("composer");
   });
 
-  it("materializa a escada canônica completa antes de permitir promoção", () => {
-    expect(hasComposerFicha("N5.01"), "N5.01 ainda não está registrada no Composer").toBe(true);
+  it("mantém a escada canônica completa depois da promoção", () => {
+    expect(hasComposerFicha("N5.01"), "N5.01 precisa permanecer registrada no Composer").toBe(true);
 
     const questoes = [1, 2, 3, 4, 5].map(nivel => generateRegisteredFichaQuestion("N5.01", nivel));
     expect(questoes.map(q => q.kind)).toEqual(Array(5).fill("partes-iguais-f45"));
