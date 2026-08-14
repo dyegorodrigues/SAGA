@@ -27,6 +27,7 @@ function Probe() {
       data-steps={question.resolucao?.passos.length ?? 0}
       data-final={String(question.resolucao?.passos.at(-1)?.parcial ?? "")}
       data-evidence={question.exigeEvidencia ?? ""}
+      data-tutorial={question.tutorial?.length ?? 0}
       data-receipts={JSON.stringify(receipts)}
     >
       <p className="text-center font-black">{question.prompt}</p>

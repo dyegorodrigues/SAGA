@@ -1,6 +1,7 @@
 import type { ResolucaoDeclarativa } from "../../contracts/pedagogySteps";
 import { Evidencia } from "../../constants/evidencias";
 import type { MasteryRule, Option, Question } from "../../types";
+import { normalizeFichaTutorial } from "../fichaQuestionContract";
 import type { FichaCompetencia } from "../schema";
 
 export const PerimetroMisconception = {
@@ -143,6 +144,9 @@ export function evidenciasPerimetro(nivel: number, correta: boolean): string[] {
 export function construirPerimetroQuestion(ficha: FichaCompetencia, level: number): Question {
   if (ficha.id !== "GM.07") throw new Error(`perimetroContract recebeu ${ficha.id}`);
   const spec = construirPerimetroSpec(level);
+  const microId = ficha.niveis?.[spec.nivel]?.micro;
+  const micro = ficha.micros.find(item => item.id === microId);
+  if (!micro) throw new Error(`GM.07 sem micro L${spec.nivel}`);
   const prompt = spec.nivel === 5
     ? `A volta toda mede ${spec.perimetro}. Três lados medem ${spec.lados[0]}, ${spec.lados[1]} e ${spec.lados[2]}. Quanto mede o lado que falta?`
     : spec.nivel === 4
@@ -155,6 +159,7 @@ export function construirPerimetroQuestion(ficha: FichaCompetencia, level: numbe
     audioPrompt: prompt,
     howto: ficha.howto,
     explain: ficha.explain,
+    tutorial: normalizeFichaTutorial(micro.params.tutorial),
     resolucao: construirPerimetroResolucao(spec),
     masteryRule: mastery(ficha, spec.nivel),
     exigeEvidencia: spec.nivel === 4 ? Evidencia.PERIMETRO_VS_AREA : undefined,

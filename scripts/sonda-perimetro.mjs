@@ -41,6 +41,7 @@ try {
           steps: Number(get("data-steps")),
           final: Number(get("data-final")),
           evidence: get("data-evidence"),
+          tutorial: Number(get("data-tutorial")),
           stage: document.querySelectorAll("[data-f63-stage]").length,
           grid: document.querySelectorAll("[data-f63-grid]").length,
           outline: document.querySelectorAll("[data-f63-outline]").length,
@@ -53,6 +54,7 @@ try {
       assert(snapshot.generic === "false" && snapshot.steps === 3 && snapshot.final === snapshot.answer, `F63 L${level} contrato R0-A`);
       assert(snapshot.stage === 1 && snapshot.grid === 1 && snapshot.outline === 1, `F63 L${level} composição ArrayGrid+ShapeCanvas perdida`);
       assert(snapshot.perimeter > 0 && snapshot.area > 0, `F63 L${level} grandezas inválidas`);
+      assert(level === 1 ? snapshot.tutorial === 3 : snapshot.tutorial === 0, `F63 L${level} onboarding ${snapshot.tutorial}`);
       assert(level === 4 ? snapshot.evidence === "perimetro-vs-area-nivel-4" : snapshot.evidence === "", `F63 L${level} evidência declarada`);
       assert(snapshot.scroll <= snapshot.width + 1, `F63 L${level} overflow em ${width}px`);
       assert(pageErrors.length === 0, `F63 L${level} pageerror: ${pageErrors.join(" | ")}`);
