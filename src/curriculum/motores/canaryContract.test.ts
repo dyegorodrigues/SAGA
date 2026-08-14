@@ -17,6 +17,24 @@ const REGISTRO: Record<string, FichaCompetencia> = Object.fromEntries(
   JOURNEY_FICHAS.map(ficha => [ficha.id, ficha]),
 );
 
+/**
+ * Competências cujo domínio inclui os inteiros negativos.
+ *
+ * As duas asserções de sinal abaixo existem para pegar gerador quebrado: até a
+ * W23, todo o currículo vivia nos naturais, e uma resposta negativa só podia
+ * ser lixo — subtração invertida, índice fora de faixa, conta que estourou.
+ *
+ * A W24 muda o domínio, não a regra. A F84 é "A Reta Completa": o negativo
+ * ali não é defeito, é a competência inteira — a criança precisa aceitar que
+ * existe número à esquerda do zero. Baixar a asserção para todo mundo
+ * devolveria o buraco às outras 48 competências, onde `-3` continua sendo bug.
+ *
+ * Por isso a exceção é NOMEADA, e não uma flexibilização geral. Para
+ * acrescentar uma competência aqui, o critério é a ficha canônica declarar
+ * inteiros no domínio — não o teste estar vermelho.
+ */
+const DOMINIOS_COM_NEGATIVOS = new Set<string>(["N7.01"]);
+
 const CANARIOS = [...COMPOSER_CANARIES];
 const progressoInicial = (): Progress => ({ lvl: 1, mast: 0, streak: 0 } as Progress);
 
@@ -59,7 +77,15 @@ describe("contrato do canário do Composer", () => {
           if (autoral.options?.length) {
             expect(autoral.options.map(o => String(o.value)), `${id} autoral L${lvl}: gabarito fora das alternativas`).toContain(String(autoral.answer));
           }
-          if (typeof autoral.answer === "number") expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
+          if (typeof autoral.answer === "number") {
+            // Domínio com negativos ainda prova que o gabarito é inteiro finito:
+            // a exceção troca o piso, não desliga a verificação.
+            if (DOMINIOS_COM_NEGATIVOS.has(id)) {
+              expect(Number.isInteger(autoral.answer), `${id} autoral L${lvl}: gabarito não inteiro`).toBe(true);
+            } else {
+              expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
+            }
+          }
         }
       }
     });
@@ -162,11 +188,20 @@ describe("contrato do canário do Composer", () => {
       }
     });
 
-    it("erro: nenhuma alternativa numérica é negativa", () => {
+    it(DOMINIOS_COM_NEGATIVOS.has(id)
+      ? "erro: toda alternativa numérica é inteiro finito, inclusive à esquerda do zero"
+      : "erro: nenhuma alternativa numérica é negativa", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
           const q = gerarAutoral(lvl);
-          for (const o of q.options ?? []) if (typeof o.value === "number") expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(0);
+          for (const o of q.options ?? []) {
+            if (typeof o.value !== "number") continue;
+            if (DOMINIOS_COM_NEGATIVOS.has(id)) {
+              expect(Number.isInteger(o.value), `${id} L${lvl}: alternativa não inteira`).toBe(true);
+            } else {
+              expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(0);
+            }
+          }
         }
       }
     });
