@@ -57,6 +57,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // O canário inativo f52d74aa passou CI 31766412517 + transversal 31766412457 no mesmo SHA.
   "N6.01",
 
+  // W18 — F73: frações equivalentes. Ficha já registrada no catálogo da Jornada;
+  // canaryContract deriva seu REGISTRO de JOURNEY_FICHAS e valida a promoção aqui.
+  "N5.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
