@@ -2,7 +2,6 @@ const { FICHA_RUNTIME_MAP: BASE } = require("./ficha_runtime_map_core.cjs");
 
 /**
  * Extensões físicas do bloco W17–W19.
- *
  * A regra de composição permanece a mesma: o mesmo renderer kind aparece em
  * cada primitiva que o palco carrega — esta é a segunda entrada por composição;
  * o observador deve unir essas linhas. Helpers não são promovidos a primitivas.
@@ -19,7 +18,16 @@ const FICHA_RUNTIME_MAP = BASE.map(entry => {
       note: `${entry.note || ""} W17/F75 relê a mesma malha 10×10 como um inteiro, sem criar uma segunda primitiva.`,
     };
   }
+  if (entry.primitive === "SingaporeBars") {
+    return {
+      ...entry,
+      kinds: [...entry.kinds, "fracoes-equivalentes-f73"],
+      componentFiles: [...entry.componentFiles, "src/components/primitives/FracoesEquivalentesStage.tsx"],
+      specializedBuilderIds: [...(entry.specializedBuilderIds || []), "N5.03"],
+      rendererKinds: [...entry.rendererKinds, "fracoes-equivalentes-f73"],
+      note: `${entry.note || ""} W18/F73 usa duas SingaporeFractionBar do mesmo comprimento para equivalência e comparação.`,
+    };
+  }
   return entry;
 });
-
 module.exports = { FICHA_RUNTIME_MAP };
