@@ -39,6 +39,7 @@ export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta
     || q.kind === "detetive-formas-f58"
     || q.kind === "regra-sequencia-f57"
     || q.kind === "partes-iguais-f45"
+    || q.kind === "fracao-numero-f72"
   ) return true;
   return Boolean(q.options || q.groups || meta?.source);
 }
@@ -68,6 +69,7 @@ export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
     || q.kind === "detetive-formas-f58"
     || q.kind === "regra-sequencia-f57"
     || q.kind === "partes-iguais-f45"
+    || q.kind === "fracao-numero-f72"
     || (q.kind === "regua-f61" && meta?.source === "medidas")
     || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
@@ -86,6 +88,7 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
     || q.kind === "detetive-formas-f58"
     || q.kind === "regra-sequencia-f57"
     || q.kind === "partes-iguais-f45"
+    || q.kind === "fracao-numero-f72"
     || (q.kind === "regua-f61" && meta?.source === "medidas")
     || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined)
@@ -104,6 +107,7 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
   if (q.kind === "detetive-formas-f58") return 1800;
   if (q.kind === "regra-sequencia-f57") return 1800;
   if (q.kind === "partes-iguais-f45") return 1800;
+  if (q.kind === "fracao-numero-f72") return 1800;
   if (q.kind === "regua-f61" && meta?.source === "medidas") return 2600;
   if (isPosicaoQuestion(q) && meta?.posicao !== undefined) return 3300;
   if (isFormaQuestion(q) && meta?.forma !== undefined) return 3700;
@@ -172,7 +176,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
   "touchplace", "shapecanvas", "grandeza", "comparacao-simbolica", "medidas", "moldura", "material-dourado",
-  "numberline-f19", "regua-f61", "quadrado100-f36", "visual-addition-f13", "emojirow-riscar-f15", "counting-on-f14", "skip-count-f30", "equal-groups-f97", "detetive-formas-f58", "regra-sequencia-f57", "partes-iguais-f45",
+  "numberline-f19", "regua-f61", "quadrado100-f36", "visual-addition-f13", "emojirow-riscar-f15", "counting-on-f14", "skip-count-f30", "equal-groups-f97", "detetive-formas-f58", "regra-sequencia-f57", "partes-iguais-f45", "fracao-numero-f72",
 ]);
 
 export function shouldRenderQuestionOptions(q: Question): boolean {

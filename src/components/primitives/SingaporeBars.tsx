@@ -105,38 +105,45 @@ export interface SingaporeFractionBarProps {
   /** Posições normalizadas 0..1 das divisões internas. */
   marcas?: number[];
   destacarPrimeira?: boolean;
+  /** Quantas partes iniciais ficam pintadas. Quando ausente, preserva o contrato F45. */
+  destacarQuantidade?: number;
   rotulo?: string;
 }
 
 /**
  * A mesma linguagem de barra de Singapura, agora exposta como inteiro
- * particionado. Não resolve a ficha: apenas desenha as partes que o palco F45
- * calcula, mantendo a representação canônica compartilhada com frações futuras.
+ * particionado. Não resolve a ficha: apenas desenha as partes que o palco calcula,
+ * mantendo a representação canônica compartilhada entre F45 e F72.
  */
-export function SingaporeFractionBar({ denominador, marcas, destacarPrimeira = true, rotulo }: SingaporeFractionBarProps) {
+export function SingaporeFractionBar({ denominador, marcas, destacarPrimeira = true, destacarQuantidade, rotulo }: SingaporeFractionBarProps) {
   const internas = [...(marcas ?? Array.from({ length: denominador - 1 }, (_, i) => (i + 1) / denominador))]
     .filter(v => Number.isFinite(v) && v > 0 && v < 1)
     .sort((a, b) => a - b);
   const bordas = [0, ...internas, 1];
   const larguras = bordas.slice(1).map((fim, i) => Math.max(0.02, fim - bordas[i]));
+  const quantidade = destacarQuantidade === undefined ? (destacarPrimeira ? 1 : 0) : Math.max(0, Math.min(denominador, Math.round(destacarQuantidade)));
 
   return (
-    <div className="mx-auto w-full max-w-xl" data-singapore-fraction-bar data-denominator={denominador}>
+    <div className="mx-auto w-full max-w-xl" data-singapore-fraction-bar data-denominator={denominador} data-highlighted={quantidade}>
       <div
         role="img"
-        aria-label={`barra dividida em ${denominador} partes${rotulo ? `; uma parte é ${rotulo}` : ""}`}
+        aria-label={`barra dividida em ${denominador} partes; ${quantidade} destacada${quantidade === 1 ? "" : "s"}${rotulo ? `; fração ${rotulo}` : ""}`}
         className="flex h-24 w-full overflow-hidden rounded-2xl border-3 border-slate-700 bg-white shadow-sm"
       >
-        {larguras.map((largura, index) => (
-          <div
-            key={`${index}-${largura}`}
-            className={`flex items-center justify-center border-r-2 border-slate-700 text-lg font-black last:border-r-0 ${destacarPrimeira && index === 0 ? "bg-sky-300 text-slate-900" : "bg-sky-50 text-slate-500"}`}
-            style={{ width: `${largura * 100}%` }}
-            data-fraction-part={index}
-          >
-            {destacarPrimeira && index === 0 && rotulo ? rotulo : ""}
-          </div>
-        ))}
+        {larguras.map((largura, index) => {
+          const destacada = index < quantidade;
+          return (
+            <div
+              key={`${index}-${largura}`}
+              className={`flex items-center justify-center border-r-2 border-slate-700 text-lg font-black last:border-r-0 ${destacada ? "bg-sky-300 text-slate-900" : "bg-sky-50 text-slate-500"}`}
+              style={{ width: `${largura * 100}%` }}
+              data-fraction-part={index}
+              data-highlighted={destacada ? "true" : "false"}
+            >
+              {destacada && index === 0 && rotulo ? rotulo : ""}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

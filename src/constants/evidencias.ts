@@ -23,12 +23,10 @@ export const Evidencia = {
   ADICAO_SEM_OBJETOS: "adicao-sem-objetos",
   SIMETRIA_EIXO: "detetive-formas-simetria-nivel-4",
 
-  /**
-   * F45 (N5.01): a criança produziu no L4 uma divisão cujos intervalos são
-   * matematicamente iguais. A evidência depende do estado final, nunca da
-   * precisão do gesto usado para posicionar as marcas.
-   */
+  /** F45 (N5.01): equipartição produzida no L4. */
   PARTES_IGUAIS_DIVISAO: "partes-iguais-corte-nivel-4",
+  /** F72 (N5.02): acerto realizado efetivamente na reta, em L3 ou superior. */
+  FRACAO_NUMERO_RETA: "fracao-numero-reta-nivel-3mais",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

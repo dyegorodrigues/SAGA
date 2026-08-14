@@ -13,6 +13,7 @@ import { N4_06 } from "../fichas/jornada/N4.06";
 import { N4_08 } from "../fichas/jornada/N4.08";
 import { N4_09 } from "../fichas/jornada/N4.09";
 import { N5_01 } from "../fichas/jornada/N5.01";
+import { N5_02 } from "../fichas/jornada/N5.02";
 import { N1_01 } from "../fichas/jornada/N1.01";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_03 } from "../fichas/jornada/N1.03";
@@ -56,6 +57,7 @@ import { construirEqualGroupsQuestion } from "../procedimentos/equalGroupsContra
 import { construirDetetiveFormasQuestion } from "../procedimentos/detetiveFormasContract";
 import { construirRegraSequenciaQuestion } from "../procedimentos/regraSequenciaContract";
 import { construirPartesIguaisQuestion } from "../procedimentos/partesIguaisContract";
+import { construirFracaoNumeroQuestion } from "../procedimentos/fracaoNumeroContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
@@ -77,9 +79,10 @@ const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
   "N4.06": N4_06,
   "N4.08": N4_08,
   "N4.09": N4_09,
-  // W15: F45 registrada e INATIVA. O palco compõe ShapeCanvas + SingaporeBars;
-  // promoção só depois de suíte, sonda real e transversal no mesmo SHA.
   "N5.01": N5_01,
+  // W16: F72 registrada e INATIVA. SingaporeBars + InteractiveNumberLine;
+  // promoção só depois dos dois workflows verdes no mesmo SHA.
+  "N5.02": N5_02,
   "N1.01": N1_01,
   "N1.02": N1_02,
   "N1.03": N1_03,
@@ -121,6 +124,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N3.03": construirCountingOnQuestion,
   "N4.01": construirEqualGroupsQuestion,
   "N5.01": construirPartesIguaisQuestion,
+  "N5.02": construirFracaoNumeroQuestion,
   "AL.03": construirSkipCountF30Question,
   "AL.04": construirRegraSequenciaQuestion,
   "GE.03": construirDetetiveFormasQuestion,
@@ -138,6 +142,7 @@ const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
   "N3.03": "counting-on-f14",
   "N4.01": "equal-groups-f97",
   "N5.01": "partes-iguais-f45",
+  "N5.02": "fracao-numero-f72",
   "AL.03": "skip-count-f30",
   "AL.04": "regra-sequencia-f57",
   "GE.03": "detetive-formas-f58",
