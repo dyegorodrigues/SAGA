@@ -141,6 +141,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F58 materializada no specialized builder DetetiveFormasStage-backed, reutilizando ShapeCanvas em vez de abrir segunda linguagem visual: escada contar lados → cantos quadrados → curvos vs retos → eixo de simetria → completar a metade, com resolucao() R0-A declarativa. A §9 exige o eixo no L4 — contar lados é leitura de atributo, achar o eixo é a única dobra mental da ficha —, e a condição foi publicada no catálogo central como Evidencia.SIMETRIA_EIXO com emissor puro em detetiveFormasProcedure, verificável sem tela. O canário inativo 6092da5acad1bdb3cd8aec4a0f6c8afe21ab3546 passou os DOIS workflows integralmente verdes no mesmo SHA — CI run 31735133641 e Certificação transversal run 31735133586.\n\nPRIMEIRA onda sob o critério fallback-first, e o delta observado prova a diferença: GE.03 não vinha de gerador legado, vinha de placeholder Em construção. Por isso o fallback cai pela primeira vez desde a abertura desta linha, em vez de apenas trocar a proveniência de uma tela que já existia.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W14-AL.04",
+    competence: "AL.04",
+    rationale: "F57 materializada no specialized builder RegraSequenciaStage-backed, preservando EmojiRow + NumberLine como as duas primitivas canônicas e a progressão completar padrão → identificar regra → sequência decrescente → lacuna intermediária → regra multiplicativa, com resolucao() R0-A e evidência de processo nos degraus difíceis. O canário inativo 1ff9aea655ff5cbca26bf4432fd0aa7b6cd470c8 passou os DOIS workflows no mesmo SHA — CI run 31747073742 e Certificação transversal run 31747073736 — antes da promoção isolada cfe4e31d680f99f5d4f4f8c14f6f03939017b0e2. Após a promoção, a Matrix ficou vermelha pelo motivo correto e observou 39 Composer, 15 legado, 36 fallback, 54 servidas e 11 divergências no CI run 31756497757.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) =>

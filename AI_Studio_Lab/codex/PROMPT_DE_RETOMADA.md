@@ -22,7 +22,7 @@ Antes de qualquer edição:
 5. confira **os dois workflows** do HEAD remoto exato, todas as jobs, reviews e review threads;
 6. se HEAD/CI/estado tiverem mudado, investigue a deriva antes de editar — o remoto vence este arquivo.
 
-## 2. DOIS WORKFLOWS — mudança estrutural, leia antes de tudo
+## 2. DOIS WORKFLOWS — infraestrutura já provada
 
 Desde o commit `a63900f` ("ci: separar certificacao transversal por SHA"), o PR é validado por **dois** workflows e não mais por um:
 
@@ -31,17 +31,17 @@ Desde o commit `a63900f` ("ci: separar certificacao transversal por SHA"), o PR 
 | **`CI`** | Gates do SAGA · Sonda real Sensei · Higiene do diff · Guarda de binários | grupo por `ref`, cancelável |
 | **`Certificação transversal`** | Sonda transversal 390 px × 8 sementes · Sonda transversal 320/900 px × 1 semente | **grupo por `head.sha`**, `cancel-in-progress: false` |
 
-**Motivo.** O `ci.yml` cancelava a certificação em curso a cada push novo. Isso forçava uma parada obrigatória de ~28 min ao fim de cada onda e permitia que um push distraído destruísse a prova de uma onda inteira — o histórico acumulava dezenas de execuções canceladas por isso. Desligar só `cancel-in-progress` num grupo compartilhado não bastaria: um grupo comum mantém apenas um run em execução e um pendente, substituindo o pendente anterior. O grupo por SHA garante independência real.
+**Motivo.** O `ci.yml` cancelava a certificação em curso a cada push novo. O grupo por SHA torna a certificação longa independente por commit.
 
 > **CONSEQUÊNCIA CONTRATUAL:** onde este documento, os checkpoints ou os runbooks disserem *"CI integralmente verde"*, leia **"os dois workflows verdes no MESMO SHA"**. Recibo de onda com um workflow só é recibo incompleto.
 
-Este commit foi feito **enquanto o run `31719520999` (Certificação transversal, SHA `94d9075`) estava `in_progress`**, propositalmente, como segundo push da prova de concorrência. A sessão que retomar deve verificar pela API se aquele run sobreviveu e concluiu. Se sobreviveu, a separação está provada e pode ser tratada como verdade. Se foi cancelado, a separação falhou e precisa ser corrigida na fonte antes de qualquer onda nova.
+A prova de concorrência **já foi feita e passou**. Os runs `31719520999` (SHA `94d9075`) e `31721098530` (SHA `0232bcc6`) coexistiram vivos em SHAs diferentes; o push posterior não cancelou o anterior. **Não refazer este teste.**
 
 ## 3. Ordem de leitura
 
 1. este arquivo
 2. `AI_Studio_Lab/codex/RETOMADA.md`
-3. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W13_GE03_F58_FECHADA_2026-08-13.md`
+3. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W14_AL04_F57_FECHADA_2026-08-13.md`
 4. `AI_Studio_Lab/codex/DEFINICAO_DE_PRONTO.md`
 5. `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`
 6. `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`
@@ -50,42 +50,40 @@ Este commit foi feito **enquanto o run `31719520999` (Certificação transversal
 
 Documentos antigos são históricos. Em conflito valem: **GitHub remoto atual → gates executáveis → checkpoint mais novo → documentos anteriores**.
 
-## 4. Estado curricular após W13
+## 4. Estado curricular após W14
 
-Fechadas: **W7, W8, W9, R0-A, W10, W11, W12, W13**.
+Fechadas: **W7, W8, W9, R0-A, W10, W11, W12, W13, W14**.
 
-Matrix observada após a promoção da W13:
+Matrix observada após a promoção da W14 e reconciliada pelo ledger:
 
-`38 Composer / 15 legado / 37 fallback / 53 servidas / 11 divergências / 12 swaps / 44 estreias`
+`39 Composer / 15 legado / 36 fallback / 54 servidas / 11 divergências / 12 swaps / 44 estreias`
 
-### W13 `GE.03 / F58` — a primeira sob o critério fallback-first
+### W14 `AL.04 / F57` — segunda drenagem fallback-first
 
-Checkpoint: `CHECKPOINT_FABRICA_CURRICULAR_W13_GE03_F58_FECHADA_2026-08-13.md`.
+Checkpoint: `CHECKPOINT_FABRICA_CURRICULAR_W14_AL04_F57_FECHADA_2026-08-13.md`.
 
-O delta observado foi **`{ composer:+1, fallback:−1, served:+1 }`** — assinatura de dreno de placeholder, diferente das doze migrações anteriores, que todas trocavam `legacy` sem mexer no `fallback`. É a primeira vez nesta linha que uma criança deixa de encontrar `Em construção`. O `legacy` fica intocado de propósito.
+O delta observado foi novamente **`{ composer:+1, fallback:−1, served:+1 }`**: `AL.04` vinha de `Em construção`, não de gerador legado. O `legacy` ficou em 15.
 
-Portão inativo certificado em `6092da5acad1bdb3cd8aec4a0f6c8afe21ab3546` — `CI` run `31735133641` e `Certificação transversal` run `31735133586`, os dois verdes no mesmo SHA. Promoção isolada em `09efe1e`.
+Portão inativo certificado no SHA `1ff9aea655ff5cbca26bf4432fd0aa7b6cd470c8`:
 
-**Restam 37 fallbacks.**
+- `CI` run `31747073742` ✅
+- `Certificação transversal` run `31747073736` ✅
 
-Marcos da W12 para conferência:
+Promoção isolada: `cfe4e31d680f99f5d4f4f8c14f6f03939017b0e2`.
 
-- regression-first de abertura: `281ce120aa1bdc7e0c887e5700211952df4fb671`
-- HEAD **inativo** comprovado: `3c80162716c40117e1faf5583fb33fe7ec23013b` — CI #1256 / run `31701736784`, 6/6
-- promoção de `N4.01`: `0452b2ed16c67ac32cc30e25ee59bfec46356264`
-- HEAD funcional final: `d902ba9e7ea198ab424ea572b70e6c4edf1a9c93` — CI #1262 / run `31712225756`, 6/6
+A promoção fez a Matrix ficar vermelha exatamente como previsto no `CI` run `31756497757`, observando `39 Composer / 15 legado / 36 fallback / 54 servidas / 11 divergências`; só depois disso entrou `W14-AL.04` no ledger.
 
-`W12 N4.01/F97` migrou legado → Composer e foi mantida no caminho crítico porque o DAG prova **23 descendentes ainda em fallback**.
+**Restam 36 fallbacks.**
 
 A definição de pronto aceita **legado como servido**. Migração legado → Composer que não destrava fallback é dívida separada, fora do caminho crítico.
 
 ## 5. Pendências abertas
 
-Nenhuma falha de CI aberta. A quebra da `Sonda real Sensei` por 404 de fonte do Google foi corrigida na paridade do filtro de ruído externo (`sonda-matricula.mjs`).
+Nenhuma falha de CI estrutural conhecida deve ser tratada por memória: sempre verifique o HEAD remoto atual.
 
-**Dívida nomeada, não urgente:** `src/index.css` ainda faz `@import` do Google Fonts, ou seja, o app depende de rede externa para a tipografia. As sondas hoje filtram esse ruído — o instrumento está corrigido, a fonte do problema não. Hospedar a tipografia localmente elimina a fragilidade e faz o app funcionar offline para a criança. Fora do caminho crítico da fábrica; registrar antes de esquecer.
+**Dívida nomeada, não urgente:** `src/index.css` ainda faz `@import` do Google Fonts. As sondas filtram o ruído de rede externa, mas hospedar a tipografia localmente continua sendo a correção definitiva. Fora do caminho crítico da fábrica.
 
-## 6. Critério de seleção de onda — vigente da W13 em diante
+## 6. Critério de seleção de onda — fallback-first
 
 1. **priorize competências em FALLBACK**;
 2. respeite o DAG e só selecione fallback cujos pré-requisitos estejam servidos;
@@ -93,9 +91,7 @@ Nenhuma falha de CI aberta. A quebra da `Sonda real Sensei` por 404 de fonte do 
 4. legado só passa à frente quando for pré-requisito bloqueante de uma fallback, ou quando não houver fallback elegível;
 5. recalcule a fila pela Matrix/DAG depois de **cada** onda; lista histórica nunca vence estado vivo.
 
-Fila registrada no pós-W12, já sem a `GE.03`: `AL.04 (2)`, `GE.04 (1)`, `GE.05 (1)`, `N2.06 (1)`.
-
-**Recalcule a fila pela Matrix/DAG antes de fixar a W14** — fechar a `GE.03` pode ter tornado elegíveis fallbacks que estavam bloqueados. Lista histórica não vence estado vivo.
+**Antes da W15, recalcule a fila do zero pela Matrix/DAG pós-W14.** `N4.10`, `N5.01`, `AL.05`, `GE.06`, `GM.07` etc. são apenas candidatas até o cálculo vivo; nenhuma é “a próxima” por registro histórico.
 
 `ROTEIRO_ATE_O_FIM.md` não tem precedência sobre este critério.
 
@@ -117,9 +113,16 @@ Fila registrada no pós-W12, já sem a `GE.03`: `AL.04 (2)`, `GE.04 (1)`, `GE.05
 
 **Verde de outro SHA nunca vale por procuração.**
 
-## 8. Medição ainda devida
+## 8. Série de tempo fallback × legado
 
-Falta entregar: **horas por onda de FALLBACK (construir) contra onda de LEGADO (migrar)**, medidas no histórico real de commits, não estimadas. É o que transforma o prazo até `fallback = 0` em conta em vez de chute. Agora existe base real para os dois lados: doze ondas de legado e uma de fallback. Entregar no fechamento da W14.
+Metodologia: tempo de parede entre o primeiro commit regression-first e o commit de recibo final de cada onda, medido no histórico real.
+
+Base consolidada antes de incorporar o timestamp final da própria W14:
+
+- **legado:** `n=9`, média `3,49 h`, mediana `2,78 h`;
+- **fallback:** W5 `2,84 h`, W13 `3,02 h` (`n=2`).
+
+A hipótese de que construir fallback seria materialmente mais caro que migrar legado **não foi confirmada**; até aqui as duas classes estão na mesma ordem de grandeza e o custo dominante é atravessar os portões. Continue alimentando a série a cada onda. Não extrapole demais enquanto `n` do fallback for pequeno.
 
 ## 9. Definição de pronto
 
@@ -133,7 +136,7 @@ Explicitamente fora da fábrica curricular: **player da resolução**, **Oficina
 
 - NÃO tocar na `main`.
 - NÃO fazer merge, marcar ready ou ativar auto-merge.
-- NÃO reabrir W7–W12.
+- NÃO reabrir ondas fechadas sem regressão comprovada.
 - NÃO tocar no Creature Engine.
 - Thinking Engine runtime NÃO autorizado.
 - NÃO fazer faxina oportunista.
@@ -143,14 +146,21 @@ Explicitamente fora da fábrica curricular: **player da resolução**, **Oficina
 
 ## 11. Se as mutações do GitHub estiverem bloqueadas
 
-Já aconteceu: uma sessão perdeu a permissão de escrita (`update_ref`, `create_file`, `update_file` e rerun bloqueados, sem `gh` nem token local). Nesse caso:
+Se uma sessão perder permissão de escrita:
 
 - **não** invente rota alternativa, force-push ou automodificação via CI;
 - registre o STOP em comentário no PR #35 com HEAD, runs, falha e próximo passo exato;
-- avise o autor: a integração precisa de escrita restaurada, e `.github/workflows/` exige permissão de workflows separada, que integrações normalmente não têm.
+- avise o autor: a integração precisa de escrita restaurada.
 
-## 12. Autonomia
+## 12. Autonomia e regra de reporte
 
-Autonomia para executar as ondas sem consulta intermediária **até o fim do Bloco 1**, obedecendo o critério fallback-first e todas as restrições acima. Reporte somente no fechamento do bloco, salvo condição de parada real comprovada no remoto.
+O antigo marco “fim do Bloco 1” morreu com o critério fallback-first e não governa mais o reporte.
+
+Regra vigente:
+
+- executar ondas autonomamente, sempre recalculando a Matrix/DAG;
+- **reportar a cada 5 ondas fechadas**, ou imediatamente em condição de parada real comprovada;
+- para o lote atual, fechar **W14, W15, W16, W17 e W18** em sequência e reportar somente ao fim da W18;
+- no relatório do lote incluir Matrix, fallback restante e série de tempo atualizada dos dois lados.
 
 Se a conversa saturar antes, feche com segurança o último estado no remoto e garanta que o checkpoint e este arquivo representem o último estado válido antes de abrir nova conversa.
