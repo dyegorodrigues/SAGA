@@ -1,7 +1,37 @@
 const path = require("node:path");
 const component = (name) => path.join("src/components/primitives", `${name}.tsx`);
 
-/** Mapa declarativo ficha → runtime. Sem transformação ou mutação no import. */
+/**
+ * Ponte explícita entre a nomenclatura autoral das fichas e o runtime.
+ *
+ * `primitive` é SEMPRE vocabulário canônico das fichas. Um helper físico como
+ * `Arranjo` pode aparecer em `componentFiles` para provar como `ArrayGrid` é
+ * realizado, mas não ganha uma falsa linha canônica só porque existe no DOM.
+ *
+ * `builderKinds` são cases comprovados em src/curriculum/Composer.ts. Em palco
+ * composto, o MESMO builder kind pode aparecer nas linhas de todas as primitivas
+ * que ele realmente carrega. `specializedBuilderIds` segue a mesma regra para
+ * builders locais de composerCanary.ts.
+ *
+ * `rendererKinds` são kinds comprovados em FichaRenderer ou
+ * GameLoopExerciseRenderer. A convenção de composição é deliberadamente
+ * redundante: se um Stage renderiza A + B, o mesmo renderer kind aparece na
+ * linha de A e na linha de B. O observador deve unir essas linhas; nunca escolher
+ * apenas a primeira. Essa é a "segunda entrada por composição" usada por
+ * CountingOnStage e pelos demais palcos compostos abaixo.
+ *
+ * Uma primitiva autoral pode ser realizada por um Stage/helper com outro nome.
+ * Nesses casos o alias/substituição fica provado em `componentFiles` e explicado
+ * em `note`. Componentes auxiliares que NÃO correspondem a uma primitiva da ficha
+ * não viram primitiva por inferência.
+ *
+ * **Regra de integridade:** arrays vazios continuam sendo lacunas reais, nunca
+ * inferências silenciosas. O mapa descreve cadeia comprovada; não fabrica
+ * builder, renderer, primitiva ou alias para fazer a Matrix ficar verde.
+ *
+ * O arquivo é deliberadamente declarativo: nenhuma transformação ou mutação
+ * acontece como efeito colateral do import.
+ */
 const FICHA_RUNTIME_MAP = [
   {
     primitive: "ArrayGrid",
