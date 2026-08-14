@@ -72,7 +72,8 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
   { id: "W19-N4.10", competence: "N4.10", rationale: "F69 materializada no palco composto ArrayGrid + InteractiveVertical, com revelação progressiva, resto válido e zero posicional no quociente. O portão inativo 4ed4858d passou CI 31798437057 + transversal 31798437091. A promoção 056c19e3 fez a Matrix observar 44 Composer, 15 legado, 31 fallback, 59 servidas e 11 divergências antes deste ledger.", delta: { composer: 1, fallback: -1, served: 1 } },
   { id: "W20-GM.07", competence: "GM.07", rationale: "F63 materializada no palco composto ArrayGrid + ShapeCanvas para distinguir a volta (perímetro) do chão interno (área), com lado faltante no L5 e evidência específica no L4. O portão inativo f68b8bb6 passou CI 31803991249 + transversal 31803991246. A promoção isolada f30b05a2 fez a Matrix observar 45 Composer, 15 legado, 30 fallback, 60 servidas e 11 divergências antes deste ledger.", delta: { composer: 1, fallback: -1, served: 1 } },
   { id: "W21-AL.05", competence: "AL.05", rationale: "F46 materializada com Balanca como significado fisico de igualdade: o sinal = deixa de ser \"aqui vem a resposta\" e passa a ser equilibrio verificavel. Diversidade de dois casos distintos no L4 e resolucao R0-A. O primeiro Chrome real acusou overflow em 320px e a causa foi corrigida sem relaxar a sonda. O portao inativo 72cf0375 passou CI 31808928178 + transversal 31808928379. A promocao isolada 4a2d4d8e fez a Matrix observar 46 Composer, 15 legado, 29 fallback, 61 servidas e 11 divergencias antes deste ledger.", delta: { composer: 1, fallback: -1, served: 1 } },
-  { id: "W22-N6.03", competence: "N6.03", rationale: "F87 materializada no palco composto Quadrado100 + SingaporeBars: parte de cem → âncoras → percentual de quantidade → desconto/acréscimo → percentual inverso, com resolucao R0-A e diagnósticos canônicos. O portão inativo eed2b8ab passou CI 31820722322 + transversal 31820722277. Promoção e ledger entram atomicamente neste mesmo SHA; nenhum delta de divergência é presumido.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W22-N6.03", competence: "N6.03", rationale: "F87 materializada no palco composto Quadrado100 + SingaporeBars: parte de cem → âncoras → percentual de quantidade → desconto/acréscimo → percentual inverso, com resolucao R0-A e diagnósticos canônicos. O portão inativo eed2b8ab passou CI 31820722322 + transversal 31820722277. Promoção e ledger entraram atomicamente; nenhum delta de divergência foi presumido.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W23-GE.06", competence: "GE.06", rationale: "F78 materializada no AngulosStage como realização explícita do ShapeCanvas em modo ângulo: abertura dinâmica, comparação independente do comprimento dos lados, graus e polígonos, com resolucao R0-A. Promoção e ledger entram atomicamente neste SHA após o portão inativo exato; nenhum delta de divergência é presumido.", delta: { composer: 1, fallback: -1, served: 1 } },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
@@ -172,10 +173,8 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   if (kind === "emojirow-riscar-f15" && rawMode === "riscar") qualified = bases.map(base => base === "EmojiRow" ? "EmojiRow#riscar" : base);
   else if (kind === "area") qualified = bases.map(base => base === "ArrayGrid" ? "ArrayGrid#área" : base);
   else if (kind === "moldura" && rawMode === "faltam") qualified = bases.map(base => base === "TenFrame" ? "TenFrame#flash" : base);
-  // W15/F45: o kind inteiro é a realização autoral do modo canônico `partição`.
-  // `reconhecer/sobrepor/nomear/produzir/simbolo` são degraus internos da mesma
-  // linguagem visual, não cinco novos modos da ficha.
   else if (kind === "partes-iguais-f45") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#partição" : base);
+  else if (kind === "angulos-f78") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#ângulo" : base);
   else {
     const mode = rawMode ? modeByRuntime.get(String(rawMode)) : undefined;
     if (mode && bases.length) qualified = [`${bases[0]}#${mode}`, ...bases.slice(1)];
