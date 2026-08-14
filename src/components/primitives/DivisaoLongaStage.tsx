@@ -14,7 +14,7 @@ export function DivisaoLongaStage({ spec, disabled, onAnswer }: Props) {
     if (disabled || indisponiveis.has(value)) return;
     const correta = value === spec.resposta;
     if (!correta) setIndisponiveis(current => new Set(current).add(value));
-    onAnswer(value, { source: "divisao-longa-f69", misconception, evidencias: evidenciasDivisaoLonga({ nivel: spec.nivel, resposta: value, respostaCorreta: spec.resposta }) });
+    onAnswer(value, { misconception, evidencias: evidenciasDivisaoLonga({ nivel: spec.nivel, resposta: value, respostaCorreta: spec.resposta }) });
   };
   return <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-5" data-f69-stage data-mode={spec.modo}>
     {spec.nivel <= 3 && <section className="w-full rounded-3xl border border-indigo-100 bg-indigo-50/60 p-3" data-f69-array>
