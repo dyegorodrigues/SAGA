@@ -41,7 +41,9 @@ export function IgualdadeEquilibrioStage({ spec, disabled, onAnswer }: Props) {
   return <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5" data-f46-stage data-mode={spec.modo}>
     <div className="w-full rounded-3xl border border-amber-100 bg-amber-50/50 px-5 pt-4">
       <p className="text-center text-sm font-bold text-amber-950">O sinal <span className="text-xl">=</span> fica no meio porque os dois lados precisam valer o mesmo.</p>
-      <Balanca leftItems={esquerda} rightItems={direita} state={selecionado === spec.resposta ? "acerto" : "ocioso"} />
+      <div className="w-full px-[62px] sm:px-16" data-f46-balance-safe-area>
+        <Balanca leftItems={esquerda} rightItems={direita} state={selecionado === spec.resposta ? "acerto" : "ocioso"} />
+      </div>
       <p className="pb-4 text-center text-2xl font-black tracking-wide text-slate-800" aria-label="equação da balança">{spec.equacao}</p>
     </div>
 
