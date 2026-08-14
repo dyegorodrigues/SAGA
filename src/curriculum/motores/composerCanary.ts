@@ -14,6 +14,7 @@ import { N4_08 } from "../fichas/jornada/N4.08";
 import { N4_09 } from "../fichas/jornada/N4.09";
 import { N5_01 } from "../fichas/jornada/N5.01";
 import { N5_02 } from "../fichas/jornada/N5.02";
+import { N6_01 } from "../fichas/jornada/N6.01";
 import { N1_01 } from "../fichas/jornada/N1.01";
 import { N1_02 } from "../fichas/jornada/N1.02";
 import { N1_03 } from "../fichas/jornada/N1.03";
@@ -58,58 +59,25 @@ import { construirDetetiveFormasQuestion } from "../procedimentos/detetiveFormas
 import { construirRegraSequenciaQuestion } from "../procedimentos/regraSequenciaContract";
 import { construirPartesIguaisQuestion } from "../procedimentos/partesIguaisContract";
 import { construirFracaoNumeroQuestion } from "../procedimentos/fracaoNumeroContract";
+import { construirDecimalQuestion } from "../procedimentos/decimalContract";
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 
 type Generator = (level: number) => Question;
 type SpecializedBuilder = (ficha: FichaCompetencia, level: number) => Question;
-
 export type GeneratorSource = NonNullable<Track["generatorSource"]>;
 
 const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
-  "N3.01": N3_01,
-  "N3.02": N3_02,
-  "N3.03": N3_03,
-  "N3.09": N3_09,
-  "N3.10": N3_10,
-  "N4.01": N4_01,
-  "N4.03": N4_03,
-  "N4.04": N4_04,
-  "N4.07": N4_07,
-  "N4.06": N4_06,
-  "N4.08": N4_08,
-  "N4.09": N4_09,
-  "N5.01": N5_01,
-  // W16: F72 registrada e INATIVA. SingaporeBars + InteractiveNumberLine;
-  // promoção só depois dos dois workflows verdes no mesmo SHA.
-  "N5.02": N5_02,
-  "N1.01": N1_01,
-  "N1.02": N1_02,
-  "N1.03": N1_03,
-  "N1.04": N1_04,
-  "N1.05": N1_05,
-  "N1.06": N1_06,
-  "N1.07": N1_07,
-  "N1.08": N1_08,
-  "N1.09": N1_09,
-  "N1.12": N1_12,
-  "N1.13": N1_13,
-  "N1.10": N1_10,
-  "N1.11": N1_11,
-  "N2.01": N2_01,
-  "N2.02": N2_02,
-  "N2.03": N2_03,
-  "AL.01": AL_01,
-  "AL.02": AL_02,
-  "AL.03": AL_03,
-  "AL.04": AL_04,
-  "GE.01": GE_01,
-  "GE.02": GE_02,
-  "GE.03": GE_03,
-  "GM.01": GM_01,
-  "GM.02": GM_02,
-  "GM.12": GM_12,
-  "GM.05": GM_05,
+  "N3.01": N3_01, "N3.02": N3_02, "N3.03": N3_03, "N3.09": N3_09, "N3.10": N3_10,
+  "N4.01": N4_01, "N4.03": N4_03, "N4.04": N4_04, "N4.07": N4_07, "N4.06": N4_06, "N4.08": N4_08, "N4.09": N4_09,
+  "N5.01": N5_01, "N5.02": N5_02,
+  // W17: F75 registrada e INATIVA; promoção só após os dois workflows verdes.
+  "N6.01": N6_01,
+  "N1.01": N1_01, "N1.02": N1_02, "N1.03": N1_03, "N1.04": N1_04, "N1.05": N1_05, "N1.06": N1_06, "N1.07": N1_07, "N1.08": N1_08, "N1.09": N1_09, "N1.12": N1_12, "N1.13": N1_13, "N1.10": N1_10, "N1.11": N1_11,
+  "N2.01": N2_01, "N2.02": N2_02, "N2.03": N2_03,
+  "AL.01": AL_01, "AL.02": AL_02, "AL.03": AL_03, "AL.04": AL_04,
+  "GE.01": GE_01, "GE.02": GE_02, "GE.03": GE_03,
+  "GM.01": GM_01, "GM.02": GM_02, "GM.12": GM_12, "GM.05": GM_05,
 };
 
 const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
@@ -125,6 +93,7 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "N4.01": construirEqualGroupsQuestion,
   "N5.01": construirPartesIguaisQuestion,
   "N5.02": construirFracaoNumeroQuestion,
+  "N6.01": construirDecimalQuestion,
   "AL.03": construirSkipCountF30Question,
   "AL.04": construirRegraSequenciaQuestion,
   "GE.03": construirDetetiveFormasQuestion,
@@ -133,37 +102,16 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
 };
 
 const SPECIALIZED_RUNTIME_KIND: Partial<Record<string, string>> = {
-  "N1.12": "numberline-f19",
-  "N2.01": "material-dourado",
-  "N2.02": "quadrado100-f36",
-  "N2.03": "comparacao-simbolica",
-  "N3.01": "visual-addition-f13",
-  "N3.02": "emojirow-riscar-f15",
-  "N3.03": "counting-on-f14",
-  "N4.01": "equal-groups-f97",
-  "N5.01": "partes-iguais-f45",
-  "N5.02": "fracao-numero-f72",
-  "AL.03": "skip-count-f30",
-  "AL.04": "regra-sequencia-f57",
-  "GE.03": "detetive-formas-f58",
-  "GM.05": "regua-f61",
+  "N1.12": "numberline-f19", "N2.01": "material-dourado", "N2.02": "quadrado100-f36", "N2.03": "comparacao-simbolica",
+  "N3.01": "visual-addition-f13", "N3.02": "emojirow-riscar-f15", "N3.03": "counting-on-f14", "N4.01": "equal-groups-f97",
+  "N5.01": "partes-iguais-f45", "N5.02": "fracao-numero-f72", "N6.01": "decimos-centesimos-f75",
+  "AL.03": "skip-count-f30", "AL.04": "regra-sequencia-f57", "GE.03": "detetive-formas-f58", "GM.05": "regua-f61",
 };
 
-export function registeredFichaRuntimeKindOverride(id: string): string | undefined {
-  return SPECIALIZED_RUNTIME_KIND[id];
-}
-
+export function registeredFichaRuntimeKindOverride(id: string): string | undefined { return SPECIALIZED_RUNTIME_KIND[id]; }
 export const COMPOSER_CANARIES = new Set<string>(DEFAULT_COMPOSER_CANARY_IDS);
-
-export interface GeneratorBinding {
-  gen: Generator;
-  source(): GeneratorSource;
-}
-
-export function hasComposerFicha(id: string): boolean {
-  return Object.prototype.hasOwnProperty.call(COMPOSER_FICHAS, id);
-}
-
+export interface GeneratorBinding { gen: Generator; source(): GeneratorSource; }
+export function hasComposerFicha(id: string): boolean { return Object.prototype.hasOwnProperty.call(COMPOSER_FICHAS, id); }
 export function generateRegisteredFichaQuestion(id: string, level: number): Question {
   const ficha = COMPOSER_FICHAS[id];
   if (!ficha) throw new Error(`Ficha Composer não registrada: ${id}.`);
@@ -171,32 +119,15 @@ export function generateRegisteredFichaQuestion(id: string, level: number): Ques
   if (specialized) return specialized(ficha, level);
   return Composer.generate(ficha, level);
 }
-
 function resolveSource(id: string, legacy: Generator | undefined): GeneratorSource {
   if (COMPOSER_CANARIES.has(id) && hasComposerFicha(id)) return "composer";
   return legacy ? "legacy" : "fallback";
 }
-
 export function selectGenerator(id: string, legacy: Generator | undefined, fallback: Generator): GeneratorBinding {
-  return {
-    gen: level => {
-      switch (resolveSource(id, legacy)) {
-        case "composer": return generateRegisteredFichaQuestion(id, level);
-        case "legacy": return (legacy as Generator)(level);
-        default: return fallback(level);
-      }
-    },
-    source: () => resolveSource(id, legacy),
-  };
+  return { gen: level => { switch (resolveSource(id, legacy)) { case "composer": return generateRegisteredFichaQuestion(id, level); case "legacy": return (legacy as Generator)(level); default: return fallback(level); } }, source: () => resolveSource(id, legacy) };
 }
-
 export function enableComposerCanary(id: string): void {
-  if (!hasComposerFicha(id)) {
-    throw new Error(`Canário inválido para ${id}: registre a ficha autoral em COMPOSER_FICHAS antes de ativar.`);
-  }
+  if (!hasComposerFicha(id)) throw new Error(`Canário inválido para ${id}: registre a ficha autoral em COMPOSER_FICHAS antes de ativar.`);
   COMPOSER_CANARIES.add(id);
 }
-
-export function rollbackComposerCanary(id: string): void {
-  COMPOSER_CANARIES.delete(id);
-}
+export function rollbackComposerCanary(id: string): void { COMPOSER_CANARIES.delete(id); }

@@ -22,11 +22,10 @@ export const Evidencia = {
   PERCURSO_VERTICAL_QUADRADO100: "percurso-vertical-quadrado100",
   ADICAO_SEM_OBJETOS: "adicao-sem-objetos",
   SIMETRIA_EIXO: "detetive-formas-simetria-nivel-4",
-
-  /** F45 (N5.01): equipartição produzida no L4. */
   PARTES_IGUAIS_DIVISAO: "partes-iguais-corte-nivel-4",
-  /** F72 (N5.02): acerto realizado efetivamente na reta, em L3 ou superior. */
   FRACAO_NUMERO_RETA: "fracao-numero-reta-nivel-3mais",
+  /** F75 (N6.01): comparação decimal visual no nível 4. */
+  DECIMAL_COMPARACAO: "decimal-comparacao-nivel-4",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

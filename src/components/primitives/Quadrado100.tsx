@@ -13,6 +13,8 @@ interface Quadrado100Props {
   onNumberClick?: (n: number) => void;
   targetNumber?: number | null;
   state?: UIState;
+  /** F75 reutiliza a malha como UM inteiro; os numerais 1..100 ficam fora da linguagem visual. */
+  showNumbers?: boolean;
 }
 
 export function Quadrado100({
@@ -25,6 +27,7 @@ export function Quadrado100({
   onNumberClick,
   targetNumber = null,
   state = 'ocioso',
+  showNumbers = true,
 }: Quadrado100Props) {
   const [selected, setSelected] = useState<number[]>([]);
 
@@ -42,8 +45,9 @@ export function Quadrado100({
         className="grid grid-cols-10 gap-0.5 p-1 rounded-lg shadow-sm w-full"
         style={{ backgroundColor: tokens.cor.elementos.borda }}
         role="grid"
-        aria-label="Quadro de números de 1 a 100"
+        aria-label={showNumbers ? "Quadro de números de 1 a 100" : "Inteiro dividido em cem partes iguais"}
         data-quadrado100-grid
+        data-show-numbers={showNumbers ? 'true' : 'false'}
       >
         {Array.from({ length: 10 }).map((_, rowIndex) => (
           <div key={`row-${rowIndex + 1}`} role="row" className="contents">
@@ -60,7 +64,6 @@ export function Quadrado100({
 
               let bgColor = tokens.cor.superficie.cartao;
               let textColor = tokens.cor.texto.principal;
-
               if (isSelected) {
                 bgColor = tokens.cor.acao.primaria;
                 textColor = tokens.cor.texto.inverso;
@@ -80,24 +83,16 @@ export function Quadrado100({
                   animate={isIncorrect ? { x: [0, -3, 3, -3, 0] } : { x: 0 }}
                   onClick={() => handleToggle(n)}
                   disabled={!interactive}
-                  // A casa oculta não pode anunciar o próprio numeral no leitor de
-                  // tela; isso entregaria a resposta. Linha/coluna preservam a mesma
-                  // estrutura espacial que a criança vidente recebe pelo quadro.
-                  aria-label={isHidden ? `Casa vazia, linha ${linha}, coluna ${coluna}` : `Número ${n}`}
+                  aria-label={showNumbers ? (isHidden ? `Casa vazia, linha ${linha}, coluna ${coluna}` : `Número ${n}`) : `Parte do inteiro, linha ${linha}, coluna ${coluna}`}
                   data-quadrado100-cell={n}
                   data-hidden={isHidden ? 'true' : 'false'}
                   className={`flex items-center justify-center font-bold text-[10px] min-[360px]:text-xs sm:text-sm ${interactive ? 'cursor-pointer' : ''} disabled:cursor-default`}
                   style={{
-                    width: '100%',
-                    aspectRatio: '1/1',
-                    minWidth: '0',
-                    backgroundColor: bgColor,
-                    color: textColor,
-                    borderRadius: '4px',
-                    transition: tokens.animacao.rapida,
+                    width: '100%', aspectRatio: '1/1', minWidth: '0', backgroundColor: bgColor, color: textColor,
+                    borderRadius: '4px', transition: tokens.animacao.rapida,
                   }}
                 >
-                  {isHidden ? <span aria-hidden="true">•</span> : n}
+                  {showNumbers ? (isHidden ? <span aria-hidden="true">•</span> : n) : <span aria-hidden="true"> </span>}
                 </motion.button>
               );
             })}
