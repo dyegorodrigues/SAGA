@@ -17,50 +17,35 @@ import { AnswerMeta, Question } from "../../types";
 import { bundleMisconceptions } from "./misconceptionBundle";
 
 type ProducaoComHistorico = AcaoDeProducao & { diagnosticosLongitudinais?: string[] };
+const AUTORIAIS = new Set(["material-dourado","numberline-f19","quadrado100-f36","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69"]);
 
-export function isMotorSlip(meta?: AnswerMeta): boolean {
-  return meta?.manipulacao !== undefined && classificarErro(meta.manipulacao) === "motor";
-}
-
+export function isMotorSlip(meta?: AnswerMeta): boolean { return meta?.manipulacao !== undefined && classificarErro(meta.manipulacao) === "motor"; }
 export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta): boolean {
   if (value === "__timeout__") return false;
   if (isMotorSlip(meta)) return true;
-  if (
-    q.kind === "material-dourado" || q.kind === "numberline-f19" || q.kind === "regua-f61"
-    || q.kind === "quadrado100-f36" || q.kind === "skip-count-f30" || q.kind === "equal-groups-f97"
-    || q.kind === "detetive-formas-f58" || q.kind === "regra-sequencia-f57" || q.kind === "partes-iguais-f45"
-    || q.kind === "fracao-numero-f72" || q.kind === "decimos-centesimos-f75" || q.kind === "fracoes-equivalentes-f73"
-  ) return true;
+  if (AUTORIAIS.has(q.kind as string) || q.kind === "regua-f61") return true;
   return Boolean(q.options || q.groups || meta?.source);
 }
-
 function isFormaQuestion(q: Question): boolean { return q.kind === "shapecanvas" && q.uiProps != null && typeof q.uiProps === "object" && "opcoes" in q.uiProps; }
 function isPosicaoQuestion(q: Question): boolean { return q.kind === "shapecanvas" && q.uiProps != null && typeof q.uiProps === "object" && "referencial" in q.uiProps && !("opcoes" in q.uiProps); }
-
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
-  return q.kind === "material-dourado" || q.kind === "numberline-f19" || q.kind === "quadrado100-f36" || q.kind === "counting-on-f14"
-    || q.kind === "skip-count-f30" || q.kind === "equal-groups-f97" || q.kind === "detetive-formas-f58" || q.kind === "regra-sequencia-f57"
-    || q.kind === "partes-iguais-f45" || q.kind === "fracao-numero-f72" || q.kind === "decimos-centesimos-f75" || q.kind === "fracoes-equivalentes-f73"
+  return AUTORIAIS.has(q.kind as string) || q.kind === "counting-on-f14"
     || (q.kind === "regua-f61" && meta?.source === "medidas") || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined) || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
     || (isFormaQuestion(q) && meta?.forma !== undefined) || (q.kind === "grandeza" && meta?.grandeza !== undefined)
     || (q.kind === "medidas" && meta?.source === "medidas");
 }
-
 export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
-  return q.kind === "material-dourado" || q.kind === "numberline-f19" || q.kind === "quadrado100-f36" || q.kind === "skip-count-f30"
-    || q.kind === "equal-groups-f97" || q.kind === "detetive-formas-f58" || q.kind === "regra-sequencia-f57" || q.kind === "partes-iguais-f45"
-    || q.kind === "fracao-numero-f72" || q.kind === "decimos-centesimos-f75" || q.kind === "fracoes-equivalentes-f73"
+  return AUTORIAIS.has(q.kind as string)
     || (q.kind === "regua-f61" && meta?.source === "medidas") || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
     || (q.kind === "touchplace" && meta?.touchplace !== undefined) || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
     || (isFormaQuestion(q) && meta?.forma !== undefined) || (q.kind === "grandeza" && meta?.grandeza !== undefined)
     || (q.kind === "medidas" && meta?.source === "medidas");
 }
-
 export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
   if (q.kind === "material-dourado") return 3000;
   if (q.kind === "quadrado100-f36") return 2200;
-  if (["numberline-f19","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73"].includes(q.kind as string)) return 1800;
+  if (["numberline-f19","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69"].includes(q.kind as string)) return 1800;
   if (q.kind === "regua-f61" && meta?.source === "medidas") return 2600;
   if (isPosicaoQuestion(q) && meta?.posicao !== undefined) return 3300;
   if (isFormaQuestion(q) && meta?.forma !== undefined) return 3700;
@@ -68,7 +53,6 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
   if (q.kind === "medidas" && meta?.source === "medidas") return 3300;
   return 1500;
 }
-
 export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
   prepareAulaSourceForAnswer(q); recordSenseiDojoAttempt(q); prepareMatriculaForAnswer(q);
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
@@ -86,14 +70,11 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
   const pickedOption=q.options?.find(option=>option.value===value);
   return pickedOption?.misconception ? pickedOption.tag || pickedOption.misconception : meta?.misconception;
 }
-
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento","touchcount","fileira","classificacao","audiochoice","touchplace","shapecanvas","grandeza","comparacao-simbolica","medidas","moldura","material-dourado",
-  "numberline-f19","regua-f61","quadrado100-f36","visual-addition-f13","emojirow-riscar-f15","counting-on-f14","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73",
+  "numberline-f19","regua-f61","quadrado100-f36","visual-addition-f13","emojirow-riscar-f15","counting-on-f14","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69",
 ]);
-export function shouldRenderQuestionOptions(q: Question): boolean {
-  return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string);
-}
+export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
   if (!meta) return [];
   const achadas:string[]=[];

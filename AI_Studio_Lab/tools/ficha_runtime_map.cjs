@@ -1,33 +1,82 @@
-const { FICHA_RUNTIME_MAP: BASE } = require("./ficha_runtime_map_core.cjs");
+const path = require("node:path");
+const component = (name) => path.join("src/components/primitives", `${name}.tsx`);
 
-/**
- * Extensões físicas do bloco W17–W19.
- * A regra de composição permanece a mesma: o mesmo renderer kind aparece em
- * cada primitiva que o palco carrega — esta é a segunda entrada por composição;
- * o observador deve unir essas linhas. Helpers não são promovidos a primitivas.
- * arrays vazios continuam sendo lacunas reais, nunca inferências silenciosas.
- */
-const FICHA_RUNTIME_MAP = BASE.map(entry => {
-  if (entry.primitive === "Quadrado100") {
-    return {
-      ...entry,
-      kinds: [...entry.kinds, "decimos-centesimos-f75"],
-      componentFiles: [...entry.componentFiles, "src/components/primitives/DecimalStage.tsx"],
-      specializedBuilderIds: [...(entry.specializedBuilderIds || []), "N6.01"],
-      rendererKinds: [...entry.rendererKinds, "decimos-centesimos-f75"],
-      note: `${entry.note || ""} W17/F75 relê a mesma malha 10×10 como um inteiro, sem criar uma segunda primitiva.`,
-    };
-  }
-  if (entry.primitive === "SingaporeBars") {
-    return {
-      ...entry,
-      kinds: [...entry.kinds, "fracoes-equivalentes-f73"],
-      componentFiles: [...entry.componentFiles, "src/components/primitives/FracoesEquivalentesStage.tsx"],
-      specializedBuilderIds: [...(entry.specializedBuilderIds || []), "N5.03"],
-      rendererKinds: [...entry.rendererKinds, "fracoes-equivalentes-f73"],
-      note: `${entry.note || ""} W18/F73 usa duas SingaporeFractionBar do mesmo comprimento para equivalência e comparação.`,
-    };
-  }
-  return entry;
-});
+/** Mapa declarativo ficha → runtime. Sem transformação ou mutação no import. */
+const FICHA_RUNTIME_MAP = [
+  {
+    primitive: "ArrayGrid",
+    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69"],
+    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage")],
+    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10"],
+    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69"],
+    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo.",
+  },
+  { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
+  { primitive: "Balanca", kinds: ["balanca", "medidas"], componentFiles: [component("Balanca"), component("MedidasStage")], builderKinds: ["balanca", "medidas"], rendererKinds: ["balanca", "medidas"] },
+  { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
+  { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
+  {
+    primitive: "EmojiRow", kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15", "regra-sequencia-f57"],
+    componentFiles: [component("EmojiRow"), component("EmojiRowStage"), component("MolduraStage"), component("EmojiRowRiscarStage"), component("RegraSequenciaStage")],
+    builderKinds: ["emojirow", "fileira", "moldura"], specializedBuilderIds: ["N3.02", "AL.04"], rendererKinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15", "regra-sequencia-f57"],
+    note: "W14/F57 usa RegraSequenciaStage e compõe NumberLine nos dois primeiros degraus.",
+  },
+  {
+    primitive: "Grupo", kinds: ["groups", "grandeza", "comparacao-simbolica", "equal-groups-f97"],
+    componentFiles: [component("Grupo"), component("GrandezaStage"), component("ComparacaoSimbolicaStage"), "src/curriculum/procedimentos/equalGroupsStage.ts"],
+    builderKinds: ["grandeza"], specializedBuilderIds: ["N2.03", "N4.01"], rendererKinds: ["grandeza", "comparacao-simbolica", "equal-groups-f97"], note: "W12/F97 reutiliza Grupo em equalGroupsStage.",
+  },
+  {
+    primitive: "InteractiveNumberLine", kinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72"],
+    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage"), component("FracaoNumeroStage")],
+    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03", "N5.02"], rendererKinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72"],
+    note: "W11/F30 e W16/F72 reutilizam InteractiveNumberLineSurface; F72 alinha a barra à mesma escala."
+  },
+  {
+    primitive: "InteractiveVertical", kinds: ["vertical", "divisao-longa-f69"],
+    componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage"), component("DivisaoLongaStage")],
+    builderKinds: ["vertical"], specializedBuilderIds: ["N4.10"], rendererKinds: ["vertical", "divisao-longa-f69"],
+    note: "VerticalPlaceValueStage compõe InteractiveVertical + MaterialDourado. F69 usa InteractiveVerticalDivisionSurface no mesmo arquivo da primitiva."
+  },
+  { primitive: "LinkingCubes", kinds: ["linking-cubes", "counting-on-f14"], componentFiles: [component("LinkingCubes"), component("CountingOnStage")], builderKinds: [], specializedBuilderIds: ["N3.03"], rendererKinds: ["linking-cubes", "counting-on-f14"], note: "W10/F14: CountingOnStage compõe LinkingCubes + NumberLine." },
+  {
+    primitive: "MaterialDourado", kinds: ["tens", "material-dourado", "vertical", "deslocamento"],
+    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage"), component("VerticalPlaceValueStage"), component("DeslocamentoStage")],
+    builderKinds: ["tens", "vertical", "deslocamento"], rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento"],
+    note: "MaterialDouradoStage compõe MaterialDourado + TenFrame; VerticalPlaceValueStage compõe MaterialDourado + InteractiveVertical."
+  },
+  { primitive: "Moedas", kinds: ["money"], componentFiles: ["src/components/Mascot.tsx"], componentExports: ["MoneyCoin", "MoneyNote"], builderKinds: [], rendererKinds: ["money"] },
+  { primitive: "NumberBond", kinds: ["bond", "familia"], componentFiles: [component("NumberBond"), component("FamiliaStage"), component("TrianguloDeFatos")], builderKinds: ["bond", "familia"], rendererKinds: ["bond", "familia"], note: "F96/N4.06 realiza NumberBond em linguagem triangular pelo helper TrianguloDeFatos." },
+  {
+    primitive: "NumberLine", kinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57"],
+    componentFiles: [component("NumberLine"), component("CountingOnStage"), component("TabuadaStage"), component("RegraSequenciaStage")],
+    builderKinds: ["numberline", "tabuada"], specializedBuilderIds: ["N3.03", "AL.04"], rendererKinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57"], note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2.",
+  },
+  {
+    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75"],
+    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos."
+  },
+  { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
+  { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
+  { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
+  {
+    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "partes-iguais-f45"],
+    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("PartesIguaisStage")],
+    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "N5.01"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "partes-iguais-f45"], note: "W13/F58 usa FiguraDesenhada; W15/F45 compõe ShapeCanvas + SingaporeBars."
+  },
+  {
+    primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73"],
+    componentFiles: [component("SingaporeBars"), component("SingaporeBarsStage"), component("StoryBarsStage"), component("PartesIguaisStage"), component("FracaoNumeroStage"), component("FracoesEquivalentesStage")],
+    builderKinds: ["storypanel"], specializedBuilderIds: ["N5.01", "N5.02", "N5.03"], rendererKinds: ["singapore-bars", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73"],
+    note: "W15/F45, W16/F72 e W18/F73 reutilizam SingaporeBars; F73 compara barras de mesmo comprimento."
+  },
+  { primitive: "StoryPanel", kinds: ["story", "scene", "storypanel", "story-bars"], componentFiles: [component("StoryPanel"), component("StoryPanelStage"), component("StoryBarsStage")], builderKinds: ["storypanel"], rendererKinds: ["story-bars"], note: "N3.10/F20 compõe StoryPanel + SingaporeBars." },
+  { primitive: "TenFrame", kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage")], builderKinds: ["tenframe", "moldura", "bond", "plain"], rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], note: "MaterialDouradoStage compõe MaterialDourado + TenFrame." },
+  { primitive: "TouchCount", kinds: ["touchcount"], componentFiles: [component("TouchCount")], builderKinds: ["touchcount"], rendererKinds: ["touchcount"] },
+  { primitive: "TouchPlace", kinds: ["touchplace"], componentFiles: [component("TouchPlace"), component("TouchPlaceStage")], builderKinds: ["touchplace"], rendererKinds: ["touchplace"] },
+  { primitive: "VisualAddition", kinds: ["visual-addition", "visual-addition-f13", "subvis"], componentFiles: [component("VisualAddition"), component("VisualAdditionStage")], builderKinds: [], specializedBuilderIds: ["N3.01"], rendererKinds: ["visual-addition", "visual-addition-f13"] },
+  { primitive: "plain", kinds: ["plain"], componentFiles: [], builtin: true, builderKinds: ["plain"], rendererKinds: ["plain"] },
+];
 module.exports = { FICHA_RUNTIME_MAP };
