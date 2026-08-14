@@ -5,13 +5,19 @@ const MIGRACOES_DO_BLOCO = [
   {
     id: "W16-N5.02",
     competence: "N5.02",
-    rationale: "F72 materializada no FracaoNumeroStage, compondo SingaporeBars + InteractiveNumberLine. Inativo 4789636c: CI 31764367753 + transversal 31764367742. Promoção a3bcf427: Matrix observou 41 Composer / 15 legado / 34 fallback / 56 servidas / 11 divergências.",
+    rationale: "F72: SingaporeBars + InteractiveNumberLine. Promoção observada pela Matrix como +1 Composer, -1 fallback, +1 servida.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
   {
     id: "W17-N6.01",
     competence: "N6.01",
-    rationale: "F75 relê Quadrado100 como um inteiro, com décimos e centésimos. Inativo f52d74aa: CI 31766412517 + transversal 31766412457. Promoção b9dc5999: Matrix observou 42 Composer / 15 legado / 33 fallback / 57 servidas / 11 divergências.",
+    rationale: "F75: Quadrado100 relido como um inteiro. Promoção observada pela Matrix como +1 Composer, -1 fallback, +1 servida.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
+  {
+    id: "W18-N5.03",
+    competence: "N5.03",
+    rationale: "F73: duas SingaporeBars do mesmo inteiro para equivalência e comparação. A promoção fez a Matrix observar 43 Composer, 15 legado, 32 fallback, 58 servidas e 11 divergências.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
 ] as const;
