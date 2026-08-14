@@ -20,6 +20,7 @@ import { construirQuadrado100Spec } from "./procedimentos/quadrado100Contract";
 import { evidenciasQuadrado100 as doQuadrado100 } from "./procedimentos/quadrado100Procedure";
 import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visualAdditionProcedure";
 import { evidenciasDetetiveFormas as daSimetria } from "./procedimentos/detetiveFormasProcedure";
+import { cortesAlvoPartesIguais, evidenciasPartesIguais as dasPartesIguais } from "./procedimentos/partesIguaisProcedure";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -177,6 +178,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       eixoCorreto: "horizontal",
     }),
   },
+  {
+    nome: "F45 (Partes Iguais) — divisão correta em partes iguais no L4",
+    evidencia: Evidencia.PARTES_IGUAIS_DIVISAO,
+    emitir: () => dasPartesIguais({ nivel: 4, denominador: 3, cortes: cortesAlvoPartesIguais(3) }),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -294,9 +300,10 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       revisoes: 1,
     })).toEqual([]);
 
-    // O eixo errado não emite, e o eixo certo fora do L4 também não: a evidência
-    // é do degrau da dobra, não de qualquer acerto da ficha.
     expect(daSimetria({ nivel: 4, eixoEscolhido: "vertical", eixoCorreto: "horizontal" })).toEqual([]);
     expect(daSimetria({ nivel: 3, eixoEscolhido: "horizontal", eixoCorreto: "horizontal" })).toEqual([]);
+
+    expect(dasPartesIguais({ nivel: 4, denominador: 2, cortes: [0.42] })).toEqual([]);
+    expect(dasPartesIguais({ nivel: 3, denominador: 2, cortes: cortesAlvoPartesIguais(2) })).toEqual([]);
   });
 });
