@@ -19,6 +19,14 @@ interface FichaRendererProps {
   falar?: (texto: string) => void;
 }
 
+/**
+ * Front-controller dos palcos autorais especializados.
+ *
+ * Os cases de passthrough abaixo são deliberados: GameLoopExerciseRenderer
+ * usa a presença literal deles como guarda contra palco duplicado ou apagado.
+ * O desenho efetivo desses kinds continua em FichaRendererBase quando este
+ * renderer é usado fora do GameLoop.
+ */
 export function FichaRenderer(props: FichaRendererProps) {
   const { question, onAnswer, disabled } = props;
   switch (question.kind) {
@@ -38,6 +46,24 @@ export function FichaRenderer(props: FichaRendererProps) {
       const spec = question.uiProps as DecimalF75Spec;
       return <DecimalStage spec={spec} disabled={Boolean(disabled)} onAnswer={(valor, meta) => { if (!disabled) onAnswer(valor, question.evaluate?.(valor) ?? false, meta); }} />;
     }
+
+    case 'story-bars':
+    case 'tabuada':
+    case 'decomposicao':
+    case 'ancora':
+    case 'familia':
+    case 'deslocamento':
+    case 'area':
+    case 'pareamento':
+    case 'touchcount':
+    case 'fileira':
+    case 'classificacao':
+    case 'audiochoice':
+    case 'touchplace':
+    case 'shapecanvas':
+    case 'grandeza':
+    case 'medidas':
+    case 'moldura':
     default:
       return <FichaRendererBase {...props} />;
   }
