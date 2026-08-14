@@ -76,6 +76,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W23 — F78: ângulos; abertura dinâmica independente do comprimento dos lados.
   "GE.06",
 
+  // W24 — F84: reta completa; inativo 1f912c8f passou CI 31825522496 + transversal 31825522510.
+  "N7.01",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
