@@ -64,8 +64,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W19 — F69: divisão longa. Inativo 4ed4858d: CI 31798437057 + transversal 31798437091.
   "N4.10",
 
-  // W20 — F63: perímetro como a volta; inativo f68b8bb6 passou os dois workflows.
+  // W20 — F63: perímetro como a volta; final inativo 72cf0375 passou CI 31808928178 + transversal 31808928379.
   "GM.07",
+
+  // W21 — F46: igualdade como equilíbrio; inativo 72cf0375 passou CI 31808928178 + transversal 31808928379.
+  "AL.05",
 
   // Bloco F0 promovido anteriormente.
   "N1.01",
