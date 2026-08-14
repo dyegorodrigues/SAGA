@@ -42,7 +42,14 @@ const FICHA_RUNTIME_MAP = [
     note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo. F63/GM.07 compõe ArrayGrid + ShapeCanvas para separar chão e volta.",
   },
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
-  { primitive: "Balanca", kinds: ["balanca", "medidas"], componentFiles: [component("Balanca"), component("MedidasStage")], builderKinds: ["balanca", "medidas"], rendererKinds: ["balanca", "medidas"] },
+  {
+    primitive: "Balanca",
+    kinds: ["balanca", "medidas", "igualdade-equilibrio-f46"],
+    componentFiles: [component("Balanca"), component("MedidasStage"), component("IgualdadeEquilibrioStage")],
+    builderKinds: ["balanca", "medidas"], specializedBuilderIds: ["AL.05"],
+    rendererKinds: ["balanca", "medidas", "igualdade-equilibrio-f46"],
+    note: "F46/AL.05 reutiliza Balanca como significado físico do sinal de igualdade: dois lados têm o mesmo valor.",
+  },
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
   { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
   {
