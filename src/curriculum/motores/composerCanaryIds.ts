@@ -89,6 +89,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "GE.03",
   "AL.04",
 
+  // W15 — F45: partes iguais. PartesIguaisStage compõe ShapeCanvas +
+  // SingaporeBars e exige prova L4 de equipartição antes da promoção.
+  // O canário inativo b32bee4c passou CI 31760839221 + transversal 31760839210.
+  "N5.01",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
