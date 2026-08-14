@@ -32,73 +32,30 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "GM.02",
   "GM.12",
 
-  // W3 — F21: dezena como unidade composta; promovida somente após a cadeia
-  // inativa (contrato/palco/boundary/a11y/evidência) ficar integralmente verde.
   "N2.01",
-
-  // W4 — F19: reta numérica responsiva e interativa. Promoção somente após
-  // contrato/palco/boundary/a11y + sonda Chrome 320/390/900 ficarem verdes.
   "N1.12",
-
-  // W5 — F61: medida padronizada com régua. Promoção somente depois do canário
-  // inativo passar suíte completa + Chrome real 320/390/900, L1–L5, tap/drag.
   "GM.05",
-
-  // W6 — F29: comparação simbólica Grupo-backed. N1.05/W2 é pré-requisito
-  // direto; promoção somente após suíte e Chrome real da ficha registrada/inativa.
   "N2.03",
-
-  // W7 — F36: Quadrado100 10×10 com percurso autoral. N2.01/W3 é pré-requisito
-  // direto; promoção após suíte + onboarding visual + Chrome 320/390/900 + 390×8.
   "N2.02",
-
-  // W8 — F13: VisualAddition autoral com ação de juntar, retirada progressiva
-  // de objetos e prova L4 sem suporte concreto. Promoção após suíte + onboarding
-  // + Chrome 320/390/900 + transversal 390×8 verdes no SHA inativo final.
   "N3.01",
-
-  // W9 — F15: EmojiRow#riscar autoral. A alfabetização explícita de X=saiu,
-  // preservação geométrica do slot, domínio sem crédito por correção e Chrome
-  // 320/390/900 ficaram verdes no SHA inativo 4218ac68 antes da promoção.
   "N3.02",
-
-  // W10 — F14: counting on por estratégia. O Stage composto LinkingCubes +
-  // NumberLine, diagnóstico da partida e resolução R0-A passaram suíte + Chrome
-  // 320/390/900 + transversal 390×8 no SHA inativo 8ee8cad1 antes da promoção.
   "N3.03",
-
-  // W11 — F30: contagem por saltos. SkipCountStage reutiliza a mesma
-  // InteractiveNumberLineSurface, compõe Quadrado100 no L3, generaliza no L4/L5
-  // e exige dois saltos distintos para mastery. O canário inativo 5988403f passou
-  // CI #1219 / run 31662349768 integralmente verde antes desta promoção.
   "AL.03",
-
-  // W12 — F97: multiplicação como grupos iguais. EqualGroupsStage reutiliza
-  // Grupo e preserva a leitura "N grupos de M" da ficha canônica. O canário
-  // inativo 3c801627 passou CI #1256 / run 31701736784 integralmente verde,
-  // incluindo F97 em Chrome real e o portão transversal 390×8, antes da promoção.
   "N4.01",
 
-  // W13 — F58: o Detetive de Formas, e a PRIMEIRA estreia sob o critério
-  // fallback-first: GE.03 não vinha de gerador legado, vinha de placeholder
-  // "Em construção". DetetiveFormasStage reutiliza ShapeCanvas em vez de abrir
-  // segunda linguagem visual, e a §9 exige o eixo de simetria no L4 — contar
-  // lados é atributo, achar o eixo é a única dobra mental da ficha.
-  // O canário inativo 6092da5a passou os DOIS workflows integralmente verdes:
-  // CI run 31735133641 e Certificação transversal run 31735133586.
+  // W13 — F58: primeira estreia fallback-first.
   "GE.03",
   "AL.04",
 
-  // W15 — F45: partes iguais. PartesIguaisStage compõe ShapeCanvas +
-  // SingaporeBars e exige prova L4 de equipartição antes da promoção.
-  // O canário inativo b32bee4c passou CI 31760839221 + transversal 31760839210.
+  // W15 — F45: partes iguais. Inativo b32bee4c: CI 31760839221 + transversal 31760839210.
   "N5.01",
 
-  // W16 — F72: fração como número. O palco compõe SingaporeBars +
-  // InteractiveNumberLine e só emite a prova de domínio quando a criança acerta
-  // efetivamente na reta (L3+). O canário inativo 4789636c passou CI
-  // 31764367753 + Certificação transversal 31764367742 no mesmo SHA.
+  // W16 — F72: fração como número. Inativo 4789636c: CI 31764367753 + transversal 31764367742.
   "N5.02",
+
+  // W17 — F75: décimos e centésimos. O mesmo Quadrado100 é relido como 1 inteiro.
+  // O canário inativo f52d74aa passou CI 31766412517 + transversal 31766412457 no mesmo SHA.
+  "N6.01",
 
   // Bloco F0 promovido anteriormente.
   "N1.01",
