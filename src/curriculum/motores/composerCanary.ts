@@ -12,7 +12,16 @@ import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparac
 import { Question, Track } from "../../types";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 type Generator=(level:number)=>Question; type SpecializedBuilder=(ficha:FichaCompetencia,level:number)=>Question; export type GeneratorSource=NonNullable<Track["generatorSource"]>;
-const COMPOSER_FICHAS:Record<string,FichaCompetencia>={"N3.01":N3_01,"N3.02":N3_02,"N3.03":N3_03,"N3.09":N3_09,"N3.10":N3_10,"N4.01":N4_01,"N4.03":N4_03,"N4.04":N4_04,"N4.06":N4_06,"N4.07":N4_07,"N4.08":N4_08,"N4.09":N4_09,"N4.10":N4_10,"N5.01":N5_01,"N5.02":N5_02,"N5.03":N5_03,"N6.01":N6_01,"N1.01":N1_01,"N1.02":N1_02,"N1.03":N1_03,"N1.04":N1_04,"N1.05":N1_05,"N1.06":N1_06,"N1.07":N1_07,"N1.08":N1_08,"N1.09":N1_09,"N1.10":N1_10,"N1.11":N1_11,"N1.12":N1_12,"N1.13":N1_13,"N2.01":N2_01,"N2.02":N2_02,"N2.03":N2_03,"AL.01":AL_01,"AL.02":AL_02,"AL.03":AL_03,"AL.04":AL_04,"GE.01":GE_01,"GE.02":GE_02,"GE.03":GE_03,"GM.01":GM_01,"GM.02":GM_02,"GM.05":GM_05,"GM.12":GM_12};
+const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
+  "N3.01":N3_01,"N3.02":N3_02,"N3.03":N3_03,"N3.09":N3_09,"N3.10":N3_10,
+  "N4.01":N4_01,"N4.03":N4_03,"N4.04":N4_04,"N4.06":N4_06,"N4.07":N4_07,"N4.08":N4_08,"N4.09":N4_09,"N4.10":N4_10,
+  "N5.01":N5_01,"N5.02":N5_02,"N5.03":N5_03,"N6.01":N6_01,
+  "N1.01":N1_01,"N1.02":N1_02,"N1.03":N1_03,"N1.04":N1_04,"N1.05":N1_05,"N1.06":N1_06,"N1.07":N1_07,"N1.08":N1_08,"N1.09":N1_09,"N1.10":N1_10,"N1.11":N1_11,"N1.12":N1_12,"N1.13":N1_13,
+  "N2.01":N2_01,"N2.02":N2_02,"N2.03":N2_03,
+  "AL.01":AL_01,"AL.02":AL_02,"AL.03":AL_03,"AL.04":AL_04,
+  "GE.01":GE_01,"GE.02":GE_02,"GE.03":GE_03,
+  "GM.01":GM_01,"GM.02":GM_02,"GM.05":GM_05,"GM.12":GM_12,
+};
 const SPECIALIZED_BUILDERS:Partial<Record<string,SpecializedBuilder>>={"N1.05":construirComparacaoQuantidadeQuestion,"N1.09":construirContagem20Question,"N1.12":construirReta20Question,"N2.01":construirDezenaUnidadesQuestion,"N2.02":construirQuadrado100Question,"N2.03":construirComparacaoSimbolicaQuestion,"N3.01":construirVisualAdditionQuestion,"N3.02":construirEmojiRowRiscarQuestion,"N3.03":construirCountingOnQuestion,"N4.01":construirEqualGroupsQuestion,"N4.10":construirDivisaoLongaQuestion,"N5.01":construirPartesIguaisQuestion,"N5.02":construirFracaoNumeroQuestion,"N5.03":construirFracaoEquivalenteQuestion,"N6.01":construirDecimalQuestion,"AL.03":construirSkipCountF30Question,"AL.04":construirRegraSequenciaQuestion,"GE.03":construirDetetiveFormasQuestion,"GM.02":construirTempoCotidianoQuestion,"GM.05":construirReguaQuestion};
 const SPECIALIZED_RUNTIME_KIND:Partial<Record<string,string>>={"N1.12":"numberline-f19","N2.01":"material-dourado","N2.02":"quadrado100-f36","N2.03":"comparacao-simbolica","N3.01":"visual-addition-f13","N3.02":"emojirow-riscar-f15","N3.03":"counting-on-f14","N4.01":"equal-groups-f97","N4.10":"divisao-longa-f69","N5.01":"partes-iguais-f45","N5.02":"fracao-numero-f72","N5.03":"fracoes-equivalentes-f73","N6.01":"decimos-centesimos-f75","AL.03":"skip-count-f30","AL.04":"regra-sequencia-f57","GE.03":"detetive-formas-f58","GM.05":"regua-f61"};
 export function registeredFichaRuntimeKindOverride(id:string):string|undefined{return SPECIALIZED_RUNTIME_KIND[id]}
