@@ -10,7 +10,8 @@ import { N5_01 } from './jornada/N5.01'; import { N5_02 } from './jornada/N5.02'
 import { AL_01 } from './jornada/AL.01'; import { AL_02 } from './jornada/AL.02'; import { AL_03 } from './jornada/AL.03'; import { AL_04 } from './jornada/AL.04'; import { AL_05 } from './jornada/AL.05';
 import { GE_01 } from './jornada/GE.01'; import { GE_02 } from './jornada/GE.02'; import { GE_03 } from './jornada/GE.03'; import { GE_06 } from './jornada/GE.06';
 import { GM_01 } from './jornada/GM.01'; import { GM_02 } from './jornada/GM.02'; import { GM_04 } from './jornada/GM.04'; import { GM_05 } from './jornada/GM.05'; import { GM_07 } from './jornada/GM.07'; import { GM_12 } from './jornada/GM.12';
+import { PE_02 } from './jornada/PE.02';
 import { JARDIM_FICHAS } from './dojo/jardim';
-export const JOURNEY_FICHAS=[N1_01,N1_02,N1_03,N1_04,N1_05,N1_06,N1_07,N1_08,N1_09,N1_10,N1_11,N1_12,N1_13,N2_01,N2_02,N2_03,N3_01,N3_02,N3_03,N3_09,N3_10,N3_11,N4_01,N4_02,N4_03,N4_04,N4_06,N4_07,N4_08,N4_09,N4_10,N5_01,N5_02,N5_03,N6_01,N6_03,N7_01,AL_01,AL_02,AL_03,AL_04,AL_05,GE_01,GE_02,GE_03,GE_06,GM_01,GM_02,GM_04,GM_05,GM_07,GM_12];
+export const JOURNEY_FICHAS=[N1_01,N1_02,N1_03,N1_04,N1_05,N1_06,N1_07,N1_08,N1_09,N1_10,N1_11,N1_12,N1_13,N2_01,N2_02,N2_03,N3_01,N3_02,N3_03,N3_09,N3_10,N3_11,N4_01,N4_02,N4_03,N4_04,N4_06,N4_07,N4_08,N4_09,N4_10,N5_01,N5_02,N5_03,N6_01,N6_03,N7_01,AL_01,AL_02,AL_03,AL_04,AL_05,GE_01,GE_02,GE_03,GE_06,GM_01,GM_02,GM_04,GM_05,GM_07,GM_12,PE_02];
 export const AllFichas=[dojo_add,dojo_sub,dojo_mul,dojo_div,...JOURNEY_FICHAS,...JARDIM_FICHAS];
 export { JARDIM,JARDIM_FICHAS } from './dojo/jardim';
