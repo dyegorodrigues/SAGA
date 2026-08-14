@@ -98,6 +98,33 @@ Estado vigente:
 
 **Invariante:** auditoria, Matrix, baseline e mapa runtime NÃO devem depender de mutação como efeito de import nem de ordem de carregamento.
 
+## 6-A. Cânone não se comprime — e agora existe portão
+
+`src/constants/evidencias.ts` foi de **156 linhas para 3** no commit `008ac01`
+(materialização da W16) e seguiu minificado por todo o bloco W15–W19. Os 2.851
+testes ficaram verdes o tempo inteiro, porque comentário não é executável.
+
+O que se perdeu não era enfeite: era a frase que explica, para cada condição da
+§9, qual ficha a exige, em que nível, e **por que acertar sem ela não provaria
+a competência**. Restaurado em `12c7cf4d`, com os 22 valores conferidos
+idênticos por comparação automática — só a documentação voltou.
+
+`src/constants/evidencias.doc.test.ts` agora reprova entrada sem bloco de
+documentação e reprova o arquivo comprimido. A trava foi verificada nos dois
+sentidos: falha no minificado, passa no restaurado.
+
+**Regra:** ao materializar uma ficha, não reescreva arquivos de cânone
+compartilhado em forma comprimida. Acrescente a sua entrada e preserve as
+existentes. Vale para `evidencias.ts`, `misconceptions.ts`,
+`ficha_runtime_map.cjs` e `coverage_matrix_core.ts` — os quatro já perderam
+documentação uma vez.
+
+**Pendência aberta:** `src/curriculum/fichas/jornada/N5.03.ts` está inteiro em
+4 linhas, minificado do mesmo jeito. As demais fichas do bloco ficaram entre 40
+e 53 linhas; as antigas, entre 78 e 117. A N5.03 é o caso agudo e precisa da
+restauração feita por quem escreveu a pedagogia dela — não por reconstrução
+externa.
+
 ## 7. Critério de seleção — fallback-first
 
 1. priorize competências em FALLBACK;
