@@ -44,13 +44,17 @@ const fracao = (n: number, d: number) => `${n}/${d}`;
 
 function opcoesFracao(numerador: number, denominador: number, tag: FracaoNumeroMisconceptionTag): FracaoNumeroF72Spec["opcoes"] {
   const correta = fracao(numerador, denominador);
-  const candidatos = new Set<string>([
+  const candidatos = [
     correta,
-    fracao(Math.max(1, numerador - 1), denominador),
-    fracao(Math.min(denominador - 1, numerador + 1), denominador),
-    fracao(numerador, Math.max(2, denominador - 1)),
-  ]);
-  return [...candidatos].slice(0, 4).map(value => ({ value, label: value, ...(value === correta ? {} : { misconception: tag }) }));
+    fracao(numerador === 1 ? 2 : 1, denominador),
+    fracao(numerador, denominador + 1),
+    fracao(Math.min(denominador, numerador + 1), denominador + 1),
+    fracao(Math.max(1, denominador - numerador), denominador),
+    fracao(numerador + 1, denominador + 2),
+    fracao(1, denominador + 2),
+  ];
+  const unicos = [...new Set(candidatos)];
+  return unicos.slice(0, 4).map(value => ({ value, label: value, ...(value === correta ? {} : { misconception: tag }) }));
 }
 
 export function construirFracaoNumeroSpec(level: number, rng: () => number = Math.random): FracaoNumeroF72Spec {

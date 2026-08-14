@@ -3,92 +3,19 @@ import { geradorLegadoDe, getTrackById } from "./curriculum";
 import { applyJourneyAnswer } from "./progressEngine";
 import { trackMisconception } from "./radarEngine";
 import { COMPOSER_CANARIES, rollbackComposerCanary, enableComposerCanary, generateRegisteredFichaQuestion } from "./composerCanary";
-import { N3_01 } from "../fichas/jornada/N3.01";
-import { N3_02 } from "../fichas/jornada/N3.02";
-import { N3_03 } from "../fichas/jornada/N3.03";
-import { N3_09 } from "../fichas/jornada/N3.09";
-import { N3_10 } from "../fichas/jornada/N3.10";
-import { N4_01 } from "../fichas/jornada/N4.01";
-import { N4_03 } from "../fichas/jornada/N4.03";
-import { N4_04 } from "../fichas/jornada/N4.04";
-import { N4_07 } from "../fichas/jornada/N4.07";
-import { N4_06 } from "../fichas/jornada/N4.06";
-import { N4_08 } from "../fichas/jornada/N4.08";
-import { N4_09 } from "../fichas/jornada/N4.09";
-import { N5_01 } from "../fichas/jornada/N5.01";
-import { N1_03 } from "../fichas/jornada/N1.03";
-import { N1_05 } from "../fichas/jornada/N1.05";
-import { N1_07 } from "../fichas/jornada/N1.07";
-import { N1_08 } from "../fichas/jornada/N1.08";
-import { N1_09 } from "../fichas/jornada/N1.09";
-import { N1_10 } from "../fichas/jornada/N1.10";
-import { N1_11 } from "../fichas/jornada/N1.11";
-import { N1_12 } from "../fichas/jornada/N1.12";
-import { N2_01 } from "../fichas/jornada/N2.01";
-import { N2_02 } from "../fichas/jornada/N2.02";
-import { N2_03 } from "../fichas/jornada/N2.03";
-import { AL_01 } from "../fichas/jornada/AL.01";
-import { AL_02 } from "../fichas/jornada/AL.02";
-import { AL_03 } from "../fichas/jornada/AL.03";
-import { AL_04 } from "../fichas/jornada/AL.04";
-import { N1_04 } from "../fichas/jornada/N1.04";
-import { N1_06 } from "../fichas/jornada/N1.06";
-import { N1_13 } from "../fichas/jornada/N1.13";
-import { GE_01 } from "../fichas/jornada/GE.01";
-import { GE_02 } from "../fichas/jornada/GE.02";
-import { GE_03 } from "../fichas/jornada/GE.03";
-import { GM_01 } from "../fichas/jornada/GM.01";
-import { GM_02 } from "../fichas/jornada/GM.02";
-import { GM_05 } from "../fichas/jornada/GM.05";
-import { GM_12 } from "../fichas/jornada/GM.12";
-import { N1_02 } from "../fichas/jornada/N1.02";
-import { N1_01 } from "../fichas/jornada/N1.01";
+import { JOURNEY_FICHAS } from "../fichas";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
 
-const REGISTRO: Record<string, FichaCompetencia> = {
-  "N3.01": N3_01,
-  "N3.02": N3_02,
-  "N3.03": N3_03,
-  "N3.09": N3_09,
-  "N3.10": N3_10,
-  "N4.01": N4_01,
-  "N4.03": N4_03,
-  "N4.04": N4_04,
-  "N4.07": N4_07,
-  "N4.06": N4_06,
-  "N4.08": N4_08,
-  "N4.09": N4_09,
-  "N5.01": N5_01,
-  "N1.03": N1_03,
-  "N1.05": N1_05,
-  "N1.07": N1_07,
-  "N1.08": N1_08,
-  "N1.09": N1_09,
-  "N1.10": N1_10,
-  "N1.11": N1_11,
-  "AL.01": AL_01,
-  "AL.03": AL_03,
-  "AL.04": AL_04,
-  "N1.01": N1_01,
-  "N1.02": N1_02,
-  "N1.04": N1_04,
-  "N1.06": N1_06,
-  "N1.13": N1_13,
-  "GE.01": GE_01,
-  "GE.02": GE_02,
-  "GM.01": GM_01,
-  "GM.02": GM_02,
-  "GM.12": GM_12,
-  "N2.01": N2_01,
-  "N2.02": N2_02,
-  "N2.03": N2_03,
-  "N1.12": N1_12,
-  "GM.05": GM_05,
-  "AL.02": AL_02,
-  "GE.03": GE_03,
-};
+/**
+ * O contrato não mantém uma segunda lista manual de fichas: o catálogo de
+ * Jornada é a autoridade. Assim toda promoção ainda precisa estar registrada,
+ * mas uma onda nova não cria dívida de bookkeeping paralela ao catálogo.
+ */
+const REGISTRO: Record<string, FichaCompetencia> = Object.fromEntries(
+  JOURNEY_FICHAS.map(ficha => [ficha.id, ficha]),
+);
 
 const CANARIOS = [...COMPOSER_CANARIES];
 const progressoInicial = (): Progress => ({ lvl: 1, mast: 0, streak: 0 } as Progress);
