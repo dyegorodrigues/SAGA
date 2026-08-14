@@ -5,16 +5,16 @@ describe("Coverage Matrix executável", () => {
   it("preserva o fechamento P21.1 e deriva o baseline vigente por migrações nomeadas", () => {
     expect(COVERAGE_CLOSED_BASELINE).toMatchObject({ composer: 26, legacy: 25, fallback: 39, served: 51, divergences: 21 });
     expect(COVERAGE_MIGRATIONS.map(m => m.id)).toEqual([
-      "W1-N1.04","W2-N1.05","W3-N2.01","W4-N1.12","W5-GM.05","W6-N2.03","W7-N2.02","W8-N3.01","W9-N3.02","W10-N3.03","OBS-COMPOSITE-N4.03","W11-AL.03","W12-N4.01","W13-GE.03","W14-AL.04","W15-N5.01","W16-N5.02","W17-N6.01",
+      "W1-N1.04", "W2-N1.05", "W3-N2.01", "W4-N1.12", "W5-GM.05", "W6-N2.03", "W7-N2.02", "W8-N3.01", "W9-N3.02", "W10-N3.03", "OBS-COMPOSITE-N4.03", "W11-AL.03", "W12-N4.01", "W13-GE.03", "W14-AL.04", "W15-N5.01", "W16-N5.02", "W17-N6.01", "W18-N5.03",
     ]);
-    expect(COVERAGE_MIGRATIONS.at(-1)).toMatchObject({ id: "W17-N6.01", competence: "N6.01", delta: { composer: 1, fallback: -1, served: 1 } });
-    expect(COVERAGE_BASELINE).toMatchObject({ composer: 42, legacy: 15, fallback: 33, served: 57, divergences: 11, modeSwaps: 12, toolIntroductions: 44 });
+    expect(COVERAGE_MIGRATIONS.at(-1)).toMatchObject({ id: "W18-N5.03", competence: "N5.03", delta: { composer: 1, fallback: -1, served: 1 } });
+    expect(COVERAGE_BASELINE).toMatchObject({ composer: 43, legacy: 15, fallback: 32, served: 58, divergences: 11, modeSwaps: 12, toolIntroductions: 44 });
   });
 
   it("liga grafo, ficha, runtime, screen, Sensei, testes, dívida e ordem causal nas 90 competências", () => {
     const result = buildCoverageMatrix();
     const divergent = result.rows.filter(row => row.divergence.length > 0).map(row => `${row.id}: pede ${row.canonicalPrimitives.join(" + ")} → entrega ${row.runtimePrimitives.join(" + ") || "nada"}; faltam ${row.divergence.join(" + ")}`);
-    expect(result.failures, ["Coverage Matrix divergiu do baseline vigente.","Não ajuste expectativa para ficar verde: investigue e reconcilie a fonte real.",...result.failures,"",`Divergências observadas (${divergent.length}):`,...divergent].join("\n")).toEqual([]);
+    expect(result.failures, ["Coverage Matrix divergiu do baseline vigente.", "Não ajuste expectativa para ficar verde: investigue e reconcilie a fonte real.", ...result.failures, "", `Divergências observadas (${divergent.length}):`, ...divergent].join("\n")).toEqual([]);
     expect(result.rows).toHaveLength(COVERAGE_BASELINE.competencies);
     expect(new Set(result.rows.map(row => row.id)).size).toBe(COVERAGE_BASELINE.competencies);
     expect(result.rows.every(row => row.canonicalFichas.length > 0)).toBe(true);
