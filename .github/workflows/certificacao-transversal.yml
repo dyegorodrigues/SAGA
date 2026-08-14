@@ -12,9 +12,21 @@ concurrency:
 
 jobs:
   sonda-transversal-portao:
-    name: Sonda transversal — 390px × 8 sementes
+    name: Sonda transversal — 390px · semente ${{ matrix.semente }}
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { semente: 1, prefixo: 1 }
+          - { semente: 7, prefixo: 2 }
+          - { semente: 42, prefixo: 3 }
+          - { semente: 99, prefixo: 4 }
+          - { semente: 123, prefixo: 5 }
+          - { semente: 777, prefixo: 6 }
+          - { semente: 2024, prefixo: 7 }
+          - { semente: 31415, prefixo: 8 }
 
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +56,8 @@ jobs:
       - name: Sonda transversal — portão canônico
         env:
           SONDA_LARGURAS: '390'
-        run: npm run sonda
+          SONDA_SEMENTES: '${{ matrix.prefixo }}'
+        run: npm run sonda -- "[semente ${{ matrix.semente }}]"
 
   sonda-transversal-responsiva:
     name: Sonda transversal — 320/900px × 1 semente
