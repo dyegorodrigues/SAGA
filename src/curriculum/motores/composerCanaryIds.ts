@@ -61,6 +61,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // canaryContract deriva seu REGISTRO de JOURNEY_FICHAS e valida a promoção aqui.
   "N5.03",
 
+  // W19 — F69: divisão longa. Inativo 4ed4858d: CI 31798437057 + transversal 31798437091.
+  "N4.10",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
