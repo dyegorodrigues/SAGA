@@ -20,6 +20,32 @@ const REGISTRO: Record<string, FichaCompetencia> = Object.fromEntries(
 const CANARIOS = [...COMPOSER_CANARIES];
 const progressoInicial = (): Progress => ({ lvl: 1, mast: 0, streak: 0 } as Progress);
 
+/**
+ * O piso numérico de cada canário sai da ficha, não de uma lista de exceções
+ * mantida aqui.
+ *
+ * O contrato exigia `>= 0` de todo número em qualquer nó. Isso valeu enquanto
+ * o currículo inteiro vivia nos naturais: ali um negativo na tela só podia ser
+ * gerador estourando um limite. A F84 ensina o sinal, e a mesma regra passou a
+ * recusar `-3` — que é o gabarito correto de N7.01 no L1.
+ *
+ * A saída não é remover a regra nem abrir exceção por id: é perguntar à ficha
+ * qual conjunto ela ensina. Quem não declara nada continua nos naturais, então
+ * os outros canários seguem protegidos exatamente como antes, e um gerador que
+ * comece a produzir negativos por engano ainda quebra o contrato.
+ */
+const pisoNumericoDe = (id: string): number => (REGISTRO[id]?.dominioNumerico === "inteiros" ? -Infinity : 0);
+
+/**
+ * Trocar sinal por conjunto não pode virar cheque em branco: onde o negativo é
+ * permitido, o contrato ainda exige inteiro finito. `NaN`, `Infinity` e frações
+ * continuam sendo defeito de gerador em qualquer ficha da Jornada.
+ */
+const exigirInteiroFinito = (valor: number, contexto: string) => {
+  expect(Number.isFinite(valor), `${contexto}: número não finito`).toBe(true);
+  expect(Number.isInteger(valor), `${contexto}: número não inteiro`).toBe(true);
+};
+
 describe("contrato do canário do Composer", () => {
   afterEach(() => {
     COMPOSER_CANARIES.clear();
@@ -59,7 +85,10 @@ describe("contrato do canário do Composer", () => {
           if (autoral.options?.length) {
             expect(autoral.options.map(o => String(o.value)), `${id} autoral L${lvl}: gabarito fora das alternativas`).toContain(String(autoral.answer));
           }
-          if (typeof autoral.answer === "number") expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
+          if (typeof autoral.answer === "number") {
+            exigirInteiroFinito(autoral.answer, `${id} autoral L${lvl}`);
+            expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(pisoNumericoDe(id));
+          }
         }
       }
     });
@@ -151,6 +180,42 @@ describe("contrato do canário do Composer", () => {
             expect(q.options.map(o => o.value), `${id} L${lvl}: diagnóstico sem gabarito`).toContain(q.answer);
             continue;
           }
+          if (q.kind === "reta-completa-f84") {
+            // O palco onde o negativo é conteúdo é também onde o contrato
+            // precisa ser mais específico: perdido o `>= 0` genérico, quem
+            // segura um gerador fora de eixo é a própria reta desenhada.
+            const reta = q.uiProps as { inicio: number; fim: number; pontos: number[]; modo: string };
+            const comprimento = reta.fim - reta.inicio;
+            expect(reta.inicio, `${id} L${lvl}: reta não alcança o negativo`).toBeLessThan(0);
+            expect(reta.fim, `${id} L${lvl}: reta não alcança o positivo`).toBeGreaterThan(0);
+            for (const ponto of reta.pontos) {
+              expect(ponto, `${id} L${lvl}: ponto fora da reta`).toBeGreaterThanOrEqual(reta.inicio);
+              expect(ponto, `${id} L${lvl}: ponto fora da reta`).toBeLessThanOrEqual(reta.fim);
+            }
+            if (reta.modo === "localizar" || reta.modo === "comparar-negativos") {
+              // Posição: o gabarito é um lugar na reta, e precisa caber nela.
+              expect(Number(q.answer), `${id} L${lvl}: gabarito à esquerda da reta`).toBeGreaterThanOrEqual(reta.inicio);
+              expect(Number(q.answer), `${id} L${lvl}: gabarito à direita da reta`).toBeLessThanOrEqual(reta.fim);
+            } else if (reta.modo === "distancia" || reta.modo === "modulo") {
+              // Distância: aqui o sinal continua proibido no gabarito — medida
+              // negativa é erro, mesmo numa ficha que ensina negativos.
+              expect(Number(q.answer), `${id} L${lvl}: distância negativa`).toBeGreaterThanOrEqual(0);
+              expect(Number(q.answer), `${id} L${lvl}: distância maior que a reta`).toBeLessThanOrEqual(comprimento);
+            } else {
+              // Ordenação: a resposta é a sequência crescente dos pontos.
+              const ordem = String(q.answer).split(",").map(Number);
+              expect(ordem, `${id} L${lvl}: ordem sem todos os pontos`).toHaveLength(reta.pontos.length);
+              expect([...ordem].sort((a, b) => a - b), `${id} L${lvl}: ordem não é crescente`).toEqual(ordem);
+              expect([...ordem].sort((a, b) => a - b), `${id} L${lvl}: ordem não usa os pontos da reta`)
+                .toEqual([...reta.pontos].sort((a, b) => a - b));
+            }
+            for (const o of q.options) {
+              if (typeof o.value !== "number") continue;
+              expect(Math.abs(o.value), `${id} L${lvl}: alternativa fora da escala da reta`).toBeLessThanOrEqual(comprimento);
+            }
+            expect(q.options.map(o => String(o.value)), `${id} L${lvl}: alternativas sem o gabarito`).toContain(String(q.answer));
+            continue;
+          }
           if (typeof teclado === "number" && teclado > 0) {
             expect(q.options.length, `${id} L${lvl}: teclado fora do escopo`).toBe(teclado);
             expect(q.options.map(o => o.value), `${id} L${lvl}: teclado sem a resposta`).toContain(q.answer);
@@ -162,11 +227,16 @@ describe("contrato do canário do Composer", () => {
       }
     });
 
-    it("erro: nenhuma alternativa numérica é negativa", () => {
+    it("erro: nenhuma alternativa numérica sai do conjunto que a ficha ensina", () => {
+      const piso = pisoNumericoDe(id);
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
           const q = gerarAutoral(lvl);
-          for (const o of q.options ?? []) if (typeof o.value === "number") expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(0);
+          for (const o of q.options ?? []) {
+            if (typeof o.value !== "number") continue;
+            exigirInteiroFinito(o.value, `${id} L${lvl}`);
+            expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(piso);
+          }
         }
       }
     });

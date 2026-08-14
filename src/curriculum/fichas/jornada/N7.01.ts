@@ -14,6 +14,8 @@ export const N7_01: FichaCompetencia = {
   strand: "N7",
   faixa: "F4",
   prereqs: ["N1.12", "N3.04"],
+  // O sinal é o conteúdo desta ficha: −3 é gabarito, não defeito de gerador.
+  dominioNumerico: "inteiros",
   howto: "À esquerda do zero os números ficam menores. Quanto mais longe, menor.",
   explain: "Olhe o termômetro: menos cinco é mais frio que menos dois. Então é menor.",
   distratores: [
