@@ -1,4 +1,108 @@
-import { FichaCompetencia,FichaDominio } from "../../schema";
+import { FichaCompetencia, FichaDominio } from "../../schema";
 import { FracaoEquivalenteMisconception } from "../../procedimentos/fracaoEquivalenteContract";
-const dominio:FichaDominio={acertos:3,de:3,sessoes:2};
-export const N5_03:FichaCompetencia={id:"N5.03",nome:"Frações Equivalentes",strand:"N5",faixa:"F3",prereqs:["N5.02"],howto:"Use barras do mesmo comprimento: cortar mais vezes muda o nome, não a quantidade.",explain:"Compare quanto do mesmo inteiro ficou pintado.",distratores:[{regra:"acha que mais partes significa mais quantidade",tag:FracaoEquivalenteMisconception.MAIS_PARTES_MAIS_QUANTIDADE},{regra:"compara só o denominador",tag:FracaoEquivalenteMisconception.COMPARA_SO_DENOMINADOR},{regra:"multiplica só um termo",tag:FracaoEquivalenteMisconception.MULTIPLICA_SO_UM}],niveis:{1:{primitiva:"storypanel",micro:"equivalencia-sobreposta",andaime:"alto"},2:{primitiva:"storypanel",micro:"equivalencia-lado-a-lado",andaime:"medio"},3:{primitiva:"storypanel",micro:"mesmo-denominador",andaime:"minimo"},4:{primitiva:"storypanel",micro:"mesmo-numerador",andaime:"minimo"},5:{primitiva:"storypanel",micro:"denominadores-diferentes",andaime:"nenhum",rt_alvo:18000}},micros:[{id:"equivalencia-sobreposta",fonte:"F73",alvo:"reconhecer frações equivalentes por sobreposição",kinds:["storypanel"],params:{},dominio},{id:"equivalencia-lado-a-lado",fonte:"F73",alvo:"reconhecer equivalência sem sobreposição",kinds:["storypanel"],params:{},dominio},{id:"mesmo-denominador",fonte:"F73",alvo:"comparar frações com mesmo denominador",kinds:["storypanel"],params:{},dominio},{id:"mesmo-numerador",fonte:"F73",alvo:"comparar frações com mesmo numerador",kinds:["storypanel"],params:{},dominio},{id:"denominadores-diferentes",fonte:"F73",alvo:"comparar frações com denominadores diferentes",kinds:["storypanel"],params:{},dominio}],erros_tipicos:[{id:FracaoEquivalenteMisconception.MAIS_PARTES_MAIS_QUANTIDADE,descricao:"Julga pelo número de partes, não pelo tamanho pintado."},{id:FracaoEquivalenteMisconception.COMPARA_SO_DENOMINADOR,descricao:"Escolhe o maior denominador como maior fração."},{id:FracaoEquivalenteMisconception.MULTIPLICA_SO_UM,descricao:"Altera só numerador ou denominador ao buscar equivalência."}]};
+
+const dominio: FichaDominio = { acertos: 3, de: 3, sessoes: 2 };
+
+/**
+ * F73 — Frações Equivalentes.
+ *
+ * Ideia pedagógica central: duas barras de mesmo comprimento tornam visível que
+ * nomes fracionários diferentes podem ocupar exatamente a mesma quantidade.
+ * A equivalência nasce de cortar todas as partes pela mesma razão; a comparação
+ * nasce de comparar espaço ocupado, nunca os algarismos isoladamente.
+ *
+ * A escada preserva a progressão da ficha canônica:
+ * sobreposição → lado a lado → mesmo denominador → mesmo numerador →
+ * denominadores diferentes.
+ */
+export const N5_03: FichaCompetencia = {
+  id: "N5.03",
+  nome: "Frações Equivalentes",
+  strand: "N5",
+  faixa: "F3",
+  prereqs: ["N5.02"],
+  howto: "Use barras do mesmo comprimento: cortar mais vezes muda o nome, não a quantidade.",
+  explain: "Compare quanto do mesmo inteiro ficou pintado.",
+  distratores: [
+    {
+      regra: "acha que mais partes significa mais quantidade",
+      tag: FracaoEquivalenteMisconception.MAIS_PARTES_MAIS_QUANTIDADE,
+    },
+    {
+      regra: "compara só o denominador",
+      tag: FracaoEquivalenteMisconception.COMPARA_SO_DENOMINADOR,
+    },
+    {
+      regra: "multiplica só um termo",
+      tag: FracaoEquivalenteMisconception.MULTIPLICA_SO_UM,
+    },
+  ],
+  niveis: {
+    1: { primitiva: "storypanel", micro: "equivalencia-sobreposta", andaime: "alto" },
+    2: { primitiva: "storypanel", micro: "equivalencia-lado-a-lado", andaime: "medio" },
+    3: { primitiva: "storypanel", micro: "mesmo-denominador", andaime: "minimo" },
+    4: { primitiva: "storypanel", micro: "mesmo-numerador", andaime: "minimo" },
+    5: {
+      primitiva: "storypanel",
+      micro: "denominadores-diferentes",
+      andaime: "nenhum",
+      rt_alvo: 18000,
+    },
+  },
+  micros: [
+    {
+      id: "equivalencia-sobreposta",
+      fonte: "F73",
+      alvo: "reconhecer frações equivalentes por sobreposição",
+      kinds: ["storypanel"],
+      params: {},
+      dominio,
+    },
+    {
+      id: "equivalencia-lado-a-lado",
+      fonte: "F73",
+      alvo: "reconhecer equivalência sem sobreposição",
+      kinds: ["storypanel"],
+      params: {},
+      dominio,
+    },
+    {
+      id: "mesmo-denominador",
+      fonte: "F73",
+      alvo: "comparar frações com mesmo denominador",
+      kinds: ["storypanel"],
+      params: {},
+      dominio,
+    },
+    {
+      id: "mesmo-numerador",
+      fonte: "F73",
+      alvo: "comparar frações com mesmo numerador",
+      kinds: ["storypanel"],
+      params: {},
+      dominio,
+    },
+    {
+      id: "denominadores-diferentes",
+      fonte: "F73",
+      alvo: "comparar frações com denominadores diferentes",
+      kinds: ["storypanel"],
+      params: {},
+      dominio,
+    },
+  ],
+  erros_tipicos: [
+    {
+      id: FracaoEquivalenteMisconception.MAIS_PARTES_MAIS_QUANTIDADE,
+      descricao: "Julga pelo número de partes, não pelo tamanho pintado.",
+    },
+    {
+      id: FracaoEquivalenteMisconception.COMPARA_SO_DENOMINADOR,
+      descricao: "Escolhe o maior denominador como maior fração.",
+    },
+    {
+      id: FracaoEquivalenteMisconception.MULTIPLICA_SO_UM,
+      descricao: "Altera só numerador ou denominador ao buscar equivalência.",
+    },
+  ],
+};
