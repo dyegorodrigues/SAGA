@@ -29,6 +29,7 @@ import { N2_03 } from "../fichas/jornada/N2.03";
 import { AL_01 } from "../fichas/jornada/AL.01";
 import { AL_02 } from "../fichas/jornada/AL.02";
 import { AL_03 } from "../fichas/jornada/AL.03";
+import { AL_04 } from "../fichas/jornada/AL.04";
 import { N1_04 } from "../fichas/jornada/N1.04";
 import { N1_06 } from "../fichas/jornada/N1.06";
 import { N1_13 } from "../fichas/jornada/N1.13";
@@ -74,6 +75,7 @@ const REGISTRO: Record<string, FichaCompetencia> = {
   "N1.11": N1_11,
   "AL.01": AL_01,
   "AL.03": AL_03,
+  "AL.04": AL_04,
   "N1.01": N1_01,
   "N1.02": N1_02,
   "N1.04": N1_04,
