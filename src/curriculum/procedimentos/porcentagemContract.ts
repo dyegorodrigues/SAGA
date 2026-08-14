@@ -86,7 +86,7 @@ export function construirPorcentagemSpec(level: number, rng: () => number = Math
     const caso = escolher([
       { percentual: 25, total: 80, parte: 20, operacao: "desconto" as const, resposta: 60 },
       { percentual: 10, total: 50, parte: 5, operacao: "acrescimo" as const, resposta: 55 },
-      { percentual: 20, total: 100, parte: 20, operacao: "desconto" as const, resposta: 80 },
+      { percentual: 20, total: 90, parte: 18, operacao: "desconto" as const, resposta: 72 },
     ], rng);
     const absoluto = caso.operacao === "desconto" ? caso.total - caso.percentual : caso.total + caso.percentual;
     return {
