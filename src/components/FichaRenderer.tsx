@@ -6,6 +6,7 @@ import { FracaoNumeroStage } from "./primitives/FracaoNumeroStage"; import type 
 import { DecimalStage } from "./primitives/DecimalStage"; import type { DecimalF75Spec } from "../curriculum/procedimentos/decimalContract";
 import { FracoesEquivalentesStage } from "./primitives/FracoesEquivalentesStage"; import type { FracaoEquivalenteF73Spec } from "../curriculum/procedimentos/fracaoEquivalenteContract";
 import { DivisaoLongaStage } from "./primitives/DivisaoLongaStage"; import type { DivisaoLongaF69Spec } from "../curriculum/procedimentos/divisaoLongaContract";
+import { PerimetroStage } from "./primitives/PerimetroStage"; import type { PerimetroF63Spec } from "../curriculum/procedimentos/perimetroContract";
 import { FichaRenderer as FichaRendererBase } from "./FichaRendererBase";
 interface FichaRendererProps{question:Question;onAnswer:(answer:any,isCorrect:boolean,meta?:AnswerMeta)=>void;disabled?:boolean;promptDone?:boolean;mostrar?:unknown;falar?:(texto:string)=>void}
 /** Front-controller. Os cases de passthrough são guardas literais de palco único. */
@@ -16,4 +17,5 @@ case 'fracao-numero-f72': return <FracaoNumeroStage spec={question.uiProps as Fr
 case 'decimos-centesimos-f75': return <DecimalStage spec={question.uiProps as DecimalF75Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
 case 'fracoes-equivalentes-f73': return <FracoesEquivalentesStage spec={question.uiProps as FracaoEquivalenteF73Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
 case 'divisao-longa-f69': return <DivisaoLongaStage spec={question.uiProps as DivisaoLongaF69Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+case 'perimetro-f63': return <PerimetroStage spec={question.uiProps as PerimetroF63Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
 case 'story-bars': case 'tabuada': case 'decomposicao': case 'ancora': case 'familia': case 'deslocamento': case 'area': case 'pareamento': case 'touchcount': case 'fileira': case 'classificacao': case 'audiochoice': case 'touchplace': case 'shapecanvas': case 'grandeza': case 'medidas': case 'moldura': default:return <FichaRendererBase {...props}/>;}}

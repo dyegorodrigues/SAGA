@@ -35,11 +35,11 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
 const FICHA_RUNTIME_MAP = [
   {
     primitive: "ArrayGrid",
-    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69"],
-    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage")],
-    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10"],
-    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69"],
-    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo.",
+    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63"],
+    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage"), component("PerimetroStage")],
+    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10", "GM.07"],
+    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63"],
+    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo. F63/GM.07 compõe ArrayGrid + ShapeCanvas para separar chão e volta.",
   },
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
   { primitive: "Balanca", kinds: ["balanca", "medidas"], componentFiles: [component("Balanca"), component("MedidasStage")], builderKinds: ["balanca", "medidas"], rendererKinds: ["balanca", "medidas"] },
@@ -92,9 +92,9 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
   {
-    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "partes-iguais-f45"],
-    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("PartesIguaisStage")],
-    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "N5.01"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "partes-iguais-f45"], note: "W13/F58 usa FiguraDesenhada; W15/F45 compõe ShapeCanvas + SingaporeBars."
+    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63"],
+    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("PartesIguaisStage"), component("PerimetroStage")],
+    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "N5.01", "GM.07"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63"], note: "W13/F58 usa FiguraDesenhada; W15/F45 compõe ShapeCanvas + SingaporeBars; F63/GM.07 compõe ShapeCanvas + ArrayGrid para comparar borda e área."
   },
   {
     primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73"],

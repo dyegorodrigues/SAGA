@@ -197,6 +197,17 @@ export const Evidencia = {
    * encontrar esse caso não prova domínio do algoritmo, prova sorte no sorteio.
    */
   DIVISAO_ZERO_QUOCIENTE: "divisao-zero-quociente-nivel-5",
+
+  /**
+   * F63 (GM.07): um acerto no L4 distinguindo a distância da **borda** do
+   * número de quadrados do interior.
+   *
+   * Somar lados em retângulos fáceis não basta para provar perímetro: a criança
+   * pode ainda usar a linguagem de área e apenas coincidir com a resposta. O
+   * contraste explícito no L4 prova que "a volta" e "o chão" são grandezas
+   * diferentes antes de avançar para o lado faltante.
+   */
+  PERIMETRO_VS_AREA: "perimetro-vs-area-nivel-4",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
