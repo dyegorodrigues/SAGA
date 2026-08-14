@@ -111,7 +111,23 @@ export interface FichaCompetencia {
   prereqs: string[]; // IDs de outras competências
   bncc?: string;
   excecaoCPA?: "perceptual" | "espacial"; // Quando a competência foge da regra CPA (ex: pareamento)
-  
+
+  /**
+   * O conjunto numérico que a competência ensina.
+   *
+   * Omitir significa `naturais`, e o contrato do canário recusa qualquer
+   * gabarito ou alternativa negativa. Essa é a regra certa para quase todo o
+   * currículo: numa ficha de contagem ou de subtração, um `-2` na tela é bug
+   * de gerador, não conteúdo.
+   *
+   * `inteiros` só vale para quem ensina o sinal como conteúdo (a strand N7).
+   * A declaração fica na ficha, e não numa lista de exceções dentro do teste,
+   * porque o conjunto numérico é propriedade da competência — quem promove um
+   * nó com negativos precisa afirmar isso onde o nó é definido.
+   */
+  dominioNumerico?: "naturais" | "inteiros";
+
+
   // Contrato Universal
   niveis?: Record<number, FichaNivel>;
   howto?: string;
@@ -130,7 +146,10 @@ export class CurriculumValidator {
     if (!ficha.strand) errors.push("Strand faltando");
     if (!ficha.faixa) errors.push("Faixa faltando");
     if (!Array.isArray(ficha.prereqs)) errors.push("Pré-requisitos devem ser um array");
-    
+    if (ficha.dominioNumerico && !["naturais", "inteiros"].includes(ficha.dominioNumerico)) {
+      errors.push(`Domínio numérico inválido '${ficha.dominioNumerico}' em ${ficha.id}`);
+    }
+
     // Validações do Contrato Universal
     if (!ficha.howto) errors.push(`Contrato Universal: 'howto' faltando em ${ficha.id}`);
     if (!ficha.explain) errors.push(`Contrato Universal: 'explain' faltando em ${ficha.id}`);
