@@ -90,10 +90,10 @@ const FICHA_RUNTIME_MAP = [
     builderKinds: ["numberline", "tabuada"], specializedBuilderIds: ["N3.03", "AL.04"], rendererKinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57"], note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2.",
   },
   {
-    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75"],
-    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage")],
-    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75"],
-    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos."
+    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("PorcentagemStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.03"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87"],
+    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W22/F87 compõe Quadrado100 + SingaporeBars."
   },
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
@@ -104,10 +104,10 @@ const FICHA_RUNTIME_MAP = [
     builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "N5.01", "GM.07"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63"], note: "W13/F58 usa FiguraDesenhada; W15/F45 compõe ShapeCanvas + SingaporeBars; F63/GM.07 compõe ShapeCanvas + ArrayGrid para comparar borda e área."
   },
   {
-    primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73"],
-    componentFiles: [component("SingaporeBars"), component("SingaporeBarsStage"), component("StoryBarsStage"), component("PartesIguaisStage"), component("FracaoNumeroStage"), component("FracoesEquivalentesStage")],
-    builderKinds: ["storypanel"], specializedBuilderIds: ["N5.01", "N5.02", "N5.03"], rendererKinds: ["singapore-bars", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73"],
-    note: "W15/F45, W16/F72 e W18/F73 reutilizam SingaporeBars; F73 compara barras de mesmo comprimento."
+    primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73", "porcentagem-f87"],
+    componentFiles: [component("SingaporeBars"), component("SingaporeBarsStage"), component("StoryBarsStage"), component("PartesIguaisStage"), component("FracaoNumeroStage"), component("FracoesEquivalentesStage"), component("PorcentagemStage")],
+    builderKinds: ["storypanel"], specializedBuilderIds: ["N5.01", "N5.02", "N5.03", "N6.03"], rendererKinds: ["singapore-bars", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73", "porcentagem-f87"],
+    note: "W15/F45, W16/F72 e W18/F73 reutilizam SingaporeBars; F73 compara barras de mesmo comprimento. W22/F87 compõe SingaporeBars com Quadrado100."
   },
   { primitive: "StoryPanel", kinds: ["story", "scene", "storypanel", "story-bars"], componentFiles: [component("StoryPanel"), component("StoryPanelStage"), component("StoryBarsStage")], builderKinds: ["storypanel"], rendererKinds: ["story-bars"], note: "N3.10/F20 compõe StoryPanel + SingaporeBars." },
   { primitive: "TenFrame", kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage")], builderKinds: ["tenframe", "moldura", "bond", "plain"], rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], note: "MaterialDouradoStage compõe MaterialDourado + TenFrame." },

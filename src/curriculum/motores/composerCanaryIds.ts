@@ -70,6 +70,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W21 — F46: igualdade como equilíbrio; inativo 72cf0375 passou CI 31808928178 + transversal 31808928379.
   "AL.05",
 
+  // W22 — F87: porcentagem; inativo eed2b8ab passou CI 31820722322 + transversal 31820722277.
+  "N6.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
