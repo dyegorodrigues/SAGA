@@ -87,6 +87,7 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // O canário inativo 6092da5a passou os DOIS workflows integralmente verdes:
   // CI run 31735133641 e Certificação transversal run 31735133586.
   "GE.03",
+  "AL.04",
 
   // Bloco F0 promovido anteriormente.
   "N1.01",
