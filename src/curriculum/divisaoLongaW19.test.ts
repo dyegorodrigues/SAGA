@@ -6,7 +6,7 @@ describe("W19 — N4.10/F69 divisão longa", () => {
   it("serve Composer e preserva rollback explícito para o fallback anterior", () => {
     expect(getTrackById("N4.10")?.prereqs).toEqual(["N4.06", "N4.05", "N3.12"]);
     expect(getTrackById("N4.10")?.generatorSource).toBe("composer");
-    expect(getTrackById("N4.10")?.contentStatus).toBe("served");
+    expect(getTrackById("N4.10")?.contentStatus).toBe("explicit");
     rollbackComposerCanary("N4.10");
     try {
       expect(getTrackById("N4.10")?.generatorSource).toBe("fallback");
@@ -15,6 +15,7 @@ describe("W19 — N4.10/F69 divisão longa", () => {
       enableComposerCanary("N4.10");
     }
     expect(getTrackById("N4.10")?.generatorSource).toBe("composer");
+    expect(getTrackById("N4.10")?.contentStatus).toBe("explicit");
   });
 
   it("fixa a escada concreto → algoritmo, resto e zero no quociente", () => {
