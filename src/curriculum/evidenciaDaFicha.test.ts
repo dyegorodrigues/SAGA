@@ -21,6 +21,7 @@ import { evidenciasQuadrado100 as doQuadrado100 } from "./procedimentos/quadrado
 import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visualAdditionProcedure";
 import { evidenciasDetetiveFormas as daSimetria } from "./procedimentos/detetiveFormasProcedure";
 import { cortesAlvoPartesIguais, evidenciasPartesIguais as dasPartesIguais } from "./procedimentos/partesIguaisProcedure";
+import { evidenciasPerimetro as doPerimetro } from "./procedimentos/perimetroContract";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -183,6 +184,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.PARTES_IGUAIS_DIVISAO,
     emitir: () => dasPartesIguais({ nivel: 4, denominador: 3, cortes: cortesAlvoPartesIguais(3) }),
   },
+  {
+    nome: "F63 (perímetro) — acerto L4 separa a volta do chão interno",
+    evidencia: Evidencia.PERIMETRO_VS_AREA,
+    emitir: () => doPerimetro(4, true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -305,5 +311,8 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
 
     expect(dasPartesIguais({ nivel: 4, denominador: 2, cortes: [0.42] })).toEqual([]);
     expect(dasPartesIguais({ nivel: 3, denominador: 2, cortes: cortesAlvoPartesIguais(2) })).toEqual([]);
+
+    expect(doPerimetro(4, false)).toEqual([]);
+    expect(doPerimetro(3, true)).toEqual([]);
   });
 });
