@@ -38,8 +38,8 @@ export function IgualdadeEquilibrioStage({ spec, disabled, onAnswer }: Props) {
     });
   };
 
-  return <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5" data-f46-stage data-mode={spec.modo}>
-    <div className="w-full rounded-3xl border border-amber-100 bg-amber-50/50 px-5 pt-4">
+  return <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 overflow-x-hidden" data-f46-stage data-mode={spec.modo}>
+    <div className="w-full overflow-hidden rounded-3xl border border-amber-100 bg-amber-50/50 px-5 pt-4">
       <p className="text-center text-sm font-bold text-amber-950">O sinal <span className="text-xl">=</span> fica no meio porque os dois lados precisam valer o mesmo.</p>
       <div className="w-full px-[62px] sm:px-16" data-f46-balance-safe-area>
         <Balanca leftItems={esquerda} rightItems={direita} state={selecionado === spec.resposta ? "acerto" : "ocioso"} />
