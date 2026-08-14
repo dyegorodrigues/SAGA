@@ -49,21 +49,42 @@ A prova de concorrência entre SHAs já passou: runs `31719520999` e `3172109853
 
 Precedência: **GitHub remoto atual → gates executáveis → este prompt/checkpoint mais novo → documentos anteriores**.
 
-## 4. Estado curricular após W19
+## 4. Estado curricular — verificado no remoto em 14/08, 18h
 
-Fechadas no bloco mais recente:
+> ⚠️ **Este bloco foi reescrito a partir do repositório, não de relatório.**
+> Um fechamento anterior descreveu W22–W26 como concluídas e a Matrix como
+> `51/15/24/66/11`. O remoto contradiz: apenas W22 e W23 foram promovidas, as
+> fichas `PE.02` e `GM.08` não existem, e o checkpoint do bloco não foi criado.
+> Os números abaixo vêm do canário, do ledger e da suíte executada.
 
-- W15 `N5.01 / F45` — partes iguais;
-- W16 `N5.02 / F72` — fração é número;
-- W17 `N6.01 / F75` — décimos e centésimos;
-- W18 `N5.03 / F73` — frações equivalentes;
-- W19 `N4.10 / F69` — divisão longa.
+Fechadas e promovidas: **W15** `N5.01/F45` · **W16** `N5.02/F72` · **W17**
+`N6.01/F75` · **W18** `N5.03/F73` · **W19** `N4.10/F69` · **W20** `GM.07/F63` ·
+**W21** `AL.05/F46` · **W22** `N6.03/F87` · **W23** `GE.06/F78`.
 
-Matrix reconciliada pós-W19:
+Matrix vigente, derivada do ledger e conferida contra a Matrix observada:
 
-`44 Composer / 15 legado / 31 fallback / 59 servidas / 11 divergências / 12 swaps / 44 estreias`
+`48 Composer / 15 legado / 27 fallback / 63 servidas / 11 divergências / 12 swaps / 44 estreias`
 
-**Restam 31 fallbacks.** Legado conta como servido e não deve ser migrado só por estética.
+**Restam 27 fallbacks.** Legado conta como servido e não deve ser migrado só por estética.
+
+### Onda em curso — W24 `N7.01 / F84`
+
+**Aberta, materializada e INATIVA. Não promovida.**
+
+- regression-first: `241a894` · materialização inativa: `1f912c8f`;
+- `N7.01` **não** está em `DEFAULT_COMPOSER_CANARY_IDS`, e **não** há linha
+  `W24-N7.01` no ledger — o que está correto para o estado atual;
+- o HEAD `1f912c8f` está com os **13 jobs verdes**: CI `31825522496` e
+  Certificação transversal `31825522510`; suíte local 209 arquivos / 2934 testes.
+
+Retomar por aqui: certificar o SHA inativo, promover isoladamente **com o ledger
+no mesmo SHA**, deixar a Matrix observar, e só então abrir a W25.
+
+### Regra reforçada — relatório não fecha onda
+
+Onda fechada é onda cujo `id` está no canário **e** no ledger **e** cujo SHA
+passou nos dois workflows. Texto de fechamento não é evidência; se o relatório
+e o repositório divergirem, o repositório vence e o texto se corrige.
 
 Recibo de código do bloco: `ecdbd3251fa1cc7b170e57bf6da2ad38c4aa6354` — CI `31799848732` ✅ + transversal `31799848715` ✅.
 
@@ -207,6 +228,6 @@ Fora da fábrica: player da resolução · Oficina · conta armada · mascote / 
 
 Executar autonomamente, recalculando Matrix/DAG em toda onda.
 
-Próximo lote: **W20–W24**. Reportar somente ao fechamento das cinco ondas, salvo condição de parada real comprovada ou mudança de protocolo que exija registro imediato.
+Próximo lote: **concluir a W24 e seguir até a W28**. Reportar somente ao fechamento das cinco ondas, salvo condição de parada real comprovada ou mudança de protocolo que exija registro imediato.
 
 Se a conversa saturar, preserve no remoto o último estado válido e registre apenas o necessário para retomada sem ambiguidade.
