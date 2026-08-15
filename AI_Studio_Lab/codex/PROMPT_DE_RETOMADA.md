@@ -1,289 +1,352 @@
-# PROMPT DE RETOMADA — SAGA
+# PROMPT DE RETOMADA — fechamento curricular do SAGA
 
-> **Uso:** copie e cole integralmente este arquivo em uma conversa nova com `@GitHub`.
-> **Manutenção:** Matrix/ledger em toda onda, sempre depois da observação real. Checkpoint + este prompt a cada bloco de 5 ondas, ou imediatamente se regra/protocolo mudar.
+> **Autoridade:** GitHub remoto. Este arquivo é a porta de entrada operacional, não uma licença para confiar em SHAs antigos. Ao retomar, confirme o HEAD real da branch, o PR e os workflows do SHA exato antes de editar.
 
-@GitHub Continue o desenvolvimento do SAGA a partir do estado remoto atual.
+Repo: `dyegorodrigues/SAGA`  
+PR: `#35` — deve permanecer **open + draft + unmerged**  
+Branch de trabalho: `codex/fechamento-curricular`  
+Base protegida: `main` — não editar, não mergear, não marcar o PR como ready.
 
-Repo: `dyegorodrigues/SAGA`
-PR: `#35`
-Branch: `codex/fechamento-curricular`
+---
 
-## 1. Fonte da verdade e reancoragem obrigatória
+## 1. Fonte da verdade e reancoragem
 
-O **GitHub remoto é a fonte da verdade**. NÃO confie apenas neste prompt, em memória, em SHA antigo ou em CI de outro commit.
+O remoto vence memória de conversa, prompt antigo, SHA copiado ou CI de outro commit.
 
-Antes de qualquer edição:
+Ao iniciar uma sessão:
 
-1. confirme PR #35 `open + draft + unmerged`;
-2. confirme a branch `codex/fechamento-curricular` e o HEAD remoto atual;
-3. confirme `main` intocada em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`;
-4. confira **os dois workflows** do HEAD exato, jobs, reviews e review threads;
-5. se houver deriva, investigue antes de editar — o remoto vence este arquivo.
+1. leia **integralmente este arquivo**;
+2. confirme o HEAD remoto atual de `codex/fechamento-curricular`;
+3. confirme PR #35 open + draft + unmerged;
+4. confirme que `main` segue intocada;
+5. consulte CI e Certificação transversal do **SHA exato** relevante para a fase em curso;
+6. só investigue deriva real. Não refaça provas já registradas aqui por hábito.
 
-## 2. Dois workflows — certificação por SHA + sementes paralelas
+A concorrência dos dois workflows já foi provada anteriormente em SHAs diferentes; não repita esse experimento.
 
-| Workflow | Jobs | Concorrência |
-|---|---|---|
-| **CI** | Gates do SAGA · Sonda real Sensei · Higiene · Binários | grupo por `ref`, cancelável |
-| **Certificação transversal** | 8 jobs paralelos de 390 px, uma semente canônica por job · 1 job 320/900 px × 1 semente | grupo por `head.sha`, `cancel-in-progress: false` |
+---
 
-Sementes canônicas em `sonda/cenas.tsx`: `[1, 7, 42, 99, 123, 777, 2024, 31415]`.
+## 2. Dois workflows e significado dos recibos
 
-`?sementes=N` / `SONDA_SEMENTES=N` continua significando **prefixo**. Cada job torna sua semente alcançável pelo prefixo e filtra nominalmente `[semente X]`. `src/curriculum/sondaSeedCoverage.test.ts` prova cobertura exata e unicidade.
+Há dois recibos independentes:
 
-A prova de concorrência entre SHAs já passou: runs `31719520999` e `31721098530` coexistiram vivos. **Não refazer.**
+- **CI** (`.github/workflows/ci.yml`): gates determinísticos, testes, build, higiene/binários e sonda real Sensei;
+- **Certificação transversal**: sondas longas 390 px em múltiplas sementes e 320/900 px.
 
-**Recibo válido = os dois workflows verdes no MESMO SHA.** Na transversal, os oito jobs 390 + responsivo precisam estar verdes.
+Regra: quando o protocolo exige “os dois verdes”, isso significa **os dois workflows concluídos com success no mesmo SHA exato**.
 
-## 3. Ordem de leitura
+Um run cancelado, vermelho, pertencente a outro SHA ou ainda em execução não serve como recibo daquele estado.
 
-1. este arquivo;
-2. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W15_W19_FECHADA_2026-08-14.md`;
-3. `AI_Studio_Lab/codex/RETOMADA.md`;
-4. `AI_Studio_Lab/codex/DEFINICAO_DE_PRONTO.md`;
-5. `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`;
-6. `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
-7. `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
-8. `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`.
+### Concorrência
 
-Precedência: **GitHub remoto atual → gates executáveis → este prompt/checkpoint mais novo → documentos anteriores**.
+A separação por SHA está provada: pushes posteriores não cancelam a certificação transversal de um SHA anterior. Portanto é permitido materializar a próxima onda somente nos pontos autorizados pelo protocolo; não é permitido, porém, promover um canário antes de o SHA inativo ter os dois recibos verdes.
 
-## 4. Estado curricular — verificado no remoto em 15/08, 01h30 UTC
+---
 
-> ⚠️ **Este bloco foi reescrito a partir do repositório, não de relatório.**
-> Os números vêm do ledger, do canário vivo e dos portões executados no HEAD
-> `dbd9c4c`.
->
-> Registro do episódio que criou esta regra: em 14/08 um relatório de
-> fechamento descreveu W22–W26 como concluídas e a Matrix como `51/15/24/66/11`
-> quando o remoto tinha apenas W22 e W23 promovidas e as fichas `PE.02`/`GM.08`
-> sequer existiam. O texto estava **à frente** do runtime. As ondas foram
-> executadas de verdade depois, e só por isso os números coincidem hoje —
-> coincidência não é evidência. Continue exigindo canário + ledger + dois
-> workflows verdes no mesmo SHA.
+## 3. Ordem de leitura complementar
 
-Fechadas e promovidas: **W15** `N5.01/F45` · **W16** `N5.02/F72` · **W17**
-`N6.01/F75` · **W18** `N5.03/F73` · **W19** `N4.10/F69` · **W20** `GM.07/F63` ·
-**W21** `AL.05/F46` · **W22** `N6.03/F87` · **W23** `GE.06/F78` · **W24**
-`N7.01/F84` · **W25** `PE.02/F64` · **W26** `GM.08/F81`.
+Depois deste arquivo, quando precisar de contexto histórico, leia somente o que for necessário, nesta ordem:
 
-Matrix vigente, derivada do ledger e conferida contra o canário vivo
-(51 ids ativos em `composerCanaryIds.ts`):
+1. `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`;
+2. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W11_AL03_F30_FECHADA_2026-08-13.md`;
+3. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W15_W19_FECHADA_2026-08-14.md`;
+4. `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W20_W24_FECHADA_2026-08-15.md`;
+5. `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
+6. `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
+7. `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`.
 
-`51 Composer / 15 legado / 24 fallback / 66 servidas / 11 divergências / 12 swaps / 44 estreias`
+Coverage Matrix, DAG, canário e runtime atuais continuam superiores a checkpoints históricos.
 
-**Restam 24 fallbacks.** Legado conta como servido e não deve ser migrado só por estética.
+---
 
-### Recibos das ondas W24–W26
+## 4. ESTADO VIVO APÓS A W28
 
-- **W24 `N7.01/F84`** — regression `241a894`; inativo `1f912c8f` (CI
-  `31825522496`, transversal `31825522510`); promoção com ledger atômico
-  `57bef7e`; **recibo final `083632d`** (CI `31840606795`, transversal
-  `31840606811`). O SHA intermediário `13ed81e` ficou **vermelho** e não serve
-  de recibo — ver a lição de gate abaixo.
-- **W25 `PE.02/F64`** — regression `b34b194`; inativo `748724d` (CI
-  `31842370575`, transversal `31842370542`); promoção `a24bbb0`; **recibo final
-  `650ac64`** (CI `31843453601`, transversal `31843453565`).
-- **W26 `GM.08/F81`** — regression `c787d85` (CI vermelho intencional);
-  inativo `3d6a636` (CI `31852463035`, transversal `31852463034`); promoção
-  `92e0a1e`; **recibo final `bb44915`** (CI `31853166671`, transversal
-  `31853166653`).
+### Fechamento curricular
 
-### Onda em curso — W27 `AL.06 / F77`
+- **W1–W28 fechadas.**
+- W24 — `N7.01 / F84`, recibo final `083632d`.
+- W25 — `PE.02 / F64`, recibo final `650ac64`.
+- W26 — `GM.08 / F81`, recibo final `bb44915`.
+- W27 — `AL.06 / F77`:
+  - materialização inativa `dbd9c4c`;
+  - portão inativo: CI `31853918490` + transversal `31853918503`, verdes;
+  - promoção atômica inicial `f4c3df2` revelou dívida de observabilidade;
+  - fechamento reconciliado `25b0307`: CI `31857701286` + transversal `31857701285`, verdes;
+  - Matrix observada: `52 Composer / 15 legado / 23 fallback / 67 servidas / 11 divergências`.
+- W28 — `GE.05 / F60 — O Mapa do Tesouro`:
+  - regression-first `e3d41ac`: vermelho **por desenho**, somente no contrato novo;
+  - materialização inativa `e4c9349`;
+  - portão inativo: CI `31858284059` + transversal `31858284068`, verdes;
+  - promoção atômica `2377aaf`: `GE.05` + `W28-GE.05` + contrato da Matrix no mesmo SHA;
+  - recibos da promoção: CI `31858733127` + transversal `31858733049`, verdes;
+  - Matrix observada: **`53 Composer / 15 legado / 22 fallback / 68 servidas / 11 divergências`**.
 
-**Materializada e INATIVA. O portão do §9.7 JÁ ESTÁ CUMPRIDO.**
+Contadores estruturais preservados: 90 competências, 94 fichas autorais, 12 trocas visuais e 44 estreias de ferramenta conforme a Matrix executável.
 
-- regression-first `a46ca9f`; materialização inativa
-  `dbd9c4c9ed97efdaed852669f5c372e30054c55a`;
-- o SHA inativo `dbd9c4c` está com **os dois workflows verdes**: CI
-  `31853918490` e Certificação transversal `31853918503`;
-- `AL.06` está **fora** de `DEFAULT_COMPOSER_CANARY_IDS` e **não** há linha
-  `W27-AL.06` no ledger — correto para o estado inativo;
-- portões locais no mesmo SHA: 212 arquivos / 2.986 testes, `tsc` limpo,
-  `auditar`, `fichas:auditar`, `grafo:check` e `build` verdes.
+### O que a W28 materializou
 
-**Próximo passo, §9.8/§9.9:** promover `AL.06` em alteração isolada do canário,
-com a linha do ledger no mesmo SHA; deixar a Matrix observar o delta real
-(esperado `{ composer +1, fallback −1, served +1 }` → `52/15/23/67/11`); e só
-então abrir a W28.
+`GE.05/F60` reutiliza `ShapeCanvas#grade` em `MapaTesouroStage` e preserva a escada canônica:
 
-### Lição de gate — contrato transversal envelhece com o currículo
+1. grade 3×3 — achar objeto;
+2. grade 5×5 — dizer coordenada;
+3. colocar objeto na coordenada;
+4. descrever caminho horizontal/vertical;
+5. ponte pré-cartesiana com dois eixos numéricos.
 
-O CI de `13ed81e` (W24) caiu porque o contrato genérico do canário exigia
-`>= 0` de todo número em qualquer nó promovido. A regra era correta enquanto o
-currículo vivia nos naturais, e passou a recusar o `-3` que é o gabarito
-legítimo da F84 no L1.
+Ordem pedagógica dura: **coluna primeiro, linha depois**. Diagnósticos canônicos: `inverte-coordenadas`, `so-uma-coordenada`, `confunde-linha-coluna`. Resolução declarativa R0-A e domínio 3/3 em 2 sessões.
 
-A correção (`083632d`) não removeu a regra nem abriu exceção por id: a ficha
-declara o conjunto que ensina (`dominioNumerico`) e o contrato pergunta a ela
-qual é o piso. Quem não declara nada segue nos naturais, então os demais
-canários continuam protegidos. O palco `reta-completa-f84` ganhou contrato
-próprio — gabarito posicional cabe na reta desenhada, gabarito de distância
-continua proibido de ser negativo, e a reta cruza o zero.
+### Auditoria histórica W20/W21
 
-**Regra:** ao abrir faixa numérica nova — inteiros agora, racionais depois —
-verifique antes se algum invariante genérico já proíbe o conteúdo novo.
-Derivar o invariante da declaração da ficha custa uma linha e evita tanto o
-falso verde quanto a exceção por id.
+O checkpoint W20–W24 registra a evidência sem maquiar o histórico:
 
-### Como se seleciona — a conta que engana
+- W20 final `74c6f0e`: transversal verde, mas CI final vermelho — recibo final **não plenamente verificado**; o portão inativo da onda foi verde e o código persistiu em heads posteriores certificados;
+- W21 final `35cd96b`: existe par histórico verde no SHA exato (`31811526114` + `31811526141`); tentativas posteriores canceladas no mesmo SHA não anulam esse par. Recibo **verificado**.
 
-O §7.3 pede a elegível que destrava mais fallbacks descendentes. A contagem
-ingênua — filhos diretos que estão em fallback — **superestima**: credita ao
-candidato filhos que continuam bloqueados por outro pré-requisito. `GM.08`
-parecia destravar `GE.09` e `GE.10`, mas `GE.10` também dependia de `GE.04`.
+### Branch duplicada
 
-Critério certo: **quantos fallbacks passam a ter _todos_ os pré-requisitos
-servidos**. Recalcule no estado vivo a cada onda; a cascata total não desempata,
-porque o grafo restante é alcançável por qualquer porta.
+`codex/w24-dominio-inteiros` é trabalho duplicado da W24 e conflita em `canaryContract.test.ts`. **Não mergear.** Pode ser removida quando houver mecanismo seguro para apagar a branch, mas não é dependência do fechamento.
 
-### Regra reforçada — relatório não fecha onda
+---
 
-Onda fechada é onda cujo `id` está no canário **e** no ledger **e** cujo SHA
-passou nos dois workflows. Texto de fechamento não é evidência; se o relatório
-e o repositório divergirem, o repositório vence e o texto se corrige.
+## 5. Regra de correção: observação vem antes do ledger
 
-Recibo de código do bloco: `ecdbd3251fa1cc7b170e57bf6da2ad38c4aa6354` — CI `31799848732` ✅ + transversal `31799848715` ✅.
+A sequência correta para qualquer mudança de estado da Matrix é:
 
-### Recibos resumidos
+1. implementar/ativar a mudança real;
+2. deixar a Matrix observar a fonte real;
+3. se o gate ficar vermelho por delta real esperado, registrar o delta no ledger;
+4. atualizar a expectativa executável;
+5. nunca reduzir divergência ou inventar contador por intenção.
 
-- W15: regression `43373a1f` → final `2ca2fb0a`; Matrix `40/15/35/55/11`.
-- W16: regression `bb1ef0e9`; inativo `4789636c` (CI `31764367753`, transversal `31764367742`); promoção `a3bcf427`; final `138da994` (CI `31765155011`, transversal `31765155010`); Matrix `41/15/34/56/11`.
-- W17: regression `536780b9`; inativo `f52d74aa` (CI `31766412517`, transversal `31766412457`); promoção `b9dc5999`; final `30744492` (CI `31766921778`, transversal `31766921781`); Matrix `42/15/33/57/11`.
-- W18: regression `4354372a`; uma versão de ledger antecipou a promoção por engano. Promoção remota real e isolada: `ecdecfec`; CI `31795872830` observou `43/15/32/58/11` e todas as falhas de W18 desapareceram; restou só a regressão intencional da W19.
-- W19: regression `31ecbd6a`; inativo `4ed4858d` (CI `31798437057`, transversal `31798437091`); promoção `056c19e3`; Matrix observou `44/15/31/59/11` **antes** do ledger; recibo final de código `ecdbd325`.
+W18 ensinou que texto não pode correr na frente do runtime. W21 ensinou que promoção não pode correr na frente do ledger. W27 ensinou que o mapa de observabilidade também é parte da prova: `expressao-f77` precisava existir declarativamente no runtime map antes de a Matrix aceitar a promoção.
 
-## 5. Regra reforçada após a correção da W18
+---
 
-A W18 expôs uma inversão proibida: texto dizia que a promoção/Matrix já tinham ocorrido antes de o canário existir no remoto.
+## 6. Estruturas declarativas — regra dura
 
-**Ordem obrigatória, sem exceção:**
+São declarativas:
 
-`promoção remota real → Matrix observa o delta real → ledger/checkpoint`
+- `src/curriculum/motores/composerCanaryIds.ts`;
+- `AI_Studio_Lab/tools/coverage_matrix_core.ts` (`COVERAGE_MIGRATIONS`);
+- `AI_Studio_Lab/tools/ficha_runtime_map.cjs`;
+- expectativas executáveis da Coverage Matrix.
 
-Documento nunca pode antecipar canário, Matrix, CI ou recibo. Se o texto estiver à frente do runtime, corrija o runtime/prova primeiro ou retire a afirmação; não use o texto como evidência.
+### Proibido
 
-## 6. Matrix e mapa runtime são declarativos
+- mutação por efeito colateral de `import`;
+- “arquivo de extensão” que só funciona se alguém lembrar de importá-lo;
+- empurrar `push`, `splice` ou alteração de referência no import;
+- duplicar a fonte declarativa para “não reescrever arquivo”.
 
-Foi removido o atalho que mutava `COVERAGE_BASELINE`/`COVERAGE_MIGRATIONS` por efeito de import e o wrapper `.map()` do mapa runtime.
+Adicionar **uma linha nova ao array canônico** é a operação correta.
 
-Estado vigente:
+### Atomicidade da promoção
 
-- `coverage_matrix.ts` é re-exportação pura;
-- `coverage_matrix_core.ts` declara estaticamente o ledger W1–W19 e deriva `COVERAGE_BASELINE` a partir de `COVERAGE_CLOSED_BASELINE + deltas`;
-- `ficha_runtime_map.cjs` é array declarativo explícito;
-- `ficha_runtime_map_core.cjs` não existe mais.
+Desde W22, e obrigatoriamente daqui em diante, **canário e ledger entram no mesmo SHA de promoção**. A expectativa nominal da Matrix deve acompanhar a mesma promoção quando necessária para codificar o delta já estabelecido pelo contrato.
 
-**Invariante:** auditoria, Matrix, baseline e mapa runtime NÃO devem depender de mutação como efeito de import nem de ordem de carregamento.
+O ledger vigente chega até `W28-GE.05`.
 
-## 6-A. Cânone não se comprime — e agora existe portão
+---
 
-`src/constants/evidencias.ts` foi de **156 linhas para 3** no commit `008ac01`
-(materialização da W16) e seguiu minificado por todo o bloco W15–W19. Os 2.851
-testes ficaram verdes o tempo inteiro, porque comentário não é executável.
+## 6-A. Gate documental do cânone
 
-O que se perdeu não era enfeite: era a frase que explica, para cada condição da
-§9, qual ficha a exige, em que nível, e **por que acertar sem ela não provaria
-a competência**. Restaurado em `12c7cf4d`, com os 22 valores conferidos
-idênticos por comparação automática — só a documentação voltou.
+A ficha canônica em `AI_Studio_Lab/pedagogia/fichas/` é contrato pedagógico, não decoração.
 
-`src/constants/evidencias.doc.test.ts` agora reprova entrada sem bloco de
-documentação e reprova o arquivo comprimido. A trava foi verificada nos dois
-sentidos: falha no minificado, passa no restaurado.
+Antes de materializar uma competência:
 
-**Regra:** ao materializar uma ficha, não reescreva arquivos de cânone
-compartilhado em forma comprimida. Acrescente a sua entrada e preserve as
-existentes. Vale para `evidencias.ts`, `misconceptions.ts`,
-`ficha_runtime_map.cjs` e `coverage_matrix_core.ts` — os quatro já perderam
-documentação uma vez.
+1. localizar a ficha autoral e sua proveniência;
+2. localizar o nó no DAG e os prereqs vivos;
+3. identificar primitiva/modo canônicos;
+4. derivar a escada dos cinco níveis;
+5. manter diagnósticos e domínio;
+6. usar o runtime map para provar qual componente físico realiza cada primitiva;
+7. se houver divergência entre ficha e screen, não escondê-la: ou alinhar o runtime ou registrar dívida objetiva.
 
-**Pendência FECHADA:** `src/curriculum/fichas/jornada/N5.03.ts` estava inteiro
-em 4 linhas. Foi restaurada em `5e97df9` e hoje tem 108 linhas, com o bloco
-pedagógico da F73 legível. Nenhuma ficha da Jornada segue minificada.
+Não inventar ficha, primitiva, modo ou pedagogia para fazer o gate ficar verde.
 
-## 7. Critério de seleção — fallback-first
+---
 
-1. priorize competências em FALLBACK;
-2. só escolha fallback cujos pré-requisitos estejam servidos;
-3. entre elegíveis, escolha a que destrava mais fallbacks descendentes;
-4. legado só passa à frente quando bloqueia uma fallback ou não há fallback elegível;
-5. recalcule Matrix + DAG depois de **cada** onda. Lista histórica nunca vence estado vivo.
+## 7. Seleção fallback-first — estado pós-W28
 
-Antes da W20, recalcular tudo. Não inferir a próxima competência deste prompt.
+### Objetivo
 
-## 8. Portões locais antes de push
+Drenar fallbacks reais com máximo ganho causal, respeitando o DAG.
 
-Quando houver checkout local funcional, antes de qualquer push que deva ser verde:
+### Elegibilidade
 
-```bash
-npm test
-npx tsc --noEmit
-npm run auditar
-npm run build
-SONDA_SEMENTES=1 npm run sonda
-```
+Um fallback é candidato quando **todos os seus prereqs já estão servidos** (`Composer` ou `legacy`).
 
-Regression-first vermelho é a exceção intencional. Se a sessão não tiver checkout local executável, **não invente resultado local**; declare a limitação e use os gates remotos obrigatórios por SHA exato.
+### Valor de desbloqueio — regra crítica
 
-## 9. Protocolo obrigatório de cada onda
+Ao avaliar um candidato X, conte quantos fallbacks adicionais passariam a ter **TODOS os prereqs servidos** se X fosse promovido.
 
-1. reancorar ficha canônica, grafo, Matrix e runtime;
-2. regression-first executável, vermelho pelo motivo correto;
-3. implementar registrada e **INATIVA**;
-4. toda ficha nova nasce com `resolucao()` declarativa tipada sob R0-A;
-5. reutilizar primitivas canônicas; não inventar segunda linguagem visual;
-6. portões locais da §8 quando houver checkout;
-7. Gates + sonda Chrome real da ficha + transversal no mesmo SHA inativo;
-8. promover somente após os dois workflows verdes nesse SHA;
-9. promoção em alteração isolada do canário;
-10. deixar a Matrix observar o delta real — nunca presumir;
-11. **só então** reconciliar `COVERAGE_MIGRATIONS`;
-12. exigir os dois workflows verdes no HEAD final exato;
-13. checkpoint + prompt só a cada 5 ondas, salvo mudança imediata de regra.
+Não conte simplesmente “filhos diretos que estão em fallback”: isso superestima nós cujo filho ainda depende de outro prereq não servido.
 
-**Não certificar várias ondas em lote.** Cada onda tem seu próprio inativo certificado, promoção isolada, observação, ledger e fechamento.
+### Estado após GE.05
 
-## 10. Série de tempo fallback × legado
+Restam 22 fallbacks:
 
-Metodologia: regression-first → recibo final, no histórico real.
+`AL.07, AL.08, GE.04, GE.07, GE.08, GE.09, GE.10, GM.06, GM.09, GM.10, GM.11, N2.06, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.03, PE.04`.
 
-- legado: `n=9`, média `3,49 h`, mediana `2,78 h`;
-- fallback limpo mensurável: W5 `2,84 h`, W13 `3,02 h`, W14 `3,07 h`, W15 `0,75 h`, W16 `0,91 h`, W17 `0,43 h` → `n=6`, média **1,84 h**, mediana **1,87 h**.
+A promoção de `GE.05` tornou `GE.08` elegível.
 
-W18/W19 ficam fora da média de throughput porque atravessaram interrupção de sessão/conector e reparo de protocolo; o tempo bruto mede mais que custo de engenharia. A queda de W15–W17 é compatível com a paralelização das sementes, mas a amostra segue pequena.
+Na fila recalculada pós-W28, os candidatos com ganho imediato 1 são:
 
-## 11. Sonda F14 / fonte externa
+- `GE.04` → torna `GE.10` elegível;
+- `GM.09` → torna `GM.11` elegível;
+- `N2.06` → torna `N2.07` elegível;
+- `PE.03` → torna `PE.04` elegível.
 
-A dependência de Google Fonts continua dívida de produto. A sonda F14 ignora somente HTTP >=400 de recurso `font` vindo de `https://fonts.gstatic.com/`; falhas do aplicativo continuam fatais. Hospedar a fonte localmente continua devido, mas não faz parte do caminho crítico curricular atual.
+Pelo desempate causal determinístico da Matrix/DAG, a **W29 começa por `GE.04`**, salvo se o estado vivo tiver derivado antes da próxima sessão. Recalcule antes de codificar; não transforme esta linha em fila estática.
 
-## 12. Definição de pronto
+---
 
-Autoridade: `AI_Studio_Lab/codex/DEFINICAO_DE_PRONTO.md`.
+## 8. Regression-first: vermelho correto não é falha de operação
 
-Fábrica curricular pronta = **grafo integralmente servido, fallback=0, nenhum `Em construção`, cadeia autoral auditável e os dois workflows verdes no mesmo SHA**. Não é necessário migrar todo legado para Composer.
+Cada onda nasce com um contrato executável que falha pelo motivo desejado.
 
-Fora da fábrica: player da resolução · Oficina · conta armada · mascote / Creature Engine · Thinking Engine runtime.
+No SHA de regression-first:
+
+- CI vermelho é **esperado e necessário**;
+- verifique que a falha está restrita ao novo contrato;
+- não espere esse CI “ficar verde”; ele nunca ficará verde sem novo commit;
+- não relaxe a expectativa;
+- depois de observar o vermelho correto, materialize a implementação inativa.
+
+O erro operacional que já ocorreu mais de uma vez foi esperar um workflow que, por desenho, não pode ficar verde. Não repetir.
+
+---
+
+## 9. Protocolo de uma onda
+
+### 9.1 Reancorar
+
+HEAD remoto, PR, Matrix, DAG, ficha, runtime e estado dos workflows.
+
+### 9.2 Recalcular seleção
+
+Aplicar §7 no estado vivo; não usar fila histórica sem recalcular.
+
+### 9.3 Ler contrato pedagógico
+
+Ficha canônica + DAG + runtime map + implementações análogas.
+
+### 9.4 Regression-first
+
+Criar teste nominal que codifica prereqs, fallback inicial, escada L1–L5, diagnósticos, resolução/domínio e invariantes visuais relevantes. Publicar e observar o vermelho correto.
+
+### 9.5 Materializar INATIVO
+
+Registrar ficha/builder/stage/renderer/mapa de runtime necessários, **sem adicionar o ID ao canário default**.
+
+### 9.6 Gates locais/determinísticos
+
+Rodar/observar, no mínimo:
+
+- testes focados;
+- suíte completa;
+- `tsc`;
+- `npm run auditar`;
+- `npm run fichas:auditar`;
+- `npm run fichas:conferir`;
+- `npm run grafo:check`;
+- Coverage Matrix;
+- build.
+
+Nunca apagar/afrouxar teste para obter verde.
+
+### 9.7 Portão inativo remoto
+
+O SHA inativo precisa dos **dois workflows verdes no mesmo SHA**. Antes de “esperar”, consulte o estado real dos runs daquele SHA. Se já estão verdes, prossiga imediatamente.
+
+### 9.8 Promover
+
+Adicionar exatamente o ID da competência ao array declarativo do canário.
+
+### 9.9 Ledger no MESMO SHA
+
+Adicionar a linha nominal da onda em `COVERAGE_MIGRATIONS`, com delta fallback-first esperado `{ composer: +1, fallback: -1, served: +1 }`, sem presumir mudança em divergências.
+
+### 9.10 Matrix observa
+
+Deixar o gate ler a fonte real. Se o delta real for diferente, investigar; a Matrix vence a expectativa humana.
+
+### 9.11 Certificar promoção
+
+CI + transversal verdes no SHA promovido/reconciliado.
+
+### 9.12 Documentação
+
+Atualizar checkpoint/PR/porta de retomada sem inventar recibo.
+
+### 9.13 Blocos
+
+A cada bloco operacional de cinco ondas, criar checkpoint consolidado. O checkpoint W20–W24 agora existe. O próximo bloco consolidável é W25–W29, portanto será fechado quando W29 encerrar.
+
+---
+
+## 10. Throughput e uso correto do tempo
+
+As sondas longas existem para provar o runtime real. Use o tempo delas para preparar análise, ficha, DAG e documentação **fora do ref ativo**, mas não mova a branch se isso puder invalidar o portão em curso.
+
+Não fique ocioso depois de um recibo já verde. Diagnosticar “está na hora de promover” não é executar.
+
+Não empilhe promoções: cada onda mantém seus próprios recibos e causalidade.
+
+---
+
+## 11. Sondas reais, fontes e ambiente
+
+Falhas de sonda real devem ser classificadas pela causa concreta. Uma falha externa de fonte/asset não é automaticamente flake. Não rerodar indefinidamente para obter verde estatístico; corrigir a causa quando ela pertence ao projeto ou registrar a evidência quando externa.
+
+Preservar Chrome real e larguras 320/390/900 quando o contrato visual exigir. Não substituir sonda real por teste unitário para encurtar o gate.
+
+---
+
+## 12. Definition of Done de uma onda
+
+Uma onda só está fechada quando:
+
+- seleção foi recalculada pelo DAG vivo;
+- regression-first falhou pelo motivo correto;
+- implementação inativa respeita ficha/runtime;
+- CI + transversal do SHA inativo estão verdes;
+- promoção + ledger são atômicos;
+- Matrix observou o delta real;
+- CI + transversal da promoção/final estão verdes;
+- documentação/porta de retomada não está atrasada em relação ao estado fechado;
+- nenhum merge na `main` ocorreu.
+
+---
 
 ## 13. Restrições duras
 
 - NÃO tocar `main`.
-- NÃO mergear, marcar ready ou ativar auto-merge.
-- NÃO reabrir onda fechada sem regressão comprovada.
-- NÃO tocar Creature Engine.
-- Thinking Engine runtime NÃO autorizado.
-- NÃO fazer faxina oportunista.
-- NÃO enfraquecer gate para obter verde.
-- NÃO tratar falha/404 como flake sem evidência.
-- NÃO alterar snapshot histórico P21.1; evolução é pelo ledger nominal.
-- NÃO usar import-time mutation/order dependence para estado de auditoria.
-- NÃO escrever ledger/checkpoint antes da prova remota que ele afirma registrar.
-- NÃO certificar várias ondas em lote.
+- NÃO mergear PR #35.
+- NÃO marcar ready.
+- NÃO habilitar auto-merge.
+- NÃO tocar o Creature Engine/Tamagotchi.
+- NÃO mergear `codex/w24-dominio-inteiros`.
+- NÃO relaxar testes, Matrix, auditorias ou sondas para conseguir verde.
+- NÃO trocar fonte da verdade por comentário/checkpoint antigo.
+- NÃO promover uma ficha só porque ela foi registrada no Composer.
+- NÃO criar ledger mutável por import.
+- NÃO contar filho direto como desbloqueio sem verificar todos os prereqs.
+- NÃO esperar verde no commit regression-first.
 
-## 14. Autonomia e reporte
+---
 
-Executar autonomamente, recalculando Matrix/DAG em toda onda.
+## 14. Autonomia e próximo passo
 
-Próximo lote: **concluir a W24 e seguir até a W28**. Reportar somente ao fechamento das cinco ondas, salvo condição de parada real comprovada ou mudança de protocolo que exija registro imediato.
+Há autonomia para executar o ciclo técnico completo sem pedir confirmação a cada microetapa, desde que as restrições acima sejam respeitadas.
 
-Se a conversa saturar, preserve no remoto o último estado válido e registre apenas o necessário para retomada sem ambiguidade.
+### Próxima ação ao retomar
+
+1. confirme o HEAD remoto e os dois workflows do último SHA;
+2. confirme a Matrix viva em torno de **53/15/22/68/11**;
+3. recalcule §7; se nada derivou, abra **W29 `GE.04`** por regression-first;
+4. siga §9 integralmente;
+5. ao fechar W29, crie o checkpoint W25–W29 e atualize esta porta novamente;
+6. prossiga fallback-first enquanto os gates permanecerem íntegros.
+
+Não transforme a reancoragem em uma hora de diagnóstico quando o próximo passo já está autorizado. Confirme o necessário e execute.
