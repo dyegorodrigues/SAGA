@@ -31,11 +31,9 @@ Ler, quando a tarefa tocar a área correspondente:
 - `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
 - `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
 - `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`;
-- `AI_Studio_Lab/codex/DESIGN_ESTADO_E_DECISOES.md` — **leia antes de tocar em
-  qualquer cor, fonte ou espaçamento.** Registra o que já foi decidido pelo dono
-  do projeto e não se reabre (a paleta por operação aritmética), o que existe e
-  apodreceu (colisões de cor entre trilhas), e o que espera decisão humana;
-- checkpoints de fábrica já fechados, inclusive W20–W24 e W25–W29.
+- `AI_Studio_Lab/codex/DESIGN_ESTADO_E_DECISOES.md` — **leia antes de tocar em qualquer cor, fonte ou espaçamento**. A paleta por operação aritmética foi decidida pelo dono do projeto e não se reabre;
+- checkpoints de fábrica já fechados W20–W24 e W25–W29;
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W30_W34_EM_CURSO_2026-08-15.md` enquanto o bloco atual estiver aberto.
 
 O checkpoint é recibo humano; **Coverage Matrix, canário, DAG e runtime vivos são a autoridade executável**.
 
@@ -51,20 +49,37 @@ O checkpoint é recibo humano; **Coverage Matrix, canário, DAG e runtime vivos 
 - Não tocar Creature Engine/Tamagotchi neste fluxo.
 - Não mergear `codex/w24-dominio-inteiros`; é trabalho duplicado da W24.
 
+### Catraca de cores
+
+A integração de `e6bb655` trouxe `DESIGN_ESTADO_E_DECISOES.md`, `src/styles/coresLiterais.test.ts`, baseline e `npm run cores:baseline`.
+
+A partir dela:
+
+- ao materializar ficha ou palco, usar os papéis de `src/styles/tokens.ts` em vez de escrever cor literal;
+- o gate recusa cor literal nova;
+- se faltar papel semântico, acrescentar o token ao sistema em vez de espalhar cor solta em componente;
+- `npm run cores:baseline` não é atalho para fazer o gate aceitar dívida nova: baseline só muda quando a decisão de design correspondente é deliberada e justificada;
+- a paleta por operação aritmética registrada em `DESIGN_ESTADO_E_DECISOES.md` é decisão do dono do projeto e não deve ser reaberta pela fábrica curricular.
+
 ---
 
-## 4. Estado curricular vivo após W29
+## 4. Estado curricular vivo após W30
 
-Ondas **W1–W29 fechadas**.
+Ondas **W1–W30 fechadas**.
 
-Coverage Matrix observada no gate da promoção W29:
+Coverage Matrix observada no gate final da W30:
 
-- **54 Composer**
+- **55 Composer**
 - **15 legado**
-- **21 fallback**
-- **69 servidas**
+- **20 fallback**
+- **70 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
+- `modeSwaps=12`
+- `toolIntroductions=44`
+- primitiva autoral ainda ausente: `Moedas`
+
+A suíte observada no fechamento corrigido da W30 é **217 arquivos / 3.055 testes**, todos verdes. `src/styles/coresLiterais.test.ts` passou.
 
 ### Últimas ondas
 
@@ -72,28 +87,56 @@ Coverage Matrix observada no gate da promoção W29:
 - W25 `PE.02/F64`: final `650ac6464a209a723d47e734c648f25c9766dc62`; CI `31843453601` + transversal `31843453565`, ambos `success`.
 - W26 `GM.08/F81`: final `bb44915264ff55e8f26282e910c9952712ce28f0`; CI `31853166671` + transversal `31853166653`, ambos `success`.
 - W27 `AL.06/F77`: fechamento reconciliado `25b0307291f70cd97a886794efe060a24bf7aa2e`; CI `31857701286` + transversal `31857701285`, ambos `success`.
-- W28 `GE.05/F60`: materialização inativa `e4c9349`; promoção atômica `2377aafc1b0ae7f8652c4af1f20197d3904b8f1f`; CI da promoção `31858733127` + transversal `31858733049`, ambos `success`.
-- W29 `GE.04/F59`: regression-first `52bdb4e249b5d9a9f9535cda46f244ccc1dc52c3`; inativo `9bec4f26a11e26c4489c95fff3523d444ab1f3f6`; promoção `3a705e28de30e6a785645864957727134c213256`.
+- W28 `GE.05/F60`: promoção `2377aafc1b0ae7f8652c4af1f20197d3904b8f1f`; CI `31858733127` + transversal `31858733049`, ambos `success`.
+- W29 `GE.04/F59`: promoção `3a705e28de30e6a785645864957727134c213256`; CI `31864419504` + transversal `31864419499`, ambos `success`.
+- W30 `N2.06/F38`: promoção `c1e7512e912421d3d1923838bf3050218e92fc59`; CI `31883028645` + transversal `31883028668`, ambos `success`; fechamento corrigido `05b7787e7239db4c687b5fa7cc47ee0b4f256447`; CI `31883452067` + transversal `31883452082`, ambos `success`.
 
 ### W28 — correção de classificação da regression-first
 
-No SHA `e3d41ac72a6a474253e73b4756dabdbb5099201f`, o CI `31858118039` terminou **cancelled**, não `failure`; a transversal `31858118099` terminou `success`. Portanto, não chamar esse CI de “vermelho pelo motivo correto”. O fechamento posterior da W28 continua certificado pelo inativo e pela promoção, mas o run cancelado permanece registrado exatamente como cancelado.
+No SHA `e3d41ac72a6a474253e73b4756dabdbb5099201f`, o CI `31858118039` terminou **cancelled**, não `failure`; a transversal `31858118099` terminou `success`. O fechamento posterior da W28 continua certificado pelo inativo e pela promoção, mas o run cancelado permanece registrado exatamente como cancelado.
 
-### W29 — GE.04 / F59 — Sólidos Geométricos
+### W29 — correção de classificação consolidada
 
-- regression-first: `52bdb4e249b5d9a9f9535cda46f244ccc1dc52c3`;
-  - CI `31863719586`: `failure`, restrita ao contrato novo porque `GE.04` ainda não estava registrada;
-  - no log: 213 arquivos anteriores / 3.016 testes anteriores passaram; o novo arquivo tinha 2 testes falhando como desenhado.
-- materialização inativa: `9bec4f26a11e26c4489c95fff3523d444ab1f3f6`;
-  - CI `31864008893`: `success`;
-  - transversal `31864008795`: `success`.
-- promoção atômica: `3a705e28de30e6a785645864957727134c213256`;
-  - CI `31864419504`: `success`;
-  - transversal `31864419499`: `success`;
-  - Matrix observada: **54/15/21/69/11**;
-  - suíte observada no gate: **214 arquivos / 3.033 testes**, todos verdes.
+No SHA regression-first `52bdb4e249b5d9a9f9535cda46f244ccc1dc52c3`:
 
-A F59 foi materializada em `SolidosGeometricosStage`, realizando `ShapeCanvas#3D` com nomeação de sólidos, rampa experimental, teste de empilhamento, ponte face↔figura plana e contagem de faces/vértices/arestas. Preserva os diagnósticos `confunde-plano-solido`, `so-um-angulo` e `propriedade-errada`, domínio 3/3 por 2 sessões e resolução declarativa R0-A.
+- workflow CI `31863719586` terminou **`cancelled` por concorrência**;
+- o job `Gates do SAGA` `94961316286` terminou `failure` antes do cancelamento;
+- o log desse job mostra a falha desenhada: os 2 testes novos falharam porque `GE.04` ainda não estava registrada, enquanto **213 arquivos / 3.016 testes anteriores passaram**.
+
+Nunca reclassificar o workflow cancelado como `failure`; registrar separadamente a conclusão do run e a evidência do job/log.
+
+### W30 — N2.06 / F38 — Pares e Ímpares
+
+Regression-first `9dc0e61df21f780249f42aaf66785ff69c6d6e76`:
+
+- workflow CI `31882060323` terminou **`cancelled` por concorrência**;
+- o job `Gates do SAGA` `95005940004` terminou `failure` antes do cancelamento;
+- o log mostrou a falha desenhada nos 2 testes novos porque `N2.06` ainda não existia no Composer; os testes anteriores permaneceram verdes.
+
+Portão inativo final `c62beaadfe10b903d6054aa56ef688c269ff5288`:
+
+- CI `31882628417`: `success`;
+- transversal `31882628429`: `success`.
+
+A materialização registra `N2.06/F38`, `ParesImparesStage`, contrato canônico, renderer e runtime `DragGroup#duplas` sem ativar o canário até o portão inativo. A escada preservada é: formar duplas até 10 → até 20 → decidir sem formar → regra do último algarismo → paridade de somas; diagnósticos `CONFUNDE_TAMANHO`, `ZERO_IMPAR`, `DECORA_SEM_ENTENDER`; resolução R0-A e domínio 3/3 em 2 sessões.
+
+Promoção atômica `c1e7512e912421d3d1923838bf3050218e92fc59`:
+
+- canário + `W30-N2.06` no ledger + baseline executável da Matrix no mesmo SHA;
+- Matrix observada: **55/15/20/70/11**;
+- suíte observada: **216 arquivos / 3.053 testes**;
+- CI `31883028645`: `success`;
+- transversal `31883028668`: `success`.
+
+Revisão de runtime após a promoção encontrou um ciclo possível causado pela identidade inline de `onProgress` no `DragGroup`. O fechamento final `05b7787e7239db4c687b5fa7cc47ee0b4f256447` corrige isso de forma isolada, estabiliza a notificação de progresso, dá tutorial semântico ao modo `duplas` e mantém cores via `tokens.ts`. O teste de montagem novo protege a regressão.
+
+No SHA corrigido:
+
+- Matrix permaneceu **55/15/20/70/11**;
+- `coresLiterais.test.ts` passou;
+- suíte: **217 arquivos / 3.055 testes**, todos verdes;
+- CI `31883452067`: `success`;
+- transversal `31883452082`: `success`.
 
 ### Auditoria histórica W20/W21 — evidência corrigida
 
@@ -102,7 +145,7 @@ A F59 foi materializada em `SolidosGeometricosStage`, realizando `ShapeCanvas#3D
 - CI `31805123752`: `failure`;
 - Certificação transversal: **nenhum run localizado para esse SHA** nas consultas feitas.
 
-Não fabricar um par verde para preencher a lacuna. O portão inativo histórico continua útil, mas o recibo final permanece incompleto.
+Não fabricar um par verde para preencher a lacuna.
 
 **W21 final `35cd96b27f9621d9882dfdd83a1f7442142ebb92`: verificado.**
 
@@ -127,7 +170,7 @@ A separação por SHA já foi provada. Não refazer teste de concorrência por r
 
 ## 6. Ledger, Matrix e runtime map
 
-O ledger nominal vive em `AI_Studio_Lab/tools/coverage_matrix_core.ts` e vai até **W29-GE.04**.
+O ledger nominal vive em `AI_Studio_Lab/tools/coverage_matrix_core.ts` e vai até **W30-N2.06**.
 
 Regras:
 
@@ -139,7 +182,7 @@ Regras:
 
 ---
 
-## 7. Seleção fallback-first — estado pós-W29
+## 7. Seleção fallback-first — estado pós-W30
 
 ### Objetivo
 
@@ -155,21 +198,20 @@ Ao avaliar um candidato X, conte quantos fallbacks adicionais passariam a ter **
 
 Não conte simplesmente “filhos diretos que estão em fallback”: isso superestima nós cujo filho ainda depende de outro prereq não servido.
 
-### Estado após GE.04
+### Estado após N2.06
 
-Restam 21 fallbacks:
+Restam 20 fallbacks:
 
-`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.09, GM.10, GM.11, N2.06, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.03, PE.04`.
+`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.09, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.03, PE.04`.
 
-A promoção de `GE.04` tornou `GE.10` elegível, mas `GE.10` não desbloqueia outro fallback imediatamente.
+A promoção de `N2.06` tornou `N2.07` elegível. `N2.07` não desbloqueia outro fallback imediatamente.
 
-No recálculo pós-W29, os candidatos de **ganho imediato 1** são:
+No recálculo pós-W30, os candidatos de **ganho imediato 1** são:
 
-- `N2.06` → torna `N2.07` elegível;
 - `PE.03` → torna `PE.04` elegível;
 - `GM.09` → torna `GM.11` elegível.
 
-Pela ordem causal executável da Matrix/DAG, **W30 começa por `N2.06`**, salvo deriva no estado vivo antes da próxima sessão. Recalcule antes de codificar; esta linha não é fila estática.
+Pela ordem causal executável observada na Matrix/DAG, `PE.03` está antes de `GM.09`; portanto, **W31 = `PE.03`**, salvo deriva no estado vivo antes da próxima sessão. Recalcule antes de codificar; esta linha não é fila estática.
 
 ---
 
@@ -184,7 +226,7 @@ No SHA regression-first:
 - não relaxe a expectativa;
 - depois da prova, materialize a implementação inativa.
 
-**Não chamar `cancelled` de `failure`.** Um run cancelado é cancelado; registre-o assim. A exceção histórica da W28 está no §4 e não deve ser usada como modelo para ondas novas.
+**Não chamar `cancelled` de `failure`.** Se um job falhou antes de um workflow ser cancelado por concorrência, registrar as duas coisas separadamente: conclusão do run = `cancelled`; evidência do job/log = falha desenhada observada.
 
 ---
 
@@ -198,9 +240,9 @@ HEAD remoto, PR, Matrix, DAG, ficha, runtime e workflows.
 
 Aplicar §7 no estado vivo; não usar fila histórica sem recalcular.
 
-### 9.3 Ler contrato pedagógico
+### 9.3 Ler contrato pedagógico e design
 
-Ficha canônica + DAG + runtime map + implementações análogas.
+Ficha canônica + DAG + runtime map + implementações análogas. Antes de tocar em cor, fonte ou espaçamento, ler `DESIGN_ESTADO_E_DECISOES.md`.
 
 ### 9.4 Regression-first
 
@@ -208,7 +250,7 @@ Criar teste nominal que codifica prereqs, fallback inicial, escada L1–L5, diag
 
 ### 9.5 Materializar INATIVO
 
-Registrar ficha/builder/stage/renderer/mapa runtime necessários, **sem adicionar o ID ao canário default**.
+Registrar ficha/builder/stage/renderer/mapa runtime necessários, **sem adicionar o ID ao canário default**. Usar `tokens.ts`; não introduzir cor literal nova.
 
 ### 9.6 Gates determinísticos
 
@@ -222,6 +264,7 @@ Observar no mínimo:
 - `npm run fichas:conferir`;
 - `npm run grafo:check`;
 - Coverage Matrix;
+- `src/styles/coresLiterais.test.ts` dentro da suíte;
 - build.
 
 Nunca apagar ou afrouxar teste para obter verde.
@@ -242,9 +285,9 @@ Adicionar a linha nominal em `COVERAGE_MIGRATIONS`, com delta fallback-first esp
 
 Deixar o gate ler a fonte real. Se o delta for diferente, investigar; a Matrix vence a expectativa humana.
 
-### 9.11 Certificar promoção
+### 9.11 Certificar promoção/final
 
-CI + transversal verdes no SHA promovido/reconciliado.
+CI + transversal verdes no SHA promovido/reconciliado. Se uma correção posterior alterar runtime da onda, esse SHA corrigido também vira o recibo final e precisa dos dois workflows verdes.
 
 ### 9.12 Documentação
 
@@ -252,7 +295,7 @@ Somente depois da prova: atualizar checkpoint/PR/porta de retomada. Não escreve
 
 ### 9.13 Blocos
 
-Checkpoint W20–W24 existe. Checkpoint **W25–W29** existe após o fechamento da W29. O próximo bloco consolidável será W30–W34.
+Checkpoint W20–W24 existe. Checkpoint W25–W29 existe. O bloco **W30–W34 está em curso** em `CHECKPOINT_FABRICA_CURRICULAR_W30_W34_EM_CURSO_2026-08-15.md`; consolidar/fechar o bloco quando W34 terminar.
 
 ---
 
@@ -280,7 +323,8 @@ Uma onda só está fechada quando:
 
 - seleção foi recalculada pelo DAG vivo;
 - regression-first produziu evidência da falha pretendida;
-- implementação inativa respeita ficha/runtime;
+- implementação inativa respeita ficha/runtime/design;
+- nenhuma cor literal nova escapou da catraca;
 - CI + transversal do SHA inativo estão verdes;
 - promoção + ledger são atômicos;
 - Matrix observou o delta real;
@@ -304,6 +348,9 @@ Uma onda só está fechada quando:
 - NÃO criar ledger mutável por import.
 - NÃO contar filho direto como desbloqueio sem verificar todos os prereqs.
 - NÃO esperar verde no commit regression-first.
+- NÃO chamar workflow `cancelled` de `failure`.
+- NÃO introduzir cor literal nova em ficha/palco; usar `tokens.ts`.
+- NÃO regenerar baseline de cores apenas para silenciar a catraca.
 - NÃO inventar ID de run, SHA, contagem de testes ou delta de Matrix. Se não foi consultado, escrever `não verificado`.
 
 ---
@@ -315,10 +362,11 @@ Há autonomia para executar o ciclo técnico completo sem pedir confirmação a 
 ### Próxima ação ao retomar
 
 1. confirme o HEAD remoto e os dois workflows do último SHA;
-2. confirme a Matrix viva em torno de **54/15/21/69/11**;
-3. recalcule §7; se nada derivou, abra **W30 `N2.06`** por regression-first;
-4. siga §9 integralmente;
-5. mantenha checkpoint/PR/porta de retomada sincronizados somente após a prova de cada fechamento;
-6. prossiga fallback-first enquanto os gates permanecerem íntegros.
+2. confirme a Matrix viva em torno de **55/15/20/70/11**;
+3. recalcule §7; se nada derivou, abra **W31 `PE.03`** por regression-first;
+4. leia o contrato canônico de `PE.03` e `DESIGN_ESTADO_E_DECISOES.md` antes de materializar;
+5. siga §9 integralmente, incluindo catraca de cores;
+6. mantenha checkpoint/PR/porta de retomada sincronizados somente após a prova de cada fechamento;
+7. prossiga fallback-first enquanto os gates permanecerem íntegros.
 
 Não transforme reancoragem em uma hora de diagnóstico quando o próximo passo já está autorizado. Confirme o necessário e execute.
