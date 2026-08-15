@@ -85,6 +85,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W26 — F81: área; o chão em unidades quadradas, reutilizando ArrayGrid.
   "GM.08",
 
+  // W27 — F77: expressão numérica; materialização inativa dbd9c4c passou CI 31853918490 + transversal 31853918503.
+  "AL.06",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
