@@ -2,13 +2,17 @@ import { afterEach, describe, expect, it } from "vitest";
 import { getTrackById } from "./motores/curriculum";
 import { enableComposerCanary, generateRegisteredFichaQuestion, hasComposerFicha, rollbackComposerCanary } from "./motores/composerCanary";
 
-describe("W26 regression-first — GM.08/F81", () => {
-  afterEach(() => rollbackComposerCanary("GM.08"));
-  it("reancora o nó no DAG e mantém fallback antes da materialização", () => {
+describe("W26 — GM.08/F81 Área", () => {
+  afterEach(() => enableComposerCanary("GM.08"));
+
+  it("rollback preserva o DAG e devolve GM.08 ao fallback anterior", () => {
+    rollbackComposerCanary("GM.08");
     expect(getTrackById("GM.08")?.prereqs).toEqual(["GM.07", "N4.02"]);
     expect(getTrackById("GM.08")?.generatorSource).toBe("fallback");
-    expect(hasComposerFicha("GM.08"), "F81 precisa existir no Composer antes da promoção").toBe(true);
+    expect(getTrackById("GM.08")?.contentStatus).toBe("fallback");
+    expect(hasComposerFicha("GM.08"), "F81 continua registrada mesmo durante rollback").toBe(true);
   });
+
   it("F81 nasce em ArrayGrid, preserva cm² e separa chão de volta nos cinco níveis", () => {
     enableComposerCanary("GM.08");
     const modos = ["contar-quadrados", "linhas-colunas", "formula", "area-vs-perimetro", "compor-areas"];
