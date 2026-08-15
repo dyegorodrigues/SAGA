@@ -20,15 +20,15 @@ Antes de editar:
 4. reancore Matrix, DAG, ficha e runtime no estado vivo;
 5. se houver deriva, investigue antes de escrever — o remoto vence este documento.
 
-**Regra de evidência:** nunca registrar ID de run, SHA, contagem de testes ou delta de Matrix sem consultar a fonte que o prova. Se a evidência não puder ser aberta, escrever `não verificado`. Número plausível não é recibo.
+**Regra de evidência:** nunca registrar ID de run, SHA, contagem de testes ou delta de Matrix sem fonte que o prove. Número plausível não é recibo.
 
-**Regra de classificação:** conclusão de workflow e evidência de job/log são fatos distintos. Um workflow `cancelled` continua `cancelled` mesmo quando um job já terminou `failure` e deixou a falha regression-first registrada.
+**Regra de classificação:** conclusão de workflow e evidência de job/log são fatos distintos. Workflow `cancelled` continua `cancelled` mesmo quando um job já terminou `failure`. Workflow `failure` só é chamado de `failure` quando a API global assim o classifica.
 
 ---
 
 ## 2. Documentos de continuidade
 
-Ler, quando a tarefa tocar a área correspondente:
+Ler, conforme a área:
 
 - `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`;
 - `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
@@ -54,153 +54,176 @@ O checkpoint é recibo humano; **Coverage Matrix, canário, DAG e runtime vivos 
 - Não tocar nem mergear `main`.
 - Não tocar Creature Engine/Tamagotchi neste fluxo.
 - Não mergear `codex/w24-dominio-inteiros`.
-- `codex/w31-promotion-staging` é rascunho redundante anterior à promoção atômica da W31; **não mergear**.
+- `codex/w31-promotion-staging` é rascunho redundante da W31; **não mergear**.
 
 ### Design, cores e tipografia
 
-A catraca de cores está vinculante:
+A catraca de cores é vinculante:
 
 - ficha/palco novo usa papéis de `src/styles/tokens.ts`;
 - não introduzir cor literal nova;
-- não regenerar baseline só para silenciar a catraca;
-- se faltar papel semântico, ampliar o sistema de tokens de forma deliberada.
+- não regenerar baseline para silenciar a catraca;
+- se faltar papel semântico, ampliar tokens deliberadamente.
 
-A família tipográfica continua decisão estética do dono: **Fredoka e Nunito permanecem exatamente as famílias escolhidas**.
+A família tipográfica continua estética do dono: **Fredoka e Nunito permanecem exatamente as famílias escolhidas**.
 
-A origem do arquivo é infraestrutura, não design. Está liberado remover a dependência de rede hospedando as mesmas fontes localmente. Caminho autorizado:
+A origem do arquivo é infraestrutura. Self-host das mesmas fontes está liberado, mas:
 
-- exceção **estreita** em `AI_Studio_Lab/tools/pr_text_guard.cjs` para `public/fonts/*.woff2` somente;
-- nenhuma exceção geral para binários, outros diretórios ou outras extensões;
-- baixar arquivos oficiais de Fredoka/Nunito e verificar integridade antes de commit;
-- se o transporte/download não for confiável no ambiente, registrar o bloqueio e **seguir a fábrica curricular**; não improvisar bytes, não trocar família e não usar fonte não verificável.
+- eventual exceção em `AI_Studio_Lab/tools/pr_text_guard.cjs` deve aceitar **somente `public/fonts/*.woff2`**;
+- não liberar binários em geral, outros diretórios ou outras extensões;
+- só versionar fonte oficial com integridade conferida;
+- se download/transporte não for confiável no ambiente, registrar bloqueio e **seguir a fábrica curricular**.
 
-A evidência que motivou essa dívida está registrada nos documentos de design: 27 respostas HTTP 404 em 27 navegações da dependência externa; o fechamento anterior só ocorreu no attempt 2.
+Estado atual: o transporte confiável dos WOFF2 não foi obtido neste ambiente; tipografia está **bloqueada por acesso de rede/transporte e não bloqueia a fábrica**. Não improvisar bytes e não trocar Fredoka/Nunito.
+
+A dívida de rede está comprovada por 27 HTTP 404 em 27 navegações da dependência externa.
 
 ---
 
-## 4. Estado curricular vivo após W31
+## 4. Estado curricular vivo após W32
 
-Ondas **W1–W31 fechadas**.
+Ondas **W1–W32 fechadas**.
 
-Coverage Matrix observada no gate da promoção W31:
+Coverage Matrix do SHA promovido W32:
 
-- **56 Composer**
+- **57 Composer**
 - **15 legado**
-- **19 fallback**
-- **71 servidas**
+- **18 fallback**
+- **72 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ainda ausente: `Moedas`
 
-Suíte observada no SHA promovido W31: **218 arquivos / 3.072 testes**, todos verdes.
+A suíte do bloco W32 contém **219 arquivos / 3.076 testes**. O gate do SHA promovido passou integralmente: auditoria do catálogo, fichas, conformidade, grafo, TypeScript, testes, build e guarda textual.
 
-A catraca de cores passou e a W31 adicionou **zero cores literais novas**.
+A catraca de cores permaneceu verde; a W32 não introduziu cor literal nova no palco novo.
 
 ### Últimas ondas
 
-- W24 `N7.01/F84`: final `083632d1cf24826cb94c3bc3450245a76333b60d`; CI `31840606795` + transversal `31840606811`, ambos `success`.
-- W25 `PE.02/F64`: final `650ac6464a209a723d47e734c648f25c9766dc62`; CI `31843453601` + transversal `31843453565`, ambos `success`.
-- W26 `GM.08/F81`: final `bb44915264ff55e8f26282e910c9952712ce28f0`; CI `31853166671` + transversal `31853166653`, ambos `success`.
-- W27 `AL.06/F77`: fechamento `25b0307291f70cd97a886794efe060a24bf7aa2e`; CI `31857701286` + transversal `31857701285`, ambos `success`.
-- W28 `GE.05/F60`: promoção `2377aafc1b0ae7f8652c4af1f20197d3904b8f1f`; CI `31858733127` + transversal `31858733049`, ambos `success`.
-- W29 `GE.04/F59`: promoção `3a705e28de30e6a785645864957727134c213256`; CI `31864419504` + transversal `31864419499`, ambos `success`.
-- W30 `N2.06/F38`: fechamento corrigido `05b7787e7239db4c687b5fa7cc47ee0b4f256447`; CI `31883452067` + transversal `31883452082`, ambos `success`.
-- W31 `PE.03/F83`: promoção `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd`; CI `31908549456` + transversal `31908549471`, ambos `completed/success`, attempt 1.
+- W24 `N7.01/F84`: final `083632d1cf24826cb94c3bc3450245a76333b60d`; CI `31840606795` + transversal `31840606811`, `success`.
+- W25 `PE.02/F64`: final `650ac6464a209a723d47e734c648f25c9766dc62`; CI `31843453601` + transversal `31843453565`, `success`.
+- W26 `GM.08/F81`: final `bb44915264ff55e8f26282e910c9952712ce28f0`; CI `31853166671` + transversal `31853166653`, `success`.
+- W27 `AL.06/F77`: final `25b0307291f70cd97a886794efe060a24bf7aa2e`; CI `31857701286` + transversal `31857701285`, `success`.
+- W28 `GE.05/F60`: promoção `2377aafc1b0ae7f8652c4af1f20197d3904b8f1f`; CI `31858733127` + transversal `31858733049`, `success`.
+- W29 `GE.04/F59`: promoção `3a705e28de30e6a785645864957727134c213256`; CI `31864419504` + transversal `31864419499`, `success`.
+- W30 `N2.06/F38`: final `05b7787e7239db4c687b5fa7cc47ee0b4f256447`; CI `31883452067` + transversal `31883452082`, `success`.
+- W31 `PE.03/F83`: promoção `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd`; CI `31908549456` + transversal `31908549471`, `success`, attempt 1.
+- W32 `GM.09/F82`: promoção `40ef8eb13cd93d1a0b2e60375964853e62118e24`; CI `31913688446` + transversal `31913688438`, ambos `completed/success`, attempt 1.
 
-### W29/W30 — padrão de evidência que permanece vinculante
+### Padrão vinculante de evidência
 
-Quando um run termina `cancelled` por concorrência mas o job Gates já falhou pelo contrato regression-first, registrar **os dois fatos separadamente**. Não rebatizar o workflow.
+- W29/W31 demonstram por que conclusão global e job devem ser separados.
+- Antes de qualquer “aguardando workflow”, consultar `fetch_commit_workflow_runs` ou API equivalente no **SHA exato**.
+- Se os dois workflows já estiverem `completed/success`, execute imediatamente.
 
-### W31 — PE.03 / F83 — Média e Chance
+---
 
-Pré-requisitos canônicos: `PE.02`, `N4.10`, `N5.02`.  
-Primitiva autoral: `SingaporeBars`.  
-Realização: `MediaChanceStage` / kind `media-chance-f83`.
+## 5. W31 — PE.03 / F83 — resumo fechado
 
-Escada preservada:
+Pré-requisitos `PE.02`, `N4.10`, `N5.02`; primitiva `SingaporeBars`; `MediaChanceStage` / `media-chance-f83`.
 
-1. nivelar três torres preservando o total;
-2. nivelar cinco torres;
-3. calcular média inteira;
-4. introduzir chance como favoráveis/total e a ponte de média fracionária;
-5. comparar chances preservando a ponte de média fracionária, inclusive média que não coincide com valor observado.
+Regression `5a2831f6519456ffaf77e93dc6bcdd988f223149`:
 
-Diagnósticos: `MEDIA_IMPOSSIVEL`, `ESQUECEU_DIVIDIR`, `IGNORA_TOTAL`.  
-Resolução: R0-A.  
-Domínio: 3/3 em 2 sessões.
-
-#### Regression-first
-
-SHA `5a2831f6519456ffaf77e93dc6bcdd988f223149`.
-
-- workflow CI `31907540508`: **`cancelled`**;
-- job `Gates do SAGA` `95067597810`: **`failure`** antes do cancelamento;
-- o log mostra exatamente os 2 testes W31 vermelhos:
-  - `hasComposerFicha("PE.03") === false`;
-  - tentativa de ativação rejeitada porque PE.03 ainda não estava em `COMPOSER_FICHAS`;
-- **217 arquivos / 3.055 testes anteriores passaram**;
+- CI `31907540508`: `cancelled`;
+- Gates `95067597810`: `failure`, exatamente os 2 testes W31 desenhados;
+- 217 arquivos / 3.055 testes anteriores verdes;
 - transversal `31907540753`: `success`.
 
-Formulação correta: **o log do job prova a falha desenhada; o workflow CI terminou `cancelled`**.
-
-#### Materialização inativa
-
-Cadeia de implementação:
-
-- `ed6ff4b0aeba922ec50b7781c21a0117f12dc063` — materializa ficha, contrato, palco, renderer e registro inativo;
-- `e5fc7c4481f80bd49e0e319a0fc87f8729e3870d` — completa `rt_alvo` L5;
-- `81ffa9b608ecc25a5579c7e906bafa8889dbf101` — reconcilia o mapa runtime `SingaporeBars → MediaChanceStage`.
-
-Portão inativo final no SHA `81ffa9b608ecc25a5579c7e906bafa8889dbf101`:
+Portão inativo `81ffa9b608ecc25a5579c7e906bafa8889dbf101`:
 
 - CI `31908108818`: `success`;
 - transversal `31908108833`: `success`.
 
-#### Promoção atômica e fechamento
+Promoção `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd`:
 
-SHA `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd`.
+- canário + `W31-PE.03` + contrato Matrix no mesmo SHA;
+- Matrix `56/15/19/71/11`;
+- 218 arquivos / 3.072 testes;
+- CI `31908549456` + transversal `31908549471`, `success`.
 
-No mesmo SHA entraram somente:
-
-- `PE.03` no canário declarativo;
-- `W31-PE.03` no ledger;
-- contrato executável da Matrix para o novo baseline.
-
-Evidência do job Gates:
-
-- Matrix **56/15/19/71/11**;
-- `PE.03 / F83` aparece `padrao-ouro`, `SingaporeBars`, conformidade `ok`;
-- suíte **218 arquivos / 3.072 testes**;
-- TypeScript, build, catálogo, fichas, conformidade, grafo e `pr:check` verdes;
-- catraca de cores verde; zero cor literal nova na W31.
-
-Conclusão global dos workflows do mesmo SHA:
-
-- CI `31908549456`: `completed/success`, attempt 1;
-- Certificação transversal `31908549471`: `completed/success`, attempt 1.
-
-**W31 está fechada.**
+**W31 fechada.**
 
 ---
 
-## 5. Dois workflows e regra anti-espera
+## 6. W32 — GM.09 / F82 — Conversões e problemas de medida
 
-Cada SHA que funciona como portão deve ser julgado pelos dois workflows:
+Pré-requisitos canônicos: `GM.05`, `N4.08`, `N6.01`.  
+Primitivas autorais: `NumberLine + Balanca`.  
+Realização: `ProblemasMedidaStage` / kind `problemas-medida-f82`.
 
-1. `CI`;
-2. `Certificação transversal`.
+Escada preservada:
 
-A separação por SHA já foi provada. Não refazer o teste de concorrência por rotina.
+1. converter cm↔m;
+2. converter g↔kg e ml↔L;
+3. comparar somente após converter para a mesma unidade;
+4. operar unidades mistas após conversão;
+5. resolver problema multietapas de medida.
 
-Antes de dizer “aguardando”, consultar `fetch_commit_workflow_runs`/API equivalente para o **SHA exato**. Se ambos já estiverem `completed/success`, o próximo passo é executar, não aguardar. Esta regra existe porque a fábrica já perdeu throughput ao parar após recibos que já estavam verdes.
+Diagnósticos: `COMPARA_SEM_CONVERTER`, `INVERTE_OPERACAO`, `MISTURA_GRANDEZAS`.  
+Resolução: R0-A.  
+Domínio: 3/3 em 2 sessões.
+
+### Regression-first
+
+SHA `fd05ef22ead9c01f8c274d69bba37e2e25422bd4`.
+
+**Conclusão global:**
+
+- CI `31912881313`: **`failure`**;
+- transversal `31912881318`: `success`.
+
+**Evidência do job:**
+
+- Gates `95080511297`: `failure`;
+- exatamente os 2 testes W32 falharam porque GM.09 ainda não estava registrada/ativável no Composer;
+- **218 arquivos / 3.072 testes anteriores verdes**.
+
+Aqui, diferentemente de W31, o workflow CI realmente terminou `failure`; não houve reclassificação de cancelamento.
+
+### Materialização inativa
+
+SHA final inativo `ddaf40bfa1ac88ddd3c8c60046b058958963c0e5`.
+
+A materialização contém ficha F82, contrato, `ProblemasMedidaStage`, renderer, registro no Composer e mapa runtime. O palco compõe fisicamente `NumberLine + Balanca`, usa tokens e GM.09 permanece fora do canário.
+
+Gate inativo:
+
+- CI `31913279161`: `success`;
+- transversal `31913279171`: `success`.
+
+Gates do SHA inativo:
+
+- 57 fichas Composer registradas, 56 ativas, GM.09 única registrada/inativa;
+- Matrix ainda `56/15/19/71/11`;
+- suíte **219 arquivos / 3.076 testes**;
+- auditorias, conformidade, grafo, TypeScript, build, guarda textual e cores verdes.
+
+### Promoção atômica e fechamento
+
+SHA `40ef8eb13cd93d1a0b2e60375964853e62118e24`.
+
+Entraram somente:
+
+- `GM.09` no canário declarativo;
+- `W32-GM.09` no ledger;
+- contrato executável da Matrix atualizado para `57/15/18/72/11`.
+
+O job Gates `95082366897` terminou `success`, com auditoria do catálogo, fichas, conformidade, grafo, TypeScript, testes, build e guarda textual verdes. Como o contrato da Matrix exige o baseline exato e o gate passou, o estado promovido é **57 Composer / 15 legado / 18 fallback / 72 servidas / 11 divergências**.
+
+Conclusão global do mesmo SHA:
+
+- CI `31913688446`: `completed/success`, attempt 1;
+- Certificação transversal `31913688438`: `completed/success`, attempt 1.
+
+**W32 está fechada.**
 
 ---
 
-## 6. Ledger, Matrix e runtime map
+## 7. Ledger, Matrix e runtime map
 
-O ledger nominal em `AI_Studio_Lab/tools/coverage_matrix_core.ts` vai até **W31-PE.03**.
+O ledger nominal em `AI_Studio_Lab/tools/coverage_matrix_core.ts` vai até **W32-GM.09**.
 
 Regras:
 
@@ -213,71 +236,74 @@ Regras:
 
 ---
 
-## 7. Seleção fallback-first — estado pós-W31
+## 8. Seleção fallback-first — estado pós-W32
 
-Restam **19 fallbacks**:
+Restam **18 fallbacks**:
 
-`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.09, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
+`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
 
-Elegibilidade: fallback só é candidato quando **todos** os prereqs já estão servidos.
+Elegibilidade: candidato somente quando **todos** os prereqs já estão servidos.
 
-Valor de desbloqueio: contar apenas fallbacks adicionais que passam a ter **todos** os prereqs servidos após a promoção hipotética.
+Valor de desbloqueio: contar apenas fallbacks adicionais que passam a ter todos os prereqs servidos após a promoção hipotética.
 
-No recálculo vivo pós-W31:
+Pós-W32:
 
-- **GM.09** é o único elegível com ganho imediato **1**, pois torna `GM.11` elegível;
-- os outros 15 elegíveis têm ganho imediato 0.
+- 16 fallbacks estão imediatamente elegíveis;
+- `AL.08` continua bloqueado por `AL.07 + N7.02`;
+- `N5.05` continua bloqueado por `N5.04 + N6.04`;
+- os 16 elegíveis têm ganho imediato **0**.
 
-Portanto, sem deriva remota, **W32 = `GM.09` — Conversões e problemas de medida**.
+Desempate vinculante:
 
-Esta linha registra o estado vivo observado; antes de codificar, faça apenas a reancoragem mínima para detectar deriva, não reinicie a seleção já resolvida sem evidência nova.
+1. maior ganho imediato;
+2. empate → ordem causal executável da Matrix/DAG (`causalWave` crescente, depois maior impacto downstream, depois ID);
+3. empate residual → menor delta estrutural / continuidade local.
 
----
+No estado vivo pós-W32, **GE.07** é o primeiro dos empatados na ordem causal (`causalWave=4`).
 
-## 8. Regression-first
-
-Cada onda nasce com teste nominal que deve falhar pelo motivo desejado antes da materialização.
-
-No SHA regression-first:
-
-- observe a falha correta no job/log;
-- não espere verde nesse mesmo commit;
-- não relaxe expectativa;
-- depois da prova, materialize inativo.
-
-Se o workflow for cancelado por concorrência depois que Gates já falhou, registre conclusão do workflow e evidência do job separadamente.
+Portanto, sem deriva remota, **W33 = `GE.07 / F79 — Polígonos: triângulos e quadriláteros`**.
 
 ---
 
-## 9. Protocolo de uma onda
+## 9. Contrato canônico já reancorado para W33
 
-1. **Reancorar** HEAD, PR, Matrix, DAG, ficha, runtime e workflows.
-2. **Recalcular apenas se houver deriva**; caso contrário siga a seleção já provada.
-3. Ler ficha canônica + DAG + runtime + implementação análoga + design.
+Competência: `GE.07`.  
+Ficha: `F79 — Polígonos: triângulos e quadriláteros`.  
+Pré-requisitos: `GE.03`, `GE.06`.  
+Primitivas: `ShapeCanvas + DragGroup`.
+
+Escada:
+
+1. identificar polígono por fechamento + lados retos, com não-exemplo aberto;
+2. reconhecer triângulos em orientações variadas;
+3. reconhecer/agrupar quadriláteros;
+4. classificar por propriedades, preservando que **quadrado também é retângulo**;
+5. construir e classificar polígono sob pelo menos duas condições simultâneas.
+
+Diagnósticos: `NAO_FECHA`, `CONTA_LADOS_ERRADO`, `CONFUNDE_CLASSE`.  
+Resolução: R0-A.  
+Domínio: reconhecimento/classificação 3/3 em 2 sessões; construção 2/3 em 2 sessões.  
+Acessibilidade: contornos visíveis, rótulo além de cor e alternativa por toque ao arrasto.
+
+A W33 deve nascer por regression-first; GE.07 não pode ser colocada no canário antes do portão inativo.
+
+---
+
+## 10. Protocolo de uma onda
+
+1. Reancorar HEAD, PR, Matrix, DAG, ficha, runtime e workflows.
+2. Recalcular seleção apenas se houver deriva; caso contrário siga a seleção provada.
+3. Ler ficha canônica + DAG + runtime + análogo + design.
 4. **Regression-first**: teste nominal, commit, observar falha desenhada.
 5. **Materializar INATIVO**: ficha/builder/stage/renderer/runtime, sem ID no canário.
-6. Rodar/observar gates determinísticos: auditorias, fichas, conformidade, grafo, TypeScript, suíte, Matrix, cores, build.
-7. **Portão inativo remoto**: CI + transversal verdes no mesmo SHA. Antes de aguardar, consultar API.
+6. Rodar/observar auditorias, fichas, conformidade, grafo, TypeScript, suíte, Matrix, cores e build.
+7. **Portão inativo**: CI + transversal verdes no mesmo SHA. Antes de aguardar, consultar API.
 8. **Promover**: ID no canário.
-9. **Ledger no mesmo SHA**: delta esperado `{ composer: +1, fallback: -1, served: +1 }`.
-10. **Matrix observa**; se divergir, investigar.
+9. **Ledger no mesmo SHA**: `{ composer:+1, fallback:-1, served:+1 }` salvo se a Matrix provar outra coisa.
+10. Matrix observa o delta real.
 11. **Certificar promoção/final**: CI + transversal verdes no SHA exato. Antes de aguardar, consultar API.
-12. **Documentar** somente depois da prova.
-13. Se runtime da onda for corrigido depois da promoção, o SHA corrigido vira o recibo final e precisa dos dois workflows verdes.
-
-O bloco W30–W34 continua em curso no checkpoint correspondente.
-
----
-
-## 10. Throughput e uso correto do tempo
-
-Sondas longas provam runtime real. Use o tempo para preparar análise em staging/blobs não referenciados, mas não mova a branch se isso invalidar portão em curso.
-
-Não fique ocioso após recibo já verde.
-
-Não empilhe promoções: cada onda mantém causalidade e recibos próprios.
-
-Infraestrutura não bloqueante — como self-host de fonte — não deve interromper a fábrica se o ambiente não permitir transporte verificável do asset.
+12. Documentar somente depois da prova.
+13. Correção posterior de runtime cria novo recibo final e exige os dois workflows verdes.
 
 ---
 
@@ -314,7 +340,7 @@ Uma onda só fecha quando:
 - NÃO esperar verde no commit regression-first.
 - NÃO chamar workflow `cancelled` de `failure`.
 - NÃO introduzir cor literal nova.
-- NÃO regenerar baseline de cores só para silenciar a catraca.
+- NÃO regenerar baseline de cores para silenciar a catraca.
 - NÃO trocar Fredoka/Nunito por conveniência de infraestrutura.
 - NÃO aceitar binário de fonte sem integridade verificada.
 - NÃO inventar ID de run, SHA, contagem ou delta.
@@ -327,12 +353,12 @@ Há autonomia para executar o ciclo técnico completo sem pedir confirmação a 
 
 ### Próxima ação ao retomar
 
-1. confirme o HEAD remoto e os workflows do SHA atual;
-2. confirme Matrix viva em torno de **56/15/19/71/11**;
-3. se nada derivou, abra **W32 `GM.09`** por regression-first;
-4. leia contrato canônico de GM.09/F82, DAG, runtime e `DESIGN_ESTADO_E_DECISOES.md`;
+1. confirme HEAD/PR e workflows do SHA atual;
+2. confirme Matrix viva em torno de **57/15/18/72/11**;
+3. se nada derivou, abra **W33 `GE.07/F79`** por regression-first;
+4. preserve `ShapeCanvas + DragGroup`, classificação por propriedades, quadrado⊂retângulo e alternativa por toque;
 5. siga o protocolo integral, incluindo catraca de cores;
-6. mantenha tipografia como infraestrutura paralela: só commitar WOFF2 se o transporte e a integridade forem verificáveis;
-7. após fechar W32, atualizar checkpoint/PR/porta de retomada e continuar fallback-first.
+6. mantenha tipografia como infraestrutura paralela bloqueada até haver transporte verificável;
+7. após fechar W33, atualizar checkpoint/PR/porta de retomada e seguir fallback-first.
 
 Não transforme reancoragem em diagnóstico longo quando o próximo passo já está autorizado. Confirme o necessário e execute.
