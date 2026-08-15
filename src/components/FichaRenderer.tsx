@@ -9,6 +9,7 @@ import { AngulosStage } from "./primitives/AngulosStage"; import type { AngulosF
 import { RetaCompletaStage } from "./primitives/RetaCompletaStage"; import type { RetaCompletaF84Spec } from "../curriculum/procedimentos/retaCompletaContract";
 import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
 import { MediaChanceStage } from "./primitives/MediaChanceStage"; import type { MediaChanceF83Spec } from "../curriculum/procedimentos/mediaChanceContract";
+import { ProblemasMedidaStage } from "./primitives/ProblemasMedidaStage"; import type { ProblemasMedidaF82Spec } from "../curriculum/procedimentos/problemasMedidaContract";
 import { AreaF81Stage } from "./primitives/AreaF81Stage"; import type { AreaF81Spec } from "../curriculum/procedimentos/areaF81Contract";
 import { ExpressaoF77Stage } from "./primitives/ExpressaoF77Stage"; import type { ExpressaoF77Spec } from "../curriculum/procedimentos/expressaoF77Contract";
 import { MapaTesouroStage } from "./primitives/MapaTesouroStage"; import type { MapaTesouroF60Spec } from "../curriculum/procedimentos/mapaTesouroContract";
@@ -46,6 +47,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'reta-completa-f84': return <RetaCompletaStage spec={question.uiProps as RetaCompletaF84Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'media-chance-f83': return <MediaChanceStage spec={question.uiProps as MediaChanceF83Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'problemas-medida-f82': return <ProblemasMedidaStage spec={question.uiProps as ProblemasMedidaF82Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'area-f81': return <AreaF81Stage spec={question.uiProps as AreaF81Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'expressao-f77': return <ExpressaoF77Stage spec={question.uiProps as ExpressaoF77Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'mapa-tesouro-f60': return <MapaTesouroStage spec={question.uiProps as MapaTesouroF60Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
