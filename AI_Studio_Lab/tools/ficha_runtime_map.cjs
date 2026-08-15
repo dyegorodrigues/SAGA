@@ -44,11 +44,11 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
   {
     primitive: "Balanca",
-    kinds: ["balanca", "medidas", "igualdade-equilibrio-f46"],
-    componentFiles: [component("Balanca"), component("MedidasStage"), component("IgualdadeEquilibrioStage")],
-    builderKinds: ["balanca", "medidas"], specializedBuilderIds: ["AL.05"],
-    rendererKinds: ["balanca", "medidas", "igualdade-equilibrio-f46"],
-    note: "F46/AL.05 reutiliza Balanca como significado físico do sinal de igualdade: dois lados têm o mesmo valor.",
+    kinds: ["balanca", "medidas", "igualdade-equilibrio-f46", "expressao-f77"],
+    componentFiles: [component("Balanca"), component("MedidasStage"), component("IgualdadeEquilibrioStage"), component("ExpressaoF77Stage")],
+    builderKinds: ["balanca", "medidas"], specializedBuilderIds: ["AL.05", "AL.06"],
+    rendererKinds: ["balanca", "medidas", "igualdade-equilibrio-f46", "expressao-f77"],
+    note: "F46/AL.05 reutiliza Balanca como significado físico do sinal de igualdade. F77/AL.06 reutiliza a mesma balança para preservar equivalência enquanto explicita precedência, agrupamento e incógnita.",
   },
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
   { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
@@ -108,7 +108,7 @@ const FICHA_RUNTIME_MAP = [
     primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73", "porcentagem-f87", "jornal-turma-f64"],
     componentFiles: [component("SingaporeBars"), component("SingaporeBarsStage"), component("StoryBarsStage"), component("PartesIguaisStage"), component("FracaoNumeroStage"), component("FracoesEquivalentesStage"), component("PorcentagemStage"), component("JornalTurmaStage")],
     builderKinds: ["storypanel"], specializedBuilderIds: ["N5.01", "N5.02", "N5.03", "N6.03", "PE.02"], rendererKinds: ["singapore-bars", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73", "porcentagem-f87", "jornal-turma-f64"],
-    note: "W15/F45, W16/F72 e W18/F73 reutilizam SingaporeBars; F73 compara barras de mesmo comprimento. W22/F87 compõe SingaporeBars com Quadrado100. W25/F64 realiza o modo vertical em JornalTurmaStage; não cria primitiva nova."
+    note: "W15/F45, W16/F72 e W18/F73 reutilizam SingaporeBars; F73 compara barras de mesmo comprimento. W22/F87 compõe Quadrado100 + SingaporeBars. W25/F64 realiza o modo vertical em JornalTurmaStage; não cria primitiva nova."
   },
   { primitive: "StoryPanel", kinds: ["story", "scene", "storypanel", "story-bars"], componentFiles: [component("StoryPanel"), component("StoryPanelStage"), component("StoryBarsStage")], builderKinds: ["storypanel"], rendererKinds: ["story-bars"], note: "N3.10/F20 compõe StoryPanel + SingaporeBars." },
   { primitive: "TenFrame", kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage")], builderKinds: ["tenframe", "moldura", "bond", "plain"], rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado"], note: "MaterialDouradoStage compõe MaterialDourado + TenFrame." },
