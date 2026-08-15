@@ -82,6 +82,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W25 — F64: Jornal da Turma; inativo 748724d0 passou CI 31842370575 + transversal 31842370542.
   "PE.02",
 
+  // W26 — F81: área; o chão em unidades quadradas, reutilizando ArrayGrid.
+  "GM.08",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",

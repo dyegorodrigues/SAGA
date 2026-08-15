@@ -5,10 +5,10 @@ describe("Coverage Matrix executável", () => {
   it("preserva o fechamento P21.1 e deriva o baseline vigente por migrações nomeadas", () => {
     expect(COVERAGE_CLOSED_BASELINE).toMatchObject({ composer: 26, legacy: 25, fallback: 39, served: 51, divergences: 21 });
     expect(COVERAGE_MIGRATIONS.map(m => m.id)).toEqual([
-      "W1-N1.04", "W2-N1.05", "W3-N2.01", "W4-N1.12", "W5-GM.05", "W6-N2.03", "W7-N2.02", "W8-N3.01", "W9-N3.02", "W10-N3.03", "OBS-COMPOSITE-N4.03", "W11-AL.03", "W12-N4.01", "W13-GE.03", "W14-AL.04", "W15-N5.01", "W16-N5.02", "W17-N6.01", "W18-N5.03", "W19-N4.10", "W20-GM.07", "W21-AL.05", "W22-N6.03", "W23-GE.06", "W24-N7.01", "W25-PE.02",
+      "W1-N1.04", "W2-N1.05", "W3-N2.01", "W4-N1.12", "W5-GM.05", "W6-N2.03", "W7-N2.02", "W8-N3.01", "W9-N3.02", "W10-N3.03", "OBS-COMPOSITE-N4.03", "W11-AL.03", "W12-N4.01", "W13-GE.03", "W14-AL.04", "W15-N5.01", "W16-N5.02", "W17-N6.01", "W18-N5.03", "W19-N4.10", "W20-GM.07", "W21-AL.05", "W22-N6.03", "W23-GE.06", "W24-N7.01", "W25-PE.02", "W26-GM.08",
     ]);
-    expect(COVERAGE_MIGRATIONS.at(-1)).toMatchObject({ id: "W25-PE.02", competence: "PE.02", delta: { composer: 1, fallback: -1, served: 1 } });
-    expect(COVERAGE_BASELINE).toMatchObject({ composer: 50, legacy: 15, fallback: 25, served: 65, divergences: 11, modeSwaps: 12, toolIntroductions: 44 });
+    expect(COVERAGE_MIGRATIONS.at(-1)).toMatchObject({ id: "W26-GM.08", competence: "GM.08", delta: { composer: 1, fallback: -1, served: 1 } });
+    expect(COVERAGE_BASELINE).toMatchObject({ composer: 51, legacy: 15, fallback: 24, served: 66, divergences: 11, modeSwaps: 12, toolIntroductions: 44 });
   });
 
   it("liga grafo, ficha, runtime, screen, Sensei, testes, dívida e ordem causal nas 90 competências", () => {
