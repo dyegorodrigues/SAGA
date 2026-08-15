@@ -7,28 +7,36 @@ PR: #35 · branch: `codex/fechamento-curricular`
 
 Este checkpoint acompanha o bloco fallback-first W30–W34. Ele não substitui a Coverage Matrix executável nem `PROMPT_DE_RETOMADA.md`; funciona como recibo humano do bloco em curso e será consolidado quando W34 fechar.
 
-Regra de evidência aplicada: nenhum ID de run, SHA, contagem de testes ou delta é registrado sem consulta à fonte correspondente. Workflow `cancelled` permanece `cancelled`, mesmo quando um job já havia falhado antes do cancelamento.
+Regra de evidência aplicada: nenhum ID de run, SHA, contagem de testes ou delta é registrado sem consulta à fonte correspondente. **Conclusão de workflow e evidência de job/log são registradas separadamente.** Workflow `cancelled` permanece `cancelled`, mesmo quando um job já havia terminado `failure`.
 
 ## Estado atual do bloco
 
 | Onda | Competência / ficha | Estado | Matrix após fechamento | Recibo final consultado |
 |---|---|---|---|---|
-| W30 | N2.06 / F38 — Pares e Ímpares | **fechada** | **55 Composer / 15 legado / 20 fallback / 70 servidas / 11 divergências** | `05b7787e7239db4c687b5fa7cc47ee0b4f256447` · CI `31883452067` + transversal `31883452082`, ambos `success` |
-| W31 | PE.03 | próxima, sujeita a reancoragem | — | — |
-| W32 | — | não selecionada | — | — |
+| W30 | N2.06 / F38 — Pares e Ímpares | **fechada** | **55 / 15 / 20 / 70 / 11** | `05b7787e7239db4c687b5fa7cc47ee0b4f256447` · CI `31883452067` + transversal `31883452082`, ambos `success` |
+| W31 | PE.03 / F83 — Média e Chance | **fechada** | **56 / 15 / 19 / 71 / 11** | `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd` · CI `31908549456` + transversal `31908549471`, ambos `success`, attempt 1 |
+| W32 | GM.09 / F82 — Conversões e problemas de medida | **selecionada** | — | — |
 | W33 | — | não selecionada | — | — |
 | W34 | — | não selecionada | — | — |
 
-## Integração de design antes da W30
+## Design e infraestrutura vinculantes
 
-O commit `e6bb655` da branch auxiliar foi integrado por fast-forward antes da onda. Ele trouxe:
+A catraca de cores continua ativa:
 
-- `AI_Studio_Lab/codex/DESIGN_ESTADO_E_DECISOES.md`;
-- `src/styles/coresLiterais.test.ts`;
-- baseline da catraca;
-- `npm run cores:baseline`.
+- ficha/palco usa papéis de `src/styles/tokens.ts`;
+- baseline não pode crescer por conveniência;
+- W30 e W31 fecharam sem introduzir dívida nova de cor; na W31 foram **zero cores literais novas**.
 
-A regra vigente desde então é simples: ficha e palco usam papéis de `src/styles/tokens.ts`; o gate recusa cor literal nova. Se faltar papel semântico, o token é ampliado de forma deliberada em vez de inserir cor solta no componente. A paleta por operação aritmética registrada no documento de design é decisão do dono do projeto e não se reabre na fábrica curricular.
+A redação de `DESIGN_ESTADO_E_DECISOES.md` foi corrigida para separar duas decisões:
+
+- **qual família usar** é estética e continua com o dono;
+- **de onde o arquivo é servido** é infraestrutura.
+
+Fredoka e Nunito permanecem as famílias. É permitido self-host local das mesmas fontes. A guarda binária só pode receber exceção estreita para `public/fonts/*.woff2`; qualquer asset precisa ter integridade verificada antes de commit. Se o ambiente não permitir download confiável, a tarefa fica bloqueada por acesso a rede e **não bloqueia a fábrica curricular**.
+
+A evidência da dependência externa ficou registrada: 27 HTTP 404 em 27 navegações.
+
+---
 
 ## W30 — N2.06 / F38 — Pares e Ímpares
 
@@ -37,7 +45,7 @@ A regra vigente desde então é simples: ficha e palco usam papéis de `src/styl
 Pré-requisito: `N2.03`.  
 Primitiva: `DragGroup#duplas`.
 
-Escada preservada:
+Escada:
 
 1. formar duplas até 10;
 2. formar duplas até 20;
@@ -45,12 +53,7 @@ Escada preservada:
 4. usar a regra do último algarismo;
 5. raciocinar sobre paridade de somas.
 
-Diagnósticos preservados:
-
-- `CONFUNDE_TAMANHO`;
-- `ZERO_IMPAR`;
-- `DECORA_SEM_ENTENDER`.
-
+Diagnósticos: `CONFUNDE_TAMANHO`, `ZERO_IMPAR`, `DECORA_SEM_ENTENDER`.  
 Resolução: R0-A.  
 Domínio: 3/3 em 2 sessões.
 
@@ -58,85 +61,130 @@ Domínio: 3/3 em 2 sessões.
 
 SHA `9dc0e61df21f780249f42aaf66785ff69c6d6e76`.
 
-- workflow CI `31882060323`: terminou **`cancelled` por concorrência**;
-- job `Gates do SAGA` `95005940004`: terminou `failure` antes do cancelamento;
-- o log mostrou a falha desenhada nos 2 testes novos porque `N2.06` ainda não existia no Composer;
-- os testes anteriores permaneceram verdes.
+- workflow CI `31882060323`: `cancelled` por concorrência;
+- job `Gates do SAGA` `95005940004`: `failure` antes do cancelamento;
+- log: os 2 testes novos falharam porque N2.06 ainda não existia no Composer; testes anteriores verdes.
 
-A evidência regression-first foi observada no job/log. O status final do workflow não é reclassificado.
+### Portão inativo e promoção
 
-### Materialização inativa
-
-A primeira materialização foi publicada em `5cdbd2e8ff7ba862911910af969607c49267dfcf`. Antes da promoção, a revisão do portão expôs que o alfabeto declarativo de conformidade ainda precisava reconhecer o modo runtime `duplas`.
-
-A linha declarativa foi corrigida sem tocar no canário, gerando o portão inativo final:
-
-`c62beaadfe10b903d6054aa56ef688c269ff5288`.
-
-Recibos do SHA exato:
+Portão inativo final `c62beaadfe10b903d6054aa56ef688c269ff5288`:
 
 - CI `31882628417`: `success`;
 - transversal `31882628429`: `success`.
 
-A materialização inativa registrou ficha `N2.06`, contrato `paresImparesContract`, `ParesImparesStage`, registro no Composer, renderer e runtime map `DragGroup#duplas`, mantendo `N2.06` fora do canário default.
+Promoção atômica `c1e7512e912421d3d1923838bf3050218e92fc59`:
 
-O palco foi escrito sob a catraca nova: cores de `tokens.ts`, sem cor literal nova.
+- canário + `W30-N2.06` no ledger + baseline Matrix;
+- Matrix `55/15/20/70/11`;
+- suíte 216 arquivos / 3.053 testes;
+- CI `31883028645` + transversal `31883028668`, ambos `success`.
+
+### Correção de runtime pós-promoção
+
+Fechamento final `05b7787e7239db4c687b5fa7cc47ee0b4f256447` estabilizou a notificação de progresso do `DragGroup`, adicionou teste de montagem, tutorial semântico de duplas e manteve cores tokenizadas.
+
+No SHA final:
+
+- Matrix `55/15/20/70/11`;
+- suíte 217 arquivos / 3.055 testes;
+- `coresLiterais.test.ts`, build, TypeScript, catálogo, fichas, conformidade, grafo, higiene e binários verdes;
+- CI `31883452067`: `success`;
+- transversal `31883452082`: `success`.
+
+---
+
+## W31 — PE.03 / F83 — Média e Chance
+
+### Seleção
+
+No estado pós-W30, `PE.03` e `GM.09` eram os únicos candidatos com ganho imediato 1. Pela ordem causal executável da Matrix/DAG, PE.03 precedia GM.09, portanto W31 foi PE.03.
+
+Pré-requisitos: `PE.02`, `N4.10`, `N5.02`.  
+Primitiva: `SingaporeBars`.  
+Realização: `MediaChanceStage`, kind `media-chance-f83`.
+
+Escada:
+
+1. nivelar três torres preservando o total;
+2. nivelar cinco torres;
+3. calcular média inteira;
+4. chance como favoráveis/total + ponte de média fracionária;
+5. comparar chances + média fracionária que pode não coincidir com valor observado.
+
+Diagnósticos: `MEDIA_IMPOSSIVEL`, `ESQUECEU_DIVIDIR`, `IGNORA_TOTAL`.  
+Resolução: R0-A.  
+Domínio: 3/3 em 2 sessões.
+
+### Regression-first — classificação correta
+
+SHA `5a2831f6519456ffaf77e93dc6bcdd988f223149`.
+
+**Conclusão dos workflows:**
+
+- CI `31907540508`: **`cancelled`**;
+- Certificação transversal `31907540753`: `success`.
+
+**Evidência do job:**
+
+- `Gates do SAGA` `95067597810`: **`failure`** antes do cancelamento do workflow;
+- o log mostra exatamente 2 testes W31 vermelhos:
+  - `hasComposerFicha("PE.03")` retornava `false`;
+  - ativação era rejeitada porque PE.03 ainda não estava registrada em `COMPOSER_FICHAS`;
+- **217 arquivos / 3.055 testes anteriores passaram**.
+
+A formulação canônica é: **o job/log prova a falha desenhada; o workflow CI terminou `cancelled`**.
+
+### Materialização inativa
+
+A materialização foi construída sem ativar o canário:
+
+- `ed6ff4b0aeba922ec50b7781c21a0117f12dc063` — ficha F83, contrato, `MediaChanceStage`, renderer e registro;
+- `e5fc7c4481f80bd49e0e319a0fc87f8729e3870d` — acrescenta `rt_alvo: 18000` no L5;
+- `81ffa9b608ecc25a5579c7e906bafa8889dbf101` — reconcilia o mapa declarativo `SingaporeBars → MediaChanceStage → media-chance-f83`.
+
+Portão inativo final do SHA exato `81ffa9b608ecc25a5579c7e906bafa8889dbf101`:
+
+- CI `31908108818`: `success`;
+- transversal `31908108833`: `success`.
 
 ### Promoção atômica
 
-SHA `c1e7512e912421d3d1923838bf3050218e92fc59`.
+SHA `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd`.
 
-No mesmo SHA entraram:
+Entraram somente os três governantes da promoção:
 
-- `N2.06` no canário declarativo;
-- `W30-N2.06` no ledger;
-- contrato executável da Matrix para o novo baseline.
+- `PE.03` no canário;
+- `W31-PE.03` no ledger;
+- contrato executável da Matrix atualizado.
 
 A Matrix observou:
 
-- **55 Composer**;
+- **56 Composer**;
 - **15 legado**;
-- **20 fallback**;
-- **70 servidas**;
+- **19 fallback**;
+- **71 servidas**;
 - **11 divergências**;
 - `modeSwaps=12`;
 - `toolIntroductions=44`;
 - `missingPrimitives=["Moedas"]`.
 
-A suíte da promoção reportou **216 arquivos / 3.053 testes**, todos verdes.
+O job Gates do SHA promovido mostrou:
 
-Recibos:
+- `PE.03 / F83` como `padrao-ouro`, `SingaporeBars`, conformidade `ok`;
+- suíte completa **218 arquivos / 3.072 testes**, todos verdes;
+- TypeScript, build, catálogo, fichas, conformidade, grafo e guarda textual verdes;
+- catraca de cores verde e **zero cor literal nova** na W31.
 
-- CI `31883028645`: `success`;
-- transversal `31883028668`: `success`.
+Conclusão global dos workflows do mesmo SHA:
 
-### Correção de runtime pós-promoção
+- CI `31908549456`: `completed/success`, attempt 1;
+- transversal `31908549471`: `completed/success`, attempt 1.
 
-A revisão da implementação detectou uma dívida não capturada pelos testes estruturais: `ParesImparesStage` criava `onProgress` inline e `DragGroup` tinha um efeito dependente da identidade desse callback, combinação capaz de realimentar renderizações ao montar a F38.
+**W31 fechada.**
 
-A correção isolada foi publicada em:
+A branch auxiliar `codex/w31-promotion-staging` (`79801d5`, `b434045`, `5242926`) é rascunho redundante da preparação anterior à promoção atômica. Não mergear.
 
-`05b7787e7239db4c687b5fa7cc47ee0b4f256447`.
-
-Ela:
-
-- estabiliza a notificação de progresso do `DragGroup`;
-- adiciona teste de montagem que protege contra o ciclo;
-- dá tutorial semanticamente correto ao modo de formar duplas;
-- tokeniza o tutorial do `DragGroup` e mantém a nova UI sem cor literal;
-- não altera canário, ledger ou Matrix.
-
-No gate desse SHA final:
-
-- Matrix permaneceu **55/15/20/70/11**;
-- `src/styles/coresLiterais.test.ts` passou;
-- suíte completa: **217 arquivos / 3.055 testes**, todos verdes;
-- build, TypeScript, catálogo, fichas, conformidade, grafo, higiene e binários passaram.
-
-Recibos finais do código da W30:
-
-- CI `31883452067`: `success`;
-- transversal `31883452082`: `success`.
+---
 
 ## Correções de evidência que continuam vinculantes
 
@@ -149,48 +197,56 @@ No SHA regression-first `e3d41ac72a6a474253e73b4756dabdbb5099201f`, o CI `318581
 No SHA regression-first `52bdb4e249b5d9a9f9535cda46f244ccc1dc52c3`:
 
 - workflow CI `31863719586`: `cancelled` por concorrência;
-- job `Gates do SAGA` `94961316286`: `failure`;
-- log: falha desenhada observada porque `GE.04` ainda não estava registrada, com 213 arquivos / 3.016 testes anteriores verdes.
+- job Gates `94961316286`: `failure`;
+- log: falha desenhada porque GE.04 ainda não estava registrada, com 213 arquivos / 3.016 testes anteriores verdes.
 
-Formulação correta: **o log mostra a falha desenhada; o run terminou `cancelled` por concorrência**.
+Padrão vinculante para W31 e ondas seguintes: **separar conclusão do workflow da evidência do job**.
 
-## Seleção pós-W30
+---
 
-Restam 20 fallbacks:
+## Seleção pós-W31 — W32
 
-`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.09, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.03, PE.04`.
+Restam **19 fallbacks**:
 
-A promoção de `N2.06` tornou `N2.07` elegível, mas ela não desbloqueia outro fallback imediatamente.
+`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.09, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
 
-Os únicos candidatos com ganho imediato 1 no recálculo pós-W30 são:
+No recálculo do estado vivo:
 
-- `PE.03` → torna `PE.04` elegível;
-- `GM.09` → torna `GM.11` elegível.
+- `GM.09` é o **único elegível com ganho imediato 1**;
+- promover `GM.09` torna `GM.11` elegível;
+- os outros 15 elegíveis têm ganho 0.
 
-Pela ordem causal executável observada na Matrix/DAG, `PE.03` precede `GM.09`. Portanto, se o remoto não derivar, **W31 = PE.03**.
+Portanto, sem deriva do remoto, **W32 = GM.09 / F82 — Conversões e problemas de medida**.
 
-## Invariantes para W31–W34
+---
+
+## Invariantes para W32–W34
 
 1. Reancorar no remoto antes de editar.
-2. Regression-first precisa de falha desenhada observada; workflow cancelado nunca é rebatizado como `failure`.
-3. Materialização permanece inativa até CI + transversal verdes no mesmo SHA.
-4. Canário, ledger, Matrix e runtime map são declarativos.
-5. Promoção e ledger entram no mesmo SHA.
-6. Matrix observa o delta real; baseline não mascara deriva.
-7. Ao avaliar desbloqueio, contar apenas fallbacks cujos **todos** os prereqs passam a estar servidos.
-8. Ler `DESIGN_ESTADO_E_DECISOES.md` antes de tocar em cor, fonte ou espaçamento.
-9. Usar `tokens.ts`; a catraca `coresLiterais.test.ts` não pode crescer por conveniência.
-10. Se uma correção posterior tocar runtime da onda, o SHA corrigido precisa de CI + transversal verdes e vira o recibo final.
-11. Não tocar `main`, não mergear PR #35, não marcar ready, não habilitar auto-merge e não tocar Creature Engine/Tamagotchi.
+2. Antes de aguardar workflow, consultar a conclusão do **SHA exato** pela API; se já estiver verde, executar.
+3. Regression-first precisa de falha desenhada observada; workflow cancelado nunca é rebatizado como `failure`.
+4. Materialização permanece inativa até CI + transversal verdes no mesmo SHA.
+5. Canário, ledger, Matrix e runtime map são declarativos.
+6. Promoção e ledger entram no mesmo SHA.
+7. Matrix observa o delta real; baseline não mascara deriva.
+8. Contar desbloqueio apenas quando **todos** os prereqs do novo fallback ficam servidos.
+9. Ler `DESIGN_ESTADO_E_DECISOES.md` antes de tocar em UI.
+10. Usar `tokens.ts`; zero cor literal nova.
+11. Correção posterior de runtime cria novo recibo final e exige CI + transversal verdes.
+12. Tipografia local não bloqueia a fábrica se o download não for verificável.
+13. Não tocar `main`, não mergear PR #35, não marcar ready, não habilitar auto-merge, não tocar Creature Engine/Tamagotchi.
+14. Não mergear `codex/w31-promotion-staging`.
 
 ## Continuidade
 
 Retomar sempre por:
 
 - `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md`;
-- este checkpoint do bloco W30–W34;
+- este checkpoint;
 - `AI_Studio_Lab/codex/DESIGN_ESTADO_E_DECISOES.md` quando houver UI;
 - `AI_Studio_Lab/tools/coverage_matrix_core.ts` / `src/curriculum/coverageMatrix.test.ts`;
 - `src/curriculum/motores/composerCanaryIds.ts`;
 - `AI_Studio_Lab/tools/ficha_runtime_map.cjs`;
 - workflows do SHA exato do HEAD.
+
+Próxima onda autorizada: **W32 = GM.09 / F82**.
