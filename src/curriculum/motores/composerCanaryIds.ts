@@ -94,6 +94,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W29 — F59: sólidos geométricos; promoção somente após o portão inativo exato.
   "GE.04",
 
+  // W30 — F38: pares e ímpares; DragGroup em modo duplas.
+  "N2.06",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
