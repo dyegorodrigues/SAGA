@@ -97,6 +97,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W30 — F38: pares e ímpares; DragGroup em modo duplas.
   "N2.06",
 
+  // W31 — F83: média e chance; promoção somente após o portão inativo exato.
+  "PE.03",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
