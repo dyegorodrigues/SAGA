@@ -100,6 +100,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W31 — F83: média e chance; promoção somente após o portão inativo exato.
   "PE.03",
 
+  // W32 — F82: conversões e problemas de medida; NumberLine + Balanca.
+  "GM.09",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
