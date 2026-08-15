@@ -88,6 +88,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W27 — F77: expressão numérica; materialização inativa dbd9c4c passou CI 31853918490 + transversal 31853918503.
   "AL.06",
 
+  // W28 — F60: mapa do tesouro; materialização inativa e4c9349 com ShapeCanvas#grade.
+  "GE.05",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
