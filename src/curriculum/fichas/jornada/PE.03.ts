@@ -31,7 +31,7 @@ export const PE_03: FichaCompetencia = {
     2: { primitiva: "storypanel", micro: "nivelar-5", andaime: "medio" },
     3: { primitiva: "storypanel", micro: "calcular-media", andaime: "minimo" },
     4: { primitiva: "storypanel", micro: "chance-fracao", andaime: "minimo" },
-    5: { primitiva: "storypanel", micro: "comparar-chances", andaime: "nenhum" },
+    5: { primitiva: "storypanel", micro: "comparar-chances", andaime: "nenhum", rt_alvo: 18000 },
   },
   micros: [
     { id: "nivelar-3", fonte: "F83", alvo: "nivelar três torres preservando o total", kinds: ["storypanel"], params: { suporte: "SingaporeBars", tutorial: tutorialMedia }, dominio },
