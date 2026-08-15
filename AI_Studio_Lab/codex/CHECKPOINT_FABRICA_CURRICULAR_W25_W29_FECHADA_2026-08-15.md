@@ -49,10 +49,11 @@ O SHA regression-first é `e3d41ac72a6a474253e73b4756dabdbb5099201f`. O CI `3185
 
 SHA `52bdb4e249b5d9a9f9535cda46f244ccc1dc52c3`.
 
-- CI `31863719586`: `failure` pela ausência esperada de `GE.04` no Composer;
-- 213 arquivos / 3.016 testes anteriores passaram; o novo arquivo nominal tinha 2 testes falhando como desenhado.
+- workflow CI `31863719586`: terminou **`cancelled` por concorrência**;
+- dentro dele, o job `Gates do SAGA` `94961316286` terminou `failure`;
+- o log desse job mostra a falha desenhada antes do cancelamento: os 2 testes novos de `solidosGeometricosW29.test.ts` falharam porque `GE.04` ainda não estava registrada no Composer, enquanto **213 arquivos / 3.016 testes anteriores passaram**.
 
-A prova foi obtida antes da materialização.
+A prova regression-first foi, portanto, observada no job/log antes da materialização, sem reclassificar o status final do workflow.
 
 ### Materialização inativa
 
@@ -103,7 +104,7 @@ Nenhum ID 404 anteriormente citado deve reaparecer como prova.
 
 ## Invariantes confirmados pelo bloco
 
-1. Regression-first precisa de evidência observada; `cancelled` nunca é rebatizado como `failure`.
+1. Regression-first precisa de evidência observada; `cancelled` nunca é rebatizado como `failure`. Quando o workflow termina cancelado mas um job já falhou, registrar separadamente o status do workflow e a evidência do job/log.
 2. Materialização fica inativa até CI + transversal do mesmo SHA ficarem verdes.
 3. Canário, ledger e Matrix são declarativos; promoção e ledger caminham no mesmo SHA.
 4. A Matrix observa o delta real; baseline não é usado para mascarar comportamento inesperado.
