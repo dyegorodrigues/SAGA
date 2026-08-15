@@ -116,10 +116,56 @@ O débito parou de crescer. Migrar é mecânico e sem risco pedagógico.
    Escolher um.
 2. **Paleta das 11 trilhas** — estender, ou assumir compartilhamento entre
    trilhas irmãs.
-3. **Tipografia.** Hoje `Fredoka` (display) e `Nunito` (texto), carregadas do
-   Google Fonts **por rede externa** — já derrubou uma sonda de CI e impede o
-   app de abrir bonito offline. Hospedar localmente é dívida conhecida.
+3. **Qual tipografia.** Hoje `Fredoka` (display) e `Nunito` (texto). Trocar de
+   família é decisão estética e é sua. **Só isto espera você.**
 4. **O ponto ótimo de idade.** Ver §5.
+
+### Correção — onde a fonte é servida NÃO é decisão do dono
+
+Uma versão anterior desta seção arquivou "hospedar a fonte localmente" junto
+com "qual fonte usar". Foi erro de redação, e ele custou caro: na W30 o agente
+leu isto, entendeu — corretamente, pelo texto — que não podia mexer, e um CI
+caiu por causa disso.
+
+São duas decisões separadas:
+
+- **qual família tipográfica** — estética, do dono, em aberto;
+- **de onde o arquivo da fonte é servido** — infraestrutura, **não é estética**.
+
+Hospedar `Fredoka` e `Nunito` localmente **não muda um pixel** do que a criança
+vê. Mantém exatamente a mesma tipografia e remove a dependência de rede.
+**Está liberado, e deve ser feito.**
+
+#### Evidência de que isso não é teórico
+
+Na W30, o CI `31892101733` falhou na primeira tentativa com **27 HTTP 404 em 27
+navegações** da sonda F15 — ou seja, 100% de falha da dependência externa
+naquela janela, não instabilidade ocasional. O SHA só fechou verde na tentativa
+2 (`run_attempt: 2`), sem nenhuma mudança de código. É pelo menos a segunda vez
+que essa dependência derruba CI.
+
+E o dano real não é o CI: é a criança em wi-fi ruim de escola abrindo o app com
+a tipografia errada, ou sem ela.
+
+#### Obstáculo técnico conhecido — e por que ele é a razão de isto nunca ter sido feito
+
+`AI_Studio_Lab/tools/pr_text_guard.cjs` **recusa binários no diff**, incluindo
+`.woff`, `.ttf`, `.png` e `.jpg`. Copiar os arquivos de fonte para o repositório
+reprova o job "Guarda de binários". Isso não é um bug do portão — ele existe por
+um motivo — mas explica por que a dívida sobreviveu tanto tempo.
+
+Dois caminhos, ambos preservando a tipografia atual:
+
+1. **Fonte embutida em CSS como `base64`** — vira texto, passa no portão sem
+   alterá-lo. Custo: o CSS cresce alguns megabytes com seis faces (3 pesos de
+   cada família). Solução imediata, sem tocar em política.
+2. **Liberar `public/fonts/*.woff2` no portão de binários** — mais limpo e mais
+   leve, porque fonte é ativo estático legítimo. Exige alterar uma regra de CI,
+   o que é decisão de infraestrutura e deve ser explícita.
+
+**Recomendado: o caminho 2**, com a exceção escrita de forma estreita (apenas
+`public/fonts/` e apenas `.woff2`), para o portão continuar barrando binário
+acidental. O caminho 1 serve se houver pressa e ninguém quiser mexer em CI.
 
 ---
 

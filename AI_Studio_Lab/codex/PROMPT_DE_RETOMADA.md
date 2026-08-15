@@ -32,6 +32,8 @@ Ler, quando a tarefa tocar a área correspondente:
 - `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
 - `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`;
 - `AI_Studio_Lab/codex/DESIGN_ESTADO_E_DECISOES.md` — **leia antes de tocar em qualquer cor, fonte ou espaçamento**. A paleta por operação aritmética foi decidida pelo dono do projeto e não se reabre;
+- `AI_Studio_Lab/codex/ROADMAP_PRODUTO_E_EXPANSAO.md` — frentes fora da fábrica
+  curricular (escola, IA, missões, contas), **inclusive o que está proibido construir**;
 - checkpoints de fábrica já fechados W20–W24 e W25–W29;
 - `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W30_W34_EM_CURSO_2026-08-15.md` enquanto o bloco atual estiver aberto.
 
