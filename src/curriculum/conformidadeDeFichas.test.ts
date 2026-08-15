@@ -212,6 +212,7 @@ const MODO_DO_RUNTIME: Record<string, string> = {
   "flash-mao": "flash, skin mão",
   padrao: "padrão",
   parear: "parear",
+  duplas: "duplas",
   "caixas/laços": "caixas/laços",
 };
 
