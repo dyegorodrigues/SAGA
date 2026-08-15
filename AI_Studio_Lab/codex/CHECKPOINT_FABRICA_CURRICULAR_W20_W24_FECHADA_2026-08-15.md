@@ -22,22 +22,39 @@ Este checkpoint consolida as ondas fallback-first W20–W24. Ele não substitui 
 ### W20 — recibo final não plenamente verificado
 
 O commit final registrado é `74c6f0eba896ec884a1d88542c8790d679b0e2cb`.
-No SHA exato, a consulta histórica encontrou:
+No SHA exato, a consulta à API encontrou:
 
-- CI `31809338980`: **failure**;
-- Certificação transversal `31809338978`: **success**.
+- CI `31805123752`: **failure**;
+- Certificação transversal: **nenhum run localizado para este SHA** nas
+  consultas feitas à API de Actions.
 
 Portanto, o recibo final da W20 **não possui um par verde completo no SHA exato**. Isso não apaga o portão inativo verde `f68b8bb6`, nem a presença posterior do código em heads certificados, mas a lacuna histórica deve permanecer registrada como tal.
+
+> **Correção de evidência (15/08).** Uma versão anterior deste checkpoint citava
+> os runs `31809338980` e `31809338978`. Nenhum dos dois existe: a API responde
+> `404 Not Found` para ambos. Os ids acima foram obtidos por consulta direta e
+> conferidos um a um. A conclusão da auditoria não muda; a prova que a
+> sustentava, sim.
 
 ### W21 — recibo final verificado
 
 O commit final registrado é `35cd96b27f9621d9882dfdd83a1f7442142ebb92`.
-No SHA exato existe um par histórico verde:
+No SHA exato existe um par verde:
 
-- CI `31811526114`: **success**;
-- Certificação transversal `31811526141`: **success**.
+- CI `31814487722`: **success** (14/08 15:35 UTC);
+- Certificação transversal `31814487733`: **success**.
 
-Há tentativas posteriores no mesmo SHA que aparecem canceladas (`31811574779` e `31811574813`). Elas não invalidam o par verde anterior; logo, o recibo final da W21 é **verificado**.
+Há execuções posteriores no mesmo SHA em que o CI aparece cancelado
+(`31819865662`, com a transversal `31819865551` verde). Cancelamento posterior
+não invalida um par verde anterior no mesmo SHA; logo, o recibo final da W21 é
+**verificado**.
+
+> **Correção de evidência (15/08).** Uma versão anterior deste checkpoint citava
+> o par `31811526114` + `31811526141` e os cancelados `31811574779` +
+> `31811574813`. Nenhum dos quatro existe: a API responde `404 Not Found` para
+> todos. Os ids acima foram obtidos por consulta direta — `31814487722` foi
+> aberto individualmente e confirma `head_sha 35cd96b…` com conclusão
+> `success`. A conclusão da auditoria não muda; a prova que a sustentava, sim.
 
 ### W22–W24
 

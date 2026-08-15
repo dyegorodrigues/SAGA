@@ -100,7 +100,13 @@ Ordem pedagógica dura: **coluna primeiro, linha depois**. Diagnósticos canôni
 O checkpoint W20–W24 registra a evidência sem maquiar o histórico:
 
 - W20 final `74c6f0e`: transversal verde, mas CI final vermelho — recibo final **não plenamente verificado**; o portão inativo da onda foi verde e o código persistiu em heads posteriores certificados;
-- W21 final `35cd96b`: existe par histórico verde no SHA exato (`31811526114` + `31811526141`); tentativas posteriores canceladas no mesmo SHA não anulam esse par. Recibo **verificado**.
+- W21 final `35cd96b`: existe par verde no SHA exato (CI `31814487722` + transversal `31814487733`); a execução posterior com CI cancelado (`31819865662`) não anula esse par. Recibo **verificado**.
+
+> **Regra que este bloco custou a aprender:** id de run é evidência, e evidência
+> se confere abrindo o run. A primeira versão desta auditoria citou quatro ids
+> que **não existem** — a API responde `404` para todos. As conclusões estavam
+> certas, os números eram inventados. Ao registrar recibo, cole o id que você
+> realmente consultou; um id plausível não é um id verificado.
 
 ### Branch duplicada
 
