@@ -100,9 +100,9 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
   {
-    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63", "angulos-f78"],
-    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("PartesIguaisStage"), component("PerimetroStage"), component("AngulosStage")],
-    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "N5.01", "GM.07", "GE.06"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63", "angulos-f78"], note: "W13/F58 usa FiguraDesenhada; W15/F45 compõe ShapeCanvas + SingaporeBars; F63/GM.07 compõe ShapeCanvas + ArrayGrid. F78/GE.06 realiza o modo ângulo em AngulosStage com vértice, raios e arco SVG declarados pelo palco especializado."
+    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60"],
+    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("PartesIguaisStage"), component("PerimetroStage"), component("AngulosStage"), component("MapaTesouroStage")],
+    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "GE.05", "N5.01", "GM.07", "GE.06"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60"], note: "W13/F58 usa FiguraDesenhada; W15/F45 compõe ShapeCanvas + SingaporeBars; F63/GM.07 compõe ShapeCanvas + ArrayGrid. F78/GE.06 realiza o modo ângulo em AngulosStage com vértice, raios e arco SVG. F60/GE.05 realiza o modo grade em MapaTesouroStage, reutilizando ShapeCanvas como superfície espacial com coluna, linha e interseção explícitas."
   },
   {
     primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73", "porcentagem-f87", "jornal-turma-f64"],

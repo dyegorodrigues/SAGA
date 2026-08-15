@@ -180,6 +180,7 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   else if (kind === "partes-iguais-f45") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#partição" : base);
   else if (kind === "angulos-f78") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#ângulo" : base);
   else if (kind === "jornal-turma-f64") qualified = bases.map(base => base === "SingaporeBars" ? "SingaporeBars#vertical" : base);
+  else if (kind === "mapa-tesouro-f60") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#grade" : base);
   else {
     const mode = rawMode ? modeByRuntime.get(String(rawMode)) : undefined;
     if (mode && bases.length) qualified = [`${bases[0]}#${mode}`, ...bases.slice(1)];
