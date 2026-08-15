@@ -163,6 +163,24 @@ Dois caminhos, ambos preservando a tipografia atual:
    leve, porque fonte é ativo estático legítimo. Exige alterar uma regra de CI,
    o que é decisão de infraestrutura e deve ser explícita.
 
+### RESOLVIDO em 15/08 — tipografia hospedada localmente
+
+Feito pelo caminho 2. `src/index.css` não tem mais `@import` do Google Fonts;
+as famílias vêm de `public/fonts/`, com `@font-face` local.
+
+- **Nada mudou visualmente:** `Fredoka` e `Nunito` seguem sendo as famílias
+  escolhidas pelo dono. Só a origem do byte mudou.
+- **4 arquivos, ~107 KB.** As duas famílias são fontes variáveis: um arquivo
+  por subconjunto cobre toda a faixa de pesos, então `font-weight` declara
+  intervalo. Uma leitura apressada do CSS do Google sugeriria 12 arquivos.
+- **Integridade conferida:** cada arquivo foi validado pelos bytes mágicos
+  `wOF2` antes de entrar no repositório. Nenhum byte improvisado.
+- **Exceção do portão é mínima:** `pr_text_guard.cjs` aceita **somente**
+  `public/fonts/*.woff2`. Verificado por mutação: `.woff2` fora da pasta
+  continua barrado, e `.ttf` dentro da pasta também.
+
+O app não depende mais de rede para se apresentar direito.
+
 **Recomendado: o caminho 2**, com a exceção escrita de forma estreita (apenas
 `public/fonts/` e apenas `.woff2`), para o portão continuar barrando binário
 acidental. O caminho 1 serve se houver pressa e ninguém quiser mexer em CI.

@@ -1,5 +1,62 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap');
 @import "tailwindcss";
+
+/**
+ * Tipografia hospedada localmente.
+ *
+ * As famílias são exatamente as mesmas — `Fredoka` para display e `Nunito`
+ * para texto, escolhidas pelo dono do projeto. Nada muda no que a criança vê.
+ * O que muda é de onde o arquivo vem.
+ *
+ * Antes, um `@import` do Google Fonts fazia a tipografia depender de rede
+ * externa. Na W30 isso derrubou o CI com 27 HTTP 404 em 27 navegações da sonda
+ * F15 — 100% de falha da dependência naquela janela, não instabilidade — e o
+ * SHA só fechou verde na segunda tentativa, sem mudança de código. Foi ao menos
+ * a segunda vez.
+ *
+ * O dano maior nunca foi o CI: era a criança em wi-fi ruim de escola abrindo o
+ * app sem a tipografia certa. Agora o app não depende mais de rede para se
+ * apresentar direito.
+ *
+ * As duas famílias são **fontes variáveis**: um arquivo por subconjunto cobre
+ * toda a faixa de pesos, e por isso `font-weight` declara intervalo em vez de
+ * valor fixo. São 4 arquivos e ~107 KB no total, contra os 12 que uma leitura
+ * apressada do CSS do Google sugeriria.
+ *
+ * `latin-ext` carrega separado de propósito: o navegador só busca esse arquivo
+ * quando a página realmente usa um caractere daquela faixa.
+ */
+@font-face {
+  font-family: "Fredoka";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/fredoka-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fredoka";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/fonts/fredoka-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("/fonts/nunito-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Nunito";
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+  src: url("/fonts/nunito-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 @theme {
   --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
