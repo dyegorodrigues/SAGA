@@ -31,6 +31,10 @@ Ler, quando a tarefa tocar a área correspondente:
 - `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
 - `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
 - `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`;
+- `AI_Studio_Lab/codex/DESIGN_ESTADO_E_DECISOES.md` — **leia antes de tocar em
+  qualquer cor, fonte ou espaçamento.** Registra o que já foi decidido pelo dono
+  do projeto e não se reabre (a paleta por operação aritmética), o que existe e
+  apodreceu (colisões de cor entre trilhas), e o que espera decisão humana;
 - checkpoints de fábrica já fechados, inclusive W20–W24 e W25–W29.
 
 O checkpoint é recibo humano; **Coverage Matrix, canário, DAG e runtime vivos são a autoridade executável**.
