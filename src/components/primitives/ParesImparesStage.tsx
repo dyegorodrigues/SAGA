@@ -45,6 +45,8 @@ export function ParesImparesStage({ spec, disabled = false, onAnswer }: Props) {
             sourceCount={spec.quantidade}
             destCount={Math.max(1, totalDuplas)}
             sourceEmoji="●"
+            destEmoji="2"
+            tutorialText="Junte dois objetos em cada caixa para formar uma dupla."
             boxCapacity={2}
             disabled={disabled}
             onProgress={({ itemsLeft, boxes }) => setProgresso({ itensRestantes: itemsLeft, duplas: boxes.filter(v => v === 2).length })}
