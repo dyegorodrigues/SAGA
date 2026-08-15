@@ -12,6 +12,7 @@ import { AreaF81Stage } from "./primitives/AreaF81Stage"; import type { AreaF81S
 import { ExpressaoF77Stage } from "./primitives/ExpressaoF77Stage"; import type { ExpressaoF77Spec } from "../curriculum/procedimentos/expressaoF77Contract";
 import { MapaTesouroStage } from "./primitives/MapaTesouroStage"; import type { MapaTesouroF60Spec } from "../curriculum/procedimentos/mapaTesouroContract";
 import { SolidosGeometricosStage } from "./primitives/SolidosGeometricosStage"; import type { SolidosGeometricosF59Spec } from "../curriculum/procedimentos/solidosGeometricosContract";
+import { ParesImparesStage } from "./primitives/ParesImparesStage"; import type { ParesImparesF38Spec } from "../curriculum/procedimentos/paresImparesContract";
 import { FracoesEquivalentesStage } from "./primitives/FracoesEquivalentesStage"; import type { FracaoEquivalenteF73Spec } from "../curriculum/procedimentos/fracaoEquivalenteContract";
 import { DivisaoLongaStage } from "./primitives/DivisaoLongaStage"; import type { DivisaoLongaF69Spec } from "../curriculum/procedimentos/divisaoLongaContract";
 import { PerimetroStage } from "./primitives/PerimetroStage"; import type { PerimetroF63Spec } from "../curriculum/procedimentos/perimetroContract";
@@ -31,6 +32,9 @@ interface FichaRendererProps {
 export function FichaRenderer(props: FichaRendererProps) {
   const { question, onAnswer, disabled } = props;
   const send = (valor: any, meta?: AnswerMeta) => { if (!disabled) onAnswer(valor, question.evaluate?.(valor) ?? false, meta); };
+  if (question.kind === 'draggroup' && (question.uiProps as { ficha?: string } | undefined)?.ficha === 'F38') {
+    return <ParesImparesStage spec={question.uiProps as ParesImparesF38Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+  }
   switch (question.kind) {
     case 'regra-sequencia-f57': return <RegraSequenciaStage spec={question.uiProps as RegraSequenciaF57Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'partes-iguais-f45': return <PartesIguaisStage spec={question.uiProps as PartesIguaisF45Spec} disabled={Boolean(disabled)} onAnswer={send}/>;

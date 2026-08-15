@@ -14,14 +14,16 @@ describe("W30 regression-first — N2.06/F38 Pares e Ímpares", () => {
 
   it("materializa a escada F38 em DragGroup#duplas sem ativar o canário por efeito colateral", () => {
     enableComposerCanary("N2.06");
-    const modos = ["formar-duplas-10", "formar-duplas-20", "decidir-visual", "ultimo-algarismo", "regra-soma"];
+    const etapas = ["formar-duplas-10", "formar-duplas-20", "decidir-visual", "ultimo-algarismo", "regra-soma"];
     const tags = new Set<string>();
 
     for (let nivel = 1; nivel <= 5; nivel += 1) {
       const q = generateRegisteredFichaQuestion("N2.06", nivel);
       const spec = q.uiProps as any;
-      expect(q.kind).toBe("pares-impares-f38");
-      expect(spec.modo).toBe(modos[nivel - 1]);
+      expect(q.kind).toBe("draggroup");
+      expect(spec.ficha).toBe("F38");
+      expect(spec.modo).toBe("duplas");
+      expect(spec.etapa).toBe(etapas[nivel - 1]);
       expect(spec.primitiva).toBe("DragGroup");
       expect(spec.modoPrimitiva).toBe("duplas");
       expect(spec.acessibilidade).toMatchObject({ toqueAlternativo: true, alvoMinPx: 48 });
