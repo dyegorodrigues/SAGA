@@ -79,6 +79,7 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
   { id: "W26-GM.08", competence: "GM.08", rationale: "F81 materializada no AreaF81Stage reutilizando ArrayGrid: contar unidades quadradas → linhas×colunas → fórmula → separar área de perímetro → compor áreas. Unidade cm² explícita e resolucao R0-A declarativa; promoção e ledger entram atomicamente após o portão inativo exato, sem presumir divergência.", delta: { composer: 1, fallback: -1, served: 1 } },
   { id: "W27-AL.06", competence: "AL.06", rationale: "F77 materializada como expressão numérica com ordem operacional progressiva e resolução R0-A declarativa. O portão inativo dbd9c4c passou CI 31853918490 + transversal 31853918503; promoção e ledger entram atomicamente neste SHA, sem presumir divergência.", delta: { composer: 1, fallback: -1, served: 1 } },
   { id: "W28-GE.05", competence: "GE.05", rationale: "F60 materializada no MapaTesouroStage, reutilizando ShapeCanvas#grade para coluna, linha, interseção e ponte pré-cartesiana. O portão inativo e4c9349 passou CI 31858284059 + transversal 31858284068; promoção e ledger entram atomicamente neste SHA, sem presumir divergência.", delta: { composer: 1, fallback: -1, served: 1 } },
+  { id: "W29-GE.04", competence: "GE.04", rationale: "F59 materializada no SolidosGeometricosStage, reutilizando ShapeCanvas#3D para nomeação, rampa experimental, empilhamento e contagem de faces/vértices/arestas. O portão inativo 9bec4f26 usa CI 31864008893 + transversal 31864008795; promoção e ledger entram atomicamente somente após ambos concluírem verdes, sem presumir divergência.", delta: { composer: 1, fallback: -1, served: 1 } },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
@@ -182,6 +183,7 @@ function deliveredPrimitives(q: any): { primitives: string[]; unknownKind?: stri
   else if (kind === "angulos-f78") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#ângulo" : base);
   else if (kind === "jornal-turma-f64") qualified = bases.map(base => base === "SingaporeBars" ? "SingaporeBars#vertical" : base);
   else if (kind === "mapa-tesouro-f60") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#grade" : base);
+  else if (kind === "solidos-geometricos-f59") qualified = bases.map(base => base === "ShapeCanvas" ? "ShapeCanvas#3D" : base);
   else {
     const mode = rawMode ? modeByRuntime.get(String(rawMode)) : undefined;
     if (mode && bases.length) qualified = [`${bases[0]}#${mode}`, ...bases.slice(1)];

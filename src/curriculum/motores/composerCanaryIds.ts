@@ -91,6 +91,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W28 — F60: mapa do tesouro; materialização inativa e4c9349 com ShapeCanvas#grade.
   "GE.05",
 
+  // W29 — F59: sólidos geométricos; promoção somente após o portão inativo exato.
+  "GE.04",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
