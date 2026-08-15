@@ -51,7 +51,14 @@ const FICHA_RUNTIME_MAP = [
     note: "F46/AL.05 reutiliza Balanca como significado físico do sinal de igualdade. F77/AL.06 reutiliza a mesma balança para preservar equivalência enquanto explicita precedência, agrupamento e incógnita. F82/GM.09 compõe Balanca + NumberLine para manter equivalência visível durante conversões e problemas de medida.",
   },
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
-  { primitive: "DragGroup", kinds: ["draggroup", "pareamento", "classificacao"], componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage")], builderKinds: ["draggroup", "pareamento", "classificacao"], rendererKinds: ["draggroup", "pareamento", "classificacao"] },
+  {
+    primitive: "DragGroup",
+    kinds: ["draggroup", "pareamento", "classificacao", "poligonos-f79"],
+    componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage"), component("PoligonosStage")],
+    builderKinds: ["draggroup", "pareamento", "classificacao"], specializedBuilderIds: ["GE.07"],
+    rendererKinds: ["draggroup", "pareamento", "classificacao", "poligonos-f79"],
+    note: "W33/F79 compõe ShapeCanvas + DragGroup em PoligonosStage; DragGroup realiza seleção, classificação e alternativa por toque sem criar primitiva nova.",
+  },
   {
     primitive: "EmojiRow",
     kinds: ["emojirow", "fileira", "moldura", "emojirow-riscar-f15", "regra-sequencia-f57"],
@@ -100,9 +107,9 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
   {
-    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "solidos-geometricos-f59", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60"],
-    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("SolidosGeometricosStage"), component("PartesIguaisStage"), component("PerimetroStage"), component("AngulosStage"), component("MapaTesouroStage")],
-    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "GE.04", "GE.05", "N5.01", "GM.07", "GE.06"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "solidos-geometricos-f59", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60"], note: "W13/F58 usa FiguraDesenhada; W29/F59 realiza o modo 3D em SolidosGeometricosStage, preservando ShapeCanvas como superfície e acrescentando rampa/empilhamento com alternativa por toque; W15/F45 compõe ShapeCanvas + SingaporeBars; F63/GM.07 compõe ShapeCanvas + ArrayGrid. F78/GE.06 realiza o modo ângulo em AngulosStage com vértice, raios e arco SVG. F60/GE.05 realiza o modo grade em MapaTesouroStage, reutilizando ShapeCanvas como superfície espacial com coluna, linha e interseção explícitas."
+    primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "solidos-geometricos-f59", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60", "poligonos-f79"],
+    componentFiles: [component("ShapeCanvas"), component("CenaDePosicaoStage"), component("FormaStage"), component("DetetiveFormasStage"), component("SolidosGeometricosStage"), component("PartesIguaisStage"), component("PerimetroStage"), component("AngulosStage"), component("MapaTesouroStage"), component("PoligonosStage")],
+    builderKinds: ["shapecanvas"], specializedBuilderIds: ["GE.03", "GE.04", "GE.05", "N5.01", "GM.07", "GE.06", "GE.07"], rendererKinds: ["shapecanvas", "detetive-formas-f58", "solidos-geometricos-f59", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60", "poligonos-f79"], note: "W13/F58 usa FiguraDesenhada; W29/F59 realiza o modo 3D em SolidosGeometricosStage, preservando ShapeCanvas como superfície e acrescentando rampa/empilhamento com alternativa por toque; W15/F45 compõe ShapeCanvas + SingaporeBars; F63/GM.07 compõe ShapeCanvas + ArrayGrid. F78/GE.06 realiza o modo ângulo em AngulosStage com vértice, raios e arco SVG. F60/GE.05 realiza o modo grade em MapaTesouroStage, reutilizando ShapeCanvas como superfície espacial com coluna, linha e interseção explícitas. W33/F79 compõe ShapeCanvas + DragGroup em PoligonosStage para identificar, classificar e construir polígonos por propriedades."
   },
   {
     primitive: "SingaporeBars", kinds: ["singapore-bars", "ratio-table", "story-bars", "partes-iguais-f45", "fracao-numero-f72", "fracoes-equivalentes-f73", "porcentagem-f87", "jornal-turma-f64", "media-chance-f83"],
