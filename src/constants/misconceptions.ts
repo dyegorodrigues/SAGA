@@ -60,6 +60,15 @@ export const MisconceptionTag = {
   /** F85: tratou subtrair um negativo como subtrair um positivo. */
   SUBTRAIR_NEGATIVO: "subtrair-negativo",
 
+  /** F89: tratou a letra como nome do objeto do contexto, não como lugar de um número. */
+  LETRA_COMO_OBJETO: "letra-como-objeto",
+
+  /** F89: respondeu por um único caso particular sem validar a regra geral. */
+  SO_CASO_PARTICULAR: "so-caso-particular",
+
+  /** F89: descreveu exemplos, mas não produziu uma regra que valha para todos. */
+  NAO_GENERALIZA: "nao-generaliza",
+
   /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
   INVERTE_DIVISAO: "inverte-divisao",
 
