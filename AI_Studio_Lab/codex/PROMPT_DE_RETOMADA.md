@@ -71,23 +71,23 @@ A regressão da W36 provou por que esta regra é vinculante: comprimir `ficha_ru
 
 ---
 
-## 4. Estado curricular vivo pós-W38
+## 4. Estado curricular vivo pós-W39
 
-Ondas **W1–W38 fechadas**.
+Ondas **W1–W39 fechadas**.
 
-Coverage Matrix observada após o fechamento final da W38:
+Coverage Matrix observada após o fechamento final da W39:
 
-- **63 Composer**
+- **64 Composer**
 - **15 legado**
-- **12 fallback**
-- **78 servidas**
+- **11 fallback**
+- **79 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ainda ausente: `Moedas`
 
-Canário ativo: **63 competências**.
+Canário ativo: **64 competências**.
 
 ### Últimos recibos técnicos
 
@@ -101,6 +101,7 @@ Canário ativo: **63 competências**.
 | W36 | `GM.10 / F93` | `61/15/14/76/11` | `a7423641c2be7c6bc5f221de7db8531e7655b1bc` — CI `31954561791` + transversal `31954561716`, success |
 | W37 | `N7.02 / F85` | `62/15/13/77/11` | `cdb57bcba6eec5f9e5b73243ac326e49594535f6` — CI `31956662185` + transversal `31956662195`, success |
 | W38 | `AL.07 / F89` | `63/15/12/78/11` | `80543525d17ee1a4d24b8150131907fcb64f206c` — CI `31959513580` + transversal `31959513510`, success |
+| W39 | `N2.07 / F66` | `64/15/11/79/11` | `e86627b779a6fb6bbd29807fa520533132df8a44` — CI `31977192229` + transversal `31977192249`, success |
 
 ---
 
@@ -227,6 +228,40 @@ Contrato F66:
 - a realização deve reutilizar o `ArrayGrid` real; helper/palco não cria uma falsa primitiva paralela;
 - tentativa que deixa sobra deve permanecer visivelmente inválida; encontrar um retângulo não autoriza parar antes de esgotar as formações.
 
+### 7.6 Fechamento técnico da W39
+
+- regression-first/documentação pós-W38: `5eba881d5f20946674122a45ed19fc48868126c0`; CI `31960036621` vermelho nominal com falha única por ausência da `N2.07`, transversal `31960036647` success;
+- materialização inativa: `eb194d4b42e97274989c9cf1d3c2522c4fbcffe5`; `FatoresRetangulosStage` reutiliza fisicamente `ArrayGrid`, mantém a sobra visível fora do retângulo completo e registra as três tags F66 aditivamente no Radar; CI `31976660344` + transversal `31976660441`, ambos `completed/success`;
+- promoção atômica final: `e86627b779a6fb6bbd29807fa520533132df8a44`, alterando somente canário + ledger + contrato Matrix; CI `31977192229` + transversal `31977192249`, ambos `completed/success`;
+- Matrix observada: `64 Composer / 15 legado / 11 fallback / 79 servidas / 11 divergências`; `modeSwaps=12`, `toolIntroductions=44`.
+
+**W39 fechada em `64/15/11/79/11`.**
+
+### 7.7 Seleção pós-W39 e contrato da W40
+
+Restam **11 fallbacks**:
+
+`AL.08, GE.09, GE.10, GM.11, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, PE.04`.
+
+Todos os candidatos elegíveis têm ganho imediato de desbloqueio zero neste estado; `N5.05` ainda exige simultaneamente `N5.04 + N6.04`. O desempate causal executável da Matrix/DAG produz as próximas três seleções:
+
+1. **W40 = `GE.09 / F91 — Círculo e Áreas`** — prereqs `GM.08 + GE.06`, primitiva `ShapeCanvas`, `causalWave=12`;
+2. **W41 = `GE.10 / F92 — Volume e Vistas`** — prereqs `GE.04 + GM.08`, primitiva `ArrayGrid` em modo 3D, `causalWave=12`;
+3. **W42 = `N4.11 / F70 — Primos e Divisores`** — prereqs `N4.07 + N4.10`, primitivas `ArrayGrid + Quadrado100`, `causalWave=13`.
+
+Contrato F91:
+
+- área deve ser **derivada visualmente**, não entregue como fórmula decorada;
+- L1: dois triângulos iguais formam um retângulo e tornam visível a metade;
+- L2: fórmula do triângulo `base × altura ÷ 2`, preservando a derivação;
+- L3: cortar uma ponta do paralelogramo e encaixar do outro lado forma retângulo de mesma área;
+- L4: círculo — raio, diâmetro e circunferência;
+- L5: área do círculo por aproximação/rearranjo de setores;
+- diagnósticos canônicos: `ESQUECE_DIVIDIR_POR_2`, `ALTURA_ERRADA`, `CONFUNDE_RAIO_DIAMETRO`; tags novas precisam nascer no Radar ainda inativo;
+- domínio 3/3 em 2 sessões, incluindo pelo menos uma derivação de fórmula;
+- a realização física deve reutilizar `ShapeCanvas`; palco/helper especializado não cria uma primitiva paralela;
+- qualquer manipulação motora deve preservar alternativa por toque e tolerância generosa; precisão de dedo nunca prova conceito.
+
 ---
 
 ## 8. Branches de rascunho / dívida de limpeza
@@ -334,9 +369,9 @@ Não pode:
 ## 12. Próximo passo em uma nova retomada
 
 1. reancorar o PR #35 no remoto;
-2. confirmar que W38 continua fechada em `63/15/12/78/11` e 63 canários, com recibo final `80543525...` / CI `31959513580` / transversal `31959513510`;
-3. localizar o regression-first nominal da W39 no HEAD atual;
-4. reancorar F66/N2.07 integralmente, inclusive tags do Radar e reutilização física do `ArrayGrid`;
+2. confirmar que W39 continua fechada em `64/15/11/79/11` e 64 canários, com recibo final `e86627b...` / CI `31977192229` / transversal `31977192249`;
+3. localizar o regression-first nominal da W40 no HEAD atual;
+4. reancorar F91/GE.09 integralmente, inclusive tags do Radar e reutilização física do `ShapeCanvas`;
 5. seguir §§10.1–10.10 sem pular runtime map, portão inativo ou promoção atômica;
-6. após W39 final verde, recalcular Matrix/DAG e atualizar porta/corpo do PR;
-7. emitir o relatório do bloco W35–W39, salvo se uma parada real comprovada exigir registro antes.
+6. após W40 final verde, recalcular Matrix/DAG e atualizar porta/corpo do PR;
+7. preservar a fila calculada W41 `GE.10/F92` e W42 `N4.11/F70`, salvo deriva real observada.
