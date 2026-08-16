@@ -71,23 +71,23 @@ A regressão da W36 provou por que esta regra é vinculante: comprimir `ficha_ru
 
 ---
 
-## 4. Estado curricular vivo pós-W37
+## 4. Estado curricular vivo pós-W38
 
-Ondas **W1–W37 fechadas**.
+Ondas **W1–W38 fechadas**.
 
-Coverage Matrix observada após o fechamento final da W37:
+Coverage Matrix observada após o fechamento final da W38:
 
-- **62 Composer**
+- **63 Composer**
 - **15 legado**
-- **13 fallback**
-- **77 servidas**
+- **12 fallback**
+- **78 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ainda ausente: `Moedas`
 
-Canário ativo: **62 competências**.
+Canário ativo: **63 competências**.
 
 ### Últimos recibos técnicos
 
@@ -100,6 +100,7 @@ Canário ativo: **62 competências**.
 | W35 | `GM.06 / F62` | `60/15/15/75/11` | `c7d21d50eb85939e190f29c3a3dbabc17bed4cd8` — CI `31934324465` + transversal `31934324470`, success |
 | W36 | `GM.10 / F93` | `61/15/14/76/11` | `a7423641c2be7c6bc5f221de7db8531e7655b1bc` — CI `31954561791` + transversal `31954561716`, success |
 | W37 | `N7.02 / F85` | `62/15/13/77/11` | `cdb57bcba6eec5f9e5b73243ac326e49594535f6` — CI `31956662185` + transversal `31956662195`, success |
+| W38 | `AL.07 / F89` | `63/15/12/78/11` | `80543525d17ee1a4d24b8150131907fcb64f206c` — CI `31959513580` + transversal `31959513510`, success |
 
 ---
 
@@ -201,6 +202,30 @@ Contrato F89:
 - diagnósticos `LETRA_COMO_OBJETO`, `SO_CASO_PARTICULAR`, `NAO_GENERALIZA` precisam estar no catálogo do Radar ainda inativo;
 - domínio 3/3 em 2 sessões, incluindo L4;
 - runtime map registra as duas entradas de composição `SingaporeBars + plain` antes da promoção.
+
+### 7.4 Fechamento técnico da W38
+
+- regression-first/documentação: `158c7407ed37310336daa9451750c8455d1d67f8`; CI `31957225134` vermelho nominal com **1** teste F89 falhando por ausência de `AL.07` e os demais 3.173 testes verdes; transversal `31957225131` success;
+- materialização inativa: `0da3ecea9519b46f582dcc8d8670dfc642cd8473`; `LinguagemLetrasStage` compõe fisicamente `SingaporeBars + plain`, e as três tags F89 entram aditivamente no Radar; CI `31959023444` + transversal `31959023443`, success;
+- promoção atômica final: `80543525d17ee1a4d24b8150131907fcb64f206c`, alterando somente canário + ledger + contrato Matrix; CI `31959513580` + transversal `31959513510`, ambos `completed/success`;
+- Matrix observada: `63 Composer / 15 legado / 12 fallback / 78 servidas / 11 divergências`; `modeSwaps=12`, `toolIntroductions=44`.
+
+**W38 fechada em `63/15/12/78/11`.**
+
+### 7.5 Seleção pós-W38 e contrato da W39
+
+Restam **12 fallbacks**: `AL.08, GE.09, GE.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, PE.04`.
+
+O recálculo preserva **W39 = `N2.07 / F66 — A Fábrica de Retângulos`** — prereqs `N4.02 + N2.06`, primitiva `ArrayGrid`. `AL.08` tornou-se elegível após W38, mas permanece em onda causal mais profunda; o desempate executável mantém N2.07.
+
+Contrato F66:
+
+- fatores são as formas de arrumar um total em retângulos completos, sem sobras;
+- níveis: pares até 12 com dica de quantidade → todos os pares até 24 → listar fatores sem dica → identificar primo pelo único retângulo `1×n` → maior fator comum de dois números;
+- diagnósticos `ESQUECE_TRIVIAIS`, `PARA_CEDO`, `CONFUNDE_FATOR_MULTIPLO` precisam nascer no Radar ainda inativo;
+- domínio 3/3 em 2 sessões, incluindo identificação de um primo no L4;
+- a realização deve reutilizar o `ArrayGrid` real; helper/palco não cria uma falsa primitiva paralela;
+- tentativa que deixa sobra deve permanecer visivelmente inválida; encontrar um retângulo não autoriza parar antes de esgotar as formações.
 
 ---
 
@@ -309,9 +334,9 @@ Não pode:
 ## 12. Próximo passo em uma nova retomada
 
 1. reancorar o PR #35 no remoto;
-2. confirmar que W37 continua fechada em `62/15/13/77/11` e 62 canários, com recibo final `cdb57bc...` / CI `31956662185` / transversal `31956662195`;
-3. localizar o regression-first nominal da W38 no HEAD atual;
-4. reancorar F89/AL.07 integralmente, inclusive tags do Radar e composição `SingaporeBars + plain`;
+2. confirmar que W38 continua fechada em `63/15/12/78/11` e 63 canários, com recibo final `80543525...` / CI `31959513580` / transversal `31959513510`;
+3. localizar o regression-first nominal da W39 no HEAD atual;
+4. reancorar F66/N2.07 integralmente, inclusive tags do Radar e reutilização física do `ArrayGrid`;
 5. seguir §§10.1–10.10 sem pular runtime map, portão inativo ou promoção atômica;
-6. recalcular Matrix/DAG depois da W38 antes de materializar a onda seguinte;
-7. continuar o bloco até W39 e só então emitir relatório de bloco, salvo parada real comprovada.
+6. após W39 final verde, recalcular Matrix/DAG e atualizar porta/corpo do PR;
+7. emitir o relatório do bloco W35–W39, salvo se uma parada real comprovada exigir registro antes.
