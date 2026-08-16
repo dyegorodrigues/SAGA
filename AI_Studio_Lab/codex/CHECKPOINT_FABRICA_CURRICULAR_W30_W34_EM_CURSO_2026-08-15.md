@@ -16,17 +16,21 @@ Regra de evidência: **conclusão global de workflow e evidência de job/log sã
 | W30 | N2.06 / F38 — Pares e Ímpares | **fechada** | **55 / 15 / 20 / 70 / 11** | `05b7787e7239db4c687b5fa7cc47ee0b4f256447` · CI `31883452067` + transversal `31883452082`, `success` |
 | W31 | PE.03 / F83 — Média e Chance | **fechada** | **56 / 15 / 19 / 71 / 11** | `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd` · CI `31908549456` + transversal `31908549471`, `success`, attempt 1 |
 | W32 | GM.09 / F82 — Conversões e problemas de medida | **fechada** | **57 / 15 / 18 / 72 / 11** | `40ef8eb13cd93d1a0b2e60375964853e62118e24` · CI `31913688446` + transversal `31913688438`, `success`, attempt 1 |
-| W33 | GE.07 / F79 — Polígonos: triângulos e quadriláteros | **selecionada** | — | — |
-| W34 | — | não selecionada | — | — |
+| W33 | GE.07 / F79 — Polígonos: triângulos e quadriláteros | **fechada** | **58 / 15 / 17 / 73 / 11** | `5fa072c84e69687491a21d0e6f975d7b9da3fd44` · CI `31916781563` + transversal `31916781644`, `success` |
+| W34 | GE.08 / F80 — O Plano Cartesiano | **selecionada** | — | — |
 
 ## Design e infraestrutura vinculantes
 
 - ficha/palco novo usa papéis de `src/styles/tokens.ts`;
 - não introduzir cor literal nova;
 - não regenerar baseline só para silenciar a catraca;
-- W30, W31 e W32 fecharam sem introduzir dívida nova de cor.
+- W30–W33 não exigiram relaxamento da catraca de cores.
 
-Fredoka e Nunito permanecem as famílias. Self-host local está liberado, mas o asset só pode entrar com integridade verificada e eventual exceção binária deve ser **somente `public/fonts/*.woff2`**. O transporte confiável não foi obtido neste ambiente; tipografia está bloqueada por rede/transporte e **não bloqueia a fábrica**.
+### Tipografia local resolvida
+
+Fredoka e Nunito permanecem as famílias escolhidas. O commit `d1101e5db6147c50f3131996b1595005c9bf874b`, integrado durante o estágio inativo da W33, trouxe quatro WOFF2 variáveis oficiais (`latin` + `latin-ext`), validou os bytes mágicos `wOF2`, removeu o `@import` do Google Fonts e restringiu a exceção binária a `public/fonts/*.woff2`. O build serve os assets por `dist/fonts/`.
+
+Não reabrir download externo nem trocar as famílias. A dívida de 27 HTTP 404 em 27 navegações permanece apenas como registro histórico da dependência externa.
 
 ---
 
@@ -84,92 +88,112 @@ SHA `7f6208ce50d902cae8ab373e664c8d6fc06c5bdd`:
 
 ## W32 — GM.09 / F82 — Conversões e problemas de medida
 
-### Seleção e contrato
-
-Pré-requisitos: `GM.05`, `N4.08`, `N6.01`.  
-Primitivas: `NumberLine + Balanca`.  
-Realização: `ProblemasMedidaStage` / `problemas-medida-f82`.
-
-Escada:
-
-1. cm↔m;
-2. g↔kg e ml↔L;
-3. comparar só depois de converter;
-4. operar unidades mistas após conversão;
-5. problema multietapas de medida.
-
-Diagnósticos: `COMPARA_SEM_CONVERTER`, `INVERTE_OPERACAO`, `MISTURA_GRANDEZAS`.  
-Resolução: R0-A.  
-Domínio: 3/3 em 2 sessões.
-
 ### Regression-first — classificação correta
 
 SHA `fd05ef22ead9c01f8c274d69bba37e2e25422bd4`.
 
-**Conclusão global:**
+**Conclusão global:** CI `31912881313`: **`failure`**; transversal `31912881318`: `success`.
 
-- CI `31912881313`: **`failure`**;
-- transversal `31912881318`: `success`.
-
-**Evidência do job:**
-
-- Gates `95080511297`: `failure`;
-- exatamente os 2 testes W32 falharam porque GM.09 ainda não estava registrada/ativável;
-- 218 arquivos / 3.072 testes anteriores verdes.
-
-Aqui o workflow CI realmente terminou `failure`; não houve cancelamento.
+**Evidência do job:** Gates `95080511297`: `failure`, exatamente os 2 testes W32; 218 arquivos / 3.072 testes anteriores verdes.
 
 ### Materialização inativa
 
-SHA `ddaf40bfa1ac88ddd3c8c60046b058958963c0e5`.
+SHA `ddaf40bfa1ac88ddd3c8c60046b058958963c0e5`:
 
-Entraram ficha, contrato, palco, renderer, Composer e mapa runtime. GM.09 ficou registrada, mas fora do canário. O runtime map prova as duas entradas físicas `NumberLine + Balanca`; o palco usa tokens.
+- GM.09 registrada e fora do canário;
+- cadeia física `NumberLine + Balanca → ProblemasMedidaStage` declarada;
+- CI `31913279161` + transversal `31913279171`, ambos `success`.
 
-Portão inativo:
+### Promoção e fechamento
 
-- CI `31913279161`: `success`;
-- transversal `31913279171`: `success`.
+SHA `40ef8eb13cd93d1a0b2e60375964853e62118e24`:
 
-Gates inativo:
-
-- 57 Composer registradas / 56 ativas / 1 inativa (GM.09);
-- Matrix `56/15/19/71/11`;
-- suíte 219 arquivos / 3.076 testes;
-- auditorias, conformidade, grafo, TypeScript, build, guarda textual e cores verdes.
-
-### Promoção atômica e fechamento
-
-SHA `40ef8eb13cd93d1a0b2e60375964853e62118e24`.
-
-Entraram somente:
-
-- GM.09 no canário declarativo;
-- `W32-GM.09` no ledger;
-- contrato executável da Matrix.
-
-O contrato executável exige e o Gates `95082366897` aprovou o baseline **57 Composer / 15 legado / 18 fallback / 72 servidas / 11 divergências**. O job também concluiu com sucesso auditoria do catálogo, fichas, conformidade, grafo, TypeScript, testes, build e guarda textual.
-
-Conclusão global do mesmo SHA:
-
-- CI `31913688446`: `completed/success`, attempt 1;
-- transversal `31913688438`: `completed/success`, attempt 1.
+- somente canário + `W32-GM.09` + contrato Matrix;
+- Gates `95082366897`: `success`;
+- Matrix `57/15/18/72/11`;
+- CI `31913688446` + transversal `31913688438`, `completed/success`.
 
 **W32 fechada.**
 
 ---
 
-## Seleção pós-W32 — W33
+## W33 — GE.07 / F79 — Polígonos
 
-Restam **18 fallbacks**:
+### Regression-first
 
-`AL.07, AL.08, GE.07, GE.08, GE.09, GE.10, GM.06, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
+SHA `139b1b077781c97bf76f7f5c157f9e2463373683`.
+
+**Conclusão global:** CI `31914303708`: `cancelled`.
+
+**Evidência do job:** Gates `95083874446`: `failure`, somente os 2 testes W33; 219 arquivos / 3.089 testes anteriores verdes. As falhas foram exatamente GE.07 não registrada e ativação recusada antes do registro em `COMPOSER_FICHAS`.
+
+### Primeiro estágio inativo
+
+SHA `702e62d8ec0f4f85d699ded8bb213dbdc95b32d3`:
+
+- materialização inicial registrada e inativa;
+- CI `31914591177` + transversal `31914591199`, ambos `success`, attempt 1.
+
+### Tipografia + runtime map ainda inativos
+
+- `d1101e5db6147c50f3131996b1595005c9bf874b`: self-host Fredoka/Nunito, guarda binária estreita e build local das fontes;
+- `af1e657ac72d5a353f7ea1416ee52aa183819f7e`: cadeia física `ShapeCanvas + DragGroup → PoligonosStage` adicionada ao `ficha_runtime_map.cjs`.
+
+### Reconciliação canônica antes da promoção
+
+A implementação inicial divergia da ficha F79 canônica. Ela foi corrigida ainda inativa em `04865f6a05a362110e035772bbd0b617cb55263c` para a escada correta:
+
+1. triângulos por lados;
+2. triângulos por ângulos;
+3. quadriláteros;
+4. hierarquia `quadrado ⊂ retângulo ⊂ paralelogramo`;
+5. propriedades combinadas.
+
+Diagnósticos canônicos: `CATEGORIAS_EXCLUSIVAS`, `SO_UM_CRITERIO`, `ORIENTACAO_FIXA`.  
+Domínio: 3/3 em 2 sessões.  
+Primitivas: `ShapeCanvas + DragGroup`.  
+Alternativa por toque preservada.
+
+Portão inativo canônico `04865f6a05a362110e035772bbd0b617cb55263c`:
+
+- CI `31916409189`: `success`;
+- transversal `31916409203`: `success`;
+- Gates `95088772299`: `success`;
+- 58 Composer registradas / 57 ativas / GE.07 única inativa;
+- Matrix ainda `57/15/18/72/11`;
+- suíte **220 arquivos / 3.093 testes**;
+- auditorias, TypeScript, build, runtime map, fontes locais e guards verdes.
+
+### Promoção atômica e fechamento
+
+SHA `5fa072c84e69687491a21d0e6f975d7b9da3fd44`.
+
+Entraram somente:
+
+- GE.07 no canário declarativo;
+- `W33-GE.07` no ledger;
+- contrato executável da Matrix.
+
+**Evidência do job:** Gates `95089806659`: `success`; Matrix observada **58 Composer / 15 legado / 17 fallback / 73 servidas / 11 divergências**; GE.07 `padrao-ouro`; suíte **220 arquivos / 3.106 testes**; auditoria, fichas, conformidade, grafo, TypeScript, testes, build e guarda textual verdes.
+
+**Conclusão global do mesmo SHA:** CI `31916781563` + transversal `31916781644`, ambos `completed/success`.
+
+**W33 fechada.**
+
+---
+
+## Seleção pós-W33 — W34
+
+Restam **17 fallbacks**:
+
+`AL.07, AL.08, GE.08, GE.09, GE.10, GM.06, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
 
 Estado de elegibilidade:
 
-- 16 estão imediatamente elegíveis;
+- 15 estão imediatamente elegíveis;
 - `AL.08` ainda exige `AL.07 + N7.02`;
 - `N5.05` ainda exige `N5.04 + N6.04`;
-- todos os 16 elegíveis têm ganho imediato 0.
+- todos os 15 elegíveis têm ganho imediato 0.
 
 Desempate pelo critério vinculante da Matrix/DAG:
 
@@ -177,31 +201,31 @@ Desempate pelo critério vinculante da Matrix/DAG:
 2. empate → `causalWave` crescente, depois maior impacto downstream, depois ID;
 3. empate residual → menor delta estrutural/continuidade local.
 
-`GE.07` é o primeiro dos empatados (`causalWave=4`).
+`GE.08` é o primeiro elegível na ordem causal (`causalWave=5`).
 
-Portanto **W33 = GE.07 / F79 — Polígonos: triângulos e quadriláteros**.
+Portanto **W34 = GE.08 / F80 — O Plano Cartesiano**.
 
-### Contrato F79 já reancorado
+### Contrato F80 já reancorado
 
-Pré-requisitos: `GE.03`, `GE.06`.  
-Primitivas: `ShapeCanvas + DragGroup`.
+Pré-requisitos: `GE.05`, `N1.12`.  
+Primitiva: `ShapeCanvas` em modo grade.  
+Regra visual: **primeiro anda, depois sobe**.
 
 Escada:
 
-1. polígono = figura fechada com lados retos; incluir não-exemplo aberto;
-2. triângulos em diferentes orientações;
-3. quadriláteros;
-4. classificação por propriedades, preservando que quadrado também é retângulo;
-5. construção/classificação sob pelo menos duas condições simultâneas.
+1. ler ponto marcado;
+2. colocar ponto;
+3. caminho entre dois pontos;
+4. desenhar figura por coordenadas;
+5. identificar padrão em pontos alinhados.
 
-Diagnósticos: `NAO_FECHA`, `CONTA_LADOS_ERRADO`, `CONFUNDE_CLASSE`.  
-Resolução: R0-A.  
-Domínio: reconhecimento/classificação 3/3 em 2 sessões; construção 2/3 em 2 sessões.  
-Acessibilidade: contornos visíveis, rótulo além de cor e alternativa por toque ao arrasto.
+Diagnósticos: `INVERTE_XY`, `IGNORA_ORIGEM`, `CONTA_MARCAS`.  
+Domínio: 3/3 em 2 sessões, incluindo pelo menos um de colocar o ponto.  
+F80 tem exposição motora alta: alternativa por toque + snap generoso são obrigatórios.
 
 ---
 
-## Invariantes para W33–W34
+## Invariantes para W34
 
 1. Reancorar no remoto antes de editar.
 2. Antes de aguardar workflow, consultar a conclusão do **SHA exato**; se já estiver verde, executar.
@@ -214,9 +238,9 @@ Acessibilidade: contornos visíveis, rótulo além de cor e alternativa por toqu
 9. Ler `DESIGN_ESTADO_E_DECISOES.md` antes de UI.
 10. Usar `tokens.ts`; zero cor literal nova.
 11. Correção posterior de runtime cria novo recibo final e exige CI + transversal verdes.
-12. Tipografia local não bloqueia a fábrica enquanto o transporte não for verificável.
+12. Tipografia local já está resolvida; não reabrir download externo.
 13. Não tocar `main`, não mergear PR #35, não marcar ready, não habilitar auto-merge, não tocar Creature Engine/Tamagotchi.
-14. Não mergear `codex/w31-promotion-staging`.
+14. Não mergear branches temporárias de staging.
 
 ## Continuidade
 
@@ -230,4 +254,4 @@ Retomar por:
 - `AI_Studio_Lab/tools/ficha_runtime_map.cjs`;
 - workflows do SHA exato do HEAD.
 
-Próxima onda autorizada: **W33 = GE.07 / F79**.
+Próxima onda autorizada: **W34 = GE.08 / F80**.
