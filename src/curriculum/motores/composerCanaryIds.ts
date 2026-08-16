@@ -121,6 +121,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W38 — F89: linguagem das letras; SingaporeBars + plain.
   "AL.07",
 
+  // W39 — F66: fábrica de retângulos; ArrayGrid. Inativo eb194d4b: CI 31976660344 + transversal 31976660441.
+  "N2.07",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
