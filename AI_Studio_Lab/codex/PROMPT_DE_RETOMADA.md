@@ -54,25 +54,38 @@ Checkpoint é recibo humano. **Coverage Matrix, canário, DAG e runtime vivos s�
 - Não tocar/mergear `main`.
 - Não tocar Creature Engine/Tamagotchi neste fluxo.
 
+### 3.1 Cânone compartilhado é aditivo
+
+Os seguintes arquivos são **cânone compartilhado aditivo**:
+
+- `AI_Studio_Lab/tools/ficha_runtime_map.cjs`
+- `src/curriculum/evidencias.ts`
+- `src/curriculum/misconceptions.ts`
+- `AI_Studio_Lab/tools/coverage_matrix_core.ts`
+
+**Cânone não se comprime.** Nova onda acrescenta o mínimo necessário sem apagar, resumir, reformatar semanticamente ou substituir documentação/rationale/aliases/notas/observabilidade preexistentes. Uma linha nova em array declarativo não é “reescrever o arquivo”.
+
+A regressão da W36 provou por que esta regra é vinculante: comprimir `ficha_runtime_map.cjs` removeu literais e rationale que os auditores usam como contrato. O reparo foi forward, restaurando o texto integral antes da promoção.
+
 ---
 
-## 4. Estado curricular vivo pós-W35
+## 4. Estado curricular vivo pós-W36
 
-Ondas **W1–W35 fechadas**.
+Ondas **W1–W36 fechadas**.
 
-Coverage Matrix observada após a promoção final da W35:
+Coverage Matrix observada após o fechamento final da W36:
 
-- **60 Composer**
+- **61 Composer**
 - **15 legado**
-- **15 fallback**
-- **75 servidas**
+- **14 fallback**
+- **76 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ainda ausente: `Moedas`
 
-Canário ativo: **60 competências**.
+Canário ativo: **61 competências**.
 
 ### Últimos recibos técnicos
 
@@ -83,6 +96,7 @@ Canário ativo: **60 competências**.
 | W33 | `GE.07 / F79` | `58/15/17/73/11` | `5fa072c84e69687491a21d0e6f975d7b9da3fd44` — CI `31916781563` + transversal `31916781644`, success |
 | W34 | `GE.08 / F80` | `59/15/16/74/11` | `da00831f80f38550835501a45e0374ee526d316f` — CI `31918571578` + transversal `31918570753`, success |
 | W35 | `GM.06 / F62` | `60/15/15/75/11` | `c7d21d50eb85939e190f29c3a3dbabc17bed4cd8` — CI `31934324465` + transversal `31934324470`, success |
+| W36 | `GM.10 / F93` | `61/15/14/76/11` | `a7423641c2be7c6bc5f221de7db8531e7655b1bc` — CI `31954561791` + transversal `31954561716`, success |
 
 ---
 
@@ -92,59 +106,48 @@ Pré-requisitos: `GM.04 + AL.03`.
 Primitivas canônicas: `Relogio + NumberLine`.  
 Realização: `HorasMinutosStage` / `horas-minutos-f62`.
 
-Contrato canônico materializado:
+Contrato: meia hora/quartos → 5 em 5 com apoio → 5 em 5 sem apoio → minuto a minuto → duração. Diagnósticos `MINUTO_COMO_NUMERO`, `IGNORA_HORA_NA_DURACAO`, `SUBTRAI_DECIMAL`; domínio 3/3 em 2 sessões.
 
-1. meia hora e quartos;
-2. minutos de 5 em 5 com numeração fantasma;
-3. minutos de 5 em 5 sem apoio;
-4. minuto a minuto;
-5. duração entre horários, contando primeiro horas inteiras e depois minutos.
+Histórico técnico que deve permanecer auditável:
 
-Diagnósticos: `MINUTO_COMO_NUMERO`, `IGNORA_HORA_NA_DURACAO`, `SUBTRAI_DECIMAL`.  
-Domínio: **3/3 em 2 sessões**.
+1. regression-first `93b5e28cf7a65fad03ade3dfc6db22c9a1d24a7b`;
+2. inativo inicial `779f40349328728b92a9a4969537ed4982625e8e` — CI `31932785122` + transversal `31932785057`, success;
+3. primeira promoção `7d7689aceb459cdf4b62c816c69723990b7e89f8` revelou dívida real de onboarding (`params.tutorial` em formato incorreto);
+4. forward rollback `917e68f209a69dd08b6b9b57796d9335dec51435` restaurou só os três governantes;
+5. inativo reparado `c30f6d291ac70d8cb0054d2da96dde7b44d003b1` — CI `31933937338` + transversal `31933937332`, success;
+6. promoção final `c7d21d50eb85939e190f29c3a3dbabc17bed4cd8` — CI `31934324465` + transversal `31934324470`, success; Matrix `60/15/15/75/11`.
 
-### 5.1 Regression-first
-
-SHA `93b5e28cf7a65fad03ade3dfc6db22c9a1d24a7b`: teste nominal nasceu antes do registro de GM.06 e falhou por desenho.
-
-### 5.2 Materialização inativa inicial
-
-SHA `779f40349328728b92a9a4969537ed4982625e8e`:
-
-- GM.06 registrada/renderizável/mapeada, fora do canário;
-- runtime map com as duas primitivas físicas;
-- CI `31932785122`: `completed/success`;
-- transversal `31932785057`: `completed/success`.
-
-### 5.3 Falha real de promoção — onboarding
-
-A primeira promoção `7d7689aceb459cdf4b62c816c69723990b7e89f8` alterou somente os três governantes, mas o `visualOnboardingGate` encontrou dívida real: `GM.06.ts` declarava `params.tutorial` como objeto, enquanto o contrato canônico reconhece array de passos.
-
-A Matrix/baseline **não foram relaxados**. Foi feito forward rollback em `917e68f209a69dd08b6b9b57796d9335dec51435`, restaurando os três governantes ao estado inativo sem reescrever histórico.
-
-### 5.4 Reparo inativo e promoção final
-
-SHA inativo reparado `c30f6d291ac70d8cb0054d2da96dde7b44d003b1` trocou somente a ficha GM.06 para `tutorial: [...]` com passos `fala/show`, mantendo o canário desligado.
-
-- CI `31933937338`: `completed/success`;
-- transversal `31933937332`: `completed/success`;
-- o gate que detectara a dívida passou sem allowlist ou mascaramento.
-
-Promoção final: `c7d21d50eb85939e190f29c3a3dbabc17bed4cd8`, novamente só com os três governantes.
-
-- CI `31934324465`: `completed/success`;
-- transversal `31934324470`: `completed/success`;
-- Matrix: `60/15/15/75/11`.
-
-**W35 fechada.**
+**W35 fechada sem relaxar gate, Matrix ou baseline.**
 
 ---
 
-## 6. Seleção fallback-first pós-W35
+## 6. W36 — GM.10 / F93 — Conversão de Unidades — fechamento
 
-Restam **15 fallbacks**:
+Pré-requisitos: `GM.05 + N2.04`.  
+Primitivas canônicas: `NumberLine + Balanca`.  
+Realização: `ConversaoUnidadesStage` / `conversao-unidades-f93`.
 
-`AL.07, AL.08, GE.09, GE.10, GM.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
+Escada: conversão comprimento → massa/capacidade → conversão decimal → escolha da unidade adequada → problema contextual. Diagnósticos `INVERTE_OPERACAO`, `MISTURA_GRANDEZAS`, `IGNORA_DECIMAL`; domínio 3/3 em 2 sessões incluindo decimal.
+
+Histórico técnico vinculante:
+
+1. regression-first/documentação pós-W35: `d9da40162d5655353db57863a2e7447769facc57`;
+2. materialização inativa inicial `ea005de46eb54307c82b3d3d3eecfaf18542cb00`; o Gates detectou compressão indevida do cânone em `ficha_runtime_map.cjs`;
+3. reparo forward inativo `49487995db80affc5ae36c611b82f048e02d4853` restaurou integralmente comentários/notas/literais canônicos e preservou GM.10; CI `31947628546` + transversal `31947628547`, success;
+4. promoção atômica `61c99d7f04bd4d2f42aea42ca24f947867f5df9b` alterou somente os três governantes e fez a Matrix observar `61/15/14/76/11`, mas o contrato genérico do canário ainda impunha `Number.isInteger` a toda ficha;
+5. o vermelho real foi **um** teste: `GM.10 L1: número não inteiro` em `canaryContract.test.ts`; não houve falha de content audit nem anomalia `src/content`;
+6. reparo final `a7423641c2be7c6bc5f221de7db8531e7655b1bc`: `dominioNumerico` ganhou `"racionais"`, GM.10 declarou esse domínio e o contrato passou a exigir inteiro apenas onde o conjunto é inteiro. Finitude nunca relaxou: `NaN` e `Infinity` continuam barrados em qualquer ficha;
+7. recertificação final no SHA exato `a7423641...`: CI `31954561791` + transversal `31954561716`, ambos `completed/success`.
+
+**W36 fechada em `61/15/14/76/11`.**
+
+---
+
+## 7. Seleção fallback-first pós-W36
+
+Restam **14 fallbacks**:
+
+`AL.07, AL.08, GE.09, GE.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
 
 Critério vinculante:
 
@@ -153,19 +156,29 @@ Critério vinculante:
 3. empate → ordem causal executável da Matrix/DAG (`causalWave` crescente, depois maior impacto downstream, depois ID);
 4. empate residual → menor delta estrutural / continuidade local.
 
-Próximas três seleções calculadas no estado pós-W35:
+Próximas três seleções calculadas no estado pós-W36:
 
-1. **W36 = `GM.10 / F93 — Conversão de Unidades`** — prereqs `GM.05 + N2.04`, primitivas `NumberLine + Balanca`;
-2. **W37 = `N7.02 / F85 — Operar com Negativos`** — prereqs `N7.01 + N3.13`, primitiva `InteractiveNumberLine`;
-3. **W38 = `AL.07 / F89 — A Linguagem das Letras`** — prereqs `AL.06 + AL.04`, primitivas `SingaporeBars + plain`; servir N7.02 também deixa `AL.08` mais próximo do desbloqueio total.
+1. **W37 = `N7.02 / F85 — Operar com Negativos`** — prereqs `N7.01 + N3.13`, primitiva `InteractiveNumberLine`;
+2. **W38 = `AL.07 / F89 — A Linguagem das Letras`** — prereqs `AL.06 + AL.04`, primitivas `SingaporeBars + plain`; servir N7.02 aproxima `AL.08` do desbloqueio total;
+3. **W39 = `N2.07 / F66 — A Fábrica de Retângulos`** — prereqs `N4.02 + N2.06`, primitiva `ArrayGrid`.
 
-W39 previsto pela ordem causal após o recálculo: **`N2.07 / F66 — A Fábrica de Retângulos`**, prereqs `N4.02 + N2.06`, primitiva `ArrayGrid`.
+Recalcular Matrix/DAG após cada promoção. Estes alvos são fila calculada, não licença para ignorar uma deriva nova.
+
+### 7.1 Contrato obrigatório da W37
+
+F85 — **Operar com Negativos**:
+
+- `dominioNumerico: "inteiros"` deve nascer já no estágio inativo;
+- níveis: soma positivo+negativo → soma negativo+positivo → dois negativos → subtração de negativo → expressões mistas com 3+ operações;
+- diagnósticos: `IGNORA_SINAL`, `DIRECAO_ERRADA`, `SUBTRAIR_NEGATIVO`;
+- domínio: 3/3 em 2 sessões, incluindo item que cruza o zero;
+- em `a − (−b)`, explicar como **cancelar uma dívida**; não usar a regra vaga “mover na direção do sinal”.
 
 ---
 
-## 7. Branches de rascunho / dívida de limpeza
+## 8. Branches de rascunho / dívida de limpeza
 
-As branches abaixo são **descartáveis, não são linha viva e nunca devem ser mergeadas**:
+As branches abaixo são descartáveis, não são linha viva e nunca devem ser mergeadas:
 
 - `codex/w24-dominio-inteiros`
 - `codex/w31-promotion-staging`
@@ -176,64 +189,57 @@ As branches abaixo são **descartáveis, não são linha viva e nunca devem ser 
 - `codex/w34-promotion-staging`
 - `codex/blob-stage-w35`
 
-O conector atual não expõe remoção de branch/ref. Apagar essas branches quando houver mecanismo de remoção. Até lá, ignorá-las como fonte de verdade.
+O conector pode não expor remoção de branch/ref em todas as sessões. Até limpeza explícita, ignorar essas branches como fonte de verdade.
 
-Não classificar `claude/w24-canary-contract-negative-j4kt89` como descartável por inferência: ela contém commits de origem já usados como referência e só deve ser removida por decisão explícita.
-
----
-
-## 8. Design, cores e tipografia
-
-A catraca de cores é vinculante:
-
-- UI/ficha/palco novo usa papéis de `src/styles/tokens.ts`;
-- não introduzir cor literal nova;
-- não regenerar baseline para silenciar a catraca;
-- se faltar papel semântico, ampliar tokens deliberadamente.
-
-Fredoka e Nunito permanecem as famílias escolhidas.
-
-**Tipografia local está resolvida e não deve ser reaberta.** A integração de `d1101e5db6147c50f3131996b1595005c9bf874b` trouxe quatro WOFF2 variáveis em `public/fonts/`, validação `wOF2`, exceção binária restrita a `public/fonts/*.woff2`, `src/index.css` sem Google Fonts e build servindo `dist/fonts/`.
-
-Não trocar famílias e não reintroduzir dependência externa de Google Fonts.
+Não classificar `claude/w24-canary-contract-negative-j4kt89` como descartável por inferência: ela contém o commit de origem `a7423641...` já integrado na linha viva.
 
 ---
 
-## 9. Protocolo vinculante de cada nova onda
+## 9. Design, cores e tipografia
 
-### 9.1 Reancoragem
+- UI/ficha/palco novo usa papéis de `src/styles/tokens.ts` e classes já estabelecidas; não introduzir cor literal nova.
+- Não regenerar baseline para silenciar catraca.
+- Fredoka e Nunito permanecem as famílias escolhidas.
+- Tipografia local está resolvida; não reabrir Google Fonts.
+- A exceção binária continua restrita a `public/fonts/*.woff2`.
+
+---
+
+## 10. Protocolo vinculante de cada nova onda
+
+### 10.1 Reancoragem
 
 Antes de editar: PR/HEAD, Matrix, DAG, ficha canônica, runtime, mapa físico e precedentes.
 
-### 9.2 Regression-first
+### 10.2 Regression-first
 
-Criar teste nominal do nó ainda não materializado. A falha precisa ser a ausência esperada de registro/ativação/contrato — não um teste frouxo inventado para falhar.
+Criar teste nominal do nó ainda não materializado. A falha precisa ser a ausência esperada de registro/contrato, não expectativa frouxa inventada para falhar.
 
-### 9.3 Classificação de CI
+### 10.3 Classificação de CI
 
 Registrar separadamente conclusão global de cada workflow, evidência de Gates/job/log e falha regression-first vs falha real de implementação.
 
-### 9.4 Materialização inativa
+### 10.4 Materialização inativa
 
 Criar ficha runtime, contrato/builder, palco, catálogo, renderer e wiring necessários **sem ativar canário**.
 
-### 9.5 Runtime map antes da promoção
+### 10.5 Runtime map antes da promoção
 
-Se houver novo kind, specialized builder, renderer, modo ou palco composto, registrar a cadeia física em `ficha_runtime_map.cjs` ainda inativa. Nunca adiar essa lacuna para depois da ativação.
+Se houver novo kind, specialized builder, renderer, modo ou palco composto, registrar a cadeia física em `ficha_runtime_map.cjs` ainda inativa. Respeitar §3.1: adicionar sem comprimir o cânone.
 
-### 9.6 Auditoria pedagógica
+### 10.6 Auditoria pedagógica
 
 Comparar implementação com a ficha canônica integral, níveis 1–5, tags, domínio, onboarding, exposição motora e resolução. CI estrutural verde não prova fidelidade pedagógica.
 
-### 9.7 Gates determinísticos
+### 10.7 Gates determinísticos
 
-Auditorias, TypeScript, suíte, build, guarda textual/binária e Matrix devem permanecer estritos. Não relaxar expectativa para ficar verde.
+Auditorias, TypeScript, suíte, build, guarda textual/binária e Matrix permanecem estritos. Não relaxar expectativa para ficar verde.
 
-### 9.8 Portão inativo exato
+### 10.8 Portão inativo exato
 
 **A promoção só é autorizada quando CI + Certificação transversal do MESMO SHA inativo estão ambos `completed/success`.** Consultar a API do SHA exato e, se ambos já estiverem verdes, executar imediatamente sem pedir confirmação.
 
-### 9.9 Promoção atômica
+### 10.9 Promoção atômica
 
 Canário + ledger nominal + contrato Matrix no mesmo SHA. Depois:
 
@@ -242,17 +248,17 @@ Canário + ledger nominal + contrato Matrix no mesmo SHA. Depois:
 3. certificar CI + transversal do SHA final;
 4. só então fechar checkpoint/porta/corpo do PR.
 
-### 9.10 Cadência W35+
+### 10.10 Cadência W35+
 
-- Não reportar a cada onda; reportar somente a cada **5 ondas**, salvo parada real comprovada.
+- Não reportar a cada onda; reportar somente a cada 5 ondas, salvo parada real comprovada.
 - Fechamento documental da onda N e regression-first da onda N+1 entram no **mesmo push**.
 - O SHA regression-first é vermelho por desenho e não substitui o recibo técnico final da onda N.
-- Em cada recálculo, calcular as **três próximas seleções** de uma vez pelo critério determinístico.
-- A serialização obrigatória que permanece é: materialização inativa → dois workflows verdes → promoção atômica → Matrix honesta → dois workflows finais verdes.
+- Em cada recálculo, calcular as três próximas seleções de uma vez pelo critério determinístico.
+- Serialização obrigatória: materialização inativa → dois workflows verdes → promoção atômica → Matrix honesta → dois workflows finais verdes.
 
 ---
 
-## 10. Autonomia e restrições
+## 11. Autonomia e restrições
 
 Pode agir autonomamente dentro deste protocolo: investigar, testar, corrigir e avançar ondas sem pedir confirmação a cada passo.
 
@@ -265,17 +271,19 @@ Não pode:
 - mergear branches de staging/rascunho;
 - relaxar testes, Matrix, auditorias ou sondas;
 - inventar recibos;
+- comprimir cânone compartilhado;
 - introduzir cores literais sem decisão semântica;
 - ampliar a exceção de binários além de `public/fonts/*.woff2`;
 - reabrir tipografia já resolvida.
 
 ---
 
-## 11. Próximo passo em uma nova retomada
+## 12. Próximo passo em uma nova retomada
 
 1. reancorar o PR #35 no remoto;
-2. confirmar que W35 continua fechada em `60/15/15/75/11` e 60 canários;
-3. confirmar o estado do regression-first W36 no HEAD atual;
-4. reancorar F93/GM.10 integralmente;
-5. seguir §§9.1–9.10 sem pular runtime map, portão inativo ou promoção atômica;
-6. continuar o bloco até W39 e só então emitir relatório de bloco, salvo parada real comprovada.
+2. confirmar que W36 continua fechada em `61/15/14/76/11` e 61 canários, com recibo final `a7423641...` / CI `31954561791` / transversal `31954561716`;
+3. localizar o regression-first nominal da W37 no HEAD atual;
+4. reancorar F85/N7.02 integralmente e confirmar `dominioNumerico: "inteiros"` antes do portão inativo;
+5. seguir §§10.1–10.10 sem pular runtime map, portão inativo ou promoção atômica;
+6. recalcular Matrix/DAG depois da W37 antes de materializar a onda seguinte;
+7. continuar o bloco até W39 e só então emitir relatório de bloco, salvo parada real comprovada.
