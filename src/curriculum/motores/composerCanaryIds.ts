@@ -118,6 +118,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W37 — F85: operar com negativos; InteractiveNumberLine, domínio dos inteiros.
   "N7.02",
 
+  // W38 — F89: linguagem das letras; SingaporeBars + plain.
+  "AL.07",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
