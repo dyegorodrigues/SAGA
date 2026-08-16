@@ -113,14 +113,13 @@ export function PlanoCartesianoStage({ spec, disabled = false, onAnswer }: Props
             aria-label={`ponto (${point.x}, ${point.y})`}
             onPointerUp={event => event.stopPropagation()}
             onClick={event => { event.stopPropagation(); snapTo(point); }}
-            className="absolute rounded-full focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
+            className="absolute rounded-full bg-transparent focus-visible:outline focus-visible:outline-2 disabled:opacity-50"
             style={{
               width: tokens.tamanho.alvo,
               height: tokens.tamanho.alvo,
               left: px.left,
               top: px.top,
               transform: "translate(-50%, -50%)",
-              backgroundColor: "transparent",
               outlineColor: tokens.cor.acao.primaria,
             }}
           />
