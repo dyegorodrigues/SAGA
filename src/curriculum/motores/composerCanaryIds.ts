@@ -115,6 +115,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W36 — F93: conversão de unidades; NumberLine + Balanca.
   "GM.10",
 
+  // W37 — F85: operar com negativos; InteractiveNumberLine, domínio dos inteiros.
+  "N7.02",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
