@@ -106,6 +106,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W33 — F79: polígonos; ShapeCanvas + DragGroup.
   "GE.07",
 
+  // W34 — F80: plano cartesiano; ShapeCanvas#grade.
+  "GE.08",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
