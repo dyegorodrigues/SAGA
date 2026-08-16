@@ -120,12 +120,19 @@ export interface FichaCompetencia {
    * currículo: numa ficha de contagem ou de subtração, um `-2` na tela é bug
    * de gerador, não conteúdo.
    *
-   * `inteiros` só vale para quem ensina o sinal como conteúdo (a strand N7).
+   * `inteiros` vale para quem ensina o sinal como conteúdo (a strand N7).
+   *
+   * `racionais` vale para quem ensina medida fracionada — conversão de unidades,
+   * decimais, frações. Ali `1,5 m` é conteúdo, e o distrator `0,01` é o erro
+   * pedagógico de quem inverteu a operação, não defeito de gerador. Mesmo neste
+   * conjunto o contrato continua exigindo número **finito**: `NaN` e `Infinity`
+   * seguem sendo bug em qualquer ficha da Jornada.
+   *
    * A declaração fica na ficha, e não numa lista de exceções dentro do teste,
    * porque o conjunto numérico é propriedade da competência — quem promove um
    * nó com negativos precisa afirmar isso onde o nó é definido.
    */
-  dominioNumerico?: "naturais" | "inteiros";
+  dominioNumerico?: "naturais" | "inteiros" | "racionais";
 
 
   // Contrato Universal
@@ -146,7 +153,7 @@ export class CurriculumValidator {
     if (!ficha.strand) errors.push("Strand faltando");
     if (!ficha.faixa) errors.push("Faixa faltando");
     if (!Array.isArray(ficha.prereqs)) errors.push("Pré-requisitos devem ser um array");
-    if (ficha.dominioNumerico && !["naturais", "inteiros"].includes(ficha.dominioNumerico)) {
+    if (ficha.dominioNumerico && !["naturais", "inteiros", "racionais"].includes(ficha.dominioNumerico)) {
       errors.push(`Domínio numérico inválido '${ficha.dominioNumerico}' em ${ficha.id}`);
     }
 

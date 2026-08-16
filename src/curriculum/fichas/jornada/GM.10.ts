@@ -8,6 +8,10 @@ const tutorial = [
 
 export const GM_10: FichaCompetencia = {
   id: "GM.10", nome: "Conversão de unidades", strand: "GM", faixa: "F4", prereqs: ["GM.05", "N2.04"],
+  dominioNumerico: "racionais",
+  // Converter unidade produz decimal: 1,5 m = 150 cm. E o distrator de quem
+  // inverte a operação é 0,01 — erro pedagógico correto, não gerador quebrado.
+
   howto: "Unidade menor: você precisa de mais delas. Unidade maior: menos.",
   explain: "A quantidade é a mesma. Só o nome e o número mudam.",
   distratores: [

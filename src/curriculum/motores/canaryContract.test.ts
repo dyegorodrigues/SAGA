@@ -37,12 +37,25 @@ const progressoInicial = (): Progress => ({ lvl: 1, mast: 0, streak: 0 } as Prog
 const pisoNumericoDe = (id: string): number => (REGISTRO[id]?.dominioNumerico === "inteiros" ? -Infinity : 0);
 
 /**
- * Trocar sinal por conjunto não pode virar cheque em branco: onde o negativo é
- * permitido, o contrato ainda exige inteiro finito. `NaN`, `Infinity` e frações
- * continuam sendo defeito de gerador em qualquer ficha da Jornada.
+ * Relaxar o conjunto não pode virar cheque em branco — mas a régua também não
+ * pode ser mais estreita que o currículo.
+ *
+ * Este contrato já foi corrigido uma vez pelo mesmo motivo. Na W24 ele exigia
+ * `>= 0` de todo número, e a F84 chegou ensinando o sinal: `-3` virou o gabarito
+ * recusado. A lição registrada então dizia, textualmente, *"inteiros agora,
+ * racionais depois"*.
+ *
+ * Aconteceu na W36. A F93 ensina **conversão de unidades**, onde `1,5 m` é
+ * conteúdo e o distrator `0,01` é o erro de quem inverteu a operação — um
+ * diagnóstico correto, não um gerador quebrado. `Number.isInteger` recusava.
+ *
+ * Então a exigência de inteiro passa a valer só onde o inteiro É o conjunto.
+ * **O que nunca se relaxa é a finitude:** `NaN` e `Infinity` continuam sendo
+ * defeito de gerador em qualquer ficha, em qualquer conjunto.
  */
-const exigirInteiroFinito = (valor: number, contexto: string) => {
+const exigirNumeroDoConjunto = (valor: number, id: string, contexto: string) => {
   expect(Number.isFinite(valor), `${contexto}: número não finito`).toBe(true);
+  if (REGISTRO[id]?.dominioNumerico === "racionais") return;
   expect(Number.isInteger(valor), `${contexto}: número não inteiro`).toBe(true);
 };
 
@@ -86,7 +99,7 @@ describe("contrato do canário do Composer", () => {
             expect(autoral.options.map(o => String(o.value)), `${id} autoral L${lvl}: gabarito fora das alternativas`).toContain(String(autoral.answer));
           }
           if (typeof autoral.answer === "number") {
-            exigirInteiroFinito(autoral.answer, `${id} autoral L${lvl}`);
+            exigirNumeroDoConjunto(autoral.answer, id, `${id} autoral L${lvl}`);
             expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(pisoNumericoDe(id));
           }
         }
@@ -234,7 +247,7 @@ describe("contrato do canário do Composer", () => {
           const q = gerarAutoral(lvl);
           for (const o of q.options ?? []) {
             if (typeof o.value !== "number") continue;
-            exigirInteiroFinito(o.value, `${id} L${lvl}`);
+            exigirNumeroDoConjunto(o.value, id, `${id} L${lvl}`);
             expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(piso);
           }
         }
