@@ -8,6 +8,7 @@ import {
   registeredFichaRuntimeKindOverride,
   rollbackComposerCanary,
 } from "./motores/composerCanary";
+import { isCanonicalMisconceptionTag } from "./motores/radarEngine";
 
 describe("W37 regression-first — N7.02/F85 Operar com Negativos", () => {
   afterEach(() => rollbackComposerCanary("N7.02"));
@@ -44,6 +45,7 @@ describe("W37 regression-first — N7.02/F85 Operar com Negativos", () => {
 
     expect(cruzouZero).toBe(true);
     expect(tags).toEqual(new Set(["ignora-sinal", "direcao-errada", "subtrair-negativo"]));
+    for (const tag of tags) expect(isCanonicalMisconceptionTag(tag), `F85 tag fora do Radar: ${tag}`).toBe(true);
 
     const l4 = generateRegisteredFichaQuestion("N7.02", 4);
     expect(JSON.stringify(l4.resolucao)).toMatch(/cancelar uma dívida/i);

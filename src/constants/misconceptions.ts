@@ -54,6 +54,12 @@ export const MisconceptionTag = {
   /** Âncora: ajustou para o lado errado — somou onde era tirar, ou o contrário (7×9 → 77) */
   DIRECAO_ERRADA: "direcao-errada",
 
+  /** F85: ignorou o sinal e operou apenas os valores absolutos. */
+  IGNORA_SINAL: "ignora-sinal",
+
+  /** F85: tratou subtrair um negativo como subtrair um positivo. */
+  SUBTRAIR_NEGATIVO: "subtrair-negativo",
+
   /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
   INVERTE_DIVISAO: "inverte-divisao",
 
