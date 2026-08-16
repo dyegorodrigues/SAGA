@@ -103,6 +103,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W32 — F82: conversões e problemas de medida; NumberLine + Balanca.
   "GM.09",
 
+  // W33 — F79: polígonos; ShapeCanvas + DragGroup.
+  "GE.07",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
