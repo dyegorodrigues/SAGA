@@ -93,9 +93,11 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Moedas", kinds: ["money"], componentFiles: ["src/components/Mascot.tsx"], componentExports: ["MoneyCoin", "MoneyNote"], builderKinds: [], rendererKinds: ["money"] },
   { primitive: "NumberBond", kinds: ["bond", "familia"], componentFiles: [component("NumberBond"), component("FamiliaStage"), component("TrianguloDeFatos")], builderKinds: ["bond", "familia"], rendererKinds: ["bond", "familia"], note: "F96/N4.06 realiza NumberBond em linguagem triangular pelo helper TrianguloDeFatos." },
   {
-    primitive: "NumberLine", kinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57", "problemas-medida-f82"],
-    componentFiles: [component("NumberLine"), component("CountingOnStage"), component("TabuadaStage"), component("RegraSequenciaStage"), component("ProblemasMedidaStage")],
-    builderKinds: ["numberline", "tabuada"], specializedBuilderIds: ["N3.03", "AL.04", "GM.09"], rendererKinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57", "problemas-medida-f82"], note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2. W32/F82 compõe NumberLine + Balanca para converter antes de comparar ou operar.",
+    primitive: "NumberLine",
+    kinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57", "problemas-medida-f82", "horas-minutos-f62"],
+    componentFiles: [component("NumberLine"), component("CountingOnStage"), component("TabuadaStage"), component("RegraSequenciaStage"), component("ProblemasMedidaStage"), component("HorasMinutosStage")],
+    builderKinds: ["numberline", "tabuada"], specializedBuilderIds: ["N3.03", "AL.04", "GM.06", "GM.09"], rendererKinds: ["numberline", "counting-on-f14", "tabuada", "regra-sequencia-f57", "problemas-medida-f82", "horas-minutos-f62"],
+    note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2. W32/F82 compõe NumberLine + Balanca para converter antes de comparar ou operar. W35/F62 compõe NumberLine + Relogio para leitura de minutos e duração.",
   },
   {
     primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87"],
@@ -104,7 +106,13 @@ const FICHA_RUNTIME_MAP = [
     note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W22/F87 compõe Quadrado100 + SingaporeBars."
   },
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
-  { primitive: "Relogio", kinds: ["relogio"], componentFiles: [component("Relogio")], builderKinds: ["relogio"], rendererKinds: ["relogio"] },
+  {
+    primitive: "Relogio",
+    kinds: ["relogio", "horas-minutos-f62"],
+    componentFiles: [component("Relogio"), component("HorasMinutosStage")],
+    builderKinds: ["relogio"], specializedBuilderIds: ["GM.06"], rendererKinds: ["relogio", "horas-minutos-f62"],
+    note: "W35/F62 reutiliza Relogio e o compõe com NumberLine em HorasMinutosStage; não cria primitiva autoral nova.",
+  },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },
   {
     primitive: "ShapeCanvas", kinds: ["shapes", "symmetry", "geo-transform", "detetive-formas-f58", "solidos-geometricos-f59", "partes-iguais-f45", "perimetro-f63", "angulos-f78", "mapa-tesouro-f60", "poligonos-f79", "plano-cartesiano-f80"],

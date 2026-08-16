@@ -10,6 +10,7 @@ import { RetaCompletaStage } from "./primitives/RetaCompletaStage"; import type 
 import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
 import { MediaChanceStage } from "./primitives/MediaChanceStage"; import type { MediaChanceF83Spec } from "../curriculum/procedimentos/mediaChanceContract";
 import { ProblemasMedidaStage } from "./primitives/ProblemasMedidaStage"; import type { ProblemasMedidaF82Spec } from "../curriculum/procedimentos/problemasMedidaContract";
+import { HorasMinutosStage } from "./primitives/HorasMinutosStage"; import type { HorasMinutosF62Spec } from "../curriculum/procedimentos/horasMinutosContract";
 import { PoligonosStage } from "./primitives/PoligonosStage"; import type { PoligonosF79Spec } from "../curriculum/procedimentos/poligonosContract";
 import { PlanoCartesianoStage } from "./primitives/PlanoCartesianoStage"; import type { PlanoCartesianoF80Spec } from "../curriculum/procedimentos/planoCartesianoContract";
 import { AreaF81Stage } from "./primitives/AreaF81Stage"; import type { AreaF81Spec } from "../curriculum/procedimentos/areaF81Contract";
@@ -50,6 +51,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'media-chance-f83': return <MediaChanceStage spec={question.uiProps as MediaChanceF83Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'problemas-medida-f82': return <ProblemasMedidaStage spec={question.uiProps as ProblemasMedidaF82Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'horas-minutos-f62': return <HorasMinutosStage spec={question.uiProps as HorasMinutosF62Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'poligonos-f79': return <PoligonosStage spec={question.uiProps as PoligonosF79Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'plano-cartesiano-f80': return <PlanoCartesianoStage spec={question.uiProps as PlanoCartesianoF80Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'area-f81': return <AreaF81Stage spec={question.uiProps as AreaF81Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
