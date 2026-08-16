@@ -7,6 +7,7 @@ import { DecimalStage } from "./primitives/DecimalStage"; import type { DecimalF
 import { PorcentagemStage } from "./primitives/PorcentagemStage"; import type { PorcentagemF87Spec } from "../curriculum/procedimentos/porcentagemContract";
 import { AngulosStage } from "./primitives/AngulosStage"; import type { AngulosF78Spec } from "../curriculum/procedimentos/angulosContract";
 import { RetaCompletaStage } from "./primitives/RetaCompletaStage"; import type { RetaCompletaF84Spec } from "../curriculum/procedimentos/retaCompletaContract";
+import { OperarNegativosStage } from "./primitives/OperarNegativosStage"; import type { OperarNegativosF85Spec } from "../curriculum/procedimentos/operarNegativosContract";
 import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
 import { MediaChanceStage } from "./primitives/MediaChanceStage"; import type { MediaChanceF83Spec } from "../curriculum/procedimentos/mediaChanceContract";
 import { ProblemasMedidaStage } from "./primitives/ProblemasMedidaStage"; import type { ProblemasMedidaF82Spec } from "../curriculum/procedimentos/problemasMedidaContract";
@@ -49,6 +50,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'porcentagem-f87': return <PorcentagemStage spec={question.uiProps as PorcentagemF87Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'angulos-f78': return <AngulosStage spec={question.uiProps as AngulosF78Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'reta-completa-f84': return <RetaCompletaStage spec={question.uiProps as RetaCompletaF84Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'operar-negativos-f85': return <OperarNegativosStage spec={question.uiProps as OperarNegativosF85Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'media-chance-f83': return <MediaChanceStage spec={question.uiProps as MediaChanceF83Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'problemas-medida-f82': return <ProblemasMedidaStage spec={question.uiProps as ProblemasMedidaF82Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
