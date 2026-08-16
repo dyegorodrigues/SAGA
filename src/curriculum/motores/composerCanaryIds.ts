@@ -112,6 +112,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W35 — F62: horas e minutos; Relogio + NumberLine.
   "GM.06",
 
+  // W36 — F93: conversão de unidades; NumberLine + Balanca.
+  "GM.10",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
