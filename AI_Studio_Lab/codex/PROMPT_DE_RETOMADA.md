@@ -51,6 +51,7 @@ Checkpoint é recibo humano. **Coverage Matrix, canário, DAG e runtime vivos s�
 - A Matrix observa o delta real; baseline não mascara deriva.
 - `ficha_runtime_map.cjs` deve ser completado **ainda no estágio inativo**, antes do portão de promoção, quando a nova ficha introduzir kind/builder/renderer/palco composto.
 - Em palco composto, a realização física é explicitada em todas as primitivas canônicas pertinentes; não inferir cadeia inexistente só para ficar verde.
+- Tag emitida por ficha só é funcional se o Radar a reconhecer; tags novas precisam nascer no catálogo canônico e ser provadas por teste nominal.
 - Não tocar/mergear `main`.
 - Não tocar Creature Engine/Tamagotchi neste fluxo.
 
@@ -61,31 +62,32 @@ Os seguintes arquivos são **cânone compartilhado aditivo**:
 - `AI_Studio_Lab/tools/ficha_runtime_map.cjs`
 - `src/curriculum/evidencias.ts`
 - `src/curriculum/misconceptions.ts`
+- `src/constants/misconceptions.ts`
 - `AI_Studio_Lab/tools/coverage_matrix_core.ts`
 
 **Cânone não se comprime.** Nova onda acrescenta o mínimo necessário sem apagar, resumir, reformatar semanticamente ou substituir documentação/rationale/aliases/notas/observabilidade preexistentes. Uma linha nova em array declarativo não é “reescrever o arquivo”.
 
-A regressão da W36 provou por que esta regra é vinculante: comprimir `ficha_runtime_map.cjs` removeu literais e rationale que os auditores usam como contrato. O reparo foi forward, restaurando o texto integral antes da promoção.
+A regressão da W36 provou por que esta regra é vinculante: comprimir `ficha_runtime_map.cjs` removeu literais e rationale que os auditores usam como contrato. O reparo foi forward, restaurando o texto integral antes da promoção. A auditoria pós-promoção da W37 reforçou a mesma regra no catálogo do Radar: diagnóstico correto fora do catálogo é silenciosamente descartado.
 
 ---
 
-## 4. Estado curricular vivo pós-W36
+## 4. Estado curricular vivo pós-W37
 
-Ondas **W1–W36 fechadas**.
+Ondas **W1–W37 fechadas**.
 
-Coverage Matrix observada após o fechamento final da W36:
+Coverage Matrix observada após o fechamento final da W37:
 
-- **61 Composer**
+- **62 Composer**
 - **15 legado**
-- **14 fallback**
-- **76 servidas**
+- **13 fallback**
+- **77 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ainda ausente: `Moedas`
 
-Canário ativo: **61 competências**.
+Canário ativo: **62 competências**.
 
 ### Últimos recibos técnicos
 
@@ -97,6 +99,7 @@ Canário ativo: **61 competências**.
 | W34 | `GE.08 / F80` | `59/15/16/74/11` | `da00831f80f38550835501a45e0374ee526d316f` — CI `31918571578` + transversal `31918570753`, success |
 | W35 | `GM.06 / F62` | `60/15/15/75/11` | `c7d21d50eb85939e190f29c3a3dbabc17bed4cd8` — CI `31934324465` + transversal `31934324470`, success |
 | W36 | `GM.10 / F93` | `61/15/14/76/11` | `a7423641c2be7c6bc5f221de7db8531e7655b1bc` — CI `31954561791` + transversal `31954561716`, success |
+| W37 | `N7.02 / F85` | `62/15/13/77/11` | `cdb57bcba6eec5f9e5b73243ac326e49594535f6` — CI `31956662185` + transversal `31956662195`, success |
 
 ---
 
@@ -143,9 +146,9 @@ Histórico técnico vinculante:
 
 ---
 
-## 7. Seleção fallback-first pós-W36
+## 7. Seleção fallback-first pós-W36 — histórico preservado
 
-Restam **14 fallbacks**:
+Restavam **14 fallbacks**:
 
 `AL.07, AL.08, GE.09, GE.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, N7.02, PE.04`.
 
@@ -173,6 +176,31 @@ F85 — **Operar com Negativos**:
 - diagnósticos: `IGNORA_SINAL`, `DIRECAO_ERRADA`, `SUBTRAIR_NEGATIVO`;
 - domínio: 3/3 em 2 sessões, incluindo item que cruza o zero;
 - em `a − (−b)`, explicar como **cancelar uma dívida**; não usar a regra vaga “mover na direção do sinal”.
+
+### 7.2 Fechamento técnico da W37
+
+- regression-first/documentação: `4a7bac1cc7fa28723debbb5f61a0afeb6afd0ce2`; vermelho nominal por ausência da N7.02, com os demais 3.157 testes verdes;
+- materialização inativa: `e7d7268b07d1027f48200ca21215dadd563e69a5`; CI `31955540067` + transversal `31955540080`, success;
+- promoção atômica: `bc4fbc63cbec661b28183a218a82aacb12fa20fd`; Matrix `62/15/13/77/11`; CI `31956022774` + transversal `31956022841`, success;
+- auditoria pós-promoção encontrou duas tags F85 ausentes do catálogo efetivo do Radar (`IGNORA_SINAL`, `SUBTRAIR_NEGATIVO`; `DIRECAO_ERRADA` já existia);
+- reparo forward final: `cdb57bcba6eec5f9e5b73243ac326e49594535f6`, adicionando somente as duas tags faltantes e asserção nominal de reconhecimento pelo Radar; CI `31956662185` + transversal `31956662195`, ambos `completed/success`.
+
+**W37 fechada em `62/15/13/77/11`.**
+
+### 7.3 Seleção pós-W37 e contrato da W38
+
+Restam **13 fallbacks**: `AL.07, AL.08, GE.09, GE.10, GM.11, N2.07, N4.11, N4.12, N5.04, N5.05, N6.02, N6.04, PE.04`.
+
+**W38 = `AL.07 / F89 — A Linguagem das Letras`** — prereqs `AL.06 + AL.04`, primitivas `SingaporeBars + plain`. Com N7.02 já servida, promover AL.07 completa os prereqs de AL.08.
+
+Contrato F89:
+
+- caixa vazia → letra → expressão simples → expressão em contexto → regra de padrão → equivalência de expressões;
+- a letra guarda o lugar de um número; notação não é conceito novo;
+- regra geral testada em pelo menos dois casos;
+- diagnósticos `LETRA_COMO_OBJETO`, `SO_CASO_PARTICULAR`, `NAO_GENERALIZA` precisam estar no catálogo do Radar ainda inativo;
+- domínio 3/3 em 2 sessões, incluindo L4;
+- runtime map registra as duas entradas de composição `SingaporeBars + plain` antes da promoção.
 
 ---
 
@@ -281,9 +309,9 @@ Não pode:
 ## 12. Próximo passo em uma nova retomada
 
 1. reancorar o PR #35 no remoto;
-2. confirmar que W36 continua fechada em `61/15/14/76/11` e 61 canários, com recibo final `a7423641...` / CI `31954561791` / transversal `31954561716`;
-3. localizar o regression-first nominal da W37 no HEAD atual;
-4. reancorar F85/N7.02 integralmente e confirmar `dominioNumerico: "inteiros"` antes do portão inativo;
+2. confirmar que W37 continua fechada em `62/15/13/77/11` e 62 canários, com recibo final `cdb57bc...` / CI `31956662185` / transversal `31956662195`;
+3. localizar o regression-first nominal da W38 no HEAD atual;
+4. reancorar F89/AL.07 integralmente, inclusive tags do Radar e composição `SingaporeBars + plain`;
 5. seguir §§10.1–10.10 sem pular runtime map, portão inativo ou promoção atômica;
-6. recalcular Matrix/DAG depois da W37 antes de materializar a onda seguinte;
+6. recalcular Matrix/DAG depois da W38 antes de materializar a onda seguinte;
 7. continuar o bloco até W39 e só então emitir relatório de bloco, salvo parada real comprovada.
