@@ -1,10 +1,16 @@
 import type { FichaCompetencia } from "../../schema";
 
 const dominio = { acertos: 3, de: 3, sessoes: 2 } as const;
-const tutorial = {
-  instruction: "No relógio, cada número percorrido pelo ponteiro grande vale 5 minutos. Para duração, avance primeiro as horas inteiras e depois os minutos restantes.",
-  say: "O ponteiro grande conta minutos de cinco em cinco; a reta de tempo mostra quanto tempo realmente passou.",
-};
+const tutorial = [
+  {
+    fala: "O ponteiro grande percorre 60 minutos em uma volta; cada número do mostrador vale 5 minutos.",
+    show: { destacarPonteiroMinutos: true, contarDeCincoEmCinco: true },
+  },
+  {
+    fala: "Para descobrir uma duração, conte o tempo que passa: avance primeiro as horas inteiras e depois os minutos restantes.",
+    show: { revelarRetaTempo: true, horasAntesDosMinutos: true },
+  },
+];
 
 export const GM_06: FichaCompetencia = {
   id: "GM.06",
