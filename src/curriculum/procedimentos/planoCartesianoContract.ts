@@ -93,8 +93,8 @@ const specs: readonly PlanoCartesianoF80Spec[] = [
   },
   {
     nivel: 4, modo: "figura-coordenadas", primitivas: ["ShapeCanvas"], modoShapeCanvas: "grade", maxCoord: 3,
-    origem: { x: 0, y: 0 }, alvo: { x: 1, y: 3 }, vertices: [{ x: 1, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 3 }, { x: 1, y: 3 }],
-    objetivo: "Complete o retângulo ligando os pontos na ordem. Qual vértice fecha a figura?", resposta: "1,3",
+    origem: { x: 0, y: 0 }, alvo: { x: 1, y: 3 }, vertices: [{ x: 1, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 3 }],
+    objetivo: "Três vértices do retângulo já estão ligados. Coloque o quarto vértice para completar a figura.", resposta: "1,3",
     opcoes: makeOptions({ x: 1, y: 3 }, [
       { ponto: { x: 3, y: 1 }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
       { ponto: { x: 0, y: 3 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
