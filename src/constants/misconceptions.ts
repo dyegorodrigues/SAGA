@@ -69,6 +69,15 @@ export const MisconceptionTag = {
   /** F89: descreveu exemplos, mas não produziu uma regra que valha para todos. */
   NAO_GENERALIZA: "nao-generaliza",
 
+  /** F66: omitiu os fatores triviais 1 e n ao listar todas as formações. */
+  ESQUECE_TRIVIAIS: "esquece-triviais",
+
+  /** F66: encontrou uma formação retangular e encerrou a busca antes de esgotar os pares. */
+  PARA_CEDO: "para-cedo",
+
+  /** F66: aceitou sobra como fator ou confundiu fator com múltiplo. */
+  CONFUNDE_FATOR_MULTIPLO: "confunde-fator-multiplo",
+
   /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
   INVERTE_DIVISAO: "inverte-divisao",
 
