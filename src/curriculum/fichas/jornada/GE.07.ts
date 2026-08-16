@@ -1,11 +1,10 @@
 import type { FichaCompetencia, FichaDominio } from "../../schema";
 import { PoligonosMisconception } from "../../procedimentos/poligonosContract";
 
-const dominioReconhecimento: FichaDominio = { acertos: 3, de: 3, sessoes: 2 };
-const dominioConstrucao: FichaDominio = { acertos: 2, de: 3, sessoes: 2 };
+const dominio: FichaDominio = { acertos: 3, de: 3, sessoes: 2 };
 const tutorial = [
-  { fala: "Passe o dedo pelo contorno: ele precisa fechar e usar lados retos.", show: { destacarContorno: true } },
-  { fala: "Conte cada lado uma vez. Depois compare as propriedades da figura.", show: { contarLados: true } },
+  { fala: "Conte os lados e depois olhe os ângulos. A posição da figura não muda suas propriedades.", show: { contarLados: true, destacarAngulos: true } },
+  { fala: "Uma forma pode pertencer a mais de um grupo. Os laços dentro de laços mostram essa hierarquia.", show: { mostrarLacos: true } },
 ];
 
 /** F79 — Polígonos: triângulos e quadriláteros. */
@@ -15,30 +14,30 @@ export const GE_07: FichaCompetencia = {
   strand: "GE",
   faixa: "F3",
   prereqs: ["GE.03", "GE.06"],
-  howto: "Confira se a figura fecha com lados retos, conte os lados e então classifique pelas propriedades.",
-  explain: "Polígonos são figuras fechadas formadas por segmentos retos. As classes podem se sobrepor: um quadrado também é um retângulo porque satisfaz as propriedades de um retângulo.",
+  howto: "Conte os lados e olhe os ângulos. Uma forma pode pertencer a mais de um grupo.",
+  explain: "O quadrado tem quatro ângulos retos, então também é retângulo; e todo retângulo também é paralelogramo.",
   distratores: [
-    { regra: "aceita contorno aberto como polígono", tag: PoligonosMisconception.NAO_FECHA },
-    { regra: "conta um lado duas vezes ou esquece um lado", tag: PoligonosMisconception.CONTA_LADOS_ERRADO },
-    { regra: "trata classes geométricas como caixas mutuamente exclusivas", tag: PoligonosMisconception.CONFUNDE_CLASSE },
+    { regra: "trata quadrado, retângulo e paralelogramo como categorias exclusivas", tag: PoligonosMisconception.CATEGORIAS_EXCLUSIVAS },
+    { regra: "usa apenas um critério quando a classificação exige combinar propriedades", tag: PoligonosMisconception.SO_UM_CRITERIO },
+    { regra: "acha que girar a figura muda sua classe geométrica", tag: PoligonosMisconception.ORIENTACAO_FIXA },
   ],
   niveis: {
-    1: { primitiva: "shapecanvas", micro: "identificar-poligono", andaime: "alto" },
-    2: { primitiva: "shapecanvas", micro: "triangulos", andaime: "medio" },
+    1: { primitiva: "shapecanvas", micro: "triangulos-lados", andaime: "alto" },
+    2: { primitiva: "shapecanvas", micro: "triangulos-angulos", andaime: "medio" },
     3: { primitiva: "draggroup", micro: "quadrilateros", andaime: "medio" },
-    4: { primitiva: "draggroup", micro: "classificar-propriedades", andaime: "minimo" },
-    5: { primitiva: "shapecanvas", micro: "construir-classificar", andaime: "nenhum", rt_alvo: 18000 },
+    4: { primitiva: "draggroup", micro: "hierarquia", andaime: "minimo" },
+    5: { primitiva: "draggroup", micro: "propriedades-combinadas", andaime: "nenhum", rt_alvo: 18000 },
   },
   micros: [
-    { id: "identificar-poligono", fonte: "F79", alvo: "distinguir polígono de não-exemplo aberto usando fechamento e lados retos", kinds: ["shapecanvas", "draggroup"], params: { modo: "identificar-poligono", tutorial }, dominio: { ...dominioReconhecimento } },
-    { id: "triangulos", fonte: "F79", alvo: "reconhecer triângulos em diferentes orientações pela propriedade de três lados", kinds: ["shapecanvas", "draggroup"], params: { modo: "triangulos", tutorial }, dominio: { ...dominioReconhecimento } },
-    { id: "quadrilateros", fonte: "F79", alvo: "agrupar quadriláteros pela propriedade de quatro lados", kinds: ["shapecanvas", "draggroup"], params: { modo: "quadrilateros", tutorial }, dominio: { ...dominioReconhecimento } },
-    { id: "classificar-propriedades", fonte: "F79", alvo: "classificar quadrados e retângulos por propriedades, aceitando inclusão de classes", kinds: ["shapecanvas", "draggroup"], params: { modo: "classificar-propriedades", tutorial }, dominio: { ...dominioReconhecimento } },
-    { id: "construir-classificar", fonte: "F79", alvo: "construir e classificar um polígono sob ao menos duas condições simultâneas", kinds: ["shapecanvas", "draggroup"], params: { modo: "construir-classificar", tutorial }, dominio: { ...dominioConstrucao } },
+    { id: "triangulos-lados", fonte: "F79", alvo: "classificar triângulos pelo número de lados iguais, independentemente da orientação", kinds: ["shapecanvas", "draggroup"], params: { modo: "triangulos-lados", tutorial }, dominio: { ...dominio } },
+    { id: "triangulos-angulos", fonte: "F79", alvo: "classificar triângulos pelos ângulos sem confundir tamanho dos lados com abertura", kinds: ["shapecanvas", "draggroup"], params: { modo: "triangulos-angulos", tutorial }, dominio: { ...dominio } },
+    { id: "quadrilateros", fonte: "F79", alvo: "classificar quadriláteros por lados, ângulos e paralelismo", kinds: ["shapecanvas", "draggroup"], params: { modo: "quadrilateros", tutorial }, dominio: { ...dominio } },
+    { id: "hierarquia", fonte: "F79", alvo: "reconhecer a inclusão quadrado ⊂ retângulo ⊂ paralelogramo usando laços aninhados", kinds: ["shapecanvas", "draggroup"], params: { modo: "hierarquia", tutorial }, dominio: { ...dominio } },
+    { id: "propriedades-combinadas", fonte: "F79", alvo: "classificar polígonos combinando ao menos duas propriedades simultâneas", kinds: ["shapecanvas", "draggroup"], params: { modo: "propriedades-combinadas", tutorial }, dominio: { ...dominio } },
   ],
   erros_tipicos: [
-    { id: PoligonosMisconception.NAO_FECHA, descricao: "Aceita uma linha quebrada aberta como polígono." },
-    { id: PoligonosMisconception.CONTA_LADOS_ERRADO, descricao: "Erra a contagem de lados ou vértices ao classificar." },
-    { id: PoligonosMisconception.CONFUNDE_CLASSE, descricao: "Não reconhece inclusão entre classes, como quadrado dentro da classe dos retângulos." },
+    { id: PoligonosMisconception.CATEGORIAS_EXCLUSIVAS, descricao: "Nega que uma figura possa pertencer simultaneamente a uma classe e às suas classes mais amplas." },
+    { id: PoligonosMisconception.SO_UM_CRITERIO, descricao: "Classifica por apenas uma propriedade quando a tarefa exige combinar critérios." },
+    { id: PoligonosMisconception.ORIENTACAO_FIXA, descricao: "Muda a classificação quando a mesma figura é girada." },
   ],
 };
