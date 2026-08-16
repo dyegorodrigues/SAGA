@@ -109,6 +109,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W34 — F80: plano cartesiano; ShapeCanvas#grade.
   "GE.08",
 
+  // W35 — F62: horas e minutos; Relogio + NumberLine.
+  "GM.06",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
