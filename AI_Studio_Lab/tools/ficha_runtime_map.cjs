@@ -35,11 +35,11 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
 const FICHA_RUNTIME_MAP = [
   {
     primitive: "ArrayGrid",
-    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66"],
-    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage"), component("PerimetroStage"), component("AreaF81Stage"), component("FatoresRetangulosStage")],
-    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10", "GM.07", "GM.08", "N2.07"],
-    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66"],
-    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo. F63/GM.07 compõe ArrayGrid + ShapeCanvas para separar chão e volta. F81/GM.08 reutiliza ArrayGrid como unidade quadrada do chão, inclusive em composição de retângulos. W39/F66/N2.07 reutiliza o ArrayGrid físico em FatoresRetangulosStage e mantém qualquer sobra visível fora do retângulo completo.",
+    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66", "volume-vistas-f92"],
+    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage"), component("PerimetroStage"), component("AreaF81Stage"), component("FatoresRetangulosStage"), component("VolumeVistasStage")],
+    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10", "GM.07", "GM.08", "N2.07", "GE.10"],
+    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66", "volume-vistas-f92"],
+    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo. F63/GM.07 compõe ArrayGrid + ShapeCanvas para separar chão e volta. F81/GM.08 reutiliza ArrayGrid como unidade quadrada do chão, inclusive em composição de retângulos. W39/F66/N2.07 reutiliza o ArrayGrid físico em FatoresRetangulosStage e mantém qualquer sobra visível fora do retângulo completo. W41/F92/GE.10 realiza ArrayGrid#3D em VolumeVistasStage: o ArrayGrid físico permanece a superfície canônica das projeções e da reconstrução; o palco acrescenta visualização/rotação 3D, onboarding explícito do mode swap e interação por toque com alvos mínimos de 80px, sem criar primitiva autoral paralela.",
   },
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
   {
