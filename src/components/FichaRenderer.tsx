@@ -22,6 +22,7 @@ import { CirculoAreasStage } from "./primitives/CirculoAreasStage"; import type 
 import { VolumeVistasStage } from "./primitives/VolumeVistasStage"; import type { VolumeVistasF92Spec } from "../curriculum/procedimentos/volumeVistasContract";
 import { PrimosDivisoresStage } from "./primitives/PrimosDivisoresStage"; import type { PrimosDivisoresF70Spec } from "../curriculum/procedimentos/primosDivisoresContract";
 import { DivisaoDoisDigitosStage } from "./primitives/DivisaoDoisDigitosStage"; import type { DivisaoDoisDigitosF71Spec } from "../curriculum/procedimentos/divisaoDoisDigitosContract";
+import { SomaFracoesStage } from "./primitives/SomaFracoesStage"; import type { SomaFracoesF74Spec } from "../curriculum/procedimentos/somaFracoesContract";
 import { ExpressaoF77Stage } from "./primitives/ExpressaoF77Stage"; import type { ExpressaoF77Spec } from "../curriculum/procedimentos/expressaoF77Contract";
 import { MapaTesouroStage } from "./primitives/MapaTesouroStage"; import type { MapaTesouroF60Spec } from "../curriculum/procedimentos/mapaTesouroContract";
 import { SolidosGeometricosStage } from "./primitives/SolidosGeometricosStage"; import type { SolidosGeometricosF59Spec } from "../curriculum/procedimentos/solidosGeometricosContract";
@@ -71,6 +72,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'volume-vistas-f92': return <VolumeVistasStage spec={question.uiProps as VolumeVistasF92Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'primos-divisores-f70': return <PrimosDivisoresStage spec={question.uiProps as PrimosDivisoresF70Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'divisao-dois-digitos-f71': return <DivisaoDoisDigitosStage spec={question.uiProps as DivisaoDoisDigitosF71Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'soma-fracoes-f74': return <SomaFracoesStage spec={question.uiProps as SomaFracoesF74Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'expressao-f77': return <ExpressaoF77Stage spec={question.uiProps as ExpressaoF77Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'mapa-tesouro-f60': return <MapaTesouroStage spec={question.uiProps as MapaTesouroF60Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'solidos-geometricos-f59': return <SolidosGeometricosStage spec={question.uiProps as SolidosGeometricosF59Spec} disabled={Boolean(disabled)} onAnswer={send}/>;

@@ -17,7 +17,7 @@ import { AnswerMeta, Question } from "../../types";
 import { bundleMisconceptions } from "./misconceptionBundle";
 
 type ProducaoComHistorico = AcaoDeProducao & { diagnosticosLongitudinais?: string[] };
-const AUTORIAIS = new Set(["material-dourado","numberline-f19","quadrado100-f36","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46"]);
+const AUTORIAIS = new Set(["material-dourado","numberline-f19","quadrado100-f36","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74"]);
 
 export function isMotorSlip(meta?: AnswerMeta): boolean { return meta?.manipulacao !== undefined && classificarErro(meta.manipulacao) === "motor"; }
 export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta): boolean {
@@ -45,7 +45,7 @@ export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
 export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
   if (q.kind === "material-dourado") return 3000;
   if (q.kind === "quadrado100-f36") return 2200;
-  if (["numberline-f19","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46"].includes(q.kind as string)) return 1800;
+  if (["numberline-f19","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74"].includes(q.kind as string)) return 1800;
   if (q.kind === "regua-f61" && meta?.source === "medidas") return 2600;
   if (isPosicaoQuestion(q) && meta?.posicao !== undefined) return 3300;
   if (isFormaQuestion(q) && meta?.forma !== undefined) return 3700;
@@ -72,7 +72,7 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
 }
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento","touchcount","fileira","classificacao","audiochoice","touchplace","shapecanvas","grandeza","comparacao-simbolica","medidas","moldura","material-dourado",
-  "numberline-f19","regua-f61","quadrado100-f36","visual-addition-f13","emojirow-riscar-f15","counting-on-f14","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46",
+  "numberline-f19","regua-f61","quadrado100-f36","visual-addition-f13","emojirow-riscar-f15","counting-on-f14","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74",
 ]);
 export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
