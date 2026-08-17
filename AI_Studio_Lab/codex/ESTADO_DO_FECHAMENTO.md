@@ -1,154 +1,98 @@
 # Estado do Fechamento Curricular — SAGA
 
-**Linha aberta em:** 11/08/2026  
-**Última atualização operacional:** 13/08/2026 — W11 fechada; W12 é a próxima onda  
+**Última atualização operacional:** 17/08/2026 — W43 fechada; W44/F74 materializada e inativa, com portão técnico verde  
 **Branch:** `codex/fechamento-curricular`  
-**PR:** #35 — deve permanecer draft, open e unmerged  
+**PR:** #35 — deve permanecer **draft + open + unmerged**  
+**Base protegida:** `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`  
 **Fonte de verdade:** GitHub remoto + gates executáveis do mesmo SHA.
+
+> Este arquivo é um **índice vivo**, não um ledger histórico. O histórico detalhado permanece nos checkpoints por onda e no Git. Para executar trabalho, leia primeiro `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md`.
 
 ## Estado atual
 
-Bloco 0 — **CONCLUÍDO**.  
-Bloco 1 — **EM EXECUÇÃO**.
+- Ondas **W1–W43 fechadas**.
+- W44 = `N5.04 / F74 — Somar Frações`.
+- F74 está **materializada, registrada no Composer e INATIVA**.
+- Última Matrix de produção fechada: **68 Composer / 15 legado / 7 fallback / 83 servidas / 11 divergências**.
+- Composer registrado no estágio inativo W44: **69**, dos quais **68 ativos + N5.04 inativa**.
+- 90 competências / 94 fichas autorais.
+- `modeSwaps=12`.
+- `toolIntroductions=44`.
+- primitiva autoral ainda ausente: `Moedas`.
 
-Ondas/contratos fechados nesta linha:
+Fallbacks ainda não fechados:
 
-- W7 `N2.02/F36`;
-- W8 `N3.01/F13`;
-- W9 `N3.02/F15`;
-- R0-A — contrato de resolução, sem delta curricular;
-- W10 `N3.03/F14`;
-- W11 `AL.03/F30`.
+`AL.08, GM.11, N5.04, N5.05, N6.02, N6.04, PE.04`.
 
-Matrix vigente reconciliada:
+## Último fechamento completo
 
-`36 Composer / 16 legado / 38 fallback / 52 servidas / 12 divergências / 12 swaps / 44 estreias`.
+### W43 — `N4.12 / F71 — Dividir por Dois Dígitos`
 
-Próxima sequência causal autorizada: **W12 `N4.01/F97`**.
+Recibo final: `83c18fd6902bb3d23a77fca04c051cd417b103b7`.
 
-## W10 — N3.03 / F14 — FECHADA
+- CI `32048810747`: `completed/success`;
+- Certificação transversal `32048810884`: `completed/success`;
+- Matrix final: `68/15/7/83/11`.
 
-- `CountingOnStage` é o owner especializado da estratégia.
-- Composição: `LinkingCubes + NumberLine`.
-- nasceu sob R0-A com resolução calculada do item;
-- RT não compra mastery, unlock ou XP.
+Não reabrir W43 sem causa nova observável.
 
-Ledger:
+## W44 — estado técnico
 
-- `W10-N3.03`: `{ composer:+1, legacy:-1, divergences:-1 }`;
-- `OBS-COMPOSITE-N4.03`: `{ divergences:-1 }`, observabilidade apenas.
+### Regression-first
 
-A evidência de `OBS-COMPOSITE-N4.03` foi retificada para o fato realmente concluído:
-SHA `0b4a5b0dbe26a2c321d7bbb23124cb81681fdcd5`, CI #1195 / run `31655630072`.
+SHA `34b6b3a5ed3fde597564685e7b2a820c2beca0f7`:
 
-## W11 — AL.03 / F30 — FECHADA
+- CI `32050560773`: `completed/failure`, vermelho nominal exclusivamente pela ausência de `N5.04/F74`;
+- transversal `32050560782`: `completed/success`;
+- 3.279/3.280 testes verdes.
 
-### Reancoragem canônica
+### Materialização inativa certificada
 
-O rascunho da scratch branch não foi copiado cegamente. A fonte canônica provou:
+Recibo técnico inativo vinculante: `a41e6e9e6317efcec230b879722a8ae3fcafd8ae`.
 
-- pré-requisitos `N1.09 + N2.01`;
-- L1: 2 em 2 com reta/arcos até 10;
-- L2: 10 em 10 com reta até 100;
-- L3: 5 em 5 com reta + `Quadrado100` até 50;
-- L4: sequência escrita, sem manipulável, generalizando o tamanho do salto;
-- L5: início deslocado, mental; o exemplo canônico `3 em 3 a partir de 6` é coberto por teste determinístico;
-- domínio `3/3` em `2 sessões`, cobrindo pelo menos **dois saltos diferentes**.
+- CI `32052726802`: **completed/success**;
+- Certificação transversal `32052726430`: **completed/success**;
+- Gates: catálogo, fichas, conformidade, grafo, TypeScript, 235 arquivos / 3.287 testes, build e guarda textual verdes;
+- higiene e binários verdes;
+- `N5.04` continua fora do canário ativo;
+- ledger e Matrix continuam pós-W43.
 
-### Arquitetura
+F74 realiza `SingaporeBars` com denominador fixo, soma/subtração, fração imprópria e simplificação como mesma quantidade/outro nome. Diagnósticos: `soma-denominador`, `nao-simplifica`, `impropria-invalida`. A restrição especial de domínio usa `masteryDisqualifier`, sem segunda autoridade de mastery.
 
-- `SkipCountStage` é o owner especializado;
-- reutiliza `InteractiveNumberLineSurface`; nenhuma segunda reta foi criada;
-- compõe `Quadrado100` no L3;
-- kind: `skip-count-f30`;
-- resolução R0-A tipada desde o nascimento;
-- misconceptions: `PERDE_O_SALTO`, `SALTO_DUPLO`, `SO_DEZENAS`, `NAO_PARTE_DE`;
-- evidência por salto: `contagem-saltos-passo-<n>`;
-- `MasteryRule.evidenciasDistintas` exige mínimo 2 valores do prefixo acima;
-- `MasteryEvidence.evidenciasVistas` continua a fonte histórica; não foi criado estado paralelo;
-- velocidade continua telemetria e não participa da coroa.
+## Próxima ação obrigatória
 
-### Recibo inativo
+**Não repetir regression-first nem materialização F74.**
 
-SHA `5988403f91a66919463ea478492560c54a8a051d`  
-CI #1219 / run `31662349768` — **success 6/6**.
+A próxima conversa deve:
 
-No mesmo SHA ficaram verdes:
+1. reancorar PR/HEAD/main/reviews/threads;
+2. ler integralmente `PROMPT_DE_RETOMADA.md` e `CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_INATIVA_CERTIFICADA_2026-08-17.md`;
+3. confirmar o portão inativo `a41e6e9e…`, CI `32052726802` + transversal `32052726430`;
+4. promover W44 **atomicamente no mesmo SHA**: canário `N5.04` + ledger `W44-N5.04` + contrato Matrix;
+5. observar o delta real da Matrix; se só a ativação mudar, expectativa `69/15/6/84/11`, mas a saída executável vence a expectativa;
+6. exigir CI + transversal verdes do SHA final da promoção;
+7. fechar W44 documentalmente;
+8. recalcular DAG/Matrix antes de escolher W45.
 
-1. Gates;
-2. Sensei real, incluindo F30;
-3. 390px × 8 sementes;
-4. 320/900px × 1 semente;
-5. higiene;
-6. binários.
+`N5.05` depende de `N5.04 + N6.04`; a fila pós-W44 deve ser recalculada, não copiada de memória.
 
-### Promoção e Matrix observa
+## Documentos vivos de retomada
 
-Promoção semântica: `7052c93b909883a671e6555e413a6992d4c5e8db`.
+- `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md` — porta operacional principal;
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_INATIVA_CERTIFICADA_2026-08-17.md` — recibo humano do ponto atual;
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W43_N4_12_F71_FECHADA_2026-08-17.md` — último fechamento completo;
+- `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
+- `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
+- `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`.
 
-O Gates pós-promoção ficou vermelho apenas porque o baseline ainda era o anterior. A Matrix observou:
+## Governança
 
-- Composer `36`;
-- legado `16`;
-- fallback `38`;
-- servidas `52`;
-- divergências `12`;
-- swaps `12`;
-- estreias `44`.
-
-Não foi necessária reconciliação adicional de observabilidade: o mapa composto já enxerga `InteractiveNumberLine + Quadrado100` para `skip-count-f30`.
-
-Ledger:
-
-`W11-AL.03 = { composer:+1, legacy:-1, divergences:-1 }`.
-
-Checkpoint detalhado:
-`CHECKPOINT_FABRICA_CURRICULAR_W11_AL03_F30_FECHADA_2026-08-13.md`.
-
-## Motor de Resolução
-
-R0-A está concluída como contrato de dados e não conta como migração curricular.
-
-Decisões de política de player continuam estacionadas em `PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`. W12 não pode congelá-las por oportunismo:
-
-- “2º erro = dica / 3º = resolução”;
-- teto de resoluções por sessão;
-- modos do player;
-- pausa acumulada de RT;
-- inércia/foco;
-- faixa do tutor e telemetria própria de ajuda.
-
-## W12 — N4.01 / F97 — PRÓXIMA
-
-Só abre após reancoragem nova do remoto.
-
-Rascunho: branch `codex/w11-w12-drafts`, arquivo `AI_Studio_Lab/codex/drafts/W12_N4_01_F97_DRAFT.md`.
-
-O rascunho é **não executável** e **não fonte de verdade**. Antes do regression-first, reconciliar F97 contra:
-
-1. ficha canônica;
-2. Curriculum Graph;
-3. Coverage Matrix;
-4. código/runtime atuais;
-5. contrato R0-A quando aplicável.
-
-## Invariantes
-
-- não tocar `main`;
-- PR #35 continua draft; nenhum merge/ready/auto-merge sem autorização explícita;
-- Creature Engine fora desta fila;
-- Thinking Engine runtime não autorizado;
-- learner state soberano;
-- RT/velocidade não compram mastery/XP;
-- gates vermelhos são evidência;
-- snapshots históricos imutáveis;
-- nenhuma faxina P2 oportunista;
-- verde de SHA anterior não vale por procuração.
-
-## Porta de handoff
-
-Para nova conversa, começar por:
-
-`CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-13.md`.
-
-Depois reancorar PR/HEAD/CI/reviews antes de qualquer edição.
+- `main` intocada;
+- PR #35 permanece draft/unmerged;
+- sem auto-merge/ready;
+- sem Creature Engine/Tamagotchi;
+- cânone compartilhado é aditivo;
+- não apagar rationale/aliases/notas históricas;
+- não relaxar testes, sondas ou Matrix;
+- não misturar recibos de SHAs diferentes;
+- issues #47 e #48 permanecem pós-90/90 e não interrompem W44–W50.
