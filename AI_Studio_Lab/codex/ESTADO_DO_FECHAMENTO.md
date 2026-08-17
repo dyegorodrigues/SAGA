@@ -1,6 +1,6 @@
 # Estado do Fechamento Curricular — SAGA
 
-**Última atualização operacional:** 17/08/2026 — W43 fechada; W44/F74 materializada e inativa, com portão técnico verde  
+**Última atualização operacional:** 17/08/2026 — W44 fechada; W45/N6.04/F88 aberta em regression-first  
 **Branch:** `codex/fechamento-curricular`  
 **PR:** #35 — deve permanecer **draft + open + unmerged**  
 **Base protegida:** `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`  
@@ -10,77 +10,82 @@
 
 ## Estado atual
 
-- Ondas **W1–W43 fechadas**.
-- W44 = `N5.04 / F74 — Somar Frações`.
-- F74 está **materializada, registrada no Composer e INATIVA**.
-- Última Matrix de produção fechada: **68 Composer / 15 legado / 7 fallback / 83 servidas / 11 divergências**.
-- Composer registrado no estágio inativo W44: **69**, dos quais **68 ativos + N5.04 inativa**.
+- Ondas **W1–W44 fechadas**.
+- W45 = `N6.04 / F88 — Razão e Proporção`, aberta em regression-first nominal.
+- Matrix fechada pós-W44: **69 Composer / 15 legado / 6 fallback / 84 servidas / 11 divergências**.
+- Composer registrado/ativo: **69/69** no fechamento W44.
 - 90 competências / 94 fichas autorais.
 - `modeSwaps=12`.
 - `toolIntroductions=44`.
 - primitiva autoral ainda ausente: `Moedas`.
 
-Fallbacks ainda não fechados:
+Fallbacks pós-W44:
 
-`AL.08, GM.11, N5.04, N5.05, N6.02, N6.04, PE.04`.
+`AL.08, GM.11, N5.05, N6.02, N6.04, PE.04`.
 
 ## Último fechamento completo
 
-### W43 — `N4.12 / F71 — Dividir por Dois Dígitos`
+### W44 — `N5.04 / F74 — Somar Frações`
 
-Recibo final: `83c18fd6902bb3d23a77fca04c051cd417b103b7`.
+Cadeia vinculante:
 
-- CI `32048810747`: `completed/success`;
-- Certificação transversal `32048810884`: `completed/success`;
-- Matrix final: `68/15/7/83/11`.
-
-Não reabrir W43 sem causa nova observável.
-
-## W44 — estado técnico
-
-### Regression-first
-
-SHA `34b6b3a5ed3fde597564685e7b2a820c2beca0f7`:
-
-- CI `32050560773`: `completed/failure`, vermelho nominal exclusivamente pela ausência de `N5.04/F74`;
-- transversal `32050560782`: `completed/success`;
-- 3.279/3.280 testes verdes.
-
-### Materialização inativa certificada
-
-Recibo técnico inativo vinculante: `a41e6e9e6317efcec230b879722a8ae3fcafd8ae`.
-
-- CI `32052726802`: **completed/success**;
-- Certificação transversal `32052726430`: **completed/success**;
-- Gates: catálogo, fichas, conformidade, grafo, TypeScript, 235 arquivos / 3.287 testes, build e guarda textual verdes;
-- higiene e binários verdes;
-- `N5.04` continua fora do canário ativo;
-- ledger e Matrix continuam pós-W43.
+- regression-first: `34b6b3a5ed3fde597564685e7b2a820c2beca0f7` — CI `32050560773` failure nominal + transversal `32050560782` success;
+- materialização inativa final: `a41e6e9e6317efcec230b879722a8ae3fcafd8ae` — CI `32052726802` + transversal `32052726430`, ambos success;
+- promoção final: `5da29dc4078d67f71012daf21c435be622163957` — CI `32062255308` + transversal `32062255294`, ambos success;
+- Matrix final observada: `69/15/6/84/11`;
+- suíte final da promoção: 235 arquivos / 3.300 testes verdes, TypeScript e build verdes.
 
 F74 realiza `SingaporeBars` com denominador fixo, soma/subtração, fração imprópria e simplificação como mesma quantidade/outro nome. Diagnósticos: `soma-denominador`, `nao-simplifica`, `impropria-invalida`. A restrição especial de domínio usa `masteryDisqualifier`, sem segunda autoridade de mastery.
 
+Não reabrir W44 sem causa nova observável.
+
+## Seleção causal da W45
+
+Após W44, os candidatos com prereqs servidos incluem `N6.02`, `N6.04`, `AL.08`, `PE.04` e `GM.11`; `N5.05` ainda depende de `N6.04`.
+
+Pelo critério vigente — prereqs servidos → maior ganho imediato de desbloqueio → menor causalWave → maior downstream → desempate residual — **N6.04/F88** é a W45 porque sua promoção desbloqueia imediatamente o fallback `N5.05`.
+
+DAG canônico:
+
+- `N6.04` prereqs `N6.03 + N4.06`;
+- `N5.05` prereqs `N5.04 + N6.04`.
+
+## W45 — contrato regression-first
+
+`N6.04 / F88 — Razão e Proporção`  
+Primitiva canônica: `SingaporeBars`  
+Faixa: F4.
+
+Cânone F88:
+
+1. dobrar a receita;
+2. triplicar;
+3. escala qualquer;
+4. razão como fração;
+5. regra de três.
+
+Diagnósticos: `SOMA_EM_VEZ_DE_ESCALAR` (central), `ESCALA_UM_LADO`, `INVERTE_RAZAO`.
+
+A interface deve tornar física a relação proporcional: as duas barras escalam juntas. Domínio `{ acertos: 3, de: 3, sessoes: 2 }`, incluindo uma escala não-inteira.
+
+O HEAD de retomada contém o regression-first nominal e **não contém materialização F88**. O vermelho esperado é exclusivamente a ausência de N6.04/F88 no Composer/Journey/runtime. Qualquer outro vermelho é falha real.
+
 ## Próxima ação obrigatória
 
-**Não repetir regression-first nem materialização F74.**
-
-A próxima conversa deve:
-
 1. reancorar PR/HEAD/main/reviews/threads;
-2. ler integralmente `PROMPT_DE_RETOMADA.md` e `CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_INATIVA_CERTIFICADA_2026-08-17.md`;
-3. confirmar o portão inativo `a41e6e9e…`, CI `32052726802` + transversal `32052726430`;
-4. promover W44 **atomicamente no mesmo SHA**: canário `N5.04` + ledger `W44-N5.04` + contrato Matrix;
-5. observar o delta real da Matrix; se só a ativação mudar, expectativa `69/15/6/84/11`, mas a saída executável vence a expectativa;
-6. exigir CI + transversal verdes do SHA final da promoção;
-7. fechar W44 documentalmente;
-8. recalcular DAG/Matrix antes de escolher W45.
-
-`N5.05` depende de `N5.04 + N6.04`; a fila pós-W44 deve ser recalculada, não copiada de memória.
+2. ler integralmente `PROMPT_DE_RETOMADA.md` e o checkpoint final W44;
+3. classificar CI + transversal do SHA regression-first W45;
+4. se o CI vermelho for exclusivamente a ausência nominal F88 e a transversal estiver verde, **não refazer o regression-first**;
+5. materializar F88 completa e **inativa**: ficha, contrato/builder, kind, palco/helper físico, renderer, Radar/misconceptions, runtime map, resolução, testes e onboarding quando aplicável;
+6. manter `N6.04` fora do canário e fora do ledger/Matrix de promoção;
+7. exigir CI + transversal verdes no mesmo SHA inativo;
+8. só então promover atomicamente canário + ledger + contrato Matrix;
+9. recertificar o SHA final antes de fechar W45.
 
 ## Documentos vivos de retomada
 
 - `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md` — porta operacional principal;
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_INATIVA_CERTIFICADA_2026-08-17.md` — recibo humano do ponto atual;
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W43_N4_12_F71_FECHADA_2026-08-17.md` — último fechamento completo;
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_FECHADA_2026-08-17.md` — último fechamento completo;
 - `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`;
 - `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`;
 - `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`.
@@ -95,4 +100,4 @@ A próxima conversa deve:
 - não apagar rationale/aliases/notas históricas;
 - não relaxar testes, sondas ou Matrix;
 - não misturar recibos de SHAs diferentes;
-- issues #47 e #48 permanecem pós-90/90 e não interrompem W44–W50.
+- issues #47 e #48 permanecem pós-90/90 e não interrompem W45–W50.

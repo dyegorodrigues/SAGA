@@ -8,8 +8,8 @@
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch viva: `codex/fechamento-curricular`
 - Base protegida: `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`
-- Estado curricular fechado: **W1–W43**
-- W44: **N5.04 / F74 — Somar Frações**, materializada e inativa, aguardando promoção atômica.
+- Estado curricular fechado: **W1–W44**
+- W45 selecionada e aberta em regression-first: **N6.04 / F88 — Razão e Proporção**.
 
 Antes de qualquer escrita:
 
@@ -21,19 +21,21 @@ Antes de qualquer escrita:
 
 ## 2. Estado vivo e autoridades
 
-Coverage Matrix do último fechamento certificado (W43):
+Coverage Matrix do fechamento certificado W44:
 
-- **68 Composer ativos**
+- **69 Composer ativos**
 - **15 legado**
-- **7 fallback**
-- **83 servidas**
+- **6 fallback**
+- **84 servidas**
 - **11 divergências**
 - 90 competências / 94 fichas autorais
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ainda ausente: `Moedas`
 
-Na materialização inativa W44, o catálogo observa **69 Composer registrados / 68 ativos / 1 registrado-inativo (`N5.04`)**; a Matrix de produção permanece `68/15/7/83/11` até a promoção.
+Fallbacks pós-W44:
+
+`AL.08, GM.11, N5.05, N6.02, N6.04, PE.04`.
 
 Autoridades executáveis:
 
@@ -56,57 +58,59 @@ Checkpoint é recibo humano; Matrix, canário, DAG, runtime e CI do SHA exato ve
 - Matrix observa o delta real. Baseline não pode ser relaxado para fabricar verde.
 - Tag emitida pela ficha só vale se Radar/catálogo a reconhecer e houver teste nominal.
 - Palco autoral não pode entregar a resposta antes da decisão da criança.
-- Exposição motora alta exige alternativa por toque/snap e separação entre erro motor e misconception.
+- Exposição motora alta exige alternativa por toque/snap, alvo generoso e separação entre erro motor e misconception.
+- RT/velocidade não governa domínio conceitual.
 - Não tocar/mergear `main`.
 - Não marcar PR ready, não habilitar auto-merge.
 - Não tocar Creature Engine/Tamagotchi neste fluxo.
 
-## 4. Último fechamento completo — W43
-
-`N4.12 / F71 — Dividir por Dois Dígitos` está fechada no SHA final `83c18fd6902bb3d23a77fca04c051cd417b103b7`.
-
-Recibos finais:
-
-- CI `32048810747` — `completed/success`
-- Certificação transversal `32048810884` — `completed/success`
-- Matrix `68/15/7/83/11`
-
-Não reabrir W43 sem causa nova observável.
-
-## 5. W44 — cadeia já executada
+## 4. W44 — fechamento vinculante
 
 Competência/ficha: `N5.04 / F74 — Somar Frações`  
-Prereq: `N5.03`  
-Primitiva canônica: `SingaporeBars`  
-Kind: `soma-fracoes-f74`
+Primitiva canônica: `SingaporeBars`.
 
-### 5.1 Regression-first
+### 4.1 Regression-first
 
 SHA `34b6b3a5ed3fde597564685e7b2a820c2beca0f7`:
 
 - CI `32050560773` — `completed/failure`, vermelho nominal exclusivamente pela ausência real de `N5.04/F74`;
 - transversal `32050560782` — `completed/success`;
-- 3.279/3.280 testes verdes no regression-first;
-- Matrix permaneceu `68/15/7/83/11`.
+- 3.279/3.280 testes verdes.
 
-### 5.2 Materialização inativa
+### 4.2 Materialização inativa
 
-A primeira materialização foi `4f1f8c702e431cb9ee7b306e39eccd7c4e7e7314`; encontrou uma incompatibilidade de mutabilidade TypeScript na resolução F74. Não usar esse SHA como recibo final.
+A primeira materialização `4f1f8c702e431cb9ee7b306e39eccd7c4e7e7314` expôs incompatibilidade de mutabilidade TypeScript na resolução F74; não é recibo final.
 
-Reparo mínimo de tipagem: `a41e6e9e6317efcec230b879722a8ae3fcafd8ae` (`fix: alinhar mutabilidade da resolucao F74`).
-
-**Este é o recibo técnico inativo vinculante da W44:** 
+Recibo técnico inativo vinculante: `a41e6e9e6317efcec230b879722a8ae3fcafd8ae`.
 
 - CI `32052726802` — `completed/success`;
 - Certificação transversal `32052726430` — `completed/success`;
-- Gates: catálogo, fichas, conformidade, grafo, TypeScript, **235 arquivos / 3.287 testes**, build e guarda textual verdes;
-- higiene e binários verdes;
-- `N5.04` registrada no Composer e **INATIVA**;
-- Matrix de produção ainda `68/15/7/83/11`.
+- 235 arquivos / 3.287 testes verdes;
+- TypeScript, build, catálogo, fichas, conformidade, grafo, higiene e binários verdes;
+- `N5.04` registrada e ainda inativa nesse SHA.
 
-A materialização inclui contrato/builder F74, ficha Jornada N5.04, `SomaFracoesStage`, renderer/wiring, runtime map SingaporeBars, política de resposta, misconceptions/Radar e testes nominal/físico.
+### 4.3 Promoção final
 
-## 6. Contrato pedagógico F74 que já está materializado
+SHA final: `5da29dc4078d67f71012daf21c435be622163957` (`feat: promover W44 N5.04 F74`).
+
+A promoção alterou **somente os três governantes**:
+
+- `composerCanaryIds.ts` — ativa `N5.04`;
+- `coverage_matrix_core.ts` — adiciona `W44-N5.04`, preservando o histórico;
+- `coverageMatrix.test.ts` — reconcilia sequência/última migração/baseline.
+
+Recibos:
+
+- CI `32062255308` — `completed/success`;
+- Certificação transversal `32062255294` — `completed/success`;
+- Matrix executável observada: **69 Composer / 15 legado / 6 fallback / 84 servidas / 11 divergências**;
+- Composer registrado/ativo `69/69`;
+- suíte: **235 arquivos / 3.300 testes verdes**;
+- TypeScript, build, auditorias, higiene, binários e sonda Sensei verdes.
+
+**W44 está FECHADA. Não reabrir sem causa nova observável.**
+
+## 5. F74 — contrato preservado
 
 Escada:
 
@@ -120,37 +124,14 @@ Restrições:
 
 - somente denominadores iguais em F74;
 - denominador representa tamanho da parte e permanece fixo;
-- não introduzir denominadores diferentes oportunisticamente;
-- `SingaporeBars` realiza fisicamente o tanque/partes, sem pré-renderizar resposta;
+- `SingaporeBars` realiza fisicamente as partes sem pré-renderizar a resposta;
 - diagnósticos: `soma-denominador`, `nao-simplifica`, `impropria-invalida`;
 - domínio `{ acertos: 3, de: 3, sessoes: 2 }`;
-- acerto imediatamente precedido por `SOMA_DENOMINADOR` na mesma questão/sessão continua correto para a missão, mas não recebe crédito de mastery; a implementação reutiliza `masteryDisqualifier`, não cria segunda autoridade de domínio.
+- acerto imediatamente precedido por `SOMA_DENOMINADOR` na mesma questão/sessão continua correto para a missão, mas não recebe crédito de mastery; a implementação reutiliza `masteryDisqualifier`.
 
-F73/N5.03 é o precedente físico de equivalência e SingaporeBars.
+## 6. Seleção causal da W45
 
-## 7. Próxima ação obrigatória — NÃO repetir materialização
-
-Ao retomar:
-
-1. reancorar PR/HEAD/main/reviews/threads;
-2. confirmar que o estado materializado de `a41e6e9e…` está presente no HEAD e que os recibos inativos acima continuam válidos;
-3. **não refazer regression-first nem materialização F74**;
-4. promover W44 atomicamente no mesmo SHA alterando somente o necessário:
-   - adicionar `N5.04` a `DEFAULT_COMPOSER_CANARY_IDS` em `composerCanaryIds.ts`, citando o portão inativo `a41e6e9e…`, CI `32052726802` + transversal `32052726430`;
-   - adicionar `W44-N5.04` ao array `COVERAGE_MIGRATIONS` em `coverage_matrix_core.ts`, preservando todo o histórico anterior;
-   - atualizar a sequência/última migração/baseline esperado em `coverageMatrix.test.ts`;
-5. executar/observar Matrix e aceitar **o delta real**. Se nada além da ativação mudou, o esperado é `69 Composer / 15 legado / 6 fallback / 84 servidas / 11 divergências`, mas a saída executável vence essa expectativa;
-6. exigir **CI + Certificação transversal completed/success do SHA final de promoção**;
-7. só então declarar W44 fechada, criar checkpoint `...W44...FECHADA...`, atualizar esta porta e PR body;
-8. recalcular DAG/Matrix e escolher W45 pelo critério causal antes de abrir o regression-first seguinte.
-
-## 8. Fila ainda não fechada
-
-FallBacks do estado pós-W43: `AL.08, GM.11, N5.04, N5.05, N6.02, N6.04, PE.04`.
-
-`N5.05` depende de `N5.04 + N6.04`; portanto a promoção W44 altera a elegibilidade downstream e a fila deve ser **recalculada**, não copiada de memória.
-
-Critério:
+Critério vivo:
 
 1. prereqs servidos;
 2. maior ganho imediato de desbloqueio;
@@ -158,23 +139,139 @@ Critério:
 4. maior downstream;
 5. ID / menor delta estrutural como desempate residual.
 
-Não escolher W45 antes de W44 final verde e Matrix/DAG observados.
+Após a Matrix W44 `69/15/6/84/11`, os fallbacks são:
 
-## 9. Documentos de continuidade
+`AL.08, GM.11, N5.05, N6.02, N6.04, PE.04`.
+
+DAG relevante:
+
+- `N6.02` prereqs `N6.01 + N3.11 + N3.12` — elegível;
+- `N6.04` prereqs `N6.03 + N4.06` — elegível;
+- `AL.08` prereqs `AL.07 + N7.02` — elegível;
+- `PE.04` prereqs `PE.03 + N6.03` — elegível;
+- `GM.11` prereqs `GM.09 + N4.02` — elegível;
+- `N5.05` prereqs `N5.04 + N6.04` — ainda bloqueada por `N6.04`.
+
+**Seleção W45: `N6.04 / F88 — Razão e Proporção`.**
+
+Rationale: entre os elegíveis, N6.04 tem ganho imediato de desbloqueio porque sua promoção torna `N5.05` elegível. Não copiar fila antiga; após W45, recalcular novamente.
+
+## 7. Contrato canônico F88 — vinculante para W45
+
+Fonte autoral: `AI_Studio_Lab/pedagogia/fichas/FICHAS_F4_COMPLETAS.md`.
+
+Identidade:
+
+- competência: `N6.04 — razão e proporcionalidade`;
+- ficha: `F88 — Razão e Proporção`;
+- primitiva: `SingaporeBars`;
+- faixa: F4;
+- prereqs DAG: `N6.03 + N4.06`.
+
+Fundamento:
+
+- duas quantidades podem crescer juntas mantendo a relação;
+- erro central: **somar em vez de escalar**;
+- imagem causal: duas barras que escalam juntas;
+- se a criança tenta mudar só uma, a outra acompanha; a relação proporcional deve ser fisicamente imposta pela interface, não apenas escrita em texto.
+
+Cinco níveis:
+
+1. dobrar a receita;
+2. triplicar;
+3. escala qualquer;
+4. razão como fração;
+5. regra de três.
+
+Diagnósticos canônicos:
+
+- `SOMA_EM_VEZ_DE_ESCALAR` — erro central;
+- `ESCALA_UM_LADO`;
+- `INVERTE_RAZAO`.
+
+Falas canônicas:
+
+- howto: “Se um dobra, o outro dobra também. Eles crescem juntos.”
+- explain: “Olhe as barras: elas mantêm a mesma proporção sempre.”
+
+Domínio:
+
+- `{ acertos: 3, de: 3, sessoes: 2 }`;
+- deve incluir pelo menos uma **escala não-inteira**.
+
+Regras transversais continuam valendo: erro motor não vira misconception, touch/snap generoso quando houver gesto, resolução não compra mastery, resposta não pode vazar, reduced motion/acessibilidade devem preservar o conceito.
+
+## 8. W45 — regression-first já aberto
+
+O HEAD de retomada contém `src/curriculum/razaoProporcaoW45.test.ts` e **não contém a materialização F88**.
+
+O contrato regression-first exige, após a futura materialização:
+
+- N6.04 sai do fallback somente quando a ficha existir;
+- registro Composer real;
+- kind especializado `razao-proporcao-f88`;
+- modos `dobrar → triplicar → escala-geral → razao-fracao → regra-de-tres`;
+- `SingaporeBars` como primitiva física;
+- barras vinculadas/escala conjunta;
+- domínio 3/3×2 com escala não-inteira;
+- tags runtime `soma-em-vez-de-escalar`, `escala-um-lado`, `inverte-razao` reconhecidas pelo Radar;
+- resolução sem fallback e semanticamente alinhada aos cinco níveis.
+
+### Estado esperado do regression-first
+
+A primeira ação da próxima conversa é conferir os workflows do HEAD exato.
+
+O vermelho esperado do CI é **somente** `razaoProporcaoW45.test.ts` falhando porque `JOURNEY_FICHAS.find(item => item.id === "N6.04")` ainda é `undefined` / F88 ainda não existe no Composer.
+
+A Certificação transversal deve permanecer verde. Qualquer outro vermelho é falha real e deve ser investigado antes de materializar.
+
+**Não “consertar” o regression-first relaxando expectativa.**
+
+## 9. Próxima ação autorizada — materialização INATIVA W45
+
+Somente depois de classificar corretamente o regression-first:
+
+1. materializar `N6.04/F88` completa e **inativa**;
+2. criar ficha Jornada, contrato/builder, kind, palco/helper especializado quando necessário, renderer/wiring, resolução, Radar/misconceptions e testes;
+3. realizar fisicamente `SingaporeBars` com duas quantidades vinculadas por um mesmo fator de escala;
+4. preservar os cinco níveis e uma escala não-inteira real;
+5. não transformar a regra de três em decoreba cruzada sem relação visível;
+6. manter `N6.04` fora de `DEFAULT_COMPOSER_CANARY_IDS`;
+7. não adicionar `W45-N6.04` ao ledger nem mudar baseline de promoção enquanto inativa;
+8. atualizar `ficha_runtime_map.cjs` antes da promoção se houver kind/builder/stage novo;
+9. registrar novas tags no Radar/cânone de forma aditiva antes da promoção;
+10. auditar resposta vazando, diversidade, resolução, domínio, onboarding, acessibilidade e filtro motor;
+11. publicar SHA inativo e exigir **CI + Certificação transversal completed/success no mesmo SHA**;
+12. só então promover atomicamente canário + ledger + contrato Matrix;
+13. aceitar o delta real da Matrix, nunca um número presumido;
+14. recertificar o SHA final e só então fechar W45;
+15. recalcular DAG/Matrix para W46.
+
+Se apenas a ativação de N6.04 mudar, o delta teórico seria `70 Composer / 15 legado / 5 fallback / 85 servidas / 11 divergências`, mas **não force esse número**; a Matrix executável é a autoridade.
+
+## 10. Cadência e serialização
+
+- Uma onda por vez.
+- Não escrever a próxima onda enquanto o SHA relevante da atual não tiver o portão exigido.
+- Fechamento documental da onda N + regression-first da onda N+1 entram no mesmo ciclo quando não houver bloqueio real.
+- Regression-first vermelho por design não substitui o recibo técnico verde da onda anterior.
+- Recalcular a fila após cada promoção; não perpetuar previsão como verdade.
+
+## 11. Documentos de continuidade
 
 Ler quando necessário:
 
 - `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_FECHADA_2026-08-17.md`
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_INATIVA_CERTIFICADA_2026-08-17.md` — histórico do portão inativo
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W43_N4_12_F71_FECHADA_2026-08-17.md`
 - `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`
 - `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`
 - `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W42_N4_11_F70_FECHADA_2026-08-17.md`
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W43_N4_12_F71_FECHADA_2026-08-17.md`
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_INATIVA_CERTIFICADA_2026-08-17.md`
 
-Issues `#47` e `#48` continuam pós-90/90 e não interrompem W44–W50.
+Issues `#47` e `#48` continuam pós-90/90 e **não interrompem W45–W50**.
 
-## 10. Restrições absolutas
+## 12. Restrições absolutas
 
 - PR #35: open + draft + unmerged.
 - `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`.
@@ -186,4 +283,4 @@ Issues `#47` e `#48` continuam pós-90/90 e não interrompem W44–W50.
 - Sem misturar recibos de SHAs distintos.
 - Sem inventar resultado de workflow que ainda não terminou.
 
-**Resumo operacional:** W43 está fechada. W44/F74 está materializada, inativa e duplamente verde no recibo `a41e6e9e…`. O próximo passo é exclusivamente a promoção atômica W44, seguida de Matrix observada e dupla recertificação final.
+**Resumo operacional:** W44/F74 está fechada no recibo final `5da29dc…`, Matrix `69/15/6/84/11`. W45 é N6.04/F88 e o HEAD de retomada abre seu regression-first nominal. A próxima conversa deve classificar esse vermelho e, se ele for exclusivamente a ausência F88, materializar N6.04 completa e inativa sem ativar canário nem ledger.
