@@ -150,6 +150,8 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   "take-apart": ["TakeApart"],
   array: ["ArrayGrid"],
   "volume-vistas-f92": ["ArrayGrid"],
+  "primos-divisores-f70": ["ArrayGrid", "Quadrado100"],
+  "divisao-dois-digitos-f71": ["InteractiveVertical"],
   relogio: ["Relogio"],
   balanca: ["Balanca"],
   medidas: ["Balanca", "Recipientes"],
