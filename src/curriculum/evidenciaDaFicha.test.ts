@@ -23,6 +23,8 @@ import { evidenciasDetetiveFormas as daSimetria } from "./procedimentos/detetive
 import { cortesAlvoPartesIguais, evidenciasPartesIguais as dasPartesIguais } from "./procedimentos/partesIguaisProcedure";
 import { evidenciasPerimetro as doPerimetro } from "./procedimentos/perimetroContract";
 import { evidenciasDivisaoDoisDigitosF71 as daDivisaoDoisDigitos } from "./procedimentos/divisaoDoisDigitosContract";
+import { construirRazaoProporcaoF88Spec } from "./procedimentos/razaoProporcaoContract";
+import { evidenciasRazaoProporcaoF88 as daRazaoProporcao } from "./procedimentos/razaoProporcaoEvidence";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -195,6 +197,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.AJUSTE_PRIMEIRA_ESTIMATIVA_F71,
     emitir: () => daDivisaoDoisDigitos(true),
   },
+  {
+    nome: "F88 (razão e proporção) — preserva a relação com fator não inteiro",
+    evidencia: Evidencia.ESCALA_NAO_INTEIRA_F88,
+    emitir: () => daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -321,5 +328,6 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
     expect(doPerimetro(4, false)).toEqual([]);
     expect(doPerimetro(3, true)).toEqual([]);
     expect(daDivisaoDoisDigitos(false)).toEqual([]);
+    expect(daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), false)).toEqual([]);
   });
 });

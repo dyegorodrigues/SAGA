@@ -218,6 +218,14 @@ export const Evidencia = {
    * ler o produto de teste, decidir aumentar/diminuir e testar novamente.
    */
   AJUSTE_PRIMEIRA_ESTIMATIVA_F71: "ajuste-primeira-estimativa-f71",
+
+  /**
+   * F88 (N6.04): ao menos um acerto em que a relação proporcional foi preservada
+   * com um **fator de escala não inteiro**. Dobrar ou triplicar corretamente não
+   * prova que a criança entendeu a relação geral; este caso impede domínio por
+   * memorização de escalas inteiras familiares.
+   */
+  ESCALA_NAO_INTEIRA_F88: "escala-nao-inteira-f88",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

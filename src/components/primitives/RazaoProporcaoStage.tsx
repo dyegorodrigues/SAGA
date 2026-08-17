@@ -6,7 +6,7 @@ import {
   type RazaoProporcaoF88Opcao,
   type RazaoProporcaoF88Spec,
 } from "../../curriculum/procedimentos/razaoProporcaoContract";
-import { RAZAO_PROPORCAO_ESCALA_NAO_INTEIRA_EVIDENCIA } from "../../constants/razaoProporcaoMisconceptions";
+import { evidenciasRazaoProporcaoF88 } from "../../curriculum/procedimentos/razaoProporcaoEvidence";
 import { SingaporeLinkedScaleBars } from "./SingaporeBars";
 
 interface Props {
@@ -36,8 +36,7 @@ export function RazaoProporcaoStage({ spec, disabled = false, onAnswer }: Props)
       return;
     }
 
-    const evidencias = [`f88-${spec.modo}`, "f88-mesmo-fator"];
-    if (spec.escalaNaoInteira) evidencias.push(RAZAO_PROPORCAO_ESCALA_NAO_INTEIRA_EVIDENCIA);
+    const evidencias = evidenciasRazaoProporcaoF88(spec, true);
     if (ultimoErro) evidencias.push(masteryDisqualifier(`f88-${ultimoErro}-precedente`));
     setRevelarEscala(true);
     onAnswer(option.value, { evidencias });
