@@ -133,6 +133,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W42 — F70: primos e divisores; ArrayGrid + Quadrado100. Inativo 6129c5c8: CI 32034443674 + transversal 32034443648.
   "N4.11",
 
+  // W43 — F71: dividir por dois dígitos; InteractiveVertical. Inativo 6c056a8d: CI 32044672592 + transversal 32044672629.
+  "N4.12",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",

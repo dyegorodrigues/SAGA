@@ -103,6 +103,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F70 materializada no PrimosDivisoresStage compondo ArrayGrid + Quadrado100: múltiplos por saltos no quadro → divisores por retângulos sem sobra → distinção divisor/múltiplo → primos por exatamente dois divisores positivos → Crivo de Eratóstenes riscando múltiplos compostos nas próprias casas. A exploração por toque não compra resposta nem misconception; o papel do 1, primo≠ímpar e as tags inverte-divisor-multiplo/esquece-um/primo-errado ficam explícitos. O portão inativo exato 6129c5c8 passou CI 32034443674 + transversal 32034443648, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W43-N4.12",
+    competence: "N4.12",
+    rationale: "F71 materializada no DivisaoDoisDigitosStage reutilizando InteractiveVertical: divisor redondo → próximo de redondo → divisor arbitrário → resto → zero no quociente. O ciclo cognitivo estimar → testar por multiplicação → ajustar é explícito, com rascunho interativo, feedback passou/cabe mais, evidência P13 de ajuste da primeira estimativa, alternativa por toque com alvos generosos e diagnósticos canônicos nao-estima/nao-ajusta/resto-maior-ou-igual-divisor. O portão inativo exato 6c056a8d passou CI 32044672592 + transversal 32044672629, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
