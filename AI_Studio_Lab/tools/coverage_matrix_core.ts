@@ -115,6 +115,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F74 materializada no SomaFracoesStage reutilizando SingaporeBars: soma com barras → soma simbólica → subtração → fração imprópria → simplificação como mesma quantidade/outro nome, sempre com denominadores iguais e sem pré-renderizar a resposta. Diagnósticos soma-denominador/nao-simplifica/impropria-invalida pertencem ao Radar; acerto imediatamente após SOMA_DENOMINADOR é desqualificado de mastery pela autoridade compartilhada masteryDisqualifier. O portão inativo exato a41e6e9e passou CI 32052726802 + transversal 32052726430, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W45-N6.04",
+    competence: "N6.04",
+    rationale: "F88 materializada no RazaoProporcaoStage reutilizando SingaporeBars por SingaporeLinkedScaleBars: dobrar → triplicar → escala geral não inteira → razão como fração → regra de três causal. Um único fator deriva simultaneamente as duas barras; o par escalado só aparece após a decisão, as três misconceptions pertencem ao Radar, a evidência P13 de escala não inteira vem do mesmo emissor puro do runtime e correção após erro conceitual não compra mastery independente. O portão inativo reparado exato fd93358b passou CI 32074518557 + transversal 32074518604, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);

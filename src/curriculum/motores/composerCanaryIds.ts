@@ -139,6 +139,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W44 — F74: somar frações; SingaporeBars. Inativo a41e6e9e: CI 32052726802 + transversal 32052726430.
   "N5.04",
 
+  // W45 — F88: razão e proporção; SingaporeBars vinculada. Inativo fd93358b: CI 32074518557 + transversal 32074518604.
+  "N6.04",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
