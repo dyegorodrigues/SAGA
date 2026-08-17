@@ -130,7 +130,7 @@ export function construirSomaFracoesResolucao(
   spec: SomaFracoesF74Spec,
 ): ResolucaoDeclarativa<SomaFracoesShow, string, SomaFracoesMisconceptionTag> {
   const juntarOuRetirar = spec.operacao === "+" ? "junte" : "retire";
-  const passos: ResolucaoDeclarativa<SomaFracoesShow, string, SomaFracoesMisconceptionTag>["passos"] = [
+  const passos: Array<ResolucaoDeclarativa<SomaFracoesShow, string, SomaFracoesMisconceptionTag>["passos"][number]> = [
     {
       id: "fixar-tamanho-da-parte",
       say: `O inteiro continua dividido em ${spec.denominador} partes iguais. O denominador diz o tamanho da parte e não muda quando você ${juntarOuRetirar} partes.`,
