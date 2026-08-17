@@ -22,6 +22,7 @@ import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visu
 import { evidenciasDetetiveFormas as daSimetria } from "./procedimentos/detetiveFormasProcedure";
 import { cortesAlvoPartesIguais, evidenciasPartesIguais as dasPartesIguais } from "./procedimentos/partesIguaisProcedure";
 import { evidenciasPerimetro as doPerimetro } from "./procedimentos/perimetroContract";
+import { evidenciasDivisaoDoisDigitosF71 as daDivisaoDoisDigitos } from "./procedimentos/divisaoDoisDigitosContract";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -189,6 +190,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.PERIMETRO_VS_AREA,
     emitir: () => doPerimetro(4, true),
   },
+  {
+    nome: "F71 (divisão por dois dígitos) — ajustou a primeira estimativa após o teste",
+    evidencia: Evidencia.AJUSTE_PRIMEIRA_ESTIMATIVA_F71,
+    emitir: () => daDivisaoDoisDigitos(true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -314,5 +320,6 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
 
     expect(doPerimetro(4, false)).toEqual([]);
     expect(doPerimetro(3, true)).toEqual([]);
+    expect(daDivisaoDoisDigitos(false)).toEqual([]);
   });
 });

@@ -76,6 +76,14 @@ export function avaliarEstimativaF71(spec: DivisaoDoisDigitosF71Spec, estimativa
   return { produto, restoProjetado, relacao: "cabe-mais" };
 }
 
+/**
+ * Evidência de domínio da F71. O mesmo emissor puro é usado pelo palco e pelo
+ * gate P13 para impedir que a ficha exija uma condição que o runtime não saiba colher.
+ */
+export function evidenciasDivisaoDoisDigitosF71(ajustouAposPrimeiroTeste: boolean): string[] {
+  return ajustouAposPrimeiroTeste ? [Evidencia.AJUSTE_PRIMEIRA_ESTIMATIVA_F71] : [];
+}
+
 export function construirDivisaoDoisDigitosF71Resolucao(
   spec: DivisaoDoisDigitosF71Spec,
 ): ResolucaoDeclarativa<DivisaoDoisDigitosF71Show, number, DivisaoDoisDigitosMisconceptionTag> {

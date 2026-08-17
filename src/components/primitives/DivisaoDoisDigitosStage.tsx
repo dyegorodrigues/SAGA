@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import type { AnswerMeta } from "../../types";
-import { Evidencia } from "../../constants/evidencias";
 import {
   avaliarEstimativaF71,
   DivisaoDoisDigitosMisconception,
+  evidenciasDivisaoDoisDigitosF71,
   type DivisaoDoisDigitosF71Spec,
 } from "../../curriculum/procedimentos/divisaoDoisDigitosContract";
 import { InteractiveVerticalDivisionEstimateSurface } from "./InteractiveVertical";
@@ -67,10 +67,9 @@ export function DivisaoDoisDigitosStage({ spec, disabled = false, onAnswer }: Pr
       return;
     }
 
-    const evidencias = [`f71-${spec.modo}`];
-    if (spec.ajustePrimeiraEstimativaObrigatorio && primeiraEstimativa !== undefined && ajustouAposPrimeiroTeste) {
-      evidencias.push(Evidencia.AJUSTE_PRIMEIRA_ESTIMATIVA_F71);
-    }
+    const evidencias = [`f71-${spec.modo}`, ...evidenciasDivisaoDoisDigitosF71(
+      spec.ajustePrimeiraEstimativaObrigatorio && primeiraEstimativa !== undefined && ajustouAposPrimeiroTeste,
+    )];
     onAnswer(spec.quociente, { source: "vertical-column", evidencias });
   };
 
