@@ -19,6 +19,7 @@ import { PlanoCartesianoStage } from "./primitives/PlanoCartesianoStage"; import
 import { AreaF81Stage } from "./primitives/AreaF81Stage"; import type { AreaF81Spec } from "../curriculum/procedimentos/areaF81Contract";
 import { FatoresRetangulosStage } from "./primitives/FatoresRetangulosStage"; import type { FatoresRetangulosF66Spec } from "../curriculum/procedimentos/fatoresRetangulosContract";
 import { CirculoAreasStage } from "./primitives/CirculoAreasStage"; import type { CirculoAreasF91Spec } from "../curriculum/procedimentos/circuloAreasContract";
+import { VolumeVistasStage } from "./primitives/VolumeVistasStage"; import type { VolumeVistasF92Spec } from "../curriculum/procedimentos/volumeVistasContract";
 import { ExpressaoF77Stage } from "./primitives/ExpressaoF77Stage"; import type { ExpressaoF77Spec } from "../curriculum/procedimentos/expressaoF77Contract";
 import { MapaTesouroStage } from "./primitives/MapaTesouroStage"; import type { MapaTesouroF60Spec } from "../curriculum/procedimentos/mapaTesouroContract";
 import { SolidosGeometricosStage } from "./primitives/SolidosGeometricosStage"; import type { SolidosGeometricosF59Spec } from "../curriculum/procedimentos/solidosGeometricosContract";
@@ -65,6 +66,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'area-f81': return <AreaF81Stage spec={question.uiProps as AreaF81Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'fatores-retangulos-f66': return <FatoresRetangulosStage spec={question.uiProps as FatoresRetangulosF66Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'circulo-areas-f91': return <CirculoAreasStage spec={question.uiProps as CirculoAreasF91Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'volume-vistas-f92': return <VolumeVistasStage spec={question.uiProps as VolumeVistasF92Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'expressao-f77': return <ExpressaoF77Stage spec={question.uiProps as ExpressaoF77Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'mapa-tesouro-f60': return <MapaTesouroStage spec={question.uiProps as MapaTesouroF60Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'solidos-geometricos-f59': return <SolidosGeometricosStage spec={question.uiProps as SolidosGeometricosF59Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
