@@ -78,6 +78,15 @@ export const MisconceptionTag = {
   /** F66: aceitou sobra como fator ou confundiu fator com múltiplo. */
   CONFUNDE_FATOR_MULTIPLO: "confunde-fator-multiplo",
 
+  /** F91: tratou o triângulo como o retângulo inteiro e esqueceu a metade. */
+  ESQUECE_DIVIDIR_POR_2: "esquece-dividir-por-2",
+
+  /** F91: usou um lado inclinado no lugar da altura perpendicular à base. */
+  ALTURA_ERRADA: "altura-errada",
+
+  /** F91: trocou raio e diâmetro ou não distinguiu a circunferência como contorno. */
+  CONFUNDE_RAIO_DIAMETRO: "confunde-raio-diametro",
+
   /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
   INVERTE_DIVISAO: "inverte-divisao",
 
