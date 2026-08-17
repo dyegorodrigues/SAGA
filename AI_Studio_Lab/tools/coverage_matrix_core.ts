@@ -109,6 +109,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F71 materializada no DivisaoDoisDigitosStage reutilizando InteractiveVertical: divisor redondo → próximo de redondo → divisor arbitrário → resto → zero no quociente. O ciclo cognitivo estimar → testar por multiplicação → ajustar é explícito, com rascunho interativo, feedback passou/cabe mais, evidência P13 de ajuste da primeira estimativa, alternativa por toque com alvos generosos e diagnósticos canônicos nao-estima/nao-ajusta/resto-maior-ou-igual-divisor. O portão inativo exato 6c056a8d passou CI 32044672592 + transversal 32044672629, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W44-N5.04",
+    competence: "N5.04",
+    rationale: "F74 materializada no SomaFracoesStage reutilizando SingaporeBars: soma com barras → soma simbólica → subtração → fração imprópria → simplificação como mesma quantidade/outro nome, sempre com denominadores iguais e sem pré-renderizar a resposta. Diagnósticos soma-denominador/nao-simplifica/impropria-invalida pertencem ao Radar; acerto imediatamente após SOMA_DENOMINADOR é desqualificado de mastery pela autoridade compartilhada masteryDisqualifier. O portão inativo exato a41e6e9e passou CI 32052726802 + transversal 32052726430, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
