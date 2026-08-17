@@ -97,6 +97,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F92 materializada no VolumeVistasStage reutilizando ArrayGrid#3D: vista frontal → três vistas → reconstrução pelas vistas → cubos ocultos → desenho das vistas, com onboarding explícito do mode swap, alternativa integral por toque, alvos mínimos de 80 px e diagnósticos canônicos ignora-ocultos/vista-trocada/sem-rotacao-mental. O portão inativo exato 33ff7d34 passou CI 32001192111 + transversal 32001192091, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W42-N4.11",
+    competence: "N4.11",
+    rationale: "F70 materializada no PrimosDivisoresStage compondo ArrayGrid + Quadrado100: múltiplos por saltos no quadro → divisores por retângulos sem sobra → distinção divisor/múltiplo → primos por exatamente dois divisores positivos → Crivo de Eratóstenes riscando múltiplos compostos nas próprias casas. A exploração por toque não compra resposta nem misconception; o papel do 1, primo≠ímpar e as tags inverte-divisor-multiplo/esquece-um/primo-errado ficam explícitos. O portão inativo exato 6129c5c8 passou CI 32034443674 + transversal 32034443648, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);

@@ -130,6 +130,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W41 — F92: volume e vistas; ArrayGrid#3D. Inativo 33ff7d34: CI 32001192111 + transversal 32001192091.
   "GE.10",
 
+  // W42 — F70: primos e divisores; ArrayGrid + Quadrado100. Inativo 6129c5c8: CI 32034443674 + transversal 32034443648.
+  "N4.11",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
