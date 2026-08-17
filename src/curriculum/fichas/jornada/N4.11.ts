@@ -31,18 +31,18 @@ export const N4_11: FichaCompetencia = {
     { regra: "classifica composto como primo ou usa ímpar como sinônimo de primo", tag: PrimosDivisoresMisconception.PRIMO_ERRADO },
   ],
   niveis: {
-    1: { primitiva: "hundred-chart", micro: "multiplos-quadro", andaime: "alto" },
+    1: { primitiva: "quadrado100", micro: "multiplos-quadro", andaime: "alto" },
     2: { primitiva: "arraygrid", micro: "divisores-retangulo", andaime: "alto" },
     3: { primitiva: "arraygrid", micro: "distinguir", andaime: "medio" },
     4: { primitiva: "arraygrid", micro: "identificar-primos", andaime: "minimo" },
-    5: { primitiva: "hundred-chart", micro: "crivo-eratostenes", andaime: "nenhum", rt_alvo: 18000 },
+    5: { primitiva: "quadrado100", micro: "crivo-eratostenes", andaime: "nenhum", rt_alvo: 18000 },
   },
   micros: [
-    { id: "multiplos-quadro", fonte: "F70", alvo: "reconhecer múltiplos como destinos de saltos iguais no quadro de 100", kinds: ["hundred-chart"], params: { modo: "multiplos-quadro", tutorial: tutorialQuadro }, dominio },
+    { id: "multiplos-quadro", fonte: "F70", alvo: "reconhecer múltiplos como destinos de saltos iguais no quadro de 100", kinds: ["quadrado100"], params: { modo: "multiplos-quadro", tutorial: tutorialQuadro }, dominio },
     { id: "divisores-retangulo", fonte: "F70", alvo: "reconhecer divisores pelas formações retangulares que fecham sem sobra", kinds: ["arraygrid"], params: { modo: "divisores-retangulo", tutorial: tutorialRetangulo }, dominio },
-    { id: "distinguir", fonte: "F70", alvo: "distinguir causalmente divisor de múltiplo usando retângulo e saltos", kinds: ["arraygrid", "hundred-chart"], params: { modo: "distinguir", tutorial: [...tutorialRetangulo, ...tutorialQuadro] }, dominio },
+    { id: "distinguir", fonte: "F70", alvo: "distinguir causalmente divisor de múltiplo usando retângulo e saltos", kinds: ["arraygrid", "quadrado100"], params: { modo: "distinguir", tutorial: [...tutorialRetangulo, ...tutorialQuadro] }, dominio },
     { id: "identificar-primos", fonte: "F70", alvo: "identificar primo por ter exatamente dois divisores positivos, 1 e ele mesmo, sem confundir primo com ímpar", kinds: ["arraygrid"], params: { modo: "identificar-primos", tutorial: tutorialRetangulo }, dominio },
-    { id: "crivo-eratostenes", fonte: "F70", alvo: "executar visualmente o Crivo de Eratóstenes riscando múltiplos no quadro de 100", kinds: ["hundred-chart"], params: { modo: "crivo-eratostenes", tutorial: tutorialCrivo }, dominio },
+    { id: "crivo-eratostenes", fonte: "F70", alvo: "executar visualmente o Crivo de Eratóstenes riscando múltiplos no quadro de 100", kinds: ["quadrado100"], params: { modo: "crivo-eratostenes", tutorial: tutorialCrivo }, dominio },
   ],
   erros_tipicos: [
     { id: PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO, descricao: "Inverteu a relação: divisor cabe sem sobra; múltiplo é resultado de repetir o número." },

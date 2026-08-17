@@ -48,16 +48,17 @@ export function PrimosDivisoresStage({ spec, options, disabled = false, onAnswer
   const responder = (option: Option) => {
     if (disabled) return;
     const value = Number(option.value);
-    const source = spec.modo === "multiplos-quadro" || spec.modo === "crivo-eratostenes"
-      ? "quadrado100"
-      : spec.modo === "distinguir"
-        ? "array-grid+quadrado100"
-        : "array-grid";
-    onAnswer(value, {
-      source,
+    const meta: AnswerMeta = {
       evidencias: [`f70-${spec.modo}`],
       ...(option.misconception ? { misconception: option.misconception } : {}),
-    });
+    };
+    // `source` é um vocabulário legado restrito. Só marcamos ArrayGrid quando
+    // essa superfície realmente participou; Quadrado100 permanece evidência F70
+    // sem ampliar uma união global por oportunismo.
+    if (spec.modo === "divisores-retangulo" || spec.modo === "distinguir" || spec.modo === "identificar-primos") {
+      meta.source = "array-grid";
+    }
+    onAnswer(value, meta);
   };
 
   return <section className="mx-auto w-full max-w-4xl px-2" data-primos-divisores-stage="" data-modo={spec.modo}>
