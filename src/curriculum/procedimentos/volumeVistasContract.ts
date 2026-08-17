@@ -102,9 +102,9 @@ export function construirVolumeVistasSpec(level: number): VolumeVistasF92Spec {
       ...base,
       resposta: `frente:${key(base.vistas.frente)}`,
       opcoes: [
-        option(`frente:${key(base.vistas.frente)}`, "Vista da frente"),
-        option(`lado:${key(base.vistas.lado)}`, "Vista do lado", VolumeVistasMisconception.VISTA_TROCADA),
-        option(`cima:${key(base.vistas.cima)}`, "Vista de cima", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
+        option(`frente:${key(base.vistas.frente)}`, "Vista A"),
+        option(`lado:${key(base.vistas.lado)}`, "Vista B", VolumeVistasMisconception.VISTA_TROCADA),
+        option(`cima:${key(base.vistas.cima)}`, "Vista C", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
       ],
     };
   }
