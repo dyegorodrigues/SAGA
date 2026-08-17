@@ -99,3 +99,39 @@ export function InteractiveVerticalDivisionSurface({ dividendo, divisor, quocien
     </div>
   </div>;
 }
+
+interface DivisionEstimateSurfaceProps {
+  dividendo: number;
+  divisor: number;
+  divisorArredondado: number;
+  estimativa: number;
+  produtoTeste?: number;
+  relacao?: 'passou' | 'cabe-mais' | 'exata';
+}
+
+/**
+ * F71 reutiliza a primitiva InteractiveVertical sem vazar o quociente correto.
+ * A faixa superior mostra somente a estimativa escolhida pela criança; o rascunho
+ * aparece depois do toque em "Testar", quando a multiplicação vira evidência causal.
+ */
+export function InteractiveVerticalDivisionEstimateSurface({ dividendo, divisor, divisorArredondado, estimativa, produtoTeste, relacao }: DivisionEstimateSurfaceProps) {
+  return <div data-interactive-vertical-division-estimate className="mx-auto max-w-md rounded-3xl border-2 border-slate-200 bg-white p-4 font-mono text-slate-800 shadow-inner" aria-label={`${dividendo} dividido por ${divisor}, estimativa em teste ${estimativa}`}>
+    <div className="mb-3 rounded-2xl bg-slate-50 p-3 text-center font-sans text-sm font-bold text-slate-700" data-f71-rounded-divisor="">
+      Para estimar: {divisor} ≈ {divisorArredondado}. O teste usa o divisor real {divisor}.
+    </div>
+    <div className="grid grid-cols-[auto_1fr] items-end gap-x-3 text-3xl font-black">
+      <div className="pb-1 text-right text-indigo-700">{divisor}</div>
+      <div>
+        <div className="min-h-12 border-b-2 border-indigo-500 px-2 text-right" aria-label={`Estimativa atual ${estimativa}`}><span className="text-indigo-700">~ {estimativa}</span></div>
+        <div className="px-2 pt-1 text-right">{dividendo}</div>
+      </div>
+    </div>
+    <div className="mt-4 min-h-24 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-3" data-f71-scratch="">
+      <p className="font-sans text-xs font-black uppercase tracking-wide text-slate-500">Rascunho — multiplicação de teste</p>
+      {produtoTeste === undefined ? <p className="mt-2 font-sans text-sm font-semibold text-slate-600">Toque em Testar para comparar a estimativa com o dividendo.</p> : <>
+        <p className="mt-2 text-right text-xl font-black">{estimativa} × {divisor} = {produtoTeste}</p>
+        <p className="mt-1 font-sans text-center text-sm font-black" data-f71-test-relation={relacao}>{relacao === 'passou' ? 'Passou do dividendo: tente menos.' : relacao === 'cabe-mais' ? 'Cabe e ainda sobra espaço para outro grupo: tente mais.' : 'Esta quantidade de grupos é a maior que cabe.'}</p>
+      </>}
+    </div>
+  </div>;
+}

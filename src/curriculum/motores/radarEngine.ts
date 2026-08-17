@@ -9,6 +9,7 @@
 import { Progress } from "../../types";
 import { MisconceptionTag, type MisconceptionTagType } from "../../constants/misconceptions";
 import { PrimosDivisoresMisconception, type PrimosDivisoresMisconceptionTag } from "../../constants/primosDivisoresMisconceptions";
+import { DivisaoDoisDigitosMisconception, type DivisaoDoisDigitosMisconceptionTag } from "../../constants/divisaoDoisDigitosMisconceptions";
 import { calendarDayDistance, dayKeyFromNowInput, localDay } from "../../utils/calendarDay";
 
 export const SPACING_INTERVALS: Record<number, number> = {
@@ -24,6 +25,7 @@ const MAX_MISCONCEPTION_INTERVAL_MS = 10 * 60 * 1000;
 const CANONICAL_MISCONCEPTION_TAGS = new Set<string>([
   ...Object.values(MisconceptionTag),
   ...Object.values(PrimosDivisoresMisconception),
+  ...Object.values(DivisaoDoisDigitosMisconception),
 ]);
 
 /**
@@ -35,7 +37,7 @@ const CANONICAL_MISCONCEPTION_TAGS = new Set<string>([
  */
 export function isCanonicalMisconceptionTag(
   tag: string,
-): tag is MisconceptionTagType | PrimosDivisoresMisconceptionTag {
+): tag is MisconceptionTagType | PrimosDivisoresMisconceptionTag | DivisaoDoisDigitosMisconceptionTag {
   return CANONICAL_MISCONCEPTION_TAGS.has(tag);
 }
 

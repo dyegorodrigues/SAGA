@@ -208,6 +208,16 @@ export const Evidencia = {
    * diferentes antes de avançar para o lado faltante.
    */
   PERIMETRO_VS_AREA: "perimetro-vs-area-nivel-4",
+
+  /**
+   * F71 (N4.12): pelo menos uma divisão em que a **primeira estimativa precisou
+   * ser ajustada depois da multiplicação de teste**.
+   *
+   * Acertar apenas casos em que o primeiro palpite coincide com o quociente não
+   * prova o mecanismo central de dividir por dois dígitos. A competência inclui
+   * ler o produto de teste, decidir aumentar/diminuir e testar novamente.
+   */
+  AJUSTE_PRIMEIRA_ESTIMATIVA_F71: "ajuste-primeira-estimativa-f71",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
