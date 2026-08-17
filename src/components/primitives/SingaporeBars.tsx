@@ -148,3 +148,65 @@ export function SingaporeFractionBar({ denominador, marcas, destacarPrimeira = t
     </div>
   );
 }
+
+export interface SingaporeLinkedScaleBarsProps {
+  baseA: number;
+  baseB: number;
+  fator?: number;
+  alvoA?: number;
+  alvoB?: number;
+  revelarEscaladas?: boolean;
+}
+
+function barWidth(value: number, max: number): string {
+  return `${Math.max(12, Math.min(100, (value / Math.max(1, max)) * 100))}%`;
+}
+
+/**
+ * F88 — realização física da invariância proporcional.
+ *
+ * Não há controles independentes por barra: o palco fornece um único fator e,
+ * quando a decisão já ocorreu, as duas barras derivadas aparecem juntas. Assim
+ * a própria estrutura impede “escalar um lado” por gesto de interface.
+ */
+export function SingaporeLinkedScaleBars({
+  baseA,
+  baseB,
+  fator,
+  alvoA,
+  alvoB,
+  revelarEscaladas = false,
+}: SingaporeLinkedScaleBarsProps): React.ReactElement {
+  const mostrarEscaladas = Boolean(revelarEscaladas && fator !== undefined && alvoA !== undefined && alvoB !== undefined);
+  const max = Math.max(baseA, baseB, mostrarEscaladas ? (alvoA as number) : 0, mostrarEscaladas ? (alvoB as number) : 0, 1);
+  const fmt = (n: number) => String(Number(n.toFixed(6))).replace(".", ",");
+  const aria = mostrarEscaladas
+    ? `duas barras vinculadas: ${fmt(baseA)} e ${fmt(baseB)}; o mesmo fator ${fmt(fator as number)} produz ${fmt(alvoA as number)} e ${fmt(alvoB as number)}`
+    : `duas barras vinculadas com quantidades ${fmt(baseA)} e ${fmt(baseB)}${fator !== undefined ? `; o mesmo fator ${fmt(fator)} será aplicado às duas` : ""}`;
+
+  const Pair = ({ a, b, scaled = false }: { a: number; b: number; scaled?: boolean }) => <div className="space-y-2" data-linked-pair={scaled ? "scaled" : "base"}>
+    <div className="flex min-h-20 items-center rounded-2xl border-2 border-slate-700 bg-sky-50 px-3">
+      <div className="flex min-h-14 items-center rounded-xl px-4 text-lg font-black text-slate-900" style={{ width: barWidth(a, max), backgroundColor: tokens.cor.elementos.base_A }} data-linked-bar="a">{fmt(a)}</div>
+    </div>
+    <div className="flex min-h-20 items-center rounded-2xl border-2 border-slate-700 bg-amber-50 px-3">
+      <div className="flex min-h-14 items-center rounded-xl px-4 text-lg font-black text-slate-900" style={{ width: barWidth(b, max), backgroundColor: tokens.cor.elementos.base_B }} data-linked-bar="b">{fmt(b)}</div>
+    </div>
+  </div>;
+
+  return <div
+    className="mx-auto w-full max-w-2xl space-y-4"
+    role="img"
+    aria-label={aria}
+    data-singapore-linked-scale=""
+    data-bars-linked="true"
+    data-scale-factor={fator === undefined ? "unknown" : numeroSeguro(fator)}
+  >
+    <Pair a={baseA} b={baseB} />
+    {fator !== undefined ? <div className="text-center text-base font-black text-slate-700" data-shared-scale-factor="">Mesmo fator × {fmt(fator)} nas duas barras</div> : <div className="text-center text-base font-black text-slate-700">Descubra um único fator para o par.</div>}
+    {mostrarEscaladas ? <div data-scaled-pair=""><Pair a={alvoA as number} b={alvoB as number} scaled /></div> : null}
+  </div>;
+}
+
+function numeroSeguro(n: number): string {
+  return String(Number(n.toFixed(6)));
+}
