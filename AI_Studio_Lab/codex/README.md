@@ -1,46 +1,31 @@
 # SAGA — continuidade e auditoria Codex
 
-Esta pasta preserva checkpoints, auditorias, decisões e handoffs do SAGA. Ela
-contém tanto **fontes operacionais atuais** quanto **documentos históricos**.
+Esta pasta preserva **fontes operacionais atuais** e **documentos históricos**. Para evitar deriva, este README é deliberadamente um índice estável: ele não registra onda corrente, Matrix, SHA curricular nem “próxima competência”.
 
-## Para retomar agora
+## Para retomar trabalho
 
-Leia nesta ordem:
+1. Reancore diretamente no GitHub o repo `dyegorodrigues/SAGA`, PR #35, branch `codex/fechamento-curricular`, HEAD, base `main`, workflows, reviews e review threads.
+2. Leia **integralmente** [`PROMPT_DE_RETOMADA.md`](./PROMPT_DE_RETOMADA.md). Essa é a porta operacional principal.
+3. Use [`ESTADO_DO_FECHAMENTO.md`](./ESTADO_DO_FECHAMENTO.md) somente como índice vivo resumido.
+4. [`RETOMADA.md`](./RETOMADA.md), [`HANDOFF_CONTINUIDADE_IA.md`](./HANDOFF_CONTINUIDADE_IA.md) e [`BRIEFING_CODEX.md`](./BRIEFING_CODEX.md) são pontes atemporais e não devem duplicar estado curricular.
+5. Abra apenas os checkpoints e auditorias que a porta operacional atual indicar como relevantes.
 
-1. [`RETOMADA.md`](./RETOMADA.md)
-2. [`CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-12.md`](./CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-12.md)
-3. [`ESTADO_DO_FECHAMENTO.md`](./ESTADO_DO_FECHAMENTO.md)
-4. [`CHECKPOINT_FABRICA_CURRICULAR_W10_N3_03_FECHADA_2026-08-12.md`](./CHECKPOINT_FABRICA_CURRICULAR_W10_N3_03_FECHADA_2026-08-12.md)
-5. [`AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`](./AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md)
-6. [`PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`](./PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md)
-
-Antes de editar, reancore o PR #35 no GitHub e confirme HEAD/CI/reviews.
-
-## Linha operacional
-
-- repo: `dyegorodrigues/SAGA`;
-- branch: `codex/fechamento-curricular`;
-- PR: #35, mantido draft/open/unmerged;
-- próxima onda: W11 `AL.03/F30`;
-- W12 `N4.01/F97` vem depois;
-- scratch remota de rascunhos: `codex/w11-w12-drafts`, fora do PR.
+Se qualquer texto divergir do GitHub remoto, do DAG, do canário, da Coverage Matrix, do runtime map ou dos gates executáveis do SHA relevante, as fontes executáveis vencem.
 
 ## Como interpretar o diretório
 
-Arquivos datados antigos, roteiros e checkpoints anteriores são **proveniência
-histórica**. Eles não devem ser apagados nem “modernizados” para esconder o estado
-em que foram escritos.
+Arquivos datados, checkpoints de ondas anteriores, auditorias antigas e roteiros preservam proveniência histórica. **Não os modernize para fingir que sempre refletiram o estado atual** e não os use como handoff vivo só porque o nome contém “checkpoint”, “final”, “continuidade” ou “nova conversa”.
 
-Os arquivos da seção “Para retomar agora” são as portas de entrada correntes.
-Mesmo eles não superam o GitHub remoto: se HEAD/CI divergir, investigue primeiro.
+Uma mudança de fase corrente deve ser refletida em `PROMPT_DE_RETOMADA.md`, em `ESTADO_DO_FECHAMENTO.md` quando pertinente e no corpo do PR #35. As pontes estáveis acima não carregam números de onda por design.
 
-## Invariantes
+## Invariantes de continuidade
 
-- nenhum patch direto em `main`;
-- nenhum merge sem autorização explícita;
-- Creature Engine fora desta linha;
-- Thinking Engine runtime não autorizado;
-- gate vermelho é evidência;
-- verde precisa pertencer ao SHA que se pretende fechar;
-- snapshots históricos da Coverage Matrix permanecem imutáveis;
-- políticas do player são tratadas separadamente da fábrica curricular.
+- `main` não recebe patch direto nem merge desta fábrica;
+- PR #35 permanece draft/open/unmerged até o fechamento integral;
+- nenhum auto-merge ou ready sem autorização adequada;
+- Creature Engine/Tamagotchi fica fora desta linha;
+- vermelho regression-first é evidência e não deve ser “corrigido” relaxando contrato;
+- verde só vale para o SHA ao qual pertence;
+- não misturar recibos entre SHAs;
+- snapshots/checkpoints históricos permanecem históricos;
+- canário, ledger e Matrix seguem o protocolo da porta operacional viva.

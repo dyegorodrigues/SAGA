@@ -1,7 +1,6 @@
 # Briefing operacional — SAGA
 
-> **Não use números/PRs antigos deste diretório por memória.**
-> A porta canônica é `RETOMADA.md`.
+> **Ponte operacional atemporal.** Este arquivo não mantém snapshot curricular próprio. A porta canônica é `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md`.
 
 ## Reancoragem obrigatória
 
@@ -9,31 +8,21 @@
 - PR #35;
 - branch `codex/fechamento-curricular`;
 - confirmar `open + draft + unmerged`;
-- confirmar HEAD remoto, CI completo do próprio HEAD e review threads;
-- ler `CHECKPOINT_FINAL_NOVA_CONVERSA_2026-08-12.md` e
-  `ESTADO_DO_FECHAMENTO.md`.
+- confirmar HEAD remoto e base `main`;
+- conferir workflows do SHA relevante, reviews e review threads;
+- ler `PROMPT_DE_RETOMADA.md` integralmente;
+- usar `ESTADO_DO_FECHAMENTO.md` como resumo, não como substituto dos gates executáveis.
 
-## Estado resumido
+Não inferir estado a partir de checkpoints datados, nomes como “final”/“nova conversa” ou memória de chat. GitHub remoto, DAG, canário, Coverage Matrix, runtime map e gates do SHA relevante vencem.
 
-- W7–W10 fechadas; R0-A concluída;
-- Matrix pós-W10: `35/17/38/52/13`, com `12 swaps / 44 estreias`;
-- próxima onda: W11 `AL.03/F30`;
-- rascunhos W11/W12 estão em `codex/w11-w12-drafts` e são não executáveis;
-- políticas do player continuam estacionadas.
+## Regra genérica de execução
 
-## Regra de execução
+A fábrica curricular segue o protocolo definido na porta operacional viva. Em linhas gerais:
 
-Para W11:
+`regression-first → materialização registrada/inativa → CI + transversal verdes no mesmo SHA inativo → promoção atômica → Matrix observa o delta real → CI + transversal verdes no SHA final → fechamento documental → recálculo causal da próxima onda`.
 
-`regression-first → registrada/inativa → gates + Chrome real no mesmo SHA →
-promoção → Matrix observa → ledger → checkpoint → CI do HEAD exato`.
-
-Não criar segunda reta: reusar `InteractiveNumberLineSurface`.
-Não inventar primitiva para satisfazer Matrix.
-Não enfraquecer gate.
-Não fechar por verde de SHA anterior.
+Não congelar aqui a identidade da onda atual. Não criar primitivas apenas para satisfazer Matrix. Não enfraquecer gates. Não fechar por verde de SHA anterior. Não misturar recibos.
 
 ## Limites
 
-Não tocar `main`, Creature Engine ou Thinking Engine runtime.
-PR #35 continua draft e nenhum merge ocorre sem autorização humana explícita.
+Não tocar/mergear `main`, não marcar PR ready, não habilitar auto-merge e não tocar Creature Engine/Tamagotchi nesta linha de trabalho. Cânone compartilhado permanece aditivo.
