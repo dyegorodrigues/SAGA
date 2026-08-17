@@ -35,11 +35,11 @@ const component = (name) => path.join("src/components/primitives", `${name}.tsx`
 const FICHA_RUNTIME_MAP = [
   {
     primitive: "ArrayGrid",
-    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66", "volume-vistas-f92"],
-    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage"), component("PerimetroStage"), component("AreaF81Stage"), component("FatoresRetangulosStage"), component("VolumeVistasStage")],
-    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10", "GM.07", "GM.08", "N2.07", "GE.10"],
-    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66", "volume-vistas-f92"],
-    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo. F63/GM.07 compõe ArrayGrid + ShapeCanvas para separar chão e volta. F81/GM.08 reutiliza ArrayGrid como unidade quadrada do chão, inclusive em composição de retângulos. W39/F66/N2.07 reutiliza o ArrayGrid físico em FatoresRetangulosStage e mantém qualquer sobra visível fora do retângulo completo. W41/F92/GE.10 realiza ArrayGrid#3D em VolumeVistasStage: o ArrayGrid físico permanece a superfície canônica das projeções e da reconstrução; o palco acrescenta visualização/rotação 3D, onboarding explícito do mode swap e interação por toque com alvos mínimos de 80px, sem criar primitiva autoral paralela.",
+    kinds: ["array", "area", "area-model", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66", "volume-vistas-f92", "primos-divisores-f70"],
+    componentFiles: [component("ArrayGrid"), component("AreaStage"), component("Arranjo"), component("TabuadaStage"), component("DecomposicaoStage"), component("AncoraStage"), component("DivisaoLongaStage"), component("PerimetroStage"), component("AreaF81Stage"), component("FatoresRetangulosStage"), component("VolumeVistasStage"), component("PrimosDivisoresStage")],
+    builderKinds: ["arraygrid", "area", "tabuada", "decomposicao", "ancora"], specializedBuilderIds: ["N4.10", "GM.07", "GM.08", "N2.07", "GE.10", "N4.11"],
+    rendererKinds: ["array", "area", "tabuada", "decomposicao", "ancora", "divisao-longa-f69", "perimetro-f63", "area-f81", "fatores-retangulos-f66", "volume-vistas-f92", "primos-divisores-f70"],
+    note: "F68/N4.09 usa AreaStage. F69/N4.10 compõe ArrayGrid com InteractiveVertical na ponte concreto→algoritmo. F63/GM.07 compõe ArrayGrid + ShapeCanvas para separar chão e volta. F81/GM.08 reutiliza ArrayGrid como unidade quadrada do chão, inclusive em composição de retângulos. W39/F66/N2.07 reutiliza o ArrayGrid físico em FatoresRetangulosStage e mantém qualquer sobra visível fora do retângulo completo. W41/F92/GE.10 realiza ArrayGrid#3D em VolumeVistasStage: o ArrayGrid físico permanece a superfície canônica das projeções e da reconstrução; o palco acrescenta visualização/rotação 3D, onboarding explícito do mode swap e interação por toque com alvos mínimos de 80px, sem criar primitiva autoral paralela. W42/F70/N4.11 reutiliza ArrayGrid em PrimosDivisoresStage para testar divisores por retângulos que fecham sem sobra; a exploração por toque é separada da evidência conceitual e qualquer sobra permanece visível.",
   },
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
   {
@@ -100,10 +100,10 @@ const FICHA_RUNTIME_MAP = [
     note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2. W32/F82 compõe NumberLine + Balanca para converter antes de comparar ou operar. W35/F62 compõe NumberLine + Relogio para leitura de minutos e duração. W36/F93 usa NumberLine + Balanca em escalas alinhadas.",
   },
   {
-    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87"],
-    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("PorcentagemStage")],
-    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.03"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87"],
-    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W22/F87 compõe Quadrado100 + SingaporeBars."
+    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87", "primos-divisores-f70"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("PorcentagemStage"), component("PrimosDivisoresStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.03", "N4.11"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87", "primos-divisores-f70"],
+    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W22/F87 compõe Quadrado100 + SingaporeBars. W42/F70/N4.11 usa o próprio Quadrado100 para múltiplos e para o Crivo de Eratóstenes: o palco risca fisicamente as casas dos múltiplos compostos e preserva os primos-base, em vez de substituir o quadro/crivo por texto abstrato."
   },
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   {

@@ -8,6 +8,7 @@
 
 import { Progress } from "../../types";
 import { MisconceptionTag, type MisconceptionTagType } from "../../constants/misconceptions";
+import { PrimosDivisoresMisconception, type PrimosDivisoresMisconceptionTag } from "../../constants/primosDivisoresMisconceptions";
 import { calendarDayDistance, dayKeyFromNowInput, localDay } from "../../utils/calendarDay";
 
 export const SPACING_INTERVALS: Record<number, number> = {
@@ -20,7 +21,10 @@ export const SPACING_INTERVALS: Record<number, number> = {
 
 /** Janela máxima de tempo para 2 erros da mesma tag serem considerados o mesmo padrão (10 min) */
 const MAX_MISCONCEPTION_INTERVAL_MS = 10 * 60 * 1000;
-const CANONICAL_MISCONCEPTION_TAGS = new Set<string>(Object.values(MisconceptionTag));
+const CANONICAL_MISCONCEPTION_TAGS = new Set<string>([
+  ...Object.values(MisconceptionTag),
+  ...Object.values(PrimosDivisoresMisconception),
+]);
 
 /**
  * O Radar conceitual aceita somente o catálogo canônico.
@@ -29,7 +33,9 @@ const CANONICAL_MISCONCEPTION_TAGS = new Set<string>(Object.values(Misconception
  * são misconceptions matemáticas e não podem abrir Oficina. A validação também
  * protege saves antigos que já carreguem strings históricas fora do catálogo.
  */
-export function isCanonicalMisconceptionTag(tag: string): tag is MisconceptionTagType {
+export function isCanonicalMisconceptionTag(
+  tag: string,
+): tag is MisconceptionTagType | PrimosDivisoresMisconceptionTag {
   return CANONICAL_MISCONCEPTION_TAGS.has(tag);
 }
 

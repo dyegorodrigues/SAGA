@@ -15,6 +15,8 @@ interface Quadrado100Props {
   state?: UIState;
   /** F75 reutiliza a malha como UM inteiro; os numerais 1..100 ficam fora da linguagem visual. */
   showNumbers?: boolean;
+  /** F70: o Crivo de Eratóstenes risca fisicamente os múltiplos compostos nas próprias casas do quadro. */
+  crossedNumbers?: number[];
 }
 
 export function Quadrado100({
@@ -28,6 +30,7 @@ export function Quadrado100({
   targetNumber = null,
   state = 'ocioso',
   showNumbers = true,
+  crossedNumbers = [],
 }: Quadrado100Props) {
   const [selected, setSelected] = useState<number[]>([]);
 
@@ -59,6 +62,7 @@ export function Quadrado100({
               const isTarget = targetNumber === n;
               const isHidden = hiddenNumbers.includes(n) && !revealedNumbers.includes(n);
               const isIncorrect = incorrectNumber === n;
+              const isCrossed = crossedNumbers.includes(n);
               const linha = rowIndex + 1;
               const coluna = columnIndex + 1;
 
@@ -86,10 +90,14 @@ export function Quadrado100({
                   aria-label={showNumbers ? (isHidden ? `Casa vazia, linha ${linha}, coluna ${coluna}` : `Número ${n}`) : `Parte do inteiro, linha ${linha}, coluna ${coluna}`}
                   data-quadrado100-cell={n}
                   data-hidden={isHidden ? 'true' : 'false'}
+                  data-crossed={isCrossed ? 'true' : 'false'}
                   className={`flex items-center justify-center font-bold text-[10px] min-[360px]:text-xs sm:text-sm ${interactive ? 'cursor-pointer' : ''} disabled:cursor-default`}
                   style={{
                     width: '100%', aspectRatio: '1/1', minWidth: '0', backgroundColor: bgColor, color: textColor,
                     borderRadius: '4px', transition: tokens.animacao.rapida,
+                    textDecoration: isCrossed ? 'line-through' : 'none',
+                    textDecorationThickness: isCrossed ? '2px' : undefined,
+                    opacity: isCrossed ? 0.55 : 1,
                   }}
                 >
                   {showNumbers ? (isHidden ? <span aria-hidden="true">•</span> : n) : <span aria-hidden="true"> </span>}
