@@ -127,6 +127,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W40 — F91: círculo e áreas; ShapeCanvas. Inativo a771f960: CI 31981350463 + transversal 31981350512.
   "GE.09",
 
+  // W41 — F92: volume e vistas; ArrayGrid#3D. Inativo 33ff7d34: CI 32001192111 + transversal 32001192091.
+  "GE.10",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
