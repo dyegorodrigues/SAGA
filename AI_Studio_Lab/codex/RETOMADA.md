@@ -1,25 +1,23 @@
 # Retomada — ponte para a porta operacional viva
 
-> **Não use conteúdo histórico deste arquivo como estado curricular.** A porta operacional atual do PR #35 é `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md` e o GitHub remoto sempre vence este resumo.
+> **Este arquivo é deliberadamente atemporal.** Ele não contém número de onda, Matrix, SHA curricular, fila nem próxima competência. Isso evita que uma ponte antiga concorra com o estado vivo.
 
-## Primeiro movimento
+## Único procedimento de retomada
 
 1. abrir `dyegorodrigues/SAGA`, PR #35;
-2. confirmar `open + draft + unmerged`;
+2. confirmar que o PR continua `open + draft + unmerged`;
 3. confirmar branch `codex/fechamento-curricular`, HEAD remoto e `main` protegida;
-4. conferir workflows do **SHA exato** do HEAD, reviews e review threads;
-5. ler integralmente `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md`;
-6. ler `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W44_N5_04_F74_FECHADA_2026-08-17.md`;
-7. usar `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md` apenas como índice vivo resumido.
+4. conferir workflows do SHA relevante, reviews e review threads;
+5. ler **integralmente** `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md` — esta é a porta operacional principal;
+6. usar `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md` apenas como índice vivo resumido;
+7. abrir somente os checkpoints que a porta operacional atual indicar como relevantes;
+8. se qualquer texto divergir de GitHub remoto, canário, DAG, Coverage Matrix, runtime map ou gates executáveis, as fontes executáveis vencem.
 
-## Estado de referência na atualização de 17/08/2026
+## Regra de manutenção
 
-- W1–W44 fechadas;
-- W44 = `N5.04 / F74 — Somar Frações`;
-- recibo final de promoção W44: `5da29dc4078d67f71012daf21c435be622163957`;
-- CI `32062255308` + Certificação transversal `32062255294`, ambos `completed/success`;
-- Matrix final W44: `69 Composer / 15 legado / 6 fallback / 84 servidas / 11 divergências`;
-- W45 selecionada pelo DAG/Matrix: `N6.04 / F88 — Razão e Proporção`;
-- o HEAD de retomada contém o **regression-first nominal da W45**; ele deve permanecer vermelho exclusivamente pela ausência real de `N6.04/F88` até a materialização inativa.
+- Não adicionar aqui estado curricular duplicado.
+- Não congelar aqui “próxima onda”, contagens ou recibos.
+- Checkpoints datados são históricos e não devem ser reinterpretados como porta viva.
+- Toda mudança de fase deve ser registrada em `PROMPT_DE_RETOMADA.md` e, quando pertinente, em `ESTADO_DO_FECHAMENTO.md` e no corpo do PR #35.
 
-Não reabrir W44 sem causa nova observável. Não promover ou materializar outra competência no lugar de N6.04 sem deriva real do DAG/Matrix. Se o remoto tiver avançado além deste estado, o remoto vence este arquivo.
+Assim, `RETOMADA.md` permanece apenas uma ponte estável e não volta a virar fonte de memória obsoleta.
