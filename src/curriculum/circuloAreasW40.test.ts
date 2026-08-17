@@ -45,8 +45,26 @@ describe("W40 regression-first — GE.09/F91 Círculo e Áreas", () => {
 
     const l1 = generateRegisteredFichaQuestion("GE.09", 1);
     expect(JSON.stringify(l1.resolucao)).toMatch(/dois triângulos|retângulo|metade|divid/i);
+
+    const l2 = generateRegisteredFichaQuestion("GE.09", 2);
+    const l2Text = JSON.stringify(l2.resolucao);
+    expect(l2Text).toMatch(/base/i);
+    expect(l2Text).toMatch(/altura/i);
+    expect(l2Text).toMatch(/multiplic|produto|×|x\s*altura/i);
+    expect(l2Text).toMatch(/metade|divid\w*\s*(?:por\s*)?2|÷\s*2/i);
+    expect(l2Text).toMatch(/triângulo|triangulo|retângulo|retangulo/i);
+
     const l3 = generateRegisteredFichaQuestion("GE.09", 3);
     expect(JSON.stringify(l3.resolucao)).toMatch(/cort|encaix|mesma área|retângulo/i);
+
+    const l4 = generateRegisteredFichaQuestion("GE.09", 4);
+    const l4Text = JSON.stringify(l4.resolucao);
+    expect(l4Text).toMatch(/raio/i);
+    expect(l4Text).toMatch(/diâmetro|diametro/i);
+    expect(l4Text).toMatch(/circunferência|circunferencia/i);
+    expect(l4Text).toMatch(/dobro.*raio|dois raios|2\s*[×x*]\s*raio|raio.*metade.*diâmetro|raio.*metade.*diametro/i);
+    expect(l4Text).toMatch(/borda|contorno|volta/i);
+
     const l5 = generateRegisteredFichaQuestion("GE.09", 5);
     expect(JSON.stringify(l5.resolucao)).toMatch(/círculo|setores|raio|π|pi/i);
   });
