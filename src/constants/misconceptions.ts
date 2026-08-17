@@ -87,6 +87,15 @@ export const MisconceptionTag = {
   /** F91: trocou raio e diâmetro ou não distinguiu a circunferência como contorno. */
   CONFUNDE_RAIO_DIAMETRO: "confunde-raio-diametro",
 
+  /** F92: contou apenas cubos aparentes e ignorou pilhas/cubos ocultos. */
+  IGNORA_OCULTOS: "ignora-ocultos",
+
+  /** F92: associou a construção à projeção de outra orientação. */
+  VISTA_TROCADA: "vista-trocada",
+
+  /** F92: respondeu sem transformar mentalmente a orientação da construção. */
+  SEM_ROTACAO_MENTAL: "sem-rotacao-mental",
+
   /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
   INVERTE_DIVISAO: "inverte-divisao",
 
