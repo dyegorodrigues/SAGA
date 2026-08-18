@@ -1,72 +1,77 @@
-# CHECKPOINT FINAL — FÁBRICA CURRICULAR 90/90 · 2026-08-18
+# CHECKPOINT FINAL — Fábrica Curricular Principal · 90/90
 
-## Marco
+Data: 2026-08-18  
+Repo: `dyegorodrigues/SAGA`  
+PR: `#35`  
+Branch: `codex/fechamento-curricular`
 
-A Fábrica Curricular principal do SAGA encerrou a fila fallback-first.
+## 1. Correção histórica explícita
 
-Estado esperado e contratual da Coverage Matrix no fechamento:
+A primeira versão deste checkpoint foi gravada cedo demais: os commits `f208a1750d9084aeabf7ac3c1efdff63f5d5ebe5` e `a6b19c05ce20bf3aaf0cac53caf3ec9d2122c8e2` documentaram “W50 fechada / 90 de 90” quando `N5.05` ainda não estava no canário e a Coverage Matrix ainda observava `74 Composer / 15 legado / 1 fallback / 89 servidas / 11 divergências`.
 
-- competências no grafo: **90**;
-- fichas autorais: **94**;
-- Composer: **75**;
-- legado: **15**;
-- fallback: **0**;
-- servidas: **90/90**;
-- divergências ficha↔screen: **11**;
-- mode swaps: **12**;
-- tool introductions: **44**.
+Essa irregularidade documental foi registrada no PR #35 e corrigida pela promoção técnica real. O histórico não foi reescrito nem ocultado.
 
-Este marco significa **currículo principal servido 90/90**. Não significa Child-Ready.
-
-## Última onda — W50 N5.05/F86
+## 2. W50 — cadeia auditável
 
 - regression-first: `609217223cd3ab29e264762d32ec8c5ef01d78f1`;
+- materialização: `3e2b9e1ac6bfd79ea043c847f8d7b33ec9d086bc` → `bc865d5c037242bedd433b90a298e944c260aa54`;
+- reparos ARIA reais: `50d74e93c96dc88628f208be787e3fc853ea1136` e `2d250b39ea8d32d4a9aa92b2797a44d5da49efa4`;
 - inativo final: `340f219a8eae3b3a71215d7a23e8e81a032afe1b`;
-- CI inativo: `32191494936` — success;
-- transversal inativo: `32191494957` — success 9/9;
-- promoção: canário `N5.05` + ledger `W50-N5.05` + contrato Matrix no mesmo snapshot;
-- resultado contratual: `75/15/0/90/11`.
+- CI inativo `32191494936` — success;
+- transversal inativa `32191494957` — success 9/9;
+- promoção técnica final: `efd270b732752ebe0d38a47efff47d958e352802`;
+- CI técnico `32196855192` — **completed/success**;
+- transversal técnica `32196855356` — **completed/success, 9/9**.
 
-Durante a certificação inativa, o axe gate detectou duas violações reais de semântica ARIA. Elas foram corrigidas na implementação; o teste foi preservado intacto. Isso faz parte da evidência de qualidade da W50, não é dívida mascarada.
+A promoção técnica foi atômica: canário `N5.05` + ledger `W50-N5.05` + contrato Coverage Matrix no mesmo SHA.
 
-## Dívidas preservadas
+## 3. Estado executável final observado
 
-O fechamento NÃO autoriza apagar ou reclassificar como resolvidos:
+No SHA técnico `efd270b732752ebe0d38a47efff47d958e352802`, a Coverage Matrix observou:
 
-1. **15 legados**, enquanto observados pela Matrix;
-2. **11 divergências ficha↔screen**, enquanto observadas;
-3. **`Moedas`**, enquanto permanecer como primitiva/dívida bloqueadora real;
-4. hardening/performance e warnings reais de bundle;
-5. Issue #47 — **Integração Sistêmica e Child-Ready**;
-6. Issue #48 — **lacunas microcurriculares/microprogressão**;
-7. Observatório da `SAGA-Research-Foundry`, P&D, `implementation_authorized: false`;
-8. qualquer outra dívida que continue sendo observada por testes, auditorias, runtime ou telemetria.
+- **90 competências**;
+- **94 fichas autorais**;
+- **75 Composer**;
+- **15 legado**;
+- **0 fallback**;
+- **90 servidas**;
+- **11 divergências ficha↔screen**;
+- `modeSwaps=12`;
+- `toolIntroductions=44`;
+- `Moedas` ainda ausente e bloqueando GM.03.
 
-## Governança pós-fábrica
+Os Gates do mesmo SHA confirmaram catálogo, fichas, conformidade, DAG, TypeScript, **245 arquivos / 3.429 testes**, build e guarda textual verdes. Sonda real Sensei, higiene e binários também ficaram verdes. A transversal fechou 9/9.
 
-- PR #35 deve continuar **open + draft + unmerged**;
-- `main` permanece intocada;
-- não marcar ready;
-- não auto-mergear;
-- não integrar PR #35 em `main`;
-- Creature Engine/Tamagotchi continua fora desta frente;
-- não iniciar automaticamente a fase Child-Ready neste checkpoint.
+## 4. Escopo concluído
 
-## Próxima conversa
+Com o SHA técnico acima, a **Fábrica Curricular Principal** atingiu tecnicamente seu alvo:
 
-A próxima conversa deve primeiro reancorar:
+- `fallback=0`;
+- `90/90 competências servidas`.
 
-- PR #35;
-- branch `codex/fechamento-curricular`;
-- `main`;
-- HEAD remoto;
-- workflows do HEAD documental;
-- reviews e review threads;
-- canário;
-- Coverage Matrix;
-- runtime map;
-- DAG.
+O fechamento formal depende ainda da certificação do HEAD documental posterior que contém esta reconciliação. Esse HEAD deve obter seus próprios CI + Certificação transversal; os recibos técnicos acima não podem ser reutilizados para essa finalidade.
 
-Somente se o HEAD documental final estiver com CI + Certificação transversal verdes e a Matrix continuar em `fallback=0`, este checkpoint é considerado formalmente certificado.
+## 5. Resíduos intencionalmente preservados
 
-A próxima fase recomendada é **Integração Sistêmica e Child-Ready**, mas sua implementação fica para uma nova retomada deliberada.
+O fim dos fallbacks não apaga outras camadas de dívida:
+
+- **15 competências legado**;
+- **11 divergências ficha↔screen**;
+- primitiva `Moedas` / GM.03;
+- hardening/performance e warning de bundle;
+- Issue #47 — Integração Sistêmica e Child-Ready;
+- Issue #48 — lacunas microcurriculares/microprogressão;
+- Observatório na Research Foundry, P&D, `implementation_authorized: false`;
+- qualquer dívida ainda observada por gates/runtime.
+
+`fallback=0` **não significa Child-Ready** e não autoriza iniciar automaticamente Integração Sistêmica, microprogressão, Observatório ou outra grande frente.
+
+## 6. Parada de governança
+
+Após o HEAD documental deste fechamento obter CI success + transversal success 9/9:
+
+1. atualizar o corpo do PR com os recibos documentais reais;
+2. declarar formalmente: **FÁBRICA CURRICULAR PRINCIPAL FORMALMENTE CONCLUÍDA — fallback=0 — 90/90 servidas**;
+3. manter PR #35 open + draft + unmerged;
+4. manter `main` intocada;
+5. **parar**, sem iniciar a fase pós-90/90.

@@ -1,103 +1,126 @@
-# CHECKPOINT — Fábrica Curricular W50 · N5.05/F86 FECHADA · 2026-08-18
+# CHECKPOINT — Fábrica Curricular W50 · N5.05/F86 — FECHADA TECNICAMENTE
 
-## Estado vinculante
+Data: 2026-08-18  
+Repo: `dyegorodrigues/SAGA`  
+PR: `#35`  
+Branch: `codex/fechamento-curricular`
 
-W50 = `N5.05 / F86 — Multiplicar Frações`.
+## 1. Correção de auditoria
 
-A onda encerra a fila fallback-first da fábrica curricular principal. A autoridade executável, após a promoção atômica, deve observar:
+Este checkpoint foi criado prematuramente numa sessão anterior, antes de existir o commit técnico de promoção de W50. A irregularidade foi detectada, registrada no corpo do PR e corrigida sem apagar o histórico.
 
-- 90 competências no grafo;
-- 94 fichas autorais;
-- 75 Composer;
-- 15 legado;
-- 0 fallback;
-- 90 servidas;
-- 11 divergências ficha↔screen;
-- 12 mode swaps;
-- 44 tool introductions;
-- `Moedas` permanece dívida real conhecida.
+Os commits documentais prematuros permanecem rastreáveis:
 
-`fallback=0` significa **fábrica curricular principal concluída**. Não significa produto Child-Ready.
+- `f208a1750d9084aeabf7ac3c1efdff63f5d5ebe5`;
+- `a6b19c05ce20bf3aaf0cac53caf3ec9d2122c8e2`.
 
-## Cadeia W50
+Eles não são recibos de promoção W50 e não devem ser reutilizados como tal.
 
-### Âncora documental anterior
+## 2. Competência
 
-- W49 documental: `5d46a36bfe494ec6af3ccecfda4b4c0658b5e8bf`;
-- CI `32187284410` — success;
-- Certificação transversal `32187284484` — success 9/9.
+- onda: **W50**;
+- competência: `N5.05`;
+- ficha: **F86 — Multiplicar Frações**;
+- primitiva/runtime reutilizado: `ArrayGrid#área` / `MultiplicarFracoesStage`;
+- estado técnico final: **promovida para Composer**.
+
+Escada canônica preservada: fração de inteiro → modelo de área → fração × fração pela interseção → generalização simbólica → divisão como “quantas frações cabem”.
+
+## 3. Cadeia técnica real
 
 ### Regression-first
 
-- SHA: `609217223cd3ab29e264762d32ec8c5ef01d78f1`;
-- vermelho nominal capturado antes da execução ser supersedida: N5.05/F86 ausente de `JOURNEY_FICHAS`;
-- catálogo, fichas, conformidade, DAG e TypeScript passaram;
-- 243 arquivos / 3.407 testes preexistentes verdes;
-- Matrix permaneceu `74/15/1/89/11`;
-- transversal `32188240862` — success.
+`609217223cd3ab29e264762d32ec8c5ef01d78f1`
+
+Não foi refeito durante a correção.
 
 ### Materialização inativa
 
 - núcleo: `3e2b9e1ac6bfd79ea043c847f8d7b33ec9d086bc`;
-- primeiro candidato completo: `bc865d5c037242bedd433b90a298e944c260aa54`.
+- candidato completo: `bc865d5c037242bedd433b90a298e944c260aa54`.
 
-F86 foi materializada reutilizando `ArrayGrid#área`:
+### Reparos reais de acessibilidade
 
-1. fração × inteiro como “fração de uma quantidade”;
-2. fração × inteiro no modelo de área;
-3. fração × fração como interseção real de duas partições;
-4. produto simbólico com retirada do preenchimento-resposta;
-5. divisão por fração como “quantas partes deste tamanho cabem?”.
+- `50d74e93c96dc88628f208be787e3fc853ea1136`;
+- `2d250b39ea8d32d4a9aa92b2797a44d5da49efa4`.
 
-Radar canônico:
+Os reparos corrigiram problemas ARIA reais detectados pela auditoria; testes e critérios de acessibilidade não foram relaxados.
 
-- `multiplicar-aumenta`;
-- `soma-em-vez-de-multiplicar`;
-- `dividir-diminui`.
+### Portão inativo final
 
-P13: `FRACAO_VEZES_FRACAO_F86`, emitida apenas em acerto real do L3; resposta errada não emite a evidência.
+SHA: `340f219a8eae3b3a71215d7a23e8e81a032afe1b`
 
-### Reparos reais de acessibilidade — sem enfraquecer gate
+- CI `32191494936` — **completed/success**;
+- Certificação transversal `32191494957` — **completed/success, 9/9**.
 
-O axe gate encontrou duas violações reais `aria-prohibited-attr` em agrupadores rotulados. Em vez de remover o teste:
+## 4. Promoção atômica corrigida
 
-- `50d74e93c96dc88628f208be787e3fc853ea1136` tornou a malha `ArrayGrid` semanticamente nomeável com `role="img"`;
-- `2d250b39ea8d32d4a9aa92b2797a44d5da49efa4` rotulou o grupo de alternativas do `ArrayGrid`;
-- `340f219a8eae3b3a71215d7a23e8e81a032afe1b` completou os grupos semânticos da F86.
+SHA técnico final W50:
 
-### Inativo final certificado
+`efd270b732752ebe0d38a47efff47d958e352802`
 
-- SHA: `340f219a8eae3b3a71215d7a23e8e81a032afe1b`;
-- CI `32191494936` — completed/success;
-- Certificação transversal `32191494957` — completed/success 9/9;
-- Gates, testes com axe intacto, build, Sensei, higiene e binários verdes.
+O commit contém simultaneamente os três governantes da promoção:
 
-### Promoção atômica
+1. `src/curriculum/motores/composerCanaryIds.ts` — ativa `N5.05`;
+2. `AI_Studio_Lab/tools/coverage_matrix_core.ts` — ledger nominal `W50-N5.05` com delta `{ composer:+1, fallback:-1, served:+1 }` e rationale do portão inativo;
+3. `src/curriculum/coverageMatrix.test.ts` — contrato reconciliado com a fonte real.
 
-A promoção final foi aplicada somente após o portão inativo verde, contendo no mesmo snapshot:
+Nenhum baseline foi alterado para fabricar verde.
 
-1. canário `N5.05`;
-2. ledger nominal `W50-N5.05`, delta `{ composer:+1, fallback:-1, served:+1 }`;
-3. contrato da Coverage Matrix para `75/15/0/90/11`.
+## 5. Recibos técnicos finais do próprio SHA
 
-Nenhum baseline foi alterado para fabricar verde. A promoção deve ser considerada válida somente com CI + Certificação transversal do próprio HEAD técnico final.
+- CI `32196855192` — **completed/success**;
+- Certificação transversal `32196855356` — **completed/success, 9/9**.
 
-## O que W50 NÃO resolve
+No CI técnico:
 
-Permanecem explicitamente fora do significado de `fallback=0`:
+- Gates verdes;
+- catálogo, fichas, conformidade e DAG verdes;
+- TypeScript verde;
+- **245 arquivos / 3.429 testes** verdes;
+- build verde;
+- Sonda real Sensei verde;
+- higiene do diff verde;
+- guarda de binários verde.
 
-- 15 competências ainda servidas por legado, enquanto observadas;
-- 11 divergências ficha↔screen, enquanto observadas;
-- primitiva `Moedas` / dívida correlata;
-- hardening e performance, inclusive bundle warning quando aplicável;
-- Integração Sistêmica e Child-Ready — Issue #47;
-- lacunas microcurriculares/microprogressão — Issue #48;
-- Observatório da `SAGA-Research-Foundry`, P&D com `implementation_authorized: false`.
+O build continua emitindo warning de tamanho do bundle; isso permanece dívida explícita de hardening/performance, não foi escondido nem convertido em falso verde.
 
-Não apagar essas dívidas no fechamento.
+## 6. Coverage Matrix observada
 
-## Regra para a próxima conversa
+A fonte executável observou no SHA técnico final:
 
-A próxima conversa deve reancorar o remoto e tratar a Fábrica Curricular como concluída somente se o HEAD documental final estiver com CI + transversal verdes e a Matrix continuar em `90/90 servidas` com `fallback=0`.
+- **90 competências**;
+- **94 fichas autorais**;
+- **75 Composer**;
+- **15 legado**;
+- **0 fallback**;
+- **90 servidas**;
+- **11 divergências ficha↔screen**;
+- `modeSwaps=12`;
+- `toolIntroductions=44`;
+- primitiva bloqueadora ainda ausente: `Moedas`, em GM.03.
 
-Depois disso, a próxima fase recomendada é **Integração Sistêmica e Child-Ready**, mas ela não deve ser iniciada automaticamente por este checkpoint.
+Portanto W50 está **tecnicamente FECHADA** e a fábrica curricular principal atingiu tecnicamente `fallback=0` e `90/90 servidas`.
+
+## 7. O que este checkpoint NÃO declara sozinho
+
+O fechamento **formal/documental** da fábrica exige um HEAD documental posterior contendo este checkpoint reconciliado, `CHECKPOINT_FABRICA_CURRICULAR_FINAL_90_DE_90_2026-08-18.md`, `ESTADO_DO_FECHAMENTO.md` e `PROMPT_DE_RETOMADA.md`, seguido por CI e Certificação transversal próprios desse HEAD.
+
+Os recibos técnicos `32196855192` / `32196855356` não certificam o commit documental posterior.
+
+## 8. Dívidas preservadas
+
+Mesmo com `fallback=0`:
+
+- 15 competências legado permanecem observadas;
+- 11 divergências ficha↔screen permanecem observadas;
+- `Moedas` / GM.03 permanece dívida real;
+- hardening/performance e warning de bundle permanecem abertos;
+- Issue #47 — Integração Sistêmica e Child-Ready — permanece pós-fábrica;
+- Issue #48 — lacunas microcurriculares/microprogressão — permanece pós-fábrica;
+- Observatório na `SAGA-Research-Foundry` permanece P&D com `implementation_authorized: false`;
+- qualquer dívida futura observada por gates/runtime continua vinculante.
+
+`fallback=0` **não significa Child-Ready**.
+
+Nenhuma fase pós-90/90 foi iniciada neste fechamento.

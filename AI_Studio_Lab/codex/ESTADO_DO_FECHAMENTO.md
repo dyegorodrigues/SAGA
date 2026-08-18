@@ -1,95 +1,99 @@
-# Estado do Fechamento Curricular — SAGA
+# ESTADO DO FECHAMENTO — Fábrica Curricular SAGA
 
-**Última atualização operacional:** 18/08/2026 — W49/PE.04/F95 fechada tecnicamente; fechamento documental em certificação  
-**Branch:** `codex/fechamento-curricular`  
-**PR:** #35 — deve permanecer **draft + open + unmerged**  
-**Base de governança:** `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada pela fábrica  
-**Fonte de verdade:** GitHub remoto + gates executáveis do mesmo SHA.
+Atualizado em 2026-08-18 após a correção da promoção W50.
 
-> A API do GitHub reporta `main` com `protected:false`; a regra vinculante deste trabalho continua sendo **não tocar `main`**. Para executar qualquer nova escrita, leia primeiro `AI_Studio_Lab/codex/PROMPT_DE_RETOMADA.md` e reancore no remoto.
+> Autoridade: GitHub remoto + DAG + canário + Coverage Matrix + gates do SHA exato. Este documento registra estado; não substitui as autoridades executáveis.
 
-## Fechamento formal
+## 1. Governança vigente
 
-- Ondas fechadas tecnicamente: **W1–W49**
-- Última onda: **W49 — PE.04 / F95 — Estatística e Chance**
-- SHA técnico final: `2bc6424205ce6bafe377a0290e7d242ce73042f5`
-- CI final: `32186216685` — **completed/success**
-- Certificação transversal final: `32186216686` — **completed/success 9/9**
-- Checkpoint W49: `CHECKPOINT_FABRICA_CURRICULAR_W49_PE_04_F95_FECHADA_2026-08-18.md`
-
-O fechamento documental da W49 deve ser certificado pelo próprio HEAD que introduz checkpoint + Estado + porta de retomada. Recibos técnicos do `2bc642…` não substituem os recibos desse SHA documental.
-
-## Cadeia vinculante W49
-
-- fechamento documental W48: `bca18663b9d7b9f683af78962f238ac80d2f35f3`;
-  - CI `32166792755` — success;
-  - transversal `32166792851` — success 9/9;
-- regression-first W49: `a98f091801c0b2585ff57586d073eb706fd65465`;
-  - CI `32167817721` — failure nominal exclusiva de PE.04 ausente;
-  - transversal `32167817676` — success;
-- materialização inativa: `eecb65c050c39ce69f18c42f504c160d02238fb3`;
-- materialização inativa final/P13: `ba03c90bab7dd49b580338a0c6df2a912e3716c7`;
-  - CI `32169040052` — success;
-  - transversal `32169040050` — success 9/9;
-- promoção atômica/final técnico: `2bc6424205ce6bafe377a0290e7d242ce73042f5`;
-  - CI `32186216685` — success;
-  - transversal `32186216686` — success 9/9.
-
-A promoção tocou exatamente canário `PE.04`, ledger `W49-PE.04` e contrato Matrix `74/15/1/89/11`. Nenhum baseline foi alterado para fabricar verde.
-
-## Coverage Matrix real pós-W49
-
-- competências: **90**
-- fichas autorais: **94**
-- Composer: **74**
-- legado: **15**
-- fallback: **1**
-- servidas: **89**
-- divergências: **11**
-- modeSwaps: **12**
-- toolIntroductions: **44**
-- primitiva ausente conhecida: **Moedas**
-
-Fallback restante:
-
-1. `N5.05` — F86, Multiplicar Frações
-
-## Estado da próxima onda
-
-**Nenhuma próxima onda está aberta neste fechamento documental.**
-
-`N5.05/F86` é a única candidata residual observada, com prerequisitos conhecidos `N5.04 + N6.04` já servidos, mas sua abertura depende do fechamento documental verde W49 e de novo recálculo remoto da Matrix/DAG.
-
-O usuário concedeu autorização contínua para executar autonomamente a onda residual até `fallback=0`, preservando uma onda por vez.
-
-## Resíduos conhecidos e conscientemente abertos
-
-Não confundir a conclusão da W49 — nem o futuro `fallback=0` — com produto Child-Ready:
-
-- **15 competências legado** continuam explicitadas pela Matrix;
-- **11 divergências ficha↔screen** continuam explicitadas;
-- `Moedas` continua ausente e afeta GM.03;
-- warning de tamanho de bundle permanece tema de hardening/performance;
-- Issue #47 preserva a fase **Integração Sistêmica e Child-Ready**;
-- Issue #48 preserva a auditoria de **lacunas microcurriculares/microprogressão**;
-- Observatório permanece na `SAGA-Research-Foundry` como P&D, `PRE-CANONICAL`, `implementation_authorized: false`.
-
-Nada acima deve ser apagado, chamado de verde ou misturado à fábrica sem evidência/autorização apropriada.
-
-## Governança
-
-- não tocar `main`;
-- PR #35 permanece draft + open + unmerged;
-- não marcar ready, não habilitar auto-merge, não mergear;
+- Repo: `dyegorodrigues/SAGA`;
+- PR: `#35` — deve permanecer **open + draft + unmerged**;
+- Branch: `codex/fechamento-curricular`;
+- `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada pela fábrica;
+- não marcar ready, não habilitar auto-merge e não mergear;
 - não tocar Creature Engine/Tamagotchi;
-- uma onda por vez;
-- não misturar recibos de SHAs;
-- não relaxar teste, P13, Matrix, Radar, DAG, contratos ou sondas;
-- não editar baseline para fabricar verde;
-- promoção = canário + ledger + contrato Matrix no mesmo SHA;
-- ledger, canário, Matrix e runtime map permanecem declarativos;
-- erro motor não vira misconception conceitual;
-- RT não governa domínio conceitual salvo contrato explícito de fluência;
-- ajuda/resolução assistida não compra mastery independente;
-- Foundry/Observatório não entra no runtime sem autorização humana específica futura;
-- ao alcançar `fallback=0`, fechar formalmente a fábrica e **parar antes da fase pós-90/90**.
+- não enfraquecer P13, Matrix, Radar, DAG, contratos ou sondas;
+- não misturar recibos entre SHAs.
+
+## 2. Estado técnico da fábrica
+
+Ondas **W1–W50 tecnicamente fechadas**.
+
+Última onda: **W50 · N5.05/F86 — Multiplicar Frações**.
+
+SHA técnico final W50:
+
+`efd270b732752ebe0d38a47efff47d958e352802`
+
+Recibos do próprio SHA:
+
+- CI `32196855192` — **completed/success**;
+- Certificação transversal `32196855356` — **completed/success, 9/9**.
+
+A promoção W50 é atômica no mesmo SHA:
+
+1. canário `N5.05`;
+2. ledger `W50-N5.05`, delta `{ composer:+1, fallback:-1, served:+1 }`;
+3. contrato da Coverage Matrix reconciliado com a observação real.
+
+## 3. Coverage Matrix observada
+
+No SHA técnico final:
+
+- **90 competências**;
+- **94 fichas autorais**;
+- **75 Composer**;
+- **15 legado**;
+- **0 fallback**;
+- **90 servidas**;
+- **11 divergências ficha↔screen**;
+- `modeSwaps=12`;
+- `toolIntroductions=44`;
+- primitiva ausente: `Moedas`, ainda bloqueando GM.03.
+
+Gates técnicos: catálogo, fichas, conformidade, DAG, TypeScript, **245 arquivos / 3.429 testes**, build e guarda textual verdes. Sonda real Sensei, higiene e binários verdes. O build continua emitindo warning de bundle, preservado como dívida de hardening/performance.
+
+## 4. Cadeia real W50
+
+- regression-first: `609217223cd3ab29e264762d32ec8c5ef01d78f1`;
+- materialização inativa: `3e2b9e1ac6bfd79ea043c847f8d7b33ec9d086bc` → `bc865d5c037242bedd433b90a298e944c260aa54`;
+- reparos ARIA: `50d74e93c96dc88628f208be787e3fc853ea1136` e `2d250b39ea8d32d4a9aa92b2797a44d5da49efa4`;
+- inativo final: `340f219a8eae3b3a71215d7a23e8e81a032afe1b`;
+- CI inativo `32191494936` — success;
+- transversal inativa `32191494957` — success 9/9;
+- promoção técnica: `efd270b732752ebe0d38a47efff47d958e352802`;
+- CI técnico `32196855192` — success;
+- transversal técnica `32196855356` — success 9/9.
+
+Regression-first, materialização e reparos ARIA não foram refeitos durante a correção.
+
+## 5. Irregularidade documental reconciliada
+
+Os commits `f208a1750d9084aeabf7ac3c1efdff63f5d5ebe5` e `a6b19c05ce20bf3aaf0cac53caf3ec9d2122c8e2` afirmaram prematuramente W50/90-de-90 antes do commit técnico de promoção.
+
+A auditoria foi registrada no PR #35 e o fechamento foi refeito na ordem correta: portão inativo → promoção técnica atômica → CI/transversal técnicos → reconciliação documental. O histórico permanece explícito; não houve tentativa de ocultar a irregularidade.
+
+## 6. Estado formal/documental
+
+A fábrica já atingiu tecnicamente `fallback=0` e `90/90 servidas`.
+
+O commit documental que contém este Estado reconciliado precisa obter **CI + Certificação transversal próprios**. Somente após ambos verdes o fechamento pode ser declarado formalmente concluído. Os recibos técnicos `32196855192` / `32196855356` não certificam esse HEAD documental.
+
+## 7. Dívidas preservadas
+
+Mesmo com `fallback=0`:
+
+- 15 competências legado;
+- 11 divergências ficha↔screen;
+- `Moedas` / GM.03;
+- hardening/performance e warning de bundle;
+- Issue #47 — Integração Sistêmica e Child-Ready;
+- Issue #48 — lacunas microcurriculares/microprogressão;
+- Observatório na `SAGA-Research-Foundry`, P&D, `implementation_authorized: false`;
+- qualquer dívida ainda observada por gates/runtime.
+
+`fallback=0` **não significa Child-Ready**.
+
+## 8. Parada
+
+Nenhuma frente pós-90/90 foi iniciada. Depois da certificação documental final, atualizar o corpo do PR com os recibos documentais, manter PR draft/open/unmerged, manter `main` intocada e **parar**.
