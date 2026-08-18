@@ -53,7 +53,7 @@ interface ContasVirgulaShow {
   adicionarZeros?: boolean;
   destacarColuna?: string;
   reagrupar?: boolean;
-  promoverOrdens?: number;
+  subirOrdens?: number;
 }
 
 type DistratorF76 = { value: string; tag: ContasVirgulaMisconceptionTag };
@@ -191,7 +191,7 @@ export function construirContasVirgulaF76Resolucao(spec: ContasVirgulaF76Spec): 
     estadoInicial: { destacarVirgulas: true },
     passos: [
       { id: "valor-posicional", say: `Multiplicar por ${spec.fator} faz cada algarismo valer ${spec.fator} vezes mais.`, show: { destacarVirgulas: true }, corrige: [D.ALINHA_PELA_DIREITA], parcial: "valor-posicional-identificado" },
-      { id: "promover-ordens", say: `Cada algarismo sobe ${ordens === 1 ? "uma ordem" : "duas ordens"} de valor posicional; use a vírgula apenas para registrar onde ficaram unidades e partes do inteiro.`, show: { promoverOrdens: ordens, alinharOrdens: true }, corrige: [D.IGNORA_ZEROS, D.VIRGULA_PERDIDA], parcial: "ordens-promovidas" },
+      { id: "subir-ordens", say: `Cada algarismo sobe ${ordens === 1 ? "uma ordem" : "duas ordens"} de valor posicional; use a vírgula apenas para registrar onde ficaram unidades e partes do inteiro.`, show: { subirOrdens: ordens, alinharOrdens: true }, corrige: [D.IGNORA_ZEROS, D.VIRGULA_PERDIDA], parcial: "ordens-subidas" },
     ],
     fallback: 0,
   };

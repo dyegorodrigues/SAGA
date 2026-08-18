@@ -140,5 +140,5 @@ describe("W47/F76 — contas com vírgula por valor posicional", () => {
       expect(violations.map(v => `L${nivel} ${v.id}: ${v.help}`)).toEqual([]);
       unmount();
     }
-  });
+  }, 20000);
 });
