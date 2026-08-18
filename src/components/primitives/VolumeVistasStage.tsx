@@ -33,7 +33,7 @@ function VistaArrayGrid({ grid, label }: { grid: VolumeVistaGrid; label: string 
   );
 }
 
-function IsometricConstruction({ alturas, orientacao }: { alturas: number[][]; orientacao: VolumeVista }) {
+export function IsometricConstruction({ alturas, orientacao }: { alturas: number[][]; orientacao: VolumeVista }) {
   const cubes = useMemo(() => {
     const result: Array<{ x: number; y: number; z: number }> = [];
     alturas.forEach((row, y) => row.forEach((height, x) => {
