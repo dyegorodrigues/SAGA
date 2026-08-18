@@ -56,7 +56,7 @@ export function ArrayGrid({ question, onAnswer, disabled = false }: Props) {
     </motion.div>
     {showEquation && <p className="text-2xl font-black text-slate-800">{actualRows} linhas × {actualCols} colunas = ?</p>}
     {requireRotate && !rotated && <p className="font-bold text-indigo-700">Gire primeiro para descobrir outro jeito.</p>}
-    <div className="grid grid-cols-2 gap-3" aria-label="Alternativas do arranjo">
+    <div role="group" className="grid grid-cols-2 gap-3" aria-label="Alternativas do arranjo">
       {question.options?.map(option => {
         const blocked = unavailable.has(option.value);
         return <button key={String(option.value)} type="button" onClick={() => choose(option.value)}
