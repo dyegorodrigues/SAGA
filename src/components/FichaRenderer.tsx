@@ -14,6 +14,7 @@ import { OperarNegativosStage } from "./primitives/OperarNegativosStage"; import
 import { LinguagemLetrasStage } from "./primitives/LinguagemLetrasStage"; import type { LinguagemLetrasF89Spec } from "../curriculum/procedimentos/linguagemLetrasContract";
 import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
 import { MediaChanceStage } from "./primitives/MediaChanceStage"; import type { MediaChanceF83Spec } from "../curriculum/procedimentos/mediaChanceContract";
+import { EstatisticaChanceStage } from "./primitives/EstatisticaChanceStage"; import type { EstatisticaChanceF95Spec } from "../curriculum/procedimentos/estatisticaChanceContract";
 import { ProblemasMedidaStage } from "./primitives/ProblemasMedidaStage"; import type { ProblemasMedidaF82Spec } from "../curriculum/procedimentos/problemasMedidaContract";
 import { HorasMinutosStage } from "./primitives/HorasMinutosStage"; import type { HorasMinutosF62Spec } from "../curriculum/procedimentos/horasMinutosContract";
 import { ConversaoUnidadesStage } from "./primitives/ConversaoUnidadesStage"; import type { ConversaoUnidadesF93Spec } from "../curriculum/procedimentos/conversaoUnidadesContract";
@@ -68,6 +69,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'linguagem-letras-f89': return <LinguagemLetrasStage spec={question.uiProps as LinguagemLetrasF89Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'media-chance-f83': return <MediaChanceStage spec={question.uiProps as MediaChanceF83Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'estatistica-chance-f95': return <EstatisticaChanceStage spec={question.uiProps as EstatisticaChanceF95Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'problemas-medida-f82': return <ProblemasMedidaStage spec={question.uiProps as ProblemasMedidaF82Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'horas-minutos-f62': return <HorasMinutosStage spec={question.uiProps as HorasMinutosF62Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'conversao-unidades-f93': return <ConversaoUnidadesStage spec={question.uiProps as ConversaoUnidadesF93Spec} disabled={Boolean(disabled)} onAnswer={send}/>;

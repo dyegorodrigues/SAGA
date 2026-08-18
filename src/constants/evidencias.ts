@@ -248,6 +248,13 @@ export const Evidencia = {
    * observa a criança recuperar a altura por volume ÷ área da base.
    */
   DIMENSAO_FALTANTE_F94: "dimensao-faltante-f94",
+
+  /**
+   * F95 (PE.04): ao menos uma chance foi representada corretamente como fração
+   * dos casos favoráveis sobre o total. A condição impede domínio apenas por
+   * linguagem verbal de "mais provável" sem quantificar a probabilidade.
+   */
+  CHANCE_FRACAO_F95: "chance-fracao-f95",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
