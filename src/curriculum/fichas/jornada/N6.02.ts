@@ -38,7 +38,7 @@ export const N6_02: FichaCompetencia = {
     2: { primitiva: "vertical", micro: "casas-diferentes", andaime: "medio" },
     3: { primitiva: "vertical", micro: "subtracao", andaime: "medio" },
     4: { primitiva: "vertical", micro: "reagrupamento", andaime: "minimo" },
-    5: { primitiva: "vertical", micro: "vezes-dez-cem", andaime: "nenhum" },
+    5: { primitiva: "vertical", micro: "vezes-dez-cem", andaime: "nenhum", rt_alvo: 18000 },
   },
   micros: [
     { id: "mesmas-casas", fonte: "F76", alvo: "somar decimais com a mesma quantidade de casas alinhando cada ordem", kinds: ["vertical", "quadrado100"], params: { modo: "mesmas-casas", tutorial }, dominio },
