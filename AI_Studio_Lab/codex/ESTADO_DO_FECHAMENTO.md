@@ -1,6 +1,6 @@
 # Estado do Fechamento Curricular — SAGA
 
-**Última atualização operacional:** 18/08/2026 — W46/AL.08/F90 fechada; W47/N6.02/F76 selecionada para regression-first  
+**Última atualização operacional:** 18/08/2026 — W46/AL.08/F90 fechada; W47/N6.02/F76 regression-first validado; materialização inativa autorizada  
 **Branch:** `codex/fechamento-curricular`  
 **PR:** #35 — deve permanecer **draft + open + unmerged**  
 **Base protegida:** `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`  
@@ -15,7 +15,11 @@
 - W46 = `AL.08 / F90 — Equações` — **FECHADA**.
 - CI final W46 `32094469085` — `completed/success`.
 - Certificação transversal final W46 `32094469058` — `completed/success`, 9/9.
-- Matrix real: **71 Composer / 15 legado / 4 fallback / 86 servidas / 11 divergências**.
+- W47 = `N6.02 / F76 — Contas com Vírgula` — regression-first **VALIDADO**.
+- Recibo regression-first W47: `073bfab1469aeb86bdc0c3376634cba559880961`.
+- CI W47 regression-first `32095359960` — `completed/failure nominal` exclusivo da ausência F76.
+- Certificação transversal W47 regression-first `32095359969` — `completed/success`, 9/9.
+- Matrix real preservada: **71 Composer / 15 legado / 4 fallback / 86 servidas / 11 divergências**.
 - 90 competências / 94 fichas autorais.
 - `modeSwaps=12` · `toolIntroductions=44`.
 - primitiva autoral ainda ausente: `Moedas`.
@@ -69,16 +73,37 @@ Nenhum destrava outro fallback restante imediatamente. O recálculo anterior tin
 
 Regression-first: `src/curriculum/contasVirgulaW47.test.ts`.
 
+## W47 regression-first — recibo vinculante
+
+SHA `073bfab1469aeb86bdc0c3376634cba559880961` — `test: fechar W46 e abrir W47 regression-first`.
+
+- CI `32095359960` — `completed/failure nominal`;
+- Certificação transversal `32095359969` — `completed/success`, 9/9;
+- Sonda real Sensei, higiene e binários — success;
+- catálogo, fichas, conformidade, DAG e TypeScript — success;
+- Matrix preservada `71/15/4/86/11`;
+- 240 arquivos / 3.348 testes: 239 arquivos e 3.347 testes passam; **1 teste falha**;
+- único vermelho: `src/curriculum/contasVirgulaW47.test.ts`;
+- erro: `expected undefined to be defined` em `:23`, pois `JOURNEY_FICHAS.find(item => item.id === "N6.02")` retorna `undefined`.
+
+Classificação: **regression-first válido**. A falha prova somente a ausência real de N6.02/F76. Não rerodar para fabricar verde e não relaxar o contrato.
+
+Checkpoint: `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W47_N6_02_F76_REGRESSION_FIRST_2026-08-18.md`.
+
 ## Próxima ação obrigatória
 
-1. publicar e classificar o regression-first W47 sem materializar F76;
-2. o vermelho nominal esperado é somente `JOURNEY_FICHAS.find(item => item.id === "N6.02")` retornando `undefined`;
-3. não relaxar o teste;
-4. depois, materializar `N6.02/F76` completa e **INATIVA**;
-5. manter N6.02 fora do canário e W47 fora do ledger/Matrix enquanto inativa;
-6. exigir CI + transversal verdes no mesmo SHA inativo;
-7. só então promover atomicamente canário + ledger + contrato Matrix;
-8. recertificar e recalcular W48 pelo estado real.
+1. materializar `N6.02/F76` completa e **INATIVA**;
+2. manter N6.02 fora do canário e W47 fora do ledger/Matrix enquanto inativa;
+3. preservar mastery, evidência L2, misconceptions, resolução causal, acessibilidade e RT fora da autoridade conceitual;
+4. exigir CI + transversal verdes no mesmo SHA inativo;
+5. só então promover atomicamente canário + ledger + contrato Matrix;
+6. recertificar e recalcular W48 pelo estado real.
+
+## Pós-90/90 — governança já preservada
+
+- Issue #47: **Integração Sistêmica e Child-Ready — roadmap autoritativo de fechamento**. `90/90 servido` não equivale a produto pronto para criança.
+- Issue #48: **registro vivo de lacunas microcurriculares/microprogressão**. A hipótese `GM.06/F62 — segundos?` está corretamente classificada como `CANDIDATA`, não dívida provada.
+- Essas frentes não interrompem W47–W50; entram em uso forte após `fallback=0` e fechamento da última onda.
 
 ## Governança
 
@@ -88,5 +113,4 @@ Regression-first: `src/curriculum/contasVirgulaW47.test.ts`.
 - sem Creature Engine/Tamagotchi;
 - cânone compartilhado aditivo;
 - não relaxar testes, sondas, P13 ou Matrix;
-- não misturar recibos entre SHAs;
-- issues #47/#48 continuam pós-90/90 e não interrompem W47–W50.
+- não misturar recibos entre SHAs.

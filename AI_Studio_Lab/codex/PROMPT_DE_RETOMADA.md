@@ -10,8 +10,9 @@
 - Base protegida: `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`
 - Estado curricular fechado: **W1–W46**
 - Último SHA técnico final certificado: `c2cf5b29639ce5a13d9d190ed312cad4df797dac`
-- Fase operacional atual: **W47 · N6.02/F76 — Contas com Vírgula · regression-first**
+- Fase operacional atual: **W47 · N6.02/F76 — Contas com Vírgula · regression-first VALIDADO; materialização inativa autorizada**
 - Contrato regression-first: `src/curriculum/contasVirgulaW47.test.ts`
+- Recibo regression-first vinculante W47: `073bfab1469aeb86bdc0c3376634cba559880961`
 
 Antes de qualquer escrita:
 
@@ -23,7 +24,7 @@ Antes de qualquer escrita:
 
 ## 2. Estado vivo pós-W46
 
-Coverage Matrix executável observada no SHA final W46:
+Coverage Matrix executável observada no SHA final W46 e preservada pelo regression-first W47:
 
 - **71 Composer**
 - **15 legado**
@@ -200,13 +201,24 @@ Acessibilidade/motor:
 - erro motor separado de misconception;
 - RT fora da autoridade conceitual.
 
-## 7. W47 regression-first
+## 7. W47 regression-first — VALIDADO
 
 Contrato: `src/curriculum/contasVirgulaW47.test.ts`.
 
-O commit que fecha documentalmente W46 **não materializa F76**. O primeiro vermelho nominal esperado é exclusivamente:
+Recibo vinculante:
 
-`JOURNEY_FICHAS.find(item => item.id === "N6.02")` retornando `undefined` e `toBeDefined()` falhando.
+- SHA `073bfab1469aeb86bdc0c3376634cba559880961` — `test: fechar W46 e abrir W47 regression-first`;
+- CI `32095359960` — `completed/failure` **nominal**;
+- Certificação transversal `32095359969` — `completed/success`, 9/9;
+- Sonda real Sensei — `completed/success`;
+- higiene e guarda de binários — `completed/success`;
+- auditoria do catálogo, fichas, conformidade, DAG e TypeScript — success;
+- Matrix preservada: `71/15/4/86/11`;
+- suíte: 240 arquivos / 3.348 testes; **239 arquivos e 3.347 testes passam; 1 teste falha**;
+- único vermelho: `src/curriculum/contasVirgulaW47.test.ts`;
+- erro exato: `AssertionError: expected undefined to be defined` em `contasVirgulaW47.test.ts:23`, porque `JOURNEY_FICHAS.find(item => item.id === "N6.02")` retorna `undefined`.
+
+Classificação: **regression-first válido**. O vermelho prova exclusivamente que `N6.02/F76` ainda não foi materializada. Não há regressão funcional paralela e não há motivo para rerun do CI nominal.
 
 O contrato já exige, para a futura materialização:
 
@@ -218,11 +230,15 @@ O contrato já exige, para a futura materialização:
 - resolução causal em todos os cinco níveis;
 - RT fora da autoridade conceitual.
 
-**Não relaxar ou reescrever o regression-first para fazê-lo verde.**
+**Não relaxar, apagar ou reescrever o regression-first para fazê-lo verde.**
 
-## 8. Depois de validar o regression-first W47
+Checkpoint do recibo:
 
-Somente depois de provar que o único vermelho é a ausência de N6.02/F76:
+`AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W47_N6_02_F76_REGRESSION_FIRST_2026-08-18.md`.
+
+## 8. Próxima ação autorizada — materialização INATIVA W47
+
+Com o regression-first W47 validado, a próxima alteração técnica é:
 
 1. materializar `N6.02/F76` completa e **INATIVA**;
 2. criar ficha Journey, contrato/builder, kind/palco apropriado, renderer/wiring, resolução, Radar/misconceptions, evidência L2, runtime map, answer policy e testes;
@@ -240,7 +256,9 @@ Somente depois de provar que o único vermelho é a ausência de N6.02/F76:
 
 - Uma onda por vez; não materializar a seguinte antes do portão correspondente.
 - Regression-first vermelho por design não substitui recibo técnico verde da onda anterior.
-- Issues #47 e #48 continuam obrigatórias na transição pós-90/90, mas não interrompem W47–W50.
+- Issue #47 é a porta pós-90/90 de **Integração Sistêmica e Child-Ready**; `90/90 servido` não equivale a produto Child-Ready.
+- Issue #48 é o registro vivo de **lacunas microcurriculares/microprogressão**; `GM.06/F62 — segundos?` permanece `CANDIDATA`, não dívida confirmada.
+- #47/#48 não interrompem W47–W50; entram em uso forte após `fallback=0` e fechamento técnico/documental da última onda.
 - Não usar baseline para fabricar verde.
 - Não inventar recibos nem misturar SHAs.
 - Cânone compartilhado é aditivo.
@@ -248,10 +266,12 @@ Somente depois de provar que o único vermelho é a ausência de N6.02/F76:
 ## 10. Documentos de continuidade
 
 - `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W47_N6_02_F76_REGRESSION_FIRST_2026-08-18.md`
 - `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W46_AL_08_F90_FECHADA_2026-08-18.md`
 - `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W45_N6_04_F88_FECHADA_2026-08-17.md`
 - `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`
 - `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`
 - `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`
+- GitHub issues `#47` e `#48` para a fase pós-90/90.
 
 `RETOMADA.md` é deliberadamente uma ponte atemporal para esta porta e não deve duplicar estado curricular.
