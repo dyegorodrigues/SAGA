@@ -29,7 +29,7 @@ export function ArrayGrid({ question, onAnswer, disabled = false }: Props) {
       className="min-h-12 rounded-full border-2 border-indigo-300 bg-indigo-50 px-6 font-black text-indigo-800">
       🔄 Girar o arranjo
     </button>}
-    <motion.div layout aria-label={`${actualRows} linhas e ${actualCols} colunas`}
+    <motion.div layout role="img" aria-label={`${actualRows} linhas e ${actualCols} colunas`}
       className={`grid overflow-hidden ${areaMode ? "gap-0 border-2 border-indigo-700" : projectionMode ? "gap-1" : "gap-1.5"}`}
       style={{ gridTemplateColumns: `repeat(${actualCols}, ${cell}px)` }} data-arraygrid-projection={projectionMode ? "true" : undefined} data-arraygrid-fraction-bands={hasFractionBands ? "true" : undefined}>
       {Array.from({ length: actualRows * actualCols }, (_, index) => {
