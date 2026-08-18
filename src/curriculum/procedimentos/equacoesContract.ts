@@ -201,12 +201,22 @@ export function construirEquacoesF90Spec(level: number, rng: () => number = Math
   const t = construirTransformacao(nivel, caso, x);
   const resposta = `f90-correta-${caso.id}`;
 
-  const opcoes: EquacoesF90Opcao[] = [
-    { value: resposta, label: t.correta, preview: { esquerda: x, direita: x, preservaEquilibrio: true, descricao: "A mesma transformação ocorreu nos dois pratos e x ficou mais isolado." } },
+  const distratores: EquacoesF90Opcao[] = [
     { value: `f90-inversa-${caso.id}`, label: t.inversaErrada, misconception: EquacoesMisconception.OPERACAO_INVERSA_ERRADA, preview: { esquerda: total + 2, direita: total + 2, preservaEquilibrio: true, descricao: "A balança continua horizontal, mas esta operação não desfaz o que prende x." } },
     { value: `f90-um-lado-${caso.id}`, label: t.unilateral, misconception: EquacoesMisconception.NAO_APLICA_AOS_DOIS, preview: { esquerda: total - 1, direita: total, preservaEquilibrio: false, descricao: "Só um prato mudou; a igualdade deixou de ser preservada." } },
     { value: `f90-quebra-${caso.id}`, label: t.quebra, misconception: EquacoesMisconception.QUEBRA_EQUILIBRIO, preview: { esquerda: total - 1, direita: total - 2, preservaEquilibrio: false, descricao: "Os pratos receberam transformações diferentes e a balança inclinou." } },
     { value: `f90-todo-${caso.id}`, label: t.todo, misconception: EquacoesMisconception.RESPONDE_O_TODO, preview: { esquerda: total + Math.max(1, x), direita: total, preservaEquilibrio: false, descricao: "O total visível não pode substituir x sem considerar os outros termos do lado." } },
+  ];
+  const omitidaPorNivel: Record<number, EquacoesMisconceptionTag> = {
+    1: EquacoesMisconception.RESPONDE_O_TODO,
+    2: EquacoesMisconception.QUEBRA_EQUILIBRIO,
+    3: EquacoesMisconception.NAO_APLICA_AOS_DOIS,
+    4: EquacoesMisconception.OPERACAO_INVERSA_ERRADA,
+    5: EquacoesMisconception.QUEBRA_EQUILIBRIO,
+  };
+  const opcoes: EquacoesF90Opcao[] = [
+    { value: resposta, label: t.correta, preview: { esquerda: x, direita: x, preservaEquilibrio: true, descricao: "A mesma transformação ocorreu nos dois pratos e x ficou mais isolado." } },
+    ...distratores.filter(opcao => opcao.misconception !== omitidaPorNivel[nivel]),
   ];
 
   return {
