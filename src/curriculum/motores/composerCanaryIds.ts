@@ -149,6 +149,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // Inativo final 23e5be94: CI 32135341005 + transversal 32135340907, ambos success.
   "N6.02",
 
+  // W48 — F94: volume de prismas por camadas; ArrayGrid#3D.
+  // Inativo final fbc80f76: CI 32154072299 + transversal 32154072327, ambos success.
+  "GM.11",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",

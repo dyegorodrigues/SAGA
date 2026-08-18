@@ -133,6 +133,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F76 materializada no ContasVirgulaStage compondo InteractiveVertical + Quadrado100: a vírgula funciona como eixo das ordens, casas ausentes recebem zero de preenchimento, subtração e reagrupamento preservam valor posicional e ×10/×100 é explicado como mudança de ordem, não regra mecânica de mover vírgula. As três misconceptions pertencem ao Radar; a evidência P13 de casas diferentes nasce somente em acerto L2; retry após erro conceitual não compra mastery independente; RT permanece apenas telemetria da ficha e não autoridade da questão. O portão inativo final exato 23e5be94 passou CI 32135341005 + transversal 32135340907, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W48-GM.11",
+    competence: "GM.11",
+    rationale: "F94 materializada no VolumePrismasStage reutilizando ArrayGrid#3D e o helper isométrico já alfabetizado na F92: cubos unitários → camada → área da base × altura → dimensão faltante → prisma de base não retangular, sempre por camadas idênticas. As três misconceptions pertencem ao Radar; a evidência P13 de dimensão faltante nasce somente em acerto L4; toque alternativo com alvos mínimos de 80 px separa erro motor de misconception; RT permanece apenas telemetria da ficha. O portão inativo reparado exato fbc80f76 passou CI 32154072299 + transversal 32154072327, ambos completed/success; promoção e ledger entram atomicamente neste SHA, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
