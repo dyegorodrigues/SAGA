@@ -8,15 +8,15 @@
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch: `codex/fechamento-curricular`
 - `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada pela fábrica
-- Observação: a API do GitHub atualmente reporta `main` como `protected:false`; não fingir proteção técnica. A regra de governança vinculante permanece **não tocar `main`**.
-- Ondas formalmente fechadas: **W1–W48**
-- Última onda: **W48 · GM.11/F94 — Volume de Prismas — FECHADA tecnicamente**
-- SHA técnico final W48: `adbb4317238ac7224e5e25466a007fb2d5018da2`
-- CI final W48: `32156476415` — **completed/success**
-- Certificação transversal final W48: `32156476430` — **completed/success**, 9/9
-- Checkpoint vinculante: `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W48_GM_11_F94_FECHADA_2026-08-18.md`
+- Observação: a API do GitHub reporta `main` como `protected:false`; não fingir proteção técnica. A regra de governança vinculante permanece **não tocar `main`**.
+- Ondas fechadas tecnicamente: **W1–W49**
+- Última onda: **W49 · PE.04/F95 — Estatística e Chance — FECHADA tecnicamente**
+- SHA técnico final W49: `2bc6424205ce6bafe377a0290e7d242ce73042f5`
+- CI final W49: `32186216685` — **completed/success**
+- Certificação transversal final W49: `32186216686` — **completed/success**, 9/9
+- Checkpoint vinculante: `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W49_PE_04_F95_FECHADA_2026-08-18.md`
 
-O commit documental que atualiza checkpoint + Estado + esta porta também precisa de **CI + Certificação transversal próprios**. Nunca reutilize os recibos técnicos do `adbb431…` para certificar um HEAD documental posterior.
+O commit documental que atualiza checkpoint + Estado + esta porta também precisa de **CI + Certificação transversal próprios**. Nunca reutilize os recibos técnicos do `2bc642…` para certificar um HEAD documental posterior.
 
 Antes de QUALQUER escrita:
 
@@ -27,113 +27,106 @@ Antes de QUALQUER escrita:
 5. se houver deriva, investigue — o remoto vence este arquivo;
 6. nunca misture recibos entre SHAs nem invente contagens/deltas.
 
-## 2. Estado vivo após W48
+## 2. Estado vivo após W49
 
-Coverage Matrix executável observada e certificada no SHA técnico final W48:
+Coverage Matrix executável observada e certificada no SHA técnico final W49:
 
 - **90 competências / 94 fichas autorais**
-- **73 Composer**
+- **74 Composer**
 - **15 legado**
-- **2 fallback**
-- **88 servidas**
+- **1 fallback**
+- **89 servidas**
 - **11 divergências ficha↔screen**
 - `modeSwaps=12`
 - `toolIntroductions=44`
 - primitiva autoral ausente conhecida: `Moedas` (dívida já explicitada em GM.03)
 
-Fallbacks reais restantes:
+Fallback real restante:
 
-- `PE.04` — F95, Estatística e Chance
 - `N5.05` — F86, Multiplicar Frações
 
-Os 15 legados, as 11 divergências e `Moedas` **não estão esquecidos nem artificialmente fechados**. São resíduos conhecidos da engenharia curricular e seguem registrados pela Matrix/auditorias e pela fase pós-fábrica.
+Os 15 legados, as 11 divergências e `Moedas` **não estão esquecidos nem artificialmente fechados**. O build continua também emitindo warning de tamanho do bundle; hardening/performance permanece dívida real pós-fábrica.
 
-## 3. W48 — cadeia vinculante
+## 3. W49 — cadeia vinculante
 
-### Registro inter-onda do Observatório
+### Âncora anterior
 
-SHA `5defb1a812221ee38987a880778ee1fc93e58ec4` registrou exclusivamente em documentação a existência da frente paralela de P&D. Não houve implementação da Foundry no runtime.
+W48 foi fechada documentalmente no SHA `bca18663b9d7b9f683af78962f238ac80d2f35f3`, com CI `32166792755` e transversal `32166792851` success 9/9. O recálculo posterior escolheu PE.04 porque `causalWave=15`, à frente de N5.05 em `causalWave=16`.
 
 ### Regression-first
 
-SHA `e27e5c0f6890817aa802870f275a87263021d8bf`:
+SHA `a98f091801c0b2585ff57586d073eb706fd65465`:
 
-- transversal `32151661911` — success;
-- CI `32151661956` terminou depois como cancelled por push posterior, porém o job `Gates do SAGA` já havia concluído com vermelho nominal;
-- única falha nova: `GM.11` ausente em `JOURNEY_FICHAS` no contrato W48;
-- **3.373 testes anteriores passaram e 1/3.374 falhou**;
-- Matrix ainda `72/15/3/87/11`.
+- CI `32167817721` — failure nominal;
+- transversal `32167817676` — success;
+- catálogo, fichas, conformidade, DAG e TypeScript passaram;
+- única falha nova: PE.04 ausente em `JOURNEY_FICHAS` no contrato W49;
+- 242 arquivos/3.390 testes anteriores passaram; somente o novo regression-first falhou;
+- Matrix permaneceu `73/15/2/88/11`.
 
 O contrato não foi relaxado e o vermelho não foi fabricado.
 
 ### Materialização inativa
 
-F94 foi materializada reutilizando `ArrayGrid#3D` e a alfabetização isométrica da F92/GE.10. A escada preserva contar cubos → área da base → repetir pela altura → fórmula → dimensão faltante/prisma não retangular.
+F95 foi materializada como continuação causal de PE.03/F83, compondo `SingaporeBars + ArrayGrid` sem nova primitiva paralela.
+
+Escada: certo/possível/impossível → mais/menos provável → chance como fração → frequência observada → contagem de possibilidades.
 
 Misconceptions canônicas:
 
-- `SOMA_DIMENSOES`;
-- `CONFUNDE_COM_AREA`;
-- `IGNORA_UNIDADE_CUBICA`.
+- `FALACIA_APOSTADOR`;
+- `TUDO_CINQUENTA`;
+- `IGNORA_TOTAL`.
 
-A materialização preserva domínio 3/3 em 2 sessões, evidência de dimensão faltante, separação entre erro motor e misconception, RT fora da autoridade conceitual e ausência de crédito de mastery por ajuda/resolução assistida.
+A implementação preserva domínio 3/3 em 2 sessões, evidência P13 real no L3, prova negativa de resposta errada, resolução declarativa, Radar canônico, ajuda/resolução sem mastery independente e interação por toque amplo.
 
-O primeiro candidato encontrou uma lacuna real no P13: o runtime já emitia `dimensao-faltante-f94`, mas o registro explícito de emissores do teste central ainda não incluía F94. O reparo adicionou prova positiva e prova negativa sem remover asserções.
+Primeiro candidato: `eecb65c050c39ce69f18c42f504c160d02238fb3`.
 
-SHA inativo final: `fbc80f764248ee18af87029fa89cda5a41d7e852`.
+SHA inativo final/P13: `ba03c90bab7dd49b580338a0c6df2a912e3716c7`.
 
-- CI `32154072299` — completed/success;
-- transversal `32154072327` — completed/success 9/9.
+- CI `32169040052` — completed/success;
+- transversal `32169040050` — completed/success 9/9.
 
-Até esse portão, GM.11 permaneceu fora do canário e sem ledger/Matrix de promoção.
+Até esse portão, PE.04 permaneceu fora do canário e sem ledger/Matrix de promoção.
 
-### Promoção atômica
+### Promoção atômica e final técnico
 
-SHA `4dd4a9a5e0ac6d26a23f50f423cb5d18abebb44c` tocou exatamente:
+SHA `2bc6424205ce6bafe377a0290e7d242ce73042f5` tocou exatamente:
 
-1. `src/curriculum/motores/composerCanaryIds.ts` — ativa `GM.11`;
-2. `AI_Studio_Lab/tools/coverage_matrix_core.ts` — ledger `W48-GM.11`, delta `{ composer:+1, fallback:-1, served:+1 }`;
-3. `src/curriculum/coverageMatrix.test.ts` — contrato `73/15/2/88/11`.
+1. `src/curriculum/motores/composerCanaryIds.ts` — ativa `PE.04`;
+2. `AI_Studio_Lab/tools/coverage_matrix_core.ts` — ledger `W49-PE.04`, delta `{ composer:+1, fallback:-1, served:+1 }`;
+3. `src/curriculum/coverageMatrix.test.ts` — contrato `74/15/1/89/11`.
 
-A transversal `32156057482` passou. O gate da Matrix recusou a promoção como verde porque observou 12 divergências: F94 entregava `ArrayGrid`, mas a tabela de conformidade ainda não qualificava seus modos como `3D`.
-
-### Reparo observacional final
-
-SHA `adbb4317238ac7224e5e25466a007fb2d5018da2` alterou somente o observador declarativo em `src/curriculum/conformidadeDeFichas.test.ts`:
-
-- `volume-prismas-f94 → ArrayGrid`;
-- `contar-cubos`, `camada-multiplicar`, `formula`, `dimensao-faltante`, `prisma-nao-retangular → 3D`.
-
-O runtime já estava correto. O baseline **não** foi alterado. A Matrix voltou a observar as 11 divergências reais.
+A Matrix observou exatamente `74/15/1/89/11`; nenhum reparo de baseline, runtime ou observador foi necessário.
 
 Recibos finais no mesmo SHA:
 
-- CI `32156476415` — completed/success;
-- transversal `32156476430` — completed/success 9/9;
-- Gates: catálogo, fichas, conformidade, DAG, TypeScript, **242 arquivos / 3.390 testes**, build e guarda textual verdes;
+- CI `32186216685` — completed/success;
+- transversal `32186216686` — completed/success 9/9;
+- Gates: catálogo, fichas, conformidade, DAG, TypeScript, **243 arquivos / 3.407 testes**, build e guarda textual verdes;
 - Sonda real Sensei, higiene e binários verdes.
 
-**W48 não deve ser refeita sem causa nova observável.**
+**W49 não deve ser refeita sem causa nova observável.**
 
 ## 4. Autorização contínua para concluir a fábrica
 
-A pausa humana entre W47 e W48 foi consumida. O usuário autorizou explicitamente a continuação autônoma, uma onda por vez, até:
+O usuário autorizou explicitamente a continuação autônoma, uma onda por vez, até:
 
 - `fallback = 0`;
 - `90/90 competências servidas`.
 
-Não existe fila autoritativa pré-fixada. Depois de cada fechamento documental verde:
+`N5.05/F86` é a única candidata residual observada após W49, mas **W50 só pode abrir depois do fechamento documental W49 verde e de novo recálculo remoto**.
+
+Depois do fechamento documental verde:
 
 1. reancorar o remoto;
 2. recalcular Matrix e DAG;
-3. conferir prerequisitos, `causalWave`, downstream e desempates vigentes;
-4. selecionar a próxima competência apenas pelo estado remoto;
+3. confirmar N5.05 como fallback real e seus prerequisitos;
+4. ler integralmente F86 e auditar reuse/contratos;
 5. executar uma única onda completa;
-6. só então recalcular novamente.
+6. ao atingir `fallback=0`, executar o fechamento formal da fábrica e parar.
 
-O último recálculo técnico anterior ao fechamento documental W48 apontava `PE.04/F95` à frente de `N5.05/F86`. Isso é **somente candidata informativa**, não abertura de W49.
-
-## 5. Protocolo obrigatório de cada onda residual
+## 5. Protocolo obrigatório da onda residual
 
 ### A. Seleção
 
@@ -190,15 +183,7 @@ Exigir no SHA técnico final:
 - binários;
 - Matrix coerente.
 
-Então:
-
-1. criar checkpoint da onda;
-2. atualizar `ESTADO_DO_FECHAMENTO.md`;
-3. atualizar este `PROMPT_DE_RETOMADA.md`;
-4. atualizar corpo do PR #35;
-5. certificar o HEAD documental posterior com seus próprios workflows;
-6. reancorar;
-7. recalcular a próxima onda.
+Então criar checkpoint da onda, atualizar Estado/porta/PR e certificar também o HEAD documental posterior.
 
 ## 6. Quando `fallback = 0`
 
