@@ -153,6 +153,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // Inativo final fbc80f76: CI 32154072299 + transversal 32154072327, ambos success.
   "GM.11",
 
+  // W49 — F95: estatística e chance; SingaporeBars + ArrayGrid.
+  // Inativo final ba03c90b: CI 32169040052 + transversal 32169040050, ambos success.
+  "PE.04",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",

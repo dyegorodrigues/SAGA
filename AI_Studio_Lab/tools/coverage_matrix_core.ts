@@ -139,6 +139,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F94 materializada no VolumePrismasStage reutilizando ArrayGrid#3D e o helper isométrico já alfabetizado na F92: cubos unitários → camada → área da base × altura → dimensão faltante → prisma de base não retangular, sempre por camadas idênticas. As três misconceptions pertencem ao Radar; a evidência P13 de dimensão faltante nasce somente em acerto L4; toque alternativo com alvos mínimos de 80 px separa erro motor de misconception; RT permanece apenas telemetria da ficha. O portão inativo reparado exato fbc80f76 passou CI 32154072299 + transversal 32154072327, ambos completed/success; promoção e ledger entram atomicamente neste SHA, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W49-PE.04",
+    competence: "PE.04",
+    rationale: "F95 materializada no EstatisticaChanceStage como continuação causal de PE.03/F83, compondo SingaporeBars + ArrayGrid para certo/possível/impossível → chance como fração → independência → frequência observada → contagem de possibilidades. A falácia do apostador pertence ao Radar; a evidência P13 de chance como fração nasce somente em acerto L3; resolução assistida não compra mastery independente e interação permanece por toque amplo sem erro motor virar misconception. O portão inativo final exato ba03c90b passou CI 32169040052 + transversal 32169040050, ambos completed/success; promoção e ledger entram atomicamente neste SHA, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);
