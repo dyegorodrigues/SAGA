@@ -210,7 +210,7 @@ export function construirEquacoesF90Spec(level: number, rng: () => number = Math
   const omitidaPorNivel: Record<number, EquacoesMisconceptionTag> = {
     1: EquacoesMisconception.OPERACAO_INVERSA_ERRADA,
     2: EquacoesMisconception.NAO_APLICA_AOS_DOIS,
-    3: EquacoesMisconception.RESPONDE_O_TODO,
+    3: EquacoesMisconception.NAO_APLICA_AOS_DOIS,
     4: EquacoesMisconception.QUEBRA_EQUILIBRIO,
     5: EquacoesMisconception.OPERACAO_INVERSA_ERRADA,
   };
