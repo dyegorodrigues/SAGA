@@ -66,6 +66,41 @@ Checkpoint é recibo humano; fontes executáveis vencem texto.
 - RT não governa domínio conceitual.
 - Não tocar/mergear `main`; não marcar PR ready; não habilitar auto-merge; não tocar Creature Engine/Tamagotchi.
 
+### Domínio numérico da ficha — portão que já parou três ondas
+
+`src/curriculum/motores/canaryContract.test.ts` valida o conjunto numérico de
+todo canário ativo. A régua sai da **ficha**, nunca de exceção por id:
+
+| declaração na ficha | o que passa a valer |
+|---|---|
+| ausente | naturais: recusa negativo e recusa não-inteiro |
+| `dominioNumerico: "inteiros"` | admite negativo; ainda exige inteiro |
+| `dominioNumerico: "racionais"` | admite decimal/fração; **e negativo também** |
+
+Em qualquer conjunto, `NaN` e `Infinity` continuam sendo defeito de gerador.
+Isso nunca se relaxa.
+
+**Histórico — o mesmo erro três vezes:**
+
+- **W24 `N7.01/F84`** — o contrato exigia `>= 0`. A ficha ensina o sinal, e `-3`
+  é o gabarito do L1. Corrigido criando `dominioNumerico`.
+- **W36 `GM.10/F93`** — o contrato exigia inteiro. Conversão de unidades produz
+  `1,5 m` e o distrator `0,01`. Corrigido criando `"racionais"`.
+- **W46 `AL.08/F90`** — aqui o gate estava **certo**: 5 opções violavam o teto
+  universal de 4. A ficha cedeu, não o contrato.
+
+**A lição das três:** antes de materializar, pergunte *"esta ficha produz número
+fora dos naturais?"*. Se sim, declare na ficha **ainda no estágio inativo**. Se
+não, não declare. E quando o gate acusar, decida qual dos dois está errado —
+contrato ou ficha — em vez de assumir qualquer um dos dois.
+
+**Já declaram:** `N7.01`, `N7.02`, `N5.04`, `N6.04`, `GM.10`, `AL.08`.
+
+⚠️ **W47 = `N6.02/F76 — Contas com Vírgula` opera decimais em todos os cinco
+níveis.** Ela vai precisar de `dominioNumerico: "racionais"`. Declare junto com a
+materialização inativa; se esquecer, o portão de promoção fecha vermelho e você
+perde um ciclo inteiro de certificação.
+
 ## 4. W46 — AL.08/F90 FECHADA
 
 Regression-first vinculante:
