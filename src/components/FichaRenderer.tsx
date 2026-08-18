@@ -23,6 +23,7 @@ import { AreaF81Stage } from "./primitives/AreaF81Stage"; import type { AreaF81S
 import { FatoresRetangulosStage } from "./primitives/FatoresRetangulosStage"; import type { FatoresRetangulosF66Spec } from "../curriculum/procedimentos/fatoresRetangulosContract";
 import { CirculoAreasStage } from "./primitives/CirculoAreasStage"; import type { CirculoAreasF91Spec } from "../curriculum/procedimentos/circuloAreasContract";
 import { VolumeVistasStage } from "./primitives/VolumeVistasStage"; import type { VolumeVistasF92Spec } from "../curriculum/procedimentos/volumeVistasContract";
+import { VolumePrismasStage } from "./primitives/VolumePrismasStage"; import type { VolumePrismasF94Spec } from "../curriculum/procedimentos/volumePrismasContract";
 import { PrimosDivisoresStage } from "./primitives/PrimosDivisoresStage"; import type { PrimosDivisoresF70Spec } from "../curriculum/procedimentos/primosDivisoresContract";
 import { DivisaoDoisDigitosStage } from "./primitives/DivisaoDoisDigitosStage"; import type { DivisaoDoisDigitosF71Spec } from "../curriculum/procedimentos/divisaoDoisDigitosContract";
 import { SomaFracoesStage } from "./primitives/SomaFracoesStage"; import type { SomaFracoesF74Spec } from "../curriculum/procedimentos/somaFracoesContract";
@@ -76,6 +77,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'fatores-retangulos-f66': return <FatoresRetangulosStage spec={question.uiProps as FatoresRetangulosF66Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'circulo-areas-f91': return <CirculoAreasStage spec={question.uiProps as CirculoAreasF91Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'volume-vistas-f92': return <VolumeVistasStage spec={question.uiProps as VolumeVistasF92Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'volume-prismas-f94': return <VolumePrismasStage spec={question.uiProps as VolumePrismasF94Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'primos-divisores-f70': return <PrimosDivisoresStage spec={question.uiProps as PrimosDivisoresF70Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'divisao-dois-digitos-f71': return <DivisaoDoisDigitosStage spec={question.uiProps as DivisaoDoisDigitosF71Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'soma-fracoes-f74': return <SomaFracoesStage spec={question.uiProps as SomaFracoesF74Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
