@@ -9,13 +9,14 @@ interface Props {
 }
 
 export function ArrayGrid({ question, onAnswer, disabled = false }: Props) {
-  const { rows, cols, allowRotate, requireRotate, areaMode, showEquation, activeCells, projectionMode } = question.uiProps;
+  const { rows, cols, allowRotate, requireRotate, areaMode, showEquation, activeCells, projectionMode, fractionRows, fractionCols } = question.uiProps;
   const [rotated, setRotated] = useState(false);
   const [unavailable, setUnavailable] = useState<Set<unknown>>(new Set());
   const actualRows = rotated ? cols : rows;
   const actualCols = rotated ? rows : cols;
   const cell = Math.min(44, Math.floor(300 / Math.max(actualRows, actualCols)));
   const active = Array.isArray(activeCells) ? new Set<number>(activeCells) : undefined;
+  const hasFractionBands = areaMode && Number.isInteger(fractionRows) && Number.isInteger(fractionCols);
 
   const choose = (value: unknown) => {
     if (disabled || unavailable.has(value) || (requireRotate && !rotated)) return;
@@ -30,11 +31,26 @@ export function ArrayGrid({ question, onAnswer, disabled = false }: Props) {
     </button>}
     <motion.div layout aria-label={`${actualRows} linhas e ${actualCols} colunas`}
       className={`grid overflow-hidden ${areaMode ? "gap-0 border-2 border-indigo-700" : projectionMode ? "gap-1" : "gap-1.5"}`}
-      style={{ gridTemplateColumns: `repeat(${actualCols}, ${cell}px)` }} data-arraygrid-projection={projectionMode ? "true" : undefined}>
+      style={{ gridTemplateColumns: `repeat(${actualCols}, ${cell}px)` }} data-arraygrid-projection={projectionMode ? "true" : undefined} data-arraygrid-fraction-bands={hasFractionBands ? "true" : undefined}>
       {Array.from({ length: actualRows * actualCols }, (_, index) => {
         const isActive = !active || active.has(index);
-        return <motion.div layout key={index} aria-hidden="true"
-          className={areaMode ? "border border-indigo-500 bg-indigo-200" : projectionMode ? (isActive ? "rounded-md border-2 border-indigo-500 bg-indigo-300" : "rounded-md border-2 border-dashed border-slate-300 bg-white") : "rounded-md bg-indigo-400"}
+        const row = Math.floor(index / actualCols);
+        const col = index % actualCols;
+        const inRowBand = hasFractionBands && row < Number(fractionRows);
+        const inColBand = hasFractionBands && col < Number(fractionCols);
+        const fractionClass = inRowBand && inColBand
+          ? "bg-emerald-400"
+          : inRowBand
+            ? "bg-sky-200"
+            : inColBand
+              ? "bg-violet-200"
+              : "bg-white";
+        return <motion.div layout key={index} aria-hidden="true" data-arraygrid-intersection={inRowBand && inColBand ? "true" : undefined}
+          className={areaMode
+            ? `border border-indigo-500 ${hasFractionBands ? fractionClass : active ? (isActive ? "bg-indigo-300" : "bg-white") : "bg-indigo-200"}`
+            : projectionMode
+              ? (isActive ? "rounded-md border-2 border-indigo-500 bg-indigo-300" : "rounded-md border-2 border-dashed border-slate-300 bg-white")
+              : "rounded-md bg-indigo-400"}
           style={{ width: cell, height: cell }} />;
       })}
     </motion.div>

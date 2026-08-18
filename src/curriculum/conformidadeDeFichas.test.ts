@@ -151,6 +151,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   array: ["ArrayGrid"],
   "volume-vistas-f92": ["ArrayGrid"],
   "volume-prismas-f94": ["ArrayGrid"],
+  "multiplicar-fracoes-f86": ["ArrayGrid"],
   "primos-divisores-f70": ["ArrayGrid", "Quadrado100"],
   "divisao-dois-digitos-f71": ["InteractiveVertical"],
   "contas-virgula-f76": ["InteractiveVertical", "Quadrado100"],
@@ -229,6 +230,11 @@ const MODO_DO_RUNTIME: Record<string, string> = {
   formula: "3D",
   "dimensao-faltante": "3D",
   "prisma-nao-retangular": "3D",
+  "fracao-inteiro": "área",
+  "fracao-inteiro-modelo": "área",
+  "fracao-fracao-area": "área",
+  "fracao-fracao-simbolico": "área",
+  "divisao-fracoes": "área",
 };
 
 /**

@@ -26,6 +26,7 @@ function areaQuestion(spec: MultiplicarFracoesF86Spec): Question {
       areaMode: true,
       showEquation: false,
       activeCells: spec.activeCells,
+      ...(spec.modo === "fracao-fracao-area" ? { fractionRows: 1, fractionCols: 3 } : {}),
     },
     options: [],
     evaluate: () => false,
@@ -85,7 +86,7 @@ export function MultiplicarFracoesStage({ spec, options, disabled = false, onAns
 
       {spec.modo === "fracao-fracao-area" && spec.mostrarIntersecao ? (
         <p className="rounded-2xl bg-emerald-50 p-3 text-center text-sm font-black text-emerald-900" data-f86-intersection>
-          A região mais marcada é a interseção: ela pertence às duas frações ao mesmo tempo.
+          A região verde é a interseção: ela pertence às duas frações ao mesmo tempo.
         </p>
       ) : null}
 

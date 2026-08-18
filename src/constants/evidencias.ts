@@ -255,6 +255,13 @@ export const Evidencia = {
    * linguagem verbal de "mais provável" sem quantificar a probabilidade.
    */
   CHANCE_FRACAO_F95: "chance-fracao-f95",
+
+  /**
+   * F86 (N5.05): ao menos uma multiplicação fração × fração foi resolvida
+   * corretamente pela interseção de duas partições do mesmo inteiro. A prova
+   * impede domínio apenas por fração de inteiro ou aplicação mecânica da regra.
+   */
+  FRACAO_VEZES_FRACAO_F86: "fracao-vezes-fracao-f86",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
