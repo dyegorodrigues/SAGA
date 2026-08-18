@@ -114,7 +114,7 @@ export function construirVolumePrismasF94Resolucao(spec: VolumePrismasF94Spec): 
         parcial: spec.resposta,
       }]),
     ],
-    fallback: spec.resposta,
+    fallback: 0,
   };
 }
 
