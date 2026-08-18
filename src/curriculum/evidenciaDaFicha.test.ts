@@ -29,6 +29,7 @@ import { construirEquacoesF90Spec } from "./procedimentos/equacoesContract";
 import { evidenciasEquacoesF90 as daEquacao } from "./procedimentos/equacoesEvidence";
 import { construirContasVirgulaF76Spec } from "./procedimentos/contasVirgulaContract";
 import { evidenciasContasVirgulaF76 as dasContasVirgula } from "./procedimentos/contasVirgulaEvidence";
+import { construirVolumePrismasF94Spec, evidenciasVolumePrismasF94 as doVolumePrismas } from "./procedimentos/volumePrismasContract";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -216,6 +217,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.CONTAS_VIRGULA_CASAS_DIFERENTES_F76,
     emitir: () => dasContasVirgula(construirContasVirgulaF76Spec(2, () => 0), true),
   },
+  {
+    nome: "F94 (volume de prismas) — dimensão faltante recuperada a partir do volume e da área da base",
+    evidencia: Evidencia.DIMENSAO_FALTANTE_F94,
+    emitir: () => doVolumePrismas(construirVolumePrismasF94Spec(4), true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -345,5 +351,6 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
     expect(daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), false)).toEqual([]);
     expect(daEquacao(construirEquacoesF90Spec(3, () => 0), false)).toEqual([]);
     expect(dasContasVirgula(construirContasVirgulaF76Spec(2, () => 0), false)).toEqual([]);
+    expect(doVolumePrismas(construirVolumePrismasF94Spec(4), false)).toEqual([]);
   });
 });
