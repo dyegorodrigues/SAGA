@@ -127,6 +127,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F90 materializada no EquacoesStage reutilizando Balanca: x + a = b → x - a = b → ax = b → dois passos → incógnita nos dois lados, sempre como transformação equivalente aplicada aos dois pratos. A alteração unilateral inclina fisicamente a balança; operação inversa errada permanece distinguível sem virar regra de troca de sinal; as quatro misconceptions pertencem ao Radar e a evidência P13 L3+ vem do emissor runtime. O portão inativo exato f3c7c4d4 passou CI 32085678926 + transversal 32085678976, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W47-N6.02",
+    competence: "N6.02",
+    rationale: "F76 materializada no ContasVirgulaStage compondo InteractiveVertical + Quadrado100: a vírgula funciona como eixo das ordens, casas ausentes recebem zero de preenchimento, subtração e reagrupamento preservam valor posicional e ×10/×100 é explicado como mudança de ordem, não regra mecânica de mover vírgula. As três misconceptions pertencem ao Radar; a evidência P13 de casas diferentes nasce somente em acerto L2; retry após erro conceitual não compra mastery independente; RT permanece apenas telemetria da ficha e não autoridade da questão. O portão inativo final exato 23e5be94 passou CI 32135341005 + transversal 32135340907, ambos completed/success; promoção e ledger entram atomicamente somente após essa certificação, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);

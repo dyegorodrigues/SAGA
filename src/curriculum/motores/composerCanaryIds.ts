@@ -145,6 +145,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W46 — F90: equações como equilíbrio; Balanca. Inativo f3c7c4d4: CI 32085678926 + transversal 32085678976.
   "AL.08",
 
+  // W47 — F76: contas com vírgula por valor posicional; InteractiveVertical + Quadrado100.
+  // Inativo final 23e5be94: CI 32135341005 + transversal 32135340907, ambos success.
+  "N6.02",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
