@@ -240,6 +240,14 @@ export const Evidencia = {
    * ausente explícita com zero; acertar só contas com formatos iguais não basta.
    */
   CONTAS_VIRGULA_CASAS_DIFERENTES_F76: "contas-virgula-casas-diferentes-f76",
+
+  /**
+   * F94 (GM.11): ao menos uma resposta correta no caso de **dimensão faltante**.
+   * A ficha canônica exige explicitamente que o domínio 3/3 em duas sessões
+   * inclua esse caso; aqui a evidência conecta a exigência ao palco que de fato
+   * observa a criança recuperar a altura por volume ÷ área da base.
+   */
+  DIMENSAO_FALTANTE_F94: "dimensao-faltante-f94",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
