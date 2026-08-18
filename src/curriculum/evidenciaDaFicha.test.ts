@@ -27,6 +27,8 @@ import { construirRazaoProporcaoF88Spec } from "./procedimentos/razaoProporcaoCo
 import { evidenciasRazaoProporcaoF88 as daRazaoProporcao } from "./procedimentos/razaoProporcaoEvidence";
 import { construirEquacoesF90Spec } from "./procedimentos/equacoesContract";
 import { evidenciasEquacoesF90 as daEquacao } from "./procedimentos/equacoesEvidence";
+import { construirContasVirgulaF76Spec } from "./procedimentos/contasVirgulaContract";
+import { evidenciasContasVirgulaF76 as dasContasVirgula } from "./procedimentos/contasVirgulaEvidence";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -209,6 +211,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.EQUACAO_L3_MAIS_F90,
     emitir: () => daEquacao(construirEquacoesF90Spec(3, () => 0), true),
   },
+  {
+    nome: "F76 (contas com vírgula) — acerto com quantidades diferentes de casas decimais",
+    evidencia: Evidencia.CONTAS_VIRGULA_CASAS_DIFERENTES_F76,
+    emitir: () => dasContasVirgula(construirContasVirgulaF76Spec(2, () => 0), true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -337,5 +344,6 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
     expect(daDivisaoDoisDigitos(false)).toEqual([]);
     expect(daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), false)).toEqual([]);
     expect(daEquacao(construirEquacoesF90Spec(3, () => 0), false)).toEqual([]);
+    expect(dasContasVirgula(construirContasVirgulaF76Spec(2, () => 0), false)).toEqual([]);
   });
 });

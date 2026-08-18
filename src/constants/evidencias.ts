@@ -233,6 +233,13 @@ export const Evidencia = {
    * evidência impede domínio composto apenas por x + a = b e x - a = b.
    */
   EQUACAO_L3_MAIS_F90: "equacao-l3-mais-f90",
+
+  /**
+   * F76 (N6.02): um acerto no L2 com números que possuem quantidades diferentes
+   * de casas decimais. A prova exige alinhar ordens pela vírgula e tornar a casa
+   * ausente explícita com zero; acertar só contas com formatos iguais não basta.
+   */
+  CONTAS_VIRGULA_CASAS_DIFERENTES_F76: "contas-virgula-casas-diferentes-f76",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];

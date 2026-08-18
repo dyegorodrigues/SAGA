@@ -152,6 +152,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   "volume-vistas-f92": ["ArrayGrid"],
   "primos-divisores-f70": ["ArrayGrid", "Quadrado100"],
   "divisao-dois-digitos-f71": ["InteractiveVertical"],
+  "contas-virgula-f76": ["InteractiveVertical", "Quadrado100"],
   relogio: ["Relogio"],
   balanca: ["Balanca"],
   medidas: ["Balanca", "Recipientes"],

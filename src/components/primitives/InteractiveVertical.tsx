@@ -135,3 +135,70 @@ export function InteractiveVerticalDivisionEstimateSurface({ dividendo, divisor,
     </div>
   </div>;
 }
+
+interface DecimalSurfaceProps {
+  parcelaA: string;
+  parcelaB?: string;
+  alinhadoA: string;
+  alinhadoB?: string;
+  operacao: '+' | '-' | '×';
+  fator?: 10 | 100;
+  resultado?: string;
+  alinhamento?: 'virgula' | 'direita';
+  zerosPreenchimento?: boolean;
+  destacarReagrupamento?: boolean;
+}
+
+function DecimalNumber({ raw, aligned, alignment }: { raw: string; aligned: string; alignment: 'virgula' | 'direita' }) {
+  const shown = alignment === 'direita' ? raw : aligned;
+  const rawDecimalLength = raw.includes(',') ? raw.split(',')[1].length : 0;
+  const commaIndex = shown.indexOf(',');
+  return <span className="inline-flex min-w-[7ch] justify-end tracking-[0.08em]" data-decimal-number="">
+    {shown.split('').map((char, index) => {
+      if (char === ',') return <span key={`${char}-${index}`} className="mx-0.5 rounded bg-rose-100 px-0.5 text-rose-700" data-decimal-comma="">,</span>;
+      const decimalIndex = commaIndex >= 0 && index > commaIndex ? index - commaIndex - 1 : -1;
+      const preenchimento = alignment === 'virgula' && decimalIndex >= rawDecimalLength && decimalIndex >= 0;
+      return <span key={`${char}-${index}`} className={preenchimento ? 'text-slate-400' : ''} data-zero-fill={preenchimento ? 'true' : undefined}>{char}</span>;
+    })}
+  </span>;
+}
+
+/**
+ * F76 reutiliza InteractiveVertical como superfície de valor posicional decimal.
+ * A vírgula é um eixo visual; alinhar pela direita não “encaixa” e produz wobble.
+ * O resultado é opcional para que o palco nunca o revele antes da decisão.
+ */
+export function InteractiveVerticalDecimalSurface({
+  parcelaA,
+  parcelaB,
+  alinhadoA,
+  alinhadoB,
+  operacao,
+  fator,
+  resultado,
+  alinhamento = 'virgula',
+  zerosPreenchimento = false,
+  destacarReagrupamento = false,
+}: DecimalSurfaceProps) {
+  const desalinhado = alinhamento === 'direita';
+  return <motion.div
+    data-interactive-vertical-decimal=""
+    data-alignment={desalinhado ? 'right-digits' : 'decimal-comma'}
+    data-zero-fill-enabled={zerosPreenchimento ? 'true' : 'false'}
+    data-regroup={destacarReagrupamento ? 'true' : 'false'}
+    animate={desalinhado ? { x: [0, -5, 5, -5, 5, 0] } : { x: 0 }}
+    transition={{ duration: 0.35 }}
+    className="relative mx-auto w-full max-w-md rounded-3xl border-2 border-slate-200 bg-white p-4 font-mono text-slate-900 shadow-inner"
+    aria-label={desalinhado ? 'Conta decimal desalinhada pelos últimos algarismos' : 'Conta decimal alinhada pelas vírgulas'}
+  >
+    <div className="mb-2 text-center font-sans text-xs font-black uppercase tracking-wider text-rose-700">vírgula = eixo das ordens</div>
+    <div className="mx-auto w-fit min-w-44 text-right text-3xl font-black sm:text-4xl">
+      <div className="py-1"><DecimalNumber raw={parcelaA} aligned={alinhadoA} alignment={alinhamento} /></div>
+      {operacao === '×' ? <div className="flex items-center justify-end gap-2 border-b-4 border-slate-800 py-1"><span className="text-indigo-700">×</span><span>{fator}</span></div> : parcelaB && alinhadoB ? <div className="flex items-center justify-end gap-2 border-b-4 border-slate-800 py-1"><span className="text-indigo-700">{operacao}</span><DecimalNumber raw={parcelaB} aligned={alinhadoB} alignment={alinhamento} /></div> : null}
+      <div className="min-h-12 py-1" data-decimal-result={resultado ? 'revealed' : 'hidden'}>{resultado ? <span className="text-emerald-700">{resultado}</span> : <span aria-hidden="true">?</span>}</div>
+    </div>
+    {zerosPreenchimento && !desalinhado ? <p className="mt-2 text-center font-sans text-xs font-bold text-slate-500">Zeros em cinza completam casas ausentes sem mudar o valor.</p> : null}
+    {destacarReagrupamento ? <p className="mt-2 rounded-xl bg-amber-50 p-2 text-center font-sans text-xs font-bold text-amber-900">Uma ordem pode virar dez unidades da ordem imediatamente menor.</p> : null}
+    {desalinhado ? <p className="mt-2 text-center font-sans text-sm font-black text-rose-700">Os últimos algarismos encostaram, mas as vírgulas não ficaram no mesmo eixo.</p> : null}
+  </motion.div>;
+}

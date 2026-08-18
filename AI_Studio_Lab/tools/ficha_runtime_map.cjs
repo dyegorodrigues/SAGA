@@ -78,10 +78,10 @@ const FICHA_RUNTIME_MAP = [
     note: "W11/F30, W16/F72 e W24/F84 reutilizam InteractiveNumberLineSurface; F72 alinha a barra à mesma escala e F84 estende a reta para negativos. W37/F85 reutiliza a mesma superfície para operar com inteiros, incluindo cruzamento do zero e cancelamento de dívida em a − (−b)."
   },
   {
-    primitive: "InteractiveVertical", kinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71"],
-    componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage"), component("DivisaoLongaStage"), component("DivisaoDoisDigitosStage")],
-    builderKinds: ["vertical"], specializedBuilderIds: ["N4.10", "N4.12"], rendererKinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71"],
-    note: "VerticalPlaceValueStage compõe InteractiveVertical + MaterialDourado. F69 usa InteractiveVerticalDivisionSurface no mesmo arquivo da primitiva. W43/F71/N4.12 reutiliza a mesma InteractiveVertical por DivisaoDoisDigitosStage e InteractiveVerticalDivisionEstimateSurface: a criança registra uma estimativa, testa pela multiplicação do divisor real e ajusta por toque; o rascunho não revela o quociente correto e o erro motor fica separado de misconception.",
+    primitive: "InteractiveVertical", kinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76"],
+    componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage"), component("DivisaoLongaStage"), component("DivisaoDoisDigitosStage"), component("ContasVirgulaStage")],
+    builderKinds: ["vertical"], specializedBuilderIds: ["N4.10", "N4.12", "N6.02"], rendererKinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76"],
+    note: "VerticalPlaceValueStage compõe InteractiveVertical + MaterialDourado. F69 usa InteractiveVerticalDivisionSurface no mesmo arquivo da primitiva. W43/F71/N4.12 reutiliza a mesma InteractiveVertical por DivisaoDoisDigitosStage e InteractiveVerticalDivisionEstimateSurface: a criança registra uma estimativa, testa pela multiplicação do divisor real e ajusta por toque; o rascunho não revela o quociente correto e o erro motor fica separado de misconception. W47/F76/N6.02 estende o mesmo arquivo com InteractiveVerticalDecimalSurface: a vírgula é eixo visual das ordens, zeros de preenchimento explicitam casas ausentes e o alinhamento pela direita produz wobble em vez de travar; ContasVirgulaStage compõe essa superfície com Quadrado100, sem primitiva paralela nem arrasto obrigatório.",
   },
   { primitive: "LinkingCubes", kinds: ["linking-cubes", "counting-on-f14"], componentFiles: [component("LinkingCubes"), component("CountingOnStage")], builderKinds: [], specializedBuilderIds: ["N3.03"], rendererKinds: ["linking-cubes", "counting-on-f14"], note: "W10/F14: CountingOnStage compõe LinkingCubes + NumberLine." },
   {
@@ -100,10 +100,10 @@ const FICHA_RUNTIME_MAP = [
     note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2. W32/F82 compõe NumberLine + Balanca para converter antes de comparar ou operar. W35/F62 compõe NumberLine + Relogio para leitura de minutos e duração. W36/F93 usa NumberLine + Balanca em escalas alinhadas.",
   },
   {
-    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87", "primos-divisores-f70"],
-    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("PorcentagemStage"), component("PrimosDivisoresStage")],
-    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.03", "N4.11"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "porcentagem-f87", "primos-divisores-f70"],
-    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W22/F87 compõe Quadrado100 + SingaporeBars. W42/F70/N4.11 usa o próprio Quadrado100 para múltiplos e para o Crivo de Eratóstenes: o palco risca fisicamente as casas dos múltiplos compostos e preserva os primos-base, em vez de substituir o quadro/crivo por texto abstrato."
+    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "contas-virgula-f76", "porcentagem-f87", "primos-divisores-f70"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("ContasVirgulaStage"), component("PorcentagemStage"), component("PrimosDivisoresStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.02", "N6.03", "N4.11"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "contas-virgula-f76", "porcentagem-f87", "primos-divisores-f70"],
+    note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W47/F76/N6.02 preserva essa mesma leitura do Quadrado100 como um inteiro enquanto InteractiveVertical explicita a conta e o eixo da vírgula; o quadro mostra as partes decimais sem antecipar o resultado. W22/F87 compõe Quadrado100 + SingaporeBars. W42/F70/N4.11 usa o próprio Quadrado100 para múltiplos e para o Crivo de Eratóstenes: o palco risca fisicamente as casas dos múltiplos compostos e preserva os primos-base, em vez de substituir o quadro/crivo por texto abstrato."
   },
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   {

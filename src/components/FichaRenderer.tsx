@@ -4,6 +4,7 @@ import { RegraSequenciaStage } from "./primitives/RegraSequenciaStage"; import t
 import { PartesIguaisStage } from "./primitives/PartesIguaisStage"; import type { PartesIguaisF45Spec } from "../curriculum/procedimentos/partesIguaisContract";
 import { FracaoNumeroStage } from "./primitives/FracaoNumeroStage"; import type { FracaoNumeroF72Spec } from "../curriculum/procedimentos/fracaoNumeroContract";
 import { DecimalStage } from "./primitives/DecimalStage"; import type { DecimalF75Spec } from "../curriculum/procedimentos/decimalContract";
+import { ContasVirgulaStage } from "./primitives/ContasVirgulaStage"; import type { ContasVirgulaF76Spec } from "../curriculum/procedimentos/contasVirgulaContract";
 import { PorcentagemStage } from "./primitives/PorcentagemStage"; import type { PorcentagemF87Spec } from "../curriculum/procedimentos/porcentagemContract";
 import { RazaoProporcaoStage } from "./primitives/RazaoProporcaoStage"; import type { RazaoProporcaoF88Spec } from "../curriculum/procedimentos/razaoProporcaoContract";
 import { EquacoesStage } from "./primitives/EquacoesStage"; import type { EquacoesF90Spec } from "../curriculum/procedimentos/equacoesContract";
@@ -56,6 +57,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'partes-iguais-f45': return <PartesIguaisStage spec={question.uiProps as PartesIguaisF45Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'fracao-numero-f72': return <FracaoNumeroStage spec={question.uiProps as FracaoNumeroF72Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'decimos-centesimos-f75': return <DecimalStage spec={question.uiProps as DecimalF75Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'contas-virgula-f76': return <ContasVirgulaStage spec={question.uiProps as ContasVirgulaF76Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'porcentagem-f87': return <PorcentagemStage spec={question.uiProps as PorcentagemF87Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'razao-proporcao-f88': return <RazaoProporcaoStage spec={question.uiProps as RazaoProporcaoF88Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'equacoes-f90': return <EquacoesStage spec={question.uiProps as EquacoesF90Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
