@@ -6,6 +6,7 @@ import { FracaoNumeroStage } from "./primitives/FracaoNumeroStage"; import type 
 import { DecimalStage } from "./primitives/DecimalStage"; import type { DecimalF75Spec } from "../curriculum/procedimentos/decimalContract";
 import { PorcentagemStage } from "./primitives/PorcentagemStage"; import type { PorcentagemF87Spec } from "../curriculum/procedimentos/porcentagemContract";
 import { RazaoProporcaoStage } from "./primitives/RazaoProporcaoStage"; import type { RazaoProporcaoF88Spec } from "../curriculum/procedimentos/razaoProporcaoContract";
+import { EquacoesStage } from "./primitives/EquacoesStage"; import type { EquacoesF90Spec } from "../curriculum/procedimentos/equacoesContract";
 import { AngulosStage } from "./primitives/AngulosStage"; import type { AngulosF78Spec } from "../curriculum/procedimentos/angulosContract";
 import { RetaCompletaStage } from "./primitives/RetaCompletaStage"; import type { RetaCompletaF84Spec } from "../curriculum/procedimentos/retaCompletaContract";
 import { OperarNegativosStage } from "./primitives/OperarNegativosStage"; import type { OperarNegativosF85Spec } from "../curriculum/procedimentos/operarNegativosContract";
@@ -57,6 +58,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'decimos-centesimos-f75': return <DecimalStage spec={question.uiProps as DecimalF75Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'porcentagem-f87': return <PorcentagemStage spec={question.uiProps as PorcentagemF87Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'razao-proporcao-f88': return <RazaoProporcaoStage spec={question.uiProps as RazaoProporcaoF88Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'equacoes-f90': return <EquacoesStage spec={question.uiProps as EquacoesF90Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'angulos-f78': return <AngulosStage spec={question.uiProps as AngulosF78Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'reta-completa-f84': return <RetaCompletaStage spec={question.uiProps as RetaCompletaF84Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'operar-negativos-f85': return <OperarNegativosStage spec={question.uiProps as OperarNegativosF85Spec} disabled={Boolean(disabled)} onAnswer={send}/>;

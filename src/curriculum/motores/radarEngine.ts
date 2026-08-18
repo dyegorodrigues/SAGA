@@ -12,6 +12,7 @@ import { PrimosDivisoresMisconception, type PrimosDivisoresMisconceptionTag } fr
 import { DivisaoDoisDigitosMisconception, type DivisaoDoisDigitosMisconceptionTag } from "../../constants/divisaoDoisDigitosMisconceptions";
 import { SomaFracoesMisconception, type SomaFracoesMisconceptionTag } from "../../constants/somaFracoesMisconceptions";
 import { RazaoProporcaoMisconception, type RazaoProporcaoMisconceptionTag } from "../../constants/razaoProporcaoMisconceptions";
+import { EquacoesMisconception, type EquacoesMisconceptionTag } from "../../constants/equacoesMisconceptions";
 import { calendarDayDistance, dayKeyFromNowInput, localDay } from "../../utils/calendarDay";
 
 export const SPACING_INTERVALS: Record<number, number> = {
@@ -30,6 +31,7 @@ const CANONICAL_MISCONCEPTION_TAGS = new Set<string>([
   ...Object.values(DivisaoDoisDigitosMisconception),
   ...Object.values(SomaFracoesMisconception),
   ...Object.values(RazaoProporcaoMisconception),
+  ...Object.values(EquacoesMisconception),
 ]);
 
 /**
@@ -41,7 +43,7 @@ const CANONICAL_MISCONCEPTION_TAGS = new Set<string>([
  */
 export function isCanonicalMisconceptionTag(
   tag: string,
-): tag is MisconceptionTagType | PrimosDivisoresMisconceptionTag | DivisaoDoisDigitosMisconceptionTag | SomaFracoesMisconceptionTag | RazaoProporcaoMisconceptionTag {
+): tag is MisconceptionTagType | PrimosDivisoresMisconceptionTag | DivisaoDoisDigitosMisconceptionTag | SomaFracoesMisconceptionTag | RazaoProporcaoMisconceptionTag | EquacoesMisconceptionTag {
   return CANONICAL_MISCONCEPTION_TAGS.has(tag);
 }
 
@@ -187,7 +189,6 @@ export function evaluateSpacedRepetition(
   }
 
   const nextReviewDays = SPACING_INTERVALS[newForce] || 1;
-
   return { nextReviewDays, newForce };
 }
 

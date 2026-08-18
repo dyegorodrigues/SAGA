@@ -25,6 +25,8 @@ import { evidenciasPerimetro as doPerimetro } from "./procedimentos/perimetroCon
 import { evidenciasDivisaoDoisDigitosF71 as daDivisaoDoisDigitos } from "./procedimentos/divisaoDoisDigitosContract";
 import { construirRazaoProporcaoF88Spec } from "./procedimentos/razaoProporcaoContract";
 import { evidenciasRazaoProporcaoF88 as daRazaoProporcao } from "./procedimentos/razaoProporcaoEvidence";
+import { construirEquacoesF90Spec } from "./procedimentos/equacoesContract";
+import { evidenciasEquacoesF90 as daEquacao } from "./procedimentos/equacoesEvidence";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -202,6 +204,11 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
     evidencia: Evidencia.ESCALA_NAO_INTEIRA_F88,
     emitir: () => daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), true),
   },
+  {
+    nome: "F90 (equações) — acerto real em equação de L3 ou superior",
+    evidencia: Evidencia.EQUACAO_L3_MAIS_F90,
+    emitir: () => daEquacao(construirEquacoesF90Spec(3, () => 0), true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -329,5 +336,6 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
     expect(doPerimetro(3, true)).toEqual([]);
     expect(daDivisaoDoisDigitos(false)).toEqual([]);
     expect(daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), false)).toEqual([]);
+    expect(daEquacao(construirEquacoesF90Spec(3, () => 0), false)).toEqual([]);
   });
 });

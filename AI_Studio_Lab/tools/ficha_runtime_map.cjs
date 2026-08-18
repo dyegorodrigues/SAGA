@@ -44,11 +44,11 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "AudioChoice", kinds: ["audiochoice"], componentFiles: [component("AudioChoice"), component("AudioChoiceStage")], builderKinds: ["audiochoice"], rendererKinds: ["audiochoice"] },
   {
     primitive: "Balanca",
-    kinds: ["balanca", "medidas", "igualdade-equilibrio-f46", "expressao-f77", "problemas-medida-f82", "conversao-unidades-f93"],
-    componentFiles: [component("Balanca"), component("MedidasStage"), component("IgualdadeEquilibrioStage"), component("ExpressaoF77Stage"), component("ProblemasMedidaStage"), component("ConversaoUnidadesStage")],
-    builderKinds: ["balanca", "medidas"], specializedBuilderIds: ["AL.05", "AL.06", "GM.09", "GM.10"],
-    rendererKinds: ["balanca", "medidas", "igualdade-equilibrio-f46", "expressao-f77", "problemas-medida-f82", "conversao-unidades-f93"],
-    note: "F46/AL.05 reutiliza Balanca como significado físico do sinal de igualdade. F77/AL.06 reutiliza a mesma balança para preservar equivalência enquanto explicita precedência, agrupamento e incógnita. F82/GM.09 compõe Balanca + NumberLine para manter equivalência visível durante conversões e problemas de medida. W36/F93 preserva a quantidade física ao trocar de unidade.",
+    kinds: ["balanca", "medidas", "igualdade-equilibrio-f46", "expressao-f77", "problemas-medida-f82", "conversao-unidades-f93", "equacoes-f90"],
+    componentFiles: [component("Balanca"), component("MedidasStage"), component("IgualdadeEquilibrioStage"), component("ExpressaoF77Stage"), component("ProblemasMedidaStage"), component("ConversaoUnidadesStage"), component("EquacoesStage")],
+    builderKinds: ["balanca", "medidas"], specializedBuilderIds: ["AL.05", "AL.06", "GM.09", "GM.10", "AL.08"],
+    rendererKinds: ["balanca", "medidas", "igualdade-equilibrio-f46", "expressao-f77", "problemas-medida-f82", "conversao-unidades-f93", "equacoes-f90"],
+    note: "F46/AL.05 reutiliza Balanca como significado físico do sinal de igualdade. F77/AL.06 reutiliza a mesma balança para preservar equivalência enquanto explicita precedência, agrupamento e incógnita. F82/GM.09 compõe Balanca + NumberLine para manter equivalência visível durante conversões e problemas de medida. W36/F93 preserva a quantidade física ao trocar de unidade. W46/F90/AL.08 reutiliza Balanca em EquacoesStage para tornar física a preservação da igualdade: a mesma transformação mantém os pratos equilibrados e uma alteração unilateral inclina a balança; não há primitiva paralela nem arrasto obrigatório.",
   },
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
   {

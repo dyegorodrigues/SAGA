@@ -226,6 +226,13 @@ export const Evidencia = {
    * memorização de escalas inteiras familiares.
    */
   ESCALA_NAO_INTEIRA_F88: "escala-nao-inteira-f88",
+
+  /**
+   * F90 (AL.08): ao menos um acerto real no L3 ou acima, quando resolver já
+   * exige desfazer coeficiente ou encadear transformações equivalentes. A
+   * evidência impede domínio composto apenas por x + a = b e x - a = b.
+   */
+  EQUACAO_L3_MAIS_F90: "equacao-l3-mais-f90",
 } as const;
 
 export type EvidenciaType = typeof Evidencia[keyof typeof Evidencia];
