@@ -155,3 +155,16 @@ Essas frentes não interrompem a fábrica W48–W50, mas entram em uso forte ap�
 ## 8. Fonte de retomada
 
 Na nova conversa, o comando correto é: reancorar o remoto, ler este arquivo integralmente e **parar se a autorização inter-onda ainda não tiver sido dada**.
+
+## Frente paralela — Observatório (P&D, não runtime)
+
+Existe uma frente registrada na `SAGA-Research-Foundry`, fora desta fila curricular e sem autoridade sobre ela:
+
+- documento: `03_architecture/OBSERVATORIO_E_AUDITORIA.md`
+- decisões diretamente correlatas: D057–D065 no `05_decisions/DECISION_LEDGER.md`
+- o mesmo Ledger está em v0.99 e contém também D066, referente ao manifesto histórico
+- status: `PRE-CANONICAL` · `implementation_authorized: false`
+
+Escopo: Recibo de Sessão, avaliação de aprendizagem fora do motor adaptativo, sete auditorias de motor, personas sintéticas e costuras de expansão.
+
+Nada dela entra no runtime sem autorização explícita do usuário conforme `00_governance/WORKFLOW.md`. Ela não altera onda, canário, Matrix, ledger curricular nem runtime map. Não interromper a fila curricular por causa dela.
