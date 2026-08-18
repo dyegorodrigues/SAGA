@@ -142,6 +142,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // W45 — F88: razão e proporção; SingaporeBars vinculada. Inativo fd93358b: CI 32074518557 + transversal 32074518604.
   "N6.04",
 
+  // W46 — F90: equações como equilíbrio; Balanca. Inativo f3c7c4d4: CI 32085678926 + transversal 32085678976.
+  "AL.08",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
