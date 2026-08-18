@@ -145,6 +145,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F95 materializada no EstatisticaChanceStage como continuação causal de PE.03/F83, compondo SingaporeBars + ArrayGrid para certo/possível/impossível → chance como fração → independência → frequência observada → contagem de possibilidades. A falácia do apostador pertence ao Radar; a evidência P13 de chance como fração nasce somente em acerto L3; resolução assistida não compra mastery independente e interação permanece por toque amplo sem erro motor virar misconception. O portão inativo final exato ba03c90b passou CI 32169040052 + transversal 32169040050, ambos completed/success; promoção e ledger entram atomicamente neste SHA, sem presumir divergência.",
     delta: { composer: 1, fallback: -1, served: 1 },
   },
+  {
+    id: "W50-N5.05",
+    competence: "N5.05",
+    rationale: "F86 materializada no MultiplicarFracoesStage reutilizando ArrayGrid#área: fração de inteiro → modelo de área → fração×fração pela interseção → generalização simbólica → divisão como quantas frações cabem. As misconceptions permanecem canônicas no Radar; a evidência de fração×fração nasce no nível 3; resolução assistida não compra mastery independente; os reparos reais de semântica ARIA entraram antes do portão final, sem enfraquecer teste ou acessibilidade. O portão inativo final exato 340f219a8eae3b3a71215d7a23e8e81a032afe1b passou CI 32191494936 + transversal 32191494957 (9/9), ambos completed/success; promoção e ledger entram atomicamente neste SHA com delta observado esperado +1 Composer, -1 fallback, +1 servida, sem presumir divergência.",
+    delta: { composer: 1, fallback: -1, served: 1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);

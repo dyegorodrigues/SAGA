@@ -157,6 +157,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // Inativo final ba03c90b: CI 32169040052 + transversal 32169040050, ambos success.
   "PE.04",
 
+  // W50 — F86: multiplicar frações; ArrayGrid#área.
+  // Inativo final 340f219a: CI 32191494936 + transversal 32191494957 (9/9), ambos success.
+  "N5.05",
+
   // Bloco F0 promovido anteriormente.
   "N1.01",
   "N1.02",
