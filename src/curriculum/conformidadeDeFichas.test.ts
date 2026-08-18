@@ -150,6 +150,7 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   "take-apart": ["TakeApart"],
   array: ["ArrayGrid"],
   "volume-vistas-f92": ["ArrayGrid"],
+  "volume-prismas-f94": ["ArrayGrid"],
   "primos-divisores-f70": ["ArrayGrid", "Quadrado100"],
   "divisao-dois-digitos-f71": ["InteractiveVertical"],
   "contas-virgula-f76": ["InteractiveVertical", "Quadrado100"],
@@ -223,6 +224,11 @@ const MODO_DO_RUNTIME: Record<string, string> = {
   "reconstruir-vistas": "3D",
   "cubos-ocultos": "3D",
   "desenhar-vistas": "3D",
+  "contar-cubos": "3D",
+  "camada-multiplicar": "3D",
+  formula: "3D",
+  "dimensao-faltante": "3D",
+  "prisma-nao-retangular": "3D",
 };
 
 /**
