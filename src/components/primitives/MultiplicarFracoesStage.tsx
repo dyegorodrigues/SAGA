@@ -67,7 +67,7 @@ export function MultiplicarFracoesStage({ spec, options, disabled = false, onAns
       </div>
 
       {spec.modo === "fracao-fracao-area" ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Duas pinturas fracionárias que se cruzam">
+        <div role="group" className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Duas pinturas fracionárias que se cruzam">
           <div className="min-h-20 rounded-2xl border-2 border-sky-300 bg-sky-50 p-3 text-center" data-f86-layer="horizontal">
             <p className="text-sm font-black text-sky-900">Primeira pintura</p>
             <p className="text-2xl font-black text-sky-800">{spec.fatorA}</p>
@@ -90,7 +90,7 @@ export function MultiplicarFracoesStage({ spec, options, disabled = false, onAns
         </p>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Respostas para multiplicação e divisão de frações">
+      <div role="group" className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Respostas para multiplicação e divisão de frações">
         {options.map((option, index) => (
           <button
             key={`${String(option.value)}-${index}`}
