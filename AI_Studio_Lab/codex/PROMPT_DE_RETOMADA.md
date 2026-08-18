@@ -1,277 +1,157 @@
 # PROMPT DE RETOMADA — Fechamento Curricular SAGA
 
-> **Porta operacional de verdade do PR #35.** Leia integralmente antes de editar. GitHub remoto, gates executáveis, DAG, canário e Matrix do SHA exato vencem memória, prompt antigo ou checkpoint.
+> **Porta operacional de verdade do PR #35.** GitHub remoto, DAG, canário, Coverage Matrix e gates do SHA exato vencem memória de conversa, prompt antigo ou checkpoint.
 
-## 1. Âncora remota
+## 1. Âncora remota obrigatória
 
 - Repo: `dyegorodrigues/SAGA`
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch: `codex/fechamento-curricular`
 - Base protegida: `main` em `106dfe0d796babebe40ebc36e5a84d4a80b9a858`
-- Estado curricular fechado: **W1–W46**
-- Último SHA técnico final certificado: `c2cf5b29639ce5a13d9d190ed312cad4df797dac`
-- Fase operacional atual: **W47 · N6.02/F76 — Contas com Vírgula · regression-first VALIDADO; materialização inativa autorizada**
-- Contrato regression-first: `src/curriculum/contasVirgulaW47.test.ts`
-- Recibo regression-first vinculante W47: `073bfab1469aeb86bdc0c3376634cba559880961`
+- Ondas formalmente fechadas: **W1–W47**
+- Última onda: **W47 · N6.02/F76 — Contas com Vírgula — FECHADA**
+- SHA técnico final W47: `f74b1f7711b34b11af98f882d19390a2258986db`
+- CI final W47: `32147466564` — **completed/success**
+- Certificação transversal final W47: `32147466708` — **completed/success**, 9/9
+- Checkpoint vinculante: `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W47_N6_02_F76_FECHADA_2026-08-18.md`
 
-Antes de qualquer escrita:
+Antes de QUALQUER escrita numa nova conversa:
 
-1. confirme PR, branch, HEAD e base remotos;
-2. confirme que `main` continua no SHA acima;
-3. consulte workflows, reviews e review threads do SHA relevante;
-4. se houver deriva, investigue antes de editar — o remoto vence este arquivo;
-5. nunca misture recibos entre SHAs nem invente contagens ou delta da Matrix.
+1. reancore PR, branch, HEAD e `main` no remoto;
+2. confirme reviews e review threads;
+3. consulte workflows do SHA relevante;
+4. se houver deriva, investigue — o remoto vence este arquivo;
+5. nunca misture recibos entre SHAs nem invente contagens/deltas.
 
-## 2. Estado vivo pós-W46
+## 2. Estado vivo após W47
 
-Coverage Matrix executável observada no SHA final W46 e preservada pelo regression-first W47:
+Coverage Matrix executável observada e certificada no SHA final W47:
 
-- **71 Composer**
+- **90 competências / 94 fichas autorais**
+- **72 Composer**
 - **15 legado**
-- **4 fallback**
-- **86 servidas**
-- **11 divergências**
-- 90 competências / 94 fichas autorais
+- **3 fallback**
+- **87 servidas**
+- **11 divergências ficha↔screen**
 - `modeSwaps=12`
 - `toolIntroductions=44`
-- primitiva autoral ainda ausente: `Moedas`
+- primitiva autoral ausente conhecida: `Moedas` (dívida já explicitada em GM.03)
 
-Fallbacks reais:
+Fallbacks reais restantes:
 
-`GM.11, N5.05, N6.02, PE.04`.
+- `GM.11` — F94, Volume de Prismas
+- `PE.04` — F95, Estatística e Chance
+- `N5.05` — F86, Multiplicar Frações
 
-Autoridades:
+Os 15 legados, as 11 divergências e `Moedas` **não estão esquecidos nem artificialmente fechados**. São resíduos conhecidos da engenharia curricular e seguem registrados pela Matrix/auditorias e pela fase pós-fábrica.
 
-- canário: `src/curriculum/motores/composerCanaryIds.ts`
-- ledger/baseline: `AI_Studio_Lab/tools/coverage_matrix_core.ts`
-- contrato Matrix: `src/curriculum/coverageMatrix.test.ts`
-- runtime físico: `AI_Studio_Lab/tools/ficha_runtime_map.cjs`
-- ficha/Composer: `src/curriculum/fichas/`
-- DAG: `curriculum/grafo_saga.yaml` + artefatos gerados
+## 3. W47 — cadeia vinculante
 
-Checkpoint é recibo humano; fontes executáveis vencem texto.
+### Regression-first
 
-## 3. Invariantes arquiteturais
+SHA `073bfab1469aeb86bdc0c3376634cba559880961`:
 
-- Registrar ficha no Composer **não ativa** competência.
-- Promoção acontece somente pelo array declarativo do canário.
-- **Canário + ledger nominal + contrato Matrix entram no mesmo SHA de promoção.**
-- Ledger, Matrix, runtime map e canário são declarativos; sem mutação por efeito colateral de import.
-- `ficha_runtime_map.cjs`, `evidencias.ts`, catálogos de misconceptions e `coverage_matrix_core.ts` são cânone compartilhado **aditivo**; não apagar, condensar ou reescrever história anterior.
-- Matrix observa o delta real; baseline não pode fabricar verde.
-- Tag emitida só vale se Radar/catálogo reconhecer e houver teste nominal.
-- Evidência de domínio deve pertencer ao catálogo central e ter emissor auditável; resposta errada não emite domínio.
-- Palco autoral não pode entregar resposta antes da decisão.
-- Exposição motora alta exige toque/snap equivalente, alvo generoso e separação erro motor × misconception.
-- RT não governa domínio conceitual.
-- Não tocar/mergear `main`; não marcar PR ready; não habilitar auto-merge; não tocar Creature Engine/Tamagotchi.
+- CI `32095359960` — failure nominal, exclusivamente F76 ausente;
+- transversal `32095359969` — success 9/9.
 
-## 4. W46 — AL.08/F90 FECHADA
+### Materialização inativa
 
-Regression-first vinculante:
+A F76 foi materializada como palco composto `InteractiveVertical + Quadrado100`, ensinando operações decimais por **valor posicional**, não pela regra mecânica de “mover a vírgula”.
 
-- SHA `d68edc718f4bcaa53da66a58e87e680450ea2d0c`;
-- CI `32076649252` — failure nominal somente por AL.08/F90 ausente;
-- transversal `32076649256` — success.
+Reparos reais antes da certificação inativa:
 
-Materialização inativa vinculante:
+- `rt_alvo` existe como telemetria de ficha; `rt_max_s` não governa domínio conceitual;
+- o passo de ×10/×100 foi nomeado sem disparar falso positivo do guard anti-regra mecânica;
+- axe continua auditando os cinco níveis, apenas com orçamento de execução explícito suficiente.
 
-- SHA `f3c7c4d4e044fd275bee0e5f6985497fd2c20ced`;
-- CI `32085678926` — success;
-- transversal `32085678976` — success;
-- AL.08 ainda fora do canário e do ledger nesse SHA.
+SHA inativo final: `23e5be94faa4fa1f15e73677c97a8a04963c1621`.
 
-Promoção atômica:
+- CI `32135341005` — completed/success;
+- transversal `32135340907` — completed/success 9/9.
 
-- SHA `d4c22e59c2e600570c705f9d0a46ff9cc38c9630`;
-- compare remoto provou exatamente três arquivos: canário AL.08 + ledger W46 + contrato Matrix;
-- transversal `32086538164` — success;
-- CI `32086538316` — failure real.
+### Promoção atômica
 
-Diagnóstico do CI vermelho:
+SHA `f74b1f7711b34b11af98f882d19390a2258986db` toca exatamente:
 
-- classe **A — regressão real**;
-- job `Gates do SAGA`, step `Testes`;
-- `src/curriculum/motores/canaryContract.test.ts:237`;
-- erro: `AL.08 L1: 5 opções: expected 5 to be less than or equal to 4`;
-- causa na materialização F90: gabarito + 4 distratores = 5 opções;
-- o gate universal de ≤4 opções estava correto e não foi relaxado.
+1. `src/curriculum/motores/composerCanaryIds.ts` — ativa `N6.02`;
+2. `AI_Studio_Lab/tools/coverage_matrix_core.ts` — ledger `W47-N6.02` com delta `{ composer:+1, fallback:-1, served:+1 }`;
+3. `src/curriculum/coverageMatrix.test.ts` — contrato `72/15/3/87/11`.
 
-Reparo:
+Recibos finais no mesmo SHA:
 
-- F90 passou a oferecer gabarito + três distratores por nível, rotacionando misconceptions;
-- `3cc05e5e…` expôs uma segunda regressão real no contrato de retry L3 ao omitir `RESPONDE_O_TODO`;
-- o SHA final `c2cf5b29639ce5a13d9d190ed312cad4df797dac` preserva no L3 `OPERACAO_INVERSA_ERRADA + QUEBRA_EQUILIBRIO + RESPONDE_O_TODO`, omitindo `NAO_APLICA_AOS_DOIS` somente nesse nível; a quarta misconception continua exercitada nos demais níveis;
-- nenhum teste, sonda, Matrix ou contrato foi enfraquecido.
+- CI `32147466564` — completed/success;
+- transversal `32147466708` — completed/success 9/9;
+- Gates: catálogo, fichas, conformidade, DAG, TypeScript, **241 arquivos / 3.373 testes**, build e guarda textual verdes;
+- Sonda real Sensei, higiene e binários verdes.
 
-Certificação final do mesmo SHA `c2cf5b29639ce5a13d9d190ed312cad4df797dac`:
+**W47 está fechada. Não reabrir sem causa nova observável.**
 
-- CI `32094469085` — `completed/success`;
-- Certificação transversal `32094469058` — `completed/success`, 9/9;
-- 239 arquivos / 3.347 testes verdes;
-- canário, palco F90, build, Sensei, higiene e binários verdes;
-- Matrix real `71/15/4/86/11`.
+## 4. PAUSA ENTRE ONDAS — autorização humana obrigatória
 
-**W46 está FECHADA. Não reabrir F90 sem causa nova observável.**
+O usuário pediu explicitamente uma parada entre W47 e W48 para realizar uma autorização externa.
 
-Checkpoint detalhado:
+### Portanto, NÃO FAÇA ainda
 
-`AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W46_AL_08_F90_FECHADA_2026-08-18.md`.
+- não crie regression-first W48;
+- não materialize F94;
+- não altere canário, ledger ou Matrix para W48;
+- não faça commit técnico da próxima onda;
+- não interprete a seleção abaixo como autorização de execução.
 
-## 5. Recalculo causal pós-W46 e seleção W47
+### Próxima candidata recalculada, somente informativa
 
-Critério vivo:
+Com W47 removida dos fallbacks, todos os prerequisitos dos três fallbacks restantes estão servidos. Pelo critério vigente (ganho imediato → menor `causalWave` → maior downstream → desempate residual):
 
-1. prereqs servidos;
-2. maior ganho imediato de desbloqueio;
-3. menor `causalWave`;
-4. maior downstream;
-5. ID / menor delta estrutural como desempate residual.
+- `GM.11` — causalWave 15, downstream residual 0;
+- `PE.04` — causalWave 15, downstream residual 0;
+- `N5.05` — causalWave 16.
 
-Quatro fallbacks reais e prereqs atuais do DAG:
+O empate residual entre GM.11 e PE.04 seleciona por ID:
 
-- `N6.02` ← `N6.01 + N3.11 + N3.12`;
-- `GM.11` ← `GM.09 + N4.02`;
-- `N5.05` ← `N5.04 + N6.04`;
-- `PE.04` ← `PE.03 + N6.03`.
+**W48 candidata: `GM.11 / F94 — Volume de Prismas`**, ficha canônica em `AI_Studio_Lab/pedagogia/fichas/FICHAS_F4_COMPLETAS.md`, primitiva `ArrayGrid` em modo 3D.
 
-Todos os prereqs estão servidos. Nenhum dos quatro destrava imediatamente outro fallback restante, portanto o primeiro desempate empata.
+**Estado: SELECIONADA, MAS NÃO ABERTA. AGUARDAR AUTORIZAÇÃO EXPLÍCITA DO USUÁRIO EM NOVA CONVERSA.**
 
-No recálculo anterior, `AL.08` e `N6.02` eram os únicos empatados na menor `causalWave` relevante. W46 não alterou o DAG; a Matrix real apenas retirou `AL.08` do conjunto fallback. Revalidado contra o DAG remoto atual, `N6.02` torna-se o candidato de menor onda causal entre os quatro restantes.
+## 5. Protocolo quando a autorização chegar
 
-**W47 = `N6.02 / F76 — Contas com Vírgula`.**
+Somente após autorização explícita:
 
-Não perpetuar fila prevista depois da próxima promoção: recalcular novamente.
+1. reancorar o remoto e reler integralmente este arquivo;
+2. recalcular Matrix/DAG novamente — a seleção acima não vence deriva remota;
+3. se GM.11/F94 continuar vencendo, criar regression-first executável e publicar SHA próprio;
+4. exigir vermelho nominal e exclusivo da ausência da ficha/materialização;
+5. materializar completa e **INATIVA**;
+6. exigir CI + transversal verdes no mesmo SHA inativo;
+7. só então promover atomicamente **canário + ledger + contrato Matrix**;
+8. exigir CI + transversal verdes no mesmo SHA final;
+9. checkpoint + estado + porta + PR body;
+10. recalcular a onda seguinte.
 
-## 6. Contrato canônico F76 — vinculante
+## 6. Regras invioláveis do PR #35
 
-Fonte autoral: `AI_Studio_Lab/pedagogia/fichas/FICHAS_F3_COMPLETAS.md`.
+- `main` não é área de trabalho;
+- PR permanece draft + open + unmerged;
+- nunca marcar ready, habilitar auto-merge ou mergear;
+- não tocar Creature Engine/Tamagotchi;
+- não relaxar testes, P13, Matrix, Radar, contratos ou sondas para obter verde;
+- não editar baseline para encobrir observação real;
+- promoção e ledger entram juntos, no mesmo SHA;
+- canário, Matrix e ledger são declarativos — sem mutação por efeito colateral de import;
+- runtime map/evidências/catálogos compartilhados são aditivos: preservar rationale/histórico;
+- erro motor não vira misconception conceitual;
+- RT conceitual não compra/reprova mastery salvo contrato específico de fluência;
+- ajuda/resolução assistida não compra mastery independente;
+- uma onda não reutiliza recibos de outra.
 
-Identidade:
+## 7. Pós-90/90 preservado
 
-- competência: `N6.02 — Operações com decimais`;
-- ficha: `F76 — Contas com Vírgula`;
-- primitivas: `InteractiveVertical + Quadrado100`;
-- prereqs DAG: `N6.01 + N3.11 + N3.12`.
+Não confundir `fallback=0` com produto Child-Ready.
 
-Fundamento:
+- Issue #47 — **Integração Sistêmica e Child-Ready**;
+- Issue #48 — **lacunas microcurriculares/microprogressão**, incluindo hipóteses como “segundos?” classificadas antes de virar dívida.
 
-- somar/subtrair decimais alinhando **a vírgula**, não os dígitos da direita;
-- só se combinam ordens iguais: décimo com décimo, unidade com unidade;
-- a vírgula é o marco que alinha as ordens;
-- zeros de preenchimento tornam explícitas casas ausentes sem mudar o valor.
+Essas frentes não interrompem a fábrica W48–W50, mas entram em uso forte após o fechamento da última onda.
 
-Cinco níveis:
+## 8. Fonte de retomada
 
-1. mesma quantidade de casas;
-2. casas diferentes, com zeros de preenchimento;
-3. subtração;
-4. reagrupamento;
-5. multiplicação por 10/100.
-
-Misconceptions canônicas:
-
-- `ALINHA_PELA_DIREITA`;
-- `IGNORA_ZEROS`;
-- `VIRGULA_PERDIDA`.
-
-Tags runtime esperadas no Radar:
-
-- `alinha-pela-direita`;
-- `ignora-zeros`;
-- `virgula-perdida`.
-
-Domínio:
-
-- `{ acertos: 3, de: 3, sessoes: 2 }`;
-- incluir ao menos um caso de **casas diferentes (L2)** como evidência executável, não texto morto.
-
-Resolução:
-
-- explicitar valor posicional e alinhamento pela vírgula;
-- mostrar zeros de preenchimento quando necessário;
-- em subtração/reagrupamento, preservar a lógica de ordens;
-- em ×10/×100, ensinar deslocamento de valor posicional, não “mover a vírgula” como regra sem significado;
-- não revelar resposta antes da decisão; resolução assistida não compra mastery independente.
-
-Acessibilidade/motor:
-
-- manipulação deve ter alternativa por toque;
-- arrasto não pode ser obrigatório para provar conceito;
-- erro motor separado de misconception;
-- RT fora da autoridade conceitual.
-
-## 7. W47 regression-first — VALIDADO
-
-Contrato: `src/curriculum/contasVirgulaW47.test.ts`.
-
-Recibo vinculante:
-
-- SHA `073bfab1469aeb86bdc0c3376634cba559880961` — `test: fechar W46 e abrir W47 regression-first`;
-- CI `32095359960` — `completed/failure` **nominal**;
-- Certificação transversal `32095359969` — `completed/success`, 9/9;
-- Sonda real Sensei — `completed/success`;
-- higiene e guarda de binários — `completed/success`;
-- auditoria do catálogo, fichas, conformidade, DAG e TypeScript — success;
-- Matrix preservada: `71/15/4/86/11`;
-- suíte: 240 arquivos / 3.348 testes; **239 arquivos e 3.347 testes passam; 1 teste falha**;
-- único vermelho: `src/curriculum/contasVirgulaW47.test.ts`;
-- erro exato: `AssertionError: expected undefined to be defined` em `contasVirgulaW47.test.ts:23`, porque `JOURNEY_FICHAS.find(item => item.id === "N6.02")` retorna `undefined`.
-
-Classificação: **regression-first válido**. O vermelho prova exclusivamente que `N6.02/F76` ainda não foi materializada. Não há regressão funcional paralela e não há motivo para rerun do CI nominal.
-
-O contrato já exige, para a futura materialização:
-
-- prereqs vivos corretos;
-- saída real do fallback para Composer;
-- mastery 3/3 × 2 sessões;
-- evidência L2 de casas diferentes;
-- três misconceptions canônicas reconhecidas pelo Radar;
-- resolução causal em todos os cinco níveis;
-- RT fora da autoridade conceitual.
-
-**Não relaxar, apagar ou reescrever o regression-first para fazê-lo verde.**
-
-Checkpoint do recibo:
-
-`AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W47_N6_02_F76_REGRESSION_FIRST_2026-08-18.md`.
-
-## 8. Próxima ação autorizada — materialização INATIVA W47
-
-Com o regression-first W47 validado, a próxima alteração técnica é:
-
-1. materializar `N6.02/F76` completa e **INATIVA**;
-2. criar ficha Journey, contrato/builder, kind/palco apropriado, renderer/wiring, resolução, Radar/misconceptions, evidência L2, runtime map, answer policy e testes;
-3. reutilizar `InteractiveVertical + Quadrado100`; não criar primitiva paralela sem causa;
-4. manter `N6.02` fora de `DEFAULT_COMPOSER_CANARY_IDS`;
-5. manter `W47-N6.02` fora do ledger/Matrix durante a fase inativa;
-6. não antecipar baseline nem declarar N6.02 servida;
-7. exigir CI + transversal verdes no mesmo SHA inativo;
-8. somente então promover atomicamente canário + ledger + contrato Matrix;
-9. deixar a Matrix executável observar o delta real;
-10. exigir CI + transversal verdes no SHA final;
-11. fechar W47 e recalcular W48 pelo remoto.
-
-## 9. Cadência e governança
-
-- Uma onda por vez; não materializar a seguinte antes do portão correspondente.
-- Regression-first vermelho por design não substitui recibo técnico verde da onda anterior.
-- Issue #47 é a porta pós-90/90 de **Integração Sistêmica e Child-Ready**; `90/90 servido` não equivale a produto Child-Ready.
-- Issue #48 é o registro vivo de **lacunas microcurriculares/microprogressão**; `GM.06/F62 — segundos?` permanece `CANDIDATA`, não dívida confirmada.
-- #47/#48 não interrompem W47–W50; entram em uso forte após `fallback=0` e fechamento técnico/documental da última onda.
-- Não usar baseline para fabricar verde.
-- Não inventar recibos nem misturar SHAs.
-- Cânone compartilhado é aditivo.
-
-## 10. Documentos de continuidade
-
-- `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W47_N6_02_F76_REGRESSION_FIRST_2026-08-18.md`
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W46_AL_08_F90_FECHADA_2026-08-18.md`
-- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W45_N6_04_F88_FECHADA_2026-08-17.md`
-- `AI_Studio_Lab/codex/AUDITORIA_PALCOS_COMPOSTOS_2026-08-12.md`
-- `AI_Studio_Lab/codex/AUDITORIA_MOTOR_DE_RESOLUCAO_2026-08-12.md`
-- `AI_Studio_Lab/codex/PENDENCIAS_PLAYER_MOTOR_RESOLUCAO.md`
-- GitHub issues `#47` e `#48` para a fase pós-90/90.
-
-`RETOMADA.md` é deliberadamente uma ponte atemporal para esta porta e não deve duplicar estado curricular.
+Na nova conversa, o comando correto é: reancorar o remoto, ler este arquivo integralmente e **parar se a autorização inter-onda ainda não tiver sido dada**.
