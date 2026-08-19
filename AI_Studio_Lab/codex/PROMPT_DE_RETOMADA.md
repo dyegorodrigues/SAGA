@@ -8,7 +8,7 @@
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch: `codex/fechamento-curricular`
 - `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada
-- HEAD de entrada do Gate B · Lote 5: `4a2ad53ca31008bce66e25730b3bf37b6d11e395`; o HEAD remoto vivo sempre vence este valor se avançar
+- HEAD de entrada do Gate B · Lote 6: `fac6abb79200e3ae45493d17ea09f9bca41689e4`; o HEAD remoto vivo sempre vence este valor se avançar
 - A API pode reportar `main` como `protected:false`; a regra vinculante permanece **não tocar `main`**.
 
 Antes de QUALQUER escrita futura:
@@ -64,7 +64,7 @@ W1–W50 não devem ser refeitas sem causa nova observável.
 - rotas originais 7 CODIGO / 0 SIMULACAO / 3 CRIANCA;
 - CI `32209683689` + transversal `32209683699` success 9/9.
 
-`GAP-007` foi posteriormente absorvido por `CLASS-002` no fechamento global de conformance ficha↔DAG; não foi corrigido em código.
+`GAP-007` foi absorvido por `CLASS-002`; não foi corrigido.
 
 ### Lote 2 — N2
 
@@ -74,7 +74,7 @@ W1–W50 não devem ser refeitas sem causa nova observável.
 - rotas originais 9 CODIGO / 1 SIMULACAO / 0 CRIANCA;
 - CI `32216926616` + transversal `32216926610` success 9/9.
 
-`GAP-021` foi posteriormente absorvido por `CLASS-002`; não foi corrigido em código.
+`GAP-021` foi absorvido por `CLASS-002`; não foi corrigido.
 
 ### Lote 3 — N3
 
@@ -84,7 +84,7 @@ W1–W50 não devem ser refeitas sem causa nova observável.
 - 7 candidatas originais `GAP-022`–`GAP-028`;
 - CI `32218633036` + transversal `32218633032` success 9/9.
 
-`GAP-026` foi posteriormente absorvido por `CLASS-002`; não foi corrigido em código.
+`GAP-026` foi absorvido por `CLASS-002`; não foi corrigido.
 
 ### Lote 4 — N4
 
@@ -101,26 +101,48 @@ W1–W50 não devem ser refeitas sem causa nova observável.
 
 ### Lote 5 — N5
 
-Escopo auditado neste snapshot: **N5.01–N5.05, 5/5**.
+- 5/5;
+- documento `AI_Studio_Lab/codex/GATE_B_LOTE_5_N5_AUDITORIA.md`;
+- snapshot `fac6abb79200e3ae45493d17ea09f9bca41689e4`;
+- proveniência 5 Composer / 0 legado / 0 fallback;
+- `CLASS-002` reconciliada globalmente e fechada para descoberta, não reparada;
+- `DECISAO-001 / GM.04` isolada como contradição pedagógica pendente humana;
+- `CLASS-003` ampliada com N5.04/F74 e N5.05/F86;
+- candidatas N5 `GAP-033`–`GAP-035`;
+- vias originais N5 3 CODIGO / 0 SIMULACAO / 0 CRIANCA;
+- CI `32260196527` — success;
+- transversal `32260196519` — success 9/9;
+- correções: 0.
+
+`GAP-034` foi posteriormente absorvido/reclassificado em `CLASS-004` no Lote 6; não foi corrigido.
+
+### Lote 6 — N6
+
+Escopo auditado neste snapshot: **N6.01–N6.04, 4/4**.
 
 Documento:
 
-`AI_Studio_Lab/codex/GATE_B_LOTE_5_N5_AUDITORIA.md`
+`AI_Studio_Lab/codex/GATE_B_LOTE_6_N6_AUDITORIA.md`
 
 Resultado materializado:
 
-- proveniência: **5 Composer / 0 legado / 0 fallback**;
-- `CLASS-002` foi reconciliada globalmente antes de N5 e fica **FECHADA PARA DESCOBERTA**, não reparada;
-- `DECISAO-001 / GM.04` foi isolada da classe como contradição pedagógica pendente de decisão humana;
-- `CLASS-003` foi ampliada com `N5.04/F74` e `N5.05/F86`;
-- 3 candidatas N5 `GAP-033`–`GAP-035`;
+- proveniência: **4 Composer / 0 legado / 0 fallback**;
+- prereqs/faixas N6 coerentes ficha↔DAG;
+- diagnóstico externo GM.04 registrado na Issue #48 comentário `5346694044`, sem decisão nem correção;
+- contagem correta CLASS-002 confirmada: 10 divergências de campo em 9 competências; classe simples = 8 casos;
+- `CLASS-004` criada para viés posicional de gabarito em comparações; `GAP-034` absorvido/reclassificado;
+- `GAP-025` ampliado para incluir F76/N6.02, sem novo ID;
+- 3 candidatas N6 novas `GAP-036`–`GAP-038`;
 - classe das três: `HIPÓTESE-A-PROVAR`;
-- vias N5: **3 CODIGO / 0 SIMULACAO / 0 CRIANCA**;
+- vias N6: **3 CODIGO / 0 SIMULACAO / 0 CRIANCA**;
+- N6.04 não abriu candidata nova;
 - correções: 0;
 - runtime, Matrix, canário e DAG intocados;
-- N6 **não iniciado**.
+- N7 **não iniciado**.
 
-O snapshot documental do Lote 5 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA**. Ler os recibos do remoto no SHA exato; não reutilizar runs anteriores.
+Registro Issue #48 do Lote 6: `5346763254`.
+
+O snapshot documental do Lote 6 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA**. Ler os recibos do remoto no SHA exato; não reutilizar runs anteriores.
 
 ## 5. Proposta de governança — Gate B′
 
@@ -162,7 +184,7 @@ Vias:
 
 Via é requisito de evidência, não autorização de gate futuro.
 
-## 7. Classes estruturais vigentes após N5
+## 7. Classes estruturais vigentes após N6
 
 ### CLASS-001 — gerador declara `lvl` e não consome
 
@@ -177,55 +199,81 @@ Via é requisito de evidência, não autorização de gate futuro.
 - §0.2: `CONFIRMADO-ATUAL`;
 - via `CODIGO`;
 - **não reparada**;
-- hipótese de liberação precoce refutada: `unlockEngine` usa `GrafoSaga.nodes` e `node.prereqs`; ficha não participa do unlock;
-- comentário de fechamento/reclassificação na Issue #48: `5342994164`.
-
-Inventário simples: **8 casos**:
-
-- prereqs/subconjunto: N3.10, N4.03, N4.06, N4.07, N4.08;
-- faixa: N1.08, N1.12, N2.07.
-
-Correção numérica: a varredura externa tinha 10 divergências de **campo** em 9 competências; GM.04 contém 2 campos e foi isolada abaixo. Portanto não existem “9 casos simples” após remover GM.04; existem 8.
-
-`GAP-007`, `GAP-021`, `GAP-026` foram absorvidos/reclassificados, não corrigidos.
-
-Teste ficha↔DAG proposto, não implementado: igualdade de prereqs + política explícita de faixa, falha `ID/campo/ficha/DAG`, sem allowlist silenciosa.
+- unlock precoce refutado: `unlockEngine` usa `GrafoSaga.nodes`/`node.prereqs`; ficha não participa do unlock;
+- inventário simples: **8 casos**;
+- contagem total: **10 divergências de campo em 9 competências**, pois GM.04 possui 2 campos;
+- `GAP-007`, `GAP-021`, `GAP-026` absorvidos/reclassificados;
+- teste ficha↔DAG proposto, não implementado.
 
 ### DECISAO-001 — GM.04
 
 - estado `PENDENTE-DE-DECISÃO-HUMANA`;
 - fato de fonte `CONFIRMADO-ATUAL`;
 - via técnica posterior `CODIGO`, bloqueada por decisão humana;
-- ficha: F2 + `[N2.01, AL.01]`;
-- DAG: F1 + `[N1.06]`;
-- prereqs disjuntos e faixa contraditória;
-- não decidir qual lado está certo até decisão pedagógica humana.
+- comentário de diagnóstico: `5346694044`;
+- diagnóstico: ficha contém micro invasor de avanço em frações de 15 minutos, semanticamente pertencente a GM.06;
+- recomendação externa: hora cheia em GM.04 sob N1.06/F1; minutos em GM.06;
+- ordem futura, se aprovada: corrigir escopo → alinhar metadata → verificar cobertura GM.06;
+- **não** alinhar metadata isoladamente;
+- nenhuma decisão nem correção executada.
 
 ### CLASS-003 — caso único por nível sob mastery repetida
 
 - `CONFIRMADO-ATUAL`;
 - via `CODIGO`;
-- membros revalidados até N5: N4.10/F69, N4.11/F70, N4.12/F71, **N5.04/F74, N5.05/F86**;
-- não duplicar esses membros em GAP apenas pela causa de caso fixo.
+- membros revalidados: N4.10/F69, N4.11/F70, N4.12/F71, N5.04/F74, N5.05/F86;
+- nenhum novo membro N6.
 
-## 8. Candidatas N5
+### CLASS-004 — viés posicional de gabarito em comparações
 
-- `GAP-033` — N5.02 L4 de reta parcial só usa `1/4` ou `3/4`; tipos VARIEDADE-DE-MASTERY + TRANSFERÊNCIA-AUSENTE; via CODIGO.
-- `GAP-034` — N5.03 tem viés posicional: L3 direita sempre maior, L4 esquerda sempre maior, L5 sem permutação; tipos VARIEDADE-DE-MASTERY + viés posicional; via CODIGO.
-- `GAP-035` — N5.03→N5.04 não exige aplicar equivalência para operar denominadores diferentes; tipos TRANSFERÊNCIA-AUSENTE + MICRONÍVEL-AUSENTE; via CODIGO.
+- `CONFIRMADO-ATUAL`;
+- via `CODIGO`;
+- membros observados: N5.03/F73 e N6.01/F75;
+- `GAP-034` absorvido/reclassificado nesta classe;
+- N6.01 L4 possui quatro pares e em todos a esquerda é maior;
+- teste de equilíbrio de lados + simetria proposto, **não implementado**.
 
-## 9. Estado acumulado do Gate B após N5
+## 8. Candidatas/reclassificações vigentes do Lote 6
+
+### GAP-025 — ampliado para F76/N6.02
+
+- permanece `CANDIDATA` / `HIPÓTESE-A-PROVAR`;
+- via CODIGO;
+- F76 é normativamente obrigada a `revelacaoProgressiva: true`, mas o contrato executável observado não materializa o eixo e o palco expõe conta vertical + Quadrado100 simultaneamente.
+
+### GAP-036 — N6.02 L3 introduz reagrupamento antes do L4
+
+- `HIPÓTESE-A-PROVAR`;
+- tipos SALTO-DE-DIFICULDADE + MICRONÍVEL-AUSENTE + RESOLUÇÃO-INSUFICIENTE;
+- via CODIGO;
+- 2 de 3 casos L3 exigem empréstimo, sem flag/andaime de reagrupamento; explicação explícita vive no L4.
+
+### GAP-037 — N6.03 não exige equivalência entre as quatro notações centrais
+
+- `HIPÓTESE-A-PROVAR`;
+- tipos CONTEÚDO-SÓ-EXPLICADO + REPRESENTAÇÃO-AUSENTE + TRANSFERÊNCIA-AUSENTE + MISCONCEPTION-NÃO-COBERTA;
+- via CODIGO;
+- cânone F87 ancora `25% = 25/100 = 0,25 = 1/4`, mas nenhuma resposta executável observada exige a ponte completa.
+
+### GAP-038 — N6.03 L4 pode avançar sem acréscimo
+
+- `HIPÓTESE-A-PROVAR`;
+- tipo VARIEDADE-DE-MASTERY;
+- via CODIGO;
+- corpus L4 = 2 descontos + 1 acréscimo, sem evidência de diversidade obrigatória.
+
+## 9. Estado acumulado do Gate B após N6
 
 Sem promover hipótese a dívida:
 
-- competências auditadas: **50/90**;
-- candidatas individuais: **31**;
-- vias individuais: **26 CODIGO / 1 SIMULACAO / 4 CRIANCA**;
-- classes estruturais: `CLASS-001`, `CLASS-002`, `CLASS-003`;
-- `DECISAO-001/GM.04` separada das classes simples;
+- competências auditadas: **54/90**;
+- candidatas individuais: **33**;
+- vias individuais: **28 CODIGO / 1 SIMULACAO / 4 CRIANCA**;
+- classes estruturais: `CLASS-001`, `CLASS-002`, `CLASS-003`, `CLASS-004`;
+- `DECISAO-001/GM.04` separada e pendente humana;
 - correções executadas pelo Gate B: **0**.
 
-A contagem de 31 já desconta `GAP-007`, `GAP-021`, `GAP-026` absorvidos por CLASS-002 e acrescenta `GAP-033`–`GAP-035`.
+A contagem parte de 31 após N5, absorve `GAP-034` em CLASS-004 (-1) e adiciona `GAP-036`–`GAP-038` (+3).
 
 ## 10. Resíduos preservados
 
@@ -269,29 +317,29 @@ Gate B′ continua proposta, não autoridade nova.
 - ajuda/resolução assistida não compra mastery independente;
 - Gate B serializado por domínio;
 - lote audit-only não implementa a descoberta;
-- não implementar gate de `lvl` nem ficha↔DAG neste lote;
+- não implementar gates de CLASS-001/002/004 neste lote;
 - Gate B′ permanece proposta;
 - Gates C–J não iniciados.
 
-## 14. Condição de parada do Gate B · Lote 5/N5
+## 14. Condição de parada do Gate B · Lote 6/N6
 
 Este lote deve conter somente:
 
-- revalidação/registro da conformance global ficha↔DAG e GM.04;
-- auditoria/documentação de N5;
+- comentário de diagnóstico externo GM.04 na Issue #48;
+- auditoria/documentação de N6;
 - atualização documental da porta/índice;
-- registro de ampliação de CLASS-003 e candidatas N5 na Issue #48.
+- registro de CLASS-004, ampliação do GAP-025 e GAP-036–038 na Issue #48.
 
-Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA** do snapshot documental do Lote 5. Depois dos dois verdes:
+Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA** do snapshot documental do Lote 6. Depois dos dois verdes:
 
 1. confirmar PR #35 open + draft + unmerged;
 2. confirmar `main` intocada;
 3. reportar classes separadas dos individuais;
-4. reportar N5 por classe e via;
-5. mencionar N6 apenas como próximo domínio natural, sem iniciá-lo;
+4. reportar N6 por classe e via;
+5. mencionar N7 apenas como próximo domínio natural, sem iniciá-lo;
 6. **PARAR**.
 
-Não corrigir CLASS-001/002/003, DECISAO-001 ou GAP-002–GAP-035. Não iniciar N6, Gate C, Gate G, Gate J, Observatório ou outra frente.
+Não corrigir CLASS-001–004, DECISAO-001 ou GAPs. Não iniciar N7, Gate C, Gate G, Gate J, Observatório ou outra frente.
 
 ## Frente paralela — Observatório (P&D, não runtime)
 
