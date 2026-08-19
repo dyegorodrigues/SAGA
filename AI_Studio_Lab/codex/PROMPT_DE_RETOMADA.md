@@ -1,6 +1,6 @@
-# PROMPT DE RETOMADA — Fechamento Curricular SAGA
+# PROMPT DE RETOMADA — Integração Sistêmica e Child-Ready SAGA
 
-> **Porta operacional de verdade do PR #35.** GitHub remoto, DAG, canário, Coverage Matrix e gates do SHA exato vencem memória de conversa, prompt antigo ou checkpoint.
+> **Porta operacional de verdade do PR #35 no pós-90/90.** GitHub remoto, fontes executáveis, Issue #47 e documentos canônicos especializados vencem memória de conversa, roadmap histórico ou checkpoint desatualizado.
 
 ## 1. Âncora remota obrigatória
 
@@ -8,119 +8,117 @@
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch: `codex/fechamento-curricular`
 - `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada pela fábrica
+- HEAD de entrada desta transição: `dc6c21c2ba013e104813a534c55de804c546b770`; o HEAD remoto vivo sempre vence este valor se avançar
 - Observação: a API do GitHub reporta `main` como `protected:false`; não fingir proteção técnica. A regra de governança vinculante permanece **não tocar `main`**.
-- Ondas fechadas tecnicamente: **W1–W50**
-- Última onda: **W50 · N5.05/F86 — Multiplicar Frações — FECHADA tecnicamente**
-- SHA técnico final W50: `efd270b732752ebe0d38a47efff47d958e352802`
-- CI técnico final: `32196855192` — **completed/success**
-- Certificação transversal técnica final: `32196855356` — **completed/success, 9/9**
 
-Antes de QUALQUER escrita:
+Antes de QUALQUER escrita futura:
 
 1. reancore PR, branch, HEAD e `main` no remoto;
-2. confirme reviews e review threads;
+2. confira reviews e review threads;
 3. consulte CI + Certificação transversal do HEAD relevante;
-4. confira canário, ledger/Matrix, runtime map e DAG;
-5. se houver deriva, investigue — o remoto vence este arquivo;
-6. nunca misture recibos entre SHAs nem invente contagens/deltas.
+4. leia a Issue #47 e este índice: `AI_Studio_Lab/codex/ROADMAP_90_90_CHILD_READY.md`;
+5. abra somente as fontes canônicas do gate realmente autorizado;
+6. trate roadmap antigo/auditoria antiga como histórico até revalidação;
+7. nunca misture recibos entre SHAs nem invente estado atual a partir de memória.
 
-## 2. Estado técnico vivo após W50
+## 2. Transição formal de modo
 
-Coverage Matrix executável observada no SHA técnico final:
+A **Fábrica Curricular Principal** terminou formalmente. O modo operacional do projeto passa de:
 
-- **90 competências / 94 fichas autorais**
-- **75 Composer**
-- **15 legado**
-- **0 fallback**
-- **90 servidas**
-- **11 divergências ficha↔screen**
-- `modeSwaps=12`
-- `toolIntroductions=44`
-- primitiva autoral ausente conhecida: `Moedas`, dívida de GM.03
+**Fábrica Curricular**
 
-O Gates do SHA técnico passou catálogo, fichas, conformidade, DAG, TypeScript, **245 arquivos / 3.429 testes**, build e guarda textual. Sonda real Sensei, higiene e binários ficaram verdes. O build continua emitindo warning de tamanho do bundle; hardening/performance permanece dívida real.
+para:
 
-`fallback=0` significa que a fábrica curricular principal atingiu tecnicamente `90/90 servidas`. **Não significa Child-Ready.**
+**Integração Sistêmica e Child-Ready**.
 
-## 3. W50 — cadeia vinculante corrigida
+Isso não significa que o produto esteja Child-Ready. A Definition of Child-Ready e a ordem dos gates são autoridade da **Issue #47 — Integração Sistêmica e Child-Ready**.
 
-### Regression-first
+O arquivo `AI_Studio_Lab/codex/ROADMAP_90_90_CHILD_READY.md` é somente índice executivo: aponta para as fontes canônicas, registra estados/classes e não substitui a Issue #47 nem documentos especializados.
 
-`609217223cd3ab29e264762d32ec8c5ef01d78f1`
+## 3. Gate A — FECHADO-COM-RECIBO
 
-Não refazer sem causa nova observável.
+Gate A da Issue #47 está **FECHADO-COM-RECIBO**.
 
-### Materialização inativa
+### Promoção técnica final W50
 
-- núcleo: `3e2b9e1ac6bfd79ea043c847f8d7b33ec9d086bc`;
-- candidato completo: `bc865d5c037242bedd433b90a298e944c260aa54`;
-- reparo ARIA real: `50d74e93c96dc88628f208be787e3fc853ea1136`;
-- reparo ARIA real: `2d250b39ea8d32d4a9aa92b2797a44d5da49efa4`;
-- inativo final: `340f219a8eae3b3a71215d7a23e8e81a032afe1b`;
-- CI inativo `32191494936` — completed/success;
-- transversal inativa `32191494957` — completed/success 9/9.
+- SHA: `efd270b732752ebe0d38a47efff47d958e352802`;
+- CI `32196855192` — **completed/success**;
+- Certificação transversal `32196855356` — **completed/success, 9/9**;
+- Coverage Matrix observada: **75 Composer / 15 legado / 0 fallback / 90 servidas / 11 divergências**;
+- cobertura final: **90 competências / 94 fichas autorais**.
 
-### Promoção atômica real
+### Fechamento documental independente
 
-SHA `efd270b732752ebe0d38a47efff47d958e352802` tocou somente os três governantes da promoção:
+- SHA: `dc6c21c2ba013e104813a534c55de804c546b770`;
+- CI `32197697198` — **completed/success**;
+- Certificação transversal `32197697050` — **completed/success, 9/9**.
 
-1. `src/curriculum/motores/composerCanaryIds.ts` — ativa `N5.05`;
-2. `AI_Studio_Lab/tools/coverage_matrix_core.ts` — ledger `W50-N5.05`, delta `{ composer:+1, fallback:-1, served:+1 }` e rationale do portão inativo;
-3. `src/curriculum/coverageMatrix.test.ts` — contrato reconciliado para a observação real.
+Os recibos técnicos e documentais são independentes e permanecem vinculados aos respectivos SHAs.
 
-A Matrix observou `75/15/0/90/11`; nenhum baseline foi relaxado para fabricar verde.
+Fontes de detalhe da fábrica fechada:
 
-Recibos do próprio SHA técnico:
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_W50_N5_05_F86_FECHADA_2026-08-18.md`;
+- `AI_Studio_Lab/codex/CHECKPOINT_FABRICA_CURRICULAR_FINAL_90_DE_90_2026-08-18.md`;
+- `AI_Studio_Lab/codex/ESTADO_DO_FECHAMENTO.md`.
 
-- CI `32196855192` — completed/success;
-- Certificação transversal `32196855356` — completed/success 9/9.
+**W1–W50 e a cadeia da fábrica não devem ser refeitas sem causa nova observável.**
 
-**W50 não deve ser refeita sem causa nova observável.**
+## 4. Estado dos gates pós-90/90
 
-## 4. Correção da documentação prematura
+- **Gate A:** FECHADO-COM-RECIBO.
+- **Gates B–J:** **NÃO INICIADOS** nesta transição.
+- A ordem e os critérios pertencem à Issue #47.
+- Gate B é o próximo gate recomendado pela §15 da Issue #47, mas permanece não iniciado até uma execução posterior explicitamente dedicada a ele.
 
-Os commits documentais `f208a1750d9084aeabf7ac3c1efdff63f5d5ebe5` e `a6b19c05ce20bf3aaf0cac53caf3ec9d2122c8e2` afirmaram prematuramente “W50 fechada / 90 de 90” antes da promoção técnica real.
+Esta transição autoriza somente o snapshot/índice executivo e a mudança formal de modo. Não iniciar mega-auditoria, Issue #48, Player/Tutor, Child-Ready operacional, Observatório, piloto ou hardening agora.
 
-A auditoria foi registrada no corpo do PR. O histórico não deve ser escondido, reescrito ou tratado como se já estivesse correto. A sequência real é:
+## 5. Disciplina de evidência
 
-regression-first → materialização inativa → reparos ARIA → portão inativo → promoção técnica atômica → CI/transversal técnicos → reconciliação documental → CI/transversal documentais.
+Usar obrigatoriamente as classes da Issue #47 §0.2:
 
-O HEAD documental que contém esta porta reconciliada precisa de **CI + Certificação transversal próprios**. Nunca reutilizar `32196855192` / `32196855356` como recibos documentais.
+- `CONFIRMADO-ATUAL`;
+- `DÍVIDA-REGISTRADA`;
+- `HISTÓRICO-A-REVALIDAR`;
+- `HIPÓTESE-A-PROVAR`;
+- `FECHADO-COM-RECIBO`;
+- `FORA-DE-ESCOPO`.
 
-## 5. Fechamento formal e parada
+Regra: documento antigo não vira estado atual por existir no repositório. Revalidar no HEAD relevante antes de afirmar que algo ainda funciona, ainda falha ou ainda possui a mesma magnitude.
 
-Quando o HEAD documental contendo:
+## 6. Resíduos preservados na transição
 
-- `CHECKPOINT_FABRICA_CURRICULAR_W50_N5_05_F86_FECHADA_2026-08-18.md`;
-- `CHECKPOINT_FABRICA_CURRICULAR_FINAL_90_DE_90_2026-08-18.md`;
-- `ESTADO_DO_FECHAMENTO.md`;
-- este `PROMPT_DE_RETOMADA.md`;
+O índice executivo classifica explicitamente os resíduos que sobreviveram ao fechamento curricular:
 
-obtiver **CI success + Certificação transversal success 9/9**, então:
+- 15 competências legado — `CONFIRMADO-ATUAL`;
+- 11 divergências ficha↔screen — `CONFIRMADO-ATUAL`;
+- `Moedas` / GM.03 — `CONFIRMADO-ATUAL`;
+- hardening/performance + warning de bundle — `CONFIRMADO-ATUAL`;
+- Issue #48 — `DÍVIDA-REGISTRADA`;
+- Observatório / Research Foundry — `DÍVIDA-REGISTRADA`, subordinado à Issue #47 e sem autorização de implementação.
 
-1. atualizar o corpo do PR #35 com o SHA e os recibos documentais reais;
-2. declarar: **FÁBRICA CURRICULAR PRINCIPAL FORMALMENTE CONCLUÍDA — fallback=0 — 90/90 servidas**;
-3. manter PR #35 open + draft + unmerged;
-4. manter `main` intocada;
-5. **parar**.
+Essas classificações registram evidência/estado. Não autorizam abrir as frentes neste commit.
 
-Não iniciar Issue #47, Issue #48, Observatório, Child-Ready ou outra grande frente dentro deste fechamento.
+## 7. Gate J — precondição de linha de base
 
-## 6. Resíduos que permanecem vinculantes
+Antes do primeiro uso sério por cada criança, o roadmap registra como precondição do Gate J uma **linha de base fora do motor adaptativo, em papel**.
 
-Mesmo após o fechamento formal:
+A exigência vem da Research Foundry, D067, e de `03_architecture/OBSERVATORIO_E_AUDITORIA.md` Parte 2. A linha de base é recurso não renovável: depois do primeiro uso sério, o ponto de partida é irrecuperável e o ganho deixa de ser interpretável de forma limpa em relação ao estado inicial.
 
-- 15 competências legado, enquanto observadas;
-- 11 divergências ficha↔screen, enquanto observadas;
-- `Moedas` / GM.03;
-- hardening/performance e warning de bundle;
-- Issue #47 — **Integração Sistêmica e Child-Ready**;
-- Issue #48 — **lacunas microcurriculares/microprogressão**;
-- qualquer dívida nova ainda observada por gates/runtime.
+A obrigação está registrada; a coleta **não foi iniciada** nesta transição.
 
-Esses resíduos não autorizam continuação automática depois do 90/90.
+## 8. Hierarquia de autoridade pós-90/90
 
-## 7. Regras invioláveis do PR #35
+1. GitHub remoto e autoridades executáveis do HEAD relevante;
+2. Issue #47 para governança da fase e Definition of Child-Ready;
+3. documentos canônicos especializados de cada gate;
+4. `ROADMAP_90_90_CHILD_READY.md` como índice executivo;
+5. documentos históricos somente como evidência a revalidar.
+
+A Issue #48 é o registro vivo de gaps do Gate B; uma entrada `CANDIDATA` continua hipótese e não pode ser chamada de dívida confirmada sem prova.
+
+A Foundry não cria uma segunda autoridade. D067 determina que a Issue #47 vence em qualquer divergência e que o Observatório passa a ser material de apoio das gates, não fila concorrente.
+
+## 9. Regras invioláveis do PR #35
 
 - GitHub remoto vence memória, checkpoint e esta porta;
 - `main` não é área de trabalho;
@@ -131,22 +129,22 @@ Esses resíduos não autorizam continuação automática depois do 90/90.
 - não misturar recibos entre SHAs;
 - não relaxar testes, P13, Matrix, Radar, DAG, contratos ou sondas para obter verde;
 - não editar baseline para encobrir observação real;
-- promoção = canário + ledger + contrato Matrix no mesmo SHA;
-- canário, Matrix, ledger e runtime map são declarativos, sem mutação por efeito colateral de import;
-- runtime map/evidências/catálogos compartilhados são aditivos: preservar rationale/histórico;
 - erro motor não vira misconception conceitual;
 - RT conceitual não compra/reprova mastery salvo contrato específico de fluência;
 - ajuda/resolução assistida não compra mastery independente;
-- dívida real não é apagada só porque a fábrica termina.
+- dívida real não é apagada por troca de fase;
+- CI verde isolado nunca significa Child-Ready.
 
-## 8. Pós-90/90 preservado
+## 10. Condição de parada desta transição
 
-Não confundir `fallback=0` com produto Child-Ready.
+Este snapshot de transição deve conter somente:
 
-- Issue #47 — **Integração Sistêmica e Child-Ready**;
-- Issue #48 — **lacunas microcurriculares/microprogressão**.
+- criação de `AI_Studio_Lab/codex/ROADMAP_90_90_CHILD_READY.md`;
+- esta mudança formal de modo no `PROMPT_DE_RETOMADA.md`.
 
-A fase pós-90/90 só começa com nova autorização/contexto depois do fechamento formal da fábrica.
+Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA** deste snapshot. Depois dos dois verdes, **parar**.
+
+Não iniciar Gate B, Issue #48, Child-Ready operacional, Observatório ou outra grande frente neste fechamento de transição.
 
 ## Frente paralela — Observatório (P&D, não runtime)
 
@@ -160,3 +158,5 @@ Existe uma frente registrada na `SAGA-Research-Foundry`, fora desta fila curricu
 Escopo: Recibo de Sessão, avaliação de aprendizagem fora do motor adaptativo, sete auditorias de motor, personas sintéticas e costuras de expansão.
 
 Nada dela entra no runtime sem autorização explícita do usuário conforme `00_governance/WORKFLOW.md`. Ela não altera onda, canário, Matrix, ledger curricular nem runtime map. Não interromper a fila curricular por causa dela.
+
+**Atualização de governança — D067:** a Research Foundry registrou que a **Issue #47 é a autoridade do pós-90/90**. O Observatório passa a ser material subordinado às gates de #47 e **não abre fila paralela**; onde houver divergência, #47 vence. A contribuição exclusiva preservada é a medição de aprendizagem fora do motor adaptativo, incluindo a linha de base anterior ao primeiro uso sério.
