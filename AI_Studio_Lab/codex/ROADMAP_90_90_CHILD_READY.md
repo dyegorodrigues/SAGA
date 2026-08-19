@@ -10,7 +10,7 @@ Este arquivo é um **índice executivo**. Ele aponta para fontes canônicas e re
 
 A Fábrica Curricular Principal foi formalmente concluída em `fallback=0` e `90/90` competências servidas. O modo do projeto é **Integração Sistêmica e Child-Ready**.
 
-Isso não declara o produto Child-Ready. A Definition of Child-Ready e a ordem dos gates pertencem à Issue #47.
+Isso não declara o produto Child-Ready. A Definition of Child-Ready e a ordem oficial dos gates pertencem à Issue #47.
 
 ## 2. Gates A–J — estado atual
 
@@ -28,6 +28,12 @@ Isso não declara o produto Child-Ready. A Definition of Child-Ready e a ordem d
 | **J — Piloto infantil/calibração** | **NÃO INICIADO** | Issue #47 §11 + precondição de linha de base |
 
 Gate B é serializado por domínio; nenhum lote autoriza automaticamente o seguinte.
+
+### Proposta Gate B′ — não oficial
+
+Antes do Lote 4 foi registrado na Issue #47 o comentário `5342129190`, propondo um **Gate B′** entre B e C para reparar/fechar primeiro saídas via `CODIGO`, migrar `SIMULACAO` para Gate G e `CRIANCA` para Gate J, com nenhuma candidata `CODIGO` aberta no início do Gate J.
+
+A proposta é **somente comentário de governança**: a §15 não foi alterada, Gate B′ não foi ativado e Gates C–J seguem não iniciados.
 
 ## 3. Gate A — recibo de fechamento
 
@@ -63,38 +69,71 @@ Classificação: **FECHADO-COM-RECIBO**.
 
 ### Lote 3 — N3
 
-- escopo curricular: `N3.01–N3.13`, **13/13**;
-- documento: `AI_Studio_Lab/codex/GATE_B_LOTE_3_N3_AUDITORIA.md`;
-- achado estrutural prévio: **`CLASS-001`**, `CONFIRMADO-ATUAL`, via `CODIGO`;
-- `CLASS-001`: **18 geradores** declaram `lvl` sem referenciá-lo diretamente no corpo;
-- candidatas N3: **7**, `GAP-022`–`GAP-028`;
-- classe das 7: `HIPÓTESE-A-PROVAR`;
-- vias das 7: **7 CODIGO / 0 SIMULACAO / 0 CRIANCA**;
+- escopo: 13/13;
+- documento: `GATE_B_LOTE_3_N3_AUDITORIA.md`;
+- snapshot: `9c6b6d47cbe2bb74f2d342b2bbe01aa40260d84b`;
+- `CLASS-001`: `CONFIRMADO-ATUAL`, via CODIGO, 18 geradores com `lvl` declarado e não consumido;
+- 7 candidatas `GAP-022`–`GAP-028`, todas `HIPÓTESE-A-PROVAR`;
+- vias: 7 CODIGO / 0 SIMULACAO / 0 CRIANCA;
+- CI `32218633036` success + transversal `32218633032` success 9/9;
+- correções: 0.
+
+### Lote 4 — N4
+
+- escopo: `N4.01–N4.12`, **12/12**;
+- documento: `AI_Studio_Lab/codex/GATE_B_LOTE_4_N4_AUDITORIA.md`;
+- proveniência: **10 Composer / 2 legado** (`N4.02`, `N4.05`);
+- novos achados de classe: **2**;
+- novas candidatas individuais: **4**, `GAP-029`–`GAP-032`;
 - correções: 0;
 - runtime/Matrix/canário/DAG: intocados.
 
-#### CLASS-001 — distribuição
+#### CLASS-002 — prereqs ficha↔DAG
 
-- `src/utils/generators.ts`: 4;
-- `src/utils/generatorsF1.ts`: 4;
-- `src/utils/generatorsF2.ts`: 4;
-- `src/utils/generatorsVisual.ts`: 6.
+- classe: `CONFIRMADO-ATUAL`;
+- via: `CODIGO`;
+- afetados: N4.03, N4.06, N4.07, N4.08;
+- as fichas TS declaram subconjuntos dos prereqs do DAG/YAML;
+- **impacto limitado revalidado:** `unlockEngine` usa `GrafoSaga`, derivado de `src/curriculum/grafo_saga.ts`; portanto não há bypass de unlock no HEAD atual.
 
-Gate proposto, não implementado: teste estático/AST deve falhar para gerador que declara `lvl` e não o referencia no corpo executável. Wrappers que encaminham `lvl` passam; `_lvl` funciona como supressão explícita. O gate não pode ser ativado até uma frente autorizada reconciliar os casos existentes.
+#### CLASS-003 — caso único por nível sob mastery repetida
 
-#### Candidatas N3
+- classe: `CONFIRMADO-ATUAL`;
+- via: `CODIGO`;
+- afetados: N4.10/F69, N4.11/F70, N4.12/F71;
+- os builders especializados usam um único cenário determinístico em cada nível enquanto as fichas exigem múltiplos acertos/sessões;
+- N4.01 foi refutado como membro: seu `equalGroupsContract` sorteia casos por nível.
 
-- GAP-022 — N3.04 não exige a flexibilidade voltar↔completar que o cânone usa como critério de domínio;
-- GAP-023 — N3.06 pode satisfazer a janela sem provar quase-dobros;
-- GAP-024 — N3.07 colapsa L2–L5 numa única família de reta e não materializa `bond/math` declarados;
-- GAP-025 — F35/F39/F40 exigem `revelacaoProgressiva: true`, mas a norma não possui consumo executável observável no HEAD;
-- GAP-026 — N3.10 diverge em prereqs: ficha TS só N3.03; DAG/YAML N3.03+N3.04;
-- GAP-027 — N3.10 possui `coversDistinctStructures`, mas a cobertura das quatro estruturas não foi encontrada na concessão real de mastery;
-- GAP-028 — N3.13 serve problema de dois passos em vez de cálculo mental/estimativa/seleção de estratégia.
+#### Candidatas N4
 
-**Próximo lote proposto, não iniciado:** **Gate B · Lote 4 — N4**.
+- GAP-029 — N4.02 legado não exige giro/comutatividade e colapsa L2–L5; via CODIGO;
+- GAP-030 — N4.05 não serve o significado de divisão por medida; via CODIGO;
+- GAP-031 — N4.05 L3–L5 repetem partição simbólica exata e não constroem resto/ponte para N4.10; via CODIGO;
+- GAP-032 — N4.07 estreia ×7 apenas no misto L4 quando o apoio da estratégia já saiu; via CRIANCA.
 
-## 5. Disciplina de evidência e VIA DE RESOLUÇÃO
+Classe das quatro candidatas: **`HIPÓTESE-A-PROVAR`**.
+
+Vias do Lote 4: **3 CODIGO / 0 SIMULACAO / 1 CRIANCA**.
+
+O snapshot documental deste Lote 4 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA** antes da parada final.
+
+**Próximo domínio natural, não iniciado:** `N5`.
+
+## 5. Estado acumulado após N4
+
+Sem transformar hipótese em dívida:
+
+- competências auditadas: **45/90**;
+- candidatas individuais abertas: **31**;
+- vias individuais acumuladas: **26 CODIGO / 1 SIMULACAO / 4 CRIANCA**;
+- achados de classe: **3** — `CLASS-001`, `CLASS-002`, `CLASS-003`;
+- classe dos três: `CONFIRMADO-ATUAL`;
+- via dos três: `CODIGO`;
+- correções do Gate B: **0**.
+
+A projeção de +40–50 candidatas nas 57 competências que restavam antes do Lote 4 foi registrada na proposta Gate B′ apenas como **projeção de planejamento**, não como contagem confirmada.
+
+## 6. Disciplina de evidência e VIA DE RESOLUÇÃO
 
 Classes obrigatórias da Issue #47 §0.2:
 
@@ -107,9 +146,9 @@ Classes obrigatórias da Issue #47 §0.2:
 
 Na Issue #48, `CANDIDATA` continua hipótese e não vira dívida confirmada sem prova/decisão suficiente.
 
-Um achado estrutural revalidado pode existir como `ACHADO-DE-CLASSE` separado das candidatas. `CLASS-001` é o primeiro registro desse tipo e **não deve ser expandido artificialmente em um GAP por competência**.
+Achado estrutural revalidado pode existir como `ACHADO-DE-CLASSE` separado das candidatas. Não duplicar causa única em um GAP por competência.
 
-Cada candidata também recebe uma via:
+Cada candidata recebe uma via:
 
 - `CODIGO` — prova de fonte/cânone/DAG/mastery;
 - `SIMULACAO` — campanha Gate G;
@@ -117,7 +156,21 @@ Cada candidata também recebe uma via:
 
 A via não inicia gate futuro nem autoriza correção.
 
-## 6. Dívidas preservadas — classificação de evidência
+## 7. CLASS-001 — contrato estrutural de nível
+
+Confirmado no Lote 3 e externamente verificado pelo usuário:
+
+- `generators.ts`: 4;
+- `generatorsF1.ts`: 4;
+- `generatorsF2.ts`: 4;
+- `generatorsVisual.ts`: **6/6**;
+- total: 18.
+
+Gate proposto, não implementado: teste AST/estático falha quando um gerador declara `lvl` e não o referencia no corpo executável; wrappers que encaminham passam; `_lvl` é supressão explícita; erro identifica arquivo/função.
+
+O Lote 4 **não implementou** esse gate.
+
+## 8. Dívidas preservadas — classificação de evidência
 
 | Item | Classe atual | Base |
 |---|---|---|
@@ -128,9 +181,9 @@ A via não inicia gate futuro nem autoriza correção.
 | **Issue #48** | **DÍVIDA-REGISTRADA** | registro vivo Gate B |
 | **Observatório / Research Foundry** | **DÍVIDA-REGISTRADA** | PRE-CANONICAL; subordinado a #47 |
 
-Oito dos 13 nós N3 permanecem legados; o Lote 3 não os migrou nem corrigiu.
+N4.02 e N4.05 permanecem legados; o Lote 4 não os migrou.
 
-## 7. Gate J — precondição não renovável: LINHA DE BASE
+## 9. Gate J — precondição não renovável: LINHA DE BASE
 
 **Estado:** `DÍVIDA-REGISTRADA` — requisito registrado, coleta não iniciada.
 
@@ -138,7 +191,7 @@ Antes do primeiro uso sério por cada criança, coletar uma **linha de base fora
 
 Isso não inicia Observatório nem Gate J.
 
-## 8. Mapa de autoridades pós-90/90
+## 10. Mapa de autoridades pós-90/90
 
 - governança/Child-Ready: Issue #47;
 - estado operacional: `PROMPT_DE_RETOMADA.md`;
@@ -146,11 +199,14 @@ Isso não inicia Observatório nem Gate J.
 - Lote 1: `GATE_B_LOTE_1_N1_AUDITORIA.md`;
 - Lote 2: `GATE_B_LOTE_2_N2_AUDITORIA.md`;
 - Lote 3: `GATE_B_LOTE_3_N3_AUDITORIA.md`;
+- Lote 4: `GATE_B_LOTE_4_N4_AUDITORIA.md`;
 - índice executivo: este arquivo;
 - fontes executáveis: Coverage Matrix, DAG, fichas, runtime map, Radar/misconceptions, canário e testes conforme autoridade específica;
 - Observatório Foundry: apoio subordinado à Issue #47 por D067.
 
-## 9. Governança vigente
+A proposta Gate B′ é comentário na Issue #47 e não substitui a autoridade da própria Issue.
+
+## 11. Governança vigente
 
 - `main` não é área de trabalho;
 - PR #35 permanece `open + draft + unmerged`;
@@ -161,8 +217,9 @@ Isso não inicia Observatório nem Gate J.
 - lote audit-only não corrige a própria descoberta;
 - não alterar runtime/Matrix/canário/DAG;
 - não implementar o gate de `CLASS-001` neste lote;
+- não ativar Gate B′ sem decisão posterior;
 - não iniciar Gates C–J;
 - não tocar Creature Engine/Tamagotchi;
 - CI verde isolado nunca significa Child-Ready.
 
-Depois de o snapshot do **Lote 3/N3** possuir **CI + Certificação transversal verdes no mesmo SHA**, confirmar governança, propor N4 sem iniciar e parar.
+Depois de o snapshot do **Lote 4/N4** possuir **CI + Certificação transversal verdes no mesmo SHA**, confirmar governança e parar. N5 precisa de nova autorização explícita.
