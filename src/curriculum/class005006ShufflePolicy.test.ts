@@ -5,17 +5,15 @@ import type { Question } from "../types";
 import { generateRegisteredFichaQuestion } from "./motores/composerCanary";
 
 /**
- * Regression-first de CLASS-006.
+ * CLASS-006 confirmada por execução no regression-first.
  *
- * A lista abaixo é o inventário confirmado no HEAD de entrada: são builders
- * especializados cuja questão fresca possui alternativas e cujo palco consome
- * a ordem do array em pelo menos um dos cinco níveis. Modos puramente
- * manipulativos de uma mesma ficha podem ignorar as alternativas; a política
- * continua no boundary da questão para que o próximo modo com lista não volte a
- * serializar o gabarito na posição zero.
+ * N2.06/F38 é controle negativo: não embaralha, mas serializa semanticamente
+ * [Par, Ímpar] e o gabarito alterna de posição entre níveis. Os 25 IDs abaixo
+ * ficaram com a resposta correta na posição zero em 5 níveis × 8 seeds antes
+ * do reparo e possuem ao menos um modo que apresenta a lista à criança.
  */
 const CLASS_006_IDS = [
-  "N2.06", "N2.07",
+  "N2.07",
   "N4.10", "N4.11",
   "N5.04", "N5.05",
   "N7.01", "N7.02",
@@ -76,6 +74,16 @@ describe("CLASS-006 — posição do gabarito em questão fresca", () => {
     ).toBeGreaterThan(1);
   });
 
+  it("N2.06 permanece controle negativo: posição varia sem shuffle artificial", () => {
+    const posicoes = new Set<number>();
+    for (let level = 1; level <= 5; level += 1) {
+      const q = generateRegisteredFichaQuestion("N2.06", level);
+      const options = opcoesDoPalco(q);
+      posicoes.add(options.findIndex(option => String(option.value) === String(q.answer)));
+    }
+    expect(posicoes.size).toBeGreaterThan(1);
+  });
+
   it("a mesma seed reproduz a mesma permutação e seeds distintas alteram o corpus", () => {
     const a = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 42)}`).join("\n");
     const b = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 42)}`).join("\n");
@@ -94,12 +102,16 @@ function arquivosTsTsx(dir: string): string[] {
 }
 
 describe("CLASS-005 — comparador aleatório em Array.sort", () => {
-  it("proíbe .sort(() => Math.random() - 0.5) em src/", () => {
+  it("proíbe o comparador aleatório em todo código produtivo de src/", () => {
     const src = path.resolve(process.cwd(), "src");
     const padrao = /\.sort\s*\(\s*\(\s*\)\s*=>\s*Math\.random\s*\(\s*\)\s*-\s*0\.5\s*\)/g;
+    const esteTeste = path.resolve(process.cwd(), "src/curriculum/class005006ShufflePolicy.test.ts");
     const ofensores: string[] = [];
 
     for (const arquivo of arquivosTsTsx(src)) {
+      // O próprio regex acima contém a sequência proibida em texto; ele é a
+      // sentinela, não código produtivo. Tudo o mais em src/ deve ficar limpo.
+      if (path.resolve(arquivo) === esteTeste) continue;
       const texto = fs.readFileSync(arquivo, "utf8");
       for (const match of texto.matchAll(padrao)) {
         const linha = texto.slice(0, match.index).split("\n").length;

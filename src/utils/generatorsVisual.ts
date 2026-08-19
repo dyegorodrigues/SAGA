@@ -1,5 +1,6 @@
 import { Question } from "../types";
 import { numOpts, pickEmo } from "../utils/generators";
+import { fisherYates } from "./shuffle";
 
 export function gVis_VisualAddition(lvl: number): Question {
   const a = Math.floor(Math.random() * 4) + 1;
@@ -73,10 +74,10 @@ export function gVis_LinkingCubesSentence(lvl: number): Question {
     kind: "plain",  
     prompt: `Qual imagem mostra ${a} + ${b} = ${total}?`,
     audioPrompt: `Ache a imagem que mostra ${a} mais ${b} igual a ${total}.`,
-    options: [
+    options: fisherYates([
       { label: "", value: "right", groups: rightGroups },
       { label: "", value: "wrong1", groups: makeWrongGroups() },
-    ].sort(() => Math.random() - 0.5),
+    ]),
     answer: "right"
   };
 }
@@ -108,7 +109,7 @@ export function gVis_TakeApart(lvl: number): Question {
     n: total,
     prompt: `Mostre uma maneira diferente de separar ${total}.`,
     audioPrompt: "Qual é a outra maneira de separar os blocos?",
-    options: [
+    options: fisherYates([
       { 
         label: "", 
         value: "right",
@@ -119,7 +120,7 @@ export function gVis_TakeApart(lvl: number): Question {
         value: "wrong",
         groups: [{ n: wrongA, color: "bg-blue-400" }, { n: wrongB, color: "bg-rose-400" }]
       }
-    ].sort(() => Math.random() - 0.5),
+    ]),
     answer: "right"
   };
 }
@@ -148,13 +149,13 @@ export function gVis_Sequence(lvl: number): Question {
     kind: "plain",
     prompt: `Conte a partir do ${start}. Quais números vêm depois?`,
     audioPrompt: "Quais números vêm depois?",
-    options: [
+    options: fisherYates([
       { label: `${start+1}, ${start+2}, ${start+3}`, value: "right" },
       // O distrator do salto de dez sairia de 20 no escopo novo; o de pular de
       // dois em dois mora dentro dele e é o erro real desta idade.
       { label: `${start+2}, ${start+4}, ${start+6}`, value: "wrong1" },
       { label: `${start+1}, ${start+3}, ${start+5}`, value: "wrong2" },
-    ].sort(() => Math.random() - 0.5),
+    ]),
     answer: "right",
     uiProps: { text: `${start}, ___, ___, ___` }
   };

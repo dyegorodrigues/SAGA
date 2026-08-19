@@ -13,6 +13,7 @@ import { construirComparacaoQuantidadeQuestion } from "../procedimentos/comparac
 import { construirEstatisticaChanceQuestion } from "../procedimentos/estatisticaChanceContract";
 import { construirMultiplicarFracoesQuestion } from "../procedimentos/multiplicarFracoesContract";
 import { Question, Track } from "../../types";
+import { fisherYates } from "../../utils/shuffle";
 import { DEFAULT_COMPOSER_CANARY_IDS } from "./composerCanaryIds";
 type Generator=(level:number)=>Question; type SpecializedBuilder=(ficha:FichaCompetencia,level:number)=>Question; export type GeneratorSource=NonNullable<Track["generatorSource"]>;
 const COMPOSER_FICHAS: Record<string, FichaCompetencia> = {
@@ -80,11 +81,29 @@ const SPECIALIZED_BUILDERS: Partial<Record<string, SpecializedBuilder>> = {
   "PE.04": construirEstatisticaChanceQuestion,
 };
 const SPECIALIZED_RUNTIME_KIND:Partial<Record<string,string>>={"N1.12":"numberline-f19","N2.01":"material-dourado","N2.02":"quadrado100-f36","N2.03":"comparacao-simbolica","N2.07":"fatores-retangulos-f66","N3.01":"visual-addition-f13","N3.02":"emojirow-riscar-f15","N3.03":"counting-on-f14","N4.01":"equal-groups-f97","N4.10":"divisao-longa-f69","N4.11":"primos-divisores-f70","N4.12":"divisao-dois-digitos-f71","N5.01":"partes-iguais-f45","N5.02":"fracao-numero-f72","N5.03":"fracoes-equivalentes-f73","N5.04":"soma-fracoes-f74","N5.05":"multiplicar-fracoes-f86","N6.01":"decimos-centesimos-f75","N6.02":"contas-virgula-f76","N6.03":"porcentagem-f87","N6.04":"razao-proporcao-f88","N7.01":"reta-completa-f84","N7.02":"operar-negativos-f85","AL.03":"skip-count-f30","AL.04":"regra-sequencia-f57","AL.05":"igualdade-equilibrio-f46","AL.06":"expressao-f77","AL.07":"linguagem-letras-f89","AL.08":"equacoes-f90","GE.03":"detetive-formas-f58","GE.04":"solidos-geometricos-f59","GE.05":"mapa-tesouro-f60","GE.06":"angulos-f78","GE.07":"poligonos-f79","GE.08":"plano-cartesiano-f80","GE.09":"circulo-areas-f91","GE.10":"volume-vistas-f92","GM.05":"regua-f61","GM.06":"horas-minutos-f62","GM.07":"perimetro-f63","GM.08":"area-f81","GM.09":"problemas-medida-f82","GM.10":"conversao-unidades-f93","GM.11":"volume-prismas-f94","PE.02":"jornal-turma-f64","PE.03":"media-chance-f83","PE.04":"estatistica-chance-f95"};
+const CLASS_006_FRESH_OPTION_IDS = new Set<string>([
+  "N2.07",
+  "N4.10", "N4.11",
+  "N5.04", "N5.05",
+  "N7.01", "N7.02",
+  "AL.06", "AL.07",
+  "GE.04", "GE.05", "GE.06", "GE.07", "GE.08", "GE.09", "GE.10",
+  "GM.06", "GM.07", "GM.08", "GM.09", "GM.10", "GM.11",
+  "PE.02", "PE.03", "PE.04",
+]);
+function shuffleFreshStageOptions(question:Question):Question{
+  if(!Array.isArray(question.options)||question.options.length<2)return question;
+  const options=fisherYates(question.options);
+  const stage=question.uiProps as Record<string,unknown>|undefined;
+  return stage&&Array.isArray(stage.opcoes)
+    ?{...question,options,uiProps:{...stage,opcoes:options}}
+    :{...question,options};
+}
 export function registeredFichaRuntimeKindOverride(id:string):string|undefined{return SPECIALIZED_RUNTIME_KIND[id]}
 export const COMPOSER_CANARIES=new Set<string>(DEFAULT_COMPOSER_CANARY_IDS);
 export interface GeneratorBinding{gen:Generator;source():GeneratorSource}
 export function hasComposerFicha(id:string):boolean{return Object.prototype.hasOwnProperty.call(COMPOSER_FICHAS,id)}
-export function generateRegisteredFichaQuestion(id:string,level:number):Question{const ficha=COMPOSER_FICHAS[id];if(!ficha)throw new Error(`Ficha Composer não registrada: ${id}.`);const specialized=SPECIALIZED_BUILDERS[id];return specialized?specialized(ficha,level):Composer.generate(ficha,level)}
+export function generateRegisteredFichaQuestion(id:string,level:number):Question{const ficha=COMPOSER_FICHAS[id];if(!ficha)throw new Error(`Ficha Composer não registrada: ${id}.`);const specialized=SPECIALIZED_BUILDERS[id];const question=specialized?specialized(ficha,level):Composer.generate(ficha,level);return CLASS_006_FRESH_OPTION_IDS.has(id)?shuffleFreshStageOptions(question):question}
 function resolveSource(id:string,legacy:Generator|undefined):GeneratorSource{if(COMPOSER_CANARIES.has(id)&&hasComposerFicha(id))return"composer";return legacy?"legacy":"fallback"}
 export function selectGenerator(id:string,legacy:Generator|undefined,fallback:Generator):GeneratorBinding{return{gen:level=>{switch(resolveSource(id,legacy)){case"composer":return generateRegisteredFichaQuestion(id,level);case"legacy":return(legacy as Generator)(level);default:return fallback(level)}},source:()=>resolveSource(id,legacy)}}
 export function enableComposerCanary(id:string):void{if(!hasComposerFicha(id))throw new Error(`Canário inválido para ${id}: registre a ficha autoral em COMPOSER_FICHAS antes de ativar.`);COMPOSER_CANARIES.add(id)}

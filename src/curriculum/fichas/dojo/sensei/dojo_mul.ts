@@ -1,5 +1,6 @@
 import { Question, Track } from "../../../../types";
 import { ri, pick } from "../../../../utils/generators";
+import { fisherYates } from "../../../../utils/shuffle";
 import { stampSenseiDojoQuestion } from "../../../motores/senseiDojoPolicy";
 
 export const gDojoMul = (lvl: number): Question => {
@@ -50,12 +51,12 @@ export const gDojoMul = (lvl: number): Question => {
     false3 = ans + 5;
   }
 
-  const opts = [
+  const opts = fisherYates([
     { label: `${ans}`, value: ans },
     { label: `${false1}`, value: false1 },
     { label: `${false2}`, value: false2 },
     { label: `${false3}`, value: false3 },
-  ].sort(() => Math.random() - 0.5);
+  ]);
 
   return stampSenseiDojoQuestion("dojo_mul", step, {
     kind: "rapid-fire",

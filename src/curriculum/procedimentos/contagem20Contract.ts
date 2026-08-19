@@ -1,6 +1,7 @@
 import { FichaCompetencia } from "../schema";
 import { Option, Question } from "../../types";
 import { MisconceptionTag } from "../../constants/misconceptions";
+import { fisherYates } from "../../utils/shuffle";
 
 const EMOJIS = ["🍎", "🥕", "🐟", "⭐", "🚗", "⚽"];
 
@@ -11,15 +12,14 @@ function randomInt(min: number, max: number) {
 function numericOptions(answer: number, min: number, max: number): Option[] {
   const values = [answer, answer - 1, answer + 1, answer - 2, answer + 2]
     .filter(value => value >= min && value <= max);
-  return [...new Set(values)].slice(0, 4)
+  return fisherYates([...new Set(values)].slice(0, 4)
     .map(value => ({
       label: String(value),
       value,
       ...(value !== answer && Math.abs(value - answer) === 1
         ? { misconception: MisconceptionTag.OFF_BY_ONE }
         : {}),
-    }))
-    .sort(() => Math.random() - 0.5);
+    })));
 }
 
 function sequenceOptions(
@@ -35,7 +35,7 @@ function sequenceOptions(
     })),
   ];
   const seen = new Set<string>();
-  return candidates
+  return fisherYates(candidates
     .filter(candidate => {
       if (seen.has(candidate.value)) return false;
       seen.add(candidate.value);
@@ -45,8 +45,7 @@ function sequenceOptions(
       label: candidate.value,
       value: candidate.value,
       ...(candidate.misconception ? { misconception: candidate.misconception } : {}),
-    }))
-    .sort(() => Math.random() - 0.5);
+    })));
 }
 
 function base(ficha: FichaCompetencia, level: number) {
