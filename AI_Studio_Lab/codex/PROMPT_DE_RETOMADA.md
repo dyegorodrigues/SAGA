@@ -8,7 +8,7 @@
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch: `codex/fechamento-curricular`
 - `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada
-- HEAD de entrada do Gate B · Lote 6: `fac6abb79200e3ae45493d17ea09f9bca41689e4`; o HEAD remoto vivo sempre vence este valor se avançar
+- HEAD de entrada auditado do Gate B · Lote 7: `3c2ed8e44e096df154de3e9f89dbdfb21273c3c4`; o HEAD remoto vivo sempre vence este valor se avançar
 - A API pode reportar `main` como `protected:false`; a regra vinculante permanece **não tocar `main`**.
 
 Antes de QUALQUER escrita futura:
@@ -118,31 +118,46 @@ W1–W50 não devem ser refeitas sem causa nova observável.
 
 ### Lote 6 — N6
 
-Escopo auditado neste snapshot: **N6.01–N6.04, 4/4**.
+- escopo N6.01–N6.04: **4/4**;
+- documento `AI_Studio_Lab/codex/GATE_B_LOTE_6_N6_AUDITORIA.md`;
+- snapshot final `3c2ed8e44e096df154de3e9f89dbdfb21273c3c4`;
+- proveniência: **4 Composer / 0 legado / 0 fallback**;
+- prereqs/faixas coerentes ficha↔DAG;
+- `CLASS-004` criada para viés posicional de gabarito em comparações; `GAP-034` absorvido/reclassificado;
+- `GAP-025` ampliado para F76/N6.02;
+- candidatas N6 `GAP-036`–`GAP-038`, 3 CODIGO;
+- `DECISAO-001/GM.04` permaneceu pendente humana;
+- CI `32291510503` — success;
+- Certificação transversal `32291509536` — success 9/9;
+- correções: 0.
+
+### Lote 7 — N7
+
+Escopo auditado: **N7.01–N7.02, 2/2**.
 
 Documento:
 
-`AI_Studio_Lab/codex/GATE_B_LOTE_6_N6_AUDITORIA.md`
+`AI_Studio_Lab/codex/GATE_B_LOTE_7_N7_AUDITORIA.md`
 
 Resultado materializado:
 
-- proveniência: **4 Composer / 0 legado / 0 fallback**;
-- prereqs/faixas N6 coerentes ficha↔DAG;
-- diagnóstico externo GM.04 registrado na Issue #48 comentário `5346694044`, sem decisão nem correção;
-- contagem correta CLASS-002 confirmada: 10 divergências de campo em 9 competências; classe simples = 8 casos;
-- `CLASS-004` criada para viés posicional de gabarito em comparações; `GAP-034` absorvido/reclassificado;
-- `GAP-025` ampliado para incluir F76/N6.02, sem novo ID;
-- 3 candidatas N6 novas `GAP-036`–`GAP-038`;
-- classe das três: `HIPÓTESE-A-PROVAR`;
-- vias N6: **3 CODIGO / 0 SIMULACAO / 0 CRIANCA**;
-- N6.04 não abriu candidata nova;
-- correções: 0;
-- runtime, Matrix, canário e DAG intocados;
-- N7 **não iniciado**.
+- proveniência: **2 Composer / 0 legado / 0 fallback**;
+- prereqs/faixas N7 coerentes ficha↔DAG;
+- `CLASS-003` ampliada com **N7.01/F84 e N7.02/F85** — um caso fixo por nível sob mastery repetida;
+- `CLASS-004` agravada: N6.01/F75 L4 tem `"direita"` inalcançável no corpus atual e resposta sempre `"esquerda"`; preocupação análoga do caminho L5/revisão foi refutada porque `GameLoop.tsx` usa Fisher–Yates correto;
+- `CLASS-004` ampliada também com **N7.01/F84 L2**, onde o maior é sempre o segundo operando do único caso;
+- `CLASS-005` criada para `.sort(() => Math.random() - 0.5)`: **27 ocorrências** atuais em `src/` (18 Composer + 3 generatorsVisual + 2 contagem20 + 4 Dojo), não 26; classe `CONFIRMADO-ATUAL`, via CODIGO;
+- medição de 200 mil permutações reproduzida: comparador aleatório ~35,93% para elemento 0 permanecer na posição 0, pior desvio 15,49 p.p.; Fisher–Yates pior desvio 0,18 p.p.;
+- gate estático contra comparador aleatório proposto, **não implementado**; prioridade recomendada antes do Gate J;
+- `CLASS-006` criada: em questões **frescas** de N7, os dois contratos serializam a correta primeiro, os palcos preservam a ordem e o GameLoop não embaralha `track.gen(...)`; gabarito é primeira alternativa em **10/10** casos canônicos N7;
+- `GAP-039`: N7.01/F84 troca localização/produção na `InteractiveNumberLine` por reta bloqueada + múltipla escolha; `HIPÓTESE-A-PROVAR`, CODIGO;
+- `GAP-040`: N7.02/F85 L4 verbaliza cancelar dívida, mas não materializa a animação de remoção de dívida/peso exigida pelo cânone v3.1 e a resolução ainda codifica movimento na reta; `HIPÓTESE-A-PROVAR`, CODIGO;
+- falsa suspeita de vazamento via `target` na reta N7 foi refutada: `pulsarTarget=false`;
+- correções executadas: 0;
+- runtime, Matrix, canário, Radar e DAG intocados;
+- **AL não iniciado**.
 
-Registro Issue #48 do Lote 6: `5346763254`.
-
-O snapshot documental do Lote 6 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA**. Ler os recibos do remoto no SHA exato; não reutilizar runs anteriores.
+O snapshot documental final do Lote 7 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA**. Os recibos finais devem ser lidos no remoto e registrados na Issue #48 sem novo commit.
 
 ## 5. Proposta de governança — Gate B′
 
@@ -184,7 +199,7 @@ Vias:
 
 Via é requisito de evidência, não autorização de gate futuro.
 
-## 7. Classes estruturais vigentes após N6
+## 7. Classes estruturais vigentes após N7
 
 ### CLASS-001 — gerador declara `lvl` e não consome
 
@@ -221,19 +236,40 @@ Via é requisito de evidência, não autorização de gate futuro.
 
 - `CONFIRMADO-ATUAL`;
 - via `CODIGO`;
-- membros revalidados: N4.10/F69, N4.11/F70, N4.12/F71, N5.04/F74, N5.05/F86;
-- nenhum novo membro N6.
+- membros revalidados: N4.10/F69, N4.11/F70, N4.12/F71, N5.04/F74, N5.05/F86, **N7.01/F84, N7.02/F85**;
+- N6 não adicionou membro.
 
 ### CLASS-004 — viés posicional de gabarito em comparações
 
 - `CONFIRMADO-ATUAL`;
 - via `CODIGO`;
-- membros observados: N5.03/F73 e N6.01/F75;
+- membros observados: N5.03/F73, N6.01/F75, **N7.01/F84**;
 - `GAP-034` absorvido/reclassificado nesta classe;
-- N6.01 L4 possui quatro pares e em todos a esquerda é maior;
+- N6.01 L4: quatro pares, sempre esquerda maior; ramo `"direita"` inalcançável para o corpus atual;
+- N7.01 L2: único par `−5 × −2`, maior sempre no segundo operando;
+- caminho de revisão do banco em `GameLoop.tsx`: Fisher–Yates correto, refutando preservação sistemática da posição original nesse caminho;
 - teste de equilíbrio de lados + simetria proposto, **não implementado**.
 
-## 8. Candidatas/reclassificações vigentes do Lote 6
+### CLASS-005 — comparador aleatório em `sort`
+
+- `CONFIRMADO-ATUAL`;
+- via `CODIGO`;
+- **27 ocorrências** em `src/` no HEAD de entrada do Lote 7;
+- distribuição não uniforme reproduzida localmente;
+- gate estático/AST proposto para proibir comparador que consuma `Math.random()` em `Array.sort`, com exceções posicionais explícitas e não silenciosas;
+- correção/gate **não implementados**;
+- prioridade recomendada antes do Gate J.
+
+### CLASS-006 — gabarito sempre primeiro no fluxo fresco N7
+
+- `CONFIRMADO-ATUAL`;
+- via `CODIGO`;
+- membros observados: N7.01/F84 e N7.02/F85;
+- 10/10 casos canônicos frescos colocam a correta como primeira opção;
+- `GameLoop` só embaralha as opções no caminho de revisão do banco; `track.gen(...)` fresco retorna sem shuffle;
+- gate de distribuição posicional de gabarito proposto, **não implementado**.
+
+## 8. Candidatas/reclassificações vigentes mais recentes
 
 ### GAP-025 — ampliado para F76/N6.02
 
@@ -245,35 +281,46 @@ Via é requisito de evidência, não autorização de gate futuro.
 
 - `HIPÓTESE-A-PROVAR`;
 - tipos SALTO-DE-DIFICULDADE + MICRONÍVEL-AUSENTE + RESOLUÇÃO-INSUFICIENTE;
-- via CODIGO;
-- 2 de 3 casos L3 exigem empréstimo, sem flag/andaime de reagrupamento; explicação explícita vive no L4.
+- via CODIGO.
 
 ### GAP-037 — N6.03 não exige equivalência entre as quatro notações centrais
 
 - `HIPÓTESE-A-PROVAR`;
 - tipos CONTEÚDO-SÓ-EXPLICADO + REPRESENTAÇÃO-AUSENTE + TRANSFERÊNCIA-AUSENTE + MISCONCEPTION-NÃO-COBERTA;
-- via CODIGO;
-- cânone F87 ancora `25% = 25/100 = 0,25 = 1/4`, mas nenhuma resposta executável observada exige a ponte completa.
+- via CODIGO.
 
 ### GAP-038 — N6.03 L4 pode avançar sem acréscimo
 
 - `HIPÓTESE-A-PROVAR`;
 - tipo VARIEDADE-DE-MASTERY;
-- via CODIGO;
-- corpus L4 = 2 descontos + 1 acréscimo, sem evidência de diversidade obrigatória.
+- via CODIGO.
 
-## 9. Estado acumulado do Gate B após N6
+### GAP-039 — N7.01 troca localização na reta por reconhecimento em botões
+
+- `CANDIDATA` / `HIPÓTESE-A-PROVAR`;
+- tipos REPRESENTAÇÃO-AUSENTE + INTERAÇÃO-AUSENTE + PRODUÇÃO-TROCADA-POR-RECONHECIMENTO;
+- via CODIGO;
+- cânone exige `InteractiveNumberLine`, marcador arrastável e contexto acoplado; palco N7 bloqueia a reta e responde por opções.
+
+### GAP-040 — N7.02 L4 não materializa remoção de dívida do cânone v3.1
+
+- `CANDIDATA` / `HIPÓTESE-A-PROVAR`;
+- tipos REPRESENTAÇÃO-DIVERGENTE + RESOLUÇÃO-DIVERGENTE;
+- via CODIGO;
+- semântica verbal “cancelar dívida” existe, mas não há remoção visual de dívida/peso e a resolução ainda usa deslocamento na reta.
+
+## 9. Estado acumulado do Gate B após N7
 
 Sem promover hipótese a dívida:
 
-- competências auditadas: **54/90**;
-- candidatas individuais: **33**;
-- vias individuais: **28 CODIGO / 1 SIMULACAO / 4 CRIANCA**;
-- classes estruturais: `CLASS-001`, `CLASS-002`, `CLASS-003`, `CLASS-004`;
+- competências auditadas: **56/90**;
+- candidatas individuais: **35**;
+- vias individuais: **30 CODIGO / 1 SIMULACAO / 4 CRIANCA**;
+- classes estruturais: `CLASS-001` a `CLASS-006`;
 - `DECISAO-001/GM.04` separada e pendente humana;
 - correções executadas pelo Gate B: **0**.
 
-A contagem parte de 31 após N5, absorve `GAP-034` em CLASS-004 (-1) e adiciona `GAP-036`–`GAP-038` (+3).
+A contagem parte de 33 após N6 e adiciona `GAP-039`–`GAP-040`, ambas CODIGO.
 
 ## 10. Resíduos preservados
 
@@ -317,29 +364,30 @@ Gate B′ continua proposta, não autoridade nova.
 - ajuda/resolução assistida não compra mastery independente;
 - Gate B serializado por domínio;
 - lote audit-only não implementa a descoberta;
-- não implementar gates de CLASS-001/002/004 neste lote;
+- não implementar gates de CLASS-001–006 neste lote;
 - Gate B′ permanece proposta;
 - Gates C–J não iniciados.
 
-## 14. Condição de parada do Gate B · Lote 6/N6
+## 14. Condição de parada do Gate B · Lote 7/N7
 
 Este lote deve conter somente:
 
-- comentário de diagnóstico externo GM.04 na Issue #48;
-- auditoria/documentação de N6;
+- auditoria/documentação de N7;
 - atualização documental da porta/índice;
-- registro de CLASS-004, ampliação do GAP-025 e GAP-036–038 na Issue #48.
+- registro de `CLASS-003`/`CLASS-004` ampliadas;
+- registro de `CLASS-005`, `CLASS-006`, `GAP-039` e `GAP-040` na Issue #48;
+- confirmação/refutação das verificações externas fornecidas, sem reparo.
 
-Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA** do snapshot documental do Lote 6. Depois dos dois verdes:
+Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA final** do snapshot documental do Lote 7. Depois dos dois verdes:
 
 1. confirmar PR #35 open + draft + unmerged;
 2. confirmar `main` intocada;
 3. reportar classes separadas dos individuais;
-4. reportar N6 por classe e via;
-5. mencionar N7 apenas como próximo domínio natural, sem iniciá-lo;
+4. reportar N7 por classe e via;
+5. mencionar **AL** apenas como próximo domínio natural, sem iniciá-lo;
 6. **PARAR**.
 
-Não corrigir CLASS-001–004, DECISAO-001 ou GAPs. Não iniciar N7, Gate C, Gate G, Gate J, Observatório ou outra frente.
+Não corrigir CLASS-001–006, DECISAO-001 ou GAPs. Não iniciar AL, Gate C, Gate G, Gate J, Observatório ou outra frente.
 
 ## Frente paralela — Observatório (P&D, não runtime)
 
