@@ -8,7 +8,7 @@
 - PR: `#35` — deve permanecer **open + draft + unmerged**
 - Branch: `codex/fechamento-curricular`
 - `main`: `106dfe0d796babebe40ebc36e5a84d4a80b9a858`, intocada
-- HEAD de entrada do Gate B · Lote 2: `ad1b239457371a1f411001fd8521984eeadb94fe`; o HEAD remoto vivo sempre vence este valor se avançar
+- HEAD de entrada do Gate B · Lote 3: `a5101b362ae6d4896258f994ed14145b37950b98`; o HEAD remoto vivo sempre vence este valor se avançar
 - A API pode reportar `main` como `protected:false`; a regra vinculante permanece **não tocar `main`**.
 
 Antes de QUALQUER escrita futura:
@@ -60,47 +60,47 @@ W1–W50 e a cadeia da fábrica não devem ser refeitas sem causa nova observáv
 
 ### Gate B · Lote 1 — N1
 
-Escopo auditado: **N1.01–N1.13, 13/13**.
-
-Documento:
-
-`AI_Studio_Lab/codex/GATE_B_LOTE_1_N1_AUDITORIA.md`
-
-Estado:
-
-- snapshot `ad1b239457371a1f411001fd8521984eeadb94fe`;
-- 10 candidatas `GAP-002`–`GAP-011`;
-- todas `HIPÓTESE-A-PROVAR`;
+- escopo: N1.01–N1.13, 13/13;
+- documento: `AI_Studio_Lab/codex/GATE_B_LOTE_1_N1_AUDITORIA.md`;
+- snapshot: `ad1b239457371a1f411001fd8521984eeadb94fe`;
+- 10 candidatas `GAP-002`–`GAP-011`, todas `HIPÓTESE-A-PROVAR`;
+- vias retroativas: 7 CODIGO / 0 SIMULACAO / 3 CRIANCA;
 - CI `32209683689` success;
 - transversal `32209683699` success 9/9;
 - correções: 0.
 
-Vias de resolução adicionadas retroativamente na Issue #48 sem alterar SHA/estado:
-
-- `CODIGO`: 7 — GAP-002, 003, 004, 007, 008, 010, 011;
-- `CRIANCA`: 3 — GAP-005, 006, 009;
-- `SIMULACAO`: 0.
-
 ### Gate B · Lote 2 — N2
 
-Escopo auditado neste snapshot: **N2.01–N2.07, 7/7**.
+- escopo: N2.01–N2.07, 7/7;
+- documento: `AI_Studio_Lab/codex/GATE_B_LOTE_2_N2_AUDITORIA.md`;
+- snapshot: `a5101b362ae6d4896258f994ed14145b37950b98`;
+- 10 candidatas `GAP-012`–`GAP-021`, todas `HIPÓTESE-A-PROVAR`;
+- vias: 9 CODIGO / 1 SIMULACAO / 0 CRIANCA;
+- CI `32216926616` success;
+- transversal `32216926610` success 9/9;
+- correções: 0.
+
+### Gate B · Lote 3 — N3
+
+Escopo auditado neste snapshot: **N3.01–N3.13, 13/13**, precedido pela varredura estrutural de geradores autorizada pelo usuário.
 
 Documento:
 
-`AI_Studio_Lab/codex/GATE_B_LOTE_2_N2_AUDITORIA.md`
+`AI_Studio_Lab/codex/GATE_B_LOTE_3_N3_AUDITORIA.md`
 
 Resultado materializado:
 
-- 10 candidatas novas `GAP-012`–`GAP-021`;
-- todas `HIPÓTESE-A-PROVAR`;
-- vias: **9 CODIGO / 1 SIMULACAO / 0 CRIANCA**;
+- `CLASS-001` — achado de classe `CONFIRMADO-ATUAL`, via `CODIGO`: **18 geradores** declaram `lvl` sem o consumir diretamente;
+- 7 candidatas N3 `GAP-022`–`GAP-028`;
+- todas as 7 candidatas: `HIPÓTESE-A-PROVAR`;
+- vias das candidatas: **7 CODIGO / 0 SIMULACAO / 0 CRIANCA**;
 - correções: 0;
 - runtime, Matrix, canário e DAG intocados;
-- N3 **não iniciado**.
+- N4 **não iniciado**.
 
-O snapshot documental deste Lote 2 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA**. Ler os recibos do remoto no SHA exato; não reutilizar runs anteriores.
+O snapshot documental deste Lote 3 precisa de **CI success + Certificação transversal success 9/9 no mesmo SHA**. Ler os recibos do remoto no SHA exato; não reutilizar runs anteriores.
 
-Próximo lote proposto, **não autorizado automaticamente**: **Gate B · Lote 3 — N3**.
+Próximo lote proposto, **não autorizado automaticamente**: **Gate B · Lote 4 — N4**.
 
 ## 5. Disciplina de evidência do Gate B
 
@@ -115,12 +115,16 @@ Usar as classes da Issue #47 §0.2:
 
 Para Issue #48:
 
-- suspeita nasce `CANDIDATA`;
+- suspeita curricular nasce `CANDIDATA`;
 - fato observável que sustenta a suspeita não transforma automaticamente a conclusão em dívida;
 - não criar ficha, micronível, aresta, regra de mastery ou correção no mesmo lote audit-only;
 - só mudar estado da candidata quando a investigação/decisão adequada produzir evidência suficiente.
 
-### VIA DE RESOLUÇÃO — regra vigente a partir do Lote 2
+### Achado de classe
+
+Um achado estrutural objetivamente revalidado pode ser registrado como `ACHADO-DE-CLASSE` e `CONFIRMADO-ATUAL`, separado das candidatas curriculares. No Lote 3 isso vale para `CLASS-001`; **não criar um GAP por competência apenas porque seu gerador participa do padrão**.
+
+### VIA DE RESOLUÇÃO
 
 Toda candidata deve declarar uma das três vias:
 
@@ -128,11 +132,26 @@ Toda candidata deve declarar uma das três vias:
 - **`SIMULACAO`** — só fecha por campanha de Aprendiz Simulado no Gate G.
 - **`CRIANCA`** — só fecha por observação de criança real no Gate J.
 
-A via é **requisito de evidência**, não autorização de execução. Uma candidata `SIMULACAO` não abre Gate G; uma `CRIANCA` não abre Gate J.
+A via é requisito de evidência, não autorização de execução. Uma candidata `SIMULACAO` não abre Gate G; uma `CRIANCA` não abre Gate J.
 
 Regra permanente: documento antigo não vira estado atual por existir no repositório. Revalidar no HEAD antes de afirmar que algo ainda funciona/falha ou mantém a mesma magnitude.
 
-## 6. Resíduos preservados
+## 6. CLASS-001 — contrato estrutural de nível
+
+No HEAD de entrada do Lote 3, a varredura de `generators.ts`, `generatorsF1.ts`, `generatorsF2.ts` e `generatorsVisual.ts` confirmou **18 geradores** cujo parâmetro se chama `lvl` e não é referenciado no próprio corpo.
+
+Distribuição:
+
+- `generators.ts`: 4;
+- `generatorsF1.ts`: 4;
+- `generatorsF2.ts`: 4;
+- `generatorsVisual.ts`: 6.
+
+A lista nominal e os falsos positivos recusados estão no documento do Lote 3.
+
+Gate proposto, **não implementado**: teste AST/estático deve falhar quando um gerador declara `lvl` e não possui referência executável ao identificador; wrappers que encaminham `lvl` passam; `_lvl` é supressão explícita. A ativação só pode ocorrer em frente de correção autorizada, não neste lote.
+
+## 7. Resíduos preservados
 
 - 15 competências legado — `CONFIRMADO-ATUAL`;
 - 11 divergências ficha↔screen — `CONFIRMADO-ATUAL`;
@@ -141,9 +160,9 @@ Regra permanente: documento antigo não vira estado atual por existir no reposit
 - Issue #48 — `DÍVIDA-REGISTRADA` como registro vivo; suas candidatas não são dívidas confirmadas;
 - Observatório / Research Foundry — `DÍVIDA-REGISTRADA`, subordinado à Issue #47 e sem autorização de implementação.
 
-N2.04 e N2.05 serem legado é parte do resíduo confirmado; as candidatas do Lote 2 sobre sua **semântica/progressão** continuam `HIPÓTESE-A-PROVAR`.
+Oito nós N3 permanecem servidos pelo legado; isso é parte do resíduo confirmado. `CLASS-001` e as candidatas N3 não autorizam migração/correção neste lote.
 
-## 7. Gate J — precondição de linha de base
+## 8. Gate J — precondição de linha de base
 
 Antes do primeiro uso sério por cada criança, permanece a precondição de uma **linha de base fora do motor adaptativo, em papel**.
 
@@ -151,19 +170,19 @@ A exigência vem da Research Foundry, D067, e de `03_architecture/OBSERVATORIO_E
 
 A obrigação está registrada; a coleta **não foi iniciada** no Gate B.
 
-## 8. Hierarquia de autoridade pós-90/90
+## 9. Hierarquia de autoridade pós-90/90
 
 1. GitHub remoto e autoridades executáveis do HEAD;
 2. Issue #47 para fase e Definition of Child-Ready;
 3. documentos canônicos especializados de cada gate;
-4. Issue #48 como registro vivo dos gaps do Gate B;
+4. Issue #48 como registro vivo dos gaps/achados do Gate B;
 5. `ROADMAP_90_90_CHILD_READY.md` como índice executivo;
 6. documentos dos lotes Gate B como auditorias de escopo;
 7. documentos históricos somente como evidência a revalidar.
 
 A Foundry não cria segunda autoridade. D067 determina que Issue #47 vence divergências e que o Observatório é material de apoio das gates, não fila concorrente.
 
-## 9. Regras invioláveis do PR #35
+## 10. Regras invioláveis do PR #35
 
 - GitHub remoto vence memória/checkpoint;
 - `main` não é área de trabalho;
@@ -181,26 +200,28 @@ A Foundry não cria segunda autoridade. D067 determina que Issue #47 vence diver
 - CI verde isolado nunca significa Child-Ready;
 - Gate B é serializado por domínio/lote;
 - lote audit-only **não implementa a própria descoberta**;
-- via `SIMULACAO`/`CRIANCA` não autoriza Gate G/J.
+- via `SIMULACAO`/`CRIANCA` não autoriza Gate G/J;
+- `CLASS-001` é achado, não autorização para editar geradores ou criar seu gate agora.
 
-## 10. Condição de parada do Gate B · Lote 2/N2
+## 11. Condição de parada do Gate B · Lote 3/N3
 
 Este lote deve conter somente:
 
-- auditoria/documentação de N2;
+- varredura/auditoria documental do padrão estrutural `lvl`;
+- auditoria/documentação de N3;
 - atualização documental da porta/índice;
-- registro das candidatas N2 na Issue #48;
-- comentário retroativo de VIA DE RESOLUÇÃO das candidatas N1.
+- registro de `CLASS-001` e das candidatas N3 na Issue #48.
 
-Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA** do snapshot documental do Lote 2. Depois dos dois verdes:
+Exigir **CI success + Certificação transversal success 9/9 no mesmo SHA** do snapshot documental do Lote 3. Depois dos dois verdes:
 
 1. confirmar PR #35 open + draft + unmerged;
 2. confirmar `main` intocada;
-3. reportar achados N2 por classe e por via;
-4. propor **N3** como lote seguinte, sem iniciá-lo;
-5. **parar**.
+3. reportar `CLASS-001` separadamente dos achados individuais;
+4. reportar candidatas N3 por classe e por via;
+5. propor **N4** como lote seguinte, sem iniciá-lo;
+6. **parar**.
 
-Não corrigir GAP-002–GAP-021 neste lote. Não iniciar N3, Gate C, Gate G, Gate J, Observatório ou outra grande frente.
+Não corrigir `CLASS-001` nem GAP-022–GAP-028. Não iniciar N4, Gate C, Gate G, Gate J, Observatório ou outra grande frente.
 
 ## Frente paralela — Observatório (P&D, não runtime)
 
