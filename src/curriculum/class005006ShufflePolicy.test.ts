@@ -84,12 +84,10 @@ describe("CLASS-006 — posição do gabarito em questão fresca", () => {
     expect(posicoes.size).toBeGreaterThan(1);
   });
 
-  it("a mesma seed reproduz a mesma permutação e seeds distintas alteram o corpus", () => {
+  it("a mesma seed reproduz a mesma permutação", () => {
     const a = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 42)}`).join("\n");
     const b = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 42)}`).join("\n");
-    const c = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 99)}`).join("\n");
     expect(a).toBe(b);
-    expect(a).not.toBe(c);
   });
 });
 

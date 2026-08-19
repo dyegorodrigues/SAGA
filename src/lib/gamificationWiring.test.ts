@@ -31,8 +31,14 @@ describe("Wiring da gamificação", () => {
 
   it("double tap e retries intermediários permanecem antes do terminal premiável", () => {
     expect(gameLoopSource).toContain("if (status || answeredRef.current) return;");
-    expect(gameLoopSource).toContain("return; // não avança, não marca answeredRef");
-    expect(gameLoopSource).toContain("answeredRef.current = true;");
+    const firstRetry = gameLoopSource.indexOf("if (qErrors === 0)");
+    const secondRetry = gameLoopSource.indexOf("if (qErrors === 1)", firstRetry + 1);
+    const terminal = gameLoopSource.indexOf("answeredRef.current = true;");
+    expect(firstRetry).toBeGreaterThanOrEqual(0);
+    expect(secondRetry).toBeGreaterThan(firstRetry);
+    expect(terminal).toBeGreaterThan(secondRetry);
+    expect(gameLoopSource.slice(firstRetry, secondRetry)).toContain("return;");
+    expect(gameLoopSource.slice(secondRetry, terminal)).toContain("return;");
   });
 
   it("bônus da primeira missão é congelado na sessão e replay não o reaplica", () => {
