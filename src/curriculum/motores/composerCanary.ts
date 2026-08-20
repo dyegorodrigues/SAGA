@@ -118,11 +118,14 @@ const CLASS_006_ORDEM_SEMANTICA = new Set<string>([
 ]);
 function shuffleFreshStageOptions(question:Question):Question{
   if(!Array.isArray(question.options)||question.options.length<2)return question;
-  const options=fisherYates(question.options);
+  const permutation=fisherYates(question.options.map((_,index)=>index));
+  const options=permutation.map(index=>question.options![index]);
   const stage=question.uiProps as Record<string,unknown>|undefined;
-  return stage&&Array.isArray(stage.opcoes)
-    ?{...question,options,uiProps:{...stage,opcoes:options}}
-    :{...question,options};
+  if(!stage||!Array.isArray(stage.opcoes))return{...question,options};
+  const stageOptions=stage.opcoes.length===permutation.length
+    ?permutation.map(index=>stage.opcoes[index])
+    :fisherYates(stage.opcoes);
+  return{...question,options,uiProps:{...stage,opcoes:stageOptions}};
 }
 export function registeredFichaRuntimeKindOverride(id:string):string|undefined{return SPECIALIZED_RUNTIME_KIND[id]}
 export const COMPOSER_CANARIES=new Set<string>(DEFAULT_COMPOSER_CANARY_IDS);
