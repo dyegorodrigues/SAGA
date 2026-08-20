@@ -1,8 +1,8 @@
 {
-  "AI_Studio_Lab/tools/coverage_matrix_core.ts": 0,
-  "AI_Studio_Lab/tools/ficha_runtime_map.cjs": 0,
+  "AI_Studio_Lab/tools/coverage_matrix_core.ts": 2,
+  "AI_Studio_Lab/tools/ficha_runtime_map.cjs": 31,
   "src/components/GameLoop.tsx": 89,
-  "src/constants/evidencias.ts": 0,
-  "src/constants/misconceptions.ts": 0,
+  "src/constants/evidencias.ts": 204,
+  "src/constants/misconceptions.ts": 220,
   "src/curriculum/Composer.ts": 152
 }
