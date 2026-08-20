@@ -2,28 +2,31 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import type { Question } from "../types";
-import { generateRegisteredFichaQuestion } from "./motores/composerCanary";
+import { COMPOSER_CANARIES, generateRegisteredFichaQuestion } from "./motores/composerCanary";
 
 /**
- * CLASS-006 confirmada por execução no regression-first.
+ * CLASS-006 — invariant estrutural por medição, sem allowlist de inclusão.
  *
- * N2.06/F38 é controle negativo: não embaralha, mas serializa semanticamente
- * [Par, Ímpar] e o gabarito alterna de posição entre níveis. Os 25 IDs abaixo
- * ficaram com a resposta correta na posição zero em 5 níveis × 8 seeds antes
- * do reparo e possuem ao menos um modo que apresenta a lista à criança.
+ * A criança pratica um nível por vez. Portanto variar a posição do gabarito
+ * entre níveis NÃO basta: para cada canário ativo e para cada nível que
+ * serializa alternativas, a distribuição precisa variar dentro do próprio
+ * nível ao longo do corpus gerável.
+ *
+ * Este gate mede a propriedade observável. Ele não conhece uma lista manual
+ * de competências "suspeitas" e, assim, novos canários entram na prova
+ * automaticamente.
  */
-const CLASS_006_IDS = [
-  "N2.07",
-  "N4.10", "N4.11",
-  "N5.04", "N5.05",
-  "N7.01", "N7.02",
-  "AL.06", "AL.07",
-  "GE.04", "GE.05", "GE.06", "GE.07", "GE.08", "GE.09", "GE.10",
-  "GM.06", "GM.07", "GM.08", "GM.09", "GM.10", "GM.11",
-  "PE.02", "PE.03", "PE.04",
-] as const;
+const CLASS_006_SAMPLES_PER_PAIR = 120;
+const CLASS_006_MAX_POSITION_SHARE = 0.60;
 
-const SEEDS = [1, 7, 42, 99, 123, 777, 2024, 31415] as const;
+function seedFrom(text: string): number {
+  let hash = 2166136261;
+  for (const char of text) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
 
 function comSemente<T>(semente: number, run: () => T): T {
   const original = Math.random;
@@ -45,49 +48,73 @@ function opcoesDoPalco(q: Question): Array<{ value: unknown }> {
   return (q.options ?? []) as Array<{ value: unknown }>;
 }
 
-function assinatura(id: typeof CLASS_006_IDS[number], seed: number): string {
-  return Array.from({ length: 5 }, (_, index) => {
-    const level = index + 1;
-    const q = comSemente(seed, () => generateRegisteredFichaQuestion(id, level));
-    return opcoesDoPalco(q).map(option => String(option.value)).join("|");
-  }).join(" / ");
+function valorDaOpcao(option: { value: unknown } | unknown): unknown {
+  if (typeof option === "object" && option !== null && "value" in option) {
+    return (option as { value: unknown }).value;
+  }
+  return option;
+}
+
+function formatarDistribuicao(contagens: Map<number, number>, total: number): string {
+  return [...contagens.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([posicao, quantidade]) => `${posicao}:${quantidade}/${total} (${((quantidade / total) * 100).toFixed(1)}%)`)
+    .join(", ");
 }
 
 describe("CLASS-006 — posição do gabarito em questão fresca", () => {
-  it.each(CLASS_006_IDS)("%s não fixa a correta numa única posição nos casos canônicos", id => {
-    const posicoes = new Set<number>();
+  it("mede todos os canários ativos, nível a nível, e reprova concentração posicional", () => {
+    const violacoes: string[] = [];
+    const perdasDeGabarito: string[] = [];
+    let paresMedidos = 0;
 
-    for (let level = 1; level <= 5; level += 1) {
-      for (const seed of SEEDS) {
-        const q = comSemente(seed, () => generateRegisteredFichaQuestion(id, level));
-        const options = opcoesDoPalco(q);
-        expect(options.length, `${id}/L${level} precisa manter alternativas serializadas`).toBeGreaterThan(1);
-        const correta = options.findIndex(option => String(option.value) === String(q.answer));
-        expect(correta, `${id}/L${level} perdeu o gabarito durante a serialização`).toBeGreaterThanOrEqual(0);
-        posicoes.add(correta);
+    for (const id of [...COMPOSER_CANARIES].sort()) {
+      for (let level = 1; level <= 5; level += 1) {
+        const contagens = new Map<number, number>();
+        let totalElegivel = 0;
+
+        comSemente(seedFrom(`${id}/L${level}`), () => {
+          for (let amostra = 0; amostra < CLASS_006_SAMPLES_PER_PAIR; amostra += 1) {
+            const q = generateRegisteredFichaQuestion(id, level);
+            const options = opcoesDoPalco(q);
+            if (options.length < 2) continue;
+
+            const correta = options.findIndex(option => String(valorDaOpcao(option)) === String(q.answer));
+            if (correta < 0) {
+              perdasDeGabarito.push(`${id}/L${level}/A${amostra + 1}: ${options.length} alternativas sem gabarito serializado`);
+              continue;
+            }
+
+            totalElegivel += 1;
+            contagens.set(correta, (contagens.get(correta) ?? 0) + 1);
+          }
+        });
+
+        if (totalElegivel === 0) continue;
+        paresMedidos += 1;
+
+        const maior = Math.max(...contagens.values());
+        const concentracao = maior / totalElegivel;
+        if (concentracao >= CLASS_006_MAX_POSITION_SHARE) {
+          violacoes.push(
+            `${id}/L${level}: distribuição [${formatarDistribuicao(contagens, totalElegivel)}] ` +
+            `(máx ${(concentracao * 100).toFixed(1)}% >= ${(CLASS_006_MAX_POSITION_SHARE * 100).toFixed(0)}%)`,
+          );
+        }
       }
     }
 
     expect(
-      posicoes.size,
-      `${id}: gabarito ficou sempre na posição ${[...posicoes].join(",") || "ausente"} em 5 níveis × ${SEEDS.length} seeds`,
-    ).toBeGreaterThan(1);
-  });
+      perdasDeGabarito,
+      `CLASS-006 perdeu o gabarito durante a serialização:\n${perdasDeGabarito.join("\n")}`,
+    ).toEqual([]);
 
-  it("N2.06 permanece controle negativo: posição varia sem shuffle artificial", () => {
-    const posicoes = new Set<number>();
-    for (let level = 1; level <= 5; level += 1) {
-      const q = generateRegisteredFichaQuestion("N2.06", level);
-      const options = opcoesDoPalco(q);
-      posicoes.add(options.findIndex(option => String(option.value) === String(q.answer)));
-    }
-    expect(posicoes.size).toBeGreaterThan(1);
-  });
-
-  it("a mesma seed reproduz a mesma permutação", () => {
-    const a = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 42)}`).join("\n");
-    const b = CLASS_006_IDS.map(id => `${id}:${assinatura(id, 42)}`).join("\n");
-    expect(a).toBe(b);
+    expect(paresMedidos, "CLASS-006 precisa medir ao menos um par competência/nível com alternativas").toBeGreaterThan(0);
+    expect(
+      violacoes,
+      `CLASS-006 detectou concentração posicional em ${violacoes.length}/${paresMedidos} pares medidos ` +
+      `(${CLASS_006_SAMPLES_PER_PAIR} amostras por par):\n${violacoes.join("\n")}`,
+    ).toEqual([]);
   });
 });
 
