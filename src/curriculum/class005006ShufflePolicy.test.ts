@@ -71,16 +71,16 @@ function opcoesDoPalco(q: Question): Array<{ value: unknown }> {
 /**
  * Identidade de uma alternativa.
  *
- * A maioria dos palcos serializa `value`. `shapecanvas` (GE.02) serializa a
- * figura — `{ cor, figura, giro, tamanho }` — e o gabarito é o nome da figura.
- * Sem reconhecer isso, a medição não encontrava o gabarito e a competência saía
- * silenciosamente da amostra: um ponto cego dentro do portão criado justamente
- * para não ter pontos cegos.
+ * A maioria dos palcos serializa `value`; F30 serializa `valor`; `shapecanvas`
+ * (GE.02) serializa a figura — `{ cor, figura, giro, tamanho }` — e o gabarito é
+ * o nome da figura. Sem reconhecer isso, a medição não encontrava o gabarito e a
+ * competência saía silenciosamente da amostra: um ponto cego dentro do portão
+ * criado justamente para não ter pontos cegos.
  *
  * Chave desconhecida continua caindo em `perdasDeGabarito`, que reprova. Formato
  * novo não some da medição — aparece como falha.
  */
-const CHAVES_DE_IDENTIDADE = ["value", "figura"] as const;
+const CHAVES_DE_IDENTIDADE = ["value", "valor", "figura"] as const;
 
 function valorDaOpcao(option: { value: unknown } | unknown): unknown {
   if (typeof option === "object" && option !== null) {
