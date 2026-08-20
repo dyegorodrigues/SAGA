@@ -53,6 +53,7 @@
   "src/curriculum/fichas/jornada/N4.09.ts": 30,
   "src/curriculum/motores/aulaProgressContext.ts": 31,
   "src/curriculum/motores/composer.ts": 70,
+  "src/curriculum/motores/composerCanary.ts": 32,
   "src/curriculum/motores/composerCanaryIds.ts": 54,
   "src/curriculum/motores/curriculum.ts": 25,
   "src/curriculum/motores/jardimCausalPrescription.ts": 31,

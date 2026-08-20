@@ -16,8 +16,28 @@ import { COMPOSER_CANARIES, generateRegisteredFichaQuestion } from "./motores/co
  * de competências "suspeitas" e, assim, novos canários entram na prova
  * automaticamente.
  */
-const CLASS_006_SAMPLES_PER_PAIR = 120;
-const CLASS_006_MAX_POSITION_SHARE = 0.60;
+const CLASS_006_SAMPLES_PER_PAIR = 200;
+
+/**
+ * Quantos desvios-padrão acima do uniforme antes de reprovar.
+ *
+ * Limiar fixo não serve: com `k` alternativas o esperado é `1/k`, então 60% é
+ * severo demais para uma questão de duas alternativas — onde o próprio acaso
+ * ultrapassa 60% com frequência — e frouxo demais para uma de quatro, em que 55%
+ * já é o dobro do esperado e passaria batido.
+ *
+ * O limiar aqui é `1/k + 4σ`, com `σ = sqrt(p(1-p)/n)`. Quatro desvios deixam a
+ * chance de falso positivo por par na casa de 1 em dezenas de milhares, o que
+ * mantém a suíte estável nas ~293 medições sem perder viés real: qualquer
+ * concentração de origem estrutural fica ordens de grandeza acima disso.
+ */
+const CLASS_006_SIGMAS = 4;
+
+function limiarDeConcentracao(alternativas: number, amostras: number): number {
+  const uniforme = 1 / alternativas;
+  const sigma = Math.sqrt((uniforme * (1 - uniforme)) / amostras);
+  return Math.min(0.99, uniforme + CLASS_006_SIGMAS * sigma);
+}
 
 function seedFrom(text: string): number {
   let hash = 2166136261;
@@ -48,9 +68,25 @@ function opcoesDoPalco(q: Question): Array<{ value: unknown }> {
   return (q.options ?? []) as Array<{ value: unknown }>;
 }
 
+/**
+ * Identidade de uma alternativa.
+ *
+ * A maioria dos palcos serializa `value`. `shapecanvas` (GE.02) serializa a
+ * figura — `{ cor, figura, giro, tamanho }` — e o gabarito é o nome da figura.
+ * Sem reconhecer isso, a medição não encontrava o gabarito e a competência saía
+ * silenciosamente da amostra: um ponto cego dentro do portão criado justamente
+ * para não ter pontos cegos.
+ *
+ * Chave desconhecida continua caindo em `perdasDeGabarito`, que reprova. Formato
+ * novo não some da medição — aparece como falha.
+ */
+const CHAVES_DE_IDENTIDADE = ["value", "figura"] as const;
+
 function valorDaOpcao(option: { value: unknown } | unknown): unknown {
-  if (typeof option === "object" && option !== null && "value" in option) {
-    return (option as { value: unknown }).value;
+  if (typeof option === "object" && option !== null) {
+    for (const chave of CHAVES_DE_IDENTIDADE) {
+      if (chave in option) return (option as Record<string, unknown>)[chave];
+    }
   }
   return option;
 }
@@ -70,7 +106,12 @@ describe("CLASS-006 — posição do gabarito em questão fresca", () => {
 
     for (const id of [...COMPOSER_CANARIES].sort()) {
       for (let level = 1; level <= 5; level += 1) {
-        const contagens = new Map<number, number>();
+        // Agrupado por número de alternativas: o mesmo par pode gerar listas de
+        // tamanhos diferentes quando alternativas duplicadas colapsam. Misturar
+        // tamanhos sub-representa as últimas posições e cria falso positivo — a
+        // posição 3 só existe nas amostras que tiveram 4 alternativas.
+        const porTamanho = new Map<number, Map<number, number>>();
+        const totalPorTamanho = new Map<number, number>();
         let totalElegivel = 0;
 
         comSemente(seedFrom(`${id}/L${level}`), () => {
@@ -86,20 +127,31 @@ describe("CLASS-006 — posição do gabarito em questão fresca", () => {
             }
 
             totalElegivel += 1;
+            const k = options.length;
+            if (!porTamanho.has(k)) porTamanho.set(k, new Map());
+            const contagens = porTamanho.get(k) as Map<number, number>;
             contagens.set(correta, (contagens.get(correta) ?? 0) + 1);
+            totalPorTamanho.set(k, (totalPorTamanho.get(k) ?? 0) + 1);
           }
         });
 
         if (totalElegivel === 0) continue;
         paresMedidos += 1;
 
-        const maior = Math.max(...contagens.values());
-        const concentracao = maior / totalElegivel;
-        if (concentracao >= CLASS_006_MAX_POSITION_SHARE) {
-          violacoes.push(
-            `${id}/L${level}: distribuição [${formatarDistribuicao(contagens, totalElegivel)}] ` +
-            `(máx ${(concentracao * 100).toFixed(1)}% >= ${(CLASS_006_MAX_POSITION_SHARE * 100).toFixed(0)}%)`,
-          );
+        for (const [k, contagens] of [...porTamanho].sort(([a], [b]) => a - b)) {
+          const total = totalPorTamanho.get(k) as number;
+          // Amostra pequena demais não decide nada: o desvio esperado engole o sinal.
+          if (total < 30) continue;
+          const maior = Math.max(...contagens.values());
+          const concentracao = maior / total;
+          const limiar = limiarDeConcentracao(k, total);
+          if (concentracao >= limiar) {
+            violacoes.push(
+              `${id}/L${level} com ${k} alternativas: distribuição ` +
+              `[${formatarDistribuicao(contagens, total)}] ` +
+              `(máx ${(concentracao * 100).toFixed(1)}% >= limiar ${(limiar * 100).toFixed(1)}%)`,
+            );
+          }
         }
       }
     }
@@ -113,7 +165,7 @@ describe("CLASS-006 — posição do gabarito em questão fresca", () => {
     expect(
       violacoes,
       `CLASS-006 detectou concentração posicional em ${violacoes.length}/${paresMedidos} pares medidos ` +
-      `(${CLASS_006_SAMPLES_PER_PAIR} amostras por par):\n${violacoes.join("\n")}`,
+      `(${CLASS_006_SAMPLES_PER_PAIR} amostras por par, limiar 1/k + ${CLASS_006_SIGMAS}σ):\n${violacoes.join("\n")}`,
     ).toEqual([]);
   });
 });
