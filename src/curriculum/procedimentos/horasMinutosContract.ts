@@ -97,7 +97,7 @@ export function construirHorasMinutosQuestion(ficha: FichaCompetencia, level: nu
   if (!micro) throw new Error(`GM.06 sem micro L${spec.nivel}.`);
   const prompt = spec.modo === "duracao"
     ? `Quanto tempo passou de ${spec.duracao?.inicio} até ${spec.duracao?.fim}?`
-    : `O ponteiro grande marca ${spec.horario.minutos} minutos. Quantos minutos são?`;
+    : "Observe o relógio. Quantos minutos o ponteiro grande marca?";
   const options: Option[] = spec.opcoes;
   return {
     kind: "horas-minutos-f62", prompt, audioPrompt: prompt, howto: ficha.howto, explain: ficha.explain,
