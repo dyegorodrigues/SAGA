@@ -20,12 +20,15 @@ describe("HorasMinutosStage — F62 / GM.06", () => {
   });
 
   it("não imprime o horário digital que entrega os minutos antes da leitura", () => {
-    const spec = construirHorasMinutosSpec(2);
-    const { container } = render(<HorasMinutosStage spec={spec} onAnswer={vi.fn()} />);
-    const header = container.querySelector<HTMLElement>("[data-f62-stage] header");
+    for (let nivel = 1; nivel <= 4; nivel += 1) {
+      const spec = construirHorasMinutosSpec(nivel);
+      const { container } = render(<HorasMinutosStage spec={spec} onAnswer={vi.fn()} />);
+      const header = container.querySelector<HTMLElement>("[data-f62-stage] header");
+      const digital = `${String(spec.horario.horas).padStart(2, "0")}:${String(spec.horario.minutos).padStart(2, "0")}`;
 
-    expect(header).not.toBeNull();
-    expect(header?.textContent).not.toContain("04:25");
+      expect(header).not.toBeNull();
+      expect(header?.textContent).not.toContain(digital);
+    }
   });
 
   it("não resolve nem destaca a duração-alvo antes da tentativa", () => {
@@ -36,5 +39,6 @@ describe("HorasMinutosStage — F62 / GM.06", () => {
     expect(timeline).not.toBeNull();
     expect(timeline?.textContent).not.toContain("60 min + 15 min = 75 min");
     expect(timeline?.querySelector(".border-dashed")).toBeNull();
+    expect(timeline?.textContent).toContain("120");
   });
 });
