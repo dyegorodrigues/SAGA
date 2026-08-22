@@ -50,7 +50,8 @@ export function diagnosticar(acao: AcaoDeMedida): string | undefined {
 
 /** §9: pelo menos um acerto no caso que contradiz a aparência. */
 export function evidenciasDe(acao: AcaoDeMedida): string[] {
-  return acertou(acao) && acao.contraintuitivo
+  const verificacaoCumprida = acao.modo !== "capacidade" || acao.verificou;
+  return acertou(acao) && acao.contraintuitivo && verificacaoCumprida
     ? [Evidencia.CASO_CONTRAINTUITIVO]
     : [];
 }

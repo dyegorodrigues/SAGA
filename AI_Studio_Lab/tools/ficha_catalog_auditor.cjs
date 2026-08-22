@@ -11,6 +11,7 @@ const COMPOSER_PATH = path.join(ROOT, "src/curriculum/Composer.ts");
 const COMPOSER_CANARY_PATH = path.join(ROOT, "src/curriculum/motores/composerCanary.ts");
 const RENDERER_PATHS = [
   path.join(ROOT, "src/components/FichaRenderer.tsx"),
+  path.join(ROOT, "src/components/FichaRendererBase.tsx"),
   path.join(ROOT, "src/components/gameloop/GameLoopExerciseRenderer.tsx"),
 ];
 // P21/P22: o número de fichas é métrica derivada. Cobertura canônica, IDs,
@@ -157,12 +158,6 @@ for (const entry of FICHA_RUNTIME_MAP) {
     check(rendererTem(kind), `${entry.primitive} declara renderer ausente para ${kind}`);
   }
 
-  /**
-   * Guarda REVERSA contra documentação atrasada.
-   *
-   * Para primitivas cujo nome autoral vira naturalmente o dispatch kind, se
-   * código e renderer já provam a cadeia, o mapa é obrigado a reconhecê-la.
-   */
   const kindConvencional = entry.primitive.replace(/[^A-Za-z0-9]/g, "").toLowerCase();
   if (composerTem(kindConvencional) && rendererTem(kindConvencional)) {
     check(

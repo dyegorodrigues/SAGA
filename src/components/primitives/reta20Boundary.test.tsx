@@ -22,7 +22,13 @@ function vizinhoErradoQueNaoEhOrigem(spec: Reta20Spec): number {
 
 describe("F19 — Reta20Stage → FichaRenderer → AnswerMeta", () => {
   it("±1 preciso chega ao Radar como OFF_BY_ONE, não como escorregão motor", () => {
+    // O contrato de runtime é aleatório por design; o boundary não pode depender
+    // de uma amostra que às vezes produz 1 → 0, onde o único vizinho ±1 é a
+    // própria origem. Fixamos apenas a fixture para provar OFF_BY_ONE sempre.
+    const random = vi.spyOn(Math, "random").mockReturnValue(0.5);
     const q = qDoNivel(3);
+    random.mockRestore();
+
     const spec = q.uiProps as Reta20Spec;
     const onAnswer = vi.fn();
     const { container } = render(<FichaRenderer question={q} onAnswer={onAnswer} />);

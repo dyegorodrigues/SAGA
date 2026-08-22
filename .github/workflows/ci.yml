@@ -1,9 +1,7 @@
 name: CI
 
-# Roda os mesmos gates que o protocolo do projeto já exige antes de publicar.
-# A intenção é que "checks verdes" deixe de depender de alguém lembrar de rodar
-# tudo localmente e passe a ser condição verificável no PR.
-
+# Faixa rápida do PR. As sondas transversais longas vivem em
+# certificacao-transversal.yml e nunca são canceladas por pushes posteriores.
 on:
   pull_request:
     branches: [main]
@@ -71,87 +69,10 @@ jobs:
           PR_BASE: origin/main
         run: npm run pr:check
 
-  # Em 11/08/2026 o contrato completo foi executado em um único job de 30m:
-  # 390px × 8 sementes terminou limpo (~27m30s), mas o job expirou já em 320px.
-  # Os dois jobs abaixo preservam exatamente o contrato de scripts/sonda-layout.mjs
-  # e apenas paralelizam as larguras: 390/8 sementes + 320/900/1 semente.
-  sonda-transversal-portao:
-    name: Sonda transversal — 390px × 8 sementes
-    runs-on: ubuntu-latest
-    timeout-minutes: 35
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 1
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Instalar dependências
-        run: npm ci
-
-      - name: Resolver Chrome do runner
-        shell: bash
-        run: |
-          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          if [ -z "$CHROME_BIN" ]; then
-            echo "Chrome/Chromium não encontrado no runner." >&2
-            exit 1
-          fi
-          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
-          "$CHROME_BIN" --version
-
-      - name: Sonda transversal — portão canônico
-        env:
-          SONDA_LARGURAS: '390'
-        run: npm run sonda
-
-  sonda-transversal-responsiva:
-    name: Sonda transversal — 320/900px × 1 semente
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-          fetch-depth: 1
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: npm
-
-      - name: Instalar dependências
-        run: npm ci
-
-      - name: Resolver Chrome do runner
-        shell: bash
-        run: |
-          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          if [ -z "$CHROME_BIN" ]; then
-            echo "Chrome/Chromium não encontrado no runner." >&2
-            exit 1
-          fi
-          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
-          "$CHROME_BIN" --version
-
-      - name: Sonda transversal — larguras responsivas
-        env:
-          SONDA_LARGURAS: '320,900'
-          SONDA_SEMENTES: '1'
-        run: npm run sonda
-
   sonda-sensei-dojo:
     name: Sonda real Sensei
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     if: github.event_name == 'pull_request'
 
     steps:
@@ -226,6 +147,69 @@ jobs:
           path: .artifacts/sonda-comparacao/
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Sonda real F36 — Quadrado100 registrado e inativo
+        run: npm run sonda:quadrado100
+
+      - name: Evidências da sonda F36
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f36-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-quadrado100/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F13 — VisualAddition registrado e inativo
+        run: npm run sonda:visual-addition
+
+      - name: Evidências da sonda F13
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f13-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-visual-addition/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F15 — EmojiRow#riscar registrado e inativo
+        run: npm run sonda:emojirow-riscar
+
+      - name: Evidências da sonda F15
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f15-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-emojirow-riscar/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F14 — counting on registrado e inativo
+        run: npm run sonda:counting-on
+
+      - name: Evidências da sonda F14
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f14-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-counting-on/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F30 — contagem por saltos registrada e inativa
+        run: npm run sonda:skip-count
+
+      - name: Evidências da sonda F30
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonda-f30-${{ github.event.pull_request.head.sha }}
+          path: .artifacts/sonda-skip-count/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Sonda real F97 — grupos iguais registrada e inativa
+        run: npm run sonda:equal-groups
 
   higiene-diff:
     name: Higiene do diff

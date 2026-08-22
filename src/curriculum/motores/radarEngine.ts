@@ -8,6 +8,15 @@
 
 import { Progress } from "../../types";
 import { MisconceptionTag, type MisconceptionTagType } from "../../constants/misconceptions";
+import { PrimosDivisoresMisconception, type PrimosDivisoresMisconceptionTag } from "../../constants/primosDivisoresMisconceptions";
+import { DivisaoDoisDigitosMisconception, type DivisaoDoisDigitosMisconceptionTag } from "../../constants/divisaoDoisDigitosMisconceptions";
+import { SomaFracoesMisconception, type SomaFracoesMisconceptionTag } from "../../constants/somaFracoesMisconceptions";
+import { RazaoProporcaoMisconception, type RazaoProporcaoMisconceptionTag } from "../../constants/razaoProporcaoMisconceptions";
+import { EquacoesMisconception, type EquacoesMisconceptionTag } from "../../constants/equacoesMisconceptions";
+import { ContasVirgulaMisconception, type ContasVirgulaMisconceptionTag } from "../../constants/contasVirgulaMisconceptions";
+import { VolumePrismasMisconception, type VolumePrismasMisconceptionTag } from "../../constants/volumePrismasMisconceptions";
+import { EstatisticaChanceMisconception, type EstatisticaChanceMisconceptionTag } from "../../constants/estatisticaChanceMisconceptions";
+import { MultiplicarFracoesMisconception, type MultiplicarFracoesMisconceptionTag } from "../../constants/multiplicarFracoesMisconceptions";
 import { calendarDayDistance, dayKeyFromNowInput, localDay } from "../../utils/calendarDay";
 
 export const SPACING_INTERVALS: Record<number, number> = {
@@ -20,7 +29,18 @@ export const SPACING_INTERVALS: Record<number, number> = {
 
 /** Janela máxima de tempo para 2 erros da mesma tag serem considerados o mesmo padrão (10 min) */
 const MAX_MISCONCEPTION_INTERVAL_MS = 10 * 60 * 1000;
-const CANONICAL_MISCONCEPTION_TAGS = new Set<string>(Object.values(MisconceptionTag));
+const CANONICAL_MISCONCEPTION_TAGS = new Set<string>([
+  ...Object.values(MisconceptionTag),
+  ...Object.values(PrimosDivisoresMisconception),
+  ...Object.values(DivisaoDoisDigitosMisconception),
+  ...Object.values(SomaFracoesMisconception),
+  ...Object.values(RazaoProporcaoMisconception),
+  ...Object.values(EquacoesMisconception),
+  ...Object.values(ContasVirgulaMisconception),
+  ...Object.values(VolumePrismasMisconception),
+  ...Object.values(EstatisticaChanceMisconception),
+  ...Object.values(MultiplicarFracoesMisconception),
+]);
 
 /**
  * O Radar conceitual aceita somente o catálogo canônico.
@@ -29,7 +49,9 @@ const CANONICAL_MISCONCEPTION_TAGS = new Set<string>(Object.values(Misconception
  * são misconceptions matemáticas e não podem abrir Oficina. A validação também
  * protege saves antigos que já carreguem strings históricas fora do catálogo.
  */
-export function isCanonicalMisconceptionTag(tag: string): tag is MisconceptionTagType {
+export function isCanonicalMisconceptionTag(
+  tag: string,
+): tag is MisconceptionTagType | PrimosDivisoresMisconceptionTag | DivisaoDoisDigitosMisconceptionTag | SomaFracoesMisconceptionTag | RazaoProporcaoMisconceptionTag | EquacoesMisconceptionTag | ContasVirgulaMisconceptionTag | VolumePrismasMisconceptionTag | EstatisticaChanceMisconceptionTag | MultiplicarFracoesMisconceptionTag {
   return CANONICAL_MISCONCEPTION_TAGS.has(tag);
 }
 
@@ -175,7 +197,6 @@ export function evaluateSpacedRepetition(
   }
 
   const nextReviewDays = SPACING_INTERVALS[newForce] || 1;
-
   return { nextReviewDays, newForce };
 }
 

@@ -2,127 +2,62 @@ import { afterEach, describe, expect, it } from "vitest";
 import { geradorLegadoDe, getTrackById } from "./curriculum";
 import { applyJourneyAnswer } from "./progressEngine";
 import { trackMisconception } from "./radarEngine";
-import {
-  COMPOSER_CANARIES,
-  rollbackComposerCanary,
-  enableComposerCanary,
-  generateRegisteredFichaQuestion,
-} from "./composerCanary";
-import { N3_09 } from "../fichas/jornada/N3.09";
-import { N3_10 } from "../fichas/jornada/N3.10";
-import { N4_03 } from "../fichas/jornada/N4.03";
-import { N4_04 } from "../fichas/jornada/N4.04";
-import { N4_07 } from "../fichas/jornada/N4.07";
-import { N4_06 } from "../fichas/jornada/N4.06";
-import { N4_08 } from "../fichas/jornada/N4.08";
-import { N4_09 } from "../fichas/jornada/N4.09";
-import { N1_03 } from "../fichas/jornada/N1.03";
-import { N1_05 } from "../fichas/jornada/N1.05";
-import { N1_07 } from "../fichas/jornada/N1.07";
-import { N1_08 } from "../fichas/jornada/N1.08";
-import { N1_09 } from "../fichas/jornada/N1.09";
-import { N1_10 } from "../fichas/jornada/N1.10";
-import { N1_11 } from "../fichas/jornada/N1.11";
-import { N1_12 } from "../fichas/jornada/N1.12";
-import { N2_01 } from "../fichas/jornada/N2.01";
-import { N2_03 } from "../fichas/jornada/N2.03";
-import { AL_01 } from "../fichas/jornada/AL.01";
-import { AL_02 } from "../fichas/jornada/AL.02";
-import { N1_04 } from "../fichas/jornada/N1.04";
-import { N1_06 } from "../fichas/jornada/N1.06";
-import { N1_13 } from "../fichas/jornada/N1.13";
-import { GE_01 } from "../fichas/jornada/GE.01";
-import { GE_02 } from "../fichas/jornada/GE.02";
-import { GM_01 } from "../fichas/jornada/GM.01";
-import { GM_02 } from "../fichas/jornada/GM.02";
-import { GM_05 } from "../fichas/jornada/GM.05";
-import { GM_12 } from "../fichas/jornada/GM.12";
-import { N1_02 } from "../fichas/jornada/N1.02";
-import { N1_01 } from "../fichas/jornada/N1.01";
+import { COMPOSER_CANARIES, rollbackComposerCanary, enableComposerCanary, generateRegisteredFichaQuestion } from "./composerCanary";
+import { JOURNEY_FICHAS } from "../fichas";
 import { Progress, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
 import { misconceptionForAnswer } from "../../components/gameloop/answerPolicy";
 
 /**
- * Contrato do canário — o padrão que TODO nó promovido precisa cumprir.
- *
- * Este arquivo existe porque N3.10 foi promovido com nove verificações e N3.09,
- * promovido antes, tinha apenas paridade. Dois canários em produção com padrões
- * diferentes é dívida silenciosa: o mais fraco só aparece quando quebra.
- *
- * A suíte **enumera `COMPOSER_CANARIES`** em vez de listar nós à mão. Promover
- * um nó novo sem registrar sua ficha aqui falha imediatamente, de modo que o
- * padrão não depende de alguém lembrar de aplicá-lo.
+ * O contrato não mantém uma segunda lista manual de fichas: o catálogo de
+ * Jornada é a autoridade. Assim toda promoção ainda precisa estar registrada,
+ * mas uma onda nova não cria dívida de bookkeeping paralela ao catálogo.
  */
-
-/**
- * Cada canário declara APENAS sua ficha.
- *
- * O gerador legado não é declarado: é descoberto em `geradorLegadoDe`. Declarar
- * seria uma chance de declarar errado, e um legado errado faria a paridade
- * comparar a ficha nova com a coisa errada — passando sem verificar nada.
- *
- * A distinção que isso revela: nem toda promoção substitui algo.
- * - **Substituição** — o nó tinha gerador próprio. Paridade faz sentido.
- * - **Estreia** — o nó caía no placeholder "Em construção!". Paridade não quer
- *   dizer nada; o que importa é que ele deixou de ser um placeholder.
- *
- * Importante: este contrato usa `generateRegisteredFichaQuestion`, a mesma
- * porta que `selectGenerator` usa em produção. Assim builders procedimentais
- * especializados (como N1.09, N2.01, N2.03, GM.02 e GM.05) não ganham caminho de teste paralelo.
- */
-const REGISTRO: Record<string, FichaCompetencia> = {
-  "N3.09": N3_09,
-  "N3.10": N3_10,
-  "N4.03": N4_03,
-  "N4.04": N4_04,
-  "N4.07": N4_07,
-  "N4.06": N4_06,
-  "N4.08": N4_08,
-  "N4.09": N4_09,
-
-  // Bloco F0. Estes nós são servidos por ficha autoral de produção sob o
-  // mesmo contrato, inclusive os builders procedimentais especializados.
-  "N1.03": N1_03,
-  "N1.05": N1_05,
-  "N1.07": N1_07,
-  "N1.08": N1_08,
-  "N1.09": N1_09,
-  "N1.10": N1_10,
-  "N1.11": N1_11,
-  "AL.01": AL_01,
-
-  "N1.01": N1_01,
-  "N1.02": N1_02,
-  "N1.04": N1_04,
-  "N1.06": N1_06,
-
-  "N1.13": N1_13,
-  "GE.01": GE_01,
-  "GE.02": GE_02,
-  "GM.01": GM_01,
-  "GM.02": GM_02,
-  "GM.12": GM_12,
-
-  // W3 — F21: substituição do legado pela experiência autoral de agrupamento.
-  "N2.01": N2_01,
-
-  // W6 — F29: substituição do legado por comparação simbólica Grupo-backed.
-  "N2.03": N2_03,
-
-  // W4 — F19: substituição do legado pela reta interativa autoral. O rollback
-  // continua descoberto por `geradorLegadoDe`, como em toda substituição.
-  "N1.12": N1_12,
-
-  // W5 — F61: estreia real. Antes da promoção GM.05 era fallback; por isso o
-  // próprio contrato deve provar rollback→placeholder e reativação→Composer.
-  "GM.05": GM_05,
-
-  "AL.02": AL_02,
-};
+const REGISTRO: Record<string, FichaCompetencia> = Object.fromEntries(
+  JOURNEY_FICHAS.map(ficha => [ficha.id, ficha]),
+);
 
 const CANARIOS = [...COMPOSER_CANARIES];
 const progressoInicial = (): Progress => ({ lvl: 1, mast: 0, streak: 0 } as Progress);
+
+/**
+ * O piso numérico de cada canário sai da ficha, não de uma lista de exceções
+ * mantida aqui.
+ *
+ * O contrato exigia `>= 0` de todo número em qualquer nó. Isso valeu enquanto
+ * o currículo inteiro vivia nos naturais: ali um negativo na tela só podia ser
+ * gerador estourando um limite. A F84 ensina o sinal, e a mesma regra passou a
+ * recusar `-3` — que é o gabarito correto de N7.01 no L1.
+ *
+ * A saída não é remover a regra nem abrir exceção por id: é perguntar à ficha
+ * qual conjunto ela ensina. Quem não declara nada continua nos naturais, então
+ * os outros canários seguem protegidos exatamente como antes, e um gerador que
+ * comece a produzir negativos por engano ainda quebra o contrato.
+ */
+const pisoNumericoDe = (id: string): number => (REGISTRO[id]?.dominioNumerico === "inteiros" ? -Infinity : 0);
+
+/**
+ * Relaxar o conjunto não pode virar cheque em branco — mas a régua também não
+ * pode ser mais estreita que o currículo.
+ *
+ * Este contrato já foi corrigido uma vez pelo mesmo motivo. Na W24 ele exigia
+ * `>= 0` de todo número, e a F84 chegou ensinando o sinal: `-3` virou o gabarito
+ * recusado. A lição registrada então dizia, textualmente, *"inteiros agora,
+ * racionais depois"*.
+ *
+ * Aconteceu na W36. A F93 ensina **conversão de unidades**, onde `1,5 m` é
+ * conteúdo e o distrator `0,01` é o erro de quem inverteu a operação — um
+ * diagnóstico correto, não um gerador quebrado. `Number.isInteger` recusava.
+ *
+ * Então a exigência de inteiro passa a valer só onde o inteiro É o conjunto.
+ * **O que nunca se relaxa é a finitude:** `NaN` e `Infinity` continuam sendo
+ * defeito de gerador em qualquer ficha, em qualquer conjunto.
+ */
+const exigirNumeroDoConjunto = (valor: number, id: string, contexto: string) => {
+  expect(Number.isFinite(valor), `${contexto}: número não finito`).toBe(true);
+  if (REGISTRO[id]?.dominioNumerico === "racionais") return;
+  expect(Number.isInteger(valor), `${contexto}: número não inteiro`).toBe(true);
+};
 
 describe("contrato do canário do Composer", () => {
   afterEach(() => {
@@ -132,10 +67,7 @@ describe("contrato do canário do Composer", () => {
 
   it("todo canário ativo está registrado neste contrato", () => {
     const semRegistro = CANARIOS.filter(id => !REGISTRO[id]);
-    expect(
-      semRegistro,
-      "promover um nó exige declarar aqui sua ficha e seu gerador legado",
-    ).toEqual([]);
+    expect(semRegistro, "promover um nó exige declarar aqui sua ficha").toEqual([]);
   });
 
   describe.each(CANARIOS)("%s", id => {
@@ -151,7 +83,6 @@ describe("contrato do canário do Composer", () => {
     it("o rollback devolve o nó ao que havia antes, e a reativação o traz de volta", () => {
       rollbackComposerCanary(id);
       expect(getTrackById(id)?.generatorSource).toBe(ehEstreia ? "fallback" : "legacy");
-
       enableComposerCanary(id);
       expect(getTrackById(id)?.generatorSource).toBe("composer");
     });
@@ -162,31 +93,23 @@ describe("contrato do canário do Composer", () => {
           const autoral = gerarAutoral(lvl);
           expect(autoral.evaluate?.(autoral.answer), `${id} autoral L${lvl}`).toBe(true);
           expect(autoral.isFallback, `${id} L${lvl} devolveu placeholder`).toBeFalsy();
-
-          expect(autoral.answer, `${id} autoral L${lvl}: sem gabarito`)
-            .not.toBeUndefined();
-          expect(String(autoral.answer ?? "").length, `${id} autoral L${lvl}: gabarito vazio`)
-            .toBeGreaterThan(0);
+          expect(autoral.answer, `${id} autoral L${lvl}: sem gabarito`).not.toBeUndefined();
+          expect(String(autoral.answer ?? "").length, `${id} autoral L${lvl}: gabarito vazio`).toBeGreaterThan(0);
           if (autoral.options?.length) {
-            expect(
-              autoral.options.map(o => String(o.value)),
-              `${id} autoral L${lvl}: gabarito fora das alternativas`,
-            ).toContain(String(autoral.answer));
+            expect(autoral.options.map(o => String(o.value)), `${id} autoral L${lvl}: gabarito fora das alternativas`).toContain(String(autoral.answer));
           }
           if (typeof autoral.answer === "number") {
-            expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(0);
+            exigirNumeroDoConjunto(autoral.answer, id, `${id} autoral L${lvl}`);
+            expect(autoral.answer, `${id} autoral L${lvl}`).toBeGreaterThanOrEqual(pisoNumericoDe(id));
           }
         }
       }
     });
 
-    it(ehEstreia
-      ? "estreia: o nó deixou de ser placeholder"
-      : "paridade: o gerador legado continua produzindo questão válida", () => {
+    it(ehEstreia ? "estreia: o nó deixou de ser placeholder" : "paridade: o gerador legado continua produzindo questão válida", () => {
       if (ehEstreia) {
         rollbackComposerCanary(id);
-        expect(getTrackById(id)?.gen(1).isFallback,
-          `${id} não era placeholder antes: isto deveria ser substituição, não estreia`).toBe(true);
+        expect(getTrackById(id)?.gen(1).isFallback, `${id} não era placeholder antes`).toBe(true);
         enableComposerCanary(id);
         expect(getTrackById(id)?.gen(1).isFallback).toBeFalsy();
         return;
@@ -202,7 +125,6 @@ describe("contrato do canário do Composer", () => {
       const antes = getTrackById(id);
       rollbackComposerCanary(id);
       const depois = getTrackById(id);
-
       expect(antes?.id).toBe(id);
       expect(depois?.id).toBe(id);
       expect(antes?.graphId).toBe(depois?.graphId);
@@ -251,49 +173,89 @@ describe("contrato do canário do Composer", () => {
         for (let i = 0; i < 30; i += 1) {
           const q = gerarAutoral(lvl);
           if (!q.options?.length) continue;
-          const certas = q.options.filter(o => o.value === q.answer);
-          expect(certas, `${id} L${lvl}`).toHaveLength(1);
+          expect(q.options.filter(o => o.value === q.answer), `${id} L${lvl}`).toHaveLength(1);
         }
       }
     });
 
-    it("a tela nunca oferece mais de quatro alternativas", () => {
+    it("a superfície de resposta respeita o contrato de cada palco", () => {
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 40; i += 1) {
           const q = gerarAutoral(lvl);
           if (!q.options) continue;
-
           const teclado = (q.uiProps as { tecladoAte?: number } | undefined)?.tecladoAte;
-          if (typeof teclado === "number" && teclado > 0) {
-            expect(q.options.length, `${id} L${lvl}: teclado fora do escopo`).toBe(teclado);
-            expect(q.options.map(o => o.value), `${id} L${lvl}: teclado sem a resposta`)
-              .toContain(q.answer);
+          if (q.kind === "emojirow-riscar-f15") {
+            expect(teclado, `${id} L${lvl}: teto do teclado autoral`).toBe(10);
+            expect(typeof q.answer, `${id} L${lvl}: resposta do teclado`).toBe("number");
+            expect(Number(q.answer), `${id} L${lvl}: resposta abaixo de zero`).toBeGreaterThanOrEqual(0);
+            expect(Number(q.answer), `${id} L${lvl}: resposta acima do teclado`).toBeLessThanOrEqual(teclado!);
+            expect(new Set(q.options.map(o => o.value)).size, `${id} L${lvl}: diagnósticos duplicados`).toBe(q.options.length);
+            expect(q.options.map(o => o.value), `${id} L${lvl}: diagnóstico sem gabarito`).toContain(q.answer);
             continue;
           }
-
-          expect(q.options.length, `${id} L${lvl}: ${q.options.length} opções`)
-            .toBeLessThanOrEqual(4);
+          if (q.kind === "reta-completa-f84") {
+            // O palco onde o negativo é conteúdo é também onde o contrato
+            // precisa ser mais específico: perdido o `>= 0` genérico, quem
+            // segura um gerador fora de eixo é a própria reta desenhada.
+            const reta = q.uiProps as { inicio: number; fim: number; pontos: number[]; modo: string };
+            const comprimento = reta.fim - reta.inicio;
+            expect(reta.inicio, `${id} L${lvl}: reta não alcança o negativo`).toBeLessThan(0);
+            expect(reta.fim, `${id} L${lvl}: reta não alcança o positivo`).toBeGreaterThan(0);
+            for (const ponto of reta.pontos) {
+              expect(ponto, `${id} L${lvl}: ponto fora da reta`).toBeGreaterThanOrEqual(reta.inicio);
+              expect(ponto, `${id} L${lvl}: ponto fora da reta`).toBeLessThanOrEqual(reta.fim);
+            }
+            if (reta.modo === "localizar" || reta.modo === "comparar-negativos") {
+              // Posição: o gabarito é um lugar na reta, e precisa caber nela.
+              expect(Number(q.answer), `${id} L${lvl}: gabarito à esquerda da reta`).toBeGreaterThanOrEqual(reta.inicio);
+              expect(Number(q.answer), `${id} L${lvl}: gabarito à direita da reta`).toBeLessThanOrEqual(reta.fim);
+            } else if (reta.modo === "distancia" || reta.modo === "modulo") {
+              // Distância: aqui o sinal continua proibido no gabarito — medida
+              // negativa é erro, mesmo numa ficha que ensina negativos.
+              expect(Number(q.answer), `${id} L${lvl}: distância negativa`).toBeGreaterThanOrEqual(0);
+              expect(Number(q.answer), `${id} L${lvl}: distância maior que a reta`).toBeLessThanOrEqual(comprimento);
+            } else {
+              // Ordenação: a resposta é a sequência crescente dos pontos.
+              const ordem = String(q.answer).split(",").map(Number);
+              expect(ordem, `${id} L${lvl}: ordem sem todos os pontos`).toHaveLength(reta.pontos.length);
+              expect([...ordem].sort((a, b) => a - b), `${id} L${lvl}: ordem não é crescente`).toEqual(ordem);
+              expect([...ordem].sort((a, b) => a - b), `${id} L${lvl}: ordem não usa os pontos da reta`)
+                .toEqual([...reta.pontos].sort((a, b) => a - b));
+            }
+            for (const o of q.options) {
+              if (typeof o.value !== "number") continue;
+              expect(Math.abs(o.value), `${id} L${lvl}: alternativa fora da escala da reta`).toBeLessThanOrEqual(comprimento);
+            }
+            expect(q.options.map(o => String(o.value)), `${id} L${lvl}: alternativas sem o gabarito`).toContain(String(q.answer));
+            continue;
+          }
+          if (typeof teclado === "number" && teclado > 0) {
+            expect(q.options.length, `${id} L${lvl}: teclado fora do escopo`).toBe(teclado);
+            expect(q.options.map(o => o.value), `${id} L${lvl}: teclado sem a resposta`).toContain(q.answer);
+            continue;
+          }
+          expect(q.options.length, `${id} L${lvl}: ${q.options.length} opções`).toBeLessThanOrEqual(4);
           expect(q.options.length, `${id} L${lvl}`).toBeGreaterThanOrEqual(2);
         }
       }
     });
 
-    it("erro: nenhuma alternativa numérica é negativa", () => {
+    it("erro: nenhuma alternativa numérica sai do conjunto que a ficha ensina", () => {
+      const piso = pisoNumericoDe(id);
       for (let lvl = 1; lvl <= 5; lvl += 1) {
         for (let i = 0; i < 30; i += 1) {
           const q = gerarAutoral(lvl);
           for (const o of q.options ?? []) {
             if (typeof o.value !== "number") continue;
-            expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(0);
+            exigirNumeroDoConjunto(o.value, id, `${id} L${lvl}`);
+            expect(o.value, `${id} L${lvl}`).toBeGreaterThanOrEqual(piso);
           }
         }
       }
     });
 
     it("erro: 500 amostras sem laço infinito nem exceção", () => {
-      expect(() => {
-        for (let i = 0; i < 500; i += 1) gerarAutoral((i % 5) + 1);
-      }).not.toThrow();
+      expect(() => { for (let i = 0; i < 500; i += 1) gerarAutoral((i % 5) + 1); }).not.toThrow();
     });
   });
 });

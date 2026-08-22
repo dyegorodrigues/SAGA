@@ -13,6 +13,17 @@ describe("F50 — diagnóstico e evidência", () => {
     expect(evidenciasDe(base)).toEqual([Evidencia.CASO_CONTRAINTUITIVO]);
     expect(evidenciasDe({ ...base, escolhido: 1 })).toEqual([]);
   });
+  it("não concede evidência contraintuitiva de capacidade antes da verificação física", () => {
+    const capacidadeSemVerificar: AcaoDeMedida = {
+      ...base,
+      modo: "capacidade",
+      formatosDiferentes: true,
+      verificou: false,
+    };
+
+    expect(evidenciasDe(capacidadeSemVerificar)).toEqual([]);
+    expect(evidenciasDe({ ...capacidadeSemVerificar, verificou: true })).toEqual([Evidencia.CASO_CONTRAINTUITIVO]);
+  });
   it("nomeia julgamento pelo tamanho no peso", () => {
     expect(diagnosticar({ ...base, escolhido: 1 })).toBe(MisconceptionTag.JULGA_PELO_TAMANHO);
   });

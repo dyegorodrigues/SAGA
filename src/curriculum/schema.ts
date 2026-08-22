@@ -1,7 +1,7 @@
 // schema.ts
 // Definindo o contrato estrito para o Motor de Fichas (Substituindo os generators.ts hardcoded)
 
-export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "scattered" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza" | "moldura" | "medidas" | "regua";
+export type KindType = "tenframe" | "bond" | "numberline" | "vertical" | "draggroup" | "arraygrid" | "balanca" | "relogio" | "quadrado100" | "shapecanvas" | "emojirow" | "tens" | "plain" | "scattered" | "storypanel" | "audiochoice" | "intruso_math" | "tabuada" | "decomposicao" | "ancora" | "familia" | "deslocamento" | "area" | "pareamento" | "touchcount" | "fileira" | "classificacao" | "touchplace" | "grandeza" | "moldura" | "medidas" | "regua" | "visual-addition";
 
 export interface FichaParams {
   [key: string]: unknown;
@@ -37,6 +37,19 @@ export interface FichaDominio {
    * existe para o painel dos pais dizer, em português, o que falta.
    */
   exige?: { evidencia: string; descricao: string };
+  /**
+   * Variedade histórica de processo — OPT-IN por micro/ficha.
+   *
+   * Ausente = sem efeito: a regra de domínio continua exatamente `acertos/de`,
+   * independência, `exige` quando houver e sessões espaçadas. Presente = a
+   * sessão só amadurece depois de existirem pelo menos `minimo` evidências
+   * históricas distintas cujo nome começa com `prefixo`.
+   *
+   * A condição nunca é inferida globalmente pelo motor e RT/velocidade jamais
+   * contam como diversidade. Isso preserva as competências já fechadas e deixa
+   * a autoria da exigência no lugar certo: a própria ficha.
+   */
+  evidenciasDistintas?: { prefixo: string; minimo: number; descricao?: string };
   /**
    * Ponte representacional: impede subir de nível enquanto uma condição desta
    * micro ainda não foi demonstrada. Útil quando o próximo nível troca de
@@ -98,7 +111,30 @@ export interface FichaCompetencia {
   prereqs: string[]; // IDs de outras competências
   bncc?: string;
   excecaoCPA?: "perceptual" | "espacial"; // Quando a competência foge da regra CPA (ex: pareamento)
-  
+
+  /**
+   * O conjunto numérico que a competência ensina.
+   *
+   * Omitir significa `naturais`, e o contrato do canário recusa qualquer
+   * gabarito ou alternativa negativa. Essa é a regra certa para quase todo o
+   * currículo: numa ficha de contagem ou de subtração, um `-2` na tela é bug
+   * de gerador, não conteúdo.
+   *
+   * `inteiros` vale para quem ensina o sinal como conteúdo (a strand N7).
+   *
+   * `racionais` vale para quem ensina medida fracionada — conversão de unidades,
+   * decimais, frações. Ali `1,5 m` é conteúdo, e o distrator `0,01` é o erro
+   * pedagógico de quem inverteu a operação, não defeito de gerador. Mesmo neste
+   * conjunto o contrato continua exigindo número **finito**: `NaN` e `Infinity`
+   * seguem sendo bug em qualquer ficha da Jornada.
+   *
+   * A declaração fica na ficha, e não numa lista de exceções dentro do teste,
+   * porque o conjunto numérico é propriedade da competência — quem promove um
+   * nó com negativos precisa afirmar isso onde o nó é definido.
+   */
+  dominioNumerico?: "naturais" | "inteiros" | "racionais";
+
+
   // Contrato Universal
   niveis?: Record<number, FichaNivel>;
   howto?: string;
@@ -117,7 +153,10 @@ export class CurriculumValidator {
     if (!ficha.strand) errors.push("Strand faltando");
     if (!ficha.faixa) errors.push("Faixa faltando");
     if (!Array.isArray(ficha.prereqs)) errors.push("Pré-requisitos devem ser um array");
-    
+    if (ficha.dominioNumerico && !["naturais", "inteiros", "racionais"].includes(ficha.dominioNumerico)) {
+      errors.push(`Domínio numérico inválido '${ficha.dominioNumerico}' em ${ficha.id}`);
+    }
+
     // Validações do Contrato Universal
     if (!ficha.howto) errors.push(`Contrato Universal: 'howto' faltando em ${ficha.id}`);
     if (!ficha.explain) errors.push(`Contrato Universal: 'explain' faltando em ${ficha.id}`);

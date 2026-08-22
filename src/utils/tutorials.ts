@@ -1,12 +1,8 @@
-import { Question } from "../types";
+import type { Question } from "../types";
+import type { TutStep } from "../contracts/pedagogySteps";
 import { LEGACY_CHOREOGRAPHIES } from "./choreographyRegistry";
 
-export interface TutStep {
-  say: string;
-  ms?: number;
-  show?: string | number | Record<string, any>;
-  sync?: "junto" | "depois";
-}
+export type { TutStep } from "../contracts/pedagogySteps";
 
 export const hasTutorial = (q: Question | string | undefined | null): boolean => {
   if (!q) return false;

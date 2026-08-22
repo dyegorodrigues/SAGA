@@ -16,6 +16,22 @@ import { evidenciasReta20 as daReta } from "./procedimentos/reta20Procedure";
 import { construirReguaSpec } from "./procedimentos/reguaContract";
 import { evidenciasDaRegua as daRegua } from "./procedimentos/reguaProcedure";
 import { evidenciasComparacaoSimbolica as daComparacaoSimbolica } from "./procedimentos/comparacaoSimbolicaProcedure";
+import { construirQuadrado100Spec } from "./procedimentos/quadrado100Contract";
+import { evidenciasQuadrado100 as doQuadrado100 } from "./procedimentos/quadrado100Procedure";
+import { evidenciasVisualAddition as daAdicaoVisual } from "./procedimentos/visualAdditionProcedure";
+import { evidenciasDetetiveFormas as daSimetria } from "./procedimentos/detetiveFormasProcedure";
+import { cortesAlvoPartesIguais, evidenciasPartesIguais as dasPartesIguais } from "./procedimentos/partesIguaisProcedure";
+import { evidenciasPerimetro as doPerimetro } from "./procedimentos/perimetroContract";
+import { evidenciasDivisaoDoisDigitosF71 as daDivisaoDoisDigitos } from "./procedimentos/divisaoDoisDigitosContract";
+import { construirRazaoProporcaoF88Spec } from "./procedimentos/razaoProporcaoContract";
+import { evidenciasRazaoProporcaoF88 as daRazaoProporcao } from "./procedimentos/razaoProporcaoEvidence";
+import { construirEquacoesF90Spec } from "./procedimentos/equacoesContract";
+import { evidenciasEquacoesF90 as daEquacao } from "./procedimentos/equacoesEvidence";
+import { construirContasVirgulaF76Spec } from "./procedimentos/contasVirgulaContract";
+import { evidenciasContasVirgulaF76 as dasContasVirgula } from "./procedimentos/contasVirgulaEvidence";
+import { construirVolumePrismasF94Spec, evidenciasVolumePrismasF94 as doVolumePrismas } from "./procedimentos/volumePrismasContract";
+import { construirEstatisticaChanceF95Spec, evidenciasEstatisticaChanceF95 as daEstatisticaChance } from "./procedimentos/estatisticaChanceContract";
+import { construirMultiplicarFracoesF86Spec, evidenciasMultiplicarFracoesF86 as daMultiplicacaoFracoes } from "./procedimentos/multiplicarFracoesContract";
 
 /**
  * O portão da P13: a regra extra da §9 chega mesmo ao motor?
@@ -133,6 +149,91 @@ const EMISSORES: { nome: string; evidencia: string; emitir: () => string[] }[] =
       correta: true,
     }),
   },
+  {
+    nome: "F36 (Quadrado100) — percurso vertical +10 completo",
+    evidencia: Evidencia.PERCURSO_VERTICAL_QUADRADO100,
+    emitir: () => {
+      const spec = construirQuadrado100Spec(2, () => 0.4);
+      return doQuadrado100({
+        modo: spec.modo,
+        inicio: spec.inicio,
+        caminho: [...spec.caminho],
+        toques: [...spec.caminho],
+        erros: [],
+        esperado: spec.alvo,
+        ultimoToque: spec.alvo,
+        acertosParciais: spec.caminho.length,
+        revisoes: 0,
+        completo: true,
+      }, spec);
+    },
+  },
+  {
+    nome: "F13 (VisualAddition) — acerto L4 sem objetos",
+    evidencia: Evidencia.ADICAO_SEM_OBJETOS,
+    emitir: () => daAdicaoVisual({
+      nivel: 4,
+      resposta: 5,
+      correta: true,
+      juntou: true,
+      usouAjuda: false,
+      revisoes: 0,
+    }),
+  },
+  {
+    nome: "F58 (DetetiveFormas) — acerto do eixo de simetria no L4",
+    evidencia: Evidencia.SIMETRIA_EIXO,
+    emitir: () => daSimetria({
+      nivel: 4,
+      eixoEscolhido: "horizontal",
+      eixoCorreto: "horizontal",
+    }),
+  },
+  {
+    nome: "F45 (Partes Iguais) — divisão correta em partes iguais no L4",
+    evidencia: Evidencia.PARTES_IGUAIS_DIVISAO,
+    emitir: () => dasPartesIguais({ nivel: 4, denominador: 3, cortes: cortesAlvoPartesIguais(3) }),
+  },
+  {
+    nome: "F63 (perímetro) — acerto L4 separa a volta do chão interno",
+    evidencia: Evidencia.PERIMETRO_VS_AREA,
+    emitir: () => doPerimetro(4, true),
+  },
+  {
+    nome: "F71 (divisão por dois dígitos) — ajustou a primeira estimativa após o teste",
+    evidencia: Evidencia.AJUSTE_PRIMEIRA_ESTIMATIVA_F71,
+    emitir: () => daDivisaoDoisDigitos(true),
+  },
+  {
+    nome: "F88 (razão e proporção) — preserva a relação com fator não inteiro",
+    evidencia: Evidencia.ESCALA_NAO_INTEIRA_F88,
+    emitir: () => daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), true),
+  },
+  {
+    nome: "F90 (equações) — acerto real em equação de L3 ou superior",
+    evidencia: Evidencia.EQUACAO_L3_MAIS_F90,
+    emitir: () => daEquacao(construirEquacoesF90Spec(3, () => 0), true),
+  },
+  {
+    nome: "F76 (contas com vírgula) — acerto com quantidades diferentes de casas decimais",
+    evidencia: Evidencia.CONTAS_VIRGULA_CASAS_DIFERENTES_F76,
+    emitir: () => dasContasVirgula(construirContasVirgulaF76Spec(2, () => 0), true),
+  },
+  {
+    nome: "F94 (volume de prismas) — dimensão faltante recuperada a partir do volume e da área da base",
+    evidencia: Evidencia.DIMENSAO_FALTANTE_F94,
+    emitir: () => doVolumePrismas(construirVolumePrismasF94Spec(4), true),
+  },
+  {
+    nome: "F95 (estatística e chance) — chance escrita como favoráveis sobre o total",
+    evidencia: Evidencia.CHANCE_FRACAO_F95,
+    emitir: () => daEstatisticaChance(construirEstatisticaChanceF95Spec(3), true),
+  },
+  {
+    nome: "F86 (multiplicar frações) — fração por fração comprovada pela interseção de áreas",
+    evidencia: Evidencia.FRACAO_VEZES_FRACAO_F86,
+    emitir: () => daMultiplicacaoFracoes(construirMultiplicarFracoesF86Spec(3), true),
+  },
 ];
 
 describe("P13 — a evidência declarada existe do lado de quem emite", () => {
@@ -226,5 +327,44 @@ describe("P13 — a evidência declarada existe do lado de quem emite", () => {
       escolha: "<",
       correta: false,
     })).toEqual([]);
+
+    const quadrado = construirQuadrado100Spec(2, () => 0.4);
+    expect(doQuadrado100({
+      modo: quadrado.modo,
+      inicio: quadrado.inicio,
+      caminho: [...quadrado.caminho],
+      toques: [quadrado.inicio + 1],
+      erros: [quadrado.inicio + 1],
+      esperado: quadrado.caminho[0],
+      ultimoToque: quadrado.inicio + 1,
+      acertosParciais: 0,
+      revisoes: 1,
+      completo: false,
+    }, quadrado)).toEqual([]);
+
+    expect(daAdicaoVisual({
+      nivel: 4,
+      resposta: 4,
+      correta: false,
+      juntou: false,
+      usouAjuda: false,
+      revisoes: 1,
+    })).toEqual([]);
+
+    expect(daSimetria({ nivel: 4, eixoEscolhido: "vertical", eixoCorreto: "horizontal" })).toEqual([]);
+    expect(daSimetria({ nivel: 3, eixoEscolhido: "horizontal", eixoCorreto: "horizontal" })).toEqual([]);
+
+    expect(dasPartesIguais({ nivel: 4, denominador: 2, cortes: [0.42] })).toEqual([]);
+    expect(dasPartesIguais({ nivel: 3, denominador: 2, cortes: cortesAlvoPartesIguais(2) })).toEqual([]);
+
+    expect(doPerimetro(4, false)).toEqual([]);
+    expect(doPerimetro(3, true)).toEqual([]);
+    expect(daDivisaoDoisDigitos(false)).toEqual([]);
+    expect(daRazaoProporcao(construirRazaoProporcaoF88Spec(3, () => 0), false)).toEqual([]);
+    expect(daEquacao(construirEquacoesF90Spec(3, () => 0), false)).toEqual([]);
+    expect(dasContasVirgula(construirContasVirgulaF76Spec(2, () => 0), false)).toEqual([]);
+    expect(doVolumePrismas(construirVolumePrismasF94Spec(4), false)).toEqual([]);
+    expect(daEstatisticaChance(construirEstatisticaChanceF95Spec(3), false)).toEqual([]);
+    expect(daMultiplicacaoFracoes(construirMultiplicarFracoesF86Spec(3), false)).toEqual([]);
   });
 });

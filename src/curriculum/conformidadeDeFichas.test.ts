@@ -149,6 +149,12 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   "linking-cubes": ["LinkingCubes"],
   "take-apart": ["TakeApart"],
   array: ["ArrayGrid"],
+  "volume-vistas-f92": ["ArrayGrid"],
+  "volume-prismas-f94": ["ArrayGrid"],
+  "multiplicar-fracoes-f86": ["ArrayGrid"],
+  "primos-divisores-f70": ["ArrayGrid", "Quadrado100"],
+  "divisao-dois-digitos-f71": ["InteractiveVertical"],
+  "contas-virgula-f76": ["InteractiveVertical", "Quadrado100"],
   relogio: ["Relogio"],
   balanca: ["Balanca"],
   medidas: ["Balanca", "Recipientes"],
@@ -171,7 +177,9 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   math: [],
   money: [],
   // Os palcos do Padrão Ouro carregam a primitiva por dentro.
-  tabuada: ["ArrayGrid"],
+  // F42 é composto: Arranjo realiza o ArrayGrid canônico, Quadrado100 é a
+  // segunda primitiva exigida e NumberLine é entrega física adicional no L1.
+  tabuada: ["ArrayGrid", "Quadrado100", "NumberLine"],
   decomposicao: ["ArrayGrid"],
   ancora: ["ArrayGrid"],
   familia: ["NumberBond"],
@@ -210,7 +218,23 @@ const MODO_DO_RUNTIME: Record<string, string> = {
   "flash-mao": "flash, skin mão",
   padrao: "padrão",
   parear: "parear",
+  duplas: "duplas",
   "caixas/laços": "caixas/laços",
+  "vista-frontal": "3D",
+  "tres-vistas": "3D",
+  "reconstruir-vistas": "3D",
+  "cubos-ocultos": "3D",
+  "desenhar-vistas": "3D",
+  "contar-cubos": "3D",
+  "camada-multiplicar": "3D",
+  formula: "3D",
+  "dimensao-faltante": "3D",
+  "prisma-nao-retangular": "3D",
+  "fracao-inteiro": "área",
+  "fracao-inteiro-modelo": "área",
+  "fracao-fracao-area": "área",
+  "fracao-fracao-simbolico": "área",
+  "divisao-fracoes": "área",
 };
 
 /**
@@ -412,8 +436,6 @@ describe("conformidade entre as fichas e o que o app serve", () => {
         const [base, modo] = p.split("#");
         const linha = `${id}\t${p}\t(${antes.size} pré-requisitos)`;
         if (antes.size === 0) { raizes.push(linha); continue; }
-        // A classe perigosa: a criança JÁ CONHECE a ferramenta e o desenho
-        // mudou de idioma sem aviso. Ela acha que sabe ler, e não sabe.
         if (modo && basesVistas.has(base)) trocaDeModo.push(`${id}\t${base} vira "${modo}"\t(vinha de ${antes.size} nós usando ${base})`);
         else ferramentaNova.push(linha);
       }

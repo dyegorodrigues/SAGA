@@ -1,217 +1,98 @@
-import React from 'react';
-import { AnswerMeta, Question } from '../types';
-
-// Import primitives
-import { EmojiRow } from './primitives/EmojiRow';
-import { TenFrame } from './primitives/TenFrame';
-import { VisualAddition } from './primitives/VisualAddition';
-import { ScatteredItems } from './primitives/ScatteredItems';
-import { LinkingCubes } from './primitives/LinkingCubes';
-import { TakeApart } from './primitives/TakeApart';
-import { NumberBond } from './primitives/NumberBond';
-import { NumberLine } from './primitives/NumberLine';
-import { InteractiveNumberLine } from './primitives/InteractiveNumberLine';
-import { Reta20Stage } from './primitives/Reta20Stage';
-import { ReguaStage } from './primitives/ReguaStage';
-import { Quadrado100 } from './primitives/Quadrado100';
-import { ShapeCanvas } from './primitives/ShapeCanvas';
-import { Relogio } from './primitives/Relogio';
-import { Balanca } from './primitives/Balanca';
-import { MaterialDourado } from './primitives/MaterialDourado';
-import { MaterialDouradoStage } from './primitives/MaterialDouradoStage';
-import { DragGroup } from './primitives/DragGroup';
-import { VerticalPlaceValueStage } from './primitives/VerticalPlaceValueStage';
-import { StoryBarsStage } from "./primitives/StoryBarsStage";
-import { TabuadaStage } from './primitives/TabuadaStage';
-import { DecomposicaoStage } from './primitives/DecomposicaoStage';
-import { AncoraStage } from './primitives/AncoraStage';
-import { FamiliaStage } from './primitives/FamiliaStage';
-import { DeslocamentoStage } from './primitives/DeslocamentoStage';
-import { AreaStage } from './primitives/AreaStage';
-import { PareamentoStage } from './primitives/PareamentoStage';
-import { TouchCount } from './primitives/TouchCount';
-import { EmojiRowStage } from './primitives/EmojiRowStage';
-import { ClassificacaoStage } from './primitives/ClassificacaoStage';
-import { TouchPlaceStage } from './primitives/TouchPlaceStage';
-import { CenaDePosicaoStage } from './primitives/CenaDePosicaoStage';
-import { FormaStage } from './primitives/FormaStage';
-import { GrandezaStage } from './primitives/GrandezaStage';
-import { ComparacaoSimbolicaStage } from './primitives/ComparacaoSimbolicaStage';
-import { MedidasStage } from './primitives/MedidasStage';
-import { MolduraStage } from './primitives/MolduraStage';
-import { AudioChoiceStage } from './primitives/AudioChoiceStage';
-import { ArrayGrid } from './primitives/ArrayGrid';
-import { MaterialDouradoSpec } from '../curriculum/procedimentos/materialDouradoContract';
-import {
-  diagnosticarMaterialDourado,
-  evidenciasMaterialDourado,
-} from '../curriculum/procedimentos/materialDouradoProcedure';
-import { Reta20Spec } from '../curriculum/procedimentos/reta20Contract';
-import { diagnosticarReta20, evidenciasReta20 } from '../curriculum/procedimentos/reta20Procedure';
-import { ReguaSpec } from '../curriculum/procedimentos/reguaContract';
-import { ComparacaoSimbolicaSpec } from '../curriculum/procedimentos/comparacaoSimbolicaContract';
-import { podeGerarDiagnostico } from '../curriculum/procedimentos/filtroMotor';
+import React from "react";
+import type { AnswerMeta, Question } from "../types";
+import { RegraSequenciaStage } from "./primitives/RegraSequenciaStage"; import type { RegraSequenciaF57Spec } from "../curriculum/procedimentos/regraSequenciaContract";
+import { PartesIguaisStage } from "./primitives/PartesIguaisStage"; import type { PartesIguaisF45Spec } from "../curriculum/procedimentos/partesIguaisContract";
+import { FracaoNumeroStage } from "./primitives/FracaoNumeroStage"; import type { FracaoNumeroF72Spec } from "../curriculum/procedimentos/fracaoNumeroContract";
+import { DecimalStage } from "./primitives/DecimalStage"; import type { DecimalF75Spec } from "../curriculum/procedimentos/decimalContract";
+import { ContasVirgulaStage } from "./primitives/ContasVirgulaStage"; import type { ContasVirgulaF76Spec } from "../curriculum/procedimentos/contasVirgulaContract";
+import { PorcentagemStage } from "./primitives/PorcentagemStage"; import type { PorcentagemF87Spec } from "../curriculum/procedimentos/porcentagemContract";
+import { RazaoProporcaoStage } from "./primitives/RazaoProporcaoStage"; import type { RazaoProporcaoF88Spec } from "../curriculum/procedimentos/razaoProporcaoContract";
+import { EquacoesStage } from "./primitives/EquacoesStage"; import type { EquacoesF90Spec } from "../curriculum/procedimentos/equacoesContract";
+import { AngulosStage } from "./primitives/AngulosStage"; import type { AngulosF78Spec } from "../curriculum/procedimentos/angulosContract";
+import { RetaCompletaStage } from "./primitives/RetaCompletaStage"; import type { RetaCompletaF84Spec } from "../curriculum/procedimentos/retaCompletaContract";
+import { OperarNegativosStage } from "./primitives/OperarNegativosStage"; import type { OperarNegativosF85Spec } from "../curriculum/procedimentos/operarNegativosContract";
+import { LinguagemLetrasStage } from "./primitives/LinguagemLetrasStage"; import type { LinguagemLetrasF89Spec } from "../curriculum/procedimentos/linguagemLetrasContract";
+import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
+import { MediaChanceStage } from "./primitives/MediaChanceStage"; import type { MediaChanceF83Spec } from "../curriculum/procedimentos/mediaChanceContract";
+import { EstatisticaChanceStage } from "./primitives/EstatisticaChanceStage"; import type { EstatisticaChanceF95Spec } from "../curriculum/procedimentos/estatisticaChanceContract";
+import { MultiplicarFracoesStage } from "./primitives/MultiplicarFracoesStage"; import type { MultiplicarFracoesF86Spec } from "../curriculum/procedimentos/multiplicarFracoesContract";
+import { ProblemasMedidaStage } from "./primitives/ProblemasMedidaStage"; import type { ProblemasMedidaF82Spec } from "../curriculum/procedimentos/problemasMedidaContract";
+import { HorasMinutosStage } from "./primitives/HorasMinutosStage"; import type { HorasMinutosF62Spec } from "../curriculum/procedimentos/horasMinutosContract";
+import { ConversaoUnidadesStage } from "./primitives/ConversaoUnidadesStage"; import type { ConversaoUnidadesF93Spec } from "../curriculum/procedimentos/conversaoUnidadesContract";
+import { PoligonosStage } from "./primitives/PoligonosStage"; import type { PoligonosF79Spec } from "../curriculum/procedimentos/poligonosContract";
+import { PlanoCartesianoStage } from "./primitives/PlanoCartesianoStage"; import type { PlanoCartesianoF80Spec } from "../curriculum/procedimentos/planoCartesianoContract";
+import { AreaF81Stage } from "./primitives/AreaF81Stage"; import type { AreaF81Spec } from "../curriculum/procedimentos/areaF81Contract";
+import { FatoresRetangulosStage } from "./primitives/FatoresRetangulosStage"; import type { FatoresRetangulosF66Spec } from "../curriculum/procedimentos/fatoresRetangulosContract";
+import { CirculoAreasStage } from "./primitives/CirculoAreasStage"; import type { CirculoAreasF91Spec } from "../curriculum/procedimentos/circuloAreasContract";
+import { VolumeVistasStage } from "./primitives/VolumeVistasStage"; import type { VolumeVistasF92Spec } from "../curriculum/procedimentos/volumeVistasContract";
+import { VolumePrismasStage } from "./primitives/VolumePrismasStage"; import type { VolumePrismasF94Spec } from "../curriculum/procedimentos/volumePrismasContract";
+import { PrimosDivisoresStage } from "./primitives/PrimosDivisoresStage"; import type { PrimosDivisoresF70Spec } from "../curriculum/procedimentos/primosDivisoresContract";
+import { DivisaoDoisDigitosStage } from "./primitives/DivisaoDoisDigitosStage"; import type { DivisaoDoisDigitosF71Spec } from "../curriculum/procedimentos/divisaoDoisDigitosContract";
+import { SomaFracoesStage } from "./primitives/SomaFracoesStage"; import type { SomaFracoesF74Spec } from "../curriculum/procedimentos/somaFracoesContract";
+import { ExpressaoF77Stage } from "./primitives/ExpressaoF77Stage"; import type { ExpressaoF77Spec } from "../curriculum/procedimentos/expressaoF77Contract";
+import { MapaTesouroStage } from "./primitives/MapaTesouroStage"; import type { MapaTesouroF60Spec } from "../curriculum/procedimentos/mapaTesouroContract";
+import { SolidosGeometricosStage } from "./primitives/SolidosGeometricosStage"; import type { SolidosGeometricosF59Spec } from "../curriculum/procedimentos/solidosGeometricosContract";
+import { ParesImparesStage } from "./primitives/ParesImparesStage"; import type { ParesImparesF38Spec } from "../curriculum/procedimentos/paresImparesContract";
+import { FracoesEquivalentesStage } from "./primitives/FracoesEquivalentesStage"; import type { FracaoEquivalenteF73Spec } from "../curriculum/procedimentos/fracaoEquivalenteContract";
+import { DivisaoLongaStage } from "./primitives/DivisaoLongaStage"; import type { DivisaoLongaF69Spec } from "../curriculum/procedimentos/divisaoLongaContract";
+import { PerimetroStage } from "./primitives/PerimetroStage"; import type { PerimetroF63Spec } from "../curriculum/procedimentos/perimetroContract";
+import { IgualdadeEquilibrioStage } from "./primitives/IgualdadeEquilibrioStage"; import type { IgualdadeEquilibrioF46Spec } from "../curriculum/procedimentos/igualdadeEquilibrioContract";
+import { FichaRenderer as FichaRendererBase } from "./FichaRendererBase";
 
 interface FichaRendererProps {
   question: Question;
   onAnswer: (answer: any, isCorrect: boolean, meta?: AnswerMeta) => void;
   disabled?: boolean;
   promptDone?: boolean;
-  /** Coreografia da micro-aula; só palcos autorais que conhecem o spec a usam. */
   mostrar?: unknown;
-  /** Voz do shell para feedback autoral no mesmo instante do gesto. */
   falar?: (texto: string) => void;
 }
 
-export function FichaRenderer({ question, onAnswer, disabled, promptDone = true, mostrar, falar }: FichaRendererProps) {
-  const { kind, uiProps, evaluate } = question;
-
-  const handleInteract = (val: any, meta?: AnswerMeta) => {
-    if (disabled) return;
-    const isCorrect = evaluate?.(val) ?? false;
-    onAnswer(val, isCorrect, meta);
-  };
-
-  switch (kind) {
-    case 'emojirow':
-      return <div className="flex justify-center"><EmojiRow {...uiProps} onItemTouch={handleInteract} disabled={disabled} promptDone={promptDone} /></div>;
-      
-    case 'bond':
-      return <div className="flex justify-center"><NumberBond {...uiProps} /></div>;
-      
-    case 'numberline':
-      return <InteractiveNumberLine {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
-
-    case 'numberline-f19': {
-      const spec = uiProps as Reta20Spec;
-      return (
-        <Reta20Stage
-          spec={spec}
-          disabled={Boolean(disabled)}
-          falar={falar}
-          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
-          onAnswer={(valor, acao, manipulacao) => {
-            const misconception = podeGerarDiagnostico(manipulacao)
-              ? diagnosticarReta20(acao, spec)
-              : undefined;
-            const evidencias = evidenciasReta20(acao, spec);
-            handleInteract(valor, {
-              manipulacao,
-              ...(misconception ? { misconception } : {}),
-              ...(evidencias.length ? { evidencias } : {}),
-            });
-          }}
-        />
-      );
-    }
-
-    case 'regua':
-    case 'regua-f61': {
-      const spec = uiProps as ReguaSpec;
-      return (
-        <ReguaStage
-          spec={spec}
-          disabled={Boolean(disabled)}
-          falar={falar}
-          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
-          onAnswer={(valor, meta) => handleInteract(valor, meta)}
-        />
-      );
-    }
-      
-    case 'tens':
-      // Contrato estático legado/genérico. F21 usa kind próprio para não esconder
-      // a diferença semântica do auditor nem sequestrar usos antigos.
-      return <MaterialDourado {...uiProps} />;
-
-    case 'material-dourado': {
-      const spec = uiProps as MaterialDouradoSpec;
-      return (
-        <MaterialDouradoStage
-          spec={spec}
-          disabled={Boolean(disabled)}
-          falar={falar}
-          mostrar={mostrar && typeof mostrar === 'object' ? mostrar as never : null}
-          onAnswer={(valor, acao) => {
-            const misconception = diagnosticarMaterialDourado(acao, spec);
-            const evidencias = evidenciasMaterialDourado(acao, spec);
-            handleInteract(valor, {
-              ...(misconception ? { misconception } : {}),
-              ...(evidencias.length ? { evidencias } : {}),
-            });
-          }}
-        />
-      );
-    }
-      
-    case 'relogio':
-      return <Relogio {...uiProps} />;
-      
-    case 'balanca':
-      return <Balanca {...uiProps} />;
-      
-    case 'draggroup':
-      return <DragGroup {...uiProps} onAnswer={handleInteract} disabled={disabled} />;
-    case 'vertical':
-      return <VerticalPlaceValueStage question={question} onAnswer={handleInteract} onMistake={handleInteract} disabled={Boolean(disabled)} />;
-    case 'story-bars':
-      return <StoryBarsStage spec={uiProps as never} />;
-    case 'tabuada':
-      return <TabuadaStage spec={uiProps as never} />;
-    case 'decomposicao':
-      return <DecomposicaoStage spec={uiProps as never} />;
-    case 'ancora':
-      return <AncoraStage spec={uiProps as never} />;
-    case 'familia':
-      return <FamiliaStage spec={uiProps as never} />;
-    case 'deslocamento':
-      return <DeslocamentoStage spec={uiProps as never} />;
-    case 'area':
-      return <AreaStage spec={uiProps as never} />;
-    case 'pareamento':
-      return <PareamentoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'touchcount':
-      return <TouchCount spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'audiochoice':
-      return <AudioChoiceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'classificacao':
-      return <ClassificacaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'touchplace':
-      return <TouchPlaceStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    // O `ShapeCanvas` estava importado aqui e **sem `case` nenhum**: a
-    // primitiva que a F47 e a F48 nomeiam caía no `default`, que desenha
-    // "Ficha não implementada". Meio-órfã — importada, nunca alcançável.
-    case 'shapecanvas':
-      // Duas fichas, dois palcos. O spec da F48 traz `opcoes`; o da F47, não.
-      return (uiProps as { opcoes?: unknown }).opcoes
-        ? <FormaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />
-        : <CenaDePosicaoStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'moldura':
-      return <MolduraStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'grandeza':
-      return <GrandezaStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'comparacao-simbolica':
-      return <ComparacaoSimbolicaStage spec={uiProps as ComparacaoSimbolicaSpec} onAnswer={(valor, meta) => handleInteract(valor, meta)} disabled={Boolean(disabled)} />;
-    case 'medidas':
-      return <MedidasStage spec={uiProps as never} onAnswer={(valor, meta) => onAnswer(valor, evaluate?.(valor) ?? false, meta)} disabled={Boolean(disabled)} />;
-    case 'fileira':
-      return <EmojiRowStage spec={uiProps as never} onAnswer={valor => handleInteract(valor)} disabled={Boolean(disabled)} />;
-    case 'array':
-      return <ArrayGrid question={question} onAnswer={handleInteract} disabled={Boolean(disabled)} />;
-    case 'tenframe':
-      return <div className="flex justify-center"><TenFrame filled={question.n!} {...uiProps} /></div>;
-    case 'visual-addition':
-      return <VisualAddition a={question.a!} b={question.b!} emojiA={question.emoji} emojiB={question.emoji} {...uiProps} />;
-    case 'scattered':
-      return <ScatteredItems n={question.n!} emoji={question.emoji!} {...uiProps} />;
-    case 'linking-cubes':
-      return <LinkingCubes groups={question.groups!} {...uiProps} />;
-    case 'take-apart':
-      return <TakeApart total={question.n!} knownSplit={{ a: question.a!, b: question.b! }} {...uiProps} />;
-    case 'plain':
-      return <div className="flex justify-center text-4xl font-black text-slate-800 py-8">{uiProps.text}</div>;
-      
-    default:
-      return <div className="p-4 border border-rose-300 text-rose-500 rounded text-center font-bold">Ficha não implementada: {kind}</div>;
+/** Front-controller. Os cases de passthrough são guardas literais de palco único. */
+export function FichaRenderer(props: FichaRendererProps) {
+  const { question, onAnswer, disabled } = props;
+  const send = (valor: any, meta?: AnswerMeta) => { if (!disabled) onAnswer(valor, question.evaluate?.(valor) ?? false, meta); };
+  if (question.kind === 'draggroup' && (question.uiProps as { ficha?: string } | undefined)?.ficha === 'F38') {
+    return <ParesImparesStage spec={question.uiProps as ParesImparesF38Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+  }
+  switch (question.kind) {
+    case 'regra-sequencia-f57': return <RegraSequenciaStage spec={question.uiProps as RegraSequenciaF57Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'partes-iguais-f45': return <PartesIguaisStage spec={question.uiProps as PartesIguaisF45Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'fracao-numero-f72': return <FracaoNumeroStage spec={question.uiProps as FracaoNumeroF72Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'decimos-centesimos-f75': return <DecimalStage spec={question.uiProps as DecimalF75Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'contas-virgula-f76': return <ContasVirgulaStage spec={question.uiProps as ContasVirgulaF76Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'porcentagem-f87': return <PorcentagemStage spec={question.uiProps as PorcentagemF87Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'razao-proporcao-f88': return <RazaoProporcaoStage spec={question.uiProps as RazaoProporcaoF88Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'equacoes-f90': return <EquacoesStage spec={question.uiProps as EquacoesF90Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'angulos-f78': return <AngulosStage spec={question.uiProps as AngulosF78Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'reta-completa-f84': return <RetaCompletaStage spec={question.uiProps as RetaCompletaF84Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'operar-negativos-f85': return <OperarNegativosStage spec={question.uiProps as OperarNegativosF85Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'linguagem-letras-f89': return <LinguagemLetrasStage spec={question.uiProps as LinguagemLetrasF89Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'media-chance-f83': return <MediaChanceStage spec={question.uiProps as MediaChanceF83Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'estatistica-chance-f95': return <EstatisticaChanceStage spec={question.uiProps as EstatisticaChanceF95Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'multiplicar-fracoes-f86': return <MultiplicarFracoesStage spec={question.uiProps as MultiplicarFracoesF86Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'problemas-medida-f82': return <ProblemasMedidaStage spec={question.uiProps as ProblemasMedidaF82Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'horas-minutos-f62': return <HorasMinutosStage spec={question.uiProps as HorasMinutosF62Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'conversao-unidades-f93': return <ConversaoUnidadesStage spec={question.uiProps as ConversaoUnidadesF93Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'poligonos-f79': return <PoligonosStage spec={question.uiProps as PoligonosF79Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'plano-cartesiano-f80': return <PlanoCartesianoStage spec={question.uiProps as PlanoCartesianoF80Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'area-f81': return <AreaF81Stage spec={question.uiProps as AreaF81Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'fatores-retangulos-f66': return <FatoresRetangulosStage spec={question.uiProps as FatoresRetangulosF66Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'circulo-areas-f91': return <CirculoAreasStage spec={question.uiProps as CirculoAreasF91Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'volume-vistas-f92': return <VolumeVistasStage spec={question.uiProps as VolumeVistasF92Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'volume-prismas-f94': return <VolumePrismasStage spec={question.uiProps as VolumePrismasF94Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'primos-divisores-f70': return <PrimosDivisoresStage spec={question.uiProps as PrimosDivisoresF70Spec} options={question.options ?? []} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'divisao-dois-digitos-f71': return <DivisaoDoisDigitosStage spec={question.uiProps as DivisaoDoisDigitosF71Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'soma-fracoes-f74': return <SomaFracoesStage spec={question.uiProps as SomaFracoesF74Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'expressao-f77': return <ExpressaoF77Stage spec={question.uiProps as ExpressaoF77Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'mapa-tesouro-f60': return <MapaTesouroStage spec={question.uiProps as MapaTesouroF60Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'solidos-geometricos-f59': return <SolidosGeometricosStage spec={question.uiProps as SolidosGeometricosF59Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'fracoes-equivalentes-f73': return <FracoesEquivalentesStage spec={question.uiProps as FracaoEquivalenteF73Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'divisao-longa-f69': return <DivisaoLongaStage spec={question.uiProps as DivisaoLongaF69Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'perimetro-f63': return <PerimetroStage spec={question.uiProps as PerimetroF63Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'igualdade-equilibrio-f46': return <IgualdadeEquilibrioStage spec={question.uiProps as IgualdadeEquilibrioF46Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'story-bars': case 'tabuada': case 'decomposicao': case 'ancora': case 'familia': case 'deslocamento': case 'area': case 'pareamento': case 'touchcount': case 'fileira': case 'classificacao': case 'audiochoice': case 'touchplace': case 'shapecanvas': case 'grandeza': case 'medidas': case 'moldura': default:
+      return <FichaRendererBase {...props}/>;
   }
 }

@@ -95,7 +95,7 @@ function drawQuestion(track: Track, p: Progress, lvlOverride?: number, pure = fa
     const item = bank[Math.floor(Math.random() * bank.length)];
     const q = JSON.parse(JSON.stringify(item.q));
     if (q.kind !== "groups" && Array.isArray(q.options)) {
-      q.options = shuffle(q.options);
+      q.options = fisherYates(q.options);
     }
     return { ...q, review: true, sig: item.sig };
   }
@@ -106,16 +106,8 @@ function drawQuestion(track: Track, p: Progress, lvlOverride?: number, pure = fa
 const WARMUP_QUESTIONS = 2;
 const warmupLvl = (lvl: number) => Math.max(1, lvl - 1);
 
-const shuffle = (arr: any[]) => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-
 import { evaluateSpacedRepetition, trackMisconception } from "../curriculum/motores/radarEngine";
+import { fisherYates } from "../utils/shuffle";
 
 export function GameLoop({
   kid,

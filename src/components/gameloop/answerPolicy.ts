@@ -6,11 +6,7 @@ import { AcaoDeForma, diagnosticar as diagnosticarForma } from "../../curriculum
 import { AcaoDeGrandeza, diagnosticar as diagnosticarGrandeza, evidenciasDe as evidenciasDaGrandeza } from "../../curriculum/procedimentos/grandezaProcedure";
 import { AcaoDeContagem, evidenciasDe as evidenciasDaContagem } from "../../curriculum/procedimentos/touchCountProcedure";
 import { AcaoDaMoldura, diagnosticar as diagnosticarMoldura, evidenciasDe as evidenciasDaMoldura } from "../../curriculum/procedimentos/tenFrameProcedure";
-import {
-  RespostaOuvidaRuntime,
-  diagnosticarAudioChoiceRuntime,
-  evidenciasAudioChoiceRuntime,
-} from "../../curriculum/procedimentos/audioChoiceRuntime";
+import { RespostaOuvidaRuntime, diagnosticarAudioChoiceRuntime, evidenciasAudioChoiceRuntime } from "../../curriculum/procedimentos/audioChoiceRuntime";
 import { AcaoDeProducao as AcaoP, evidenciasDe as evidenciasDaProducao } from "../../curriculum/procedimentos/producaoProcedure";
 import { AcaoDeForma as AcaoF, evidenciasDe as evidenciasDaForma } from "../../curriculum/procedimentos/formaProcedure";
 import { classificarErro, podeGerarDiagnostico } from "../../curriculum/procedimentos/filtroMotor";
@@ -21,63 +17,35 @@ import { AnswerMeta, Question } from "../../types";
 import { bundleMisconceptions } from "./misconceptionBundle";
 
 type ProducaoComHistorico = AcaoDeProducao & { diagnosticosLongitudinais?: string[] };
+const AUTORIAIS = new Set(["material-dourado","numberline-f19","quadrado100-f36","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74","razao-proporcao-f88","equacoes-f90","contas-virgula-f76"]);
 
-/** §8.3-bis: o erro veio do dedo, não da cabeça? */
-export function isMotorSlip(meta?: AnswerMeta): boolean {
-  return meta?.manipulacao !== undefined && classificarErro(meta.manipulacao) === "motor";
-}
-
+export function isMotorSlip(meta?: AnswerMeta): boolean { return meta?.manipulacao !== undefined && classificarErro(meta.manipulacao) === "motor"; }
 export function isRetryableAnswer(q: Question, value: unknown, meta?: AnswerMeta): boolean {
   if (value === "__timeout__") return false;
   if (isMotorSlip(meta)) return true;
-  // F21, F19 e F61 respondem dentro do próprio palco e não possuem q.options;
-  // um erro deve voltar à mesma representação, não consumir a questão.
-  if (q.kind === "material-dourado" || q.kind === "numberline-f19" || q.kind === "regua-f61") return true;
+  if (AUTORIAIS.has(q.kind as string) || q.kind === "regua-f61") return true;
   return Boolean(q.options || q.groups || meta?.source);
 }
-
-function isFormaQuestion(q: Question): boolean {
-  return q.kind === "shapecanvas"
-    && q.uiProps != null
-    && typeof q.uiProps === "object"
-    && "opcoes" in q.uiProps;
-}
-
-function isPosicaoQuestion(q: Question): boolean {
-  return q.kind === "shapecanvas"
-    && q.uiProps != null
-    && typeof q.uiProps === "object"
-    && "referencial" in q.uiProps
-    && !("opcoes" in q.uiProps);
-}
-
+function isFormaQuestion(q: Question): boolean { return q.kind === "shapecanvas" && q.uiProps != null && typeof q.uiProps === "object" && "opcoes" in q.uiProps; }
+function isPosicaoQuestion(q: Question): boolean { return q.kind === "shapecanvas" && q.uiProps != null && typeof q.uiProps === "object" && "referencial" in q.uiProps && !("opcoes" in q.uiProps); }
 export function ownsAuthorialRetry(q: Question, meta?: AnswerMeta): boolean {
-  return q.kind === "material-dourado"
-    || q.kind === "numberline-f19"
-    || (q.kind === "regua-f61" && meta?.source === "medidas")
-    || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
-    || (q.kind === "touchplace" && meta?.touchplace !== undefined)
-    || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
-    || (isFormaQuestion(q) && meta?.forma !== undefined)
-    || (q.kind === "grandeza" && meta?.grandeza !== undefined)
+  return AUTORIAIS.has(q.kind as string) || q.kind === "counting-on-f14"
+    || (q.kind === "regua-f61" && meta?.source === "medidas") || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
+    || (q.kind === "touchplace" && meta?.touchplace !== undefined) || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
+    || (isFormaQuestion(q) && meta?.forma !== undefined) || (q.kind === "grandeza" && meta?.grandeza !== undefined)
     || (q.kind === "medidas" && meta?.source === "medidas");
 }
-
 export function ownsAuthorialFeedback(q: Question, meta?: AnswerMeta): boolean {
-  return q.kind === "material-dourado"
-    || q.kind === "numberline-f19"
-    || (q.kind === "regua-f61" && meta?.source === "medidas")
-    || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
-    || (q.kind === "touchplace" && meta?.touchplace !== undefined)
-    || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
-    || (isFormaQuestion(q) && meta?.forma !== undefined)
-    || (q.kind === "grandeza" && meta?.grandeza !== undefined)
+  return AUTORIAIS.has(q.kind as string)
+    || (q.kind === "regua-f61" && meta?.source === "medidas") || (q.kind === "audiochoice" && meta?.audiochoice !== undefined)
+    || (q.kind === "touchplace" && meta?.touchplace !== undefined) || (isPosicaoQuestion(q) && meta?.posicao !== undefined)
+    || (isFormaQuestion(q) && meta?.forma !== undefined) || (q.kind === "grandeza" && meta?.grandeza !== undefined)
     || (q.kind === "medidas" && meta?.source === "medidas");
 }
-
 export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number {
   if (q.kind === "material-dourado") return 3000;
-  if (q.kind === "numberline-f19") return 1800;
+  if (q.kind === "quadrado100-f36") return 2200;
+  if (["numberline-f19","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74","razao-proporcao-f88","equacoes-f90","contas-virgula-f76"].includes(q.kind as string)) return 1800;
   if (q.kind === "regua-f61" && meta?.source === "medidas") return 2600;
   if (isPosicaoQuestion(q) && meta?.posicao !== undefined) return 3300;
   if (isFormaQuestion(q) && meta?.forma !== undefined) return 3700;
@@ -85,98 +53,38 @@ export function authorialFeedbackHoldMs(q: Question, meta?: AnswerMeta): number 
   if (q.kind === "medidas" && meta?.source === "medidas") return 3300;
   return 1500;
 }
-
-/**
- * Boundary comum de toda tentativa não-motora.
- *
- * - Aula do Dia registra a competência-fonte para o progressEngine;
- * - Dojo aritmético registra token + número da tentativa para que recuperação
- *   após erro não conte como fluência de primeira resposta;
- * - Matrícula apenas marca qual sonda está na tela; o resultado só é consumido
- *   no boundary terminal, portanto retry intermediário não vira múltiplos erros.
- */
 export function misconceptionForAnswer(q: Question, value: unknown, meta?: AnswerMeta): string | undefined {
-  prepareAulaSourceForAnswer(q);
-  recordSenseiDojoAttempt(q);
-  prepareMatriculaForAnswer(q);
+  prepareAulaSourceForAnswer(q); recordSenseiDojoAttempt(q); prepareMatriculaForAnswer(q);
   if (!podeGerarDiagnostico(meta?.manipulacao)) return undefined;
-
   if (meta?.audiochoice) return diagnosticarAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime);
-
   if (meta?.pareamento && q.uiProps && "receptores" in q.uiProps) {
-    const cena = {
-      receptores: (q.uiProps as { receptores: { quantidade: number } }).receptores.quantidade,
-      itens: (q.uiProps as { itens: { quantidade: number } }).itens.quantidade,
-    };
-    const daAcao = diagnosticarPareamento(meta.pareamento, cena);
-    if (daAcao) return daAcao;
+    const cena = { receptores: (q.uiProps as { receptores: { quantidade: number } }).receptores.quantidade, itens: (q.uiProps as { itens: { quantidade: number } }).itens.quantidade };
+    const daAcao = diagnosticarPareamento(meta.pareamento, cena); if (daAcao) return daAcao;
   }
-
-  if (meta?.classificacao) {
-    const daAcao = diagnosticarClassificacao(meta.classificacao as AcaoDeClassificacao);
-    if (daAcao) return daAcao;
-  }
-
-  if (meta?.touchplace) {
-    const acao = meta.touchplace as ProducaoComHistorico;
-    const unidas = bundleMisconceptions([
-      diagnosticarProducao(acao),
-      ...(acao.diagnosticosLongitudinais ?? []),
-    ]);
-    if (unidas) return unidas;
-  }
-
-  if (meta?.posicao) {
-    const daAcao = diagnosticarPosicao(meta.posicao as AcaoDePosicao);
-    if (daAcao) return daAcao;
-  }
-
-  if (meta?.forma) {
-    const daAcao = diagnosticarForma(meta.forma as AcaoDeForma);
-    if (daAcao) return daAcao;
-  }
-
-  if (meta?.grandeza) {
-    const daAcao = diagnosticarGrandeza(meta.grandeza as AcaoDeGrandeza);
-    if (daAcao) return daAcao;
-  }
-
-  if (meta?.moldura) {
-    const daAcao = diagnosticarMoldura(meta.moldura as AcaoDaMoldura);
-    if (daAcao) return daAcao;
-  }
-
-  const pickedOption = q.options?.find(option => option.value === value);
-  return pickedOption?.misconception
-    ? pickedOption.tag || pickedOption.misconception
-    : meta?.misconception;
+  if (meta?.classificacao) { const v=diagnosticarClassificacao(meta.classificacao as AcaoDeClassificacao); if(v) return v; }
+  if (meta?.touchplace) { const acao=meta.touchplace as ProducaoComHistorico; const v=bundleMisconceptions([diagnosticarProducao(acao),...(acao.diagnosticosLongitudinais??[])]); if(v) return v; }
+  if (meta?.posicao) { const v=diagnosticarPosicao(meta.posicao as AcaoDePosicao); if(v) return v; }
+  if (meta?.forma) { const v=diagnosticarForma(meta.forma as AcaoDeForma); if(v) return v; }
+  if (meta?.grandeza) { const v=diagnosticarGrandeza(meta.grandeza as AcaoDeGrandeza); if(v) return v; }
+  if (meta?.moldura) { const v=diagnosticarMoldura(meta.moldura as AcaoDaMoldura); if(v) return v; }
+  const pickedOption=q.options?.find(option=>option.value===value);
+  return pickedOption?.misconception ? pickedOption.tag || pickedOption.misconception : meta?.misconception;
 }
-
 export const PALCOS_QUE_RESPONDEM = new Set([
-  "pareamento", "touchcount", "fileira", "classificacao", "audiochoice",
-  "touchplace", "shapecanvas", "grandeza", "comparacao-simbolica", "medidas", "moldura", "material-dourado",
-  "numberline-f19", "regua-f61",
+  "pareamento","touchcount","fileira","classificacao","audiochoice","touchplace","shapecanvas","grandeza","comparacao-simbolica","medidas","moldura","material-dourado",
+  "numberline-f19","regua-f61","quadrado100-f36","visual-addition-f13","emojirow-riscar-f15","counting-on-f14","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74","razao-proporcao-f88","equacoes-f90","contas-virgula-f76",
 ]);
-
-export function shouldRenderQuestionOptions(q: Question): boolean {
-  return Boolean(q.options)
-    && q.kind !== "vertical"
-    && q.kind !== "numberline-interactive"
-    && q.kind !== "drag-group"
-    && q.kind !== "array"
-    && !PALCOS_QUE_RESPONDEM.has(q.kind as string);
-}
-
+export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
   if (!meta) return [];
-  const achadas: string[] = [];
-  if (meta.classificacao) achadas.push(...evidenciasDaClassificacao(meta.classificacao as AcaoDeClassificacao));
-  if (meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
-  if (meta.audiochoice) achadas.push(...evidenciasAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime));
-  if (meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));
-  if (meta.forma) achadas.push(...evidenciasDaForma(meta.forma as AcaoF));
-  if (meta.grandeza) achadas.push(...evidenciasDaGrandeza(meta.grandeza as AcaoDeGrandeza));
-  if (meta.moldura) achadas.push(...evidenciasDaMoldura(meta.moldura as AcaoDaMoldura));
-  if (meta.evidencias) achadas.push(...meta.evidencias);
+  const achadas:string[]=[];
+  if(meta.classificacao) achadas.push(...evidenciasDaClassificacao(meta.classificacao as AcaoDeClassificacao));
+  if(meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
+  if(meta.audiochoice) achadas.push(...evidenciasAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime));
+  if(meta.touchplace) achadas.push(...evidenciasDaProducao(meta.touchplace as AcaoP));
+  if(meta.forma) achadas.push(...evidenciasDaForma(meta.forma as AcaoF));
+  if(meta.grandeza) achadas.push(...evidenciasDaGrandeza(meta.grandeza as AcaoDeGrandeza));
+  if(meta.moldura) achadas.push(...evidenciasDaMoldura(meta.moldura as AcaoDaMoldura));
+  if(meta.evidencias) achadas.push(...meta.evidencias);
   return [...new Set(achadas)];
 }

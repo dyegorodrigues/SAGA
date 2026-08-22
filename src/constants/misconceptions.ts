@@ -54,6 +54,48 @@ export const MisconceptionTag = {
   /** Âncora: ajustou para o lado errado — somou onde era tirar, ou o contrário (7×9 → 77) */
   DIRECAO_ERRADA: "direcao-errada",
 
+  /** F85: ignorou o sinal e operou apenas os valores absolutos. */
+  IGNORA_SINAL: "ignora-sinal",
+
+  /** F85: tratou subtrair um negativo como subtrair um positivo. */
+  SUBTRAIR_NEGATIVO: "subtrair-negativo",
+
+  /** F89: tratou a letra como nome do objeto do contexto, não como lugar de um número. */
+  LETRA_COMO_OBJETO: "letra-como-objeto",
+
+  /** F89: respondeu por um único caso particular sem validar a regra geral. */
+  SO_CASO_PARTICULAR: "so-caso-particular",
+
+  /** F89: descreveu exemplos, mas não produziu uma regra que valha para todos. */
+  NAO_GENERALIZA: "nao-generaliza",
+
+  /** F66: omitiu os fatores triviais 1 e n ao listar todas as formações. */
+  ESQUECE_TRIVIAIS: "esquece-triviais",
+
+  /** F66: encontrou uma formação retangular e encerrou a busca antes de esgotar os pares. */
+  PARA_CEDO: "para-cedo",
+
+  /** F66: aceitou sobra como fator ou confundiu fator com múltiplo. */
+  CONFUNDE_FATOR_MULTIPLO: "confunde-fator-multiplo",
+
+  /** F91: tratou o triângulo como o retângulo inteiro e esqueceu a metade. */
+  ESQUECE_DIVIDIR_POR_2: "esquece-dividir-por-2",
+
+  /** F91: usou um lado inclinado no lugar da altura perpendicular à base. */
+  ALTURA_ERRADA: "altura-errada",
+
+  /** F91: trocou raio e diâmetro ou não distinguiu a circunferência como contorno. */
+  CONFUNDE_RAIO_DIAMETRO: "confunde-raio-diametro",
+
+  /** F92: contou apenas cubos aparentes e ignorou pilhas/cubos ocultos. */
+  IGNORA_OCULTOS: "ignora-ocultos",
+
+  /** F92: associou a construção à projeção de outra orientação. */
+  VISTA_TROCADA: "vista-trocada",
+
+  /** F92: respondeu sem transformar mentalmente a orientação da construção. */
+  SEM_ROTACAO_MENTAL: "sem-rotacao-mental",
+
   /** Família ×÷: respondeu o divisor em vez do quociente (12÷3 → 3) */
   INVERTE_DIVISAO: "inverte-divisao",
 
@@ -131,6 +173,17 @@ export const MisconceptionTag = {
 
   /** @deprecated Compatibilidade com telemetria W3 provisória anterior ao cânone integral. */
   TROCA_DU: "troca-dezenas-unidades",
+
+  /* --- quadro de cem (ficha F36 / N2.02) ---------------------------- */
+
+  /** F36: moveu para o lado quando a relação pedida era vertical, ou vice-versa. */
+  QUADRADO100_CONFUNDE_DIRECAO: "confunde-direcao-quadrado100",
+
+  /** F36: não preservou a coluna/unidade ao variar uma dezena. */
+  QUADRADO100_NAO_VE_PADRAO_DEZENA: "nao-ve-padrao-dezena",
+
+  /** F36: substituiu o salto de dez por uma sequência de passos de um em um. */
+  QUADRADO100_SO_CONTA_UM_A_UM: "so-conta-um-a-um-quadrado100",
 
   /* --- reta numérica (ficha F19 / N1.12) ---------------------------- */
 

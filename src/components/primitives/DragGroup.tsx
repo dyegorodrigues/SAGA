@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { tokens, UIState } from '../../styles/tokens';
 
@@ -7,7 +7,10 @@ export function DragGroup({
   destCount, 
   sourceEmoji = "🍎", 
   destEmoji = "🐰", 
-  onAnswer, 
+  tutorialText,
+  onAnswer,
+  onProgress,
+  boxCapacity = 1,
   disabled, 
   state = 'ocioso',
   q // for backward compatibility
@@ -15,8 +18,11 @@ export function DragGroup({
   sourceCount?: number; 
   destCount?: number; 
   sourceEmoji?: string; 
-  destEmoji?: string; 
-  onAnswer?: (val: any) => void; 
+  destEmoji?: string;
+  tutorialText?: string;
+  onAnswer?: (val: any) => void;
+  onProgress?: (progress: { itemsLeft: number; boxes: number[] }) => void;
+  boxCapacity?: number;
   disabled?: boolean; 
   state?: UIState;
   q?: any;
@@ -25,14 +31,20 @@ export function DragGroup({
   const actualDestCount = destCount ?? q?.divisor ?? 2;
   const actualSourceEmoji = sourceEmoji ?? q?.emoji ?? "🍎";
   const actualDestEmoji = destEmoji ?? "🐰";
+  const capacity = Math.max(1, Math.round(boxCapacity));
 
   const [itemsLeft, setItemsLeft] = useState(actualSourceCount);
   const [boxes, setBoxes] = useState<number[]>(Array(actualDestCount).fill(0));
   const [isAnswered, setIsAnswered] = useState(false);
+  const onProgressRef = useRef(onProgress);
+
+  useEffect(() => {
+    onProgressRef.current = onProgress;
+  }, [onProgress]);
 
   const [showTutorial, setShowTutorial] = useState(false);
   useEffect(() => {
-    // Only show once per page load for this component
+    // Only show once per page load for this component.
     if (!window.localStorage.getItem('seen-draggroup-tut')) {
       setShowTutorial(true);
       window.localStorage.setItem('seen-draggroup-tut', '1');
@@ -40,7 +52,6 @@ export function DragGroup({
     }
   }, []);
 
-  
   const reset = () => {
     setItemsLeft(actualSourceCount);
     setBoxes(Array(actualDestCount).fill(0));
@@ -50,12 +61,21 @@ export function DragGroup({
   useEffect(() => {
     reset();
   }, [actualSourceCount, actualDestCount]);
+
+  // Progresso é uma notificação do estado interno. A identidade do callback não
+  // faz parte do estado observado: depender dela criava um ciclo quando o pai
+  // passava uma função inline e atualizava estado em resposta à notificação.
+  useEffect(() => {
+    onProgressRef.current?.({ itemsLeft, boxes: [...boxes] });
+  }, [itemsLeft, boxes]);
   
   const handleBoxClick = (i: number) => {
     if (disabled) return;
-    // se for legacy (q.dividend), aceita múltiplos itens, senão 1 a 1
+    // se for legacy (q.dividend), aceita múltiplos itens; o modo autoral pode
+    // declarar capacidade explícita (F38 usa 2 para que cada destino seja uma dupla).
     const isLegacy = !!q;
-    if (itemsLeft > 0 && (isLegacy || boxes[i] === 0)) {
+    const room = isLegacy || boxes[i] < capacity;
+    if (itemsLeft > 0 && room) {
       setItemsLeft(l => l - 1);
       setBoxes(b => {
         const nb = [...b];
@@ -83,21 +103,26 @@ export function DragGroup({
           }
         }
       } else {
-        const allFilled = boxes.every(v => v === 1);
+        const allFilled = boxes.every(v => v === capacity);
         if (allFilled) {
           setIsAnswered(true);
           onAnswer(actualDestCount);
         }
       }
     }
-  }, [itemsLeft, boxes, disabled, onAnswer, actualDestCount, q, isAnswered]);
+  }, [itemsLeft, boxes, disabled, onAnswer, actualDestCount, q, isAnswered, capacity]);
   
   return (
-            <div className={`w-full flex flex-col items-center gap-6 mt-4 select-none ${tokens.estado[state]} relative`}>
+    <div className={`w-full flex flex-col items-center gap-6 mt-4 select-none ${tokens.estado[state]} relative`}>
       {showTutorial && (
         <div className="absolute top-[-70px] left-0 right-0 z-50 pointer-events-none flex justify-center">
-          <div className="bg-indigo-50 p-4 rounded-2xl shadow-xl border-4 border-indigo-400 flex flex-col items-center max-w-[320px]">
-             <span className="text-xl mb-2 text-center font-black text-indigo-700 leading-tight">Dê uma comidinha para cada bichinho!</span>
+          <div
+            className="p-4 rounded-2xl shadow-xl border-4 flex flex-col items-center max-w-[320px]"
+            style={{ backgroundColor: tokens.cor.superficie.destaque, borderColor: tokens.cor.elementos.marcador }}
+          >
+             <span className="text-xl mb-2 text-center font-black leading-tight" style={{ color: tokens.cor.texto.principal }}>
+               {tutorialText ?? 'Dê uma comidinha para cada bichinho!'}
+             </span>
              <div className="flex gap-2 text-3xl animate-bounce">👇👇👇</div>
           </div>
         </div>

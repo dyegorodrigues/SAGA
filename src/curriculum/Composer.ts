@@ -76,6 +76,7 @@ import {
   multiplicadoresDoNivel,
   numeroMaximoDoNivel,
 } from "./procedimentos/deslocamentoProcedure";
+import { fisherYates } from "../utils/shuffle";
 
 const EMOJIS = ["🍎", "🦴", "🥕", "🐟", "🧀", "🏈", "⚽", "🚗", "🐶", "🐱"];
 
@@ -142,9 +143,8 @@ function numericOptions(answer: number, min: number, max: number) {
   const candidates = [answer, answer - 1, answer + 1, answer - 2, answer + 2]
     .filter(value => value >= min && value <= max);
   const values = [...new Set(candidates)].slice(0, Math.min(3, max - min + 1));
-  return values
-    .map(value => ({ label: String(value), value }))
-    .sort(() => Math.random() - 0.5);
+  return fisherYates(values
+    .map(value => ({ label: String(value), value })));
 }
 
 /**
@@ -291,7 +291,7 @@ export class Composer {
           options.push({ label: String(target), value: target });
           if(wrong1 >= min && wrong1 <= max && wrong1 !== target) options.push({ label: String(wrong1), value: wrong1 });
           if(wrong2 >= min && wrong2 <= max && wrong2 !== target && wrong2 !== wrong1) options.push({ label: String(wrong2), value: wrong2 });
-          options.sort(() => Math.random() - 0.5);
+          options = fisherYates(options);
         } else {
           evaluate = (ans) => true; answer = target; options = [{ label: "Continuar 👍", value: target }];
         }
@@ -341,12 +341,12 @@ export class Composer {
         
         evaluate = (ans) => ans === target;
         answer = target;
-        options = [
+        options = fisherYates([
           { label: String(target), value: target },
           { label: String(target + 1), value: target + 1 },
           { label: String(target - 1 >= 0 ? target - 1 : target + 2), value: target - 1 >= 0 ? target - 1 : target + 2 },
           { label: String(target + 2), value: target + 2 }
-        ].sort(() => Math.random() - 0.5);
+        ]);
         break;
       }
         
@@ -392,10 +392,9 @@ export class Composer {
               misconception: MisconceptionTag.OFF_BY_ONE,
             }] : []),
           ];
-          options = candidatos
+          options = fisherYates(candidatos
             .filter((opcao, indice) => candidatos.findIndex(item => String(item.value) === String(opcao.value)) === indice)
-            .slice(0, 4)
-            .sort(() => Math.random() - 0.5);
+            .slice(0, 4));
         }
         break;
       }
@@ -455,7 +454,7 @@ export class Composer {
           options.push({ label: String(target), value: target });
           if(wrong1 >= min && wrong1 <= max && wrong1 !== target) options.push({ label: String(wrong1), value: wrong1 });
           if(wrong2 >= min && wrong2 <= max && wrong2 !== target && wrong2 !== wrong1) options.push({ label: String(wrong2), value: wrong2 });
-          options.sort(() => Math.random() - 0.5);
+          options = fisherYates(options);
         } else {
           evaluate = (ans) => true; answer = target; options = [{ label: "Continuar 👍", value: target }];
         }
@@ -483,10 +482,9 @@ export class Composer {
         const targetMinutes = totalMinutes % 60;
         answer = `${targetHours}:${String(targetMinutes).padStart(2, "0")}`;
         uiProps = { initialHours, initialMinutes, interactive: false };
-        options = [answer, `${initialHours}:${String(initialMinutes).padStart(2, "0")}`, `${targetHours}:${String((targetMinutes + 15) % 60).padStart(2, "0")}`]
+        options = fisherYates([answer, `${initialHours}:${String(initialMinutes).padStart(2, "0")}`, `${targetHours}:${String((targetMinutes + 15) % 60).padStart(2, "0")}`]
           .filter((value, index, values) => values.indexOf(value) === index)
-          .map(value => ({ label: value, value }))
-          .sort(() => Math.random() - 0.5);
+          .map(value => ({ label: value, value })));
         evaluate = (ans) => ans === answer;
         break;
       }
@@ -538,7 +536,7 @@ export class Composer {
         const cols = randomInt(colsMin, colsMax);
         const answerMode = params.answer_mode ?? "total";
         answer = arrayAnswer({ rows, cols, answerMode });
-        options = arrayOptions({ rows, cols, answerMode }).sort(() => Math.random() - 0.5);
+        options = fisherYates(arrayOptions({ rows, cols, answerMode }));
         uiProps = {
           rows, cols, answerMode,
           allowRotate: params.allow_rotate ?? false,
@@ -584,7 +582,7 @@ export class Composer {
         });
 
         answer = solveAdditive(situation);
-        options = additiveOptions(situation).sort(() => Math.random() - 0.5);
+        options = fisherYates(additiveOptions(situation));
         uiProps = buildStoryBarsSpec(situation, narrative, lvl);
         evaluate = candidate => candidate === answer;
         promptOverride = narrative.question;
@@ -609,13 +607,12 @@ export class Composer {
         const spec = construirTabuadaSpec(situacao, lvl, PADRAO_DA_TABUADA[situacao.tabuada]);
 
         answer = spec.resposta;
-        options = spec.alternativas
+        options = fisherYates(spec.alternativas
           .map(a => ({
             value: a.valor,
             label: String(a.valor),
             ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
-          }))
-          .sort(() => Math.random() - 0.5);
+          })));
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
@@ -641,13 +638,12 @@ export class Composer {
         const spec = construirDecomposicaoSpec(escolha.tabuada, escolha.vezes, lvl);
 
         answer = spec.resposta;
-        options = spec.alternativas
+        options = fisherYates(spec.alternativas
           .map(a => ({
             value: a.valor,
             label: String(a.valor),
             ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
-          }))
-          .sort(() => Math.random() - 0.5);
+          })));
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
@@ -671,13 +667,12 @@ export class Composer {
         const spec = construirAncoraSpec(escolha.tabuada, escolha.vezes, lvl);
 
         answer = spec.resposta;
-        options = spec.alternativas
+        options = fisherYates(spec.alternativas
           .map(a => ({
             value: a.valor,
             label: String(a.valor),
             ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
-          }))
-          .sort(() => Math.random() - 0.5);
+          })));
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
@@ -708,13 +703,12 @@ export class Composer {
         const spec = construirFamiliaSpec({ a: escolha.a, b: escolha.b }, escolha.vertice, lvl);
 
         answer = spec.resposta;
-        options = spec.alternativas
+        options = fisherYates(spec.alternativas
           .map(a => ({
             value: a.valor,
             label: String(a.valor),
             ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
-          }))
-          .sort(() => Math.random() - 0.5);
+          })));
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
@@ -736,13 +730,12 @@ export class Composer {
         const spec = construirDeslocamentoSpec(escolha, lvl);
 
         answer = spec.resposta;
-        options = spec.alternativas
+        options = fisherYates(spec.alternativas
           .map(a => ({
             value: a.valor,
             label: String(a.valor),
             ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
-          }))
-          .sort(() => Math.random() - 0.5);
+          })));
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
@@ -1023,13 +1016,12 @@ export class Composer {
         const spec = construirAreaSpec(escolha, lvl);
 
         answer = spec.resposta;
-        options = spec.alternativas
+        options = fisherYates(spec.alternativas
           .map(a => ({
             value: a.valor,
             label: String(a.valor),
             ...(a.tag ? { misconception: a.tag, tag: a.tag } : {}),
-          }))
-          .sort(() => Math.random() - 0.5);
+          })));
         uiProps = spec;
         evaluate = candidate => candidate === answer;
         promptOverride = `Quanto é ${spec.falado}?`;
@@ -1072,15 +1064,15 @@ export class Composer {
           const sequences = Array.from(new Set(
             [ascending, reversed, swapped, rotated].map(sequence => sequence.join(" → ")),
           ));
-          const shuffled = [...ascending].sort(() => Math.random() - 0.5);
+          const shuffled = fisherYates([...ascending]);
           answer = correct;
           big = shuffled.join("   ");
           uiProps = { text: big };
-          options = sequences.map(sequence => ({
+          options = fisherYates(sequences.map(sequence => ({
             label: sequence,
             value: sequence,
             ...(sequence === correct ? {} : { misconception: MisconceptionTag.ORDEM_ERRADA }),
-          })).sort(() => Math.random() - 0.5);
+          })));
           evaluate = ans => String(ans) === correct;
           promptOverride = String(params.audio_prompt ?? "Coloque os números do menor para o maior.");
         } else if (params.complemento_dez) {
@@ -1100,10 +1092,9 @@ export class Composer {
               misconception: MisconceptionTag.OFF_BY_ONE,
             }] : []),
           ];
-          options = candidatos
+          options = fisherYates(candidatos
             .filter((opcao, indice) => candidatos.findIndex(item => String(item.value) === String(opcao.value)) === indice)
-            .slice(0, 4)
-            .sort(() => Math.random() - 0.5);
+            .slice(0, 4));
           evaluate = ans => Number(ans) === answer;
           promptOverride = `${parte} mais quanto dá dez?`;
         } else if (typeof params.dezenas_max === "number") {
@@ -1194,7 +1185,7 @@ export class Composer {
         }
         
         uiProps = { text: seq.join(" ") };
-        options = [{label: A, value: A}, {label: B, value: B}].sort(() => Math.random() - 0.5);
+        options = fisherYates([{label: A, value: A}, {label: B, value: B}]);
         evaluate = (ans) => ans === intruder;
         answer = intruder;
         break;

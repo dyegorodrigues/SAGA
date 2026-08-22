@@ -34,6 +34,12 @@ export interface EmojiRowProps {
   crossedOut?: boolean;
   promptDone?: boolean;
   onItemTouch?: (count: number) => void;
+
+  /** W9/F15 — retirada sem deslocar o objeto do slot original. */
+  markedIndices?: number[];
+  markStyle?: 'x' | 'ghost';
+  markInteractive?: boolean;
+  onItemMark?: (index: number) => void;
 }
 
 export function EmojiRow({
@@ -49,7 +55,11 @@ export function EmojiRow({
   onItemTouch,
   disabled,
   crossedOut,
-  promptDone = true
+  promptDone = true,
+  markedIndices = [],
+  markStyle = 'x',
+  markInteractive = false,
+  onItemMark,
 }: EmojiRowProps) {
 
   const [phase, setPhase] = useState<'waiting' | 'flashing' | 'done'>(
@@ -93,6 +103,11 @@ export function EmojiRow({
     }
   };
 
+  const handleMark = (idx: number) => {
+    if (!markInteractive || disabled || !promptDone) return;
+    onItemMark?.(idx);
+  };
+
   return (
     <div
       className={pontos
@@ -106,6 +121,7 @@ export function EmojiRow({
         { (phase === 'flashing' || !flashDurationMs) ? (
           Array.from({ length: n }).map((_, i) => {
             const isHighlighted = highlightIndex === i || (interactiveCount && !touchedItems.has(i));
+            const isMarked = markedIndices.includes(i);
             
             // In touch mode, items are dimmed until touched
             const isTouched = interactiveCount ? touchedItems.has(i) : true;
@@ -116,12 +132,25 @@ export function EmojiRow({
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
                   scale: isHighlighted ? 1.35 : 1, 
-                  opacity: isTouched ? 1 : 0.3,
+                  opacity: isMarked ? 0.42 : (isTouched ? 1 : 0.3),
                   filter: isTouched ? 'grayscale(0%)' : 'grayscale(100%)'
                 }}
                 exit={{ scale: 0, opacity: 0 }}
-                onClick={() => handleTouch(i)}
-                className={`${pontos ? 'absolute' : 'relative'} inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''}`}
+                onClick={() => markInteractive ? handleMark(i) : handleTouch(i)}
+                onKeyDown={event => {
+                  if (!markInteractive || (event.key !== 'Enter' && event.key !== ' ')) return;
+                  event.preventDefault();
+                  handleMark(i);
+                }}
+                {...(markInteractive ? {
+                  role: 'button',
+                  tabIndex: disabled || !promptDone ? -1 : 0,
+                  'aria-label': isMarked ? `Item ${i + 1} já riscado` : `Riscar item ${i + 1}`,
+                  'aria-disabled': disabled || !promptDone || isMarked,
+                } : {})}
+                data-marked={isMarked ? 'true' : 'false'}
+                data-mark-style={isMarked ? markStyle : undefined}
+                className={`${pontos ? 'absolute' : 'relative'} inline-block ${interactiveCount && !touchedItems.has(i) ? 'cursor-pointer' : ''} ${markInteractive ? 'cursor-pointer' : ''} ${isMarked && markStyle === 'ghost' ? 'rounded-xl outline outline-2 outline-dashed outline-slate-500' : ''}`}
                 style={{
                   zIndex: isHighlighted ? 20 : 1,
                   fontSize: small ? '24px' : tokens.tamanho.base,
@@ -169,7 +198,10 @@ export function EmojiRow({
                   </span>
                 )}
                 {emoji}
-              {crossedOut && <div className="absolute inset-0 flex items-center justify-center"><div className="w-full h-1 bg-red-500 -rotate-45 shadow-sm" /></div>}
+                {isMarked && markStyle === 'x' && (
+                  <span className="absolute inset-0 flex items-center justify-center text-5xl font-black text-red-600 pointer-events-none" aria-hidden="true">×</span>
+                )}
+                {crossedOut && <div className="absolute inset-0 flex items-center justify-center"><div className="w-full h-1 bg-red-500 -rotate-45 shadow-sm" /></div>}
               </motion.span>
             );
           })

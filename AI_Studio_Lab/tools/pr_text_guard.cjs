@@ -28,9 +28,30 @@ const paths = new Set([
   ...gitNames(["ls-files", "--others", "--exclude-standard", "-z"]),
 ]);
 
+/**
+ * Exceção única e estreita: as fontes da identidade visual, hospedadas
+ * localmente.
+ *
+ * O `@import` do Google Fonts em `src/index.css` já derrubou o CI mais de uma
+ * vez — na W30 foram 27 HTTP 404 em 27 navegações da sonda F15, 100% de falha
+ * da dependência naquela janela. E o dano maior não é o CI: é a criança em
+ * wi-fi ruim de escola abrindo o app sem a tipografia.
+ *
+ * Hospedar o arquivo não muda um pixel do que a criança vê — `Fredoka` e
+ * `Nunito` continuam sendo as famílias escolhidas pelo dono do projeto. Trocar
+ * de família continua sendo decisão dele; de onde o byte vem é infraestrutura.
+ *
+ * A exceção é deliberadamente mínima: **só `public/fonts/`, só `.woff2`**.
+ * Qualquer outro binário, em qualquer outro lugar, continua barrado — inclusive
+ * `.ttf` e `.woff` dentro da própria pasta.
+ */
+const ehFonteLocal = (caminho) =>
+  caminho.startsWith("public/fonts/") && extname(caminho).toLowerCase() === ".woff2";
+
 const blocked = [];
 for (const path of paths) {
   if (!existsSync(path)) continue;
+  if (ehFonteLocal(path)) continue;
   const bytes = readFileSync(path);
   if (blockedExtensions.has(extname(path).toLowerCase()) || bytes.includes(0)) blocked.push(path);
 }

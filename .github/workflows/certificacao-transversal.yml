@@ -1,0 +1,96 @@
+name: Certificação transversal
+
+# Portões longos: cada SHA tem seu próprio grupo, portanto um push posterior
+# não cancela nem substitui a certificação já iniciada de um commit anterior.
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: certificacao-transversal-${{ github.event.pull_request.head.sha }}
+  cancel-in-progress: false
+
+jobs:
+  sonda-transversal-portao:
+    name: Sonda transversal — 390px · semente ${{ matrix.semente }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { semente: 1, prefixo: 1 }
+          - { semente: 7, prefixo: 2 }
+          - { semente: 42, prefixo: 3 }
+          - { semente: 99, prefixo: 4 }
+          - { semente: 123, prefixo: 5 }
+          - { semente: 777, prefixo: 6 }
+          - { semente: 2024, prefixo: 7 }
+          - { semente: 31415, prefixo: 8 }
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Sonda transversal — portão canônico
+        env:
+          SONDA_LARGURAS: '390'
+          SONDA_SEMENTES: '${{ matrix.prefixo }}'
+        run: npm run sonda -- "[semente ${{ matrix.semente }}]"
+
+  sonda-transversal-responsiva:
+    name: Sonda transversal — 320/900px × 1 semente
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Resolver Chrome do runner
+        shell: bash
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "Chrome/Chromium não encontrado no runner." >&2
+            exit 1
+          fi
+          echo "SONDA_CHROME=$CHROME_BIN" >> "$GITHUB_ENV"
+          "$CHROME_BIN" --version
+
+      - name: Sonda transversal — larguras responsivas
+        env:
+          SONDA_LARGURAS: '320,900'
+          SONDA_SEMENTES: '1'
+        run: npm run sonda
