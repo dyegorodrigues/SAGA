@@ -26,7 +26,7 @@ export function HorasMinutosStage({ spec, disabled = false, onAnswer }: Props) {
       <header className="rounded-2xl border p-4 space-y-2" style={{ backgroundColor: tokens.cor.superficie.cartao, borderColor: tokens.cor.elementos.borda }}>
         <p className="text-sm font-bold" style={{ color: tokens.cor.texto.secundario }}>Cada número do mostrador vale 5 minutos</p>
         <p className="text-lg font-black" style={{ color: tokens.cor.texto.principal }}>
-          {spec.duracao ? `${spec.duracao.inicio} → ${spec.duracao.fim}` : `${String(spec.horario.horas).padStart(2, "0")}:${String(spec.horario.minutos).padStart(2, "0")}`}
+          {spec.duracao ? `${spec.duracao.inicio} → ${spec.duracao.fim}` : "Observe os ponteiros"}
         </p>
         <p className="text-sm" style={{ color: tokens.cor.texto.secundario }}>
           {spec.duracao ? "Conte primeiro a hora inteira e depois complete os minutos na reta de tempo." : "Siga o ponteiro grande desde o 12 e conte os minutos no intervalo pedido."}
@@ -58,14 +58,12 @@ export function HorasMinutosStage({ spec, disabled = false, onAnswer }: Props) {
           <p className="font-bold px-2" style={{ color: tokens.cor.texto.principal }}>{spec.duracao ? "Reta de duração" : "Contagem de minutos"}</p>
           <NumberLine
             min={0}
-            max={spec.duracao?.minutos ?? 60}
+            max={spec.duracao ? 120 : 60}
             step={spec.duracao ? 15 : supportStep}
-            targetValue={spec.resposta}
             larguraPorPonto={48}
-            highlightedRanges={[{ start: 0, end: spec.resposta, color: tokens.cor.elementos.base_A }]}
           />
           {spec.saltosHorasAntesDosMinutos && (
-            <p className="px-2 text-sm font-bold" style={{ color: tokens.cor.texto.secundario }}>60 min + 15 min = 75 min</p>
+            <p className="px-2 text-sm font-bold" style={{ color: tokens.cor.texto.secundario }}>Conte uma hora inteira (60 min) e depois os minutos restantes.</p>
           )}
         </div>
       )}
