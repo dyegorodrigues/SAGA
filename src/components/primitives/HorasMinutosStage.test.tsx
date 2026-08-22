@@ -19,6 +19,15 @@ describe("HorasMinutosStage — F62 / GM.06", () => {
     }
   });
 
+  it("não imprime o horário digital que entrega os minutos antes da leitura", () => {
+    const spec = construirHorasMinutosSpec(2);
+    const { container } = render(<HorasMinutosStage spec={spec} onAnswer={vi.fn()} />);
+    const header = container.querySelector<HTMLElement>("[data-f62-stage] header");
+
+    expect(header).not.toBeNull();
+    expect(header?.textContent).not.toContain("04:25");
+  });
+
   it("não resolve nem destaca a duração-alvo antes da tentativa", () => {
     const spec = construirHorasMinutosSpec(5);
     const { container } = render(<HorasMinutosStage spec={spec} onAnswer={vi.fn()} />);
