@@ -49,14 +49,28 @@ export function diagnosticar(acao: AcaoDeMedida): string | undefined {
 }
 
 /** §9: pelo menos um acerto no caso que contradiz a aparência. */
+/**
+ * Em capacidade, a aparência engana: recipiente alto e estreito parece levar mais
+ * que baixo e largo. A ação de despejar é o que desfaz a ilusão, então acerto sem
+ * despejar não prova conservação — pode ser sorte entre duas alternativas.
+ *
+ * Peso não tem afordância equivalente e preserva o comportamento anterior.
+ *
+ * Vive numa função só porque `evidenciasDe` e `dominou` precisam da mesma regra.
+ * Duplicá-la já produziu divergência: o reparo de 22/08 corrigiu `evidenciasDe` e
+ * deixou `dominou` coroando sem verificação.
+ */
+function verificacaoCumprida(acao: AcaoDeMedida): boolean {
+  return acao.modo !== "capacidade" || acao.verificou;
+}
+
 export function evidenciasDe(acao: AcaoDeMedida): string[] {
-  const verificacaoCumprida = acao.modo !== "capacidade" || acao.verificou;
-  return acertou(acao) && acao.contraintuitivo && verificacaoCumprida
+  return acertou(acao) && acao.contraintuitivo && verificacaoCumprida(acao)
     ? [Evidencia.CASO_CONTRAINTUITIVO]
     : [];
 }
 
 export function dominou(historico: AcaoDeMedida[]): boolean {
   const corretas = historico.filter(acertou);
-  return corretas.length >= 3 && corretas.some(a => a.contraintuitivo);
+  return corretas.length >= 3 && corretas.some(a => a.contraintuitivo && verificacaoCumprida(a));
 }

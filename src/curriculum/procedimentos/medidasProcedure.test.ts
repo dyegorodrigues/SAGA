@@ -34,4 +34,14 @@ describe("F50 — diagnóstico e evidência", () => {
     expect(dominou([base, { ...base, contraintuitivo: false }, { ...base, contraintuitivo: false }])).toBe(true);
     expect(dominou([{ ...base, contraintuitivo: false }, { ...base, contraintuitivo: false }, { ...base, contraintuitivo: false }])).toBe(false);
   });
+  it("não coroa capacidade contraintuitiva sem a verificação física", () => {
+    const capacidade: AcaoDeMedida = { ...base, modo: "capacidade", formatosDiferentes: true };
+    const semVerificar = { ...capacidade, verificou: false };
+    const comVerificar = { ...capacidade, verificou: true };
+
+    // Três acertos, um deles contraintuitivo — mas sem despejar. Não pode coroar.
+    expect(dominou([semVerificar, semVerificar, semVerificar])).toBe(false);
+    // O mesmo histórico, com a verificação feita, coroa.
+    expect(dominou([comVerificar, comVerificar, comVerificar])).toBe(true);
+  });
 });
