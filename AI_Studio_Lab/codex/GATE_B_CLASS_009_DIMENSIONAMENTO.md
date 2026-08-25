@@ -112,7 +112,39 @@ apodrecer em silêncio.
 - descoberta: **concluída** para as 75 servidas pelo Composer neste SHA;
 - limite conhecido: 15 fichas de gerador legado não são alcançadas pelo
   instrumento — `HIPÓTESE-A-PROVAR`, não aprovação;
-- reparadas: `GM.06` (GAP-054), `N2.07`;
-- fila aberta: `GM.09`, `GM.10`, `N4.10`, `N5.01`, `N5.02`, `N6.01`, `PE.03`;
-- classe reparada **só** quando a fila fechar e o registro contiver apenas
-  entradas legítimas.
+- reparadas: `GM.06` (GAP-054), `N2.07`, `GM.09`, `GM.10`, `N4.10`, `N5.01`,
+  `N5.02`, `N6.01`;
+- fila aberta: **nenhuma**. O registro do instrumento não contém mais nenhuma
+  entrada `A-REPARAR`, e o próprio teste afirma isso;
+- classe **reparada** para as 75 servidas pelo Composer neste SHA.
+
+### 6.1 Reclassificações feitas ao reparar
+
+Duas fichas continuam ecoando o rótulo e **devem** continuar:
+
+| Ficha | Onde ecoa | Por que é legítimo |
+|---|---|---|
+| N6.01 / F75 | modo `comparar` | o numeral sob cada quadrado diz qual é qual; comparar pela área pintada é a estratégia concreta do nível, não um gabarito |
+| PE.03 / F83 | modo `comparar-chances` | os sacos precisam de rótulo A/B para poderem ser escolhidos |
+
+`N6.01` só apareceu como legítima **depois** do reparo: o vazamento real dela
+era outro (`4/10 = 0,4` na ponte fração→decimal) e estava escondido atrás
+deste eco. Medir de novo depois de cada reparo é o que separou os dois.
+
+### 6.2 O que cada reparo passou a exigir
+
+| Ficha | Antes | Depois |
+|---|---|---|
+| GM.10 / F93 | `1 m = 100 cm` no cabeçalho, na balança e na legenda | `1 m = ? cm`; em `unidade-adequada` a incógnita é a unidade |
+| GM.09 / F82 | `2 m = 200 cm` sempre escrito | escondido só onde a conversão **é** a resposta (L1–L3); em L4–L5 continua como andaime |
+| N5.01 / F45 | a barra pintava `quarto` / `1/4` no texto e no `aria-label` | sem rótulo; partição e destaque bastam |
+| N5.02 / F72 | a barra pintava `spec.resposta` | sem rótulo |
+| N6.01 / F75 | `4/10 = 0,4` | `4/10 = ?` |
+| PE.03 / F83 | `3/5` escrito ao lado dos círculos | `?`; os círculos já mostram favoráveis e total |
+| N4.10 / F69 | conta armada **resolvida**: quociente, produto, `21 × 4 + 0 = 84` | quociente `?`, sem produto nem prova real; `revelar` fica para a explicação depois da resposta |
+
+## 7. Limite que continua aberto
+
+As 15 fichas servidas por gerador legado não passam por este instrumento.
+Enquanto forem legado, a classe está medida em 75/90, não em 90/90 —
+`HIPÓTESE-A-PROVAR`, registrada aqui para não virar aprovação silenciosa.
