@@ -73,6 +73,11 @@ describe("CLASS-007 — N2.07/F66: a fábrica de retângulos precisa ser operáv
     expect(suporte()).toContain("3x4");
     expect(suporte()).toContain("6x2");
     expect(suporte()).not.toContain("1x12");
+
+    // 12 em 5 colunas sobra 2: passar por ali não fecha formação nenhuma.
+    fireEvent.click(controle("mais-colunas")!);
+    expect(view.container.querySelector("[data-f66-invalid-remainder]")).not.toBeNull();
+    expect(suporte(), "sobra não é formação fechada").not.toContain("2x5");
     view.unmount();
   });
 
@@ -80,9 +85,12 @@ describe("CLASS-007 — N2.07/F66: a fábrica de retângulos precisa ser operáv
     const { view } = montar(1);
     const grade = view.container.querySelector("[data-array-grid-f66]");
     expect(grade).not.toBeNull();
-    // ArrayGrid sem opções não renderiza nenhum alvo clicável; deixá-lo
+    // ArrayGrid sem opções não renderiza alvo próprio nenhum; deixá-lo
     // "habilitado" com onAnswer no-op era a forma que o Gate B mediu.
-    expect(grade!.querySelectorAll("button").length, "a grade não deve ter alvo próprio em F66").toBe(0);
+    const alvosDaGrade = grade!.querySelector('[aria-label="Alternativas do arranjo"]');
+    expect(alvosDaGrade?.querySelectorAll("button").length ?? 0, "a grade não deve ter alvo próprio em F66").toBe(0);
+    // O que a criança opera é o controle de colunas do palco, e ele é vivo.
+    expect(grade!.querySelectorAll('[data-f66-control]').length).toBe(2);
   });
 
   it("a prop disabled continua fechando alternativas e controles", () => {
