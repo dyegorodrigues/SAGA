@@ -31,6 +31,15 @@ export function construirConversaoUnidadesSpec(level:number):ConversaoUnidadesF9
   return{nivel,modo:"problema",primitivas:["NumberLine","Balanca"],equivalencia:{origem:2.5,unidadeOrigem:"L",destino:2500,unidadeDestino:"ml",grandeza:"capacidade"},quantidadeFisicaPreservada:true,incluiDecimal:true,resposta:2500,opcoes:opcoes(2500,"2500 ml",[{value:25,label:"25 ml",misconception:ConversaoUnidadesMisconception.IGNORA_DECIMAL},{value:0.0025,label:"0,0025 ml",misconception:ConversaoUnidadesMisconception.INVERTE_OPERACAO},{value:"2500 g",label:"2500 g",misconception:ConversaoUnidadesMisconception.MISTURA_GRANDEZAS}])};
 }
 
+/**
+ * O lado que a criança tem de descobrir. A tela nunca o escreve antes da
+ * resposta: em F93 a equivalência é sempre o que se pergunta -- inclusive em
+ * `unidade-adequada`, onde o que falta é a unidade e não o número.
+ */
+export function incognitaConversaoF93(spec:ConversaoUnidadesF93Spec):string{
+  return spec.modo==="unidade-adequada"?"? (qual unidade?)":`? ${spec.equivalencia.unidadeDestino}`;
+}
+
 export function construirConversaoUnidadesResolucao(spec:ConversaoUnidadesF93Spec):ResolucaoDeclarativa<ConversaoShow,string|number,ConversaoUnidadesMisconceptionTag>{
   const show={equivalencia:spec.equivalencia,quantidadeFisicaPreservada:true as const};
   return{estadoInicial:show,passos:[

@@ -38,8 +38,6 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "N4.09": { motivo: "LEGITIMO", porque: "produtos parciais da decomposição; coincidem com a resposta só quando a parcela é o total" },
 
   // A reparar: o suporte afirma a resposta que o enunciado pergunta.
-  "GM.09": { motivo: "A-REPARAR", porque: "escreve \"2 m = 200 cm\" enquanto pergunta quantos centímetros são 2 metros" },
-  "GM.10": { motivo: "A-REPARAR", porque: "escreve \"1 m = 100 cm\" enquanto pergunta a conversão" },
   "N4.10": { motivo: "A-REPARAR", porque: "exibe o quociente pronto e a prova real da divisão pedida" },
   "N6.01": { motivo: "A-REPARAR", porque: "escreve \"4/10 = 0,4\" enquanto pergunta quanto está pintado" },
   "N5.01": { motivo: "A-REPARAR", porque: "escreve o nome da parte que o enunciado pede" },
@@ -99,7 +97,7 @@ describe("CLASS-009 — nenhuma tela declara a resposta que ela mesma pergunta",
 
   it("a fila de reparo do Gate B′ é explícita e não some sem recibo", () => {
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR").map(([id]) => id).sort();
-    expect(aReparar).toEqual(["GM.09", "GM.10", "N4.10", "N5.01", "N5.02", "N6.01", "PE.03"]);
+    expect(aReparar).toEqual(["N4.10", "N5.01", "N5.02", "N6.01", "PE.03"]);
     for (const [, item] of Object.entries(REGISTRO)) expect(item.porque.length).toBeGreaterThan(20);
   });
 });

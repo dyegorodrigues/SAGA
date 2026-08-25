@@ -2,7 +2,7 @@ import React from "react";
 import { Balanca, type BalancaItem } from "./Balanca";
 import { NumberLine } from "./NumberLine";
 import { tokens } from "../../styles/tokens";
-import type { ProblemasMedidaF82Spec } from "../../curriculum/procedimentos/problemasMedidaContract";
+import { rotuloConvertidoF82, type ProblemasMedidaF82Spec } from "../../curriculum/procedimentos/problemasMedidaContract";
 import type { AnswerMeta } from "../../types";
 
 interface Props {
@@ -18,14 +18,17 @@ export function ProblemasMedidaStage({ spec, disabled = false, onAnswer }: Props
   const passo = escalaMax <= 3 ? 1 : Math.max(1, Math.round(escalaMax / 5));
   const alvoEscala = Math.min(escalaMax, spec.conversao.valorInicial);
   const leftItems: BalancaItem[] = [{ id: "origem", weight: 1, label: textoMedida(spec.conversao.valorInicial, spec.conversao.de), color: tokens.cor.elementos.base_A }];
-  const rightItems: BalancaItem[] = [{ id: "convertida", weight: 1, label: textoMedida(spec.conversao.valorConvertido, spec.conversao.para), color: tokens.cor.elementos.base_B }];
+  // CLASS-009: nos níveis em que a conversão é a própria resposta, a balança
+  // pergunta em vez de afirmar. Nos de duas etapas ela continua escrita.
+  const convertidoLabel = rotuloConvertidoF82(spec);
+  const rightItems: BalancaItem[] = [{ id: "convertida", weight: 1, label: convertidoLabel, color: tokens.cor.elementos.base_B }];
 
   return (
     <section className="w-full max-w-3xl mx-auto space-y-5" data-f82-stage data-f82-level={spec.nivel} data-f82-mode={spec.modo}>
       <header className="rounded-2xl border p-4 space-y-2" style={{ backgroundColor: tokens.cor.superficie.cartao, borderColor: tokens.cor.elementos.borda }}>
         <p className="text-sm font-bold" style={{ color: tokens.cor.texto.secundario }}>Mesma quantidade, outra unidade</p>
         <p className="text-lg font-black" style={{ color: tokens.cor.texto.principal }}>
-          {textoMedida(spec.conversao.valorInicial, spec.conversao.de)} = {textoMedida(spec.conversao.valorConvertido, spec.conversao.para)}
+          {textoMedida(spec.conversao.valorInicial, spec.conversao.de)} = {convertidoLabel}
         </p>
         <p className="text-sm" style={{ color: tokens.cor.texto.secundario }}>
           {spec.exigeConversaoAntes ? "Converta primeiro. Só depois compare ou opere." : "A unidade muda, mas a quantidade representada continua a mesma."}

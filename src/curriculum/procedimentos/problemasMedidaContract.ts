@@ -93,6 +93,21 @@ export function construirProblemasMedidaSpec(level: number): ProblemasMedidaF82S
   };
 }
 
+/**
+ * Em F82 a conversão às vezes É a resposta (L1-L3) e às vezes é só o degrau de
+ * um problema de duas etapas (L4-L5). No primeiro caso escrevê-la na tela
+ * entrega o gabarito; no segundo ela é andaime legítimo.
+ */
+export function conversaoEhARespostaF82(spec: ProblemasMedidaF82Spec): boolean {
+  return spec.resposta === spec.conversao.valorConvertido;
+}
+
+export function rotuloConvertidoF82(spec: ProblemasMedidaF82Spec): string {
+  return conversaoEhARespostaF82(spec)
+    ? `? ${spec.conversao.para}`
+    : `${spec.conversao.valorConvertido} ${spec.conversao.para}`;
+}
+
 export function construirProblemasMedidaResolucao(spec: ProblemasMedidaF82Spec): ResolucaoDeclarativa<ProblemasMedidaShow, number, ProblemasMedidaMisconceptionTag> {
   const show: ProblemasMedidaShow = { conversao: spec.conversao, valoresOriginais: spec.valoresOriginais, unidadeResposta: spec.unidadeResposta, exigeConversaoAntes: spec.exigeConversaoAntes };
   return { estadoInicial: show, passos: [

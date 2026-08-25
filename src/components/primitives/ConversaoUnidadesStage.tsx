@@ -2,13 +2,16 @@ import React from "react";
 import { Balanca } from "./Balanca";
 import { NumberLine } from "./NumberLine";
 import { tokens } from "../../styles/tokens";
-import type { ConversaoUnidadesF93Spec } from "../../curriculum/procedimentos/conversaoUnidadesContract";
+import { incognitaConversaoF93, type ConversaoUnidadesF93Spec } from "../../curriculum/procedimentos/conversaoUnidadesContract";
 import type { AnswerMeta } from "../../types";
 
 interface Props { spec:ConversaoUnidadesF93Spec; disabled?:boolean; onAnswer:(answer:string|number,meta?:AnswerMeta)=>void; }
 export function ConversaoUnidadesStage({spec,disabled=false,onAnswer}:Props){
   const origemLabel=`${spec.equivalencia.origem} ${spec.equivalencia.unidadeOrigem}`;
-  const destinoLabel=`${spec.equivalencia.destino} ${spec.equivalencia.unidadeDestino}`;
+  // CLASS-009: o lado de destino é a resposta. A balança passa a fazer a
+  // pergunta em vez de respondê-la -- "1 m = ? cm" continua sendo o mesmo
+  // princípio físico, sem entregar o número.
+  const destinoLabel=incognitaConversaoF93(spec);
   return <section className="mx-auto w-full max-w-3xl space-y-5 px-1 py-2" data-f93-stage data-f93-level={spec.nivel} data-f93-mode={spec.modo}>
     <header className="rounded-2xl border p-4" style={{backgroundColor:tokens.cor.superficie.cartao,borderColor:tokens.cor.elementos.borda}}>
       <p className="text-sm font-bold" style={{color:tokens.cor.texto.secundario}}>A quantidade física não muda</p>
