@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import type { AnswerMeta, Option, Question } from "../../types";
 import {
+  construcaoCompletaVolumePrismasF94,
+  construcaoExigidaVolumePrismasF94,
   evidenciasVolumePrismasF94,
   type VolumePrismasF94Spec,
 } from "../../curriculum/procedimentos/volumePrismasContract";
@@ -58,8 +60,14 @@ export function VolumePrismasStage({ spec, options, disabled = false, onAnswer }
     ? alturasPorCubos(spec, cubos)
     : alturasPorCamadas(spec, camadas), [spec, cubos, camadas]);
 
+  // CLASS-007: enquanto a construção que a ficha manda fazer não estiver
+  // pronta, as alternativas ficam fechadas. Sem isso, "Adicionar cubinho" e
+  // "Adicionar camada" seriam enfeite: a criança compraria o acerto no botão.
+  const construcaoCompleta = construcaoCompletaVolumePrismasF94(spec, { cubos, camadas });
+  const respostasFechadas = disabled || !construcaoCompleta;
+
   const responder = (valor: string) => {
-    if (disabled) return;
+    if (respostasFechadas) return;
     setSelecionado(valor);
     const option = options.find(item => String(item.value) === valor);
     const correta = valor === spec.resposta;
@@ -69,6 +77,10 @@ export function VolumePrismasStage({ spec, options, disabled = false, onAnswer }
     };
     onAnswer(valor, meta);
   };
+
+  const pendencia = construcaoExigidaVolumePrismasF94(spec) === "cubos"
+    ? `Faltam ${spec.volume - cubos} cubinhos para encher o prisma.`
+    : `Faltam ${spec.altura - camadas} camadas para fechar o prisma.`;
 
   const podeAdicionarCubinho = spec.modo === "contar-cubos" && cubos < spec.volume;
   const podeAdicionarCamada = spec.modo !== "contar-cubos" && spec.modo !== "dimensao-faltante" && camadas < spec.altura;
@@ -111,9 +123,13 @@ export function VolumePrismasStage({ spec, options, disabled = false, onAnswer }
         A base não precisa ser retangular: se todas as camadas são idênticas, conte uma camada e repita pela altura.
       </p> : null}
 
+      {construcaoCompleta ? null : <p className="w-full rounded-2xl bg-amber-50 p-3 text-center text-sm font-bold text-amber-900" aria-live="polite" data-f94-pendencia>
+        {pendencia}
+      </p>}
+
       <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Respostas para volume do prisma">
         {options.map(option => (
-          <button key={String(option.value)} type="button" disabled={disabled} onClick={() => responder(String(option.value))}
+          <button key={String(option.value)} type="button" disabled={respostasFechadas} onClick={() => responder(String(option.value))}
             className={`min-h-20 min-w-20 rounded-2xl border-2 px-3 py-3 font-black ${selecionado === String(option.value) ? "border-indigo-600 bg-indigo-50 text-indigo-900" : "border-slate-200 bg-white text-slate-800"} disabled:opacity-50`}>
             {option.label ?? String(option.value)}
           </button>

@@ -57,7 +57,11 @@ describe("CLASS-007 — GM.11/F94: construir é condição da resposta", () => {
       expect(onAnswer).not.toHaveBeenCalled();
 
       // O palco já começa com uma camada; faltam as demais até a altura.
-      for (let i = 1; i < spec.altura; i += 1) fireEvent.click(adicionar!);
+      // A penúltima camada ainda não é o prisma: parar aqui mantém tudo fechado.
+      for (let i = 1; i < spec.altura - 1; i += 1) fireEvent.click(adicionar!);
+      expect(respostaCerta().disabled, `L${nivel} abriu com ${spec.altura - 1} de ${spec.altura} camadas`).toBe(true);
+
+      fireEvent.click(adicionar!);
       expect(respostaCerta().disabled, `L${nivel} continuou fechado com o prisma completo`).toBe(false);
       fireEvent.click(respostaCerta());
       expect(onAnswer).toHaveBeenCalledTimes(1);

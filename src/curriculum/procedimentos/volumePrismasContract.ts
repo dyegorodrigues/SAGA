@@ -72,6 +72,27 @@ export function alturasVisiveisVolumePrismasF94(spec: VolumePrismasF94Spec, cama
   return spec.baseCells.map(row => row.map(cell => cell ? preenchidas : 0));
 }
 
+/** O que a criança precisa ter construído antes de a resposta valer. */
+export type ConstrucaoExigidaF94 = "cubos" | "camadas" | "nenhuma";
+
+export function construcaoExigidaVolumePrismasF94(spec: VolumePrismasF94Spec): ConstrucaoExigidaF94 {
+  if (spec.modo === "contar-cubos") return "cubos";
+  // L4 mostra só a base de propósito: a altura é o que se pergunta, e empilhar
+  // camadas até fechar o volume entregaria a resposta na tela.
+  if (spec.modo === "dimensao-faltante") return "nenhuma";
+  return "camadas";
+}
+
+export function construcaoCompletaVolumePrismasF94(
+  spec: VolumePrismasF94Spec,
+  construido: { cubos: number; camadas: number },
+): boolean {
+  const exigida = construcaoExigidaVolumePrismasF94(spec);
+  if (exigida === "nenhuma") return true;
+  if (exigida === "cubos") return construido.cubos >= spec.volume;
+  return construido.camadas >= spec.altura;
+}
+
 export function evidenciasVolumePrismasF94(spec: VolumePrismasF94Spec, correta: boolean): string[] {
   if (!correta || spec.modo !== "dimensao-faltante") return [];
   return [Evidencia.DIMENSAO_FALTANTE_F94];
