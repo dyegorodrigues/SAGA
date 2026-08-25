@@ -39,6 +39,7 @@ A ordem é a ordem real dos commits; nada aqui é reescrito depois.
 | 1 | GAP-054 — GM.06/F62 (vazamento) | `0be6973`, `57ef143` | `2b26bc2`, `74883c6` | enunciado e scaffold deixam de conter o gabarito |
 | 2 | CLASS-007 — GM.12/F50 | `02579c8` | `60887e8`, `d32a092` | `CASO_CONTRAINTUITIVO` exige `verificou`; `dominou()` alinhado a `evidenciasDe()` |
 | 3 | CLASS-007 — GM.11/F94 | `bbd2ce9` | `6635716` | alternativas fechadas até o prisma estar construído (L1 cubinhos, L2/L3/L5 camadas) |
+| 4 | CLASS-007 + CLASS-009 — N2.07/F66 | `71daf98` | `44f215c` | a fábrica de retângulos vira operável; a lista de formações passa a ser o que a criança fechou |
 
 ### Fronteira medida em GM.11
 
@@ -54,8 +55,27 @@ uma sessão futura não a "conserte" por simetria.
 Descoberta fechada para o SHA medido em `41d4233`: `N2.07, N4.02, GE.04,
 GE.07, GE.09, GM.11, GM.12` (7/90 = 7,78%).
 
-- reparadas: `GM.12`, `GM.11`;
-- abertas: `N2.07`, `GE.07` (sub-forma A, callback morto); `N4.02`, `GE.04`, `GE.09` (sub-forma B, ação opcional).
+- reparadas: `GM.12`, `GM.11`, `N2.07`;
+- abertas: `GE.07` (sub-forma A, callback morto); `N4.02`, `GE.04`, `GE.09` (sub-forma B, ação opcional).
+
+### Correção de medição em N2.07
+
+O dimensionamento registrou N2.07 como "callback morto: `ArrayGrid` fica
+habilitado e recebe `onAnswer={() => undefined}`". A forma estava certa, mas a
+medição na tela mostrou que F66 passa `options: []` à grade — que por isso não
+renderiza **alvo clicável nenhum**. O callback morto nunca chegava a ser
+alcançável pela criança: era um cheiro de código, não um bypass vivo. O defeito
+vivo em N2.07 era outro, e maior — CLASS-009, abaixo.
+
+## 6. CLASS-009 — a tela declara a própria resposta
+
+Aberta ao reparar N2.07. Dimensionada em
+`GATE_B_CLASS_009_DIMENSIONAMENTO.md`: 7 vazamentos confirmados em 75 fichas
+servidas pelo Composer (`GM.09`, `GM.10`, `N4.10`, `N5.01`, `N5.02`, `N6.01`,
+`PE.03`), mais `GM.06` e `N2.07` já reparadas.
+
+`GAP-054` deixa de ser um defeito individual e passa a ser a primeira
+testemunha desta classe.
 
 Classe reparada só quando as cinco restantes fecharem **e** existir um gate
 por descoberta que reprove uma reincidência futura — não uma lista escrita à
