@@ -35,7 +35,9 @@ function Chance({ spec }: { spec: MediaChanceF83Spec }) {
             <div key={i} className={`h-14 w-14 rounded-full border-4 ${i < spec.chance!.favoraveis ? "border-sky-700 bg-sky-200" : "border-slate-400 bg-white"}`} aria-label={i < spec.chance.favoraveis ? "favorável" : "outro caso"} />
           ))}
         </div>
-        <div className="mt-4 text-2xl font-black text-slate-800">{spec.chance.favoraveis}/{spec.chance.total}</div>
+        {/* CLASS-009: os círculos já mostram favoráveis e total. Escrever a
+            fração ao lado respondia a pergunta antes de ela ser feita. */}
+        <div className="mt-4 text-2xl font-black text-slate-800">?</div>
       </div>
     );
   }

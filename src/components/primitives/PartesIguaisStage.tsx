@@ -97,7 +97,10 @@ export function PartesIguaisStage({ spec, disabled, onAnswer }: Props) {
             denominador={spec.denominador}
             marcas={barraMarcas}
             destacarPrimeira={spec.modo !== "produzir"}
-            rotulo={spec.modo === "nomear" ? spec.rotulo : spec.modo === "simbolo" ? `1/${spec.denominador}` : undefined}
+            // CLASS-009: em "nomear" e "simbolo" o rótulo É a resposta -- e a
+            // barra o escrevia no texto e no aria-label. A partição e o
+            // destaque continuam dizendo tudo que a pergunta precisa.
+            rotulo={undefined}
           />
         )}
 

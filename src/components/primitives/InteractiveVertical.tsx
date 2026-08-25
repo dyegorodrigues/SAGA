@@ -78,25 +78,27 @@ interface DivisionSurfaceProps {
   quociente: number;
   resto: number;
   destacarZero?: boolean;
+  /** CLASS-009: só a explicação depois da resposta pode revelar a conta feita. */
+  revelar?: boolean;
 }
 
 /** Extensão visual da primitiva InteractiveVertical para a conta de divisão da F69. */
-export function InteractiveVerticalDivisionSurface({ dividendo, divisor, quociente, resto, destacarZero = false }: DivisionSurfaceProps) {
-  const digits = String(quociente).split('');
+export function InteractiveVerticalDivisionSurface({ dividendo, divisor, quociente, resto, destacarZero = false, revelar = false }: DivisionSurfaceProps) {
+  const digits = revelar ? String(quociente).split('') : ['?'];
   const produto = divisor * quociente;
   return <div data-interactive-vertical-division className="mx-auto max-w-md rounded-3xl border-2 border-slate-200 bg-white p-4 font-mono text-slate-800 shadow-inner" aria-label={`${dividendo} dividido por ${divisor}`}>
     <div className="grid grid-cols-[auto_1fr] items-end gap-x-3 text-3xl font-black">
       <div className="pb-1 text-right text-indigo-700">{divisor}</div>
       <div>
-        <div className="flex min-h-10 justify-end border-b-2 border-indigo-500 px-2" aria-label={`Quociente ${quociente}`}>{digits.map((digit, i) => <span key={`${digit}-${i}`} className={destacarZero && digit === '0' ? 'rounded bg-amber-200 px-1 text-amber-900' : 'px-1'}>{digit}</span>)}</div>
+        <div className="flex min-h-10 justify-end border-b-2 border-indigo-500 px-2" aria-label={revelar ? `Quociente ${quociente}` : "Quociente a descobrir"}>{digits.map((digit, i) => <span key={`${digit}-${i}`} className={destacarZero && digit === '0' ? 'rounded bg-amber-200 px-1 text-amber-900' : 'px-1'}>{digit}</span>)}</div>
         <div className="px-2 pt-1 text-right">{dividendo}</div>
       </div>
     </div>
-    <div className="mt-3 space-y-1 text-right text-lg" aria-label="Conferência da divisão">
+    {revelar ? <div className="mt-3 space-y-1 text-right text-lg" aria-label="Conferência da divisão">
       <p>− {produto}</p>
       <div className="border-t border-slate-300 pt-1">resto {resto}</div>
       <p className="text-sm font-sans font-bold text-slate-600">{quociente} × {divisor} + {resto} = {dividendo}</p>
-    </div>
+    </div> : <p className="mt-3 text-center text-sm font-sans font-bold text-slate-600">Faça a conta e escolha o resultado.</p>}
   </div>;
 }
 

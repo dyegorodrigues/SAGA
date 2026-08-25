@@ -48,7 +48,7 @@ describe("CLASS-009 — N4.10/F69: a conta armada não pode vir resolvida", () =
   it("a superfície de divisão não mostra quociente, produto nem prova real", () => {
     for (let nivel = 3; nivel <= 5; nivel += 1) {
       const spec = construirDivisaoLongaSpec(nivel);
-      const { container, unmount } = render(<DivisaoLongaStage spec={spec} onAnswer={() => undefined} />);
+      const { container, unmount } = render(<DivisaoLongaStage spec={spec} disabled={false} onAnswer={() => undefined} />);
       const texto = suporte(container);
       expect(texto.includes(`Quociente ${spec.quociente}`), `L${nivel} rotulou o quociente`).toBe(false);
       expect(texto.includes(`${spec.quociente} × ${spec.divisor} + ${spec.resto} = ${spec.dividendo}`), `L${nivel} imprimiu a prova real`).toBe(false);

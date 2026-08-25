@@ -47,7 +47,10 @@ export function DecimalStage({ spec, disabled, onAnswer }: Props) {
           <Quadrado100 showNumbers={false} highlightedNumbers={pintados(spec.pintados)} />
         )}
 
-        {spec.fracao && <p className="mt-2 text-center text-xl font-black" data-f75-fraction>{spec.fracao} = {spec.opcoes.find(o => o.value === spec.resposta)?.label}</p>}
+        {/* CLASS-009: a ponte mostrava a fração E o decimal correspondente,
+            que é exatamente o que o enunciado pergunta. A fração fica; o
+            outro lado da ponte é o que a criança tem de atravessar. */}
+        {spec.fracao && <p className="mt-2 text-center text-xl font-black" data-f75-fraction>{spec.fracao} = ?</p>}
         {spec.ordenar && <MiniReta valores={spec.ordenar} />}
 
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3" data-f75-options>

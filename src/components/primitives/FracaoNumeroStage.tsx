@@ -68,7 +68,7 @@ export function FracaoNumeroStage({ spec, disabled, onAnswer }: Props) {
         <p className="mb-4 text-center text-sm font-bold text-slate-600">A barra inteira e o trecho de 0 a 1 representam a mesma quantidade.</p>
 
         {spec.modo === "colecao" ? <Colecao spec={spec} /> : (
-          <SingaporeFractionBar denominador={spec.denominador} destacarQuantidade={Math.min(spec.numerador, spec.denominador)} rotulo={spec.modo === "barra" ? spec.resposta : undefined} />
+          <SingaporeFractionBar denominador={spec.denominador} destacarQuantidade={Math.min(spec.numerador, spec.denominador)} /* CLASS-009: pintar spec.resposta na barra respondia a pergunta. */ />
         )}
 
         {spec.nivel >= 3 && (
