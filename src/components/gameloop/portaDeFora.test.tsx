@@ -57,6 +57,7 @@ const PALCOS_QUE_DESENHAM: Array<[string, number[]]> = [
  */
 const PALCOS_COM_PORTAO: Array<[string, number[]]> = [
   ["GE.04", [3, 4]],
+  ["GE.07", [1, 2, 3, 4, 5]],
   ["GE.09", [1, 3, 5]],
   ["GM.11", [1, 2, 3, 5]],
 ];

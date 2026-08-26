@@ -203,6 +203,23 @@ export function construirPoligonosSpec(level: number): PoligonosF79Spec {
   };
 }
 
+/**
+ * A conferência que a ficha manda fazer antes de nomear a classe.
+ *
+ * `howto` diz "conte os lados e olhe os ângulos", e L4/L5 pedem duas
+ * propriedades ao mesmo tempo. O ato é conferir cada figura da cena contra cada
+ * critério do nível — inclusive a cópia girada, que é o remédio direto do
+ * distrator `orientacao-fixa`.
+ *
+ * Conferir não é acertar: os critérios listados são propriedades que a figura
+ * TEM, então a conferência não escolhe classe nenhuma e não imprime o gabarito.
+ * Ela produz a informação de que a resposta precisa, que é o que separa um
+ * portão CLASS-007 legítimo de um vazamento GAP-054.
+ */
+export function conferenciasExigidasF79(spec: PoligonosF79Spec): number {
+  return spec.criterios.length * spec.figuras.length;
+}
+
 export function construirPoligonosResolucao(spec: PoligonosF79Spec): ResolucaoDeclarativa<PoligonosShow, string, PoligonosMisconceptionTag> {
   const figura = spec.figuras[0];
   return {

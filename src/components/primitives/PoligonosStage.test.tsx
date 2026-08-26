@@ -17,7 +17,7 @@ function montar(nivel: number) {
   };
   /** Cada toque numa peça seguido de um toque num grupo conclui uma conferência. */
   const conferir = () => {
-    const grupos = [...view.container.querySelectorAll<HTMLElement>("[data-f79-grupo]")];
+    const grupos = [...view.container.querySelectorAll<HTMLElement>("[data-f79-draggroup] [data-draggroup-box]")];
     if (!grupos.length) throw new Error(`F79 L${nivel} sem grupos de conferência.`);
     for (let i = 0; i < spec.criterios.length * spec.figuras.length; i += 1) {
       fireEvent.click(grupos[i % grupos.length]);
@@ -48,7 +48,7 @@ describe("CLASS-007 — GE.07/F79: conferir os critérios é condição da respo
 
   it("uma conferência parcial não abre as alternativas", () => {
     const { spec, onAnswer, opcao, view } = montar(5);
-    const grupos = [...view.container.querySelectorAll<HTMLElement>("[data-f79-grupo]")];
+    const grupos = [...view.container.querySelectorAll<HTMLElement>("[data-f79-draggroup] [data-draggroup-box]")];
     const total = spec.criterios.length * spec.figuras.length;
 
     for (let i = 0; i < total - 1; i += 1) fireEvent.click(grupos[i % grupos.length]);
@@ -60,11 +60,11 @@ describe("CLASS-007 — GE.07/F79: conferir os critérios é condição da respo
   it("o DragGroup oferece um grupo por critério e uma peça por figura conferida", () => {
     for (const nivel of [1, 2, 3, 4, 5]) {
       const { spec, view } = montar(nivel);
-      const grupos = view.container.querySelectorAll("[data-f79-grupo]");
+      const grupos = view.container.querySelectorAll("[data-f79-draggroup] [data-draggroup-box]");
       expect(grupos.length, `L${nivel} precisa de um grupo por critério`).toBe(spec.criterios.length);
       // Cada figura é conferida contra cada critério: é isso que "combinar
       // propriedades" quer dizer, e é o que a ficha manda fazer antes de nomear.
-      expect(view.container.querySelectorAll("[data-f79-peca]").length, `L${nivel} peças`)
+      expect(view.container.querySelectorAll("[data-f79-draggroup] [data-draggroup-item]").length, `L${nivel} peças`)
         .toBe(spec.criterios.length * spec.figuras.length);
       view.unmount();
     }

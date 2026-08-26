@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import type { AnswerMeta } from "../../types";
+import { conferenciasExigidasF79 } from "../../curriculum/procedimentos/poligonosContract";
 import type { PoligonoFiguraF79, PoligonosF79Spec } from "../../curriculum/procedimentos/poligonosContract";
 import { tokens } from "../../styles/tokens";
 import { DragGroup } from "./DragGroup";
@@ -77,8 +78,23 @@ function LacosAninhados({ spec }: { spec: PoligonosF79Spec }) {
 }
 
 export function PoligonosStage({ spec, disabled = false, onAnswer }: Props) {
+  // CLASS-007, sub-forma A. O `DragGroup` estava habilitado com
+  // `onAnswer={() => undefined}`: a criança agrupava, o callback não fazia
+  // nada, e os botões de baixo compravam a resposta sozinhos. Era uma
+  // affordance que fingia avaliar.
+  //
+  // O callback volta a existir, e o que ele conta passa a ser a conferência que
+  // a ficha manda fazer: cada figura da cena contra cada critério do nível.
+  // Quem abre o portão é o `onAnswer` do próprio DragGroup — o callback que
+  // estava morto. `onProgress` só alimenta o texto do que falta: se ele também
+  // abrisse, o callback continuaria decorativo e o reparo seria de fachada.
+  const exigidas = conferenciasExigidasF79(spec);
+  const [conferidas, setConferidas] = useState(0);
+  const [conferenciaCompleta, setConferenciaCompleta] = useState(false);
+  const respostasFechadas = disabled || !conferenciaCompleta;
+
   const responder = (value: string, misconception?: string) => {
-    if (disabled) return;
+    if (respostasFechadas) return;
     onAnswer(value, misconception ? { misconception } : undefined);
   };
 
@@ -106,19 +122,30 @@ export function PoligonosStage({ spec, disabled = false, onAnswer }: Props) {
       </div>
 
       <div className="rounded-2xl border p-4" style={{ backgroundColor: tokens.cor.superficie.destaque, borderColor: tokens.cor.elementos.borda }} data-f79-draggroup>
-        <p className="font-black" style={{ color: tokens.cor.texto.principal }}>DragGroup — agrupe usando o critério pedido</p>
-        <p className="text-sm" style={{ color: tokens.cor.texto.secundario }}>Arraste ou toque na peça e depois no grupo. Girar a figura não muda sua classe.</p>
+        <p className="font-black" style={{ color: tokens.cor.texto.principal }}>DragGroup — confira cada figura contra cada critério</p>
+        <p className="text-sm" style={{ color: tokens.cor.texto.secundario }}>
+          São {spec.figuras.length === 1 ? "uma figura" : `${spec.figuras.length} figuras`} e {spec.criterios.length} critérios: toque num grupo para conferir mais uma. Girar a figura não muda sua classe.
+        </p>
         <DragGroup
-          sourceCount={4}
-          destCount={2}
+          sourceCount={exigidas}
+          destCount={spec.criterios.length}
           sourceEmoji="🔷"
           destEmoji="⭕"
-          boxCapacity={2}
+          destLabels={spec.criterios}
+          boxCapacity={spec.figuras.length}
           tutorialText="Compare lados e ângulos; use mais de uma propriedade quando a tarefa pedir."
           disabled={disabled}
-          onAnswer={() => undefined}
+          onAnswer={() => setConferenciaCompleta(true)}
+          onProgress={({ itemsLeft }) => setConferidas(exigidas - itemsLeft)}
         />
       </div>
+
+      {respostasFechadas && !disabled && <p
+        className="rounded-2xl p-3 text-center text-sm font-bold"
+        style={{ backgroundColor: tokens.cor.superficie.destaque, color: tokens.cor.texto.principal }}
+        aria-live="polite"
+        data-f79-pendencia
+      >Faltam {exigidas - conferidas} conferências antes de nomear a classe.</p>}
 
       <LacosAninhados spec={spec} />
 
@@ -136,7 +163,7 @@ export function PoligonosStage({ spec, disabled = false, onAnswer }: Props) {
           <button
             key={`${option.value}-${option.label}`}
             type="button"
-            disabled={disabled}
+            disabled={respostasFechadas}
             onClick={() => responder(option.value, option.misconception)}
             className="min-h-14 rounded-2xl border px-3 py-2 font-black disabled:opacity-50"
             style={{ backgroundColor: tokens.cor.superficie.cartao, borderColor: tokens.cor.elementos.borda, color: tokens.cor.texto.principal }}

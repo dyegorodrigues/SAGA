@@ -5,8 +5,9 @@ import { tokens, UIState } from '../../styles/tokens';
 export function DragGroup({ 
   sourceCount, 
   destCount, 
-  sourceEmoji = "🍎", 
-  destEmoji = "🐰", 
+  sourceEmoji = "🍎",
+  destEmoji = "🐰",
+  destLabels,
   tutorialText,
   onAnswer,
   onProgress,
@@ -17,8 +18,14 @@ export function DragGroup({
 }: { 
   sourceCount?: number; 
   destCount?: number; 
-  sourceEmoji?: string; 
+  sourceEmoji?: string;
   destEmoji?: string;
+  /**
+   * Nome de cada destino, na ordem das caixas. Sem isto os grupos são emojis
+   * anônimos — servem para repartir, não para classificar. A F79 precisa dizer
+   * qual critério cada grupo representa, senão conferir vira tarefa mecânica.
+   */
+  destLabels?: string[];
   tutorialText?: string;
   onAnswer?: (val: any) => void;
   onProgress?: (progress: { itemsLeft: number; boxes: number[] }) => void;
@@ -141,6 +148,7 @@ export function DragGroup({
             key={`left-${i}`}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
+            data-draggroup-item
             className="text-3xl cursor-pointer hover:scale-110 active:scale-95 transition-transform"
           >
             {actualSourceEmoji}
@@ -155,6 +163,8 @@ export function DragGroup({
           <div 
             key={`box-${i}`}
             onClick={() => handleBoxClick(i)}
+            data-draggroup-box={i}
+            aria-label={destLabels?.[i]}
             className="flex-1 flex flex-col items-center justify-center p-2 gap-1 cursor-pointer transition-colors shadow-sm hover:brightness-95 relative"
             style={{
               minWidth: tokens.tamanho.alvo,
@@ -165,7 +175,9 @@ export function DragGroup({
               borderRadius: '12px'
             }}
           >
-            {!q && <div className="text-3xl opacity-30 absolute">{actualDestEmoji}</div>}
+            {destLabels?.[i]
+              ? <span className="px-1 text-center text-xs font-black leading-tight" style={{ color: tokens.cor.texto.principal }}>{destLabels[i]}</span>
+              : !q && <div className="text-3xl opacity-30 absolute">{actualDestEmoji}</div>}
             {count > 0 && Array.from({ length: count }).map((_, j) => (
               <motion.div
                 key={`box-${i}-${j}`}
