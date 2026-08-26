@@ -48,6 +48,9 @@ A ordem é a ordem real dos commits; nada aqui é reescrito depois.
 | 10 | CLASS-007 na casca | `dfd9799` | `dfd9799` | a barra genérica não duplica mais um palco que já responde |
 | 11 | CLASS-007 — GE.07/F79 | `68c77d4` | `7732b64` | conferir cada figura contra cada critério antes de nomear a classe |
 | 12 | N4.02/F98 — palco em branco | `68c77d4` | `8c02c4c` | o arranjo existe na tela; a partir de L2 o giro é exigido |
+| 13 | CLASS-003 — instrumento | — | `eb667bd` | gate por descoberta de variedade de caso nos 75 canários, com catraca nos dois sentidos |
+| 14 | CLASS-003 — N4.10/F69 | `7a26274` | `7a26274` | o caso do nível é sorteado; a invariante da escada, não |
+| 15 | CLASS-009 — instrumento | `7a26274` | `7a26274` | o gate mede texto por elemento; rótulo numérico exige vizinhança não-dígito |
 
 A linha 10 é a única cujo recibo vermelho e correção estão no mesmo commit: o
 achado apareceu ao medir o efeito do reparo de GE.04, já dentro da frente, e
@@ -199,13 +202,64 @@ presumida. A classe entra com inventário medido e sem reparo, como a CLASS-009
 entrou; o próximo passo é o dimensionamento dela, e o gate de `portaDeFora`
 já existe para recebê-lo.
 
-## 8. Recibos desta rodada
+## 8. CLASS-003 — um nível que é um caso só
+
+Prioridade 3 do roadmap (variedade/mastery estrutural), aberta com instrumento
+e inventário medido, sem reparo em massa.
+
+As fichas cobram 3 acertos de 3 em 2 sessões — algumas 4/4 em 3. Quando o
+contrato devolve **um único caso determinístico** naquele nível, a criança
+responde o mesmo item seis a doze vezes e o motor conclui domínio. Não é
+prática distribuída: é memorizar um item.
+
+Medido sobre os 75 canários, 8 amostras consecutivas por (ficha, nível) a
+partir de duas sementes: **31 competências e 151 pares**. O inventário
+documental falava em **18 competências "conhecidas"**; a medição achou 13 a
+mais — `N1.02`, `N2.06`, `N2.07`, `N5.03`, `AL.05`, `GE.03`, `GE.04`, `GE.05`,
+`GE.06`, `GE.07`, `GE.08`, `GE.09`, `GE.10`. É a terceira vez nesta fase que um
+inventário escrito à mão fica atrás do medido.
+
+### A dívida que esta frente criou
+
+Cinco dessas — `GE.04`, `GE.07`, `GE.09`, `GM.11`, `N2.07` — são exatamente as
+que ganharam portão de ação nas linhas 3, 4, 8, 9 e 11. O portão está certo e
+continua insuficiente: a criança o atravessa seis vezes com o mesmo item.
+Fechar a CLASS-007 numa ficha não a torna avaliável enquanto o nível for um
+caso só. Fica registrado como dívida desta frente, não como pendência de
+terceiros.
+
+### Primeiro reparo e o que ele revelou
+
+`N4.10/F69` saiu do registro na linha 14, e a catraca cobrou a saída sozinha.
+Fila em **30 competências / 146 pares**.
+
+O reparo consumiu números aleatórios, deslocou o fluxo do PRNG e fez o gate da
+CLASS-009 acusar `N6.03`. Não era vazamento: a resposta era `10` e o apoio fixo
+diz `100% é o inteiro`. A causa é mais funda que um caso — `textContent` cola
+nós vizinhos sem separador, então a reta numérica virava `024681012` e, em
+`N4.09`, o `2` de "3 × 2" grudava no `6` seguinte formando `3x26`. **O gate
+media texto que a criança não vê.**
+
+Corrigido na linha 15: o suporte é remontado por elemento e rótulo numérico
+exige vizinhança não-dígito. `N4.09` sai do registro da CLASS-009 — todas as
+detecções dela eram artefato, e a justificativa antiga racionalizava o
+artefato. `AL.03` e `N4.03` continuam detectadas, o que prova que a correção
+não afrouxou nada; foi a própria catraca de entradas obsoletas que cobrou isso,
+duas vezes, durante o conserto.
+
+Consequência para o fechamento anterior: os **7 vazamentos reparados continuam
+reparados**. O que estava inflado era a contagem de "21 fichas ecoam o rótulo,
+14 legítimas" — parte das legítimas era ruído do instrumento.
+
+## 9. Recibos desta rodada
 
 - `tsc --noEmit`: limpo;
-- suíte inteira: **3484/3484** em 261 arquivos;
+- suíte inteira: **3492/3492** em 263 arquivos;
 - `npm run auditar`: invariantes canônicos, guard documental, palcos compostos e
   matriz de cobertura aprovados;
 - mutação: cada correção derruba o teste novo quando revertida — 3 mutações em
-  GE.09, 3 em GE.04, 5 em GE.07, 5 em N4.02 e 6 na porta da casca. As duas que
-  sobrevivem estão nomeadas no commit: a guarda redundante de `testar()` em
-  GE.04 e o `answerMode` de N4.02, que nenhum renderizador lê.
+  GE.09, 3 em GE.04, 5 em GE.07, 5 em N4.02, 6 na porta da casca, 5 no gate da
+  CLASS-003 e 6 no reparo de N4.10. As três que sobrevivem estão nomeadas nos
+  commits: a guarda redundante de `testar()` em GE.04, o `answerMode` de N4.02
+  que nenhum renderizador lê, e `cobraRepeticao` no gate da CLASS-003, que não
+  discrimina hoje porque toda ficha cobra repetição.
