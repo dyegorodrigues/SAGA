@@ -39,12 +39,32 @@ export function SolidosGeometricosStage({ spec, disabled, onAnswer }: Props) {
   const [testeFeito, setTesteFeito] = useState(false);
   const [faceAberta, setFaceAberta] = useState(false);
 
+  // CLASS-007: "prever e testar" é o alvo dos micros L3 e L4, e o experimento
+  // era decorativo — dava para comprar mastery sem encostar nele. Onde há
+  // experimento, o toque na alternativa é a PREVISÃO, e é o teste que envia.
+  //
+  // A ordem importa nos dois sentidos. O texto do resultado ("a superfície
+  // curva permite rolar") responde a pergunta; se o teste rodasse antes da
+  // previsão, ele deixaria de testar a criança e passaria a informá-la. Por
+  // isso o experimento também fica fechado até existir previsão.
+  const preverAntes = Boolean(spec.experimento);
   const responder = (valor: number) => {
     if (disabled) return;
     setSelecionado(valor);
+    if (preverAntes) return;
+    enviar(valor);
+  };
+
+  const enviar = (valor: number) => {
     const option = spec.opcoes.find(item => item.value === valor);
     const misconception = valor === spec.resposta ? undefined : option?.misconception;
     onAnswer(valor, misconception ? { misconception } : undefined);
+  };
+
+  const testar = () => {
+    if (disabled || selecionado === undefined) return;
+    setTesteFeito(true);
+    enviar(selecionado);
   };
 
   return (
@@ -84,13 +104,19 @@ export function SolidosGeometricosStage({ spec, disabled, onAnswer }: Props) {
       {spec.experimento && (
         <button
           type="button"
-          disabled={disabled}
-          onClick={() => setTesteFeito(true)}
+          disabled={disabled || selecionado === undefined}
+          onClick={testar}
           className="min-h-12 rounded-2xl border-2 border-amber-400 bg-amber-50 px-5 py-3 font-black text-amber-900 disabled:opacity-50"
           data-f59-experiment={spec.experimento}
         >
           {spec.experimento === "rampa" ? "Testar na rampa" : "Testar empilhamento"}
         </button>
+      )}
+
+      {preverAntes && !testeFeito && !disabled && (
+        <p className="text-center text-sm font-bold text-amber-900" aria-live="polite" data-f59-pendencia>
+          {selecionado === undefined ? "Faça sua previsão e depois teste." : "Agora teste a sua previsão."}
+        </p>
       )}
 
       {testeFeito && spec.experimento && (
