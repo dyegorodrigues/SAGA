@@ -182,34 +182,64 @@ export const gN4_01 = (lvl: number): Question => {
 };
 
 // N4.02 — Arranjos retangulares e comutatividade
+/**
+ * O `ArrayGrid` lê `question.uiProps`. Sem esse objeto ele nem chega a ser
+ * montado: o `GameLoopExerciseRenderer` só chama o `FichaRenderer` quando a
+ * questão tem `uiProps`, e `shouldRenderQuestionOptions` é `false` para
+ * `kind: "array"` justamente porque a grade desenha as próprias alternativas.
+ * O resultado medido era uma tela vazia nos cinco níveis — nem arranjo, nem
+ * botão, nem giro. O `nlEnd: 1` que ficava aqui como "hack to show rotate
+ * button" endereçava um renderizador que não lê `nlEnd` para arranjos.
+ *
+ * `requireRotate` a partir de L2 não é enfeite: a pergunta ali é qual conta
+ * mostra o total, que é a pergunta da comutatividade. O giro precisa acontecer
+ * antes, e o `ArrayGrid` já sabe segurar as alternativas até ele acontecer.
+ *
+ * `showEquation` fica `false` de propósito. Ele escreveria "N linhas × M
+ * colunas = ?" logo acima de alternativas que são `N × M`, `N + M` e `M - N`:
+ * o gabarito em duas linhas da mesma tela.
+ */
+const arranjoUiProps = (rows: number, cols: number, lvl: number) => ({
+  rows,
+  cols,
+  allowRotate: lvl > 1,
+  requireRotate: lvl > 1,
+  areaMode: false,
+  showEquation: false,
+  answerMode: lvl === 1 ? "total" : "equation",
+});
+
 export const gN4_02 = (lvl: number): Question => {
   const rows = ri(2, 5);
   const cols = ri(2, 5);
   const total = rows * cols;
-  
+
   if (lvl === 1) {
     return {
       kind: "array",
       prompt: `Quantos bloquinhos tem no total? (Conte as ${rows} linhas de ${cols})`,
       a: rows, b: cols,
       emoji: pick(["🟦", "🟩", "🟨", "⭐", "📦"]),
+      uiProps: arranjoUiProps(rows, cols, lvl),
       options: numOpts(total, total - rows, total + cols, rows + cols),
-      answer: total
-    };
-  } else {
-    return {
-      kind: "array",
-      prompt: `O retângulo tem ${rows} linhas e ${cols} colunas. Qual conta mostra o total?`,
-      a: rows, b: cols,
-      nlEnd: 1, // hack to show rotate button
-      options: [
-        { label: `${rows} × ${cols}`, value: `${rows} × ${cols}` },
-        { label: `${rows} + ${cols}`, value: `${rows} + ${cols}` },
-        { label: `${cols} - ${rows}`, value: `${cols} - ${rows}` }
-      ],
-      answer: `${rows} × ${cols}`
+      answer: total,
+      evaluate: answer => Number(answer) === total,
     };
   }
+  const resposta = `${rows} × ${cols}`;
+  return {
+    kind: "array",
+    prompt: `O retângulo tem ${rows} linhas e ${cols} colunas. Qual conta mostra o total?`,
+    a: rows, b: cols,
+    uiProps: arranjoUiProps(rows, cols, lvl),
+    options: [
+      { label: resposta, value: resposta },
+      { label: `${rows} + ${cols}`, value: `${rows} + ${cols}` },
+      { label: `${cols} - ${rows}`, value: `${cols} - ${rows}` }
+    ],
+    answer: resposta,
+    evaluate: answer => String(answer) === resposta,
+  };
 };
 
 // N4.05 — Divisão: repartir e medir

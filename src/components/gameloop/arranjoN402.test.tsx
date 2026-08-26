@@ -37,7 +37,7 @@ function montar(nivel: number) {
   const handlePick = vi.fn();
   const view = render(<GameLoopExerciseRenderer {...shell} q={q} handlePick={handlePick} />);
   const alternativas = () => [...view.container.querySelectorAll<HTMLButtonElement>("button")]
-    .filter(botao => (q.options ?? []).some(option => (option.label ?? String(option.value)) === botao.textContent?.trim()));
+    .filter(botao => (q.options ?? []).some(option => String(option.label ?? option.value) === botao.textContent?.trim()));
   const girar = () => [...view.container.querySelectorAll<HTMLButtonElement>("button")]
     .find(botao => botao.textContent?.includes("Girar")) ?? null;
   const certa = () => {
@@ -50,7 +50,7 @@ function montar(nivel: number) {
 
 const rotuloCerto = (q: Question) => {
   const option = (q.options ?? []).find(item => item.value === q.answer);
-  return option?.label ?? String(q.answer);
+  return String(option?.label ?? q.answer);
 };
 
 describe("N4.02/F98 — o arranjo precisa existir na tela", () => {
@@ -71,7 +71,7 @@ describe("N4.02/F98 — o arranjo precisa existir na tela", () => {
     expect(girar(), "L1 não pede comutatividade").toBeNull();
     expect(certa().disabled).toBe(false);
     fireEvent.click(certa());
-    expect(handlePick).toHaveBeenCalledWith(q.answer, undefined, expect.objectContaining({ source: "array-grid" }));
+    expect(handlePick).toHaveBeenCalledWith(q.answer, true, expect.objectContaining({ source: "array-grid" }));
   });
 
   it("a partir de L2 a expressão só é aceita depois de girar o arranjo", () => {
@@ -86,7 +86,7 @@ describe("N4.02/F98 — o arranjo precisa existir na tela", () => {
       fireEvent.click(girar()!);
       expect(certa().disabled, `L${nivel} continuou fechado depois do giro`).toBe(false);
       fireEvent.click(certa());
-      expect(handlePick).toHaveBeenCalledWith(q.answer, undefined, expect.objectContaining({ source: "array-grid" }));
+      expect(handlePick).toHaveBeenCalledWith(q.answer, true, expect.objectContaining({ source: "array-grid" }));
       view.unmount();
     }
   });
