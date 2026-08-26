@@ -41,7 +41,6 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "GE.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a classe do ângulo é sempre a mesma por nível" },
   "GE.08": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o par ordenado é sempre o mesmo por nível" },
   "GE.10": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a vista pedida é sempre a mesma por nível" },
-  "GM.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a hora lida é sempre a mesma por nível" },
   "GM.09": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o resultado do problema de medida é sempre o mesmo por nível" },
   "GM.12": { motivo: "A-REPARAR", niveis: [5], porque: "L5 responde sempre 'ordenado'" },
   "N1.01": { motivo: "A-REPARAR", niveis: [1, 2], porque: "o pareamento dá sempre 'deu certinho' em L1 e sempre 'sobrou' em L2" },

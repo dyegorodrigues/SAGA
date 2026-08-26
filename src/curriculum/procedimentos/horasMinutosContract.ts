@@ -39,36 +39,77 @@ const options = (correta: number, erradas: Array<{ value: number; label?: string
   ...erradas.map(x => ({ value: x.value, label: x.label ?? `${x.value} min`, misconception: x.misconception })),
 ].filter((x, i, a) => a.findIndex(y => y.value === x.value) === i).slice(0, 4);
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+const hhmm = (horas: number, minutos: number) => `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
+
+/**
+ * CLASS-003 — o relógio do nível é sorteado, a escada não.
+ *
+ * Marcava sempre a mesma hora: 3h30, 4h25, 7h40, 2h17 e a duração 9:35→10:50.
+ * Decorar "30" vencia L1 sem ler ponteiro nenhum.
+ *
+ * O passo do minuto é o degrau, e continua fixo: quartos de hora em L1, cinco
+ * em cinco em L2 e L3, minuto a minuto em L4. Em L4 o minuto sorteado NÃO cai
+ * na marca de cinco — se caísse, o nível viraria uma repetição de L3.
+ */
 export function construirHorasMinutosSpec(level: number): HorasMinutosF62Spec {
   const nivel = clamp(level);
-  if (nivel === 1) return {
-    nivel, modo: "meia-hora-quartos", primitivas: ["Relogio", "NumberLine"], horario: { horas: 3, minutos: 30 },
-    intervaloMinutos: 15, numeracaoFantasma: true, saltosHorasAntesDosMinutos: false, resposta: 30,
-    opcoes: options(30, [{ value: 6, misconception: HorasMinutosMisconception.MINUTO_COMO_NUMERO }, { value: 45, misconception: HorasMinutosMisconception.SUBTRAI_DECIMAL }]),
-  };
-  if (nivel === 2) return {
-    nivel, modo: "cinco-em-cinco-com-apoio", primitivas: ["Relogio", "NumberLine"], horario: { horas: 4, minutos: 25 },
-    intervaloMinutos: 5, numeracaoFantasma: true, saltosHorasAntesDosMinutos: false, resposta: 25,
-    opcoes: options(25, [{ value: 5, misconception: HorasMinutosMisconception.MINUTO_COMO_NUMERO }, { value: 20, misconception: HorasMinutosMisconception.SUBTRAI_DECIMAL }]),
-  };
-  if (nivel === 3) return {
-    nivel, modo: "cinco-em-cinco", primitivas: ["Relogio", "NumberLine"], horario: { horas: 7, minutos: 40 },
-    intervaloMinutos: 5, numeracaoFantasma: false, saltosHorasAntesDosMinutos: false, resposta: 40,
-    opcoes: options(40, [{ value: 8, misconception: HorasMinutosMisconception.MINUTO_COMO_NUMERO }, { value: 35, misconception: HorasMinutosMisconception.SUBTRAI_DECIMAL }]),
-  };
-  if (nivel === 4) return {
-    nivel, modo: "minuto-a-minuto", primitivas: ["Relogio", "NumberLine"], horario: { horas: 2, minutos: 17 },
-    intervaloMinutos: 1, numeracaoFantasma: false, saltosHorasAntesDosMinutos: false, resposta: 17,
-    opcoes: options(17, [{ value: 3, misconception: HorasMinutosMisconception.MINUTO_COMO_NUMERO }, { value: 20, misconception: HorasMinutosMisconception.SUBTRAI_DECIMAL }]),
-  };
+  const primitivas = ["Relogio", "NumberLine"] as ["Relogio", "NumberLine"];
+  const HM = HorasMinutosMisconception;
+
+  if (nivel <= 4) {
+    const horas = ri(1, 12);
+    const minutos = nivel === 1 ? escolher([15, 30, 45] as const)
+      : nivel === 4 ? escolher([2, 3, 7, 8, 12, 13, 17, 18, 22, 23, 27, 28, 37, 43, 47, 52, 58] as const)
+      : ri(1, 11) * 5;
+    const intervaloMinutos = nivel === 1 ? 15 : nivel === 4 ? 1 : 5;
+    // Ler o ponteiro como se fosse o número da hora: 30 minutos vira "6".
+    const comoNumero = Math.max(1, Math.round(minutos / 5));
+    // Vizinho no passo do nível: o erro de contar uma marca a mais ou a menos.
+    // Se o vizinho cair em cima do "leu como número" — acontece nos minutos
+    // baixos de L4 —, anda mais um passo: duas alternativas iguais apagariam
+    // um dos dois erros que a ficha nomeia.
+    let vizinho = minutos - intervaloMinutos > 0 ? minutos - intervaloMinutos : minutos + intervaloMinutos;
+    if (vizinho === comoNumero || vizinho === minutos) vizinho = minutos + intervaloMinutos * 2;
+    return {
+      nivel,
+      modo: nivel === 1 ? "meia-hora-quartos" : nivel === 2 ? "cinco-em-cinco-com-apoio" : nivel === 3 ? "cinco-em-cinco" : "minuto-a-minuto",
+      primitivas,
+      horario: { horas, minutos },
+      intervaloMinutos,
+      numeracaoFantasma: nivel <= 2,
+      saltosHorasAntesDosMinutos: false,
+      resposta: minutos,
+      opcoes: options(minutos, [
+        { value: comoNumero, misconception: HM.MINUTO_COMO_NUMERO },
+        { value: vizinho, misconception: HM.SUBTRAI_DECIMAL },
+      ]),
+    };
+  }
+
+  // L5: a duração precisa atravessar a hora — é o que o nível ensina.
+  const horas = ri(1, 10);
+  const minutos = ri(1, 11) * 5;
+  const duracaoMinutos = ri(13, 23) * 5;
+  const fimTotal = horas * 60 + minutos + duracaoMinutos;
+  const fim = { horas: Math.floor(fimTotal / 60), minutos: fimTotal % 60 };
+  // Tratar hh:mm como decimal: 1h15 vira "115".
+  const comoDecimal = Math.floor(duracaoMinutos / 60) * 100 + duracaoMinutos % 60;
   return {
-    nivel, modo: "duracao", primitivas: ["Relogio", "NumberLine"], horario: { horas: 9, minutos: 35 },
-    intervaloMinutos: 5, numeracaoFantasma: false, duracao: { inicio: "09:35", fim: "10:50", minutos: 75 },
-    saltosHorasAntesDosMinutos: true, resposta: 75,
-    opcoes: options(75, [
-      { value: 15, misconception: HorasMinutosMisconception.IGNORA_HORA_NA_DURACAO },
-      { value: 115, misconception: HorasMinutosMisconception.SUBTRAI_DECIMAL },
-      { value: 50, misconception: HorasMinutosMisconception.MINUTO_COMO_NUMERO },
+    nivel,
+    modo: "duracao",
+    primitivas,
+    horario: { horas, minutos },
+    intervaloMinutos: 5,
+    numeracaoFantasma: false,
+    duracao: { inicio: hhmm(horas, minutos), fim: hhmm(fim.horas, fim.minutos), minutos: duracaoMinutos },
+    saltosHorasAntesDosMinutos: true,
+    resposta: duracaoMinutos,
+    opcoes: options(duracaoMinutos, [
+      { value: duracaoMinutos % 60, misconception: HM.IGNORA_HORA_NA_DURACAO },
+      { value: comoDecimal, misconception: HM.SUBTRAI_DECIMAL },
+      { value: fim.minutos, misconception: HM.MINUTO_COMO_NUMERO },
     ]),
   };
 }

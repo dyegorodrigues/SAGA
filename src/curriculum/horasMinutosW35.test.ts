@@ -46,7 +46,16 @@ describe("W35 regression-first — GM.06/F62 Horas e Minutos", () => {
     expect(l3.numeracaoFantasma).toBe(false);
 
     const l5 = generateRegisteredFichaQuestion("GM.06", 5).uiProps as any;
-    expect(l5.duracao).toMatchObject({ inicio: "09:35", fim: "10:50", minutos: 75 });
+    // A duração é sorteada desde a CLASS-003; o que a escada exige não é o
+    // 9:35→10:50 de antes, é que o intervalo atravesse a hora — é isso que o
+    // nível ensina. Fixar o par aqui era o que prendia o contrato ao caso único.
+    const emMinutos = (hhmm: string) => {
+      const [h, m] = hhmm.split(":").map(Number);
+      return h * 60 + m;
+    };
+    expect(l5.duracao, "L5 precisa de duração").toBeDefined();
+    expect(emMinutos(l5.duracao.fim) - emMinutos(l5.duracao.inicio)).toBe(l5.duracao.minutos);
+    expect(l5.duracao.minutos, "a duração de L5 precisa atravessar a hora").toBeGreaterThan(60);
     expect(l5.saltosHorasAntesDosMinutos).toBe(true);
 
     expect(tags).toEqual(new Set(["minuto-como-numero", "ignora-hora-na-duracao", "subtrai-decimal"]));
