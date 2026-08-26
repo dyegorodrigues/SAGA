@@ -45,13 +45,47 @@ interface PerimetroShow {
   ladoFaltante?: number;
 }
 
-const CASOS = [
-  { modo: "contar-malha", largura: 3, altura: 2, lados: [3, 2, 3, 2], area: 6 },
-  { modo: "somar-lados", largura: 5, altura: 3, lados: [5, 3, 5, 3], area: 15 },
-  { modo: "figura-irregular", largura: 4, altura: 3, lados: [4, 2, 1, 1, 3, 3], area: 8 },
-  { modo: "perimetro-vs-area", largura: 4, altura: 3, lados: [4, 3, 4, 3], area: 12 },
-  { modo: "lado-faltante", largura: 5, altura: 4, lados: [5, 4, 5, 4], area: 20 },
-] as const satisfies ReadonlyArray<{ modo: PerimetroModo; largura: number; altura: number; lados: readonly number[]; area: number }>;
+const MODOS: readonly PerimetroModo[] = [
+  "contar-malha", "somar-lados", "figura-irregular", "perimetro-vs-area", "lado-faltante",
+];
+
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/**
+ * CLASS-003 — a figura do nível é sorteada, a escada não.
+ *
+ * Era uma figura por nível: 3×2, 5×3, o L de lados [4,2,1,1,3,3], 4×3 e 5×4. A
+ * ficha cobra repetição, então a criança percorria a MESMA borda seis vezes.
+ *
+ * O sorteio consertou junto uma incoerência que o caso fixo carregava: aqueles
+ * lados descrevem um L de área 11, e o spec declarava 8. A área alimenta o
+ * distrator `CONFUNDE_COM_AREA`, então uma criança que calculasse a área de
+ * verdade não achava a própria conta entre as alternativas. Agora a área sai da
+ * própria figura.
+ *
+ * A área também não pode empatar com o perímetro: seriam duas alternativas
+ * certas, e o erro que o distrator nomeia deixaria de ser erro. Em retângulo
+ * isso acontece exatamente em 3×6, 4×4 e 6×3.
+ */
+function sortearFigura(nivel: number): { largura: number; altura: number; lados: number[]; area: number } {
+  for (let tentativa = 0; tentativa < 40; tentativa += 1) {
+    const largura = ri(3, nivel <= 2 ? 6 : 8);
+    const altura = ri(2, nivel <= 2 ? 5 : 6);
+    const perimetro = 2 * (largura + altura);
+    if (nivel === 3) {
+      // Mordida num canto: o L tem os mesmos 2(l+a) de borda e menos área.
+      const w = ri(1, largura - 2);
+      const h = ri(1, altura - 1);
+      const area = largura * altura - w * h;
+      if (area === perimetro || altura - h <= 0 || largura - w <= 0) continue;
+      return { largura, altura, area, lados: [largura, altura - h, w, h, largura - w, altura] };
+    }
+    const area = largura * altura;
+    if (area === perimetro) continue;
+    return { largura, altura, area, lados: [largura, altura, largura, altura] };
+  }
+  return { largura: 5, altura: 3, area: 15, lados: [5, 3, 5, 3] };
+}
 
 function clampLevel(level: number): number {
   return Math.max(1, Math.min(5, Math.round(level)));
@@ -78,22 +112,21 @@ function opcoes(nivel: number, resposta: number, perimetro: number, area: number
 
 export function construirPerimetroSpec(level: number): PerimetroF63Spec {
   const nivel = clampLevel(level);
-  const caso = CASOS[nivel - 1];
-  const lados = [...caso.lados];
+  const { largura, altura, lados, area } = sortearFigura(nivel);
   const perimetro = lados.reduce((soma, lado) => soma + lado, 0);
   const ladoFaltante = nivel === 5 ? lados[lados.length - 1] : undefined;
   const resposta = ladoFaltante ?? perimetro;
   return {
     nivel,
-    modo: caso.modo,
-    largura: caso.largura,
-    altura: caso.altura,
+    modo: MODOS[nivel - 1],
+    largura,
+    altura,
     lados,
     perimetro,
-    area: caso.area,
+    area,
     resposta,
     ladoFaltante,
-    opcoes: opcoes(nivel, resposta, perimetro, caso.area, lados[lados.length - 1]),
+    opcoes: opcoes(nivel, resposta, perimetro, area, lados[lados.length - 1]),
   };
 }
 

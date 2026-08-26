@@ -44,26 +44,64 @@ function opcoes(correta: number, erradas: Array<{ value: number; misconception: 
     .slice(0, 4);
 }
 
+const MODOS_F81 = ["contar-quadrados", "linhas-colunas", "formula", "area-vs-perimetro", "compor-areas"] as const;
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/**
+ * CLASS-003 — a região do nível é sorteada, a escada não.
+ *
+ * Era uma região por nível: 3×4, 4×6, 5×7, 3×5 e o par 3×4+2×4. A ficha cobra
+ * repetição, então a criança contava a MESMA malha seis vezes.
+ *
+ * Duas colisões que as faixas precisam evitar, e ambas transformariam um
+ * distrator em resposta certa: área igual ao perímetro (acontece em 3×6, 4×4 e
+ * 6×3) alimenta `CONFUNDE_PERIMETRO`, e área igual a linhas + colunas
+ * alimentaria `CONTA_UM_A_UM`.
+ */
+function sortearRegiao(nivel: number): { rows: number; cols: number; regioes: AreaF81Regiao[] } {
+  const faixa: [number, number] = nivel <= 2 ? [3, 6] : nivel === 3 ? [4, 8] : [3, 7];
+  for (let tentativa = 0; tentativa < 40; tentativa += 1) {
+    const cols = ri(faixa[0], faixa[1]);
+    const rows = nivel === 5 ? ri(4, 7) : ri(faixa[0], faixa[1]);
+    const area = rows * cols;
+    if (area === 2 * (rows + cols) || area === rows + cols) continue;
+    if (nivel === 5) {
+      // Duas faixas empilhadas, mesma largura: a composição preenche o contorno.
+      const primeira = ri(2, rows - 2);
+      return { rows, cols, regioes: [{ rows: primeira, cols }, { rows: rows - primeira, cols }] };
+    }
+    return { rows, cols, regioes: [{ rows, cols }] };
+  }
+  return { rows: 3, cols: 4, regioes: [{ rows: 3, cols: 4 }] };
+}
+
 export function construirAreaF81Spec(level: number): AreaF81Spec {
   const nivel = clamp(level);
-  if (nivel === 1) {
-    const regioes = [{ rows: 3, cols: 4 }]; const area = areaDe(regioes);
-    return { nivel, modo: "contar-quadrados", rows: 3, cols: 4, regioes, area, perimetro: 14, unidade: "cm²", resposta: area, opcoes: opcoes(area, [{ value: 7, misconception: AreaF81Misconception.CONTA_UM_A_UM }, { value: 14, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO }]) };
-  }
-  if (nivel === 2) {
-    const regioes = [{ rows: 4, cols: 6 }]; const area = areaDe(regioes);
-    return { nivel, modo: "linhas-colunas", rows: 4, cols: 6, regioes, area, perimetro: 20, unidade: "cm²", resposta: area, opcoes: opcoes(area, [{ value: 10, misconception: AreaF81Misconception.CONTA_UM_A_UM }, { value: 20, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO }]) };
-  }
-  if (nivel === 3) {
-    const regioes = [{ rows: 5, cols: 7 }]; const area = areaDe(regioes);
-    return { nivel, modo: "formula", rows: 5, cols: 7, regioes, area, perimetro: 24, unidade: "cm²", resposta: area, opcoes: opcoes(area, [{ value: 12, misconception: AreaF81Misconception.CONTA_UM_A_UM }, { value: 24, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO }]) };
-  }
-  if (nivel === 4) {
-    const regioes = [{ rows: 3, cols: 5 }]; const area = areaDe(regioes);
-    return { nivel, modo: "area-vs-perimetro", rows: 3, cols: 5, regioes, area, perimetro: 16, unidade: "cm²", resposta: area, opcoes: opcoes(area, [{ value: 16, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO }, { value: 8, misconception: AreaF81Misconception.IGNORA_UNIDADE }]) };
-  }
-  const regioes = [{ rows: 3, cols: 4 }, { rows: 2, cols: 4 }]; const area = areaDe(regioes);
-  return { nivel, modo: "compor-areas", rows: 5, cols: 4, regioes, area, perimetro: 18, unidade: "cm²", resposta: area, opcoes: opcoes(area, [{ value: 12, misconception: AreaF81Misconception.CONTA_UM_A_UM }, { value: 18, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO }]) };
+  const { rows, cols, regioes } = sortearRegiao(nivel);
+  const area = areaDe(regioes);
+  const perimetro = 2 * (rows + cols);
+  const contouUmAUm = rows + cols;
+  const erradas = nivel === 4
+    ? [
+        { value: perimetro, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO },
+        { value: contouUmAUm, misconception: AreaF81Misconception.IGNORA_UNIDADE },
+      ]
+    : [
+        { value: contouUmAUm, misconception: AreaF81Misconception.CONTA_UM_A_UM },
+        { value: perimetro, misconception: AreaF81Misconception.CONFUNDE_PERIMETRO },
+      ];
+  return {
+    nivel,
+    modo: MODOS_F81[nivel - 1],
+    rows,
+    cols,
+    regioes,
+    area,
+    perimetro,
+    unidade: "cm²",
+    resposta: area,
+    opcoes: opcoes(area, erradas),
+  };
 }
 
 export function construirAreaF81Resolucao(spec: AreaF81Spec): ResolucaoDeclarativa<AreaF81Show, number, AreaF81MisconceptionTag> {
