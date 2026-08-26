@@ -87,8 +87,12 @@ export function CirculoAreasStage({ spec, disabled = false, onAnswer }: Props) {
   const transformarLabel = spec.modo === "triangulo-montagem" ? "Montar as duas cópias"
     : spec.modo === "paralelogramo-corte" ? "Cortar e encaixar a peça"
     : "Rearranjar os setores";
+  // CLASS-007: o cabeçalho manda transformar primeiro, mas nada segurava as
+  // alternativas. Enquanto a montagem/corte/rearranjo não acontece, elas ficam
+  // fechadas — é a transformação que produz a figura de onde a área sai.
+  const respostasFechadas = disabled || (podeTransformar && !transformado);
   const responder = (value: string, misconception?: string) => {
-    if (disabled) return;
+    if (respostasFechadas) return;
     onAnswer(value, misconception ? { misconception } : undefined);
   };
 
@@ -115,11 +119,18 @@ export function CirculoAreasStage({ spec, disabled = false, onAnswer }: Props) {
       data-f91-transform
     >{transformarLabel}</button>}
 
+    {respostasFechadas && podeTransformar && !disabled && <p
+      className="rounded-2xl p-3 text-center text-sm font-bold"
+      style={{ backgroundColor: tokens.cor.superficie.destaque, color: tokens.cor.texto.principal }}
+      aria-live="polite"
+      data-f91-pendencia
+    >Faça a transformação antes de escolher a área.</p>}
+
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" aria-label="Alternativas de Círculo e Áreas">
       {spec.opcoes.map((opcao, index) => <button
         key={`${opcao.value}-${index}`}
         type="button"
-        disabled={disabled}
+        disabled={respostasFechadas}
         onClick={() => responder(opcao.value, opcao.misconception)}
         className="min-h-14 rounded-2xl border-2 px-4 py-3 font-black disabled:opacity-50"
         style={{ backgroundColor: tokens.cor.superficie.cartao, borderColor: tokens.cor.elementos.borda, color: tokens.cor.texto.principal }}

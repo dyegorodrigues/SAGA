@@ -30,12 +30,12 @@ const shell = {
   playAulinha: vi.fn(), setShowClockTutorial: vi.fn(), sound: false, peekAgain: vi.fn(),
   setJourneyDone: vi.fn(), orderTaps: [], handleOrderTap: vi.fn(), orderShake: null,
   hiddenOpts: [], armedOpt: null, setArmedOpt: vi.fn(),
-};
+} as unknown as React.ComponentProps<typeof GameLoopExerciseRenderer>;
 
 function montar(nivel: number) {
   const q = gN4_02(nivel);
   const handlePick = vi.fn();
-  const view = render(<GameLoopExerciseRenderer {...(shell as never)} q={q as never} handlePick={handlePick} />);
+  const view = render(<GameLoopExerciseRenderer {...shell} q={q} handlePick={handlePick} />);
   const alternativas = () => [...view.container.querySelectorAll<HTMLButtonElement>("button")]
     .filter(botao => (q.options ?? []).some(option => (option.label ?? String(option.value)) === botao.textContent?.trim()));
   const girar = () => [...view.container.querySelectorAll<HTMLButtonElement>("button")]
