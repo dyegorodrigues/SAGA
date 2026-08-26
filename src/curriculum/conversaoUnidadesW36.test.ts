@@ -38,11 +38,17 @@ describe("W36 regression-first — GM.10/F93 Conversão de Unidades", () => {
       for (const option of q.options ?? []) if (option.misconception) tags.add(option.misconception);
     }
 
+    // A CLASS-003 sorteia o número; o que a F93 fixa é o PAR de unidades e o
+    // fator, não o valor. Cravar "1 m" aqui voltaria a exigir caso único.
     const l1 = generateRegisteredFichaQuestion("GM.10", 1).uiProps as any;
-    expect(l1.equivalencia).toMatchObject({ origem: 1, unidadeOrigem: "m", destino: 100, unidadeDestino: "cm" });
+    expect(l1.equivalencia).toMatchObject({ unidadeOrigem: "m", unidadeDestino: "cm" });
+    expect(l1.equivalencia.destino).toBe(l1.equivalencia.origem * 100);
+    expect(l1.incluiDecimal).toBe(false);
 
     const l3 = generateRegisteredFichaQuestion("GM.10", 3).uiProps as any;
-    expect(l3.equivalencia).toMatchObject({ origem: 1.5, unidadeOrigem: "m", destino: 150, unidadeDestino: "cm" });
+    expect(l3.equivalencia).toMatchObject({ unidadeOrigem: "m", unidadeDestino: "cm" });
+    expect(l3.equivalencia.destino).toBe(Math.round(l3.equivalencia.origem * 100));
+    expect(Number.isInteger(l3.equivalencia.origem), "L3 é o degrau do decimal").toBe(false);
     expect(l3.incluiDecimal).toBe(true);
 
     expect(tags).toEqual(new Set(["inverte-operacao", "mistura-grandezas", "ignora-decimal"]));

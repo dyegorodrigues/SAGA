@@ -73,6 +73,7 @@
   "src/curriculum/procedimentos/audioChoiceProcedure.ts": 157,
   "src/curriculum/procedimentos/classificacaoContract.ts": 113,
   "src/curriculum/procedimentos/classificacaoProcedure.ts": 207,
+  "src/curriculum/procedimentos/conversaoUnidadesContract.ts": 20,
   "src/curriculum/procedimentos/decomposicaoContract.ts": 31,
   "src/curriculum/procedimentos/decomposicaoProcedure.ts": 47,
   "src/curriculum/procedimentos/deslocamentoProcedure.ts": 60,

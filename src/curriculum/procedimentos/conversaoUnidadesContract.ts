@@ -22,13 +22,92 @@ const opcoes=(correta:string|number,label:string,erradas:Array<{value:string|num
   {value:correta,label},...erradas,
 ].filter((x,i,a)=>a.findIndex(y=>String(y.value)===String(x.value))===i).slice(0,4);
 
-export function construirConversaoUnidadesSpec(level:number):ConversaoUnidadesF93Spec{
-  const nivel=clamp(level);
-  if(nivel===1)return{nivel,modo:"cm-m",primitivas:["NumberLine","Balanca"],equivalencia:{origem:1,unidadeOrigem:"m",destino:100,unidadeDestino:"cm",grandeza:"comprimento"},quantidadeFisicaPreservada:true,incluiDecimal:false,resposta:100,opcoes:opcoes(100,"100 cm",[{value:0.01,label:"0,01 cm",misconception:ConversaoUnidadesMisconception.INVERTE_OPERACAO},{value:1000,label:"1000 cm",misconception:ConversaoUnidadesMisconception.MISTURA_GRANDEZAS}])};
-  if(nivel===2)return{nivel,modo:"massa-capacidade",primitivas:["NumberLine","Balanca"],equivalencia:{origem:2,unidadeOrigem:"kg",destino:2000,unidadeDestino:"g",grandeza:"massa"},quantidadeFisicaPreservada:true,incluiDecimal:false,resposta:2000,opcoes:opcoes(2000,"2000 g",[{value:0.002,label:"0,002 g",misconception:ConversaoUnidadesMisconception.INVERTE_OPERACAO},{value:"2000 ml",label:"2000 ml",misconception:ConversaoUnidadesMisconception.MISTURA_GRANDEZAS}])};
-  if(nivel===3)return{nivel,modo:"decimal",primitivas:["NumberLine","Balanca"],equivalencia:{origem:1.5,unidadeOrigem:"m",destino:150,unidadeDestino:"cm",grandeza:"comprimento"},quantidadeFisicaPreservada:true,incluiDecimal:true,resposta:150,opcoes:opcoes(150,"150 cm",[{value:15,label:"15 cm",misconception:ConversaoUnidadesMisconception.IGNORA_DECIMAL},{value:0.015,label:"0,015 cm",misconception:ConversaoUnidadesMisconception.INVERTE_OPERACAO}])};
-  if(nivel===4)return{nivel,modo:"unidade-adequada",primitivas:["NumberLine","Balanca"],equivalencia:{origem:1,unidadeOrigem:"altura de uma porta",destino:2,unidadeDestino:"m",grandeza:"comprimento"},quantidadeFisicaPreservada:true,incluiDecimal:false,resposta:"m",opcoes:opcoes("m","metro (m)",[{value:"g",label:"grama (g)",misconception:ConversaoUnidadesMisconception.MISTURA_GRANDEZAS},{value:"cm-invertido",label:"0,02 cm",misconception:ConversaoUnidadesMisconception.INVERTE_OPERACAO}])};
-  return{nivel,modo:"problema",primitivas:["NumberLine","Balanca"],equivalencia:{origem:2.5,unidadeOrigem:"L",destino:2500,unidadeDestino:"ml",grandeza:"capacidade"},quantidadeFisicaPreservada:true,incluiDecimal:true,resposta:2500,opcoes:opcoes(2500,"2500 ml",[{value:25,label:"25 ml",misconception:ConversaoUnidadesMisconception.IGNORA_DECIMAL},{value:0.0025,label:"0,0025 ml",misconception:ConversaoUnidadesMisconception.INVERTE_OPERACAO},{value:"2500 g",label:"2500 g",misconception:ConversaoUnidadesMisconception.MISTURA_GRANDEZAS}])};
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+/** Português escreve decimal com vírgula; a tela da criança também. */
+const virgula = (valor: number) => String(valor).replace(".", ",");
+
+/** Objetos cuja unidade adequada uma criança consegue julgar por experiência. */
+const OBJETOS_F93 = [
+  { objeto: "altura de uma porta", unidade: "m", nome: "metro (m)", grandeza: "comprimento", medida: 2, outra: { value: "g", label: "grama (g)" } },
+  { objeto: "massa de uma maçã", unidade: "g", nome: "grama (g)", grandeza: "massa", medida: 150, outra: { value: "m", label: "metro (m)" } },
+  { objeto: "água de uma garrafa", unidade: "L", nome: "litro (L)", grandeza: "capacidade", medida: 2, outra: { value: "cm", label: "centímetro (cm)" } },
+  { objeto: "espessura de uma moeda", unidade: "mm", nome: "milímetro (mm)", grandeza: "comprimento", medida: 2, outra: { value: "kg", label: "quilograma (kg)" } },
+] as const;
+
+/**
+ * CLASS-003 — o número do nível é sorteado, a escada não.
+ *
+ * Era uma conversão por nível: 1 m, 2 kg, 1,5 m, a porta e 2,5 L. A ficha cobra
+ * repetição, então a criança convertia o MESMO número seis vezes — e decorar
+ * "100" vencia o nível sem entender o fator.
+ *
+ * O `modo` continua fixo: comprimento, massa, decimal, unidade adequada e
+ * problema são a escada da F93. E o decimal só aparece onde a escada o pede:
+ * sortear origem quebrada em L1 ou L2 anteciparia o degrau de L3.
+ */
+export function construirConversaoUnidadesSpec(level: number): ConversaoUnidadesF93Spec {
+  const nivel = clamp(level);
+  const base = { nivel, primitivas: ["NumberLine", "Balanca"] as ["NumberLine", "Balanca"], quantidadeFisicaPreservada: true as const };
+
+  if (nivel === 1 || nivel === 2) {
+    const comprimento = nivel === 1;
+    const origem = ri(2, 9);
+    const fator = comprimento ? 100 : 1000;
+    const destino = origem * fator;
+    const unidadeOrigem = comprimento ? "m" : "kg";
+    const unidadeDestino = comprimento ? "cm" : "g";
+    const invertido = origem / fator;
+    return {
+      ...base,
+      modo: comprimento ? "cm-m" : "massa-capacidade",
+      equivalencia: { origem, unidadeOrigem, destino, unidadeDestino, grandeza: comprimento ? "comprimento" : "massa" },
+      incluiDecimal: false,
+      resposta: destino,
+      opcoes: opcoes(destino, `${destino} ${unidadeDestino}`, [
+        { value: invertido, label: `${virgula(invertido)} ${unidadeDestino}`, misconception: ConversaoUnidadesMisconception.INVERTE_OPERACAO },
+        { value: `${destino} ${comprimento ? "g" : "ml"}`, label: `${destino} ${comprimento ? "g" : "ml"}`, misconception: ConversaoUnidadesMisconception.MISTURA_GRANDEZAS },
+      ]),
+    };
+  }
+
+  if (nivel === 3 || nivel === 5) {
+    const comprimento = nivel === 3;
+    // Meio inteiro: o degrau é ler a vírgula, não dominar decimal de três casas.
+    const origem = ri(1, 8) + 0.5;
+    const fator = comprimento ? 100 : 1000;
+    const destino = Math.round(origem * fator);
+    const unidadeOrigem = comprimento ? "m" : "L";
+    const unidadeDestino = comprimento ? "cm" : "ml";
+    // Ignorar a vírgula: 1,5 vira 15 em vez de 150.
+    const semVirgula = Number(String(origem).replace(".", ""));
+    const invertido = origem / fator;
+    return {
+      ...base,
+      modo: comprimento ? "decimal" : "problema",
+      equivalencia: { origem, unidadeOrigem, destino, unidadeDestino, grandeza: comprimento ? "comprimento" : "capacidade" },
+      incluiDecimal: true,
+      resposta: destino,
+      opcoes: opcoes(destino, `${destino} ${unidadeDestino}`, [
+        { value: semVirgula, label: `${semVirgula} ${unidadeDestino}`, misconception: ConversaoUnidadesMisconception.IGNORA_DECIMAL },
+        { value: invertido, label: `${virgula(invertido)} ${unidadeDestino}`, misconception: ConversaoUnidadesMisconception.INVERTE_OPERACAO },
+        { value: `${destino} ${comprimento ? "g" : "g"}`, label: `${destino} g`, misconception: ConversaoUnidadesMisconception.MISTURA_GRANDEZAS },
+      ]),
+    };
+  }
+
+  const alvo = escolher(OBJETOS_F93);
+  return {
+    ...base,
+    modo: "unidade-adequada",
+    equivalencia: { origem: 1, unidadeOrigem: alvo.objeto, destino: alvo.medida, unidadeDestino: alvo.unidade, grandeza: alvo.grandeza },
+    incluiDecimal: false,
+    resposta: alvo.unidade,
+    opcoes: opcoes(alvo.unidade, alvo.nome, [
+      { value: alvo.outra.value, label: alvo.outra.label, misconception: ConversaoUnidadesMisconception.MISTURA_GRANDEZAS },
+      { value: `${alvo.unidade}-invertido`, label: `${virgula(alvo.medida / 100)} ${alvo.unidade}`, misconception: ConversaoUnidadesMisconception.INVERTE_OPERACAO },
+    ]),
+  };
 }
 
 /**
