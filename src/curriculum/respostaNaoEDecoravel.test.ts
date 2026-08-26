@@ -45,7 +45,7 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "GM.09": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o resultado do problema de medida é sempre o mesmo por nível" },
   "GM.12": { motivo: "A-REPARAR", niveis: [5], porque: "L5 responde sempre 'ordenado'" },
   "N1.01": { motivo: "A-REPARAR", niveis: [1, 2], porque: "o pareamento dá sempre 'deu certinho' em L1 e sempre 'sobrou' em L2" },
-  "N1.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a quantidade contada é sempre a mesma por nível" },
+  "N1.02": { motivo: "OPCOES-NAO-RENDERIZADAS", niveis: [1, 2, 3, 4, 5], porque: "o modo rítmico da F27 não tem alternativas; a criança dispara o canhão e conta em voz alta, e a quantidade é o escopo do nível" },
   "N1.10": { motivo: "A-REPARAR", niveis: [1], porque: "a parte que falta é sempre 1 em L1" },
   "N2.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a paridade perguntada é sempre a mesma por nível" },
   "N5.01": { motivo: "A-REPARAR", niveis: [2, 4], porque: "a partição perguntada dá sempre a mesma resposta" },

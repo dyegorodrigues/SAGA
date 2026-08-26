@@ -41,7 +41,7 @@ import { generateRegisteredFichaQuestion, hasComposerFicha } from "./motores/com
 type Motivo = "LEGITIMO" | "A-REPARAR";
 
 const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: string }> = {
-  "N1.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "quantidade fixa por nível; L5 já varia" },
+  "N1.02": { motivo: "LEGITIMO", niveis: [1, 2, 3, 4], porque: "a quantidade É o escopo do nível na F27 §5 (3, 5, 10, 10), e o modo rítmico não tem alternativa: a criança dispara e conta em voz alta, não escolhe" },
 };
 
 const SEMENTES = [0x2f6e2b1, 0x5bd1e99];
@@ -147,7 +147,7 @@ describe("CLASS-003 — nenhum nível repete o mesmo caso sob mastery repetida",
     // reparo derruba a entrada e o teste acima cobra a atualização.
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR");
     const pares = aReparar.reduce((total, [, item]) => total + item.niveis.length, 0);
-    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(1);
-    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(4);
+    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(0);
+    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(0);
   });
 });
