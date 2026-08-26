@@ -8,6 +8,7 @@
   "src/components/Mascot.tsx": 37,
   "src/components/MascotEvolution.tsx": 37,
   "src/components/gameloop/GameLoopExerciseRenderer.tsx": 45,
+  "src/components/gameloop/answerPolicy.ts": 23,
   "src/components/mascots/DragonMascot.tsx": 27,
   "src/components/mascots/MascotAccessories.tsx": 21,
   "src/components/primitives/AreaStage.tsx": 20,
@@ -104,7 +105,7 @@
   "src/subjects/sci.ts": 27,
   "src/types.ts": 129,
   "src/utils/generators.ts": 29,
-  "src/utils/generatorsF2.ts": 21,
+  "src/utils/generatorsF2.ts": 38,
   "src/utils/generatorsVisual.ts": 24,
   "src/utils/legadoF0.ts": 60,
   "src/utils/matricula.ts": 36
