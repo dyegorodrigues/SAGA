@@ -15,17 +15,20 @@ describe("W42/F70 — realização física ArrayGrid + Quadrado100", () => {
     expect(container.querySelector("[data-arraygrid-f70]")).toBeInTheDocument();
     expect(container.querySelector("[data-f70-remainder]")).toBeInTheDocument();
 
-    const testar3 = screen.getByRole("button", { name: "Testar divisor 3" });
-    expect(testar3.className).toMatch(/min-h-20/);
-    fireEvent.click(testar3);
+    // O divisor certo vem do spec: a CLASS-003 sorteia o total, e com ele o
+    // divisor que fecha o retângulo.
+    const divisor = Number(spec.resposta);
+    const testar = screen.getByRole("button", { name: `Testar divisor ${divisor}` });
+    expect(testar.className).toMatch(/min-h-20/);
+    fireEvent.click(testar);
 
     expect(container.querySelector("[data-f70-complete-rectangle]")).toBeInTheDocument();
     expect(onAnswer).not.toHaveBeenCalled();
 
-    const correta = screen.getByRole("button", { name: "3 — fecha um retângulo sem sobra" });
+    const correta = screen.getByRole("button", { name: `${divisor} — fecha um retângulo sem sobra` });
     expect(correta.className).toMatch(/min-h-20/);
     fireEvent.click(correta);
-    expect(onAnswer).toHaveBeenCalledWith(3, {
+    expect(onAnswer).toHaveBeenCalledWith(divisor, {
       source: "array-grid",
       evidencias: ["f70-divisores-retangulo"],
     });
@@ -37,19 +40,22 @@ describe("W42/F70 — realização física ArrayGrid + Quadrado100", () => {
     const { container } = render(<PrimosDivisoresStage spec={spec} options={spec.opcoes} onAnswer={onAnswer} />);
 
     expect(container.querySelector("[data-quadrado100-f70]")).toBeInTheDocument();
-    const crivo2 = screen.getByRole("button", { name: "Aplicar crivo do 2" });
-    const crivo3 = screen.getByRole("button", { name: "Aplicar crivo do 3" });
-    expect(crivo2.className).toMatch(/min-h-20/);
-    expect(crivo3).toBeDisabled();
+    // As bases do crivo saem do spec; o que o nível ensina é a ORDEM, não o 2 e
+    // o 3 em particular.
+    const [primeira, segunda] = spec.crivoBases;
+    const crivoA = screen.getByRole("button", { name: `Aplicar crivo do ${primeira}` });
+    const crivoB = screen.getByRole("button", { name: `Aplicar crivo do ${segunda}` });
+    expect(crivoA.className).toMatch(/min-h-20/);
+    expect(crivoB, "a segunda base só abre depois da primeira").toBeDisabled();
 
-    fireEvent.click(crivo2);
-    expect(screen.getByRole("gridcell", { name: "Número 4" })).toHaveAttribute("data-crossed", "true");
-    expect(screen.getByRole("gridcell", { name: "Número 2" })).toHaveAttribute("data-crossed", "false");
-    expect(crivo3).not.toBeDisabled();
+    fireEvent.click(crivoA);
+    expect(screen.getByRole("gridcell", { name: `Número ${primeira * 2}` })).toHaveAttribute("data-crossed", "true");
+    expect(screen.getByRole("gridcell", { name: `Número ${primeira}` }), "a própria base não é riscada").toHaveAttribute("data-crossed", "false");
+    expect(crivoB).not.toBeDisabled();
 
-    fireEvent.click(crivo3);
-    expect(screen.getByRole("gridcell", { name: "Número 9" })).toHaveAttribute("data-crossed", "true");
-    expect(screen.getByRole("gridcell", { name: "Número 3" })).toHaveAttribute("data-crossed", "false");
+    fireEvent.click(crivoB);
+    expect(screen.getByRole("gridcell", { name: `Número ${segunda * segunda}` })).toHaveAttribute("data-crossed", "true");
+    expect(screen.getByRole("gridcell", { name: `Número ${segunda}` })).toHaveAttribute("data-crossed", "false");
     expect(onAnswer).not.toHaveBeenCalled();
   });
 

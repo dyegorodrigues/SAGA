@@ -55,13 +55,84 @@ const acessibilidade = {
   erroMotorNaoTag: true as const,
 };
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const MODOS_F71 = ["divisor-redondo", "divisor-quase-redondo", "divisor-geral", "com-resto", "zero-quociente"] as const;
+
+/**
+ * A estimativa que o palco oferece de partida: o quociente arredondado POR
+ * BAIXO, em dezenas ou centenas. É por baixo de propósito — uma estimativa que
+ * passa do dividendo ensina a recuar, e o que a F71 ensina é a avançar.
+ */
+const estimativaDe = (quociente: number) => {
+  const passo = quociente >= 100 ? 100 : 10;
+  return Math.floor(quociente / passo) * passo;
+};
+
+/**
+ * CLASS-003 — a conta do nível é sorteada, a escada não.
+ *
+ * Era uma conta por nível: 840÷20, 399÷19, 736÷23, 745÷23 e 2424÷24. A criança
+ * estimava o MESMO quociente seis vezes.
+ *
+ * O degrau de cada nível está no DIVISOR e no resto, não no tamanho do número:
+ * redondo em L1, arredondando para cima em L2 — que é o que força o ajuste da
+ * primeira estimativa —, geral em L3, com resto em L4 e com zero no quociente
+ * em L5. Sortear sem essas amarras trocaria os degraus de lugar.
+ */
 export function construirDivisaoDoisDigitosF71Spec(level: number): DivisaoDoisDigitosF71Spec {
   const nivel = clamp(level);
-  if (nivel === 1) return { ficha: "F71", nivel, modo: "divisor-redondo", primitivas: ["InteractiveVertical"], dividendo: 840, divisor: 20, divisorArredondado: 20, estimativaInicial: 40, quociente: 42, resto: 0, ajustePrimeiraEstimativaObrigatorio: false, acessibilidade };
-  if (nivel === 2) return { ficha: "F71", nivel, modo: "divisor-quase-redondo", primitivas: ["InteractiveVertical"], dividendo: 399, divisor: 19, divisorArredondado: 20, estimativaInicial: 20, quociente: 21, resto: 0, ajustePrimeiraEstimativaObrigatorio: true, acessibilidade };
-  if (nivel === 3) return { ficha: "F71", nivel, modo: "divisor-geral", primitivas: ["InteractiveVertical"], dividendo: 736, divisor: 23, divisorArredondado: 20, estimativaInicial: 30, quociente: 32, resto: 0, ajustePrimeiraEstimativaObrigatorio: false, acessibilidade };
-  if (nivel === 4) return { ficha: "F71", nivel, modo: "com-resto", primitivas: ["InteractiveVertical"], dividendo: 745, divisor: 23, divisorArredondado: 20, estimativaInicial: 30, quociente: 32, resto: 9, ajustePrimeiraEstimativaObrigatorio: false, acessibilidade };
-  return { ficha: "F71", nivel, modo: "zero-quociente", primitivas: ["InteractiveVertical"], dividendo: 2424, divisor: 24, divisorArredondado: 20, estimativaInicial: 100, quociente: 101, resto: 0, ajustePrimeiraEstimativaObrigatorio: false, acessibilidade };
+  const base = { ficha: "F71" as const, nivel, modo: MODOS_F71[nivel - 1], primitivas: ["InteractiveVertical"] as ["InteractiveVertical"], acessibilidade };
+
+  if (nivel === 1) {
+    const divisor = ri(2, 5) * 10;
+    // Ímpar de propósito: com quociente múltiplo de dez a estimativa por baixo
+    // seria o próprio quociente, e a alternativa "manteve a primeira
+    // estimativa" viraria uma segunda resposta certa.
+    const quociente = ri(21, 48) | 1;
+    return {
+      ...base, divisor, divisorArredondado: divisor, dividendo: divisor * quociente,
+      estimativaInicial: estimativaDe(quociente), quociente, resto: 0,
+      ajustePrimeiraEstimativaObrigatorio: false,
+    };
+  }
+
+  if (nivel === 2) {
+    // Divisor logo abaixo da dezena: arredondar para cima subestima o quociente,
+    // e a criança precisa ajustar depois do primeiro teste.
+    const dezena = ri(2, 5) * 10;
+    const divisor = dezena - ri(1, 2);
+    // Quociente múltiplo de dez faria a estimativa por baixo já acertar, e o
+    // ajuste que este nível existe para ensinar deixaria de ser necessário.
+    const quociente = ri(21, 45) | 1;
+    return {
+      ...base, divisor, divisorArredondado: dezena, dividendo: divisor * quociente,
+      estimativaInicial: estimativaDe(quociente), quociente, resto: 0,
+      ajustePrimeiraEstimativaObrigatorio: true,
+    };
+  }
+
+  if (nivel === 3 || nivel === 4) {
+    const dezena = ri(2, 5) * 10;
+    const divisor = dezena + ri(1, 3);
+    const quociente = ri(21, 40) | 1;
+    const resto = nivel === 4 ? ri(1, divisor - 1) : 0;
+    return {
+      ...base, divisor, divisorArredondado: Math.round(divisor / 10) * 10,
+      dividendo: divisor * quociente + resto,
+      estimativaInicial: estimativaDe(quociente), quociente, resto,
+      ajustePrimeiraEstimativaObrigatorio: false,
+    };
+  }
+
+  // L5: o quociente precisa carregar um zero no meio — é ele que o nível mede.
+  const divisor = ri(11, 49);
+  const quociente = ri(1, 9) * 100 + ri(1, 9);
+  return {
+    ...base, divisor, divisorArredondado: Math.round(divisor / 10) * 10,
+    dividendo: divisor * quociente,
+    estimativaInicial: estimativaDe(quociente), quociente, resto: 0,
+    ajustePrimeiraEstimativaObrigatorio: false,
+  };
 }
 
 export function avaliarEstimativaF71(spec: DivisaoDoisDigitosF71Spec, estimativa: number): {
@@ -154,15 +225,19 @@ export function construirDivisaoDoisDigitosQuestion(ficha: FichaCompetencia, lev
   const micro = ficha.micros.find(item => item.id === id);
   if (!micro) throw new Error(`N4.12 sem micro L${spec.nivel}.`);
 
+  // O enunciado sai do spec. Com a conta fixa ele podia ser escrito à mão; com
+  // a CLASS-003 sorteando, um enunciado cravado passaria a mentir sobre a conta
+  // desenhada logo abaixo.
+  const conta = `${spec.dividendo} ÷ ${spec.divisor}`;
   const prompt = spec.modo === "divisor-redondo"
-    ? "Estime quantos grupos de 20 cabem em 840, teste a multiplicação e ajuste até fechar a divisão."
+    ? `Estime quantos grupos de ${spec.divisor} cabem em ${spec.dividendo}, teste a multiplicação e ajuste até fechar a divisão.`
     : spec.modo === "divisor-quase-redondo"
-      ? "Para 399 ÷ 19, use 20 como referência, teste com 19 e ajuste a primeira estimativa."
+      ? `Para ${conta}, use ${spec.divisorArredondado} como referência, teste com ${spec.divisor} e ajuste a primeira estimativa.`
       : spec.modo === "divisor-geral"
-        ? "Em 736 ÷ 23, faça uma estimativa, teste por multiplicação e ajuste até encontrar o maior número de grupos que cabe."
+        ? `Em ${conta}, faça uma estimativa, teste por multiplicação e ajuste até encontrar o maior número de grupos que cabe.`
         : spec.modo === "com-resto"
-          ? "Em 745 ÷ 23, estime, teste e ajuste. Depois confira se o resto é menor que o divisor."
-          : "Em 2424 ÷ 24, estime e ajuste preservando o zero necessário no quociente.";
+          ? `Em ${conta}, estime, teste e ajuste. Depois confira se o resto é menor que o divisor.`
+          : `Em ${conta}, estime e ajuste preservando o zero necessário no quociente.`;
 
   // O palco F71 não renderiza estas opções: elas documentam o espaço diagnóstico
   // do contrato para Radar/testes sem transformar a tarefa física em múltipla escolha.

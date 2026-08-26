@@ -63,110 +63,140 @@ export function riscadosDoCrivo(bases: number[]): number[] {
   return [...riscados].sort((a, b) => a - b);
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+const PRIMOS_F70 = [11, 13, 17, 19, 23, 29, 31, 37, 41, 43] as const;
+const divisoresProprios = (n: number) => {
+  const saida: number[] = [];
+  for (let d = 2; d < n; d += 1) if (n % d === 0) saida.push(d);
+  return saida;
+};
+const primo = (n: number) => { if (n < 2) return false; for (let d = 2; d * d <= n; d += 1) if (n % d === 0) return false; return true; };
+
+/**
+ * CLASS-003 — o número do nível é sorteado, a escada não.
+ *
+ * Era um caso por nível: base 6, total 18, o par 4/12, o primo 13 e o crivo com
+ * bases 2 e 3. A criança riscava o MESMO quadro seis vezes.
+ *
+ * As bases de L1 e L3 são compostas de propósito: o distrator
+ * `INVERTE_DIVISOR_MULTIPLO` precisa de um divisor próprio para existir, e
+ * número primo não tem nenhum.
+ */
 export function construirPrimosDivisoresF70Spec(level: number): PrimosDivisoresF70Spec {
   const nivel = clamp(level);
+  const base0 = { ficha: "F70" as const, nivel, primitivas: ["ArrayGrid", "Quadrado100"] as ["ArrayGrid", "Quadrado100"] };
 
   if (nivel === 1) {
+    const base = escolher([4, 6, 8, 9, 12] as const);
+    const destacados = [base, base * 2, base * 3];
+    const resposta = base * 4;
+    const divisorProprio = escolher(divisoresProprios(base));
     return {
-      ficha: "F70",
-      nivel,
+      ...base0,
       modo: "multiplos-quadro",
-      primitivas: ["ArrayGrid", "Quadrado100"],
-      total: 6,
-      base: 6,
+      total: base,
+      base,
       divisorInicial: 2,
       divisoresTeste: [],
-      quadroDestacados: [6, 12, 18],
+      quadroDestacados: destacados,
       crivoBases: [],
-      resposta: 24,
+      resposta,
       opcoes: [
-        option(24, "24"),
-        option(3, "3 — porque cabe em 6", PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO),
-        option(20, "20"),
-        option(25, "25"),
+        option(resposta, String(resposta)),
+        option(divisorProprio, `${divisorProprio} — porque cabe em ${base}`, PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO),
+        option(resposta - 1, String(resposta - 1)),
+        option(resposta + 1, String(resposta + 1)),
       ],
     };
   }
 
   if (nivel === 2) {
+    const total = escolher([12, 15, 18, 20, 24, 28, 30, 36] as const);
+    const divisores = divisoresProprios(total);
+    const resposta = escolher(divisores);
+    const naoDivisores: number[] = [];
+    for (let d = 2; naoDivisores.length < 2 && d < total; d += 1) if (total % d !== 0 && d !== resposta) naoDivisores.push(d);
     return {
-      ficha: "F70",
-      nivel,
+      ...base0,
       modo: "divisores-retangulo",
-      primitivas: ["ArrayGrid", "Quadrado100"],
-      total: 18,
-      divisorInicial: 4,
-      divisoresTeste: [2, 3, 4, 5],
+      total,
+      divisorInicial: naoDivisores[0],
+      divisoresTeste: [...new Set([resposta, ...naoDivisores])].sort((a, b) => a - b),
       quadroDestacados: [],
       crivoBases: [],
-      resposta: 3,
+      resposta,
       opcoes: [
-        option(3, "3 — fecha um retângulo sem sobra"),
-        option(4, "4"),
-        option(5, "5"),
-        option(36, "36 — é múltiplo de 18", PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO),
+        option(resposta, `${resposta} — fecha um retângulo sem sobra`),
+        option(naoDivisores[0], String(naoDivisores[0])),
+        option(naoDivisores[1], String(naoDivisores[1])),
+        option(total * 2, `${total * 2} — é múltiplo de ${total}`, PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO),
       ],
     };
   }
 
   if (nivel === 3) {
+    const base = escolher([3, 4, 5, 6, 8] as const);
+    const total = base * ri(2, 5);
     return {
-      ficha: "F70",
-      nivel,
+      ...base0,
       modo: "distinguir",
-      primitivas: ["ArrayGrid", "Quadrado100"],
-      total: 12,
-      base: 4,
-      divisorInicial: 4,
-      divisoresTeste: [3, 4, 5],
-      quadroDestacados: [4, 8, 12, 16, 20, 24],
+      total,
+      base,
+      divisorInicial: base,
+      divisoresTeste: [base - 1, base, base + 1],
+      quadroDestacados: Array.from({ length: 6 }, (_, i) => base * (i + 1)),
       crivoBases: [],
       resposta: 1,
       opcoes: [
-        option(1, "4 é divisor de 12; 12 é múltiplo de 4"),
-        option(2, "12 é divisor de 4; 4 é múltiplo de 12", PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO),
-        option(3, "4 e 12 são só múltiplos um do outro"),
-        option(4, "4 e 12 são só divisores um do outro"),
+        option(1, `${base} é divisor de ${total}; ${total} é múltiplo de ${base}`),
+        option(2, `${total} é divisor de ${base}; ${base} é múltiplo de ${total}`, PrimosDivisoresMisconception.INVERTE_DIVISOR_MULTIPLO),
+        option(3, `${base} e ${total} são só múltiplos um do outro`),
+        option(4, `${base} e ${total} são só divisores um do outro`),
       ],
     };
   }
 
   if (nivel === 4) {
+    const total = escolher(PRIMOS_F70);
     return {
-      ficha: "F70",
-      nivel,
+      ...base0,
       modo: "identificar-primos",
-      primitivas: ["ArrayGrid", "Quadrado100"],
-      total: 13,
+      total,
       divisorInicial: 2,
       divisoresTeste: [2, 3, 4],
       quadroDestacados: [],
       crivoBases: [],
       resposta: 1,
       opcoes: [
-        option(1, "13 é primo: seus divisores positivos são 1 e 13"),
-        option(0, "13 não é primo porque é ímpar", PrimosDivisoresMisconception.PRIMO_ERRADO),
-        option(2, "13 é primo porque 1 também é primo", PrimosDivisoresMisconception.ESQUECE_UM),
+        option(1, `${total} é primo: seus divisores positivos são 1 e ${total}`),
+        option(0, `${total} não é primo porque é ímpar`, PrimosDivisoresMisconception.PRIMO_ERRADO),
+        option(2, `${total} é primo porque 1 também é primo`, PrimosDivisoresMisconception.ESQUECE_UM),
       ],
     };
   }
 
+  // L5: riscar as bases e apontar o primeiro primo que sobrou.
+    // Sempre duas bases ou mais: o crivo é sequencial, e uma base só apagaria a
+  // ordem que o nível ensina — riscar o 3 depois de ter riscado o 2.
+  const crivoBases = escolher([[2, 3], [2, 3, 5], [2, 3, 5, 7]] as const);
+  let resposta = Math.max(...crivoBases) + 1;
+  while (!primo(resposta)) resposta += 1;
+  const composto = resposta * resposta;
   return {
-    ficha: "F70",
-    nivel,
+    ...base0,
     modo: "crivo-eratostenes",
-    primitivas: ["ArrayGrid", "Quadrado100"],
     total: 100,
     divisorInicial: 2,
     divisoresTeste: [],
     quadroDestacados: [],
-    crivoBases: [2, 3],
-    resposta: 5,
+    crivoBases: [...crivoBases],
+    resposta,
     opcoes: [
-      option(5, "5"),
+      option(resposta, String(resposta)),
       option(1, "1", PrimosDivisoresMisconception.ESQUECE_UM),
-      option(9, "9", PrimosDivisoresMisconception.PRIMO_ERRADO),
-      option(6, "6"),
+      option(composto, String(composto), PrimosDivisoresMisconception.PRIMO_ERRADO),
+      option(resposta + 1, String(resposta + 1)),
     ],
   };
 }
