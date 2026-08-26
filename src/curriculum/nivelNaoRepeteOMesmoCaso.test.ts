@@ -22,38 +22,28 @@ import { generateRegisteredFichaQuestion, hasComposerFicha } from "./motores/com
  * entrada que ganhou variedade também, para que o registro encolha a cada
  * reparo em vez de apodrecer.
  *
- * Estado medido em `abe71b5`: 31 competências, 151 pares (ficha, nível). O
- * inventário documental anterior falava em 18 competências "conhecidas"; a
- * medição sobre os 75 canários encontrou 13 a mais.
+ * CORREÇÃO DE MEDIÇÃO. A primeira varredura acusou 31 competências e 151 pares,
+ * e estava inflada por um defeito da própria digital: ela usava
+ * `JSON.stringify(uiProps, Object.keys(uiProps).sort())` supondo que o segundo
+ * argumento ordenasse as chaves. Ele FILTRA — e filtra em qualquer
+ * profundidade —, então o conteúdo de objetos aninhados sumia. Ficha que varia
+ * só por dentro, como `N5.03` em `esquerda`/`direita`, era contada como caso
+ * único.
  *
- * `N4.10/F69` foi o primeiro reparo e já saiu daqui: a catraca pegou a saída e
- * cobrou a atualização, que é exatamente o que ela existe para fazer.
+ * Com serialização profunda, o inventário real é de 3 competências e 13 pares.
+ * Os treze reparos já feitos continuam válidos: todos tinham o caso preso em
+ * campo de primeiro nível, e a digital antiga os acusava pelo motivo certo.
+ *
+ * O que a correção NÃO absolve está medido em `respostaNaoEDecoravel.test.ts`:
+ * em muitas fichas o caso varia e a RESPOSTA não, e decorar o rótulo vence o
+ * nível do mesmo jeito.
  */
 type Motivo = "LEGITIMO" | "A-REPARAR";
 
 const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: string }> = {
-  // A reparar: o contrato tem um caso fixo por nível e a ficha cobra repetição.
-  // Cinco destas — GE.04, GE.07, GE.09, GM.11, N2.07 — receberam portão de
-  // ação na frente da CLASS-007. O portão está certo e continua insuficiente:
-  // a criança o atravessa seis vezes com o mesmo item.
-  "AL.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 5], porque: "igualdade/equilíbrio com balança fixa por nível; L4 já varia" },
-  "AL.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "expressão F77 fixa por nível" },
-  "AL.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "linguagem/letras com enunciado fixo por nível" },
   "GE.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 5], porque: "detetive de formas com peça fixa por nível; L4 já varia" },
-  "GE.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "mapa do tesouro com coordenada fixa por nível" },
-  "GE.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "ângulos com medida fixa por nível" },
-  "GE.08": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "plano cartesiano com par ordenado fixo por nível" },
-  "GE.10": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "vistas do mesmo sólido por nível" },
-  "GM.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "horas/minutos com relógio fixo por nível" },
-  "GM.09": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "problema de medida com enunciado fixo por nível" },
   "N1.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "quantidade fixa por nível; L5 já varia" },
-  "N2.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "pares/ímpares com quantidade fixa por nível" },
-  "N5.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "fração equivalente com par fixo por nível; L5 já varia" },
-  "N5.04": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "soma de frações com par fixo por nível" },
   "N5.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "multiplicação de frações com par fixo por nível" },
-  "PE.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "jornal da turma com conjunto de dados fixo por nível" },
-  "PE.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "média/chance com conjunto fixo por nível" },
-  "PE.04": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "estatística/chance com conjunto fixo por nível" },
 };
 
 const SEMENTES = [0x2f6e2b1, 0x5bd1e99];
@@ -70,13 +60,29 @@ function semear(semente: number): void {
   };
 }
 
+/**
+ * Serialização estável e PROFUNDA do spec.
+ *
+ * A primeira versão usava `JSON.stringify(uiProps, Object.keys(uiProps).sort())`
+ * achando que o segundo argumento ordenava as chaves. Ele filtra: só sobrevive
+ * o que estiver na lista, em qualquer profundidade. O conteúdo de objetos
+ * aninhados sumia da digital, e ficha que varia só por dentro — `N5.03`, cujo
+ * caso mora em `esquerda`/`direita` — era contada como caso único.
+ */
+function estavel(valor: unknown): string {
+  if (Array.isArray(valor)) return `[${valor.map(estavel).join(",")}]`;
+  if (valor && typeof valor === "object") {
+    return `{${Object.keys(valor as object).sort()
+      .map(chave => `${chave}:${estavel((valor as Record<string, unknown>)[chave])}`)
+      .join(",")}}`;
+  }
+  return String(valor);
+}
+
 /** Enunciado, resposta, conjunto de alternativas e spec. A ordem das opções não entra. */
 function digital(question: ReturnType<typeof generateRegisteredFichaQuestion>): string {
   const opcoes = (question.options ?? []).map(option => String(option.value)).sort();
-  const spec = question.uiProps
-    ? JSON.stringify(question.uiProps, Object.keys(question.uiProps as object).sort())
-    : "";
-  return [question.prompt, String(question.answer), opcoes.join(","), spec].join("|");
+  return [question.prompt, String(question.answer), opcoes.join(","), estavel(question.uiProps)].join("|");
 }
 
 /** Domínio que a ficha cobra: mais de um acerto, ou mais de uma sessão. */
@@ -143,7 +149,7 @@ describe("CLASS-003 — nenhum nível repete o mesmo caso sob mastery repetida",
     // reparo derruba a entrada e o teste acima cobra a atualização.
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR");
     const pares = aReparar.reduce((total, [, item]) => total + item.niveis.length, 0);
-    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(18);
-    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(86);
+    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(3);
+    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(13);
   });
 });
