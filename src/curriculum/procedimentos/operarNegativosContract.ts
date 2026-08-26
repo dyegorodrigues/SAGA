@@ -40,51 +40,108 @@ function opts(correta: number, erradas: Array<{ value: number; misconception: Op
     .slice(0, 4);
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const ONM = OperarNegativosMisconception;
+/** A ficha escreve o menos com o traço longo, como na tela da criança. */
+const neg = (valor: number) => `−${Math.abs(valor)}`;
+
+/**
+ * CLASS-003 — a conta do nível é sorteada, a escada não.
+ *
+ * Era uma expressão por nível: 4 + (−6), −7 + 3, −3 + (−4), −2 − (−5) e
+ * −4 + 7 − (−3) + (−2). A criança andava a MESMA reta seis vezes.
+ *
+ * O que cada nível ensina fica preso ao sinal, não ao número: L1 parte de um
+ * positivo e cruza o zero, L2 parte de um negativo e NÃO cruza, L3 soma dois
+ * negativos e vai mais para a esquerda, L4 subtrai um negativo e anda para a
+ * direita. Sortear sem essas amarras trocaria o degrau de lugar.
+ */
 export function construirOperarNegativosSpec(level: number): OperarNegativosF85Spec {
   const nivel = clamp(level);
-  if (nivel === 1) return {
-    nivel, modo: "soma-pos-neg", inicio: -10, fim: 10, posicaoInicial: 4, resposta: -2,
-    expressao: "4 + (−6)", movimentos: [4, -2], primitivas: ["InteractiveNumberLine"], cruzaZero: true, contexto: "saldo",
-    opcoes: opts(-2, [
-      { value: 10, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-      { value: 2, misconception: OperarNegativosMisconception.DIRECAO_ERRADA },
-      { value: -10, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-    ]),
-  };
-  if (nivel === 2) return {
-    nivel, modo: "soma-neg-pos", inicio: -10, fim: 10, posicaoInicial: -7, resposta: -4,
-    expressao: "−7 + 3", movimentos: [-7, -4], primitivas: ["InteractiveNumberLine"], cruzaZero: false, contexto: "saldo",
-    opcoes: opts(-4, [
-      { value: -10, misconception: OperarNegativosMisconception.DIRECAO_ERRADA },
-      { value: 4, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-      { value: 10, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-    ]),
-  };
-  if (nivel === 3) return {
-    nivel, modo: "dois-negativos", inicio: -12, fim: 6, posicaoInicial: -3, resposta: -7,
-    expressao: "−3 + (−4)", movimentos: [-3, -7], primitivas: ["InteractiveNumberLine"], cruzaZero: false, contexto: "divida",
-    opcoes: opts(-7, [
-      { value: 1, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-      { value: 7, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-      { value: -1, misconception: OperarNegativosMisconception.DIRECAO_ERRADA },
-    ]),
-  };
-  if (nivel === 4) return {
-    nivel, modo: "subtracao-negativo", inicio: -10, fim: 10, posicaoInicial: -2, resposta: 3,
-    expressao: "−2 − (−5)", movimentos: [-2, 3], primitivas: ["InteractiveNumberLine"], cruzaZero: true, contexto: "divida",
-    opcoes: opts(3, [
-      { value: -7, misconception: OperarNegativosMisconception.SUBTRAIR_NEGATIVO },
-      { value: 7, misconception: OperarNegativosMisconception.IGNORA_SINAL },
-      { value: -3, misconception: OperarNegativosMisconception.DIRECAO_ERRADA },
-    ]),
-  };
+  const primitivas = ["InteractiveNumberLine"] as ["InteractiveNumberLine"];
+
+  if (nivel === 1) {
+    const inicioPos = ri(2, 7);
+    const somado = -(inicioPos + ri(1, 5));
+    const resposta = inicioPos + somado;
+    return {
+      nivel, modo: "soma-pos-neg", inicio: -12, fim: 12, posicaoInicial: inicioPos, resposta,
+      expressao: `${inicioPos} + (${neg(somado)})`, movimentos: [inicioPos, resposta], primitivas,
+      cruzaZero: true, contexto: "saldo",
+      opcoes: opts(resposta, [
+        { value: inicioPos - somado, misconception: ONM.IGNORA_SINAL },
+        { value: -resposta, misconception: ONM.DIRECAO_ERRADA },
+        { value: inicioPos + Math.abs(somado), misconception: ONM.IGNORA_SINAL },
+      ]),
+    };
+  }
+
+  if (nivel === 2) {
+    const inicioNeg = -ri(4, 9);
+    const somado = ri(1, Math.abs(inicioNeg) - 1);
+    const resposta = inicioNeg + somado;
+    return {
+      nivel, modo: "soma-neg-pos", inicio: -12, fim: 12, posicaoInicial: inicioNeg, resposta,
+      expressao: `${neg(inicioNeg)} + ${somado}`, movimentos: [inicioNeg, resposta], primitivas,
+      cruzaZero: false, contexto: "saldo",
+      opcoes: opts(resposta, [
+        { value: inicioNeg - somado, misconception: ONM.DIRECAO_ERRADA },
+        { value: -resposta, misconception: ONM.IGNORA_SINAL },
+        { value: Math.abs(inicioNeg) + somado, misconception: ONM.IGNORA_SINAL },
+      ]),
+    };
+  }
+
+  if (nivel === 3) {
+    const inicioNeg = -ri(2, 6);
+    const somado = -ri(2, 6);
+    const resposta = inicioNeg + somado;
+    return {
+      nivel, modo: "dois-negativos", inicio: resposta - 2, fim: 6, posicaoInicial: inicioNeg, resposta,
+      expressao: `${neg(inicioNeg)} + (${neg(somado)})`, movimentos: [inicioNeg, resposta], primitivas,
+      cruzaZero: false, contexto: "divida",
+      opcoes: opts(resposta, [
+        { value: Math.abs(inicioNeg) - Math.abs(somado), misconception: ONM.IGNORA_SINAL },
+        { value: -resposta, misconception: ONM.IGNORA_SINAL },
+        { value: inicioNeg - somado, misconception: ONM.DIRECAO_ERRADA },
+      ]),
+    };
+  }
+
+  if (nivel === 4) {
+    const inicioNeg = -ri(1, 5);
+    const subtraido = -ri(3, 8);
+    const resposta = inicioNeg - subtraido;
+    return {
+      nivel, modo: "subtracao-negativo", inicio: -12, fim: 12, posicaoInicial: inicioNeg, resposta,
+      expressao: `${neg(inicioNeg)} − (${neg(subtraido)})`, movimentos: [inicioNeg, resposta], primitivas,
+      cruzaZero: resposta > 0, contexto: "divida",
+      opcoes: opts(resposta, [
+        { value: inicioNeg + subtraido, misconception: ONM.SUBTRAIR_NEGATIVO },
+        { value: -resposta, misconception: ONM.IGNORA_SINAL },
+        { value: inicioNeg - Math.abs(subtraido) + 1, misconception: ONM.DIRECAO_ERRADA },
+      ]),
+    };
+  }
+
+  const partida = -ri(2, 6);
+  const mais = ri(4, 9);
+  const menosNegativo = -ri(1, 4);
+  const maisNegativo = -ri(1, 4);
+  const passo1 = partida + mais;
+  const passo2 = passo1 - menosNegativo;
+  const resposta = passo2 + maisNegativo;
+  const extremos = [partida, passo1, passo2, resposta];
   return {
-    nivel, modo: "expressoes-mistas", inicio: -12, fim: 12, posicaoInicial: -4, resposta: 4,
-    expressao: "−4 + 7 − (−3) + (−2)", movimentos: [-4, 3, 6, 4], primitivas: ["InteractiveNumberLine"], cruzaZero: true, contexto: "misto",
-    opcoes: opts(4, [
-      { value: -2, misconception: OperarNegativosMisconception.SUBTRAIR_NEGATIVO },
-      { value: -8, misconception: OperarNegativosMisconception.DIRECAO_ERRADA },
-      { value: 12, misconception: OperarNegativosMisconception.IGNORA_SINAL },
+    nivel, modo: "expressoes-mistas",
+    inicio: Math.min(...extremos) - 2, fim: Math.max(...extremos) + 2,
+    posicaoInicial: partida, resposta,
+    expressao: `${neg(partida)} + ${mais} − (${neg(menosNegativo)}) + (${neg(maisNegativo)})`,
+    movimentos: extremos, primitivas, cruzaZero: true, contexto: "misto",
+    opcoes: opts(resposta, [
+      { value: resposta + 2 * menosNegativo, misconception: ONM.SUBTRAIR_NEGATIVO },
+      { value: partida - mais, misconception: ONM.DIRECAO_ERRADA },
+      { value: Math.abs(partida) + mais, misconception: ONM.IGNORA_SINAL },
     ]),
   };
 }

@@ -19,14 +19,92 @@ const clamp=(n:number)=>Math.max(1,Math.min(5,Math.round(n)));
 function opts(correta:string|number, erradas:Array<{value:string|number;misconception:RetaCompletaMisconceptionTag}>):RetaCompletaF84Spec["opcoes"]{
   return [{value:correta,label:String(correta)},...erradas.map(x=>({...x,label:String(x.value)}))].filter((x,i,a)=>a.findIndex(y=>y.value===x.value)===i).slice(0,4);
 }
-export function construirRetaCompletaSpec(level:number):RetaCompletaF84Spec{
-  const nivel=clamp(level);
-  if(nivel===1)return {nivel,modo:"localizar",inicio:-6,fim:6,pontos:[-3],resposta:-3,opcoes:opts(-3,[{value:3,misconception:RetaCompletaMisconception.LADO_ERRADO},{value:-2,misconception:RetaCompletaMisconception.ZERO_COMO_PASSO},{value:2,misconception:RetaCompletaMisconception.NEGATIVO_COMO_POSITIVO}])};
-  if(nivel===2)return {nivel,modo:"comparar-negativos",inicio:-7,fim:3,pontos:[-5,-2],resposta:-2,opcoes:opts(-2,[{value:-5,misconception:RetaCompletaMisconception.NEGATIVO_COMO_POSITIVO},{value:2,misconception:RetaCompletaMisconception.LADO_ERRADO}])};
-  if(nivel===3)return {nivel,modo:"ordenar-mistos",inicio:-8,fim:6,pontos:[-3,2,-7,5],resposta:"-7,-3,2,5",opcoes:opts("-7,-3,2,5",[{value:"5,2,-3,-7",misconception:RetaCompletaMisconception.NEGATIVO_COMO_POSITIVO},{value:"-3,-7,2,5",misconception:RetaCompletaMisconception.LADO_ERRADO}])};
-  if(nivel===4)return {nivel,modo:"distancia",inicio:-6,fim:5,pontos:[-3,2],resposta:5,opcoes:opts(5,[{value:6,misconception:RetaCompletaMisconception.ZERO_COMO_PASSO},{value:1,misconception:RetaCompletaMisconception.NEGATIVO_COMO_POSITIVO},{value:-5,misconception:RetaCompletaMisconception.LADO_ERRADO}])};
-  return {nivel,modo:"modulo",inicio:-8,fim:8,pontos:[-6],resposta:6,opcoes:opts(6,[{value:-6,misconception:RetaCompletaMisconception.NEGATIVO_COMO_POSITIVO},{value:7,misconception:RetaCompletaMisconception.ZERO_COMO_PASSO},{value:0,misconception:RetaCompletaMisconception.LADO_ERRADO}])};
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const RCM = RetaCompletaMisconception;
+
+/**
+ * CLASS-003 — o ponto do nível é sorteado, a escada não.
+ *
+ * Era um ponto por nível: −3, o par −5/−2, a lista −3,2,−7,5, o par −3/2 e o
+ * −6. Decorar "−3" vencia L1 sem olhar a reta.
+ *
+ * O `modo` continua fixo, e com ele o que cada nível mede: localizar, comparar
+ * negativos, ordenar mistos, medir distância e ler módulo. Os pontos sorteados
+ * evitam o zero em L1, L2 e L5 — zero não tem lado, e é justamente o lado que
+ * esses níveis ensinam.
+ */
+export function construirRetaCompletaSpec(level: number): RetaCompletaF84Spec {
+  const nivel = clamp(level);
+
+  if (nivel === 1) {
+    const alvo = -ri(2, 6);
+    return {
+      nivel, modo: "localizar", inicio: alvo - ri(1, 3), fim: ri(3, 7), pontos: [alvo], resposta: alvo,
+      opcoes: opts(alvo, [
+        { value: -alvo, misconception: RCM.LADO_ERRADO },
+        { value: alvo + 1, misconception: RCM.ZERO_COMO_PASSO },
+        { value: -alvo - 1, misconception: RCM.NEGATIVO_COMO_POSITIVO },
+      ]),
+    };
+  }
+
+  if (nivel === 2) {
+    // Dois negativos: comparar aqui é decidir qual está mais perto do zero.
+    const menor = -ri(4, 8);
+    const maior = -ri(1, 3);
+    return {
+      nivel, modo: "comparar-negativos", inicio: menor - 1, fim: ri(2, 5), pontos: [menor, maior], resposta: maior,
+      opcoes: opts(maior, [
+        { value: menor, misconception: RCM.NEGATIVO_COMO_POSITIVO },
+        { value: -maior, misconception: RCM.LADO_ERRADO },
+      ]),
+    };
+  }
+
+  if (nivel === 3) {
+    const negativos = [-ri(5, 9), -ri(1, 4)];
+    const positivos = [ri(1, 3), ri(4, 6)];
+    const pontos = [negativos[1], positivos[0], negativos[0], positivos[1]];
+    const ordenados = [...pontos].sort((a, b) => a - b);
+    const invertido = [...ordenados].reverse().join(",");
+    // Trocar os dois negativos de lugar é o erro de quem lê −7 como maior.
+    const trocado = [ordenados[1], ordenados[0], ordenados[2], ordenados[3]].join(",");
+    return {
+      nivel, modo: "ordenar-mistos", inicio: ordenados[0] - 1, fim: ordenados[3] + 1, pontos,
+      resposta: ordenados.join(","),
+      opcoes: opts(ordenados.join(","), [
+        { value: invertido, misconception: RCM.NEGATIVO_COMO_POSITIVO },
+        { value: trocado, misconception: RCM.LADO_ERRADO },
+      ]),
+    };
+  }
+
+  if (nivel === 4) {
+    const esquerda = -ri(2, 6);
+    const direita = ri(1, 5);
+    const distancia = direita - esquerda;
+    return {
+      nivel, modo: "distancia", inicio: esquerda - 1, fim: direita + 1, pontos: [esquerda, direita], resposta: distancia,
+      opcoes: opts(distancia, [
+        { value: distancia + 1, misconception: RCM.ZERO_COMO_PASSO },
+        { value: direita - Math.abs(esquerda), misconception: RCM.NEGATIVO_COMO_POSITIVO },
+        { value: -distancia, misconception: RCM.LADO_ERRADO },
+      ]),
+    };
+  }
+
+  const alvo = -ri(3, 8);
+  const modulo = Math.abs(alvo);
+  return {
+    nivel, modo: "modulo", inicio: alvo - 1, fim: modulo + 1, pontos: [alvo], resposta: modulo,
+    opcoes: opts(modulo, [
+      { value: alvo, misconception: RCM.NEGATIVO_COMO_POSITIVO },
+      { value: modulo + 1, misconception: RCM.ZERO_COMO_PASSO },
+      { value: 0, misconception: RCM.LADO_ERRADO },
+    ]),
+  };
 }
+
 export function construirRetaCompletaResolucao(spec:RetaCompletaF84Spec):ResolucaoDeclarativa<RetaCompletaShow,string|number,RetaCompletaMisconceptionTag>{
   return {estadoInicial:{inicio:spec.inicio,fim:spec.fim,pontos:spec.pontos,destacarZero:true},passos:[
     {id:"ancorar-zero",say:"O zero é a origem, não o fim da reta.",show:{inicio:spec.inicio,fim:spec.fim,pontos:spec.pontos,destacarZero:true},corrige:[RetaCompletaMisconception.LADO_ERRADO],parcial:spec.resposta},
