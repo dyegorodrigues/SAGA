@@ -77,32 +77,66 @@ const clampLevel = (level: number) => Math.max(1, Math.min(5, Math.round(level))
 
 const canonicalSelection = (ids: string[]) => [...ids].sort().join("|");
 
-function attrSpec(nivel: 1 | 2 | 3): DetetiveFormasF58Spec {
-  if (nivel === 1) {
-    const afirmacoes: DetetiveFormasAfirmacao[] = [
-      { id: "3-lados", texto: "Tem 3 lados.", correta: false },
-      { id: "4-lados", texto: "Tem 4 lados.", correta: true },
-      { id: "nenhum-lado-reto", texto: "Não tem lado reto.", correta: false },
-    ];
-    return { nivel, modo: "atributos-lados", figura: "quadrado", giro: 0, afirmacoes, resposta: canonicalSelection(afirmacoes.filter(a => a.correta).map(a => a.id)) };
-  }
+/** O que cada forma realmente tem. As afirmações são conferidas contra isto. */
+const FORMAS: Record<DetetiveFormasFigura, { lados: number; cantos: number; curvo: boolean; cantosRetos: boolean }> = {
+  circulo: { lados: 0, cantos: 0, curvo: true, cantosRetos: false },
+  triangulo: { lados: 3, cantos: 3, curvo: false, cantosRetos: false },
+  quadrado: { lados: 4, cantos: 4, curvo: false, cantosRetos: true },
+  retangulo: { lados: 4, cantos: 4, curvo: false, cantosRetos: true },
+};
 
-  if (nivel === 2) {
-    const afirmacoes: DetetiveFormasAfirmacao[] = [
-      { id: "4-lados", texto: "Tem 4 lados.", correta: true },
-      { id: "4-cantos-quadrados", texto: "Tem 4 cantos quadrados.", correta: true },
-      { id: "3-cantos", texto: "Tem 3 cantos.", correta: false },
-    ];
-    return { nivel, modo: "atributos-cantos", figura: "retangulo", giro: 0, afirmacoes, resposta: canonicalSelection(afirmacoes.filter(a => a.correta).map(a => a.id)) };
-  }
+const sortear = <T,>(itens: readonly T[], rng: () => number): T => itens[Math.floor(rng() * itens.length)] ?? itens[0];
 
-  const afirmacoes: DetetiveFormasAfirmacao[] = [
-    { id: "contorno-curvo", texto: "O contorno é curvo.", correta: true },
-    { id: "tem-cantos", texto: "Tem cantos.", correta: false },
-    { id: "tem-lados-retos", texto: "Tem lados retos.", correta: false },
-  ];
-  return { nivel, modo: "atributos-contorno", figura: "circulo", giro: 0, afirmacoes, resposta: canonicalSelection(afirmacoes.filter(a => a.correta).map(a => a.id)) };
+/**
+ * CLASS-003 — a figura do nível é sorteada, e as afirmações verdadeiras com ela.
+ *
+ * Era uma figura por nível: quadrado, retângulo e círculo. Com a figura fixa,
+ * as afirmações verdadeiras eram sempre as mesmas — decorar quais marcar vencia
+ * o nível sem olhar a forma desenhada.
+ *
+ * Cada nível continua olhando para uma propriedade: lados em L1, cantos em L2,
+ * contorno em L3. E cada afirmação passa a ser conferida contra `FORMAS`, para
+ * que uma figura nova não entre com um enunciado que mente sobre ela.
+ */
+function attrSpec(nivel: 1 | 2 | 3, rng: () => number): DetetiveFormasF58Spec {
+  // O círculo só entra onde a pergunta é sobre contorno: perguntar "quantos
+  // lados" de um círculo troca o degrau de L1 por uma pegadinha.
+  const figura = nivel === 1
+    ? sortear(["quadrado", "retangulo", "triangulo"] as const, rng)
+    : nivel === 2
+      ? sortear(["quadrado", "retangulo", "triangulo"] as const, rng)
+      : sortear(["circulo", "quadrado", "triangulo"] as const, rng);
+  const forma = FORMAS[figura];
+
+  const afirmacoes: DetetiveFormasAfirmacao[] = nivel === 1
+    ? [
+        { id: "3-lados", texto: "Tem 3 lados.", correta: forma.lados === 3 },
+        { id: "4-lados", texto: "Tem 4 lados.", correta: forma.lados === 4 },
+        { id: "nenhum-lado-reto", texto: "Não tem lado reto.", correta: forma.lados === 0 },
+      ]
+    : nivel === 2
+      ? [
+          { id: "4-lados", texto: "Tem 4 lados.", correta: forma.lados === 4 },
+          { id: "4-cantos-quadrados", texto: "Tem 4 cantos quadrados.", correta: forma.cantosRetos },
+          { id: "3-cantos", texto: "Tem 3 cantos.", correta: forma.cantos === 3 },
+        ]
+      : [
+          { id: "contorno-curvo", texto: "O contorno é curvo.", correta: forma.curvo },
+          { id: "tem-cantos", texto: "Tem cantos.", correta: forma.cantos > 0 },
+          { id: "tem-lados-retos", texto: "Tem lados retos.", correta: forma.lados > 0 },
+        ];
+
+  const modo = nivel === 1 ? "atributos-lados" : nivel === 2 ? "atributos-cantos" : "atributos-contorno";
+  return {
+    nivel,
+    modo,
+    figura,
+    giro: 0,
+    afirmacoes,
+    resposta: canonicalSelection(afirmacoes.filter(a => a.correta).map(a => a.id)),
+  };
 }
+
 
 function symmetryAxisSpec(rng: () => number): DetetiveFormasF58Spec {
   const eixosDisponiveis: DetetiveFormasEixo[] = ["vertical", "horizontal", "diagonal", "diagonal-oposta"];
@@ -127,31 +161,39 @@ function symmetryAxisSpec(rng: () => number): DetetiveFormasF58Spec {
   };
 }
 
-function symmetryCompleteSpec(): DetetiveFormasF58Spec {
+/**
+ * CLASS-003 — a malha de simetria também é sorteada.
+ *
+ * O eixo, as origens e o ponto que falta eram fixos, então a criança decorava a
+ * casa e acertava sem refletir nada. Os distratores continuam sendo os dois
+ * erros que a F58 nomeia: refletir na altura errada e parar antes do eixo.
+ */
+function symmetryCompleteSpec(rng: () => number = Math.random): DetetiveFormasF58Spec {
+  const inteiro = (min: number, max: number) => min + Math.floor(rng() * (max - min + 1));
+  const eixo = inteiro(3, 4);
+  const distancia = inteiro(1, eixo - 1);
+  const alturaA = inteiro(1, 2);
+  const alturaB = alturaA + inteiro(1, 2);
+  const espelho = (x: number) => 2 * eixo - x;
+  const origemX = eixo - distancia;
   const pontos: DetetiveFormasPonto[] = [
-    { id: "origem-a", x: 1, y: 1, origem: true },
-    { id: "origem-b", x: 1, y: 3, origem: true },
-    { id: "reflexo-a", x: 5, y: 1 },
-    { id: "candidato-correto", x: 5, y: 3, resposta: true },
-    { id: "candidato-alto", x: 5, y: 2 },
-    { id: "candidato-perto", x: 4, y: 3 },
+    { id: "origem-a", x: origemX, y: alturaA, origem: true },
+    { id: "origem-b", x: origemX, y: alturaB, origem: true },
+    { id: "reflexo-a", x: espelho(origemX), y: alturaA },
+    { id: "candidato-correto", x: espelho(origemX), y: alturaB, resposta: true },
+    // Mesma coluna, altura errada.
+    { id: "candidato-alto", x: espelho(origemX), y: alturaB - 1 },
+    // Altura certa, mas parou antes de chegar ao espelho.
+    { id: "candidato-perto", x: espelho(origemX) - 1, y: alturaB },
   ];
-  return {
-    nivel: 5,
-    modo: "simetria-completar",
-    figura: "quadrado",
-    giro: 0,
-    resposta: "candidato-correto",
-    pontos,
-    eixoGrade: 3,
-  };
+  return { nivel: 5, modo: "simetria-completar", figura: "quadrado", giro: 0, resposta: "candidato-correto", pontos, eixoGrade: eixo };
 }
 
 export function construirDetetiveFormasSpec(level: number, rng: () => number = Math.random): DetetiveFormasF58Spec {
   const nivel = clampLevel(level);
-  if (nivel <= 3) return attrSpec(nivel as 1 | 2 | 3);
+  if (nivel <= 3) return attrSpec(nivel as 1 | 2 | 3, rng);
   if (nivel === 4) return symmetryAxisSpec(rng);
-  return symmetryCompleteSpec();
+  return symmetryCompleteSpec(rng);
 }
 
 export function construirDetetiveFormasResolucao(spec: DetetiveFormasF58Spec): ResolucaoDeclarativa<DetetiveFormasResolutionShow, string, DetetiveFormasMisconceptionTag> {

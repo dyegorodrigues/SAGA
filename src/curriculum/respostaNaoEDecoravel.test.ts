@@ -36,7 +36,7 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "AL.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 5], porque: "o número que equilibra é sempre o mesmo por nível" },
   "AL.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o valor da expressão é sempre o mesmo por nível" },
   "AL.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a letra generalizada é sempre a mesma por nível" },
-  "GE.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 5], porque: "a peça sorteada é a mesma, e com ela a resposta" },
+  "GE.03": { motivo: "OPCOES-NAO-RENDERIZADAS", niveis: [5], porque: "em L5 a resposta é o id do ponto tocado na malha; o que a criança escolhe é a casa, e a malha é sorteada" },
   "GE.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a casa do mapa é sempre a mesma por nível" },
   "GE.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a classe do ângulo é sempre a mesma por nível" },
   "GE.08": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o par ordenado é sempre o mesmo por nível" },
