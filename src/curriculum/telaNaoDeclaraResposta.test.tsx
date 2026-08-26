@@ -30,6 +30,7 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "GE.08": { motivo: "LEGITIMO", porque: "o enunciado dita o par ordenado; a habilidade é localizá-lo no plano" },
   "GE.10": { motivo: "LEGITIMO", porque: "as vistas precisam de rótulo A/B/C para poderem ser escolhidas" },
   "N2.06": { motivo: "LEGITIMO", porque: "\"paridade\" no apoio contém \"par\" por acaso de substring" },
+  "N1.07": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta: em L2 a régua vai até 10 e a resposta é 10; esconder a marca apaga a pergunta" },
   "N7.01": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta dos inteiros" },
   "N7.02": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta dos inteiros" },
   "PE.02": { motivo: "LEGITIMO", porque: "as barras do gráfico precisam de rótulo de categoria" },
@@ -47,7 +48,33 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   // ("produtos parciais coincidem com a resposta") racionalizava o artefato.
 };
 
-const SEMENTES = [0x2f6e2b1, 0x5bd1e99, 0x1a2b3c4];
+/**
+ * Cinco sementes, e o veredito exige unanimidade em algum nível.
+ *
+ * Vazamento estrutural — o apoio escreve a resposta porque é assim que a tela
+ * é montada — reproduz em toda amostra. Coincidência numérica não: a resposta
+ * do perímetro em GM.07 bate com a medida de OUTRO lado só em alguns sorteios,
+ * e a parte que falta em N1.10 iguala a parte visível só quando a divisão é
+ * simétrica. Com semente fixa e caso fixo, coincidência parecia estrutural.
+ *
+ * Isso deixou de ser teórico quando a CLASS-003 passou a sortear os casos:
+ * cada reparo desloca o fluxo do PRNG, e um gate que reprova por coincidência
+ * acusaria ficha diferente a cada commit. Foi assim que N6.03 apareceu.
+ */
+const SEMENTES = [0x2f6e2b1, 0x5bd1e99, 0x1a2b3c4, 0x6e11d07, 0x24c8fa3];
+
+/**
+ * Vazamentos caso-dependentes já triados, por `ficha|nível`.
+ *
+ * A catraca destes é de mão única, e de propósito: parcial NOVO reprova,
+ * parcial que sumiu não. A taxa de um parcial depende do fluxo do PRNG, e a
+ * CLASS-003 desloca esse fluxo a cada reparo — cobrar permanência aqui traria
+ * de volta exatamente a fragilidade que a unanimidade veio remover.
+ */
+const PARCIAIS_CONHECIDOS: Record<string, string> = {
+  "AL.02|5": "a fileira do padrão é o objeto observado; o emoji da resposta aparece nela em parte dos sorteios",
+  "GM.02|5": "os ícones da cena são o objeto da comparação; coincidem com a resposta em parte dos sorteios",
+};
 const norm = (t: string) => t.replace(/\s+/g, "").replace(/×/g, "x").toLowerCase();
 /**
  * Texto do suporte com a fronteira dos ELEMENTOS preservada.
@@ -100,8 +127,10 @@ function semear(semente: number): void {
   };
 }
 
-function varrer(): Set<string> {
-  const vazam = new Set<string>();
+function varrer(): { vazam: Set<string>; parciais: string[] } {
+  // Por (ficha, nível): quantas amostras foram avaliadas e quantas vazaram.
+  // O denominador importa — amostra pulada não é amostra que não vazou.
+  const contagem = new Map<string, { avaliadas: number; vazaram: number }>();
   const ids = JOURNEY_FICHAS.map(ficha => ficha.id).filter(hasComposerFicha);
   for (const semente of SEMENTES) {
     semear(semente);
@@ -114,12 +143,23 @@ function varrer(): Set<string> {
         const { container, unmount } = render(<FichaRenderer question={question} onAnswer={() => undefined} />);
         const copia = container.cloneNode(true) as HTMLElement;
         for (const botao of [...copia.querySelectorAll("button")]) botao.remove();
-        if (declara(norm(copia.textContent ?? ""), normEspacado(textoPorElemento(copia)), rotulo)) vazam.add(id);
+        const chave = `${id}|${nivel}`;
+        const placar = contagem.get(chave) ?? { avaliadas: 0, vazaram: 0 };
+        placar.avaliadas += 1;
+        if (declara(norm(copia.textContent ?? ""), normEspacado(textoPorElemento(copia)), rotulo)) placar.vazaram += 1;
+        contagem.set(chave, placar);
         unmount();
       }
     }
   }
-  return vazam;
+  const vazam = new Set<string>();
+  const parciais: string[] = [];
+  for (const [chave, { avaliadas, vazaram }] of contagem) {
+    if (avaliadas === 0) continue;
+    if (vazaram === avaliadas) vazam.add(chave.split("|")[0]);
+    else if (vazaram > 0) parciais.push(`${chave} (${vazaram}/${avaliadas})`);
+  }
+  return { vazam, parciais: parciais.sort() };
 }
 
 describe("CLASS-009 — nenhuma tela declara a resposta que ela mesma pergunta", () => {
@@ -129,12 +169,31 @@ describe("CLASS-009 — nenhuma tela declara a resposta que ela mesma pergunta",
   });
 
   it("nenhuma ficha vaza fora do registro medido, e nenhuma entrada do registro está obsoleta", { timeout: 180000 }, () => {
-    const vazam = varrer();
+    const { vazam } = varrer();
     const novas = [...vazam].filter(id => !REGISTRO[id]).sort();
     const obsoletas = Object.keys(REGISTRO).filter(id => !vazam.has(id)).sort();
 
     expect(novas, `fichas novas declarando a própria resposta: ${novas.join(", ")}`).toEqual([]);
     expect(obsoletas, `entradas do registro que pararam de vazar — remova-as: ${obsoletas.join(", ")}`).toEqual([]);
+  });
+
+  it("nenhum vazamento é parcial: caso-dependente é coincidência, e coincidência não é veredito", { timeout: 180000 }, () => {
+    // Um (ficha, nível) que vaza em algumas sementes e não em outras não está
+    // declarando a resposta: está esbarrando nela. Foi assim que N6.03 apareceu
+    // (7 em 187) e que GM.07 e N1.10 apareceriam se o rótulo de um dígito
+    // entrasse na varredura — a resposta do perímetro bate com a medida de
+    // outro lado só em alguns sorteios.
+    //
+    // Enquanto a CLASS-003 sorteia casos, cada reparo desloca o fluxo do PRNG.
+    // Sem esta asserção, um parcial entraria ou sairia do veredito em silêncio
+    // a cada commit, e o registro acusaria ficha diferente sem ninguém ter
+    // mexido nela. Parcial novo aqui é para triar, não para registrar às cegas.
+    const { parciais } = varrer();
+    const novos = parciais.filter(entrada => !PARCIAIS_CONHECIDOS[entrada.split(" ")[0]]);
+    expect(novos, `vazamentos caso-dependentes novos, para triar:\n${novos.join("\n")}`).toEqual([]);
+    for (const [chave, porque] of Object.entries(PARCIAIS_CONHECIDOS)) {
+      expect(porque.length, `${chave} sem justificativa`).toBeGreaterThan(20);
+    }
   });
 
   it("a fila de reparo do Gate B′ é explícita e não some sem recibo", () => {
