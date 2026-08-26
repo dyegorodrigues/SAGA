@@ -55,7 +55,13 @@ describe("W33 — GE.07/F79 Polígonos — contrato canônico reconciliado", () 
     const l4 = generateRegisteredFichaQuestion("GE.07", 4).uiProps as any;
     expect(l4.hierarquia).toBe(true);
     expect(l4.quadradoTambemRetangulo).toBe(true);
-    expect(l4.lacosAninhados).toContain("quadrados⊂retângulos");
+    // A CLASS-003 sorteia a figura de L4 entre quadrado e retângulo, então a
+    // cadeia de laços acompanha a figura em vez de ser sempre a do quadrado.
+    // O que a F79 exige é que TODA cadeia termine em paralelogramo, que é a
+    // classe mais ampla da escada.
+    expect(l4.lacosAninhados.length).toBeGreaterThanOrEqual(2);
+    expect(l4.lacosAninhados).toContain("paralelogramos⊂quadriláteros");
+    expect(l4.lacosAninhados.some((laco: string) => laco.endsWith("⊂paralelogramos"))).toBe(true);
 
     const l5 = generateRegisteredFichaQuestion("GE.07", 5).uiProps as any;
     expect(l5.propriedadesCombinadas).toBe(true);

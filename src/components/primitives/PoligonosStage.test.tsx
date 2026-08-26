@@ -70,6 +70,27 @@ describe("CLASS-007 — GE.07/F79: conferir os critérios é condição da respo
     }
   });
 
+  it("cada classe sorteada tem traço próprio: nenhuma figura mente sobre si mesma", () => {
+    // A CLASS-003 sorteia a classe. Se duas classes dividissem o mesmo
+    // polígono, o cartão diria "3 lados iguais" ao lado de um desenho que não
+    // os tem.
+    const tracos = new Map<string, string>();
+    for (const nivel of [1, 2, 3, 4, 5]) {
+      for (let i = 0; i < 40; i += 1) {
+        const spec = construirPoligonosSpec(nivel);
+        const view = render(<PoligonosStage spec={spec} onAnswer={vi.fn()} />);
+        const alvo = spec.figuras[0];
+        const pontos = view.container.querySelector("polygon")?.getAttribute("points") ?? "";
+        const classe = `${alvo.familia}/${alvo.classeLados ?? "-"}/${alvo.classeAngulos ?? "-"}`;
+        const jaVisto = tracos.get(pontos);
+        if (jaVisto) expect(jaVisto, `${classe} e ${jaVisto} dividem o mesmo traço`).toBe(classe);
+        else tracos.set(pontos, classe);
+        view.unmount();
+      }
+    }
+    expect(tracos.size, "o palco precisa desenhar mais de uma figura").toBeGreaterThan(3);
+  });
+
   it("a prop disabled continua fechando tudo", () => {
     const spec = construirPoligonosSpec(3);
     const { container } = render(<PoligonosStage spec={spec} onAnswer={vi.fn()} disabled />);

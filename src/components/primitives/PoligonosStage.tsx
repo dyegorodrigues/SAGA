@@ -12,13 +12,22 @@ interface Props {
   onAnswer: (answer: string, meta?: AnswerMeta) => void;
 }
 
+/**
+ * Um traço por classe. Quando a CLASS-003 passou a sortear a classe da figura,
+ * equilátero, escaleno e obtusângulo caíam todos no mesmo traço genérico — a
+ * criança leria "3 lados iguais" no cartão olhando um triângulo que não tem os
+ * lados iguais. Figura que mente sobre si mesma não ensina a classificar.
+ */
 function pontosFigura(figura: PoligonoFiguraF79): string {
   if (figura.familia === "quadrado") return "48,38 132,38 132,122 48,122";
   if (figura.familia === "paralelogramo") return "58,38 142,38 122,122 38,122";
   if (figura.familia === "losango") return "90,26 146,80 90,134 34,80";
   if (figura.familia === "retangulo") return "34,48 146,48 146,112 34,112";
   if (figura.classeAngulos === "retangulo") return "40,122 40,42 142,122";
-  return "90,28 146,124 34,124";
+  if (figura.classeAngulos === "obtusangulo") return "26,118 154,118 118,58";
+  if (figura.classeLados === "equilatero") return "90,26 146,124 34,124";
+  if (figura.classeLados === "escaleno") return "56,30 152,124 30,124";
+  return "90,34 138,124 42,124";
 }
 
 function FiguraSvg({ figura, destaque = false }: { figura: PoligonoFiguraF79; destaque?: boolean }) {

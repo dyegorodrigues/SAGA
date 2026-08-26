@@ -59,53 +59,81 @@ function options(correta: string, label: string, erradas: Array<{ value: string;
     .slice(0, 4);
 }
 
-const trianguloIsosceles: PoligonoFiguraF79 = {
-  id: "tri-isosceles",
-  familia: "triangulo",
-  lados: 3,
-  giro: 37,
-  ladosIguais: 2,
-  classeLados: "isosceles",
-  classeAngulos: "acutangulo",
-};
-const trianguloRetangulo: PoligonoFiguraF79 = {
-  id: "tri-retangulo",
-  familia: "triangulo",
-  lados: 3,
-  giro: 121,
-  ladosIguais: 0,
-  angulosRetos: 1,
-  classeLados: "escaleno",
-  classeAngulos: "retangulo",
-};
-const paralelogramo: PoligonoFiguraF79 = {
-  id: "paralelogramo",
-  familia: "paralelogramo",
-  lados: 4,
-  giro: 18,
-  ladosIguais: 0,
-  angulosRetos: 0,
-  paresParalelos: 2,
-};
-const quadrado: PoligonoFiguraF79 = {
-  id: "quadrado",
-  familia: "quadrado",
-  lados: 4,
-  giro: 31,
-  ladosIguais: 4,
-  angulosRetos: 4,
-  paresParalelos: 2,
-};
-const losango: PoligonoFiguraF79 = {
-  id: "losango",
-  familia: "losango",
-  lados: 4,
-  giro: 42,
-  ladosIguais: 4,
-  angulosRetos: 0,
-  paresParalelos: 2,
-};
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+/** Duas orientações bem separadas: a cópia precisa parecer outra coisa e não ser. */
+const giroSorteado = () => ri(10, 80);
+const giroDaCopia = (giro: number) => giro + ri(100, 260);
 
+interface ClasseTriangulo {
+  classeLados: NonNullable<PoligonoFiguraF79["classeLados"]>;
+  classeAngulos: NonNullable<PoligonoFiguraF79["classeAngulos"]>;
+  ladosIguais: number;
+  angulosRetos: number;
+  rotulo: string;
+  criterio: string;
+}
+
+const POR_LADOS: readonly ClasseTriangulo[] = [
+  { classeLados: "equilatero", classeAngulos: "acutangulo", ladosIguais: 3, angulosRetos: 0, rotulo: "Equilátero — 3 lados iguais", criterio: "3 lados iguais" },
+  { classeLados: "isosceles", classeAngulos: "acutangulo", ladosIguais: 2, angulosRetos: 0, rotulo: "Isósceles — 2 lados iguais", criterio: "2 lados iguais" },
+  { classeLados: "escaleno", classeAngulos: "acutangulo", ladosIguais: 0, angulosRetos: 0, rotulo: "Escaleno — nenhum lado igual", criterio: "nenhum lado igual" },
+];
+
+const POR_ANGULOS: readonly ClasseTriangulo[] = [
+  { classeLados: "escaleno", classeAngulos: "retangulo", ladosIguais: 0, angulosRetos: 1, rotulo: "Triângulo retângulo — 1 ângulo reto", criterio: "1 ângulo reto" },
+  { classeLados: "escaleno", classeAngulos: "acutangulo", ladosIguais: 0, angulosRetos: 0, rotulo: "Acutângulo — todos os ângulos agudos", criterio: "todos os ângulos agudos" },
+  { classeLados: "escaleno", classeAngulos: "obtusangulo", ladosIguais: 0, angulosRetos: 0, rotulo: "Obtusângulo — 1 ângulo obtuso", criterio: "1 ângulo obtuso" },
+];
+
+interface ClasseQuadrilatero {
+  familia: PoligonoFamilia;
+  nome: string;
+  ladosIguais: number;
+  angulosRetos: number;
+  paresParalelos: number;
+  criterios: string[];
+  /** Classes que a figura também é, da mais específica para a mais ampla. */
+  tambemE: string[];
+}
+
+const QUADRILATEROS: readonly ClasseQuadrilatero[] = [
+  { familia: "paralelogramo", nome: "Paralelogramo", ladosIguais: 0, angulosRetos: 0, paresParalelos: 2, criterios: ["4 lados", "2 pares de lados paralelos"], tambemE: ["paralelogramo"] },
+  { familia: "losango", nome: "Losango", ladosIguais: 4, angulosRetos: 0, paresParalelos: 2, criterios: ["4 lados iguais", "2 pares de lados paralelos"], tambemE: ["losango", "paralelogramo"] },
+  { familia: "retangulo", nome: "Retângulo", ladosIguais: 0, angulosRetos: 4, paresParalelos: 2, criterios: ["4 ângulos retos", "2 pares de lados paralelos"], tambemE: ["retângulo", "paralelogramo"] },
+  { familia: "quadrado", nome: "Quadrado", ladosIguais: 4, angulosRetos: 4, paresParalelos: 2, criterios: ["4 lados iguais", "4 ângulos retos", "2 pares de lados paralelos"], tambemE: ["quadrado", "retângulo", "paralelogramo"] },
+];
+
+const quadrilateroFigura = (classe: ClasseQuadrilatero, id: string, giro: number): PoligonoFiguraF79 => ({
+  id, familia: classe.familia, lados: 4, giro,
+  ladosIguais: classe.ladosIguais, angulosRetos: classe.angulosRetos, paresParalelos: classe.paresParalelos,
+});
+
+const trianguloFigura = (classe: ClasseTriangulo, id: string, giro: number): PoligonoFiguraF79 => ({
+  id, familia: "triangulo", lados: 3, giro,
+  ladosIguais: classe.ladosIguais, angulosRetos: classe.angulosRetos,
+  classeLados: classe.classeLados, classeAngulos: classe.classeAngulos,
+});
+
+const chave = (nomes: string[]) => nomes.join("-").toLowerCase().replace(/[âêôáéíóúãõç]/g, c => "aeoaeiouaoc"["âêôáéíóúãõç".indexOf(c)]);
+
+/**
+ * CLASS-003 — a figura do nível é sorteada, a escada não.
+ *
+ * As figuras eram as mesmas por nível, e a resposta com elas: sempre
+ * "isósceles" em L1, sempre "losango e paralelogramo" em L5. A frente da
+ * CLASS-007 pôs a conferência de critérios na frente, e a criança conferia as
+ * MESMAS figuras seis vezes.
+ *
+ * Girar não bastaria. Com a classe fixa, decorar o rótulo vence o nível — foi
+ * o defeito que apareceu em GE.04, onde "sim" acertava L3 e L4 para sempre.
+ * Então a CLASSE é sorteada junto, e o desenho acompanha: `pontosFigura` ganhou
+ * traço próprio para equilátero, escaleno e obtusângulo, porque uma classe que
+ * caísse no traço genérico seria uma figura mentindo sobre si mesma.
+ *
+ * A cópia girada continua sendo a MESMA figura em outra orientação: é ela que
+ * desmente o distrator `orientacao-fixa`, que a ficha declara.
+ */
 export function construirPoligonosSpec(level: number): PoligonosF79Spec {
   const nivel = clamp(level);
   const base = {
@@ -114,91 +142,89 @@ export function construirPoligonosSpec(level: number): PoligonosF79Spec {
     orientacoesVariadas: true as const,
     alternativaPorToque: true as const,
   };
-  if (nivel === 1) return {
-    ...base,
-    modo: "triangulos-lados",
-    figuras: [trianguloIsosceles, { ...trianguloIsosceles, id: "tri-isosceles-girado", giro: 173 }],
-    resposta: "isosceles",
-    opcoes: options("isosceles", "Isósceles — 2 lados iguais", [
-      { value: "equilatero", label: "Equilátero — 3 lados iguais", misconception: PoligonosMisconception.SO_UM_CRITERIO },
-      { value: "nao-triangulo", label: "Não é triângulo nessa posição", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
-    ]),
-    criterio: "lados",
-    hierarquia: false,
-    quadradoTambemRetangulo: false,
-    lacosAninhados: [],
-    propriedadesCombinadas: false,
-    criterios: ["3 lados", "2 lados iguais"],
-    criteriosMinimos: 1,
-  };
-  if (nivel === 2) return {
-    ...base,
-    modo: "triangulos-angulos",
-    figuras: [trianguloRetangulo, { ...trianguloRetangulo, id: "tri-retangulo-girado", giro: 226 }],
-    resposta: "retangulo",
-    opcoes: options("retangulo", "Triângulo retângulo — 1 ângulo reto", [
-      { value: "obtusangulo", label: "Obtusângulo", misconception: PoligonosMisconception.SO_UM_CRITERIO },
-      { value: "nao-triangulo", label: "Deixou de ser triângulo porque girou", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
-    ]),
-    criterio: "angulos",
-    hierarquia: false,
-    quadradoTambemRetangulo: false,
-    lacosAninhados: [],
-    propriedadesCombinadas: false,
-    criterios: ["3 lados", "1 ângulo reto"],
-    criteriosMinimos: 1,
-  };
-  if (nivel === 3) return {
-    ...base,
-    modo: "quadrilateros",
-    figuras: [paralelogramo, quadrado, losango],
-    resposta: "paralelogramo",
-    opcoes: options("paralelogramo", "Paralelogramo — 2 pares de lados paralelos", [
-      { value: "retangulo", label: "Retângulo — precisa de 4 ângulos retos", misconception: PoligonosMisconception.SO_UM_CRITERIO },
-      { value: "nao-quadrilatero", label: "Não é quadrilátero porque está inclinado", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
-    ]),
-    criterio: "quadrilateros",
-    hierarquia: false,
-    quadradoTambemRetangulo: false,
-    lacosAninhados: [],
-    propriedadesCombinadas: false,
-    criterios: ["4 lados", "2 pares de lados paralelos"],
-    criteriosMinimos: 1,
-  };
-  if (nivel === 4) return {
-    ...base,
-    modo: "hierarquia",
-    figuras: [quadrado],
-    resposta: "quadrado-retangulo-paralelogramo",
-    opcoes: options("quadrado-retangulo-paralelogramo", "Quadrado, retângulo e paralelogramo", [
-      { value: "so-quadrado", label: "Só quadrado", misconception: PoligonosMisconception.CATEGORIAS_EXCLUSIVAS },
-      { value: "quadrado-retangulo", label: "Quadrado e retângulo, mas não paralelogramo", misconception: PoligonosMisconception.SO_UM_CRITERIO },
-      { value: "nao-retangulo-girado", label: "Só seria retângulo sem estar girado", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
-    ]),
-    criterio: "hierarquia",
-    hierarquia: true,
-    quadradoTambemRetangulo: true,
-    lacosAninhados: ["quadrados⊂retângulos", "retângulos⊂paralelogramos", "paralelogramos⊂quadriláteros"],
-    propriedadesCombinadas: true,
-    criterios: ["4 lados iguais", "4 ângulos retos", "2 pares de lados paralelos"],
-    criteriosMinimos: 2,
-  };
+  const giro = giroSorteado();
+
+  if (nivel === 1 || nivel === 2) {
+    const familia = nivel === 1 ? POR_LADOS : POR_ANGULOS;
+    const alvo = escolher(familia);
+    const outro = escolher(familia.filter(c => c !== alvo));
+    const valor = nivel === 1 ? alvo.classeLados : alvo.classeAngulos;
+    const valorOutro = nivel === 1 ? outro.classeLados : outro.classeAngulos;
+    return {
+      ...base,
+      modo: nivel === 1 ? "triangulos-lados" : "triangulos-angulos",
+      figuras: [
+        trianguloFigura(alvo, `tri-${valor}`, giro),
+        trianguloFigura(alvo, `tri-${valor}-girado`, giroDaCopia(giro)),
+      ],
+      resposta: valor,
+      opcoes: options(valor, alvo.rotulo, [
+        { value: valorOutro, label: outro.rotulo, misconception: PoligonosMisconception.SO_UM_CRITERIO },
+        { value: "nao-triangulo", label: "Não é triângulo nessa posição", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
+      ]),
+      criterio: nivel === 1 ? "lados" : "angulos",
+      hierarquia: false,
+      quadradoTambemRetangulo: false,
+      lacosAninhados: [],
+      propriedadesCombinadas: false,
+      criterios: ["3 lados", alvo.criterio],
+      criteriosMinimos: 1,
+    };
+  }
+
+  if (nivel === 3) {
+    const alvo = escolher(QUADRILATEROS.filter(q => q.familia !== "quadrado"));
+    const outro = escolher(QUADRILATEROS.filter(q => q !== alvo));
+    const acompanham = QUADRILATEROS.filter(q => q !== alvo).slice(0, 2);
+    return {
+      ...base,
+      modo: "quadrilateros",
+      figuras: [
+        quadrilateroFigura(alvo, alvo.familia, giro),
+        ...acompanham.map((q, indice) => quadrilateroFigura(q, `${q.familia}-${indice}`, giroSorteado())),
+      ],
+      resposta: alvo.familia,
+      opcoes: options(alvo.familia, `${alvo.nome} — ${alvo.criterios[alvo.criterios.length - 1]}`, [
+        { value: outro.familia, label: `${outro.nome} — precisa de ${outro.criterios[0]}`, misconception: PoligonosMisconception.SO_UM_CRITERIO },
+        { value: "nao-quadrilatero", label: "Não é quadrilátero porque está inclinado", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
+      ]),
+      criterio: "quadrilateros",
+      hierarquia: false,
+      quadradoTambemRetangulo: false,
+      lacosAninhados: [],
+      propriedadesCombinadas: false,
+      criterios: alvo.criterios,
+      criteriosMinimos: 1,
+    };
+  }
+
+  // L4 e L5 perguntam a inclusão: a figura pertence a mais de uma classe.
+  const candidatos = nivel === 4
+    ? QUADRILATEROS.filter(q => q.familia === "quadrado" || q.familia === "retangulo")
+    : QUADRILATEROS.filter(q => q.familia === "losango" || q.familia === "quadrado");
+  const alvo = escolher(candidatos);
+  const cadeia = alvo.tambemE;
+  const resposta = chave(cadeia);
+  const soEle = chave([cadeia[0]]);
+  const parcial = chave(cadeia.slice(0, Math.max(1, cadeia.length - 1)));
   return {
     ...base,
-    modo: "propriedades-combinadas",
-    figuras: [losango, { ...losango, id: "losango-girado", giro: 137 }],
-    resposta: "losango-paralelogramo",
-    opcoes: options("losango-paralelogramo", "Losango e paralelogramo", [
-      { value: "so-losango", label: "Só losango", misconception: PoligonosMisconception.CATEGORIAS_EXCLUSIVAS },
-      { value: "retangulo", label: "Retângulo, porque tem 4 lados", misconception: PoligonosMisconception.SO_UM_CRITERIO },
-      { value: "nao-quadrilatero", label: "Não é quadrilátero nessa orientação", misconception: PoligonosMisconception.ORIENTACAO_FIXA },
+    modo: nivel === 4 ? "hierarquia" : "propriedades-combinadas",
+    figuras: nivel === 4
+      ? [quadrilateroFigura(alvo, alvo.familia, giro)]
+      : [quadrilateroFigura(alvo, alvo.familia, giro), quadrilateroFigura(alvo, `${alvo.familia}-girado`, giroDaCopia(giro))],
+    resposta,
+    opcoes: options(resposta, cadeia.map((nome, indice) => indice === 0 ? nome[0].toUpperCase() + nome.slice(1) : nome).join(", ").replace(/, ([^,]*)$/, " e $1"), [
+      { value: soEle, label: `Só ${cadeia[0]}`, misconception: PoligonosMisconception.CATEGORIAS_EXCLUSIVAS },
+      { value: parcial, label: `${cadeia[0][0].toUpperCase() + cadeia[0].slice(1)}, mas não ${cadeia[cadeia.length - 1]}`, misconception: PoligonosMisconception.SO_UM_CRITERIO },
+      { value: "nao-na-orientacao", label: `Só seria ${cadeia[cadeia.length - 1]} sem estar girado`, misconception: PoligonosMisconception.ORIENTACAO_FIXA },
     ]),
-    criterio: "combinado",
+    criterio: nivel === 4 ? "hierarquia" : "combinado",
     hierarquia: true,
     quadradoTambemRetangulo: true,
-    lacosAninhados: ["losangos⊂paralelogramos", "paralelogramos⊂quadriláteros"],
+    lacosAninhados: cadeia.slice(0, -1).map((nome, indice) => `${nome}s⊂${cadeia[indice + 1]}s`).concat("paralelogramos⊂quadriláteros"),
     propriedadesCombinadas: true,
-    criterios: ["4 lados iguais", "2 pares de lados paralelos", "ângulos não precisam ser retos"],
+    criterios: alvo.criterios,
     criteriosMinimos: 2,
   };
 }
