@@ -57,14 +57,85 @@ const acessibilidade = {
 };
 
 const retangular = (rows: number, cols: number) => Array.from({ length: rows }, () => Array.from({ length: cols }, () => 1));
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/** Base em L: um bloco retangular é retirado de um canto, e a forma continua conexa. */
+function baseEmL(rows: number, cols: number, mordidaRows: number, mordidaCols: number): number[][] {
+  return Array.from({ length: rows }, (_, linha) =>
+    Array.from({ length: cols }, (_, coluna) =>
+      linha >= rows - mordidaRows && coluna >= cols - mordidaCols ? 0 : 1));
+}
+
+const MODOS: readonly VolumePrismasF94Modo[] = [
+  "contar-cubos", "camada-multiplicar", "formula", "dimensao-faltante", "prisma-nao-retangular",
+];
+
+interface PrismaSorteado { baseRows: number; baseCols: number; baseCells: number[][]; areaBase: number; altura: number }
+
+/**
+ * CLASS-003 — o prisma do nível é sorteado, a escada não.
+ *
+ * Cada nível tinha um prisma só: 2×2×2, 3×4×3, 2×5×4, 3×4×3 e a base em L com
+ * altura 3. A ficha cobra 3 acertos de 3 em 2 sessões e a frente da CLASS-007
+ * ainda pôs um portão de construção na frente — a criança construía o MESMO
+ * prisma seis vezes. Portão sem variedade não mede volume: mede memória.
+ *
+ * O `modo` continua fixo por nível: contar cubos, multiplicar camadas, fórmula,
+ * dimensão faltante e base não retangular são a escada da F94.
+ *
+ * Três amarras que as faixas precisam respeitar, e por quê:
+ *
+ * - `altura ≥ 2` sempre: com altura 1 o volume é igual à área da base, e o
+ *   distrator `IGNORA_UNIDADE_CUBICA` (`{volume} cm²`) passaria a valer tanto
+ *   quanto a resposta;
+ * - `baseRows + baseCols + altura ≠ volume`: é o distrator `SOMA_DIMENSOES`, e
+ *   colidir com a resposta reprovaria a criança certa;
+ * - L1 fica pequeno porque o portão da CLASS-007 pede um toque por cubo: um
+ *   prisma de 60 cubos vira tarefa de paciência, não de contagem.
+ */
+function sortearPrisma(nivel: number): PrismaSorteado {
+  for (let tentativa = 0; tentativa < 40; tentativa += 1) {
+    const altura = nivel === 1 ? ri(2, 3) : ri(2, nivel === 5 ? 4 : 5);
+    const baseRows = nivel === 1 ? ri(2, 3) : ri(2, 4);
+    const baseCols = nivel === 1 ? ri(2, 3) : ri(3, 5);
+    if (nivel === 5) {
+      const mordidaRows = ri(1, baseRows - 1);
+      const mordidaCols = ri(1, baseCols - 1);
+      const areaBase = baseRows * baseCols - mordidaRows * mordidaCols;
+      if (areaBase < 4) continue;
+      const candidato = { baseRows, baseCols, baseCells: baseEmL(baseRows, baseCols, mordidaRows, mordidaCols), areaBase, altura };
+      if (aceita(nivel, candidato)) return candidato;
+      continue;
+    }
+    const areaBase = baseRows * baseCols;
+    const candidato = { baseRows, baseCols, baseCells: retangular(baseRows, baseCols), areaBase, altura };
+    if (aceita(nivel, candidato)) return candidato;
+  }
+  // Sorteio sem saída não existe nestas faixas; o retângulo mínimo é a rede.
+  return { baseRows: 2, baseCols: 3, baseCells: retangular(2, 3), areaBase: 6, altura: 2 };
+}
+
+function aceita(nivel: number, p: PrismaSorteado): boolean {
+  const volume = p.areaBase * p.altura;
+  if (nivel === 1 && volume > 12) return false;
+  if (p.areaBase === volume) return false;
+  if (nivel === 4) return p.areaBase !== p.altura && volume + p.areaBase !== p.altura;
+  return p.baseRows + p.baseCols + p.altura !== volume;
+}
 
 export function construirVolumePrismasF94Spec(level: number): VolumePrismasF94Spec {
   const nivel = clamp(level);
-  if (nivel === 1) return { ficha: "F94", nivel, modo: "contar-cubos", primitivas: ["ArrayGrid"], visualizacao: "3D", baseRows: 2, baseCols: 2, baseCells: retangular(2, 2), altura: 2, areaBase: 4, volume: 8, unidade: "cm³", resposta: "8-cm3", respostaLabel: "8 cm³", acessibilidade };
-  if (nivel === 2) return { ficha: "F94", nivel, modo: "camada-multiplicar", primitivas: ["ArrayGrid"], visualizacao: "3D", baseRows: 3, baseCols: 4, baseCells: retangular(3, 4), altura: 3, areaBase: 12, volume: 36, unidade: "cm³", resposta: "36-cm3", respostaLabel: "36 cm³", acessibilidade };
-  if (nivel === 3) return { ficha: "F94", nivel, modo: "formula", primitivas: ["ArrayGrid"], visualizacao: "3D", baseRows: 2, baseCols: 5, baseCells: retangular(2, 5), altura: 4, areaBase: 10, volume: 40, unidade: "cm³", resposta: "40-cm3", respostaLabel: "40 cm³", acessibilidade };
-  if (nivel === 4) return { ficha: "F94", nivel, modo: "dimensao-faltante", primitivas: ["ArrayGrid"], visualizacao: "3D", baseRows: 3, baseCols: 4, baseCells: retangular(3, 4), altura: 3, areaBase: 12, volume: 36, unidade: "cm³", resposta: "3-altura", respostaLabel: "3 unidades de altura", dimensaoFaltante: "altura", acessibilidade };
-  return { ficha: "F94", nivel, modo: "prisma-nao-retangular", primitivas: ["ArrayGrid"], visualizacao: "3D", baseRows: 3, baseCols: 3, baseCells: [[1, 1, 1], [1, 0, 0], [1, 0, 0]], altura: 3, areaBase: 5, volume: 15, unidade: "cm³", resposta: "15-cm3", respostaLabel: "15 cm³", acessibilidade };
+  const modo = MODOS[nivel - 1];
+  const { baseRows, baseCols, baseCells, areaBase, altura } = sortearPrisma(nivel);
+  const volume = areaBase * altura;
+  const base = {
+    ficha: "F94" as const, nivel, modo, primitivas: ["ArrayGrid"] as ["ArrayGrid"], visualizacao: "3D" as const,
+    baseRows, baseCols, baseCells, altura, areaBase, volume, unidade: "cm³" as const, acessibilidade,
+  };
+  if (modo === "dimensao-faltante") {
+    return { ...base, resposta: `${altura}-altura`, respostaLabel: `${altura} unidades de altura`, dimensaoFaltante: "altura" };
+  }
+  return { ...base, resposta: `${volume}-cm3`, respostaLabel: `${volume} cm³` };
 }
 
 export function alturasVisiveisVolumePrismasF94(spec: VolumePrismasF94Spec, camadas: number): number[][] {

@@ -94,6 +94,7 @@
   "src/curriculum/procedimentos/tenFrameProcedure.ts": 164,
   "src/curriculum/procedimentos/touchCountContract.ts": 180,
   "src/curriculum/procedimentos/touchCountProcedure.ts": 176,
+  "src/curriculum/procedimentos/volumePrismasContract.ts": 26,
   "src/curriculum/schema.ts": 85,
   "src/lib/firebase.ts": 83,
   "src/lib/gamificationProgress.ts": 28,

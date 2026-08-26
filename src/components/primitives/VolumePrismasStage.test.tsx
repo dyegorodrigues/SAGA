@@ -5,17 +5,27 @@ import { fireEvent, render } from "@testing-library/react";
 import { VolumePrismasStage } from "./VolumePrismasStage";
 import { GM_11 } from "../../curriculum/fichas/jornada/GM.11";
 import {
-  construirVolumePrismasF94Spec,
   construirVolumePrismasQuestion,
   type VolumePrismasF94Spec,
 } from "../../curriculum/procedimentos/volumePrismasContract";
 
-const opcoesDe = (nivel: number) => construirVolumePrismasQuestion(GM_11, nivel).options ?? [];
+/**
+ * Spec e alternativas saem da MESMA questão.
+ *
+ * Antes eram duas chamadas independentes ao contrato. Com um prisma fixo por
+ * nível elas coincidiam por sorte; quando a CLASS-003 passou a sortear o
+ * prisma, a alternativa certa deixou de existir na tela do spec renderizado.
+ * O acoplamento sempre esteve aqui — o caso fixo é que o escondia.
+ */
+function questaoDe(nivel: number) {
+  const questao = construirVolumePrismasQuestion(GM_11, nivel);
+  return { spec: questao.uiProps as VolumePrismasF94Spec, options: questao.options ?? [] };
+}
 
 function montar(nivel: number) {
-  const spec = construirVolumePrismasF94Spec(nivel);
+  const { spec, options } = questaoDe(nivel);
   const onAnswer = vi.fn();
-  const view = render(<VolumePrismasStage spec={spec} options={opcoesDe(nivel)} onAnswer={onAnswer} />);
+  const view = render(<VolumePrismasStage spec={spec} options={options} onAnswer={onAnswer} />);
   const respostaCerta = () => {
     const alvo = [...view.container.querySelectorAll("button")]
       .find(botao => botao.textContent?.trim() === spec.respostaLabel);
@@ -83,9 +93,9 @@ describe("CLASS-007 — GM.11/F94: construir é condição da resposta", () => {
   });
 
   it("a prop disabled continua fechando tudo, mesmo com o prisma construído", () => {
-    const spec: VolumePrismasF94Spec = construirVolumePrismasF94Spec(4);
+    const { spec, options } = questaoDe(4);
     const onAnswer = vi.fn();
-    const { container } = render(<VolumePrismasStage spec={spec} options={opcoesDe(4)} onAnswer={onAnswer} disabled />);
+    const { container } = render(<VolumePrismasStage spec={spec} options={options} onAnswer={onAnswer} disabled />);
     for (const botao of container.querySelectorAll("button")) expect(botao.disabled).toBe(true);
   });
 });
