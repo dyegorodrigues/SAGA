@@ -25,7 +25,6 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "AL.02": { motivo: "LEGITIMO", porque: "a fileira do padrão é o próprio objeto observado; escondê-la apaga a pergunta" },
   "AL.03": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta numérica" },
   "GM.02": { motivo: "LEGITIMO", porque: "os ícones da cena são o objeto da comparação" },
-  "GE.04": { motivo: "LEGITIMO", porque: "o enunciado nomeia a propriedade testada (rola/empilha); a alternativa a ecoa" },
   "GE.05": { motivo: "LEGITIMO", porque: "o enunciado dita a casa do mapa; a habilidade é executar a coordenada" },
   "GE.08": { motivo: "LEGITIMO", porque: "o enunciado dita o par ordenado; a habilidade é localizá-lo no plano" },
   "GE.10": { motivo: "LEGITIMO", porque: "as vistas precisam de rótulo A/B/C para poderem ser escolhidas" },
@@ -74,6 +73,8 @@ const SEMENTES = [0x2f6e2b1, 0x5bd1e99, 0x1a2b3c4, 0x6e11d07, 0x24c8fa3];
 const PARCIAIS_CONHECIDOS: Record<string, string> = {
   "AL.02|5": "a fileira do padrão é o objeto observado; o emoji da resposta aparece nela em parte dos sorteios",
   "GM.02|5": "os ícones da cena são o objeto da comparação; coincidem com a resposta em parte dos sorteios",
+  "GE.04|3": "o enunciado nomeia a propriedade testada (\"o cubo rola na rampa?\"); quando a resposta é \"rola\" ela ecoa, quando é \"não rola\" não",
+  "GE.04|4": "mesmo eco do enunciado em empilhamento, e só nos sorteios em que a resposta é a afirmativa",
 };
 const norm = (t: string) => t.replace(/\s+/g, "").replace(/×/g, "x").toLowerCase();
 /**

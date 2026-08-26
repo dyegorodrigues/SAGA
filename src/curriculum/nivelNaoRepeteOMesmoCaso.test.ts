@@ -40,12 +40,10 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "AL.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "expressão F77 fixa por nível" },
   "AL.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "linguagem/letras com enunciado fixo por nível" },
   "GE.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 5], porque: "detetive de formas com peça fixa por nível; L4 já varia" },
-  "GE.04": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "um sólido por nível; o portão do experimento não traz variedade" },
   "GE.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "mapa do tesouro com coordenada fixa por nível" },
   "GE.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "ângulos com medida fixa por nível" },
   "GE.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "as mesmas figuras por nível; a conferência repete o mesmo item" },
   "GE.08": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "plano cartesiano com par ordenado fixo por nível" },
-  "GE.09": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "base/altura e raio fixos por nível, atrás do portão de transformação" },
   "GE.10": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "vistas do mesmo sólido por nível" },
   "GM.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "horas/minutos com relógio fixo por nível" },
   "GM.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "perímetro com figura fixa por nível" },
@@ -153,7 +151,7 @@ describe("CLASS-003 — nenhum nível repete o mesmo caso sob mastery repetida",
     // reparo derruba a entrada e o teste acima cobra a atualização.
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR");
     const pares = aReparar.reduce((total, [, item]) => total + item.niveis.length, 0);
-    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(28);
-    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(136);
+    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(26);
+    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(126);
   });
 });

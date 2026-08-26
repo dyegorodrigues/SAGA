@@ -38,71 +38,119 @@ interface CirculoAreasShow {
 const clamp = (n: number) => Math.max(1, Math.min(5, Math.round(n)));
 const option = (value: string, label: string, misconception?: CirculoAreasMisconceptionTag) => ({ value, label, ...(misconception ? { misconception } : {}) });
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/**
+ * CLASS-003 — as medidas do nível são sorteadas, a escada não.
+ *
+ * Cada nível tinha uma figura só: 8×5, 10×6, 7×4, raio 4 e raio 3. A ficha
+ * cobra repetição, e a frente da CLASS-007 pôs um portão de transformação na
+ * frente — a criança montava, cortava e rearranjava a MESMA figura seis vezes.
+ *
+ * `base` sai sempre par nos níveis de triângulo porque a área é `b × h ÷ 2`:
+ * com base ímpar e altura ímpar a resposta cairia em meio quadradinho, e o
+ * distrator `ESQUECE_DIVIDIR_POR_2` deixaria de ser o dobro exato do certo.
+ * No L3 o produto também sai par, pela mesma razão do lado do distrator.
+ */
+function medidasDeTriangulo(): { base: number; altura: number } {
+  const base = ri(2, 7) * 2;
+  return { base, altura: ri(3, 9) };
+}
+
 export function construirCirculoAreasSpec(level: number): CirculoAreasF91Spec {
   const nivel = clamp(level);
   const common = { ficha: "F91" as const, nivel, primitivas: ["ShapeCanvas"] as ["ShapeCanvas"] };
-  if (nivel === 1) return {
-    ...common,
-    modo: "triangulo-montagem",
-    base: 8,
-    altura: 5,
-    resposta: "20",
-    opcoes: [
-      option("20", "20 unidades quadradas"),
-      option("40", "40 unidades quadradas", CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
-      option("32", "32 unidades quadradas", CirculoAreasMisconception.ALTURA_ERRADA),
-    ],
-  };
-  if (nivel === 2) return {
-    ...common,
-    modo: "formula-triangulo",
-    base: 10,
-    altura: 6,
-    resposta: "30",
-    opcoes: [
-      option("30", "10 × 6 ÷ 2 = 30"),
-      option("60", "10 × 6 = 60", CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
-      option("40", "10 × 8 ÷ 2 = 40", CirculoAreasMisconception.ALTURA_ERRADA),
-    ],
-  };
-  if (nivel === 3) return {
-    ...common,
-    modo: "paralelogramo-corte",
-    base: 7,
-    altura: 4,
-    resposta: "28",
-    opcoes: [
-      option("28", "28 unidades quadradas"),
-      option("22", "22 unidades quadradas", CirculoAreasMisconception.ALTURA_ERRADA),
-      option("14", "14 unidades quadradas", CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
-    ],
-  };
-  if (nivel === 4) return {
-    ...common,
-    modo: "circulo-medidas",
-    base: 0,
-    altura: 0,
-    raio: 4,
-    diametro: 8,
-    resposta: "raio-4-diametro-8",
-    opcoes: [
-      option("raio-4-diametro-8", "Raio 4; diâmetro 8; circunferência é a volta"),
-      option("raio-8-diametro-4", "Raio 8; diâmetro 4", CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO),
-      option("raio-4-diametro-4", "Raio e diâmetro medem 4", CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO),
-    ],
-  };
+
+  if (nivel === 1) {
+    const { base, altura } = medidasDeTriangulo();
+    const area = base * altura / 2;
+    const alturaErrada = altura + 2;
+    return {
+      ...common,
+      modo: "triangulo-montagem",
+      base,
+      altura,
+      resposta: String(area),
+      opcoes: [
+        option(String(area), `${area} unidades quadradas`),
+        option(String(area * 2), `${area * 2} unidades quadradas`, CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
+        option(String(base * alturaErrada / 2), `${base * alturaErrada / 2} unidades quadradas`, CirculoAreasMisconception.ALTURA_ERRADA),
+      ],
+    };
+  }
+
+  if (nivel === 2) {
+    const { base, altura } = medidasDeTriangulo();
+    const area = base * altura / 2;
+    const alturaErrada = altura + 2;
+    return {
+      ...common,
+      modo: "formula-triangulo",
+      base,
+      altura,
+      resposta: String(area),
+      opcoes: [
+        option(String(area), `${base} × ${altura} ÷ 2 = ${area}`),
+        option(String(base * altura), `${base} × ${altura} = ${base * altura}`, CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
+        option(String(base * alturaErrada / 2), `${base} × ${alturaErrada} ÷ 2 = ${base * alturaErrada / 2}`, CirculoAreasMisconception.ALTURA_ERRADA),
+      ],
+    };
+  }
+
+  if (nivel === 3) {
+    const base = ri(5, 12);
+    const altura = base % 2 === 0 ? ri(3, 8) : ri(2, 4) * 2;
+    const area = base * altura;
+    const alturaErrada = altura - 1;
+    return {
+      ...common,
+      modo: "paralelogramo-corte",
+      base,
+      altura,
+      resposta: String(area),
+      opcoes: [
+        option(String(area), `${area} unidades quadradas`),
+        option(String(base * alturaErrada), `${base * alturaErrada} unidades quadradas`, CirculoAreasMisconception.ALTURA_ERRADA),
+        option(String(area / 2), `${area / 2} unidades quadradas`, CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
+      ],
+    };
+  }
+
+  if (nivel === 4) {
+    const raio = ri(2, 9);
+    const diametro = raio * 2;
+    return {
+      ...common,
+      modo: "circulo-medidas",
+      base: 0,
+      altura: 0,
+      raio,
+      diametro,
+      resposta: `raio-${raio}-diametro-${diametro}`,
+      opcoes: [
+        option(`raio-${raio}-diametro-${diametro}`, `Raio ${raio}; diâmetro ${diametro}; circunferência é a volta`),
+        option(`raio-${diametro}-diametro-${raio}`, `Raio ${diametro}; diâmetro ${raio}`, CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO),
+        option(`raio-${raio}-diametro-${raio}`, `Raio e diâmetro medem ${raio}`, CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO),
+      ],
+    };
+  }
+
+  // Raio 2 colapsaria dois distratores: 2r e r² valem 4 os dois, e a criança
+  // veria "4π" duas vezes na tela.
+  const raio = ri(3, 9);
+  const diametro = raio * 2;
   return {
     ...common,
     modo: "area-circulo",
     base: 0,
     altura: 0,
-    raio: 3,
-    diametro: 6,
-    resposta: "9π",
+    raio,
+    diametro,
+    resposta: `${raio ** 2}π`,
     opcoes: [
-      option("9π", "9π unidades quadradas"),
-      option("6π", "6π unidades quadradas", CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO),
-      option("18π", "18π unidades quadradas", CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
+      option(`${raio ** 2}π`, `${raio ** 2}π unidades quadradas`),
+      option(`${diametro}π`, `${diametro}π unidades quadradas`, CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO),
+      option(`${raio ** 2 * 2}π`, `${raio ** 2 * 2}π unidades quadradas`, CirculoAreasMisconception.ESQUECE_DIVIDIR_POR_2),
     ],
   };
 }
