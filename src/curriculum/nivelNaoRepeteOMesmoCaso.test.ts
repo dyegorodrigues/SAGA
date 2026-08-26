@@ -54,7 +54,6 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "GM.10": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "conversão com par de unidades fixo por nível" },
   "N1.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "quantidade fixa por nível; L5 já varia" },
   "N2.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "pares/ímpares com quantidade fixa por nível" },
-  "N2.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o mesmo número a fatorar por nível, atrás da fábrica de retângulos" },
   "N4.11": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "primos/divisores com número fixo por nível" },
   "N4.12": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "divisão por dois dígitos com conta fixa por nível" },
   "N5.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "fração equivalente com par fixo por nível; L5 já varia" },
@@ -154,7 +153,7 @@ describe("CLASS-003 — nenhum nível repete o mesmo caso sob mastery repetida",
     // reparo derruba a entrada e o teste acima cobra a atualização.
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR");
     const pares = aReparar.reduce((total, [, item]) => total + item.niveis.length, 0);
-    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(29);
-    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(141);
+    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(28);
+    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(136);
   });
 });

@@ -63,83 +63,171 @@ const option = (value: number, label: string, misconception?: FatoresRetangulosM
   ...(misconception ? { misconception } : {}),
 });
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+const listar = (numeros: readonly number[]) => numeros.join(", ");
+const parEmTexto = (par: { linhas: number; colunas: number }) => `${par.linhas}×${par.colunas}`;
+const PRIMOS_F66 = [11, 13, 17, 19, 23, 29, 31, 37] as const;
+
+/**
+ * Divisor de abertura que não desenha o MDC — nem como linha, nem como coluna.
+ *
+ * Devolve `null` quando o par sorteado não tem abertura segura nenhuma: em
+ * 27 com MDC 9, os únicos divisores são 3 e 9, e 27 ÷ 3 é o próprio 9. Esses
+ * pares são recusados na origem, não remendados depois.
+ */
+function aberturaLongeDoMdc(total: number, mdc: number): number | null {
+  for (let divisor = 2; divisor < total; divisor += 1) {
+    if (total % divisor !== 0) continue;
+    if (divisor === mdc || total / divisor === mdc) continue;
+    return divisor;
+  }
+  return null;
+}
+
+const PARES_MDC = [[2, 3], [3, 2], [2, 5], [3, 4], [4, 3]] as const;
+
+function sortearParaMdc(): { mdc: number; total: number; segundoTotal: number; abertura: number } {
+  for (let tentativa = 0; tentativa < 60; tentativa += 1) {
+    const mdc = escolher([6, 8, 9, 12] as const);
+    const [a, b] = escolher(PARES_MDC);
+    const total = mdc * a;
+    const abertura = aberturaLongeDoMdc(total, mdc);
+    if (abertura !== null) return { mdc, total, segundoTotal: mdc * b, abertura };
+  }
+  return { mdc: 6, total: 12, segundoTotal: 18, abertura: 2 };
+}
+
+/** Menor número que NÃO divide o total: serve de tentativa que deixa sobra. */
+function naoDivisor(total: number): number {
+  for (let candidato = 5; candidato < total; candidato += 1) if (total % candidato !== 0) return candidato;
+  return total - 1;
+}
+
+function totalCom(paresMin: number, faixa: [number, number]): number {
+  for (let tentativa = 0; tentativa < 60; tentativa += 1) {
+    const total = ri(faixa[0], faixa[1]);
+    if (paresDeFatores(total).length >= paresMin) return total;
+  }
+  return paresMin >= 4 ? 24 : 12;
+}
+
+/**
+ * CLASS-003 — o número do nível é sorteado, a escada não.
+ *
+ * Cada nível tinha um total só: 12, 24, 18, 13 e o par 18/24. A ficha cobra 3
+ * acertos de 3 em 2 sessões, e a frente da CLASS-007 tornou a fábrica de
+ * retângulos operável — a criança operava a fábrica sobre o MESMO número seis
+ * vezes.
+ *
+ * Sortear aqui custa mais que nos outros contratos porque os rótulos eram
+ * strings escritas à mão ("1×24, 2×12, 3×8 e 4×6"). Agora rótulo e distrator
+ * saem do próprio número, e cada distrator continua nomeando o mesmo erro de
+ * antes: parar cedo, esquecer os triviais, tratar múltiplo como fator.
+ *
+ * Os pisos de quantidade não são estéticos. Com poucos pares os valores dos
+ * distratores colidem entre si — em L2, `contagem - 1` encosta no `1` de
+ * "parar cedo" — e duas alternativas com o mesmo valor quebram a leitura da
+ * resposta. Por isso L2 pede 4 pares, L3 pede 5 fatores e o MDC de L5 fica em
+ * 6 ou mais.
+ */
 export function construirFatoresRetangulosF66Spec(level: number): FatoresRetangulosF66Spec {
   const nivel = clamp(level);
+  const base = { ficha: "F66" as const, nivel, primitivas: ["ArrayGrid"] as ["ArrayGrid"] };
 
   if (nivel === 1) {
-    const total = 12;
+    const total = totalCom(3, [8, 40]);
+    const pares = paresDeFatores(total);
+    const ultimo = pares[pares.length - 1];
+    const penultimo = pares[pares.length - 2];
+    const sobra = naoDivisor(total);
+    const opcoes = [
+      option(ultimo.linhas, parEmTexto(ultimo)),
+      option(sobra, `${sobra} × ${Math.floor(total / sobra)} e sobram ${total % sobra}`, FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
+      option(penultimo.linhas, `Parar em ${parEmTexto(penultimo)}`, FatoresRetangulosMisconception.PARA_CEDO),
+      option(total, `Esquecer 1 × ${total}`, FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
+    ];
     return {
-      ficha: "F66",
-      nivel,
+      ...base,
       modo: "pares-com-dica",
-      primitivas: ["ArrayGrid"],
       total,
       fatores: fatoresDe(total),
-      pares: paresDeFatores(total),
-      dicaQuantidadePares: 3,
+      pares,
+      dicaQuantidadePares: pares.length,
       divisorInicial: 2,
-      previewDivisorByValue: { "3": 3, "5": 5, "2": 2, "12": 2 },
-      resposta: 3,
-      opcoes: [
-        option(3, "3 × 4"),
-        option(5, "5 × 2 e sobram 2", FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
-        option(2, "Parar em 2 × 6", FatoresRetangulosMisconception.PARA_CEDO),
-        option(12, "Esquecer 1 × 12", FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
-      ],
+      previewDivisorByValue: {
+        [String(ultimo.linhas)]: ultimo.linhas,
+        [String(sobra)]: sobra,
+        [String(penultimo.linhas)]: penultimo.linhas,
+        [String(total)]: 1,
+      },
+      resposta: ultimo.linhas,
+      opcoes,
     };
   }
 
   if (nivel === 2) {
-    const total = 24;
+    const total = totalCom(4, [16, 60]);
+    const pares = paresDeFatores(total);
+    const semTriviais = pares.slice(1);
+    const espurio = naoDivisor(total);
     return {
-      ficha: "F66",
-      nivel,
+      ...base,
       modo: "todos-pares",
-      primitivas: ["ArrayGrid"],
       total,
       fatores: fatoresDe(total),
-      pares: paresDeFatores(total),
-      divisorInicial: 4,
-      previewDivisorByValue: { "4": 4, "3": 3, "1": 4, "5": 5 },
-      resposta: 4,
+      pares,
+      divisorInicial: pares[pares.length - 1].linhas,
+      previewDivisorByValue: {
+        [String(pares.length)]: pares[pares.length - 1].linhas,
+        [String(pares.length - 1)]: semTriviais[0].linhas,
+        "1": pares[pares.length - 1].linhas,
+        [String(pares.length + 1)]: espurio,
+      },
+      resposta: pares.length,
       opcoes: [
-        option(4, "1×24, 2×12, 3×8 e 4×6"),
-        option(3, "2×12, 3×8 e 4×6", FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
-        option(1, "Só 4×6", FatoresRetangulosMisconception.PARA_CEDO),
-        option(5, "5×4 e tratar a sobra como fator", FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
+        option(pares.length, pares.map(parEmTexto).join(", ")),
+        option(pares.length - 1, semTriviais.map(parEmTexto).join(", "), FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
+        option(1, `Só ${parEmTexto(pares[pares.length - 1])}`, FatoresRetangulosMisconception.PARA_CEDO),
+        option(pares.length + 1, `${pares.map(parEmTexto).join(", ")} e ${espurio}×${Math.floor(total / espurio)}`, FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
       ],
     };
   }
 
   if (nivel === 3) {
-    const total = 18;
+    const total = totalCom(3, [16, 60]);
+    const fatores = fatoresDe(total);
+    const semTriviais = fatores.slice(1, -1);
+    const espurio = naoDivisor(total);
+    const comEspurio = [...fatores, espurio].sort((a, b) => a - b);
     return {
-      ficha: "F66",
-      nivel,
+      ...base,
       modo: "listar-fatores",
-      primitivas: ["ArrayGrid"],
       total,
-      fatores: fatoresDe(total),
+      fatores,
       pares: paresDeFatores(total),
-      divisorInicial: 3,
-      previewDivisorByValue: { "6": 6, "4": 3, "2": 3, "5": 5 },
-      resposta: 6,
+      divisorInicial: fatores[1],
+      previewDivisorByValue: {
+        [String(fatores.length)]: fatores[1],
+        [String(semTriviais.length)]: semTriviais[0],
+        "2": fatores[1],
+        [String(fatores.length + 1)]: espurio,
+      },
+      resposta: fatores.length,
       opcoes: [
-        option(6, "1, 2, 3, 6, 9, 18"),
-        option(4, "2, 3, 6, 9", FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
-        option(2, "1, 2 e parar", FatoresRetangulosMisconception.PARA_CEDO),
-        option(5, "1, 2, 3, 5, 6, 9, 18", FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
+        option(fatores.length, listar(fatores)),
+        option(semTriviais.length, listar(semTriviais), FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
+        option(2, `${fatores[0]}, ${fatores[1]} e parar`, FatoresRetangulosMisconception.PARA_CEDO),
+        option(fatores.length + 1, listar(comEspurio), FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
       ],
     };
   }
 
   if (nivel === 4) {
-    const total = 13;
+    const total = escolher(PRIMOS_F66);
     return {
-      ficha: "F66",
-      nivel,
+      ...base,
       modo: "identificar-primo",
-      primitivas: ["ArrayGrid"],
       total,
       fatores: fatoresDe(total),
       pares: paresDeFatores(total),
@@ -148,32 +236,45 @@ export function construirFatoresRetangulosF66Spec(level: number): FatoresRetangu
       previewDivisorByValue: { "1": 1, "0": 2 },
       resposta: 1,
       opcoes: [
-        option(1, "Sim — só existe 1 × 13"),
+        option(1, `Sim — só existe 1 × ${total}`),
         option(0, "Não — deve existir outro retângulo", FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
       ],
     };
   }
 
-  const total = 18;
-  const segundoTotal = 24;
-  const mdc = maiorFatorComum(total, segundoTotal);
+  const { mdc, total, segundoTotal, abertura } = sortearParaMdc();
+  // Fator comum menor que o MDC, para "parou cedo" ser um erro plausível.
+  const comuns = fatoresDe(mdc).filter(fator => fator > 2 && fator < mdc);
+  const paraCedo = comuns.length ? comuns[comuns.length - 1] : 2;
+  // Fator do segundo número que não divide o primeiro: o múltiplo confundido.
+  // ...e diferente de 2, que já é o distrator dos triviais: dois valores iguais
+  // apagariam uma das alternativas.
+  const naoComum = fatoresDe(segundoTotal).find(fator => fator > 2 && total % fator !== 0 && fator !== paraCedo && fator !== mdc) ?? segundoTotal;
   return {
-    ficha: "F66",
-    nivel,
+    ...base,
     modo: "maior-fator-comum",
-    primitivas: ["ArrayGrid"],
     total,
     segundoTotal,
     fatores: fatoresDe(total),
     pares: paresDeFatores(total),
     maiorFatorComum: mdc,
-    divisorInicial: mdc,
-    previewDivisorByValue: { "6": 6, "3": 3, "12": 12, "2": 2 },
+    // CLASS-009: a tela não pode abrir mostrando o MDC. Não basta evitar o MDC
+    // como divisor — o COMPLEMENTO também o entrega: com total 24 e divisor 2,
+    // a grade escreve "12 linhas × 2 colunas", e 12 era a resposta. Com o caso
+    // fixo o MDC era 6, de um caractere só, e o gate da CLASS-009 nem olhava;
+    // o sorteio trouxe MDC de dois dígitos e o vazamento apareceu.
+    divisorInicial: abertura,
+    previewDivisorByValue: {
+      [String(mdc)]: mdc,
+      [String(paraCedo)]: paraCedo,
+      [String(naoComum)]: naoComum,
+      "2": 2,
+    },
     resposta: mdc,
     opcoes: [
-      option(6, "6"),
-      option(3, "3", FatoresRetangulosMisconception.PARA_CEDO),
-      option(12, "12", FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
+      option(mdc, String(mdc)),
+      option(paraCedo, String(paraCedo), FatoresRetangulosMisconception.PARA_CEDO),
+      option(naoComum, String(naoComum), FatoresRetangulosMisconception.CONFUNDE_FATOR_MULTIPLO),
       option(2, "2", FatoresRetangulosMisconception.ESQUECE_TRIVIAIS),
     ],
   };

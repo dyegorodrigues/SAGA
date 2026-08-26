@@ -18,8 +18,29 @@ function montar(nivel: number) {
     return (copia.textContent ?? "").replace(/\s+/g, "").replace(/×/g, "x");
   };
   const controle = (nome: string) => view.container.querySelector<HTMLButtonElement>(`[data-f66-control="${nome}"]`);
-  return { spec, onAnswer, view, suporte, controle };
+  // O controle move UMA coluna por clique, então o teste precisa saber onde
+  // está. Antes o total era fixo e os cliques eram contados na mão.
+  let colunaAtual = spec.divisorInicial;
+  const irPara = (alvo: number) => {
+    while (colunaAtual < alvo) { fireEvent.click(controle("mais-colunas")!); colunaAtual += 1; }
+    while (colunaAtual > alvo) { fireEvent.click(controle("menos-colunas")!); colunaAtual -= 1; }
+  };
+  return { spec, onAnswer, view, suporte, controle, irPara };
 }
+
+/** Menor divisor acima do inicial que fecha retângulo — a próxima descoberta. */
+const proximoQueFecha = (total: number, apos: number): number => {
+  for (let d = apos + 1; d <= total; d += 1) if (total % d === 0) return d;
+  throw new Error(`F66: ${total} não tem divisor acima de ${apos}.`);
+};
+
+/** Menor divisor acima do inicial que deixa sobra — passar por ali não fecha nada. */
+const proximoComSobra = (total: number, apos: number): number => {
+  for (let d = apos + 1; d <= total; d += 1) if (total % d !== 0) return d;
+  throw new Error(`F66: ${total} não tem divisor com sobra acima de ${apos}.`);
+};
+
+const formacao = (linhas: number, colunas: number) => `${linhas}x${colunas}`;
 
 describe("GAP — N2.07/F66: a tela não pode imprimir as formações que a criança deve descobrir", () => {
   it("nenhum nível exibe, de saída, uma formação que a criança ainda não fechou", () => {
@@ -50,34 +71,44 @@ describe("CLASS-007 — N2.07/F66: a fábrica de retângulos precisa ser operáv
     expect(mais, "F66 sem controle para aumentar as colunas").not.toBeNull();
     expect(menos, "F66 sem controle para diminuir as colunas").not.toBeNull();
 
-    // 12 com 2 colunas fecha; com 5 sobra.
-    expect(spec.divisorInicial).toBe(2);
+    // O total é sorteado (CLASS-003), então a conta vem do spec, não do texto.
+    expect(spec.total % spec.divisorInicial, "L1 abre num divisor que fecha").toBe(0);
     expect(view.container.querySelector("[data-f66-complete-rectangle]")).not.toBeNull();
 
-    for (let i = 0; i < 3; i += 1) fireEvent.click(mais!);
-    expect(view.container.querySelector("[data-f66-invalid-remainder]"), "12 em 5 colunas tem de sobrar").not.toBeNull();
+    const comSobra = proximoComSobra(spec.total, spec.divisorInicial);
+    for (let coluna = spec.divisorInicial; coluna < comSobra; coluna += 1) fireEvent.click(mais!);
+    expect(view.container.querySelector("[data-f66-invalid-remainder]"),
+      `${spec.total} em ${comSobra} colunas tem de sobrar`).not.toBeNull();
     expect(view.container.querySelector("[data-f66-complete-rectangle]")).toBeNull();
 
-    fireEvent.click(menos!);
-    expect(view.container.querySelector("[data-f66-complete-rectangle]"), "12 em 4 colunas fecha").not.toBeNull();
+    // Descer uma coluna só volta a fechar se aquela coluna dividir o total.
+    for (let coluna = comSobra; coluna > spec.divisorInicial; coluna -= 1) fireEvent.click(menos!);
+    expect(view.container.querySelector("[data-f66-complete-rectangle]"),
+      `${spec.total} voltou ao divisor inicial e tem de fechar`).not.toBeNull();
   });
 
   it("a lista de formações é o que a criança fechou, e cresce só por exploração", () => {
-    const { view, controle, suporte } = montar(1);
-    // Começa em 2 colunas: 6×2 já está fechado na tela inicial.
-    expect(suporte()).toContain("6x2");
-    expect(suporte()).not.toContain("3x4");
+    const { spec, view, controle, suporte, irPara } = montar(1);
+    const inicial = formacao(spec.total / spec.divisorInicial, spec.divisorInicial);
+    const proxima = proximoQueFecha(spec.total, spec.divisorInicial);
+    const descoberta = formacao(spec.total / proxima, proxima);
+    const trivial = formacao(1, spec.total);
 
-    for (let i = 0; i < 2; i += 1) fireEvent.click(controle("mais-colunas")!);
-    // 12 em 4 colunas fecha em 3×4 — agora sim a formação foi descoberta.
-    expect(suporte()).toContain("3x4");
-    expect(suporte()).toContain("6x2");
-    expect(suporte()).not.toContain("1x12");
+    // A formação do divisor inicial já está fechada na tela; as outras, não.
+    expect(suporte()).toContain(inicial);
+    expect(suporte()).not.toContain(descoberta);
 
-    // 12 em 5 colunas sobra 2: passar por ali não fecha formação nenhuma.
-    fireEvent.click(controle("mais-colunas")!);
+    irPara(proxima);
+    expect(suporte(), `${spec.total} em ${proxima} colunas fecha ${descoberta}`).toContain(descoberta);
+    expect(suporte(), "o que já estava fechado não some").toContain(inicial);
+    expect(suporte(), "a trivial 1 × n só entra quando a criança chegar lá").not.toContain(trivial);
+
+    // Passar por um divisor com sobra não fecha formação nenhuma.
+    const comSobra = proximoComSobra(spec.total, proxima);
+    irPara(comSobra);
     expect(view.container.querySelector("[data-f66-invalid-remainder]")).not.toBeNull();
-    expect(suporte(), "sobra não é formação fechada").not.toContain("2x5");
+    expect(suporte(), "sobra não é formação fechada")
+      .not.toContain(formacao(Math.floor(spec.total / comSobra), comSobra));
     view.unmount();
   });
 
