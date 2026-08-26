@@ -25,6 +25,9 @@ import { generateRegisteredFichaQuestion, hasComposerFicha } from "./motores/com
  * Estado medido em `abe71b5`: 31 competências, 151 pares (ficha, nível). O
  * inventário documental anterior falava em 18 competências "conhecidas"; a
  * medição sobre os 75 canários encontrou 13 a mais.
+ *
+ * `N4.10/F69` foi o primeiro reparo e já saiu daqui: a catraca pegou a saída e
+ * cobrou a atualização, que é exatamente o que ela existe para fazer.
  */
 type Motivo = "LEGITIMO" | "A-REPARAR";
 
@@ -53,7 +56,6 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "N1.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "quantidade fixa por nível; L5 já varia" },
   "N2.06": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "pares/ímpares com quantidade fixa por nível" },
   "N2.07": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o mesmo número a fatorar por nível, atrás da fábrica de retângulos" },
-  "N4.10": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "divisão longa com 24÷4, 29÷4, 84÷4, 156÷3 e 612÷6 fixos" },
   "N4.11": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "primos/divisores com número fixo por nível" },
   "N4.12": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "divisão por dois dígitos com conta fixa por nível" },
   "N5.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "fração equivalente com par fixo por nível; L5 já varia" },
@@ -153,7 +155,7 @@ describe("CLASS-003 — nenhum nível repete o mesmo caso sob mastery repetida",
     // reparo derruba a entrada e o teste acima cobra a atualização.
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR");
     const pares = aReparar.reduce((total, [, item]) => total + item.niveis.length, 0);
-    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(31);
-    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(151);
+    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(30);
+    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(146);
   });
 });

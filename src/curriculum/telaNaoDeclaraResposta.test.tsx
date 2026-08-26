@@ -37,13 +37,58 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "PE.03": { motivo: "LEGITIMO", porque: "em comparar-chances os sacos precisam de rótulo A/B para poderem ser escolhidos" },
   "PE.04": { motivo: "LEGITIMO", porque: "os sacos precisam de rótulo A/B para poderem ser escolhidos" },
   "N4.03": { motivo: "LEGITIMO", porque: "a contagem saltada é a estratégia ensinada em L1, não um gabarito impresso" },
-  "N4.09": { motivo: "LEGITIMO", porque: "produtos parciais da decomposição; coincidem com a resposta só quando a parcela é o total" },
 
   // A reparar: o suporte afirma a resposta que o enunciado pergunta.
+
+  // `N4.09` saiu daqui. A detecção dela era artefato de colagem, não eco: com
+  // resposta 26, o texto grudava o `2` de "3 × 2" no `6` seguinte e formava
+  // "3x26". A ficha nunca escreveu 26 em lugar nenhum. Medida por elemento, ela
+  // não declara a resposta em nível nenhum, e a justificativa antiga
+  // ("produtos parciais coincidem com a resposta") racionalizava o artefato.
 };
 
 const SEMENTES = [0x2f6e2b1, 0x5bd1e99, 0x1a2b3c4];
 const norm = (t: string) => t.replace(/\s+/g, "").replace(/×/g, "x").toLowerCase();
+/**
+ * Texto do suporte com a fronteira dos ELEMENTOS preservada.
+ *
+ * `textContent` concatena nós vizinhos sem separador nenhum: os marcadores da
+ * reta numérica, que a criança vê como caixas separadas, viram `024681012`.
+ * Juntar os nós de texto com espaço devolve o que está de fato na tela.
+ */
+function textoPorElemento(raiz: HTMLElement): string {
+  const pedacos: string[] = [];
+  const caminhante = raiz.ownerDocument.createTreeWalker(raiz, 4 /* NodeFilter.SHOW_TEXT */);
+  for (let no = caminhante.nextNode(); no; no = caminhante.nextNode()) {
+    const texto = (no.textContent ?? "").trim();
+    if (texto) pedacos.push(texto);
+  }
+  return pedacos.join(" ");
+}
+const normEspacado = (t: string) => t.replace(/\s+/g, " ").replace(/×/g, "x").toLowerCase();
+
+/**
+ * Rótulo numérico só conta como declarado quando é o mesmo número.
+ *
+ * `norm` apaga os espaços de propósito, para pegar um "1 0" escrito solto. O
+ * efeito colateral aparece quando a resposta é um numeral curto: `10` "aparece"
+ * dentro de `100% é o inteiro`, que é apoio fixo da N6.03 e não diz nada sobre
+ * a pergunta. Os três seeds fixos nunca tinham sorteado resposta 10 ali; a
+ * varredura da CLASS-003 deslocou o fluxo do PRNG e o falso positivo apareceu.
+ *
+ * A fronteira de dígito sozinha não resolve: sobre o texto colado, a reta
+ * numérica vira `0246810121416` e todo numeral fica ladeado por dígitos —
+ * silenciaria AL.03, N4.03 e N4.09, que são detecções reais e legítimas. Por
+ * isso a fronteira é medida sobre o texto POR ELEMENTO, onde `10` continua
+ * casando entre os marcadores da régua e para de casar dentro de `100`.
+ *
+ * Nada real foi silenciado, e não é promessa: a catraca de entradas obsoletas
+ * reprova nomeando a ficha se alguma detecção conhecida sumir.
+ */
+function declara(suporte: string, suporteEspacado: string, rotulo: string): boolean {
+  if (!/^\d+$/.test(rotulo)) return suporte.includes(rotulo);
+  return new RegExp(`(?<!\\d)${rotulo}(?!\\d)`).test(suporteEspacado);
+}
 const original = Math.random;
 afterEach(() => { Math.random = original; });
 
@@ -69,7 +114,7 @@ function varrer(): Set<string> {
         const { container, unmount } = render(<FichaRenderer question={question} onAnswer={() => undefined} />);
         const copia = container.cloneNode(true) as HTMLElement;
         for (const botao of [...copia.querySelectorAll("button")]) botao.remove();
-        if (norm(copia.textContent ?? "").includes(rotulo)) vazam.add(id);
+        if (declara(norm(copia.textContent ?? ""), normEspacado(textoPorElemento(copia)), rotulo)) vazam.add(id);
         unmount();
       }
     }

@@ -40,13 +40,53 @@ interface DivisaoLongaShow {
   baixar?: boolean;
 }
 
-const CASOS = [
-  { modo: "arranjo-exata", dividendo: 24, divisor: 4 },
-  { modo: "arranjo-resto", dividendo: 29, divisor: 4 },
-  { modo: "ponte-algoritmo", dividendo: 84, divisor: 4 },
-  { modo: "algoritmo", dividendo: 156, divisor: 3 },
-  { modo: "zero-quociente", dividendo: 612, divisor: 6 },
-] as const satisfies ReadonlyArray<{ modo: DivisaoLongaModo; dividendo: number; divisor: number }>;
+const MODOS: readonly DivisaoLongaModo[] = [
+  "arranjo-exata", "arranjo-resto", "ponte-algoritmo", "algoritmo", "zero-quociente",
+];
+
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/**
+ * CLASS-003 — o caso do nível é sorteado, a escada não.
+ *
+ * O contrato devolvia `24÷4`, `29÷4`, `84÷4`, `156÷3` e `612÷6`, um caso fixo
+ * por nível, enquanto a ficha cobra 4 acertos de 4 em 3 sessões. Doze respostas
+ * ao mesmo item medem memória de um item, não divisão.
+ *
+ * O que NÃO é sorteado é o `modo`: cada nível guarda a sua invariante —
+ * exata em arranjo, resto visível, ponte de dois dígitos, algoritmo de três, e
+ * zero no meio do quociente. Sortear a invariante desfaria a escada concreto →
+ * algoritmo, que é o que a F69 ensina.
+ *
+ * As faixas ficam apertadas de propósito. Além da escada, elas seguram os
+ * distratores de `alternativas()`: com quociente pequeno demais, `naoBaixou`
+ * colapsa na própria resposta e a criança certa seria reprovada.
+ */
+function sortearCaso(nivel: number): { modo: DivisaoLongaModo; dividendo: number; divisor: number } {
+  const modo = MODOS[nivel - 1];
+  if (nivel === 1) {
+    const divisor = ri(3, 5);
+    return { modo, divisor, dividendo: divisor * ri(3, 8) };
+  }
+  if (nivel === 2) {
+    const divisor = ri(3, 5);
+    return { modo, divisor, dividendo: divisor * ri(3, 8) + ri(1, divisor - 1) };
+  }
+  if (nivel === 3) {
+    const divisor = ri(3, 6);
+    return { modo, divisor, dividendo: divisor * ri(11, Math.floor(99 / divisor)) };
+  }
+  if (nivel === 4) {
+    const divisor = ri(3, 7);
+    const quociente = ri(Math.max(30, Math.ceil(100 / divisor)), Math.floor(999 / divisor));
+    return { modo, divisor, dividendo: divisor * quociente };
+  }
+  // L5: o quociente precisa carregar um zero no meio — é ele que o nível mede.
+  const divisor = ri(2, 6);
+  const centenas = ri(1, Math.floor(999 / divisor / 100));
+  const quociente = centenas * 100 + ri(1, 9);
+  return { modo, divisor, dividendo: divisor * quociente };
+}
 
 function clampLevel(level: number): number {
   return Math.max(1, Math.min(5, Math.round(level)));
@@ -70,7 +110,7 @@ function alternativas(nivel: number, dividendo: number, divisor: number, quocien
 
 export function construirDivisaoLongaSpec(level: number): DivisaoLongaF69Spec {
   const nivel = clampLevel(level);
-  const caso = CASOS[nivel - 1];
+  const caso = sortearCaso(nivel);
   const quociente = Math.floor(caso.dividendo / caso.divisor);
   const resto = caso.dividendo % caso.divisor;
   if (!restoEhValido(caso.dividendo, caso.divisor, quociente, resto)) throw new Error("F69 gerou divisão inválida");
