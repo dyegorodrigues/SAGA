@@ -51,7 +51,6 @@ const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: strin
   "N5.01": { motivo: "A-REPARAR", niveis: [2, 4], porque: "a partição perguntada dá sempre a mesma resposta" },
   "N5.03": { motivo: "A-REPARAR", niveis: [1, 2], porque: "os três pares de L1/L2 são todos equivalentes: a resposta é sempre 'igual'" },
   "N5.04": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a soma de frações dá sempre o mesmo resultado por nível" },
-  "N5.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "o produto de frações é sempre o mesmo por nível" },
   "PE.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a leitura do gráfico dá sempre a mesma resposta por nível" },
   "PE.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a média e a chance dão sempre a mesma resposta por nível" },
   "PE.04": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "a estatística e a chance dão sempre a mesma resposta por nível" },

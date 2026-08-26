@@ -43,7 +43,6 @@ type Motivo = "LEGITIMO" | "A-REPARAR";
 const REGISTRO: Record<string, { motivo: Motivo; niveis: number[]; porque: string }> = {
   "GE.03": { motivo: "A-REPARAR", niveis: [1, 2, 3, 5], porque: "detetive de formas com peça fixa por nível; L4 já varia" },
   "N1.02": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4], porque: "quantidade fixa por nível; L5 já varia" },
-  "N5.05": { motivo: "A-REPARAR", niveis: [1, 2, 3, 4, 5], porque: "multiplicação de frações com par fixo por nível" },
 };
 
 const SEMENTES = [0x2f6e2b1, 0x5bd1e99];
@@ -149,7 +148,7 @@ describe("CLASS-003 — nenhum nível repete o mesmo caso sob mastery repetida",
     // reparo derruba a entrada e o teste acima cobra a atualização.
     const aReparar = Object.entries(REGISTRO).filter(([, item]) => item.motivo === "A-REPARAR");
     const pares = aReparar.reduce((total, [, item]) => total + item.niveis.length, 0);
-    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(3);
-    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(13);
+    expect(aReparar.length, "competências na fila de reparo da CLASS-003").toBe(2);
+    expect(pares, "pares (ficha, nível) na fila de reparo da CLASS-003").toBe(8);
   });
 });

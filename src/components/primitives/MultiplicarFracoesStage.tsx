@@ -26,7 +26,12 @@ function areaQuestion(spec: MultiplicarFracoesF86Spec): Question {
       areaMode: true,
       showEquation: false,
       activeCells: spec.activeCells,
-      ...(spec.modo === "fracao-fracao-area" ? { fractionRows: 1, fractionCols: 3 } : {}),
+      // As faixas são os NUMERADORES da conta: 1/2 × 3/4 pinta uma linha e três
+      // colunas, e a interseção é o produto. Estavam cravadas em 1 e 3, do caso
+      // fixo; com a CLASS-003 sorteando, o desenho contradiria a expressão.
+      ...(spec.modo === "fracao-fracao-area"
+        ? { fractionRows: Number(spec.fatorA.split("/")[0]), fractionCols: Number(spec.fatorB.split("/")[0]) }
+        : {}),
     },
     options: [],
     evaluate: () => false,

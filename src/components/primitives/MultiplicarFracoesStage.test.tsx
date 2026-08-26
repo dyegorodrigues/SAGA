@@ -5,19 +5,23 @@ import { describe, expect, it, vi } from "vitest";
 import axe from "axe-core";
 import { Evidencia } from "../../constants/evidencias";
 import { N5_05 } from "../../curriculum/fichas/jornada/N5.05";
-import { construirMultiplicarFracoesQuestion } from "../../curriculum/procedimentos/multiplicarFracoesContract";
+import { construirMultiplicarFracoesQuestion, MultiplicarFracoesMisconception } from "../../curriculum/procedimentos/multiplicarFracoesContract";
 import { MultiplicarFracoesStage } from "./MultiplicarFracoesStage";
 
 describe("MultiplicarFracoesStage — F86 / N5.05", () => {
-  it("L3 mostra as duas faixas no ArrayGrid e três células reais de interseção", () => {
+  // A conta de L3 é sorteada (CLASS-003): faixas e interseção saem do spec.
+  const numeradorDe = (texto: string) => Number(texto.split("/")[0]);
+
+  it("L3 mostra as duas faixas no ArrayGrid e a interseção que a conta pede", () => {
     const q = construirMultiplicarFracoesQuestion(N5_05, 3);
     const spec = q.uiProps as any;
     const { container } = render(<MultiplicarFracoesStage spec={spec} options={q.options ?? []} onAnswer={() => undefined} />);
 
     expect(container.querySelector('[data-arraygrid-fraction-bands="true"]')).not.toBeNull();
-    expect(container.querySelectorAll('[data-arraygrid-intersection="true"]')).toHaveLength(3);
-    expect(container.querySelector('[data-f86-layer="horizontal"]')?.textContent).toContain("1/2");
-    expect(container.querySelector('[data-f86-layer="vertical"]')?.textContent).toContain("3/4");
+    expect(container.querySelectorAll('[data-arraygrid-intersection="true"]'))
+      .toHaveLength(numeradorDe(spec.fatorA) * numeradorDe(spec.fatorB));
+    expect(container.querySelector('[data-f86-layer="horizontal"]')?.textContent).toContain(spec.fatorA);
+    expect(container.querySelector('[data-f86-layer="vertical"]')?.textContent).toContain(spec.fatorB);
     expect(container.querySelector("[data-f86-intersection]")?.textContent).toMatch(/interseção/i);
   });
 
@@ -27,17 +31,19 @@ describe("MultiplicarFracoesStage — F86 / N5.05", () => {
     const onAnswer = vi.fn();
     const { getByRole, unmount } = render(<MultiplicarFracoesStage spec={spec} options={q.options ?? []} onAnswer={onAnswer} />);
 
-    fireEvent.click(getByRole("button", { name: "3/8" }));
-    expect(onAnswer).toHaveBeenCalledWith("3/8", expect.objectContaining({
+    fireEvent.click(getByRole("button", { name: spec.respostaLabel }));
+    expect(onAnswer).toHaveBeenCalledWith(spec.resposta, expect.objectContaining({
       source: "array-grid",
       evidencias: [Evidencia.FRACAO_VEZES_FRACAO_F86],
     }));
     unmount();
 
+    // O distrator de somar-em-vez-de-multiplicar também sai da conta sorteada.
+    const somou = (q.options ?? []).find(o => o.misconception === MultiplicarFracoesMisconception.SOMA_EM_VEZ_DE_MULTIPLICAR)!;
     const errado = vi.fn();
     const telaErrada = render(<MultiplicarFracoesStage spec={spec} options={q.options ?? []} onAnswer={errado} />);
-    fireEvent.click(telaErrada.getByRole("button", { name: "4/6" }));
-    expect(errado).toHaveBeenCalledWith("4/6", expect.objectContaining({
+    fireEvent.click(telaErrada.getByRole("button", { name: String(somou.label) }));
+    expect(errado).toHaveBeenCalledWith(somou.value, expect.objectContaining({
       source: "array-grid",
       misconception: "soma-em-vez-de-multiplicar",
     }));

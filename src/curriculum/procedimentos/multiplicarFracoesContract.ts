@@ -57,38 +57,81 @@ const acessibilidade = {
 };
 const cells = (n: number) => Array.from({ length: Math.max(0, n) }, (_, index) => index);
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const mdc = (a: number, b: number): number => (b === 0 ? a : mdc(b, a % b));
+const simplificar = (n: number, d: number) => { const g = mdc(n, d); return `${n / g}/${d / g}`; };
+const NOMES = ["", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez", "onze", "doze"] as const;
+const porExtenso = (n: number) => NOMES[n] ?? String(n);
+const PARTES: Record<number, string> = { 2: "meios", 3: "terços", 4: "quartos", 5: "quintos", 6: "sextos", 8: "oitavos" };
+
+/**
+ * CLASS-003 — a conta do nível é sorteada, a escada não.
+ *
+ * Era uma conta por nível — 1/2×8, 2/3×12, 1/2×3/4, 2/3×3/5, 2÷1/4 — e com ela
+ * a resposta: decorar "4" vencia L1 sem multiplicar nada.
+ *
+ * A grade não é enfeite: ela É a conta. Em L1 e L2 `rows × cols` é o inteiro e
+ * as casas pintadas são a resposta; em L3 e L4 as linhas são o denominador do
+ * primeiro fator e as colunas o do segundo, e a interseção é o produto. Sortear
+ * os números sem redesenhar a grade faria a figura contradizer a expressão.
+ */
 export function construirMultiplicarFracoesF86Spec(level: number): MultiplicarFracoesF86Spec {
   const nivel = clamp(level);
-  if (nivel === 1) return {
-    ficha: "F86", nivel, modo: "fracao-inteiro", primitiva: "ArrayGrid", visualizacao: "área",
-    rows: 2, cols: 4, activeCells: cells(4), expressao: "1/2 × 8", leitura: "metade de oito",
-    fatorA: "1/2", fatorB: "8", resposta: 4, respostaLabel: "4", mostrarIntersecao: true, acessibilidade,
-  };
-  if (nivel === 2) return {
-    ficha: "F86", nivel, modo: "fracao-inteiro-modelo", primitiva: "ArrayGrid", visualizacao: "área",
-    rows: 3, cols: 4, activeCells: cells(8), expressao: "2/3 × 12", leitura: "dois terços de doze",
-    fatorA: "2/3", fatorB: "12", resposta: 8, respostaLabel: "8", mostrarIntersecao: true, acessibilidade,
-  };
-  if (nivel === 3) return {
-    ficha: "F86", nivel, modo: "fracao-fracao-area", primitiva: "ArrayGrid", visualizacao: "área",
-    rows: 2, cols: 4, activeCells: cells(3), expressao: "1/2 × 3/4", leitura: "metade de três quartos",
-    fatorA: "1/2", fatorB: "3/4", resposta: "3/8", respostaLabel: "3/8", mostrarIntersecao: true, acessibilidade,
-  };
-  if (nivel === 4) return {
-    ficha: "F86", nivel, modo: "fracao-fracao-simbolico", primitiva: "ArrayGrid", visualizacao: "área",
-    rows: 3, cols: 5, activeCells: [], expressao: "2/3 × 3/5", leitura: "dois terços de três quintos",
-    fatorA: "2/3", fatorB: "3/5", resposta: "2/5", respostaLabel: "2/5", mostrarIntersecao: false, acessibilidade,
-  };
-  return {
-    ficha: "F86", nivel, modo: "divisao-fracoes", primitiva: "ArrayGrid", visualizacao: "área",
-    rows: 2, cols: 4, activeCells: cells(8), expressao: "2 ÷ 1/4", leitura: "quantos quartos cabem em dois inteiros",
-    fatorA: "2", fatorB: "1/4", resposta: 8, respostaLabel: "8", mostrarIntersecao: true, acessibilidade,
-  };
-}
+  const base = { ficha: "F86" as const, nivel, primitiva: "ArrayGrid" as const, visualizacao: "área" as const, acessibilidade };
 
-export function evidenciasMultiplicarFracoesF86(spec: MultiplicarFracoesF86Spec, correta: boolean): string[] {
-  if (!correta || spec.modo !== "fracao-fracao-area") return [];
-  return [Evidencia.FRACAO_VEZES_FRACAO_F86];
+  if (nivel === 1 || nivel === 2) {
+    // L2 precisa de numerador entre 2 e denominador-1, então o denominador
+    // começa em 3. Com denominador 2 a faixa se invertia e saía 2/2 = 1: a
+    // resposta virava o próprio inteiro, as três alternativas colapsavam numa
+    // e a tela passava a mostrar a resposta.
+    const denominador = nivel === 1 ? ri(2, 4) : ri(3, 4);
+    const numerador = nivel === 1 ? 1 : ri(2, denominador - 1);
+    const cols = ri(3, 5);
+    const inteiro = denominador * cols;
+    const resposta = inteiro * numerador / denominador;
+    const fatorA = `${numerador}/${denominador}`;
+    return {
+      ...base,
+      modo: nivel === 1 ? "fracao-inteiro" : "fracao-inteiro-modelo",
+      rows: denominador, cols, activeCells: cells(resposta),
+      expressao: `${fatorA} × ${inteiro}`,
+      leitura: `${numerador === 1 ? "a metade" : `${porExtenso(numerador)} ${PARTES[denominador] ?? "partes"}`} de ${porExtenso(inteiro)}`,
+      fatorA, fatorB: String(inteiro),
+      resposta, respostaLabel: String(resposta), mostrarIntersecao: true,
+    };
+  }
+
+  if (nivel === 3 || nivel === 4) {
+    const b = ri(2, 4);
+    const d = ri(3, 5);
+    const a = ri(1, b - 1);
+    const c = ri(1, d - 1);
+    const resposta = simplificar(a * c, b * d);
+    const fatorA = `${a}/${b}`;
+    const fatorB = `${c}/${d}`;
+    return {
+      ...base,
+      modo: nivel === 3 ? "fracao-fracao-area" : "fracao-fracao-simbolico",
+      rows: b, cols: d, activeCells: nivel === 3 ? cells(a * c) : [],
+      expressao: `${fatorA} × ${fatorB}`,
+      leitura: `${a === 1 ? "a metade" : `${porExtenso(a)} ${PARTES[b] ?? "partes"}`} de ${porExtenso(c)} ${PARTES[d] ?? "partes"}`,
+      fatorA, fatorB,
+      resposta, respostaLabel: resposta, mostrarIntersecao: nivel === 3,
+    };
+  }
+
+  const inteiros = ri(2, 4);
+  const denominador = ri(3, 5);
+  const resposta = inteiros * denominador;
+  return {
+    ...base,
+    modo: "divisao-fracoes",
+    rows: inteiros, cols: denominador, activeCells: cells(resposta),
+    expressao: `${inteiros} ÷ 1/${denominador}`,
+    leitura: `quantos ${PARTES[denominador] ?? "partes"} cabem em ${porExtenso(inteiros)} inteiros`,
+    fatorA: String(inteiros), fatorB: `1/${denominador}`,
+    resposta, respostaLabel: String(resposta), mostrarIntersecao: true,
+  };
 }
 
 export function construirMultiplicarFracoesF86Resolucao(spec: MultiplicarFracoesF86Spec): ResolucaoDeclarativa<MultiplicarFracoesF86Show, string | number, MultiplicarFracoesMisconceptionTag> {
@@ -136,31 +179,50 @@ function mastery(ficha: FichaCompetencia, nivel: number): MasteryRule {
   return { acertos: micro.dominio.acertos, de: micro.dominio.de, sessoes: micro.dominio.sessoes };
 }
 
+export function evidenciasMultiplicarFracoesF86(spec: MultiplicarFracoesF86Spec, correta: boolean): string[] {
+  if (!correta || spec.modo !== "fracao-fracao-area") return [];
+  return [Evidencia.FRACAO_VEZES_FRACAO_F86];
+}
+
+/**
+ * Alternativas derivadas da conta sorteada.
+ *
+ * Cada distrator continua nomeando o mesmo erro de antes: multiplicar por
+ * fração faz crescer, somar em vez de multiplicar, dividir faz diminuir. O que
+ * mudou é que agora eles saem dos números da conta, e não de uma lista escrita
+ * para cinco contas fixas.
+ */
 function opcoes(spec: MultiplicarFracoesF86Spec): Option[] {
-  if (spec.nivel === 1) return [
-    { value: 4, label: "4" },
-    { value: 16, label: "16", misconception: MultiplicarFracoesMisconception.MULTIPLICAR_AUMENTA },
-    { value: 8, label: "8" },
-  ];
-  if (spec.nivel === 2) return [
-    { value: 8, label: "8" },
-    { value: 18, label: "18", misconception: MultiplicarFracoesMisconception.MULTIPLICAR_AUMENTA },
-    { value: 6, label: "6" },
-  ];
-  if (spec.nivel === 3) return [
-    { value: "3/8", label: "3/8" },
-    { value: "4/6", label: "4/6", misconception: MultiplicarFracoesMisconception.SOMA_EM_VEZ_DE_MULTIPLICAR },
-    { value: "3/4", label: "3/4" },
-  ];
-  if (spec.nivel === 4) return [
-    { value: "2/5", label: "2/5" },
-    { value: "5/8", label: "5/8", misconception: MultiplicarFracoesMisconception.SOMA_EM_VEZ_DE_MULTIPLICAR },
-    { value: "6/15", label: "6/15" },
-  ];
+  const partes = (texto: string) => { const [n, d] = texto.split("/").map(Number); return { n, d: d ?? 1 }; };
+  if (spec.nivel === 1 || spec.nivel === 2) {
+    const a = partes(spec.fatorA);
+    const inteiro = Number(spec.fatorB);
+    // Multiplicar por fração faz crescer: usa o inverso da fração.
+    const cresceu = inteiro * a.d / a.n;
+    const candidatos: Option[] = [
+      { value: spec.resposta, label: spec.respostaLabel },
+      { value: cresceu, label: String(cresceu), misconception: MultiplicarFracoesMisconception.MULTIPLICAR_AUMENTA },
+      { value: inteiro, label: String(inteiro) },
+    ];
+    return candidatos.filter((item, i, all) => all.findIndex(o => String(o.value) === String(item.value)) === i);
+  }
+  if (spec.nivel === 3 || spec.nivel === 4) {
+    const a = partes(spec.fatorA);
+    const b = partes(spec.fatorB);
+    const somado = `${a.n + b.n}/${a.d + b.d}`;
+    const candidatos: Option[] = [
+      { value: spec.resposta, label: spec.respostaLabel },
+      { value: somado, label: somado, misconception: MultiplicarFracoesMisconception.SOMA_EM_VEZ_DE_MULTIPLICAR },
+      { value: spec.fatorB, label: spec.fatorB },
+    ];
+    return candidatos.filter((item, i, all) => all.findIndex(o => String(o.value) === String(item.value)) === i);
+  }
+  const b = partes(spec.fatorB);
+  const diminuiu = `${Number(spec.fatorA)}/${b.d}`;
   return [
-    { value: 8, label: "8" },
-    { value: "1/2", label: "1/2", misconception: MultiplicarFracoesMisconception.DIVIDIR_DIMINUI },
-    { value: 2, label: "2" },
+    { value: spec.resposta, label: spec.respostaLabel },
+    { value: diminuiu, label: diminuiu, misconception: MultiplicarFracoesMisconception.DIVIDIR_DIMINUI },
+    { value: Number(spec.fatorA), label: spec.fatorA },
   ];
 }
 
