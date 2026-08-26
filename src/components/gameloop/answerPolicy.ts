@@ -70,9 +70,33 @@ export function misconceptionForAnswer(q: Question, value: unknown, meta?: Answe
   const pickedOption=q.options?.find(option=>option.value===value);
   return pickedOption?.misconception ? pickedOption.tag || pickedOption.misconception : meta?.misconception;
 }
+/**
+ * Palcos que desenham as próprias alternativas — a casca não pode desenhá-las
+ * de novo.
+ *
+ * O defeito original: `pareamento` e `touchcount` mostravam a resposta duas
+ * vezes, o teclado do palco e a barra da casca embaixo. Pior que feio: a barra
+ * deixava responder sem contar e sem distribuir, que é a única coisa que essas
+ * duas fichas medem.
+ *
+ * Foi corrigido escrevendo dois nomes aqui, e a lista ficou para trás. Quando a
+ * frente de reparo da CLASS-007 fechou as alternativas DENTRO dos palcos —
+ * prisma construído em `volume-prismas-f94`, transformação feita em
+ * `circulo-areas-f91`, experimento rodado em `solidos-geometricos-f59` — a
+ * barra de fora continuou aberta e continuou vendendo o acerto. O portão do
+ * palco virava enfeite: a criança encontrava o mesmo rótulo logo abaixo.
+ *
+ * Esta lista não é o detector. O detector é `portaDeFora.test.tsx`, que
+ * renderiza a casca inteira e reprova quando o rótulo da resposta aparece em
+ * dois botões. Esquecer de listar um palco novo não abre mais um buraco
+ * silencioso: abre um teste vermelho que nomeia o `kind`.
+ */
 export const PALCOS_QUE_RESPONDEM = new Set([
   "pareamento","touchcount","fileira","classificacao","audiochoice","touchplace","shapecanvas","grandeza","comparacao-simbolica","medidas","moldura","material-dourado",
   "numberline-f19","regua-f61","quadrado100-f36","visual-addition-f13","emojirow-riscar-f15","counting-on-f14","skip-count-f30","equal-groups-f97","detetive-formas-f58","regra-sequencia-f57","partes-iguais-f45","fracao-numero-f72","decimos-centesimos-f75","fracoes-equivalentes-f73","divisao-longa-f69","perimetro-f63","igualdade-equilibrio-f46","soma-fracoes-f74","razao-proporcao-f88","equacoes-f90","contas-virgula-f76",
+  // Medidos pela varredura da CLASS-007: o palco já desenha a alternativa e a
+  // fecha até a ação da ficha acontecer.
+  "poligonos-f79","solidos-geometricos-f59","circulo-areas-f91","volume-prismas-f94","fatores-retangulos-f66",
 ]);
 export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
