@@ -29,7 +29,17 @@ describe("a ficha em si", () => {
   it("o domínio é critério de fluência, não de compreensão", () => {
     // 8 de 10 em 3 sessões: o que importa aqui é consistência, não acerto único.
     for (const micro of N4_03.micros) {
-      expect(micro.dominio).toEqual({ acertos: 8, de: 10, sessoes: 3 });
+      expect(micro.dominio).toMatchObject({ acertos: 8, de: 10, sessoes: 3 });
+    }
+  });
+
+  it("o nível que mistura tabuadas exige mais de uma tabuada (CLASS-008)", () => {
+    // A fluência que o nível misto cobra é escolher entre tabuadas, não repetir
+    // uma. Sem esta exigência, oito acertos seguidos em ×2 coroavam "mistura".
+    const misturadas = N4_03.micros.find(micro => micro.id === "misturadas")!;
+    expect(misturadas.dominio.evidenciasDistintas).toMatchObject({ prefixo: "familia:N4.03:", minimo: 2 });
+    for (const micro of N4_03.micros.filter(item => item.id !== "misturadas")) {
+      expect(micro.dominio.evidenciasDistintas, `${micro.id} não mistura tabuadas`).toBeUndefined();
     }
   });
 });

@@ -187,6 +187,14 @@ export interface Question {
   exigeEvidencia?: string;
   /** Evidência que precisa existir antes de esta micro liberar o próximo nível. */
   gateEvidenceBeforeAdvance?: string;
+  /**
+   * CLASS-008: qual FAMÍLIA este item exercitou, num nível que integra várias.
+   *
+   * Emitida ao acertar, junto das outras evidências. É ela que permite à regra
+   * de domínio exigir mais de uma família antes de coroar — sem isso, o nível
+   * integrador coroa quem demonstrou uma só, e a coroa mente sobre integração.
+   */
+  evidenciaDeFamilia?: string;
   /** Regra de dominio da micro que gerou esta questao. */
   masteryRule?: MasteryRule;
   /** expressão revelada SÓ ao acertar (ex.: esconde a palavra, mostra "CA + SA = CASA 🏠" depois) */

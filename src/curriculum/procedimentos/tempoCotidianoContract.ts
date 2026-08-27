@@ -1,6 +1,7 @@
 import { MisconceptionTag } from "../../constants/misconceptions";
 import { Option, Question } from "../../types";
 import { FichaCompetencia } from "../schema";
+import { evidenciaDeFamilia } from "./familiaIntegradora";
 
 const PARTES_DO_DIA = [
   { value: "manha", label: "🌅", say: "manhã" },
@@ -74,7 +75,14 @@ function shuffled<T>(items: readonly T[]): T[] {
   return copy;
 }
 
-function base(ficha: FichaCompetencia, level: number) {
+/**
+ * CLASS-008: cada família de tempo cotidiano tem nome próprio.
+ *
+ * O L5 sorteia entre quatro — parte do dia, ontem/hoje/amanhã, dia da semana e
+ * ordem de acontecimentos. Sem a etiqueta, a regra de domínio não distingue
+ * quem percorreu as quatro de quem respondeu cinco vezes sobre a manhã.
+ */
+function base(ficha: FichaCompetencia, level: number, familia: string) {
   const microId = ficha.niveis[level]?.micro;
   const micro = microId ? ficha.micros.find(candidate => candidate.id === microId) : undefined;
   if (!micro) throw new Error(`GM.02 sem micro do nível ${level}.`);
@@ -84,10 +92,16 @@ function base(ficha: FichaCompetencia, level: number) {
     explain: ficha.explain,
     audibleOptions: true,
     ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
+    evidenciaDeFamilia: evidenciaDeFamilia(ficha.id, familia),
     masteryRule: {
       acertos: micro.dominio?.acertos ?? 4,
       de: micro.dominio?.de ?? 5,
       sessoes: micro.dominio?.sessoes ?? 2,
+      // CLASS-008: a exigência de diversidade de família viaja junto. Sem esta
+      // linha a ficha pede duas famílias e a questão chega ao motor sem pedir.
+      ...(micro.dominio?.evidenciasDistintas
+        ? { evidenciasDistintas: micro.dominio.evidenciasDistintas }
+        : {}),
     },
   };
 }
@@ -96,7 +110,7 @@ function dayPartQuestion(ficha: FichaCompetencia, level: number): Question {
   const scene = CENAS_DIA[randomInt(0, CENAS_DIA.length - 1)];
   const options: Option[] = shuffled(PARTES_DO_DIA).map(option => ({ ...option }));
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "parte-do-dia"),
     kind: "plain",
     prompt: "Ouça a cena e escolha a parte do dia.",
     audioPrompt: scene.audio,
@@ -122,7 +136,7 @@ function relativeDayQuestion(ficha: FichaCompetencia, level: number): Question {
     say: event.say,
   }));
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "dia-relativo"),
     kind: "plain",
     prompt: "Ouça ontem, hoje e amanhã. Escolha o evento pedido.",
     audioPrompt,
@@ -157,7 +171,7 @@ function weekdayQuestion(ficha: FichaCompetencia, level: number): Question {
         : {}),
   }));
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "dia-da-semana"),
     kind: "plain",
     prompt: "Ouça os dias. Você pode tocar no alto-falante de cada opção.",
     audioPrompt: `Hoje é ${current}. Que dia vem ${relation}?`,
@@ -196,7 +210,7 @@ function eventOrderQuestion(ficha: FichaCompetencia, level: number): Question {
     ...(candidate.misconception ? { misconception: candidate.misconception } : {}),
   }));
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "ordem-de-eventos"),
     kind: "plain",
     prompt: "Qual sequência de acontecimentos faz sentido?",
     audioPrompt: `Pense na ordem de uma ${routine.name}. Qual sequência acontece primeiro, depois e por último?`,

@@ -2,6 +2,7 @@ import { FichaCompetencia } from "../schema";
 import { Option, Question } from "../../types";
 import { MisconceptionTag } from "../../constants/misconceptions";
 import { fisherYates } from "../../utils/shuffle";
+import { evidenciaDeFamilia } from "./familiaIntegradora";
 
 const EMOJIS = ["🍎", "🥕", "🐟", "⭐", "🚗", "⚽"];
 
@@ -48,7 +49,14 @@ function sequenceOptions(
     })));
 }
 
-function base(ficha: FichaCompetencia, level: number) {
+/**
+ * CLASS-008: cada uma das três formas de contar tem nome próprio.
+ *
+ * O L5 sorteia entre elas, e sem essa etiqueta a regra de domínio não tem como
+ * saber que a criança respondeu seis vezes a mesma família — coroaria "conta de
+ * três jeitos" sobre quem só contou para trás.
+ */
+function base(ficha: FichaCompetencia, level: number, familia: string) {
   const microId = ficha.niveis[level]?.micro;
   const micro = microId ? ficha.micros.find(candidate => candidate.id === microId) : undefined;
   if (!micro) throw new Error(`N1.09 sem micro do nível ${level}.`);
@@ -57,10 +65,16 @@ function base(ficha: FichaCompetencia, level: number) {
     howto: ficha.howto,
     explain: ficha.explain,
     ...(typeof rtAlvoMs === "number" && rtAlvoMs > 0 ? { rt_max_s: rtAlvoMs / 1000 } : {}),
+    evidenciaDeFamilia: evidenciaDeFamilia(ficha.id, familia),
     masteryRule: {
       acertos: micro.dominio?.acertos ?? 4,
       de: micro.dominio?.de ?? 5,
       sessoes: micro.dominio?.sessoes ?? 2,
+      // CLASS-008: a exigência de diversidade de família viaja junto. Sem esta
+      // linha a ficha pede duas famílias e a questão chega ao motor sem pedir.
+      ...(micro.dominio?.evidenciasDistintas
+        ? { evidenciasDistintas: micro.dominio.evidenciasDistintas }
+        : {}),
     },
   };
 }
@@ -69,7 +83,7 @@ function countObjects(ficha: FichaCompetencia, level: number, min: number, max: 
   const target = randomInt(min, max);
   const emoji = EMOJIS[randomInt(0, EMOJIS.length - 1)];
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "contar-objetos"),
     kind: "scattered",
     prompt: "Conte os objetos. Quantos há?",
     audioPrompt: "Conte os objetos. Quantos há?",
@@ -87,7 +101,7 @@ function continueFromN(ficha: FichaCompetencia, level: number): Question {
   const correct = [start + 1, start + 2, start + 3];
   const answer = correct.join(" · ");
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "continuar-de-n"),
     kind: "plain",
     prompt: `Comece no ${start}. Qual trilha continua a contagem certinho?`,
     audioPrompt: `Comece no ${start}. Qual trilha continua a contagem certinho?`,
@@ -116,7 +130,7 @@ function countdown(ficha: FichaCompetencia, level: number): Question {
   const correct = [start - 1, start - 2, start - 3];
   const answer = correct.join(" · ");
   return {
-    ...base(ficha, level),
+    ...base(ficha, level, "contagem-regressiva"),
     kind: "plain",
     prompt: `Comece no ${start} e conte para trás. Qual trilha está certa?`,
     audioPrompt: `Comece no ${start} e conte para trás. Qual trilha está certa?`,

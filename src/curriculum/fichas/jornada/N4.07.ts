@@ -1,5 +1,6 @@
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 /**
  * F44 — Tabuadas do 6 ao 9. As difíceis; com estratégia, viram poucas.
@@ -14,6 +15,23 @@ import { FichaCompetencia } from "../../schema";
  */
 
 const dominio = { acertos: 8, de: 10, sessoes: 3 };
+
+/**
+ * CLASS-008 — o nível integrador não coroa quem demonstrou uma família só.
+ *
+ * Os níveis 4 e 5 misturam as tabuadas difíceis — ×6, ×7, ×8 e ×9 — e
+ * depois o conjunto completo.
+ * O gerador sorteia entre elas a cada tentativa, e a regra de domínio contava
+ * apenas acertos, janela e sessões: dava para satisfazer o mastery inteiro sem
+ * nunca sair de uma delas. A coroa dizia "integrou" sobre quem não integrou.
+ */
+const dominioIntegrador = {
+  ...dominio,
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "N4.07",
+    "Acertar em pelo menos duas tabuadas diferentes.",
+  ),
+};
 
 export const N4_07: FichaCompetencia = {
   id: "N4.07",
@@ -39,8 +57,8 @@ export const N4_07: FichaCompetencia = {
     { id: "nove", alvo: "resolver o ×9 como dez menos um grupo", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio },
     { id: "seis", alvo: "resolver o ×6 como cinco mais um grupo", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio },
     { id: "oito", alvo: "resolver o ×8 como o dobro do quatro", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio },
-    { id: "dificeis", alvo: "escolher a estratégia certa entre as quatro, sem apoio", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio },
-    { id: "completa", alvo: "recuperar qualquer fato da tabuada completa", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio },
+    { id: "dificeis", alvo: "escolher a estratégia certa entre as quatro, sem apoio", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio: dominioIntegrador },
+    { id: "completa", alvo: "recuperar qualquer fato da tabuada completa", kinds: ["ancora"], params: { audio_prompt: "Escute e responda." }, dominio: dominioIntegrador },
   ],
   erros_tipicos: [
     { id: MisconceptionTag.PAROU_NA_ANCORA, descricao: "Devolveu o fato fácil sem fazer o ajuste." },

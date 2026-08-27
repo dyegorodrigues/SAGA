@@ -47,8 +47,8 @@ describe("F05 na fronteira com o GameLoop", () => {
 
   it("primeira audição exige também primeira resposta certa", () => {
     const certa = { ...leitura, resposta: 6, repeticoes: 0 };
-    expect(evidenciasDaResposta({ audiochoice: certa })).toContain(Evidencia.PRIMEIRA_AUDICAO);
-    expect(evidenciasDaResposta({ audiochoice: { ...certa, tentativa: 2 } }))
+    expect(evidenciasDaResposta({ audiochoice: certa }, q)).toContain(Evidencia.PRIMEIRA_AUDICAO);
+    expect(evidenciasDaResposta({ audiochoice: { ...certa, tentativa: 2 } }, q))
       .not.toContain(Evidencia.PRIMEIRA_AUDICAO);
   });
 

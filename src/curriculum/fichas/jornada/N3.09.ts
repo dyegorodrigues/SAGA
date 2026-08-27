@@ -1,4 +1,5 @@
 import { FichaCompetencia } from "../../schema";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 const dominio = { acertos: 3, de: 3, sessoes: 2 };
 const tutorial = [
@@ -6,6 +7,22 @@ const tutorial = [
   { fala: "Cubinhos com cubinhos.", show: { agruparCubinhos: true } },
   { fala: "Comece pelos cubinhos.", show: { destacarColuna: "unidades" } },
 ];
+
+/**
+ * CLASS-008 — o nível integrador não coroa quem demonstrou uma família só.
+ *
+ * O L5 alterna adição e subtração na mesma conta armada.
+ * O gerador sorteia entre elas a cada tentativa, e a regra de domínio contava
+ * apenas acertos, janela e sessões: dava para satisfazer o mastery inteiro sem
+ * nunca sair de uma delas. A coroa dizia "integrou" sobre quem não integrou.
+ */
+const dominioIntegrador = {
+  ...dominio,
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "N3.09",
+    "Acertar pelo menos uma adição e uma subtração armadas.",
+  ),
+};
 
 export const N3_09: FichaCompetencia = {
   id: "N3.09",
@@ -32,7 +49,7 @@ export const N3_09: FichaCompetencia = {
     { id: "soma_unidades", alvo: "somar um número de dois algarismos e unidades sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 99, bottom_min: 1, bottom_max: 9, result_max: 100, operation: "+", forbid_regroup: true, show_place_value: true, tutorial }, dominio },
     { id: "soma_duas_ordens", alvo: "somar dezenas e unidades por coluna sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 99, bottom_min: 10, bottom_max: 89, result_max: 100, operation: "+", forbid_regroup: true, show_place_value: true, tutorial }, dominio },
     { id: "subtracao", alvo: "subtrair dezenas e unidades por coluna sem empréstimo", kinds: ["vertical"], params: { top_min: 20, top_max: 99, bottom_min: 10, bottom_max: 89, operation: "-", forbid_regroup: true }, dominio },
-    { id: "misto", alvo: "alternar soma e subtração sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 99, bottom_min: 1, bottom_max: 89, result_max: 100, operation: "mixed", forbid_regroup: true }, dominio },
+    { id: "misto", alvo: "alternar soma e subtração sem reagrupamento", kinds: ["vertical"], params: { top_min: 10, top_max: 99, bottom_min: 1, bottom_max: 89, result_max: 100, operation: "mixed", forbid_regroup: true }, dominio: dominioIntegrador },
   ],
   erros_tipicos: [
     { id: "soma_digitos", descricao: "Soma todos os algarismos sem separar as ordens." },

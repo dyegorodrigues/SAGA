@@ -17,6 +17,7 @@ import {
 } from "./procedimentos/additiveProcedure";
 import { buildNarrative } from "./procedimentos/additiveNarrative";
 import { buildStoryBarsSpec } from "./procedimentos/storyBarsContract";
+import { evidenciaDeFamilia } from "./procedimentos/familiaIntegradora";
 import { construirTabuadaSpec } from "./procedimentos/tabuadaContract";
 import {
   OUTRO_FATOR_MAX,
@@ -257,6 +258,13 @@ export class Composer {
     let n: number | undefined;
     let emoji: string | undefined;
     let promptOverride: string | undefined;
+    /**
+     * CLASS-008: a família que ESTA tentativa exercitou, quando o nível reúne
+     * mais de uma. Quem sabe qual foi é o sorteio logo abaixo; sem gravá-la
+     * aqui, a regra de domínio não tem como exigir variedade e o nível
+     * integrador coroa quem demonstrou uma família só.
+     */
+    let familia: string | undefined;
     let vTop: number | undefined;
     let vBot: number | undefined;
     let vOp: "+" | "-" | undefined;
@@ -504,6 +512,7 @@ export class Composer {
 
       case "vertical": {
         const operands = verticalOperands(params, `${ficha.id}/${micro.id}`);
+        familia = operands.operation === "+" ? "adicao" : "subtracao";
         vTop = operands.top;
         vBot = operands.bottom;
         vOp = operands.operation;
@@ -604,6 +613,7 @@ export class Composer {
         }
 
         const situacao = candidatas[randomInt(0, candidatas.length - 1)];
+        familia = `tabuada-${situacao.tabuada}`;
         const spec = construirTabuadaSpec(situacao, lvl, PADRAO_DA_TABUADA[situacao.tabuada]);
 
         answer = spec.resposta;
@@ -635,6 +645,7 @@ export class Composer {
         }
 
         const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        familia = `tabuada-${escolha.tabuada}`;
         const spec = construirDecomposicaoSpec(escolha.tabuada, escolha.vezes, lvl);
 
         answer = spec.resposta;
@@ -664,6 +675,7 @@ export class Composer {
         }
 
         const escolha = candidatas[randomInt(0, candidatas.length - 1)];
+        familia = `tabuada-${escolha.tabuada}`;
         const spec = construirAncoraSpec(escolha.tabuada, escolha.vezes, lvl);
 
         answer = spec.resposta;
@@ -1206,11 +1218,19 @@ export class Composer {
       ...(micro.dominio?.gateAntesDeAvancar
         ? { gateEvidenceBeforeAdvance: micro.dominio.gateAntesDeAvancar.evidencia }
         : {}),
+      ...(familia ? { evidenciaDeFamilia: evidenciaDeFamilia(ficha.id, familia) } : {}),
       ...(micro.dominio ? {
         masteryRule: {
           acertos: micro.dominio.acertos,
           de: micro.dominio.de,
           sessoes: micro.dominio.sessoes,
+          // CLASS-008: a exigência de diversidade de família também viaja. Este
+          // serializador copiava três campos e deixava `evidenciasDistintas`
+          // para trás — a ficha pedia duas famílias, a questão chegava ao motor
+          // sem pedir nada, e o nível integrador coroava quem fez uma só.
+          ...(micro.dominio.evidenciasDistintas
+            ? { evidenciasDistintas: micro.dominio.evidenciasDistintas }
+            : {}),
         },
       } : {}),
       rt_max_s: ficha.niveis?.[lvl]?.rt_alvo

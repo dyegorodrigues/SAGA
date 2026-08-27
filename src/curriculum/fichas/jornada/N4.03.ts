@@ -1,5 +1,6 @@
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 /**
  * F42 — Tabuadas Fáceis (×2, ×5, ×10). A ordem certa não é numérica, é por padrão.
@@ -16,6 +17,22 @@ import { FichaCompetencia } from "../../schema";
 
 /** Critério de FLUÊNCIA, não de compreensão: velocidade e consistência. */
 const dominio = { acertos: 8, de: 10, sessoes: 3 };
+
+/**
+ * CLASS-008 — o nível integrador não coroa quem demonstrou uma família só.
+ *
+ * Os níveis 4 e 5 misturam as tabuadas do ×2, ×5 e ×10.
+ * O gerador sorteia entre elas a cada tentativa, e a regra de domínio contava
+ * apenas acertos, janela e sessões: dava para satisfazer o mastery inteiro sem
+ * nunca sair de uma delas. A coroa dizia "integrou" sobre quem não integrou.
+ */
+const dominioIntegrador = {
+  ...dominio,
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "N4.03",
+    "Acertar em pelo menos duas tabuadas diferentes.",
+  ),
+};
 
 export const N4_03: FichaCompetencia = {
   id: "N4.03",
@@ -63,7 +80,7 @@ export const N4_03: FichaCompetencia = {
       alvo: "recuperar o fato sem apoio visual, nas três tabuadas",
       kinds: ["tabuada"],
       params: { audio_prompt: "Escute e responda." },
-      dominio,
+      dominio: dominioIntegrador,
     },
   ],
   erros_tipicos: [

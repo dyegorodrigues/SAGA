@@ -558,7 +558,7 @@ export function GameLoop({
         durationMs,
         targetRtMs: targetRtSeconds !== undefined ? targetRtSeconds * 1000 : undefined,
         helpUsed: helpUsedRef.current,
-        evidencias: right ? evidenciasDaResposta(answerMeta) : undefined,
+        evidencias: right ? evidenciasDaResposta(answerMeta, q) : undefined,
         exigeEvidencia: q.exigeEvidencia,
         gateEvidenceBeforeAdvance: q.gateEvidenceBeforeAdvance,
         masteryRule: q.masteryRule,

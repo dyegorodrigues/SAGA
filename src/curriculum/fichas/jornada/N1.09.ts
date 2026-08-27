@@ -1,7 +1,25 @@
 import { FichaCompetencia } from "../../schema";
 import { MisconceptionTag } from "../../../constants/misconceptions";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 /** N1.09 — contagem até 20 e a partir de qualquer número. */
+/**
+ * CLASS-008 — o nível integrador não coroa quem demonstrou uma família só.
+ *
+ * O L5 reúne três famílias: contar objetos, continuar a partir de N e
+ * contar para trás.
+ * O gerador sorteia entre elas a cada tentativa, e a regra de domínio contava
+ * apenas acertos, janela e sessões: dava para satisfazer o mastery inteiro sem
+ * nunca sair de uma delas. A coroa dizia "integrou" sobre quem não integrou.
+ */
+const dominioIntegrador = {
+  ...{ acertos: 4, de: 5, sessoes: 2 },
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "N1.09",
+    "Demonstrar pelo menos duas das três formas de contar: objetos, continuar de N, ou para trás.",
+  ),
+};
+
 export const N1_09: FichaCompetencia = {
   id: "N1.09",
   nome: "Contagem até 20 e a partir de qualquer número",
@@ -64,7 +82,7 @@ export const N1_09: FichaCompetencia = {
       alvo: "recuperar flexivelmente contagem de objetos, continuação a partir de N e regressiva",
       kinds: ["plain"],
       params: { modo: "counting_mixed", n_min: 10, n_max: 20, start: 4, end: 10 },
-      dominio: { acertos: 4, de: 5, sessoes: 2 },
+      dominio: dominioIntegrador,
     },
   ],
   erros_tipicos: [

@@ -1,7 +1,25 @@
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 /** P22.5 — GM.02: Tempo cotidiano pré-leitor. */
+/**
+ * CLASS-008 — o nível integrador não coroa quem demonstrou uma família só.
+ *
+ * O L5 reúne quatro famílias: partes do dia, ontem/hoje/amanhã, dias da
+ * semana e ordem de acontecimentos.
+ * O gerador sorteia entre elas a cada tentativa, e a regra de domínio contava
+ * apenas acertos, janela e sessões: dava para satisfazer o mastery inteiro sem
+ * nunca sair de uma delas. A coroa dizia "integrou" sobre quem não integrou.
+ */
+const dominioIntegrador = {
+  ...{ acertos: 4, de: 5, sessoes: 2 },
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "GM.02",
+    "Demonstrar pelo menos duas das quatro famílias de tempo cotidiano.",
+  ),
+};
+
 export const GM_02: FichaCompetencia = {
   id: "GM.02",
   nome: "Tempo cotidiano",
@@ -65,7 +83,7 @@ export const GM_02: FichaCompetencia = {
       alvo: "alternar partes do dia, relativos temporais, semana e ordem de eventos sem pista de formato",
       kinds: ["plain"],
       params: { modo: "time_mixed", audio_primary: true },
-      dominio: { acertos: 4, de: 5, sessoes: 2 },
+      dominio: dominioIntegrador,
     },
   ],
 

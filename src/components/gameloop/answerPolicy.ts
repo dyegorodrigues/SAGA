@@ -124,9 +124,20 @@ export const PALCOS_QUE_RESPONDEM = new Set([
   "media-chance-f83", "estatistica-chance-f95",
 ]);
 export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
-export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
-  if (!meta) return [];
+/**
+ * Tudo o que a tentativa CERTA provou, para o motor de maestria.
+ *
+ * A questão é obrigatória, e não por capricho de assinatura: é dela que sai a
+ * `evidenciaDeFamilia` da CLASS-008 — qual das famílias do nível integrador
+ * esta tentativa exercitou. Deixá-la opcional era o convite a esquecê-la no
+ * único lugar que chama esta função, e aí o requisito de diversidade viaja até
+ * o motor sem nunca receber uma família para contar: a coroa não chegaria
+ * nunca, o que é o defeito espelhado do que a classe veio corrigir.
+ */
+export function evidenciasDaResposta(meta: AnswerMeta | undefined, question: Question): string[] {
   const achadas:string[]=[];
+  if (question.evidenciaDeFamilia) achadas.push(question.evidenciaDeFamilia);
+  if (!meta) return achadas;
   if(meta.classificacao) achadas.push(...evidenciasDaClassificacao(meta.classificacao as AcaoDeClassificacao));
   if(meta.touchcount) achadas.push(...evidenciasDaContagem(meta.touchcount as AcaoDeContagem));
   if(meta.audiochoice) achadas.push(...evidenciasAudioChoiceRuntime(meta.audiochoice as RespostaOuvidaRuntime));

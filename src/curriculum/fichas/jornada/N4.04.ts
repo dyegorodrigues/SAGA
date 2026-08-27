@@ -1,5 +1,6 @@
 import { MisconceptionTag } from "../../../constants/misconceptions";
 import { FichaCompetencia } from "../../schema";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 /**
  * F43 — Tabuadas do 3 e do 4. Dobrar e dobrar de novo.
@@ -15,6 +16,23 @@ import { FichaCompetencia } from "../../schema";
 
 /** Critério de FLUÊNCIA: velocidade e consistência, não acerto único. */
 const dominio = { acertos: 8, de: 10, sessoes: 3 };
+
+/**
+ * CLASS-008 — o nível integrador não coroa quem demonstrou uma família só.
+ *
+ * Os níveis 4 e 5 misturam as tabuadas que se decompõem com as que já
+ * estavam dominadas.
+ * O gerador sorteia entre elas a cada tentativa, e a regra de domínio contava
+ * apenas acertos, janela e sessões: dava para satisfazer o mastery inteiro sem
+ * nunca sair de uma delas. A coroa dizia "integrou" sobre quem não integrou.
+ */
+const dominioIntegrador = {
+  ...dominio,
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "N4.04",
+    "Acertar em pelo menos duas tabuadas diferentes.",
+  ),
+};
 
 export const N4_04: FichaCompetencia = {
   id: "N4.04",
@@ -63,14 +81,14 @@ export const N4_04: FichaCompetencia = {
       alvo: "escolher a estratégia certa entre ×3 e ×4, sem apoio",
       kinds: ["decomposicao"],
       params: { audio_prompt: "Escute e responda." },
-      dominio,
+      dominio: dominioIntegrador,
     },
     {
       id: "fluencia",
       alvo: "recuperar o fato em ×2, ×3, ×4, ×5 e ×10, venha ele de padrão ou de decomposição",
       kinds: ["decomposicao"],
       params: { audio_prompt: "Escute e responda." },
-      dominio,
+      dominio: dominioIntegrador,
     },
   ],
   erros_tipicos: [
