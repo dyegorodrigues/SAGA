@@ -56,48 +56,104 @@ function opts(correta: number, unidade: UnidadeF82, erradas: Array<{ value: numb
     .slice(0, 4);
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/**
+ * CLASS-003 — as medidas são sorteadas, a escada não.
+ *
+ * O problema era um só por nível: 2 m, 3 kg, 2 m contra 150 cm, 1 m mais 75 cm
+ * e 2 L com 500 e 250 ml. As respostas certas eram 200, 3000, 200, 175 e 1750,
+ * para sempre.
+ *
+ * O degrau continua sendo a GRANDEZA e o número de etapas: converter
+ * comprimento, converter massa, comparar depois de converter, operar com
+ * unidades mistas, e o problema de três etapas em capacidade.
+ */
 export function construirProblemasMedidaSpec(level: number): ProblemasMedidaF82Spec {
   const nivel = clamp(level);
-  if (nivel === 1) return {
-    nivel, modo: "converter-comprimento", primitivas: ["NumberLine", "Balanca"], grandeza: "comprimento",
-    conversao: { de: "m", para: "cm", fator: 100, valorInicial: 2, valorConvertido: 200 }, mesmaQuantidade: true,
-    exigeConversaoAntes: false, unidadesMistas: false, etapas: 1, resposta: 200, unidadeResposta: "cm",
-    opcoes: opts(200, "cm", [{ value: 20, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO }, { value: 2, misconception: ProblemasMedidaMisconception.MISTURA_GRANDEZAS }]),
-  };
-  if (nivel === 2) return {
-    nivel, modo: "converter-grandezas", primitivas: ["NumberLine", "Balanca"], grandeza: "massa",
-    conversao: { de: "kg", para: "g", fator: 1000, valorInicial: 3, valorConvertido: 3000 }, mesmaQuantidade: true,
-    exigeConversaoAntes: false, unidadesMistas: false, etapas: 1, resposta: 3000, unidadeResposta: "g",
-    opcoes: opts(3000, "g", [{ value: 300, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO }, { value: 3, misconception: ProblemasMedidaMisconception.MISTURA_GRANDEZAS }]),
-  };
-  if (nivel === 3) return {
-    nivel, modo: "comparar-apos-converter", primitivas: ["NumberLine", "Balanca"], grandeza: "comprimento",
-    conversao: { de: "m", para: "cm", fator: 100, valorInicial: 2, valorConvertido: 200 }, mesmaQuantidade: true,
-    valoresOriginais: [{ valor: 2, unidade: "m" }, { valor: 150, unidade: "cm" }], exigeConversaoAntes: true, unidadesMistas: true, etapas: 2,
-    resposta: 200, unidadeResposta: "cm",
-    opcoes: opts(200, "cm", [{ value: 150, misconception: ProblemasMedidaMisconception.COMPARA_SEM_CONVERTER }, { value: 20, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO }]),
-  };
-  if (nivel === 4) return {
-    nivel, modo: "operar-unidades-mistas", primitivas: ["NumberLine", "Balanca"], grandeza: "comprimento",
-    conversao: { de: "m", para: "cm", fator: 100, valorInicial: 1, valorConvertido: 100 }, mesmaQuantidade: true,
-    valoresOriginais: [{ valor: 1, unidade: "m" }, { valor: 75, unidade: "cm" }], exigeConversaoAntes: true, unidadesMistas: true, etapas: 2,
-    resposta: 175, unidadeResposta: "cm",
-    opcoes: opts(175, "cm", [{ value: 76, misconception: ProblemasMedidaMisconception.COMPARA_SEM_CONVERTER }, { value: 25, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO }]),
-  };
+  const primitivas = ["NumberLine", "Balanca"] as ["NumberLine", "Balanca"];
+
+  if (nivel === 1 || nivel === 2) {
+    const comprimento = nivel === 1;
+    const inicial = ri(2, 9);
+    const fator = comprimento ? 100 : 1000;
+    const convertido = inicial * fator;
+    return {
+      nivel, modo: comprimento ? "converter-comprimento" : "converter-grandezas", primitivas,
+      grandeza: comprimento ? "comprimento" : "massa",
+      conversao: { de: comprimento ? "m" : "kg", para: comprimento ? "cm" : "g", fator, valorInicial: inicial, valorConvertido: convertido },
+      mesmaQuantidade: true, exigeConversaoAntes: false, unidadesMistas: false, etapas: 1,
+      resposta: convertido, unidadeResposta: comprimento ? "cm" : "g",
+      opcoes: opts(convertido, comprimento ? "cm" : "g", [
+        // Dividir onde era para multiplicar: a conversão de cabeça para baixo.
+        { value: convertido / (fator / 10), misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO },
+        // Responder o número que já estava lá, como se a unidade não contasse.
+        { value: inicial, misconception: ProblemasMedidaMisconception.MISTURA_GRANDEZAS },
+      ]),
+    };
+  }
+
+  if (nivel === 3) {
+    // A medida convertida precisa vencer a comparação: se a outra fosse maior,
+    // a resposta deixaria de ser a que o enunciado pergunta.
+    const inicial = ri(2, 9);
+    const convertido = inicial * 100;
+    const outra = ri(Math.floor(convertido / 100) * 10, convertido - 10);
+    return {
+      nivel, modo: "comparar-apos-converter", primitivas, grandeza: "comprimento",
+      conversao: { de: "m", para: "cm", fator: 100, valorInicial: inicial, valorConvertido: convertido },
+      mesmaQuantidade: true, valoresOriginais: [{ valor: inicial, unidade: "m" }, { valor: outra, unidade: "cm" }],
+      exigeConversaoAntes: true, unidadesMistas: true, etapas: 2,
+      resposta: convertido, unidadeResposta: "cm",
+      opcoes: opts(convertido, "cm", [
+        { value: outra, misconception: ProblemasMedidaMisconception.COMPARA_SEM_CONVERTER },
+        { value: inicial * 10, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO },
+      ]),
+    };
+  }
+
+  if (nivel === 4) {
+    const inicial = ri(1, 8);
+    const convertido = inicial * 100;
+    const resto = ri(2, 19) * 5;
+    const total = convertido + resto;
+    return {
+      nivel, modo: "operar-unidades-mistas", primitivas, grandeza: "comprimento",
+      conversao: { de: "m", para: "cm", fator: 100, valorInicial: inicial, valorConvertido: convertido },
+      mesmaQuantidade: true, valoresOriginais: [{ valor: inicial, unidade: "m" }, { valor: resto, unidade: "cm" }],
+      exigeConversaoAntes: true, unidadesMistas: true, etapas: 2,
+      resposta: total, unidadeResposta: "cm",
+      opcoes: opts(total, "cm", [
+        // Somar sem converter: 1 + 75 vira 76.
+        { value: inicial + resto, misconception: ProblemasMedidaMisconception.COMPARA_SEM_CONVERTER },
+        // Subtrair onde era para somar.
+        { value: Math.abs(convertido - resto), misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO },
+      ]),
+    };
+  }
+
+  // Três etapas: parte de um volume em litros, tira e devolve em mililitros.
+  const litros = ri(2, 6);
+  const emMl = litros * 1000;
+  const retirado = ri(2, 9) * 100;
+  const acrescentado = ri(1, retirado / 100 - 1) * 100;
+  const total = emMl - retirado + acrescentado;
   return {
-    nivel, modo: "problema-multietapa", primitivas: ["NumberLine", "Balanca"], grandeza: "capacidade",
-    conversao: { de: "L", para: "ml", fator: 1000, valorInicial: 2, valorConvertido: 2000 }, mesmaQuantidade: true,
-    valoresOriginais: [{ valor: 2, unidade: "L" }, { valor: 500, unidade: "ml" }], exigeConversaoAntes: true, unidadesMistas: true, etapas: 3,
-    resposta: 1750, unidadeResposta: "ml",
-    opcoes: opts(1750, "ml", [{ value: 250, misconception: ProblemasMedidaMisconception.COMPARA_SEM_CONVERTER }, { value: 2250, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO }, { value: 2, misconception: ProblemasMedidaMisconception.MISTURA_GRANDEZAS }]),
+    nivel, modo: "problema-multietapa", primitivas, grandeza: "capacidade",
+    conversao: { de: "L", para: "ml", fator: 1000, valorInicial: litros, valorConvertido: emMl },
+    mesmaQuantidade: true, valoresOriginais: [{ valor: litros, unidade: "L" }, { valor: retirado, unidade: "ml" }],
+    exigeConversaoAntes: true, unidadesMistas: true, etapas: 3,
+    resposta: total, unidadeResposta: "ml",
+    opcoes: opts(total, "ml", [
+      // Operar sem converter os litros: sobra só a conta dos mililitros.
+      { value: retirado - acrescentado, misconception: ProblemasMedidaMisconception.COMPARA_SEM_CONVERTER },
+      // Trocar retirar por acrescentar.
+      { value: emMl + retirado - acrescentado, misconception: ProblemasMedidaMisconception.INVERTE_OPERACAO },
+      { value: litros, misconception: ProblemasMedidaMisconception.MISTURA_GRANDEZAS },
+    ]),
   };
 }
 
-/**
- * Em F82 a conversão às vezes É a resposta (L1-L3) e às vezes é só o degrau de
- * um problema de duas etapas (L4-L5). No primeiro caso escrevê-la na tela
- * entrega o gabarito; no segundo ela é andaime legítimo.
- */
 export function conversaoEhARespostaF82(spec: ProblemasMedidaF82Spec): boolean {
   return spec.resposta === spec.conversao.valorConvertido;
 }
@@ -130,11 +186,14 @@ export function construirProblemasMedidaQuestion(ficha: FichaCompetencia, level:
   const id = ficha.niveis?.[spec.nivel]?.micro;
   const micro = ficha.micros.find(x => x.id === id);
   if (!micro) throw new Error(`GM.09 sem micro L${spec.nivel}.`);
-  const prompt = spec.modo === "converter-comprimento" ? "2 metros representam quantos centímetros?"
-    : spec.modo === "converter-grandezas" ? "3 quilogramas representam quantos gramas?"
-    : spec.modo === "comparar-apos-converter" ? "Converta 2 m para centímetros antes de comparar com 150 cm. Qual é a medida de 2 m em cm?"
-    : spec.modo === "operar-unidades-mistas" ? "Converta 1 m para centímetros e some 75 cm. Qual é o total?"
-    : "Há 2 L. Retire 500 ml e depois acrescente 250 ml. Quantos mililitros restam?";
+  const { valorInicial, de, para } = spec.conversao;
+  const outra = spec.valoresOriginais?.[1];
+  const acrescentado = spec.nivel === 5 ? spec.resposta - (spec.conversao.valorConvertido - (outra?.valor ?? 0)) : 0;
+  const prompt = spec.modo === "converter-comprimento" ? `${valorInicial} metros representam quantos centímetros?`
+    : spec.modo === "converter-grandezas" ? `${valorInicial} quilogramas representam quantos gramas?`
+    : spec.modo === "comparar-apos-converter" ? `Converta ${valorInicial} ${de} para centímetros antes de comparar com ${outra?.valor} ${para}. Qual é a medida de ${valorInicial} ${de} em ${para}?`
+    : spec.modo === "operar-unidades-mistas" ? `Converta ${valorInicial} ${de} para centímetros e some ${outra?.valor} ${para}. Qual é o total?`
+    : `Há ${valorInicial} L. Retire ${outra?.valor} ml e depois acrescente ${acrescentado} ml. Quantos mililitros restam?`;
   const options: Option[] = spec.opcoes;
   return { kind: "problemas-medida-f82", prompt, audioPrompt: prompt, howto: ficha.howto, explain: ficha.explain, tutorial: normalizeFichaTutorial(micro.params.tutorial), resolucao: construirProblemasMedidaResolucao(spec), masteryRule: mastery(ficha, spec.nivel), uiProps: spec, options, answer: spec.resposta, evaluate: a => Number(a) === spec.resposta };
 }

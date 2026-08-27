@@ -28,6 +28,13 @@ export interface IgualdadeEquilibrioF46Spec {
 interface Show { esquerda: IgualdadeTermo[]; direita: IgualdadeTermo[]; equacao: string; equilibrar?: boolean; destacarIgual?: boolean; }
 
 const clamp = (n: number) => Math.max(1, Math.min(5, Math.round(n)));
+/** Inteiro no intervalo, pelo mesmo `rng` injetado que o resto do contrato usa. */
+function ri(min: number, max: number, rng: () => number): number {
+  const bruto = rng();
+  const seguro = Number.isFinite(bruto) ? Math.max(0, Math.min(0.999999, bruto)) : 0;
+  return min + Math.floor(seguro * (max - min + 1));
+}
+
 function escolher<T>(xs: readonly T[], rng: () => number): T {
   const raw = rng();
   const safe = Number.isFinite(raw) ? Math.max(0, Math.min(0.999999, raw)) : 0;
@@ -60,16 +67,25 @@ export function construirIgualdadeEquilibrioSpec(level: number, rng: () => numbe
   let equacao: string;
 
   if (nivel === 1) {
-    modo = "igualdade-simples"; caso = "3-igual-caixa"; esquerda = [{ valor: 3 }]; direita = [{ valor: 3, oculto: true }]; resposta = 3; equacao = "3 = □";
+    // O peso é sorteado; o que o nível ensina é que a caixa vale o MESMO que
+    // está do outro lado, e isso não depende de qual número está lá.
+    const peso = ri(2, 9, rng);
+    modo = "igualdade-simples"; caso = `${peso}-igual-caixa`; esquerda = [{ valor: peso }]; direita = [{ valor: peso, oculto: true }]; resposta = peso; equacao = `${peso} = □`;
   } else if (nivel === 2) {
-    modo = "soma-um-lado"; caso = "3-mais-2-igual-caixa"; esquerda = [{ valor: 3 }, { valor: 2 }]; direita = [{ valor: 5, oculto: true }]; resposta = 5; equacao = "3 + 2 = □";
+    const primeira = ri(2, 8, rng);
+    const segunda = ri(2, 8, rng);
+    modo = "soma-um-lado"; caso = `${primeira}-mais-${segunda}-igual-caixa`; esquerda = [{ valor: primeira }, { valor: segunda }]; direita = [{ valor: primeira + segunda, oculto: true }]; resposta = primeira + segunda; equacao = `${primeira} + ${segunda} = □`;
   } else if (nivel === 3) {
-    modo = "incognita-meio"; caso = "3-mais-caixa-igual-7"; esquerda = [{ valor: 3 }, { valor: 4, oculto: true }]; direita = [{ valor: 7 }]; resposta = 4; equacao = "3 + □ = 7";
+    const visivel = ri(2, 8, rng);
+    const escondida = ri(2, 8, rng);
+    modo = "incognita-meio"; caso = `${visivel}-mais-caixa-igual-${visivel + escondida}`; esquerda = [{ valor: visivel }, { valor: escondida, oculto: true }]; direita = [{ valor: visivel + escondida }]; resposta = escondida; equacao = `${visivel} + □ = ${visivel + escondida}`;
   } else if (nivel === 4) {
     const escolhido = escolher(CASOS_L4, rng);
     modo = "somas-dois-lados"; caso = escolhido.caso; esquerda = escolhido.esquerda.map(item => ({ ...item })); direita = escolhido.direita.map(item => ({ ...item })); resposta = escolhido.resposta; equacao = escolhido.equacao;
   } else {
-    modo = "saco-fechado"; caso = "saco-mais-3-igual-8"; esquerda = [{ valor: 5, oculto: true, saco: true }, { valor: 3 }]; direita = [{ valor: 8 }]; resposta = 5; equacao = "saco + 3 = 8";
+    const foraDoSaco = ri(2, 8, rng);
+    const dentroDoSaco = ri(2, 8, rng);
+    modo = "saco-fechado"; caso = `saco-mais-${foraDoSaco}-igual-${foraDoSaco + dentroDoSaco}`; esquerda = [{ valor: dentroDoSaco, oculto: true, saco: true }, { valor: foraDoSaco }]; direita = [{ valor: foraDoSaco + dentroDoSaco }]; resposta = dentroDoSaco; equacao = `saco + ${foraDoSaco} = ${foraDoSaco + dentroDoSaco}`;
   }
 
   return { nivel, modo, caso, esquerda, direita, resposta, equacao, opcoes: alternativas(resposta) };

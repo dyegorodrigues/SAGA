@@ -16,7 +16,11 @@ export interface LinguagemLetrasF89Spec {
   modo: LinguagemLetrasModo;
   enunciadoVisual: string;
   expressao: string;
-  letra: "n";
+  /**
+   * A letra que generaliza. Era o literal `"n"` — o tipo prendia o contrato a
+   * uma letra só, e prender a letra é prender a resposta de L1.
+   */
+  letra: string;
   tabela?: Array<{ n: number; valor: number }>;
   barraPartes: number;
   barraDestaque: number;
@@ -40,90 +44,155 @@ const opts = (correta: string, erradas: Array<{ value: string; misconception: Li
     .filter((item, index, all) => all.findIndex(other => other.value === item.value) === index)
     .slice(0, 4);
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+
+/**
+ * A letra, e o objeto cujo nome começa por ela.
+ *
+ * O objeto é o distrator `LETRA_COMO_OBJETO`: a criança que lê a letra como
+ * abreviação de uma coisa — "n de nozes" — em vez de um número qualquer.
+ */
+const LETRAS_F89 = [
+  { letra: "n", objeto: "nozes" },
+  { letra: "x", objeto: "xícaras" },
+  { letra: "k", objeto: "kiwis" },
+  { letra: "a", objeto: "abelhas" },
+  { letra: "m", objeto: "maçãs" },
+  { letra: "p", objeto: "peras" },
+] as const;
+
+const CONTEXTOS_F89 = [
+  { recipiente: "pacote", coisa: "figurinhas" },
+  { recipiente: "caixa", coisa: "lápis" },
+  { recipiente: "cesta", coisa: "ovos" },
+  { recipiente: "saco", coisa: "bolinhas" },
+] as const;
+
+const MULTIPLOS_F89: Record<number, string> = { 2: "dobro", 3: "triplo", 4: "quádruplo", 5: "quíntuplo" };
+
+/**
+ * CLASS-003 — a letra muda, o que se generaliza não.
+ *
+ * A resposta era sempre n, 2n, 3n, 2n+1 e 4n. Decorar cinco escritas vencia a
+ * competência sem a criança generalizar uma vez.
+ *
+ * O degrau continua sendo O QUE se generaliza: a letra no lugar da caixa, um
+ * múltiplo, o múltiplo num contexto, a regra de um padrão, e a soma de dois
+ * múltiplos. O coeficiente e a letra é que passam a ser sorteados.
+ */
 export function construirLinguagemLetrasSpec(level: number): LinguagemLetrasF89Spec {
   const nivel = clamp(level);
+  const { letra, objeto } = escolher(LETRAS_F89);
+  const primitivas = ["SingaporeBars", "plain"] as ["SingaporeBars", "plain"];
+
   if (nivel === 1) return {
     nivel,
     modo: "caixa-vira-letra",
     enunciadoVisual: "A caixa vazia guarda um número. Qual símbolo pode guardar esse mesmo lugar?",
     expressao: "□ → ?",
-    letra: "n",
+    letra,
     barraPartes: 4,
     barraDestaque: 1,
-    primitivas: ["SingaporeBars", "plain"],
-    resposta: "n",
-    opcoes: opts("n", [
-      { value: "5", misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
-      { value: "nozes", misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
+    primitivas,
+    resposta: letra,
+    opcoes: opts(letra, [
+      { value: String(ri(2, 9)), misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
+      { value: objeto, misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
       { value: "?", misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
     ]),
   };
-  if (nivel === 2) return {
-    nivel,
-    modo: "expressao-simples",
-    enunciadoVisual: "Escreva o dobro de qualquer número n.",
-    expressao: "dobro de n",
-    letra: "n",
-    tabela: [{ n: 2, valor: 4 }, { n: 5, valor: 10 }],
-    barraPartes: 2,
-    barraDestaque: 2,
-    primitivas: ["SingaporeBars", "plain"],
-    resposta: "2n",
-    opcoes: opts("2n", [
-      { value: "n+2", misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
-      { value: "4", misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
-      { value: "nn", misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
-    ]),
-  };
-  if (nivel === 3) return {
-    nivel,
-    modo: "expressao-contexto",
-    enunciadoVisual: "Cada pacote tem n figurinhas. Quantas há em 3 pacotes?",
-    expressao: "3 pacotes × n figurinhas",
-    letra: "n",
-    tabela: [{ n: 2, valor: 6 }, { n: 4, valor: 12 }],
-    barraPartes: 3,
-    barraDestaque: 3,
-    primitivas: ["SingaporeBars", "plain"],
-    resposta: "3n",
-    opcoes: opts("3n", [
-      { value: "n+3", misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
-      { value: "6", misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
-      { value: "3 figurinhas", misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
-    ]),
-  };
-  if (nivel === 4) return {
-    nivel,
-    modo: "regra-padrao",
-    enunciadoVisual: "A tabela cresce 3, 5, 7, 9... Qual regra produz qualquer linha?",
-    expressao: "n → 3, 5, 7, 9...",
-    letra: "n",
-    tabela: [{ n: 1, valor: 3 }, { n: 2, valor: 5 }, { n: 3, valor: 7 }, { n: 4, valor: 9 }],
-    barraPartes: 5,
-    barraDestaque: 3,
-    primitivas: ["SingaporeBars", "plain"],
-    resposta: "2n+1",
-    opcoes: opts("2n+1", [
-      { value: "n+2", misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
-      { value: "7", misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
-      { value: "número ímpar", misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
-    ]),
-  };
+
+  if (nivel === 2) {
+    const fator = ri(2, 5);
+    const caso = ri(2, 6);
+    return {
+      nivel,
+      modo: "expressao-simples",
+      enunciadoVisual: `Escreva o ${MULTIPLOS_F89[fator]} de qualquer número ${letra}.`,
+      expressao: `${MULTIPLOS_F89[fator]} de ${letra}`,
+      letra,
+      tabela: [{ n: caso, valor: caso * fator }, { n: caso + 3, valor: (caso + 3) * fator }],
+      barraPartes: fator,
+      barraDestaque: fator,
+      primitivas,
+      resposta: `${fator}${letra}`,
+      opcoes: opts(`${fator}${letra}`, [
+        { value: `${letra}+${fator}`, misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
+        { value: String(caso * fator), misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
+        { value: `${letra}${letra}`, misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
+      ]),
+    };
+  }
+
+  if (nivel === 3) {
+    const { recipiente, coisa } = escolher(CONTEXTOS_F89);
+    const quantos = ri(2, 5);
+    const caso = ri(2, 6);
+    return {
+      nivel,
+      modo: "expressao-contexto",
+      enunciadoVisual: `Cada ${recipiente} tem ${letra} ${coisa}. Quantas há em ${quantos} ${recipiente}s?`,
+      expressao: `${quantos} ${recipiente}s × ${letra} ${coisa}`,
+      letra,
+      tabela: [{ n: caso, valor: caso * quantos }, { n: caso + 2, valor: (caso + 2) * quantos }],
+      barraPartes: quantos,
+      barraDestaque: quantos,
+      primitivas,
+      resposta: `${quantos}${letra}`,
+      opcoes: opts(`${quantos}${letra}`, [
+        { value: `${letra}+${quantos}`, misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
+        { value: String(caso * quantos), misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
+        { value: `${quantos} ${coisa}`, misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
+      ]),
+    };
+  }
+
+  if (nivel === 4) {
+    // Um padrão aritmético: passo e ponto de partida sorteados. A regra é
+    // `passo·n + inicial`, e a tabela nasce dela — não de uma lista escrita.
+    const passo = ri(2, 4);
+    const constante = ri(1, 5);
+    const linhas = [1, 2, 3, 4].map(n => ({ n, valor: passo * n + constante }));
+    return {
+      nivel,
+      modo: "regra-padrao",
+      enunciadoVisual: `A tabela cresce ${linhas.map(linha => linha.valor).join(", ")}... Qual regra produz qualquer linha?`,
+      expressao: `${letra} → ${linhas.map(linha => linha.valor).join(", ")}...`,
+      letra,
+      tabela: linhas,
+      barraPartes: passo + 1,
+      barraDestaque: passo,
+      primitivas,
+      resposta: `${passo}${letra}+${constante}`,
+      opcoes: opts(`${passo}${letra}+${constante}`, [
+        // Somar o passo em vez de multiplicar por ele: acerta uma linha e
+        // erra as outras, que é exatamente não generalizar.
+        { value: `${letra}+${passo}`, misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
+        { value: String(linhas[2].valor), misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
+        { value: constante % 2 === 1 ? "número ímpar" : "número par", misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
+      ]),
+    };
+  }
+
+  const parcela = ri(2, 4);
+  const caso = ri(2, 5);
+  const total = parcela * 2;
   return {
     nivel,
     modo: "equivalencia-expressoes",
-    enunciadoVisual: "Duas barras mostram 2n + 2n. Qual escrita representa a mesma quantidade?",
-    expressao: "2n + 2n",
-    letra: "n",
-    tabela: [{ n: 2, valor: 8 }, { n: 5, valor: 20 }],
-    barraPartes: 4,
-    barraDestaque: 4,
-    primitivas: ["SingaporeBars", "plain"],
-    resposta: "4n",
-    opcoes: opts("4n", [
-      { value: "4n²", misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
-      { value: "8", misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
-      { value: "2n+2", misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
+    enunciadoVisual: `Duas barras mostram ${parcela}${letra} + ${parcela}${letra}. Qual escrita representa a mesma quantidade?`,
+    expressao: `${parcela}${letra} + ${parcela}${letra}`,
+    letra,
+    tabela: [{ n: caso, valor: caso * total }, { n: caso + 3, valor: (caso + 3) * total }],
+    barraPartes: total,
+    barraDestaque: total,
+    primitivas,
+    resposta: `${total}${letra}`,
+    opcoes: opts(`${total}${letra}`, [
+      { value: `${total}${letra}²`, misconception: LinguagemLetrasMisconception.LETRA_COMO_OBJETO },
+      { value: String(caso * total), misconception: LinguagemLetrasMisconception.SO_CASO_PARTICULAR },
+      { value: `${parcela}${letra}+${parcela}`, misconception: LinguagemLetrasMisconception.NAO_GENERALIZA },
     ]),
   };
 }

@@ -23,18 +23,124 @@ export interface ExpressaoF77Spec {
 }
 interface ExpressaoF77Show { expressao: string; ladoDireito: string; prioridade: string; destacarPrioridade?: boolean; colapsarPrioridade?: boolean; equilibrar?: boolean }
 
-const specs: readonly ExpressaoF77Spec[] = [
-  { nivel: 1, modo: "mesma-ordem", expressao: "18 ÷ 3 × 2", ladoDireito: "?", prioridade: "18 ÷ 3", resposta: 12, opcoes: [{ value: 12, label: "12" }, { value: 3, label: "3" }, { value: 9, label: "9" }, { value: 18, label: "18" }] },
-  { nivel: 2, modo: "precedencia", expressao: "2 + 3 × 4", ladoDireito: "?", prioridade: "3 × 4", resposta: 14, opcoes: [{ value: 14, label: "14" }, { value: 20, label: "20", misconception: ExpressaoF77Misconception.RESOLVE_DA_ESQUERDA }, { value: 24, label: "24" }, { value: 9, label: "9" }] },
-  { nivel: 3, modo: "parenteses", expressao: "(2 + 3) × 4", ladoDireito: "?", prioridade: "(2 + 3)", resposta: 20, opcoes: [{ value: 20, label: "20" }, { value: 14, label: "14", misconception: ExpressaoF77Misconception.IGNORA_PARENTESES }, { value: 24, label: "24" }, { value: 18, label: "18" }] },
-  { nivel: 4, modo: "incognita-meio", expressao: "3 + □ × 2", ladoDireito: "11", prioridade: "□ × 2", resposta: 4, opcoes: [{ value: 4, label: "4" }, { value: 8, label: "8", misconception: ExpressaoF77Misconception.SO_INCOGNITA_NO_FIM }, { value: 7, label: "7" }, { value: 2, label: "2" }] },
-  { nivel: 5, modo: "propriedades", expressao: "(4 + 3) × 5", ladoDireito: "4 × 5 + 3 × 5", prioridade: "distributiva", resposta: 35, opcoes: [{ value: 35, label: "35" }, { value: 27, label: "27" }, { value: 40, label: "40" }, { value: 20, label: "20" }] },
-] as const;
-
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
 const clamp = (n: number) => Math.max(1, Math.min(5, Math.round(n)));
+
+/**
+ * As quatro alternativas, se e só se forem quatro números distintos e positivos.
+ *
+ * Devolve `null` quando o sorteio colidiu — é o chamador que tenta de novo. Um
+ * remendo no valor deslocaria o distrator para longe do erro que ele nomeia, e
+ * a alternativa deixaria de descrever alguém.
+ */
+function alternativas(certa: number, erradas: ExpressaoF77Opcao[]): ExpressaoF77Opcao[] | null {
+  const todas = [{ value: certa, label: String(certa) }, ...erradas];
+  const valores = todas.map(item => item.value);
+  if (new Set(valores).size !== todas.length) return null;
+  if (valores.some(valor => valor <= 0 || !Number.isInteger(valor))) return null;
+  return todas;
+}
+const erro = (value: number, misconception?: ExpressaoF77MisconceptionTag): ExpressaoF77Opcao =>
+  ({ value, label: String(value), ...(misconception ? { misconception } : {}) });
+
+/**
+ * CLASS-003 — os números mudam, a ordem não.
+ *
+ * A expressão era uma só por nível: 18÷3×2, 2+3×4, (2+3)×4, 3+□×2=11 e
+ * (4+3)×5. As respostas certas eram 12, 14, 20, 4 e 35, para sempre.
+ *
+ * A escada é a ORDEM que cada nível ensina — mesma ordem, precedência,
+ * parênteses, incógnita no meio, distributiva — e a forma da expressão continua
+ * a mesma em cada degrau. O que passa a variar são os números dentro dela.
+ */
 export function construirExpressaoF77Spec(level: number): ExpressaoF77Spec {
-  const spec = specs[clamp(level) - 1];
-  return { ...spec, opcoes: spec.opcoes.map(option => ({ ...option })) };
+  const nivel = clamp(level);
+
+  for (let tentativa = 0; tentativa < 200; tentativa += 1) {
+    if (nivel === 1) {
+      // A divisão precisa ser exata: "mesma ordem" com resto produziria um
+      // número quebrado que o nível ainda não sabe escrever.
+      const divisor = ri(2, 9);
+      const quociente = ri(2, 9);
+      const dividendo = divisor * quociente;
+      const fator = ri(2, 9);
+      const opcoes = alternativas(quociente * fator, [
+        erro(quociente), erro(dividendo), erro(divisor * fator),
+      ]);
+      if (!opcoes) continue;
+      return {
+        nivel, modo: "mesma-ordem", expressao: `${dividendo} ÷ ${divisor} × ${fator}`,
+        ladoDireito: "?", prioridade: `${dividendo} ÷ ${divisor}`,
+        resposta: quociente * fator, opcoes,
+      };
+    }
+
+    if (nivel === 2) {
+      const parcela = ri(2, 9);
+      const fatorA = ri(2, 9);
+      const fatorB = ri(2, 9);
+      const opcoes = alternativas(parcela + fatorA * fatorB, [
+        // Somar antes de multiplicar: o erro que o nível existe para pegar.
+        erro((parcela + fatorA) * fatorB, ExpressaoF77Misconception.RESOLVE_DA_ESQUERDA),
+        erro(fatorA * fatorB), erro(parcela + fatorA),
+      ]);
+      if (!opcoes) continue;
+      return {
+        nivel, modo: "precedencia", expressao: `${parcela} + ${fatorA} × ${fatorB}`,
+        ladoDireito: "?", prioridade: `${fatorA} × ${fatorB}`,
+        resposta: parcela + fatorA * fatorB, opcoes,
+      };
+    }
+
+    if (nivel === 3) {
+      const primeira = ri(2, 9);
+      const segunda = ri(2, 9);
+      const fator = ri(2, 9);
+      const opcoes = alternativas((primeira + segunda) * fator, [
+        // Ignorar o parêntese devolve exatamente a conta de L2.
+        erro(primeira + segunda * fator, ExpressaoF77Misconception.IGNORA_PARENTESES),
+        erro(primeira * fator), erro(primeira + segunda + fator),
+      ]);
+      if (!opcoes) continue;
+      return {
+        nivel, modo: "parenteses", expressao: `(${primeira} + ${segunda}) × ${fator}`,
+        ladoDireito: "?", prioridade: `(${primeira} + ${segunda})`,
+        resposta: (primeira + segunda) * fator, opcoes,
+      };
+    }
+
+    if (nivel === 4) {
+      const parcela = ri(2, 9);
+      const fator = ri(2, 6);
+      const incognita = ri(2, 9);
+      const resultado = parcela + incognita * fator;
+      const opcoes = alternativas(incognita, [
+        // Quem trata a incógnita como último operando resolve "a + □ = total".
+        erro(resultado - parcela, ExpressaoF77Misconception.SO_INCOGNITA_NO_FIM),
+        erro(resultado - fator), erro(fator),
+      ]);
+      if (!opcoes) continue;
+      return {
+        nivel, modo: "incognita-meio", expressao: `${parcela} + □ × ${fator}`,
+        ladoDireito: String(resultado), prioridade: `□ × ${fator}`,
+        resposta: incognita, opcoes,
+      };
+    }
+
+    const primeira = ri(2, 9);
+    const segunda = ri(2, 9);
+    const fator = ri(2, 9);
+    const opcoes = alternativas((primeira + segunda) * fator, [
+      erro(primeira + segunda * fator), erro(primeira * fator), erro(segunda * fator),
+    ]);
+    if (!opcoes) continue;
+    return {
+      nivel, modo: "propriedades", expressao: `(${primeira} + ${segunda}) × ${fator}`,
+      ladoDireito: `${primeira} × ${fator} + ${segunda} × ${fator}`, prioridade: "distributiva",
+      resposta: (primeira + segunda) * fator, opcoes,
+    };
+  }
+  throw new Error(`AL.06 L${nivel}: não achei quatro alternativas distintas.`);
 }
 
 export function construirExpressaoF77Resolucao(spec: ExpressaoF77Spec): ResolucaoDeclarativa<ExpressaoF77Show, number, ExpressaoF77MisconceptionTag> {

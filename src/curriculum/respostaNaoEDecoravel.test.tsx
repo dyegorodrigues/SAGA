@@ -49,10 +49,6 @@ import type { Question } from "../types";
  * também, para o registro encolher a cada reparo.
  */
 const REGISTRO: Record<string, { niveis: number[]; porque: string }> = {
-  "AL.05": { niveis: [1, 2, 3], porque: "o número que equilibra a balança é sempre o mesmo por nível" },
-  "AL.06": { niveis: [1, 2, 3, 4, 5], porque: "o valor da expressão é sempre o mesmo por nível" },
-  "AL.07": { niveis: [1, 2, 3, 4, 5], porque: "a letra generalizada é sempre a mesma por nível" },
-  "GM.09": { niveis: [1, 2, 3, 4, 5], porque: "o resultado do problema de medida é sempre o mesmo por nível" },
   "N2.06": { niveis: [1, 2, 3, 4, 5], porque: "a paridade perguntada é sempre a mesma por nível" },
   "N4.12": { niveis: [1, 2, 3, 4, 5], porque: "a casca desenha os nomes de erro como alternativas, e 'quociente ajustado' acerta sempre" },
   "N5.01": { niveis: [2], porque: "as duas partes de L2 são sempre iguais: 'encaixam' acerta sempre" },
