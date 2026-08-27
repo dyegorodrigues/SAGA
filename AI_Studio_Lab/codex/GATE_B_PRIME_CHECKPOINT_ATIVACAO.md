@@ -4,6 +4,11 @@ Data: 2026-08-21
 Fase: **Gate B′ — reparação das saídas CODIGO do Gate B**  
 Base certificada: `c710719cbd50f0f1eef4cc82536a1264da7daf67`
 
+> **Chegando agora?** A seção 13 diz onde a fase está: quais classes fecharam,
+> quais gates vigiam o quê e as duas coisas que continuam abertas. As seções 1 a
+> 3 são o começo desta fase e ficaram como estavam — o livro de reparos é
+> append-only, e ler as decisões na ordem em que foram tomadas é o ponto dele.
+
 ## 1. Motivo
 
 Gate B foi encerrado e certificado: 90/90 competências auditadas, 54 candidatas individuais ativas (49 CODIGO / 1 SIMULACAO / 4 CRIANCA), oito classes estruturais e zero correções funcionais dentro da auditoria.
