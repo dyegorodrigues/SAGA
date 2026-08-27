@@ -15,7 +15,13 @@ export interface EstatisticaChanceF95Spec {
   acessibilidade: { toqueAlternativo: true; semArrastoObrigatorio: true; alvoMinPx: 80; erroMotorNaoTag: true };
   favoraveis: number;
   total: number;
+  /** O que a caixa de L1 guarda — o enunciado nasce dela. */
+  caixa?: { conteudo: string; procurado: string };
+  /** Os dois sacos de L2. O palco desenha estes, não números escritos à mão. */
+  sacos?: Array<{ label: string; favoraveis: number; total: number }>;
   historico?: string[];
+  /** De que experimento L4 fala — a falácia é sobre ele, e o palco o nomeia. */
+  experimento?: { nome: string; artigo: string; resultados: string[] };
   grade?: { linhas: number; colunas: number; rotulosLinhas: string[]; rotulosColunas: string[] };
   resposta: string | number;
   opcoes: Array<{ value: string | number; label: string; misconception?: EstatisticaChanceMisconceptionTag }>;
@@ -31,30 +37,138 @@ function opts(correta: string | number, erradas: Array<{ value: string | number;
     .slice(0, 4);
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+
+/**
+ * CLASS-003 — o experimento é sorteado, a escada não.
+ *
+ * As respostas certas eram "certo", "Saco B", "3/5", "continua 1/2" e 6, nessa
+ * ordem, em todo sorteio. Cinco rótulos decorados venciam a competência.
+ *
+ * O degrau continua sendo o que cada nível pergunta: nomear a certeza, comparar
+ * dois sacos, escrever a fração, resistir à falácia do apostador e contar
+ * combinações numa grade.
+ */
+const CAIXAS_F95: readonly { conteudo: string; procurado: string }[] = [
+  { conteudo: "fichas azuis", procurado: "uma ficha azul" },
+  { conteudo: "bolas vermelhas", procurado: "uma bola vermelha" },
+  { conteudo: "cartas de copas", procurado: "uma carta de copas" },
+  { conteudo: "botões amarelos", procurado: "um botão amarelo" },
+];
+const EXPERIMENTOS_F95: readonly { nome: string; artigo: string; resultados: string[]; favoraveis: number; total: number }[] = [
+  { nome: "moeda justa", artigo: "uma", resultados: ["cara", "coroa"], favoraveis: 1, total: 2 },
+  { nome: "dado justo", artigo: "um", resultados: ["1", "2", "3", "4", "5", "6"], favoraveis: 1, total: 6 },
+  { nome: "roleta de três cores", artigo: "uma", resultados: ["azul", "verde", "amarelo"], favoraveis: 1, total: 3 },
+  { nome: "roleta de quatro cores", artigo: "uma", resultados: ["azul", "verde", "amarelo", "vermelho"], favoraveis: 1, total: 4 },
+];
+const PECAS_F95: readonly { nome: string; itens: string[] }[] = [
+  { nome: "camisa", itens: ["camisa A", "camisa B", "camisa C", "camisa D"] },
+  { nome: "calça", itens: ["calça 1", "calça 2", "calça 3", "calça 4"] },
+  { nome: "boné", itens: ["boné curto", "boné longo", "boné listrado", "boné liso"] },
+  { nome: "tênis", itens: ["tênis branco", "tênis preto", "tênis azul", "tênis verde"] },
+];
+
 export function construirEstatisticaChanceF95Spec(level: number): EstatisticaChanceF95Spec {
   const nivel = clamp(level);
   const base = { ficha: "F95" as const, nivel, primitivas: ["SingaporeBars", "ArrayGrid"] as ["SingaporeBars", "ArrayGrid"], acessibilidade };
-  if (nivel === 1) return {
-    ...base, modo: "certo-possivel-impossivel", favoraveis: 6, total: 6, resposta: "certo",
-    opcoes: opts("certo", [{ value: "possível", misconception: EstatisticaChanceMisconception.TUDO_CINQUENTA }, { value: "impossível" }]),
-  };
-  if (nivel === 2) return {
-    ...base, modo: "mais-menos-provavel", favoraveis: 4, total: 6, resposta: "Saco B",
-    opcoes: opts("Saco B", [{ value: "Saco A", misconception: EstatisticaChanceMisconception.TUDO_CINQUENTA }, { value: "iguais" }]),
-  };
-  if (nivel === 3) return {
-    ...base, modo: "chance-fracao", favoraveis: 3, total: 5, resposta: "3/5",
-    opcoes: opts("3/5", [{ value: "3/3", misconception: EstatisticaChanceMisconception.IGNORA_TOTAL }, { value: "5/3", misconception: EstatisticaChanceMisconception.IGNORA_TOTAL }]),
-  };
-  if (nivel === 4) return {
-    ...base, modo: "frequencia-independencia", favoraveis: 1, total: 2, historico: ["cara", "cara", "cara", "cara", "coroa"], resposta: "continua 1/2",
-    opcoes: opts("continua 1/2", [{ value: "agora coroa é mais provável", misconception: EstatisticaChanceMisconception.FALACIA_APOSTADOR }, { value: "agora cara é mais provável", misconception: EstatisticaChanceMisconception.FALACIA_APOSTADOR }]),
-  };
+
+  if (nivel === 1) {
+    // Só os dois extremos: a caixa tem tudo do que se procura, ou não tem nada.
+    //
+    // O caso do meio faria "possível" ser a resposta em parte dos sorteios — e
+    // "possível" é a casa do TUDO_CINQUENTA, quem responde "pode ser" para tudo.
+    // Naquela rodada o distrator ficaria sem casa e a tela não diagnosticaria
+    // nada. Nomear a certeza é o degrau; a chance intermediária é L2 em diante.
+    const caixa = escolher(CAIXAS_F95);
+    const total = ri(4, 9);
+    const soTem = Math.random() < 0.5;
+    return {
+      ...base, modo: "certo-possivel-impossivel", favoraveis: soTem ? total : 0, total, caixa,
+      resposta: soTem ? "certo" : "impossível",
+      opcoes: opts(soTem ? "certo" : "impossível", [
+        { value: "possível", misconception: EstatisticaChanceMisconception.TUDO_CINQUENTA },
+        { value: soTem ? "impossível" : "certo" },
+      ]),
+    };
+  }
+
+  if (nivel === 2) {
+    // Mesmo total nos dois sacos: o degrau é comparar favoráveis, não converter
+    // frações — isso é L3. Qual saco ganha é sorteado; deixar sempre o B faria a
+    // resposta ser sempre "Saco B", que é a CLASS-003 de novo.
+    const total = ri(5, 9);
+    const maior = ri(2, total - 1);
+    const menor = ri(1, maior - 1);
+    const certoEhA = Math.random() < 0.5;
+    const sacos = [
+      { label: "Saco A", favoraveis: certoEhA ? maior : menor, total },
+      { label: "Saco B", favoraveis: certoEhA ? menor : maior, total },
+    ];
+    return {
+      ...base, modo: "mais-menos-provavel", favoraveis: maior, total, sacos,
+      resposta: certoEhA ? "Saco A" : "Saco B",
+      opcoes: opts(certoEhA ? "Saco A" : "Saco B", [
+        // Quem acha que tudo é cinquenta por cento responde "iguais". A tag
+        // estava no saco errado: ninguém que comete esse erro escolhe um saco.
+        { value: "iguais", misconception: EstatisticaChanceMisconception.TUDO_CINQUENTA },
+        { value: certoEhA ? "Saco B" : "Saco A" },
+      ]),
+    };
+  }
+
+  if (nivel === 3) {
+    const total = ri(4, 9);
+    const favoraveis = ri(2, total - 1);
+    return {
+      ...base, modo: "chance-fracao", favoraveis, total, resposta: `${favoraveis}/${total}`,
+      opcoes: opts(`${favoraveis}/${total}`, [
+        { value: `${favoraveis}/${favoraveis}`, misconception: EstatisticaChanceMisconception.IGNORA_TOTAL },
+        { value: `${total}/${favoraveis}`, misconception: EstatisticaChanceMisconception.IGNORA_TOTAL },
+      ]),
+    };
+  }
+
+  if (nivel === 4) {
+    const experimento = escolher(EXPERIMENTOS_F95);
+    // Um histórico desequilibrado é o que convida à falácia: sem uma sequência
+    // que "está devendo" um resultado, não há apostador a desmentir.
+    const insistente = escolher(experimento.resultados);
+    const outro = escolher(experimento.resultados.filter(r => r !== insistente));
+    const historico = [...Array.from({ length: ri(3, 4) }, () => insistente), outro];
+    return {
+      ...base, modo: "frequencia-independencia",
+      favoraveis: experimento.favoraveis, total: experimento.total,
+      historico, experimento: { nome: experimento.nome, artigo: experimento.artigo, resultados: experimento.resultados },
+      resposta: `continua ${experimento.favoraveis}/${experimento.total}`,
+      opcoes: opts(`continua ${experimento.favoraveis}/${experimento.total}`, [
+        { value: `agora ${outro} é mais provável`, misconception: EstatisticaChanceMisconception.FALACIA_APOSTADOR },
+        { value: `agora ${insistente} é mais provável`, misconception: EstatisticaChanceMisconception.FALACIA_APOSTADOR },
+      ]),
+    };
+  }
+
+  // A grade é linhas × colunas, e somar precisa dar outro número: com 2×2 a
+  // soma bate com o produto e o erro mais comum do nível acerta por acidente.
+  // Duas peças distintas, sorteadas sem comparador aleatório: o `sort` com
+  // `Math.random() - 0.5` é a CLASS-005, e o gate do repositório o proíbe em
+  // src/ inteiro — ele não embaralha uniformemente e concentra posições.
+  const iPrimeira = ri(0, PECAS_F95.length - 1);
+  const primeira = PECAS_F95[iPrimeira];
+  const segunda = PECAS_F95[(iPrimeira + ri(1, PECAS_F95.length - 1)) % PECAS_F95.length];
+  let linhas = ri(2, 4);
+  let colunas = ri(2, 4);
+  while (linhas + colunas === linhas * colunas || linhas === colunas) colunas = ri(2, 4);
+  const combinacoes = linhas * colunas;
   return {
-    ...base, modo: "contar-possibilidades", favoraveis: 6, total: 6,
-    grade: { linhas: 3, colunas: 2, rotulosLinhas: ["camisa A", "camisa B", "camisa C"], rotulosColunas: ["calça 1", "calça 2"] },
-    resposta: 6,
-    opcoes: opts(6, [{ value: 5 }, { value: 3, misconception: EstatisticaChanceMisconception.IGNORA_TOTAL }, { value: 2 }]),
+    ...base, modo: "contar-possibilidades", favoraveis: combinacoes, total: combinacoes,
+    grade: { linhas, colunas, rotulosLinhas: primeira.itens.slice(0, linhas), rotulosColunas: segunda.itens.slice(0, colunas) },
+    resposta: combinacoes,
+    opcoes: opts(combinacoes, [
+      { value: linhas + colunas },
+      { value: linhas, misconception: EstatisticaChanceMisconception.IGNORA_TOTAL },
+      { value: colunas },
+    ]),
   };
 }
 
@@ -87,11 +201,16 @@ export function construirEstatisticaChanceQuestion(ficha: FichaCompetencia, leve
   if (ficha.id !== "PE.04") throw new Error(`estatisticaChanceContract recebeu ${ficha.id}.`);
   const spec = construirEstatisticaChanceF95Spec(level);
   const { micro, rule } = mastery(ficha, spec.nivel);
-  const prompt = spec.modo === "certo-possivel-impossivel" ? "Se uma caixa contém apenas fichas azuis, tirar uma ficha azul é certo, possível ou impossível?"
-    : spec.modo === "mais-menos-provavel" ? "Qual saco é mais provável de dar uma ficha marcada: A com 2 de 6 ou B com 4 de 6?"
-    : spec.modo === "chance-fracao" ? "Há 3 resultados favoráveis entre 5 resultados possíveis. Qual fração representa essa chance?"
-    : spec.modo === "frequencia-independencia" ? "Depois desse histórico de moeda justa, qual é a chance de cara na próxima jogada?"
-    : "Com 3 camisas e 2 calças, quantas combinações diferentes podem ser formadas?";
+  const caixa = spec.caixa;
+  const sacos = spec.sacos ?? [];
+  const grade = spec.grade;
+  const prompt = spec.modo === "certo-possivel-impossivel"
+    ? `Se uma caixa contém ${spec.favoraveis === 0 ? `apenas peças que não são ${caixa?.conteudo}` : `apenas ${caixa?.conteudo}`}, tirar ${caixa?.procurado} é certo, possível ou impossível?`
+    : spec.modo === "mais-menos-provavel"
+      ? `Qual saco é mais provável de dar uma ficha marcada: ${sacos.map(saco => `${saco.label.replace("Saco ", "")} com ${saco.favoraveis} de ${saco.total}`).join(" ou ")}?`
+    : spec.modo === "chance-fracao" ? `Há ${spec.favoraveis} resultados favoráveis entre ${spec.total} resultados possíveis. Qual fração representa essa chance?`
+    : spec.modo === "frequencia-independencia" ? `Depois desse histórico de ${spec.experimento?.nome}, qual é a chance de ${spec.experimento?.resultados[0]} na próxima jogada?`
+    : `Com ${grade?.linhas} ${grade?.rotulosLinhas[0].split(" ")[0]}s e ${grade?.colunas} ${grade?.rotulosColunas[0].split(" ")[0]}s, quantas combinações diferentes podem ser formadas?`;
   const options: Option[] = spec.opcoes;
   return {
     kind: "estatistica-chance-f95",

@@ -62,9 +62,6 @@ const REGISTRO: Record<string, { niveis: number[]; porque: string }> = {
   "N5.01": { niveis: [2], porque: "as duas partes de L2 são sempre iguais: 'encaixam' acerta sempre" },
   "N5.03": { niveis: [1, 2], porque: "os pares de L1/L2 são todos equivalentes: a resposta é sempre 'São iguais'" },
   "N5.04": { niveis: [1, 2, 3, 4, 5], porque: "a soma de frações dá sempre o mesmo resultado por nível" },
-  "PE.02": { niveis: [1, 2, 3, 4, 5], porque: "a leitura do gráfico dá sempre a mesma resposta por nível" },
-  "PE.03": { niveis: [1, 2, 3, 4, 5], porque: "a média e a chance dão sempre a mesma resposta por nível" },
-  "PE.04": { niveis: [1, 2, 3, 4, 5], porque: "a estatística e a chance dão sempre a mesma resposta por nível" },
 };
 
 const SEMENTES = [0x2f6e2b1, 0x5bd1e99];

@@ -40,7 +40,7 @@ function GradePossibilidades({ spec }: { spec: EstatisticaChanceF95Spec }) {
   );
 }
 
-function Historico({ historico }: { historico?: string[] }) {
+function Historico({ historico, experimento }: { historico?: string[]; experimento?: { nome: string; artigo: string } }) {
   if (!historico) return null;
   return (
     <div className="mx-auto max-w-xl rounded-3xl bg-amber-50 p-4" data-f95-history>
@@ -48,7 +48,9 @@ function Historico({ historico }: { historico?: string[] }) {
       <div className="flex flex-wrap justify-center gap-2" aria-label={`histórico: ${historico.join(", ")}`}>
         {historico.map((resultado, i) => <span key={`${resultado}-${i}`} className="rounded-full border-2 border-amber-300 bg-white px-4 py-2 font-black text-amber-900">{resultado}</span>)}
       </div>
-      <p className="mt-3 text-center text-sm font-bold text-amber-900">O histórico descreve o que aconteceu; ele não altera uma moeda justa na próxima jogada.</p>
+      <p className="mt-3 text-center text-sm font-bold text-amber-900">
+        O histórico descreve o que aconteceu; ele não altera {experimento?.artigo ?? "uma"} {experimento?.nome ?? "moeda justa"} na próxima jogada.
+      </p>
     </div>
   );
 }
@@ -74,13 +76,17 @@ export function EstatisticaChanceStage({ spec, disabled, onAnswer }: Props) {
 
         {spec.modo === "mais-menos-provavel" ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            <BarraChance favoraveis={2} total={6} label="Saco A" />
-            <BarraChance favoraveis={4} total={6} label="Saco B" />
+            {/* Os sacos vêm do spec. Estavam escritos à mão aqui — 2 de 6 e 4
+                de 6 —, e a barra desenhada teria passado a mentir sobre o
+                enunciado assim que a CLASS-003 sorteou o contrato. */}
+            {(spec.sacos ?? []).map(saco => (
+              <BarraChance key={saco.label} favoraveis={saco.favoraveis} total={saco.total} label={saco.label} />
+            ))}
           </div>
         ) : spec.modo === "contar-possibilidades" ? <GradePossibilidades spec={spec} /> : (
           <div className="space-y-4">
             <BarraChance favoraveis={spec.favoraveis} total={spec.total} label={spec.modo === "chance-fracao" ? "Casos da experiência" : "Resultados possíveis"} />
-            <Historico historico={spec.historico} />
+            <Historico historico={spec.historico} experimento={spec.experimento} />
           </div>
         )}
 

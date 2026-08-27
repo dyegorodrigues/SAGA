@@ -44,9 +44,15 @@ describe("W31 regression-first — PE.03/F83 Média e Chance", () => {
       expect(spec.meioBloco).toBe(false);
     }
 
+    // A chance e a média deixaram de ser o par fixo 3/5 e 4,5 desde a CLASS-003.
+    // O que a escada cobra continua: uma fração legível de casos favoráveis
+    // dentro do total, e uma média que cai entre dois números inteiros.
     const chance = generateRegisteredFichaQuestion("PE.03", 4).uiProps as any;
-    expect(chance.chance).toMatchObject({ favoraveis: 3, total: 5, fracao: "3/5" });
-    expect(chance.exemploMediaFracionaria).toMatchObject({ media: 4.5, meioBloco: true });
+    expect(chance.chance.favoraveis).toBeGreaterThan(0);
+    expect(chance.chance.favoraveis).toBeLessThan(chance.chance.total);
+    expect(chance.chance.fracao).toBe(`${chance.chance.favoraveis}/${chance.chance.total}`);
+    expect(chance.exemploMediaFracionaria.meioBloco).toBe(true);
+    expect(chance.exemploMediaFracionaria.media % 1).toBe(0.5);
 
     const comparar = generateRegisteredFichaQuestion("PE.03", 5).uiProps as any;
     expect(comparar.sacos).toHaveLength(2);

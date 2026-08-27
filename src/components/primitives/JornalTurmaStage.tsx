@@ -9,6 +9,9 @@ interface Props {
 }
 
 export function JornalTurmaStage({ spec, disabled, onAnswer }: Props) {
+  // A tabela é o dado da pesquisa; `valores` é a altura desenhada. Os dois só
+  // diferem em "completar-barra", onde a barra perguntada nasce vazia — e era
+  // aí que a tela mentia: o enunciado prometia o dado e a tabela mostrava zero.
   const max = Math.max(...spec.valores, 1);
   const send = (value: string | number, misconception?: string) =>
     onAnswer(value, misconception && String(value) !== String(spec.resposta) ? { misconception } : undefined);
@@ -23,7 +26,7 @@ export function JornalTurmaStage({ spec, disabled, onAnswer }: Props) {
             <div className="mb-2 text-xs font-black uppercase text-slate-500">Tabela</div>
             {spec.categorias.map((categoria, i) => (
               <div key={categoria} className="flex justify-between border-b border-slate-200 py-2 text-sm font-bold">
-                <span>{categoria}</span><span>{spec.valores[i]}</span>
+                <span>{categoria}</span><span>{spec.tabela[i]}</span>
               </div>
             ))}
           </div>
