@@ -72,6 +72,9 @@ A ordem é a ordem real dos commits; nada aqui é reescrito depois.
 | 34 | CLASS-010 — fechada | `4e658c6` | `4e658c6` | dezessete palcos param de vender o acerto por dois caminhos; gate por comportamento, com prova de vida |
 | 35 | CLASS-008 — fechada | `564cedd` | `564cedd` | emissão, transporte e aplicação da diversidade de famílias; oito níveis integradores, dois descobertos pelo gate |
 | 36 | D068 — inventário de portões medido | `54f59f7` | `54f59f7` | a lista escrita à mão vira medição com catraca; ela já estava três entradas atrás |
+| 37 | CLASS-004 — fechada | `8318a93` | `8318a93` | o lado certo deixa de ser sempre o mesmo em N6.01 L4; detector isolado e testado contra casos conhecidos |
+| 38 | CLASS-001 — fechada | `f82742a` | `f82742a` | o L3 de N4.06 volta a existir: o apoio deixa de ser cobrado de quem não pode tê-lo |
+| 39 | CLASS-002 — fechada exceto a DECISAO-001 | `7ce0e49` | `7ce0e49` | cinco fichas voltam a documentar os pré-requisitos que o DAG cobra; GM.04 fica com catraca |
 
 A linha 10 é a única cujo recibo vermelho e correção estão no mesmo commit: o
 achado apareceu ao medir o efeito do reparo de GE.04, já dentro da frente, e
@@ -436,7 +439,7 @@ alguém seja avisado.
 ## 11. Recibos desta rodada
 
 - `tsc --noEmit`: limpo;
-- suíte inteira: **3660/3660** em 295 arquivos;
+- suíte inteira: **3665/3665** em 298 arquivos;
 - `npm run auditar`: invariantes canônicos, guard documental, palcos compostos e
   matriz de cobertura aprovados;
 - catraca de densidade documental: piso subido a cada arquivo de runtime que
@@ -444,7 +447,8 @@ alguém seja avisado.
 - mutação: cada correção derruba o teste novo quando revertida. Nesta rodada, 5
   em GM.06, 4 no instrumento da CLASS-003, 11 nas fichas de PE, 11 nas de GE, 8
   em AL e GM.09, 9 nas últimas cinco da CLASS-003, 3 no gate da CLASS-010, 7 na
-  CLASS-008 e 4 no D068 — todas vermelhas.
+  CLASS-008, 4 no D068, 4 na CLASS-004, 3 na CLASS-001 e 3 na CLASS-002 —
+  todas vermelhas.
 
 Quatro mutações precisaram de um gate MELHOR antes de morrer, e elas dizem duas
 coisas que valem mais que os reparos:
@@ -467,25 +471,115 @@ redundante de `testar()` em GE.04, o `answerMode` de N4.02 que nenhum
 renderizador lê, e `cobraRepeticao` no gate da CLASS-003, que não discrimina
 hoje porque toda ficha cobra repetição.
 
-## 12. Onde o Gate B′ está agora
+## 12. As três últimas — CLASS-001, CLASS-002 e CLASS-004
+
+### CLASS-004 — viés posicional em comparação
+
+Quando a pergunta é "qual dos dois?", a resposta não é um número: é um LADO. Se
+o lado certo é sempre o mesmo, a criança aprende a apontar para lá e o nível
+deixa de medir a comparação, mesmo com os objetos comparados mudando.
+
+A varredura de rótulo não via isso, e não por descuido: **o rótulo varia**. Em
+`N6.01` L4 a alternativa se chamava "0,5" ou "0,7", conforme o par; em `N5.03`
+L3 ela se chamava "3/4 é maior". O que não variava era o `value` — `esquerda`,
+`direita` —, que é o que diz para onde o dedo vai.
+
+`N5.03` saiu do viés durante a CLASS-003. Faltava `N6.01` L4, onde os quatro
+pares de decimais vinham com o maior sempre à esquerda. O par continua sendo o
+que era — o maior é o de menos casas, para que ler "25" como maior que "5" siga
+sendo o erro que o nível pega —; o que passa a ser sorteado é de que lado ele
+cai.
+
+O detector foi isolado do corpus para ser testado contra casos conhecidos: lado
+preso acusa, lado que alterna absolve, número invariável é outra classe, e
+rótulo preso junto com o lado é a CLASS-003 e não esta. Duas classes acusando o
+mesmo caso dariam dois reparos para um defeito, e o registro de uma delas nunca
+esvaziaria.
+
+### CLASS-001 — gerador declara nível sem consumi-lo
+
+Um caso nas 75 fichas: `N4.06` L2 e L3 davam questões idênticas, com a mesma
+semente, em todas as sementes testadas.
+
+A causa é fina e vale registrar inteira. O L3 promete *"passar da multiplicação
+para a divisão dentro da mesma família"* e nunca entregava uma divisão, porque o
+filtro cobrava apoio de TODA candidata — e uma pergunta de divisão não sobra
+frase de apoio nenhuma: as outras três contas da família contêm o fator que é a
+resposta, e mostrá-las seria escrever o gabarito ao lado da pergunta. Sem
+candidata de divisão, o L3 caía sempre no vértice do produto e virava cópia
+exata do L2.
+
+Agora o apoio é condição de quem pergunta o PRODUTO. A divisão do L3 aparece sem
+apoio, que é justamente o passo que o nível declara.
+
+O gate compara níveis com a MESMA semente, e o par consigo mesmo é o controle:
+sem semente fixa, dois sorteios diferentes quase nunca coincidem por acaso, e o
+gate ficaria verde para sempre sem medir nada.
+
+### CLASS-002 — conformance ficha ↔ DAG
+
+Quem tranca a porta é o DAG: é dele que `unlockEngine` e `rescuePlanner` leem. O
+`prereqs` da ficha é documentação — e documentação que discorda do que o app faz
+é pior que documentação ausente, porque convence de uma coisa errada.
+
+Seis fichas discordavam; cinco diziam MENOS do que o DAG cobra — `N3.10`,
+`N4.03`, `N4.06`, `N4.07`, `N4.08` — e foram alinhadas.
+
+A sexta é `GM.04`, e ela **não se resolve escrevendo código**. É a `DECISAO-001`:
+o YAML reserva os minutos para GM.06, a F55 canônica os inclui, e a ficha TS traz
+um micro de avançar 15 minutos. Alinhar ali seria escolher em silêncio qual
+autoridade curricular vence e redistribuir escopo entre duas competências. Fica
+registrada como pendência de decisão humana, com catraca: no dia em que as duas
+concordarem, a entrada reprova pedindo para ser removida.
+
+O NOME não entra na comparação, de propósito: na ficha é o que a criança vê — "O
+Mapa do Tesouro" — e no DAG é o rótulo curricular — "Localização em malhas e
+mapas". São dois registros da mesma coisa, e igualá-los perderia um dos dois.
+
+### Uma lição de instrumento, de novo
+
+O gate do inventário de portões media uma amostra ao acaso por nível, e o
+`vertical` de `N3.09` ora desenhava o rótulo da resposta num botão ora não: o
+inventário aparecia e sumia entre execuções. **Inventário que muda sozinho não é
+catraca, é ruído.** Com sementes fixas a medição estabilizou e `N3.09` L4 entrou
+— o teclado da conta armada tem o dígito da resposta, e tocá-lo sozinho não
+envia nada.
+
+## 13. Onde o Gate B′ está agora
 
 | Classe | Estado |
 |---|---|
+| CLASS-001 (nível declarado e não consumido) | fechada, gate por descoberta com semente fixa |
+| CLASS-002 (conformance ficha ↔ DAG) | fechada, exceto a `DECISAO-001/GM.04` |
 | CLASS-003 (caso único / resposta decorável) | fechada nas duas dimensões, registros vazios |
+| CLASS-004 (viés posicional em comparação) | fechada, detector com controle |
+| CLASS-005, CLASS-006 | fechadas antes do Gate B′ |
 | CLASS-007 (bypass da ação probatória) | fechada nas testemunhas medidas; inventário de portões medido; falta a ficha declarar a ação probatória |
 | CLASS-008 (diversidade de famílias no mastery) | fechada, gate por descoberta e prova comportamental |
 | CLASS-009 (a tela declara a resposta) | fechada, com três correções de medição |
 | CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
-| CLASS-001, CLASS-002, CLASS-004 | **abertas**, prioridade 4 |
 
-Sete gates por descoberta vigiam as 75 fichas do Composer, todos com catraca:
+Dez gates por descoberta vigiam as 75 fichas do Composer, todos com catraca:
 
 | gate | o que mede |
 |---|---|
 | `telaNaoDeclaraResposta` | o suporte não escreve a resposta |
 | `nivelNaoRepeteOMesmoCaso` | o nível não é um caso só |
 | `respostaNaoEDecoravel` | o rótulo certo não é sempre o mesmo |
+| `vieseDeLadoNaComparacao` | o lado certo não é sempre o mesmo |
+| `nivelDeclaradoEConsumido` | dois níveis não dão a mesma questão |
+| `fichaConcordaComODag` | a ficha documenta o que o DAG cobra |
 | `respostaNaoSeCompraDuasVezes` | um acerto, um caminho |
 | `portaDeFora` | o inventário de portões não encolhe |
 | `evidenciaExigidaNaoSeCompra` | a prova não vem junto com o clique |
 | `nivelIntegradorExigeFamilias` | quem integra famílias exige mais de uma |
+
+### O que continua aberto
+
+Duas coisas, as duas nomeadas e nenhuma delas por falta de trabalho:
+
+1. **`DECISAO-001/GM.04`** — decisão humana sobre qual autoridade curricular
+   vence antes de qualquer edição que redistribua escopo entre GM.04 e GM.06.
+2. **A outra metade do D068** — descobrir onde DEVERIA existir portão exige a
+   ficha declarar, de forma legível por máquina, qual interação ela trata como
+   probatória. Também é decisão de cânone.
