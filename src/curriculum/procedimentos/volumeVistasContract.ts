@@ -27,6 +27,12 @@ export interface VolumeVistasF92Spec {
   alturas: number[][];
   vistas: Record<VolumeVista, VolumeVistaGrid>;
   orientacaoInicial: VolumeVista;
+  /**
+   * A ordem em que o palco desenha as três vistas, quando ele as rotula por
+   * letra. Sem isto a vista frontal era sempre a "Vista A" — a letra vinha da
+   * posição no desenho, não do sorteio, e "A" acertava L1 para sempre.
+   */
+  vistasEmbaralhadas?: VolumeVista[];
   resposta: string;
   opcoes: Array<{ value: string; label: string; misconception?: VolumeVistasMisconceptionTag }>;
   acessibilidade: { toqueAlternativo: true; snapGeneroso: true; alvoMinPx: 80 };
@@ -94,49 +100,120 @@ function specBase(nivel: number, modo: VolumeVistasModo, alturas: number[][]): O
   };
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/** Uma permutação das três vistas, por Fisher-Yates. */
+function embaralharVistas(): VolumeVista[] {
+  const ordem: VolumeVista[] = ["frente", "lado", "cima"];
+  for (let i = ordem.length - 1; i > 0; i -= 1) {
+    const j = ri(0, i);
+    [ordem[i], ordem[j]] = [ordem[j], ordem[i]];
+  }
+  return ordem;
+}
+
+const letraDaVista = (ordem: VolumeVista[], vista: VolumeVista) => String.fromCharCode(65 + ordem.indexOf(vista));
+
+/** Uma construção de `linhas × colunas` com alturas até `alturaMax`. */
+function sortearAlturas(linhas: number, colunas: number, alturaMax: number): number[][] {
+  return Array.from({ length: linhas }, () => Array.from({ length: colunas }, () => ri(0, alturaMax)));
+}
+
+/** As três projeções são silhuetas diferentes umas das outras? */
+function vistasDistintas(alturas: number[][]): boolean {
+  const projecoes = projetar(alturas);
+  return new Set([key(projecoes.frente), key(projecoes.lado), key(projecoes.cima)]).size === 3;
+}
+
+const ocupadas = (alturas: number[][]) => alturas.flat().filter(altura => altura > 0).length;
+const totalDeCubos = (alturas: number[][]) => alturas.flat().reduce((soma, altura) => soma + altura, 0);
+
+/**
+ * CLASS-003 — a construção é sorteada, a escada não.
+ *
+ * A pilha era uma só por nível, e o rótulo certo era pior que fixo: era
+ * autodeclarado. "Vista A" acertava L1 porque a vista frontal era sempre a
+ * primeira desenhada. "Construção que reproduz as três vistas" e "As três
+ * vistas desenhadas corretamente" acertavam L3 e L5 porque DIZEM que estão
+ * certas, ao lado de "Construção girada" e "Repete a mesma vista três vezes",
+ * que dizem que estão erradas. Ler português vencia a competência.
+ *
+ * Em L1 e L2 as três vistas passam a ser desenhadas em ordem sorteada e
+ * rotuladas por letra, e é a letra que a criança responde. Em L3 e L5 a criança
+ * constrói e desenha: as alternativas ali existem para o Radar, e quem as
+ * desenhava era a barra da casca, por fora do palco — a mesma porta dos fundos
+ * que a frente da CLASS-007 fechou nos outros palcos autorais.
+ */
 export function construirVolumeVistasSpec(level: number): VolumeVistasF92Spec {
   const nivel = clamp(level);
-  if (nivel === 1) {
-    const base = specBase(nivel, "vista-frontal", [[1, 2, 1], [0, 1, 1]]);
+
+  if (nivel === 1 || nivel === 2) {
+    // Duas vistas com a mesma silhueta dariam duas respostas certas em L1 e
+    // deixariam a ordem de L2 indistinguível.
+    let alturas = sortearAlturas(nivel === 1 ? 2 : 3, 3, 2);
+    while (!vistasDistintas(alturas) || ocupadas(alturas) < 2) alturas = sortearAlturas(nivel === 1 ? 2 : 3, 3, 2);
+    const base = specBase(nivel, nivel === 1 ? "vista-frontal" : "tres-vistas", alturas);
+    const ordem = embaralharVistas();
+    const letra = (vista: VolumeVista) => letraDaVista(ordem, vista);
+
+    if (nivel === 1) {
+      return {
+        ...base, vistasEmbaralhadas: ordem,
+        resposta: `frente:${key(base.vistas.frente)}`,
+        opcoes: ordem.map(vista => option(
+          `${vista}:${key(base.vistas[vista])}`,
+          `Vista ${letra(vista)}`,
+          vista === "frente" ? undefined
+            : vista === "lado" ? VolumeVistasMisconception.VISTA_TROCADA
+            : VolumeVistasMisconception.SEM_ROTACAO_MENTAL,
+        )),
+      };
+    }
+
+    const emOrdem = `${letra("frente")}-${letra("lado")}-${letra("cima")}`;
+    const trocada = `${letra("frente")}-${letra("cima")}-${letra("lado")}`;
+    const semRotacao = `${letra("cima")}-${letra("lado")}-${letra("frente")}`;
+    const comoSequencia = (chave: string) => chave.split("-").join(" → ");
     return {
-      ...base,
-      resposta: `frente:${key(base.vistas.frente)}`,
+      ...base, vistasEmbaralhadas: ordem, resposta: emOrdem,
       opcoes: [
-        option(`frente:${key(base.vistas.frente)}`, "Vista A"),
-        option(`lado:${key(base.vistas.lado)}`, "Vista B", VolumeVistasMisconception.VISTA_TROCADA),
-        option(`cima:${key(base.vistas.cima)}`, "Vista C", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
+        option(emOrdem, comoSequencia(emOrdem)),
+        option(trocada, comoSequencia(trocada), VolumeVistasMisconception.VISTA_TROCADA),
+        option(semRotacao, comoSequencia(semRotacao), VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
       ],
     };
   }
-  if (nivel === 2) {
-    const base = specBase(nivel, "tres-vistas", [[2, 1, 0], [1, 2, 1], [0, 1, 1]]);
-    return {
-      ...base,
-      resposta: "frente-lado-cima",
-      opcoes: [
-        option("frente-lado-cima", "Frente → lado → cima"),
-        option("frente-cima-lado", "Frente → cima → lado", VolumeVistasMisconception.VISTA_TROCADA),
-        option("mesma-vista", "As três vistas são iguais", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
-      ],
-    };
-  }
+
   if (nivel === 3) {
-    const base = specBase(nivel, "reconstruir-vistas", [[1, 2], [0, 1]]);
-    const target = base.alturas.flat().join("-");
+    let alturas = sortearAlturas(2, 2, 3);
+    while (ocupadas(alturas) < 2 || totalDeCubos(alturas) < 3) alturas = sortearAlturas(2, 2, 3);
+    const base = specBase(nivel, "reconstruir-vistas", alturas);
+    const alvo = alturas.flat().join("-");
+    const girado = alturas.flat().reverse().join("-");
+    const semRotacao = alturas.map(linha => [...linha].reverse()).flat().join("-");
+    // Os três precisam ser strings distintas; construções simétricas colidem.
+    if (alvo === girado || alvo === semRotacao || girado === semRotacao) return construirVolumeVistasSpec(level);
     return {
       ...base,
-      resposta: `reconstruir:${target}`,
+      resposta: `reconstruir:${alvo}`,
       opcoes: [
-        option(`reconstruir:${target}`, "Construção que reproduz as três vistas"),
-        option("reconstruir:2-1-1-0", "Construção girada", VolumeVistasMisconception.VISTA_TROCADA),
-        option("reconstruir:1-1-0-1", "Construção sem rotação mental", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
+        option(`reconstruir:${alvo}`, `Pilha ${alvo}`),
+        option(`reconstruir:${girado}`, `Pilha ${girado}`, VolumeVistasMisconception.VISTA_TROCADA),
+        option(`reconstruir:${semRotacao}`, `Pilha ${semRotacao}`, VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
       ],
     };
   }
+
   if (nivel === 4) {
-    const base = specBase(nivel, "cubos-ocultos", [[3, 1], [2, 1]]);
-    const total = base.alturas.flat().reduce((sum, value) => sum + value, 0);
-    const aparentes = base.alturas.flat().filter(value => value > 0).length;
+    // Sem cubo escondido não há o que contar: o total precisa passar do número
+    // de posições ocupadas, senão o distrator IGNORA_OCULTOS acerta.
+    let alturas = sortearAlturas(2, 2, 3);
+    while (ocupadas(alturas) < 2 || totalDeCubos(alturas) <= ocupadas(alturas) || totalDeCubos(alturas) - 1 === ocupadas(alturas)) {
+      alturas = sortearAlturas(2, 2, 3);
+    }
+    const base = specBase(nivel, "cubos-ocultos", alturas);
+    const total = totalDeCubos(alturas);
+    const aparentes = ocupadas(alturas);
     return {
       ...base,
       resposta: String(total),
@@ -147,15 +224,18 @@ export function construirVolumeVistasSpec(level: number): VolumeVistasF92Spec {
       ],
     };
   }
-  const base = specBase(nivel, "desenhar-vistas", [[1, 2, 1], [2, 1, 0]]);
+
+  let alturas = sortearAlturas(2, 3, 2);
+  while (!vistasDistintas(alturas) || ocupadas(alturas) < 2) alturas = sortearAlturas(2, 3, 2);
+  const base = specBase(nivel, "desenhar-vistas", alturas);
   const resposta = `desenhar:${key(base.vistas.frente)}|${key(base.vistas.lado)}|${key(base.vistas.cima)}`;
   return {
     ...base,
     resposta,
     opcoes: [
-      option(resposta, "As três vistas desenhadas corretamente"),
-      option(`desenhar:${key(base.vistas.lado)}|${key(base.vistas.frente)}|${key(base.vistas.cima)}`, "Frente e lado trocados", VolumeVistasMisconception.VISTA_TROCADA),
-      option("desenhar:sem-rotacao", "Repete a mesma vista três vezes", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
+      option(resposta, `Desenho ${key(base.vistas.frente)}`),
+      option(`desenhar:${key(base.vistas.lado)}|${key(base.vistas.frente)}|${key(base.vistas.cima)}`, `Desenho ${key(base.vistas.lado)}`, VolumeVistasMisconception.VISTA_TROCADA),
+      option("desenhar:sem-rotacao", "Desenho de uma vista só", VolumeVistasMisconception.SEM_ROTACAO_MENTAL),
     ],
   };
 }

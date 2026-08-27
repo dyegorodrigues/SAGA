@@ -20,6 +20,9 @@ export interface MapaTesouroF60Spec {
   linhas: string[];
   alvoColuna: number;
   alvoLinha: number;
+  /** A casa de partida do caminho de L4. Os outros níveis não têm origem. */
+  origemColuna?: number;
+  origemLinha?: number;
   objetivo: string;
   resposta: number;
   opcoes: MapaTesouroOpcao[];
@@ -33,18 +36,122 @@ interface MapaTesouroShow {
   piscarIntersecao?: boolean;
 }
 
-const specs: readonly MapaTesouroF60Spec[] = [
-  { nivel: 1, modo: "achar-objeto", gradeSize: 3, colunas: ["A", "B", "C"], linhas: ["1", "2", "3"], alvoColuna: 2, alvoLinha: 2, objetivo: "Ache a coluna B e depois a linha 2.", resposta: 22, opcoes: [{ value: 22, label: "B2" }, { value: 12, label: "A2", misconception: MapaTesouroMisconception.SO_UMA_COORDENADA }, { value: 21, label: "B1", misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA }, { value: 33, label: "C3" }] },
-  { nivel: 2, modo: "dizer-coordenada", gradeSize: 5, colunas: ["A", "B", "C", "D", "E"], linhas: ["1", "2", "3", "4", "5"], alvoColuna: 3, alvoLinha: 4, objetivo: "Diga a coordenada do tesouro.", resposta: 34, opcoes: [{ value: 34, label: "C4" }, { value: 43, label: "D3", misconception: MapaTesouroMisconception.INVERTE_COORDENADAS }, { value: 30, label: "C", misconception: MapaTesouroMisconception.SO_UMA_COORDENADA }, { value: 24, label: "B4", misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA }] },
-  { nivel: 3, modo: "colocar-objeto", gradeSize: 5, colunas: ["A", "B", "C", "D", "E"], linhas: ["1", "2", "3", "4", "5"], alvoColuna: 4, alvoLinha: 2, objetivo: "Coloque o tesouro em D2.", resposta: 42, opcoes: [{ value: 42, label: "D2" }, { value: 24, label: "B4", misconception: MapaTesouroMisconception.INVERTE_COORDENADAS }, { value: 41, label: "D1", misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA }, { value: 20, label: "linha 2", misconception: MapaTesouroMisconception.SO_UMA_COORDENADA }] },
-  { nivel: 4, modo: "descrever-caminho", gradeSize: 5, colunas: ["A", "B", "C", "D", "E"], linhas: ["1", "2", "3", "4", "5"], alvoColuna: 4, alvoLinha: 2, objetivo: "Saia de A4 e chegue a D2.", resposta: 1, opcoes: [{ value: 1, label: "3 à direita, 2 para cima" }, { value: 2, label: "2 à direita, 3 para cima", misconception: MapaTesouroMisconception.INVERTE_COORDENADAS }, { value: 3, label: "3 à direita", misconception: MapaTesouroMisconception.SO_UMA_COORDENADA }, { value: 4, label: "3 à esquerda, 2 para baixo", misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA }] },
-  { nivel: 5, modo: "pre-cartesiano", gradeSize: 5, colunas: ["1", "2", "3", "4", "5"], linhas: ["1", "2", "3", "4", "5"], alvoColuna: 3, alvoLinha: 2, objetivo: "Use os dois eixos numéricos.", resposta: 32, opcoes: [{ value: 32, label: "(3, 2)" }, { value: 23, label: "(2, 3)", misconception: MapaTesouroMisconception.INVERTE_COORDENADAS }, { value: 30, label: "3", misconception: MapaTesouroMisconception.SO_UMA_COORDENADA }, { value: 42, label: "(4, 2)", misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA }] },
-] as const;
-
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
 const clamp = (n: number) => Math.max(1, Math.min(5, Math.round(n)));
+
+/** Um número por casa: coluna nas dezenas, linha nas unidades. */
+const casa = (coluna: number, linha: number) => coluna * 10 + linha;
+
+const LETRAS = ["A", "B", "C", "D", "E"] as const;
+const NUMEROS = ["1", "2", "3", "4", "5"] as const;
+
+/** Sorteia um valor no intervalo evitando os que já estão em uso. */
+function outro(maximo: number, ...evitar: number[]): number {
+  const livres = Array.from({ length: maximo }, (_, i) => i + 1).filter(valor => !evitar.includes(valor));
+  return livres[ri(0, livres.length - 1)];
+}
+
+/**
+ * CLASS-003 — o tesouro muda de casa, a escada não.
+ *
+ * Estava sempre no mesmo lugar: B2, C4, D2, D2 e (3,2). Decorar cinco rótulos
+ * vencia a competência inteira sem a criança cruzar coluna com linha uma vez.
+ *
+ * O que continua fixo é o degrau: o tamanho da grade, se os eixos são
+ * letra/número ou número/número, e o que o nível pede — achar, dizer, colocar,
+ * descrever o caminho, ler os dois eixos numéricos.
+ *
+ * Coluna e linha nunca saem iguais. Numa casa da diagonal, trocar uma pela
+ * outra devolve a MESMA casa: o distrator de inversão viraria uma segunda
+ * alternativa certa, e a deduplicação o apagaria — o erro que a ficha mais
+ * nomeia sumiria da tela justamente onde ele é invisível.
+ */
 export function construirMapaTesouroF60Spec(level: number): MapaTesouroF60Spec {
-  const spec = specs[clamp(level) - 1];
-  return { ...spec, colunas: [...spec.colunas], linhas: [...spec.linhas], opcoes: spec.opcoes.map(option => ({ ...option })) };
+  const nivel = clamp(level);
+  const gradeSize = nivel === 1 ? 3 : 5;
+  const eixoHorizontalNumerico = nivel === 5;
+  const colunas = [...(eixoHorizontalNumerico ? NUMEROS : LETRAS)].slice(0, gradeSize);
+  const linhas = [...NUMEROS].slice(0, gradeSize);
+
+  const alvoColuna = ri(1, gradeSize);
+  const alvoLinha = outro(gradeSize, alvoColuna);
+  const nomeCasa = (coluna: number, linha: number) =>
+    eixoHorizontalNumerico ? `(${colunas[coluna - 1]}, ${linhas[linha - 1]})` : `${colunas[coluna - 1]}${linhas[linha - 1]}`;
+
+  const inverte = { value: casa(alvoLinha, alvoColuna), label: nomeCasa(alvoLinha, alvoColuna), misconception: MapaTesouroMisconception.INVERTE_COORDENADAS };
+  const base = { nivel, gradeSize, colunas, linhas, alvoColuna, alvoLinha };
+
+  if (nivel === 4) {
+    // O caminho sobe e vai para a direita: a origem fica à esquerda e mais
+    // embaixo. `dx` e `dy` precisam diferir, senão "3 à direita, 3 para cima" e
+    // a versão invertida dizem a mesma coisa e o distrator some.
+    for (;;) {
+      const origemColuna = ri(1, gradeSize - 1);
+      const destinoColuna = ri(origemColuna + 1, gradeSize);
+      const destinoLinha = ri(1, gradeSize - 1);
+      const origemLinha = ri(destinoLinha + 1, gradeSize);
+      const dx = destinoColuna - origemColuna;
+      const dy = origemLinha - destinoLinha;
+      if (dx === dy || destinoColuna === destinoLinha) continue;
+      return {
+        ...base, modo: "descrever-caminho", alvoColuna: destinoColuna, alvoLinha: destinoLinha, origemColuna, origemLinha,
+        objetivo: `Saia de ${nomeCasa(origemColuna, origemLinha)} e chegue a ${nomeCasa(destinoColuna, destinoLinha)}.`,
+        resposta: 1,
+        opcoes: [
+          { value: 1, label: `${dx} à direita, ${dy} para cima` },
+          { value: 2, label: `${dy} à direita, ${dx} para cima`, misconception: MapaTesouroMisconception.INVERTE_COORDENADAS },
+          { value: 3, label: `${dx} à direita`, misconception: MapaTesouroMisconception.SO_UMA_COORDENADA },
+          { value: 4, label: `${dx} à esquerda, ${dy} para baixo`, misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA },
+        ],
+      };
+    }
+  }
+
+  if (nivel === 1) {
+    const outraColuna = outro(gradeSize, alvoColuna, alvoLinha);
+    const outraLinha = outro(gradeSize, alvoLinha, alvoColuna);
+    return {
+      ...base, modo: "achar-objeto",
+      objetivo: `Ache a coluna ${colunas[alvoColuna - 1]} e depois a linha ${linhas[alvoLinha - 1]}.`,
+      resposta: casa(alvoColuna, alvoLinha),
+      opcoes: [
+        { value: casa(alvoColuna, alvoLinha), label: nomeCasa(alvoColuna, alvoLinha) },
+        { value: casa(outraColuna, alvoLinha), label: nomeCasa(outraColuna, alvoLinha), misconception: MapaTesouroMisconception.SO_UMA_COORDENADA },
+        { value: casa(alvoColuna, outraLinha), label: nomeCasa(alvoColuna, outraLinha), misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA },
+        inverte,
+      ],
+    };
+  }
+
+  if (nivel === 3) {
+    const outraLinha = outro(gradeSize, alvoLinha, alvoColuna);
+    return {
+      ...base, modo: "colocar-objeto",
+      objetivo: `Coloque o tesouro em ${nomeCasa(alvoColuna, alvoLinha)}.`,
+      resposta: casa(alvoColuna, alvoLinha),
+      opcoes: [
+        { value: casa(alvoColuna, alvoLinha), label: nomeCasa(alvoColuna, alvoLinha) },
+        inverte,
+        { value: casa(alvoColuna, outraLinha), label: nomeCasa(alvoColuna, outraLinha), misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA },
+        // Linha sem coluna: a casa não existe, e é esse o ponto — quem usa uma
+        // coordenada só não aponta lugar nenhum.
+        { value: alvoLinha * 10, label: `linha ${linhas[alvoLinha - 1]}`, misconception: MapaTesouroMisconception.SO_UMA_COORDENADA },
+      ],
+    };
+  }
+
+  const outraColuna = outro(gradeSize, alvoColuna, alvoLinha);
+  return {
+    ...base, modo: nivel === 2 ? "dizer-coordenada" : "pre-cartesiano",
+    objetivo: nivel === 2 ? "Diga a coordenada do tesouro." : "Use os dois eixos numéricos.",
+    resposta: casa(alvoColuna, alvoLinha),
+    opcoes: [
+      { value: casa(alvoColuna, alvoLinha), label: nomeCasa(alvoColuna, alvoLinha) },
+      inverte,
+      { value: alvoColuna * 10, label: colunas[alvoColuna - 1], misconception: MapaTesouroMisconception.SO_UMA_COORDENADA },
+      { value: casa(outraColuna, alvoLinha), label: nomeCasa(outraColuna, alvoLinha), misconception: MapaTesouroMisconception.CONFUNDE_LINHA_COLUNA },
+    ],
+  };
 }
 
 export function construirMapaTesouroResolucao(spec: MapaTesouroF60Spec): ResolucaoDeclarativa<MapaTesouroShow, number, MapaTesouroMisconceptionTag> {

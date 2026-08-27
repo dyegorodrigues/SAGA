@@ -122,7 +122,16 @@ export function VolumeVistasStage({ spec, disabled = false, onAnswer }: Props) {
 
       {spec.modo !== "reconstruir-vistas" && spec.modo !== "desenhar-vistas" && (
         <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Projeções em ArrayGrid">
-          {vistas.map((vista, index) => <VistaArrayGrid key={vista} grid={spec.vistas[vista]} label={spec.modo === "vista-frontal" ? `Vista ${String.fromCharCode(65 + index)}` : nomes[vista]} />)}
+          {/* A letra vem do spec, não da posição no laço. Rotular pela ordem
+              fixa frente/lado/cima fazia a "Vista A" ser sempre a frontal —
+              acertar L1 não exigia girar nada, bastava tocar na primeira. */}
+          {(spec.vistasEmbaralhadas ?? vistas).map((vista, index) => (
+            <VistaArrayGrid
+              key={vista}
+              grid={spec.vistas[vista]}
+              label={spec.vistasEmbaralhadas ? `Vista ${String.fromCharCode(65 + index)}` : nomes[vista]}
+            />
+          ))}
         </div>
       )}
 

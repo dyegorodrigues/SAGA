@@ -25,10 +25,14 @@ describe("W41/F92 — palco ArrayGrid#3D e acessibilidade motora", () => {
     const spec = construirVolumeVistasSpec(3);
     render(<VolumeVistasStage spec={spec} onAnswer={onAnswer} />);
 
-    fireEvent.click(screen.getByRole("button", { name: "posição 1, 1: 0 cubos" }));
-    fireEvent.click(screen.getByRole("button", { name: "posição 1, 2: 0 cubos" }));
-    fireEvent.click(screen.getByRole("button", { name: "posição 1, 2: 1 cubos" }));
-    fireEvent.click(screen.getByRole("button", { name: "posição 2, 2: 0 cubos" }));
+    // A construção é sorteada desde a CLASS-003: os toques saem dela, não de um
+    // roteiro fixo. Cada toque numa posição acrescenta um cubo, e o rótulo do
+    // botão diz quantos já estão lá.
+    spec.alturas.forEach((linha, r) => linha.forEach((altura, c) => {
+      for (let cubo = 0; cubo < altura; cubo += 1) {
+        fireEvent.click(screen.getByRole("button", { name: `posição ${r + 1}, ${c + 1}: ${cubo} cubos` }));
+      }
+    }));
     fireEvent.click(screen.getByRole("button", { name: "Conferir reconstrução" }));
 
     expect(onAnswer).toHaveBeenCalledWith(spec.resposta, {

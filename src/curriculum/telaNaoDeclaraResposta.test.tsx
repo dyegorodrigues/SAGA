@@ -28,7 +28,6 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "GE.05": { motivo: "LEGITIMO", porque: "o enunciado dita a casa do mapa; a habilidade é executar a coordenada" },
   "GE.08": { motivo: "LEGITIMO", porque: "o enunciado dita o par ordenado; a habilidade é localizá-lo no plano" },
   "GE.10": { motivo: "LEGITIMO", porque: "as vistas precisam de rótulo A/B/C para poderem ser escolhidas" },
-  "N2.06": { motivo: "LEGITIMO", porque: "\"paridade\" no apoio contém \"par\" por acaso de substring" },
   "N1.07": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta: em L2 a régua vai até 10 e a resposta é 10; esconder a marca apaga a pergunta" },
   "N7.01": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta dos inteiros" },
   "N7.02": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta dos inteiros" },
@@ -37,6 +36,11 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "PE.03": { motivo: "LEGITIMO", porque: "em comparar-chances os sacos precisam de rótulo A/B para poderem ser escolhidos" },
   "PE.04": { motivo: "LEGITIMO", porque: "os sacos precisam de rótulo A/B para poderem ser escolhidos" },
   "N4.03": { motivo: "LEGITIMO", porque: "a contagem saltada é a estratégia ensinada em L1, não um gabarito impresso" },
+
+  // `N2.06` saiu daqui. A entrada dizia, com todas as letras, que "paridade"
+  // continha "par" por acaso de substring — e a fronteira de palavra passou a
+  // medir isso sozinha. Uma justificativa que descreve um artefato da medição é
+  // uma medição a corrigir, não uma exceção a manter.
 
   // A reparar: o suporte afirma a resposta que o enunciado pergunta.
 
@@ -112,10 +116,37 @@ const normEspacado = (t: string) => t.replace(/\s+/g, " ").replace(/×/g, "x").t
  *
  * Nada real foi silenciado, e não é promessa: a catraca de entradas obsoletas
  * reprova nomeando a ficha se alguma detecção conhecida sumir.
+ *
+ * ### A mesma correção, agora para os rótulos que não são só dígitos
+ *
+ * A primeira versão desta função deixou o texto COLADO para rótulos
+ * alfanuméricos, e a colagem voltou a mentir assim que a CLASS-003 passou a
+ * sortear os casos. Em `GE.05` o mapa desenha os cabeçalhos dos eixos em
+ * células separadas — `a`, `b`, `c`, `1`, `2`, `3` —, e com a resposta `C1` o
+ * texto colado vira `abc123`, que contém `c1`. A tela não escreve `C1` em lugar
+ * nenhum: escreve um `c` numa ponta e um `1` na outra, que é o que qualquer
+ * mapa precisa fazer para que a criança possa nomear uma casa.
+ *
+ * É a mesma família do `3x26` que tirou `N4.09` daqui. A fronteira de elemento
+ * passa a valer para todo rótulo; a fronteira de dígito continua valendo por
+ * cima, para os numerais.
  */
-function declara(suporte: string, suporteEspacado: string, rotulo: string): boolean {
-  if (!/^\d+$/.test(rotulo)) return suporte.includes(rotulo);
-  return new RegExp(`(?<!\\d)${rotulo}(?!\\d)`).test(suporteEspacado);
+const escaparRegex = (texto: string) => texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+function declara(suporteEspacado: string, rotulo: string): boolean {
+  // O rótulo é normalizado do MESMO jeito que a tela. Apagar os espaços só de
+  // um lado faria "Saco A" virar "sacoa" e deixar de casar com o "saco a" que
+  // está escrito ali — um falso negativo tão silencioso quanto o falso
+  // positivo que a fronteira de elemento veio corrigir.
+  const alvo = normEspacado(rotulo);
+  // Fronteira de PALAVRA, e não `includes`: `reto` aparece dentro de `correto`,
+  // que é apoio fixo da F78 e não diz nada sobre o ângulo desenhado. É a mesma
+  // coincidência de substring que trouxe N6.03 aqui — `10` dentro de `100%` —,
+  // agora do lado das letras. A fronteira só é exigida onde a ponta do rótulo é
+  // letra ou dígito: `(3, 2)` começa em parêntese e não tem o que delimitar.
+  const abre = /^[\p{L}\p{N}]/u.test(alvo) ? "(?<![\\p{L}\\p{N}])" : "";
+  const fecha = /[\p{L}\p{N}]$/u.test(alvo) ? "(?![\\p{L}\\p{N}])" : "";
+  return new RegExp(`${abre}${escaparRegex(alvo)}${fecha}`, "u").test(suporteEspacado);
 }
 const original = Math.random;
 afterEach(() => { Math.random = original; });
@@ -139,15 +170,15 @@ function varrer(): { vazam: Set<string>; parciais: string[] } {
       for (let nivel = 1; nivel <= 5; nivel += 1) {
         const question = generateRegisteredFichaQuestion(id, nivel);
         const certa = (question.options ?? []).find(option => question.evaluate?.(option.value));
-        const rotulo = norm(String(certa?.label ?? certa?.value ?? ""));
-        if (!certa || rotulo.length < 2) continue;
+        const rotulo = String(certa?.label ?? certa?.value ?? "");
+        if (!certa || norm(rotulo).length < 2) continue;
         const { container, unmount } = render(<FichaRenderer question={question} onAnswer={() => undefined} />);
         const copia = container.cloneNode(true) as HTMLElement;
         for (const botao of [...copia.querySelectorAll("button")]) botao.remove();
         const chave = `${id}|${nivel}`;
         const placar = contagem.get(chave) ?? { avaliadas: 0, vazaram: 0 };
         placar.avaliadas += 1;
-        if (declara(norm(copia.textContent ?? ""), normEspacado(textoPorElemento(copia)), rotulo)) placar.vazaram += 1;
+        if (declara(normEspacado(textoPorElemento(copia)), rotulo)) placar.vazaram += 1;
         contagem.set(chave, placar);
         unmount();
       }

@@ -30,37 +30,84 @@ function options(correta: string | number, erradas: Array<{ value: string | numb
     .filter((item, i, all) => all.findIndex(other => other.value === item.value) === i).slice(0, 4);
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
+
+/** Uma abertura do tipo pedido, sempre em passos de cinco graus. */
+function anguloDoTipo(qual: "agudo" | "reto" | "obtuso"): number {
+  if (qual === "reto") return 90;
+  return qual === "agudo" ? ri(3, 17) * 5 : ri(19, 34) * 5;
+}
+
+/**
+ * CLASS-003 — a abertura é sorteada, a escada não.
+ *
+ * O ângulo era sempre o mesmo: 45°, 65 contra 120, 55 contra 105, 40° e 120°.
+ * As respostas certas eram "agudo", "B", "B", 40 e "obtuso", para sempre.
+ *
+ * O degrau continua sendo o que o nível pergunta: classificar a abertura,
+ * comparar duas, comparar quando os lados têm comprimentos diferentes, medir em
+ * graus, e classificar o ângulo de um polígono.
+ */
 export function construirAngulosSpec(level: number): AngulosF78Spec {
   const nivel = clamp(level);
-  if (nivel === 1) {
-    const anguloA = 45;
-    return { nivel, modo: "classificar", anguloA, resposta: "agudo", opcoes: options("agudo", [
-      { value: "obtuso", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
-      { value: "reto", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
-    ]) };
+
+  // Classificar a abertura desenhada — em L1 solta, em L5 dentro de um polígono.
+  if (nivel === 1 || nivel === 5) {
+    const anguloA = anguloDoTipo(escolher(["agudo", "reto", "obtuso"] as const));
+    // A resposta sai do desenho, não do sorteio: se o traço e o rótulo viessem
+    // de dois lugares, uma mudança num deles faria a tela mentir.
+    const qual = tipo(anguloA);
+    const outros = (["agudo", "reto", "obtuso"] as const).filter(item => item !== qual);
+    return {
+      nivel, modo: nivel === 1 ? "classificar" : "poligonos", anguloA, resposta: qual,
+      opcoes: options(qual, [
+        { value: outros[0], misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
+        { value: outros[1], misconception: nivel === 1 ? AngulosMisconception.CONFUNDE_AGUDO_OBTUSO : AngulosMisconception.TRANSFERIDOR_INVERTIDO },
+      ]),
+    };
   }
-  if (nivel === 2) {
-    return { nivel, modo: "comparar", anguloA: 65, anguloB: 120, resposta: "B", opcoes: options("B", [
-      { value: "A", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
-      { value: "iguais", misconception: AngulosMisconception.ANGULO_PELO_LADO },
-    ]) };
+
+  if (nivel === 2 || nivel === 3) {
+    // Uma abertura pequena e uma grande, e qual delas se chama A é sorteado:
+    // deixar a maior sempre em B faria a resposta ser sempre "B".
+    const menor = ri(5, 16) * 5;
+    const maior = ri(Math.floor(menor / 5) + 3, 34) * 5;
+    const maiorEhA = Math.random() < 0.5;
+    const anguloA = maiorEhA ? maior : menor;
+    const anguloB = maiorEhA ? menor : maior;
+    const resposta = maiorEhA ? "A" : "B";
+    if (nivel === 2) {
+      return { nivel, modo: "comparar", anguloA, anguloB, resposta, opcoes: options(resposta, [
+        { value: maiorEhA ? "B" : "A", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
+        { value: "iguais", misconception: AngulosMisconception.ANGULO_PELO_LADO },
+      ]) };
+    }
+    // L3 existe para desmentir "o lado mais comprido é o ângulo maior": o
+    // ângulo MAIOR recebe o lado mais CURTO. Sem isso, quem julga pelo desenho
+    // acerta, e o distrator ANGULO_PELO_LADO fica na tela sem nomear ninguém.
+    const ladoCurto = ri(60, 85);
+    const ladoLongo = ri(120, 150);
+    return {
+      nivel, modo: "lados-diferentes", anguloA, anguloB,
+      ladoA: maiorEhA ? ladoCurto : ladoLongo,
+      ladoB: maiorEhA ? ladoLongo : ladoCurto,
+      resposta,
+      opcoes: options(resposta, [
+        { value: maiorEhA ? "B" : "A", misconception: AngulosMisconception.ANGULO_PELO_LADO },
+        { value: "iguais", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
+      ]),
+    };
   }
-  if (nivel === 3) {
-    return { nivel, modo: "lados-diferentes", anguloA: 55, anguloB: 105, ladoA: 145, ladoB: 72, resposta: "B", opcoes: options("B", [
-      { value: "A", misconception: AngulosMisconception.ANGULO_PELO_LADO },
-      { value: "iguais", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
-    ]) };
-  }
-  if (nivel === 4) {
-    return { nivel, modo: "medir-graus", anguloA: 40, resposta: 40, opcoes: options(40, [
-      { value: 140, misconception: AngulosMisconception.TRANSFERIDOR_INVERTIDO },
-      { value: 90, misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
-      { value: 50, misconception: AngulosMisconception.ANGULO_PELO_LADO },
-    ]) };
-  }
-  return { nivel, modo: "poligonos", anguloA: 120, resposta: "obtuso", opcoes: options("obtuso", [
-    { value: "agudo", misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
-    { value: "reto", misconception: AngulosMisconception.TRANSFERIDOR_INVERTIDO },
+
+  // Medir em graus. O reto fica de fora: 90° faria o distrator do ângulo reto
+  // virar a resposta, e o suplemento cairia em cima dela.
+  let anguloA = ri(3, 34) * 5;
+  while (anguloA === 90 || anguloA === 85 || anguloA === 80) anguloA = ri(3, 34) * 5;
+  return { nivel, modo: "medir-graus", anguloA, resposta: anguloA, opcoes: options(anguloA, [
+    { value: 180 - anguloA, misconception: AngulosMisconception.TRANSFERIDOR_INVERTIDO },
+    { value: 90, misconception: AngulosMisconception.CONFUNDE_AGUDO_OBTUSO },
+    { value: anguloA + 10, misconception: AngulosMisconception.ANGULO_PELO_LADO },
   ]) };
 }
 

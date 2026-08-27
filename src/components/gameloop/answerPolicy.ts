@@ -97,6 +97,11 @@ export const PALCOS_QUE_RESPONDEM = new Set([
   // Medidos pela varredura da CLASS-007: o palco já desenha a alternativa e a
   // fecha até a ação da ficha acontecer.
   "poligonos-f79","solidos-geometricos-f59","circulo-areas-f91","volume-prismas-f94","fatores-retangulos-f66",
+  // GE.10/F92: o palco desenha as alternativas em L1, L2 e L4, e em L3 e L5 a
+  // criança constrói e desenha. Ali a barra da casca era pura porta dos fundos
+  // — e ainda por cima com o rótulo "Construção que reproduz as três vistas",
+  // que dizia estar certo. Tocar nele pulava a reconstrução inteira.
+  "volume-vistas-f92",
 ]);
 export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {

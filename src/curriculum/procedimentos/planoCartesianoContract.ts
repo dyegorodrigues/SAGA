@@ -57,77 +57,115 @@ const makeOptions = (
   ...erradas.map(item => ({ value: encode(item.ponto), label: label(item.ponto), misconception: item.misconception })),
 ];
 
-const specs: readonly PlanoCartesianoF80Spec[] = [
-  {
-    nivel: 1, modo: "ler-ponto", primitivas: ["ShapeCanvas"], modoShapeCanvas: "grade", maxCoord: 3,
-    origem: { x: 0, y: 0 }, alvo: { x: 3, y: 2 }, objetivo: "Leia o ponto marcado.", resposta: "3,2",
-    opcoes: makeOptions({ x: 3, y: 2 }, [
-      { ponto: { x: 2, y: 3 }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
-      { ponto: { x: 2, y: 2 }, misconception: PlanoCartesianoMisconception.CONTA_MARCAS },
-      { ponto: { x: 3, y: 1 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
-    ]),
-    primeiroAndaDepoisSobe: true, alternativaPorToque: true, snapGeneroso: true, raioSnapPx: 44,
-    caminhoEntrePontos: false, desenharFigura: false, identificarPadrao: false,
-  },
-  {
-    nivel: 2, modo: "colocar-ponto", primitivas: ["ShapeCanvas"], modoShapeCanvas: "grade", maxCoord: 3,
-    origem: { x: 0, y: 0 }, alvo: { x: 2, y: 3 }, objetivo: "Coloque o ponto em (2, 3).", resposta: "2,3",
-    opcoes: makeOptions({ x: 2, y: 3 }, [
-      { ponto: { x: 3, y: 2 }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
-      { ponto: { x: 1, y: 2 }, misconception: PlanoCartesianoMisconception.CONTA_MARCAS },
-      { ponto: { x: 2, y: 2 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
-    ]),
-    primeiroAndaDepoisSobe: true, alternativaPorToque: true, snapGeneroso: true, raioSnapPx: 44,
-    caminhoEntrePontos: false, desenharFigura: false, identificarPadrao: false,
-  },
-  {
-    nivel: 3, modo: "caminho", primitivas: ["ShapeCanvas"], modoShapeCanvas: "grade", maxCoord: 3,
-    origem: { x: 0, y: 0 }, inicio: { x: 1, y: 1 }, alvo: { x: 3, y: 2 }, objetivo: "Saia de (1, 1) e chegue a (3, 2). Qual ponto final respeita o caminho?", resposta: "3,2",
-    opcoes: makeOptions({ x: 3, y: 2 }, [
-      { ponto: { x: 2, y: 3 }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
-      { ponto: { x: 2, y: 1 }, misconception: PlanoCartesianoMisconception.CONTA_MARCAS },
-      { ponto: { x: 3, y: 1 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
-    ]),
-    primeiroAndaDepoisSobe: true, alternativaPorToque: true, snapGeneroso: true, raioSnapPx: 44,
-    caminhoEntrePontos: true, desenharFigura: false, identificarPadrao: false,
-  },
-  {
-    nivel: 4, modo: "figura-coordenadas", primitivas: ["ShapeCanvas"], modoShapeCanvas: "grade", maxCoord: 3,
-    origem: { x: 0, y: 0 }, alvo: { x: 1, y: 3 }, vertices: [{ x: 1, y: 1 }, { x: 3, y: 1 }, { x: 3, y: 3 }],
-    objetivo: "Três vértices do retângulo já estão ligados. Coloque o quarto vértice para completar a figura.", resposta: "1,3",
-    opcoes: makeOptions({ x: 1, y: 3 }, [
-      { ponto: { x: 3, y: 1 }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
-      { ponto: { x: 0, y: 3 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
-      { ponto: { x: 1, y: 2 }, misconception: PlanoCartesianoMisconception.CONTA_MARCAS },
-    ]),
-    primeiroAndaDepoisSobe: true, alternativaPorToque: true, snapGeneroso: true, raioSnapPx: 44,
-    caminhoEntrePontos: false, desenharFigura: true, identificarPadrao: false,
-  },
-  {
-    nivel: 5, modo: "padrao-alinhado", primitivas: ["ShapeCanvas"], modoShapeCanvas: "grade", maxCoord: 3,
-    origem: { x: 0, y: 0 }, alvo: { x: 3, y: 3 }, pontosPadrao: [{ x: 0, y: 0 }, { x: 1, y: 1 }, { x: 2, y: 2 }],
-    objetivo: "Os pontos estão alinhados seguindo o mesmo padrão. Qual vem depois?", resposta: "3,3",
-    opcoes: makeOptions({ x: 3, y: 3 }, [
-      { ponto: { x: 3, y: 2 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
-      { ponto: { x: 2, y: 3 }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
-      { ponto: { x: 2, y: 2 }, misconception: PlanoCartesianoMisconception.CONTA_MARCAS },
-    ]),
-    primeiroAndaDepoisSobe: true, alternativaPorToque: true, snapGeneroso: true, raioSnapPx: 44,
-    caminhoEntrePontos: false, desenharFigura: false, identificarPadrao: true,
-  },
-] as const;
-
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
 const clamp = (n: number) => Math.max(1, Math.min(5, Math.round(n)));
+
+const MAX_COORD = 3;
+const CENA_BASE = {
+  primitivas: ["ShapeCanvas"] as ["ShapeCanvas"],
+  modoShapeCanvas: "grade" as const,
+  maxCoord: MAX_COORD as 3,
+  origem: { x: 0, y: 0 },
+  primeiroAndaDepoisSobe: true as const,
+  alternativaPorToque: true as const,
+  snapGeneroso: true as const,
+  raioSnapPx: 44,
+};
+
+/**
+ * Os três erros da ficha, escritos como deslocamentos do alvo.
+ *
+ * `INVERTE_XY` troca as coordenadas; `CONTA_MARCAS` anda uma casa a menos no
+ * eixo horizontal — quem conta traços em vez de intervalos; `IGNORA_ORIGEM`
+ * sobe uma a menos, como quem começa a contar no primeiro traço e não no zero.
+ *
+ * Um alvo na diagonal devolveria o próprio alvo na inversão, e o distrator
+ * sumiria na deduplicação — por isso `x` e `y` do alvo nunca são iguais.
+ */
+function distratoresDoAlvo(alvo: PontoCartesianoF80): Array<{ ponto: PontoCartesianoF80; misconception: PlanoCartesianoMisconceptionTag }> {
+  return [
+    { ponto: { x: alvo.y, y: alvo.x }, misconception: PlanoCartesianoMisconception.INVERTE_XY },
+    { ponto: { x: alvo.x - 1, y: alvo.y }, misconception: PlanoCartesianoMisconception.CONTA_MARCAS },
+    { ponto: { x: alvo.x, y: alvo.y - 1 }, misconception: PlanoCartesianoMisconception.IGNORA_ORIGEM },
+  ];
+}
+
+/** Um ponto da malha fora da diagonal, com folga para os dois distratores. */
+function sortearAlvo(): PontoCartesianoF80 {
+  for (;;) {
+    const x = ri(1, MAX_COORD);
+    const y = ri(1, MAX_COORD);
+    if (x === y) continue;
+    return { x, y };
+  }
+}
+
+/**
+ * CLASS-003 — o ponto muda, a malha não.
+ *
+ * O alvo era sempre o mesmo: (3,2), (2,3), (3,2), (1,3) e (3,3). Decorar cinco
+ * pares vencia a competência sem a criança sair da origem uma vez.
+ *
+ * A malha continua indo até 3 nos dois eixos: é o escopo declarado da ficha, e
+ * mexer nele mudaria o que o nível cobra. O que passa a variar é o ponto.
+ */
 export function construirPlanoCartesianoF80Spec(level: number): PlanoCartesianoF80Spec {
-  const spec = specs[clamp(level) - 1];
+  const nivel = clamp(level);
+  const cena = { ...CENA_BASE, nivel, origem: { x: 0, y: 0 }, caminhoEntrePontos: false, desenharFigura: false, identificarPadrao: false };
+
+  if (nivel === 1 || nivel === 2) {
+    const alvo = sortearAlvo();
+    return {
+      ...cena, modo: nivel === 1 ? "ler-ponto" : "colocar-ponto", alvo,
+      objetivo: nivel === 1 ? "Leia o ponto marcado." : `Coloque o ponto em (${alvo.x}, ${alvo.y}).`,
+      resposta: encode(alvo), opcoes: makeOptions(alvo, distratoresDoAlvo(alvo)),
+    };
+  }
+
+  if (nivel === 3) {
+    const alvo = sortearAlvo();
+    // A partida fica dentro da malha e não pode ser o próprio destino: um
+    // caminho de comprimento zero não é caminho.
+    let inicio = { x: ri(0, MAX_COORD), y: ri(0, MAX_COORD) };
+    while (inicio.x === alvo.x && inicio.y === alvo.y) inicio = { x: ri(0, MAX_COORD), y: ri(0, MAX_COORD) };
+    return {
+      ...cena, modo: "caminho", caminhoEntrePontos: true, inicio, alvo,
+      objetivo: `Saia de (${inicio.x}, ${inicio.y}) e chegue a (${alvo.x}, ${alvo.y}). Qual ponto final respeita o caminho?`,
+      resposta: encode(alvo), opcoes: makeOptions(alvo, distratoresDoAlvo(alvo)),
+    };
+  }
+
+  if (nivel === 4) {
+    // Três cantos desenhados e o quarto por colocar. Os quatro precisam FECHAR
+    // o retângulo — um quarto ponto solto faria o enunciado prometer uma figura
+    // que o desenho não entrega.
+    for (;;) {
+      const x1 = ri(0, MAX_COORD - 1);
+      const x2 = ri(x1 + 1, MAX_COORD);
+      const y1 = ri(0, MAX_COORD - 1);
+      const y2 = ri(y1 + 1, MAX_COORD);
+      // O canto que falta é (x1, y2); os outros três já vêm ligados.
+      const alvo = { x: x1, y: y2 };
+      if (alvo.x === alvo.y || alvo.x < 1 || alvo.y < 1) continue;
+      return {
+        ...cena, modo: "figura-coordenadas", desenharFigura: true, alvo,
+        vertices: [{ x: x1, y: y1 }, { x: x2, y: y1 }, { x: x2, y: y2 }],
+        objetivo: "Três vértices do retângulo já estão ligados. Coloque o quarto vértice para completar a figura.",
+        resposta: encode(alvo), opcoes: makeOptions(alvo, distratoresDoAlvo(alvo)),
+      };
+    }
+  }
+
+  // O padrão anda em UM eixo por vez. Andar nos dois com passo igual só cabe na
+  // diagonal dentro de uma malha de 3, e ali a inversão devolveria o alvo.
+  const horizontal = Math.random() < 0.5;
+  const fixo = ri(1, MAX_COORD - 1);
+  const pontosPadrao = [0, 1, 2].map(passo => (horizontal ? { x: passo, y: fixo } : { x: fixo, y: passo }));
+  const alvo = horizontal ? { x: 3, y: fixo } : { x: fixo, y: 3 };
   return {
-    ...spec,
-    origem: { ...spec.origem },
-    alvo: { ...spec.alvo },
-    inicio: spec.inicio ? { ...spec.inicio } : undefined,
-    vertices: spec.vertices?.map(p => ({ ...p })),
-    pontosPadrao: spec.pontosPadrao?.map(p => ({ ...p })),
-    opcoes: spec.opcoes.map(option => ({ ...option })),
+    ...cena, modo: "padrao-alinhado", identificarPadrao: true, alvo, pontosPadrao,
+    objetivo: "Os pontos estão alinhados seguindo o mesmo padrão. Qual vem depois?",
+    resposta: encode(alvo), opcoes: makeOptions(alvo, distratoresDoAlvo(alvo)),
   };
 }
 
