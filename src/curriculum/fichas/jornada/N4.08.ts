@@ -35,7 +35,12 @@ export const N4_08: FichaCompetencia = {
   nome: "Multiplicação por 1 dígito e por 10 e 100",
   strand: "N4",
   faixa: "F3",
-  prereqs: ["N4.07"],
+  // CLASS-002 — a ficha dizia menos pré-requisitos do que o DAG cobra.
+  //
+  // Quem tranca a porta é o DAG: é dele que `unlockEngine` e `rescuePlanner`
+  // leem. O campo aqui é documentação, e documentação que discorda do que o app
+  // faz é pior que documentação ausente — ela convence de uma coisa errada.
+  prereqs: ["N2.04", "N3.11", "N4.07"],
   howto: "Multiplicar por dez faz cada algarismo subir uma casa.",
   explain: "Veja o material: cada peça virou a peça de cima.",
   distratores: [

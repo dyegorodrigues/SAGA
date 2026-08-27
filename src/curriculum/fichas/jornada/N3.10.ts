@@ -16,7 +16,12 @@ export const N3_10: FichaCompetencia = {
   nome: "Problemas aditivos em painéis",
   strand: "N3",
   faixa: "F1",
-  prereqs: ["N3.03"],
+  // CLASS-002 — a ficha dizia menos pré-requisitos do que o DAG cobra.
+  //
+  // Quem tranca a porta é o DAG: é dele que `unlockEngine` e `rescuePlanner`
+  // leem. O campo aqui é documentação, e documentação que discorda do que o app
+  // faz é pior que documentação ausente — ela convence de uma coisa errada.
+  prereqs: ["N3.03", "N3.04"],
   howto: "Veja o que aconteceu: chegou mais ou foi embora? Se chegou, junte. Se foi, tire.",
   explain: "Olhe de novo o que mudou entre as duas cenas.",
   distratores: [

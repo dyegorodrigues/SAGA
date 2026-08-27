@@ -18,7 +18,12 @@ export const N4_06: FichaCompetencia = {
   nome: "Família de multiplicação e divisão",
   strand: "N4",
   faixa: "F2",
-  prereqs: ["N4.03"],
+  // CLASS-002 — a ficha dizia menos pré-requisitos do que o DAG cobra.
+  //
+  // Quem tranca a porta é o DAG: é dele que `unlockEngine` e `rescuePlanner`
+  // leem. O campo aqui é documentação, e documentação que discorda do que o app
+  // faz é pior que documentação ausente — ela convence de uma coisa errada.
+  prereqs: ["N4.03", "N4.05"],
   howto: "Os dois de baixo multiplicados dão o de cima. E o de cima dividido por um dá o outro.",
   explain: "Olhe o triângulo: se você sabe a multiplicação, já sabe a divisão.",
   distratores: [

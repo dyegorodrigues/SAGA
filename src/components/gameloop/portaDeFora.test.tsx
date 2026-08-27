@@ -57,6 +57,11 @@ const PORTOES_MEDIDOS = [
   "GE.09|1", "GE.09|3", "GE.09|5",
   "GM.11|1", "GM.11|2", "GM.11|3", "GM.11|5",
   "N2.06|1", "N2.06|2",
+  // A conta armada: o teclado tem o dígito da resposta, e tocá-lo sozinho não
+  // envia nada — a criança ainda precisa montar a coluna. Só apareceu depois de
+  // a varredura ganhar sementes fixas; com uma amostra ao acaso por nível, ele
+  // entrava e saía do inventário entre execuções.
+  "N3.09|4",
 ];
 
 /**
@@ -75,6 +80,21 @@ const PALCOS_DE_PRODUCAO: Array<[string, number[], string]> = [
   ["GE.10", [3], "Conferir reconstrução"],
   ["GE.10", [5], "Conferir três vistas"],
 ];
+
+/**
+ * Sementes fixas para o inventário.
+ *
+ * Sem elas a varredura media uma amostra ao acaso por nível, e um palco como o
+ * `vertical` de `N3.09` ora desenhava o rótulo da resposta num botão, ora não —
+ * o inventário aparecia e sumia entre execuções. Inventário que muda sozinho
+ * não é catraca, é ruído.
+ */
+const SEMENTES = [0x2f6e2b1, 0x5bd1e99, 0x1a2b3c4];
+const originalRandom = Math.random;
+function semear(semente: number): void {
+  let estado = semente >>> 0;
+  Math.random = () => { estado = (estado * 1664525 + 1013904223) >>> 0; return estado / 0x100000000; };
+}
 
 const rotuloDaResposta = (q: Question): string => {
   const opcoes = q.options ?? [];
@@ -124,10 +144,22 @@ describe("CLASS-007 na casca — o portão do palco não pode ter porta dos fund
     let comRotuloNaTela = 0;
     for (const ficha of JOURNEY_FICHAS.filter(item => hasComposerFicha(item.id))) {
       for (let nivel = 1; nivel <= 5; nivel += 1) {
-        const { naTela, vende } = medirPorta(generateRegisteredFichaQuestion(ficha.id, nivel) as Question);
-        if (!naTela) continue;
+        // Um portão só conta como portão se estiver fechado em TODA semente em
+        // que o rótulo apareceu. Vender numa delas já é porta aberta.
+        let apareceu = false;
+        let vendeuAlguma = false;
+        for (const semente of SEMENTES) {
+          semear(semente);
+          const q = generateRegisteredFichaQuestion(ficha.id, nivel) as Question;
+          Math.random = originalRandom;
+          const { naTela, vende } = medirPorta(q);
+          if (!naTela) continue;
+          apareceu = true;
+          if (vende) vendeuAlguma = true;
+        }
+        if (!apareceu) continue;
         comRotuloNaTela += 1;
-        if (!vende) medidos.push(`${ficha.id}|${nivel}`);
+        if (!vendeuAlguma) medidos.push(`${ficha.id}|${nivel}`);
       }
     }
 

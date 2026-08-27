@@ -38,7 +38,12 @@ export const N4_07: FichaCompetencia = {
   nome: "Tabuadas do 6 ao 9",
   strand: "N4",
   faixa: "F2",
-  prereqs: ["N4.04"],
+  // CLASS-002 — a ficha dizia menos pré-requisitos do que o DAG cobra.
+  //
+  // Quem tranca a porta é o DAG: é dele que `unlockEngine` e `rescuePlanner`
+  // leem. O campo aqui é documentação, e documentação que discorda do que o app
+  // faz é pior que documentação ausente — ela convence de uma coisa errada.
+  prereqs: ["N4.04", "N4.06"],
   howto: "Nove é quase dez. Faça sete vezes dez e tire um sete.",
   explain: "Comece pelo fato fácil que você sabe. Depois ajuste.",
   distratores: [
