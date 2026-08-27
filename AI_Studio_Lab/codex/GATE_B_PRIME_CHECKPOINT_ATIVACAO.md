@@ -51,6 +51,25 @@ A ordem é a ordem real dos commits; nada aqui é reescrito depois.
 | 13 | CLASS-003 — instrumento | — | `eb667bd` | gate por descoberta de variedade de caso nos 75 canários, com catraca nos dois sentidos |
 | 14 | CLASS-003 — N4.10/F69 | `7a26274` | `7a26274` | o caso do nível é sorteado; a invariante da escada, não |
 | 15 | CLASS-009 — instrumento | `7a26274` | `7a26274` | o gate mede texto por elemento; rótulo numérico exige vizinhança não-dígito |
+| 16 | CLASS-003 — N4.12/F71 e N4.11/F70 | `c1989c7` | `c1989c7` | a conta e o número do crivo são sorteados; o quociente ímpar impede a estimativa virar resposta |
+| 17 | CLASS-003 — N7.01/F84 e N7.02/F85 | `7463017` | `7463017` | ponto e conta sorteados com a invariante de sinal de cada nível |
+| 18 | CLASS-003 — GM.10/F93 | `41411ca` | `41411ca` | a conversão é sorteada; o decimal só aparece onde a escada o pede |
+| 19 | CLASS-003 — GM.07/F63 e GM.08/F81 | `2ca40fa` | `2ca40fa` | figura e região sorteadas; a área declarada volta a fechar com o desenho |
+| 20 | CLASS-003 — GE.07/F79 | `cc38888` | `cc38888` | a CLASSE da figura é sorteada, e cada classe ganha traço próprio no SVG |
+| 21 | CLASS-003 — GE.09/F91 e GE.04/F59 | `944fa37` | `944fa37` | medidas e sólido sorteados; a resposta segue o sólido, não a posição |
+| 22 | CLASS-009 — instrumento | `2ae6cdf` | `2ae6cdf` | veredito por unanimidade entre amostras; parcial vira relatório com catraca de mão única |
+| 23 | CLASS-003 — N2.07/F66 | `7dd15e9` | `7dd15e9` | o número é sorteado, e a abertura longe do MDC recusa o par inseguro na origem |
+| 24 | CLASS-003 — GM.11/F94 | `c3e380a` | `c3e380a` | o prisma é sorteado; o teste do palco deixa de pedir spec e opções em duas chamadas |
+| 25 | CLASS-003 — instrumento (digital) | `c528e8a` | `c528e8a` | serializador estável e profundo; `JSON.stringify(obj, chaves)` filtrava em vez de ordenar |
+| 26 | CLASS-003 — N5.05/F86, GE.03/F58 | `b236e9a`, `cbf8e23` | `b236e9a`, `cbf8e23` | a conta é a própria grade; a forma e a malha saem de tabela-verdade |
+| 27 | CLASS-003 — caso único fechada | `fc2a1cf` | `fc2a1cf` | zero a reparar na primeira dimensão; `N1.02` medida e classificada |
+| 28 | CLASS-003 — GM.06/F62 | `60334c0` | `60334c0` | relógio e duração sorteados; o gate mede os dois ponteiros separados |
+| 29 | CLASS-003 — instrumento (tela) | `d5dc891` | `d5dc891` | quem confirma o rótulo decorável é o render da casca; a categoria escrita à mão some |
+| 30 | CLASS-003 — PE.02, PE.03, PE.04 | `b4aa5ee` | `b4aa5ee` | pesquisa, torres e experimento sorteados; três distratores que não pegavam ninguém corrigidos |
+| 31 | CLASS-003 + CLASS-009 — GE.05, GE.06, GE.08, GE.10 | `b434b5e` | `b434b5e` | caso sorteado nas quatro; rótulo que se autodeclarava certo eliminado; três correções de medição na CLASS-009 |
+| 32 | CLASS-003 — AL.05, AL.06, AL.07, GM.09 | `707e48d` | `707e48d` | balança, expressão, letra e problema sorteados; cada distrator passa a ser o resultado do erro que nomeia |
+| 33 | CLASS-003 — resposta decorável fechada | `2149f93` | `2149f93` | N2.06, N4.12, N5.01, N5.03, N5.04; registro esvazia; dois palcos de produção param de ter barra por fora |
+| 34 | CLASS-010 — fechada | `4e658c6` | `4e658c6` | dezessete palcos param de vender o acerto por dois caminhos; gate por comportamento, com prova de vida |
 
 A linha 10 é a única cujo recibo vermelho e correção estão no mesmo commit: o
 achado apareceu ao medir o efeito do reparo de GE.04, já dentro da frente, e
@@ -178,88 +197,206 @@ por descoberta que reprove uma reincidência futura — não uma lista escrita �
 mão (D068). As cinco fecharam na linha 7; o gate por descoberta é o `d774406`
 da linha 5.
 
-## 7. CLASS-010 — a resposta desenhada duas vezes
+## 7. CLASS-010 — a resposta desenhada duas vezes — **FECHADA**
 
-Aberta ao medir a porta dos fundos da casca (linha 10). Fechar os cinco `kind`
-desta frente não fecha a classe: a varredura dos 75 canários do Composer, em
-cinco níveis, encontrou **20 competências** em que o rótulo da resposta continua
-aparecendo em dois botões da mesma tela — o do palco autoral e o da barra
-genérica embaixo.
+Aberta ao medir a porta dos fundos da casca (linha 10) e fechada na linha 34.
 
-`AL.06`, `AL.07`, `GE.05`, `GE.06`, `GE.08`, `GE.10`, `GM.06`, `GM.08`,
-`GM.09`, `GM.10`, `N2.06`, `N4.03`, `N4.11`, `N5.05`, `N6.03`, `N7.01`,
-`N7.02`, `PE.02`, `PE.03`, `PE.04`.
+O inventário de abertura contou **20 competências** em que o rótulo da resposta
+aparecia em dois botões da mesma tela. Ele estava errado nos dois sentidos, e o
+erro era do método: contar RÓTULO acusa um teclado numérico que legitimamente
+tem o dígito da resposta, e acusa uma malha que tem a casa certa. `N4.03` e
+`N4.11` entraram por isso.
 
-Duas dessas são CLASS-007 vivas, não só duplicação: `N2.06` (L1–L2) e `N4.03`
-(L2–L3) fecham as próprias alternativas no mount, e a barra de fora as reabre.
-As outras dezoito desenham a resposta duas vezes sem portão a contornar — feio,
-e ainda assim um segundo caminho de mastery que ninguém mediu.
+A medição que fechou a classe é por COMPORTAMENTO. Cada botão é clicado num
+render limpo — o primeiro clique pode desabilitar a tela inteira, e contar os
+seguintes no mesmo render diria que só existe um caminho justamente onde há
+dois — e conta-se quantos fazem o `handlePick` receber uma resposta que a
+questão aceita. Deu **dois em todos os cinco níveis de dezessete `kind`**:
 
-Não foram reparadas aqui de propósito. Suprimir a barra em vinte competências é
-mudança de tela em massa, e a direção perigosa do mesmo ajuste — deixar uma
-questão sem caminho para responder — precisa ser medida por competência, não
-presumida. A classe entra com inventário medido e sem reparo, como a CLASS-009
-entrou; o próximo passo é o dimensionamento dela, e o gate de `portaDeFora`
-já existe para recebê-lo.
+`primos-divisores-f70`, `multiplicar-fracoes-f86`, `porcentagem-f87`,
+`reta-completa-f84`, `operar-negativos-f85`, `expressao-f77`,
+`linguagem-letras-f89`, `mapa-tesouro-f60`, `angulos-f78`,
+`plano-cartesiano-f80`, `horas-minutos-f62`, `area-f81`,
+`problemas-medida-f82`, `conversao-unidades-f93`, `jornal-turma-f64`,
+`media-chance-f83`, `estatistica-chance-f95`.
 
-## 8. CLASS-003 — um nível que é um caso só
+`N4.03` e `N4.11` saíram: nenhum clique isolado vendia acerto duas vezes ali. A
+"CLASS-007 viva em N2.06 L1–L2 e N4.03 L2–L3" do inventário antigo também era
+leitura do texto, não do comportamento.
 
-Prioridade 3 do roadmap (variedade/mastery estrutural), aberta com instrumento
-e inventário medido, sem reparo em massa.
+Três palcos saíram da duplicação antes, durante a frente da CLASS-003, porque a
+duplicata era o próprio defeito que se estava reparando: `volume-vistas-f92`
+(linha 31), `divisao-dois-digitos-f71` e `draggroup` (linha 33). Nos dois
+últimos a barra da casca desenhava NOMES DE ERRO como se fossem alternativas —
+"quociente ajustado" estava num botão e acertava os cinco níveis da F71 sem
+nenhuma estimativa.
+
+Zero caminho não é defeito nesta classe. Onde a ficha exige construir o prisma,
+rodar o experimento ou conferir os critérios, nenhum clique isolado vende nada,
+e é exatamente isso que a CLASS-007 garantiu. Quem cobra a EXISTÊNCIA do
+caminho é `portaDeFora.test.tsx`, do outro lado — e ele ganhou uma prova nova,
+pela ausência: nos palcos de produção o rótulo da resposta não pode estar em
+botão nenhum, e o teste também cobra que o botão de confirmar exista, senão
+bastaria quebrar o palco para passar.
+
+O gate novo (`respostaNaoSeCompraDuasVezes.test.tsx`) nasce com registro vazio.
+Registro vazio tem um risco próprio: "ninguém duplica" e "não olhei" dão o mesmo
+verde. Por isso ele afirma também quantas fichas vê vendendo por UM caminho — a
+mutação que cega a contagem fica vermelha por causa dessa afirmação, e não por
+causa da catraca.
+
+## 8. CLASS-003 — um nível que é um caso só — **FECHADA NAS DUAS DIMENSÕES**
+
+Prioridade 3 do roadmap (variedade/mastery estrutural). Aberta com instrumento e
+inventário medido; fechada em zero a reparar nas duas dimensões que a medição
+separou.
 
 As fichas cobram 3 acertos de 3 em 2 sessões — algumas 4/4 em 3. Quando o
 contrato devolve **um único caso determinístico** naquele nível, a criança
 responde o mesmo item seis a doze vezes e o motor conclui domínio. Não é
 prática distribuída: é memorizar um item.
 
-Medido sobre os 75 canários, 8 amostras consecutivas por (ficha, nível) a
-partir de duas sementes: **31 competências e 151 pares**. O inventário
-documental falava em **18 competências "conhecidas"**; a medição achou 13 a
-mais — `N1.02`, `N2.06`, `N2.07`, `N5.03`, `AL.05`, `GE.03`, `GE.04`, `GE.05`,
-`GE.06`, `GE.07`, `GE.08`, `GE.09`, `GE.10`. É a terceira vez nesta fase que um
-inventário escrito à mão fica atrás do medido.
+### Dimensão 1 — o caso único
 
-### A dívida que esta frente criou
+Medido sobre os 75 canários, 8 amostras consecutivas por (ficha, nível) a partir
+de duas sementes: **31 competências e 151 pares**. O inventário documental
+falava em **18 competências "conhecidas"**; a medição achou 13 a mais. É a
+terceira vez nesta fase que um inventário escrito à mão fica atrás do medido.
 
-Cinco dessas — `GE.04`, `GE.07`, `GE.09`, `GM.11`, `N2.07` — são exatamente as
-que ganharam portão de ação nas linhas 3, 4, 8, 9 e 11. O portão está certo e
-continua insuficiente: a criança o atravessa seis vezes com o mesmo item.
-Fechar a CLASS-007 numa ficha não a torna avaliável enquanto o nível for um
-caso só. Fica registrado como dívida desta frente, não como pendência de
-terceiros.
+Fechada na linha 27, em zero a reparar, depois de 15 contratos sorteados.
 
-### Primeiro reparo e o que ele revelou
+### Dimensão 2 — a resposta decorável
 
-`N4.10/F69` saiu do registro na linha 14, e a catraca cobrou a saída sozinha.
-Fila em **30 competências / 146 pares**.
+Sortear o caso não basta. Se o RÓTULO da alternativa certa é sempre o mesmo, a
+criança decora o rótulo e vence o nível sem fazer a conta. Não é hipótese:
+aconteceu em `GE.04`, onde a esfera estava sempre na rampa, e em `GE.07`, onde a
+resposta era sempre "isósceles" em L1.
 
-O reparo consumiu números aleatórios, deslocou o fluxo do PRNG e fez o gate da
-CLASS-009 acusar `N6.03`. Não era vazamento: a resposta era `10` e o apoio fixo
-diz `100% é o inteiro`. A causa é mais funda que um caso — `textContent` cola
-nós vizinhos sem separador, então a reta numérica virava `024681012` e, em
-`N4.09`, o `2` de "3 × 2" grudava no `6` seguinte formando `3x26`. **O gate
-media texto que a criança não vê.**
+Aberta com **22 fichas** e fechada na linha 33 com **zero**. O caminho de 22 a
+zero passou por uma correção do próprio instrumento (linha 29) que mudou o
+veredito nos dois sentidos: `AL.01`, `N1.01`, `N1.02`, `GE.03` e `GM.12` saíram
+porque ninguém desenha o rótulo delas, e `N4.12` ENTROU porque eu tinha escrito
+à mão que a F71 não renderiza alternativas — e a casca renderizava.
 
-Corrigido na linha 15: o suporte é remontado por elemento e rótulo numérico
-exige vizinhança não-dígito. `N4.09` sai do registro da CLASS-009 — todas as
-detecções dela eram artefato, e a justificativa antiga racionalizava o
-artefato. `AL.03` e `N4.03` continuam detectadas, o que prova que a correção
-não afrouxou nada; foi a própria catraca de entradas obsoletas que cobrou isso,
-duas vezes, durante o conserto.
+### A dívida que esta frente criou, e o que aconteceu com ela
 
-Consequência para o fechamento anterior: os **7 vazamentos reparados continuam
-reparados**. O que estava inflado era a contagem de "21 fichas ecoam o rótulo,
-14 legítimas" — parte das legítimas era ruído do instrumento.
+Cinco das fichas medidas — `GE.04`, `GE.07`, `GE.09`, `GM.11`, `N2.07` — eram
+exatamente as que ganharam portão de ação nas linhas 3, 4, 8, 9 e 11. O portão
+estava certo e continuava insuficiente: a criança o atravessava seis vezes com o
+mesmo item. As cinco foram sorteadas nas linhas 20, 21, 23 e 24. A dívida foi
+paga na mesma rodada em que foi registrada.
+
+### O que sortear os casos revelou
+
+Randomizar não foi só variar. Cada contrato aberto mostrou uma invariante que o
+caso fixo escondia — e quase sempre um distrator que não descrevia ninguém:
+
+- `GM.07/F63`: os lados de L3 desenhavam um L de área 11 e o spec declarava 8. O
+  distrator `CONFUNDE_COM_AREA` não continha a conta que a criança faria.
+- `PE.02/F64`: a tabela mostrava 0 para a barra que falta enquanto o enunciado
+  afirmava "a tabela diz 7".
+- `PE.03/F83`: em L5 o saco de maior chance também tinha mais bolas marcadas.
+  Quem ignora o total — o erro que o nível existe para pegar — acertava.
+- `PE.04/F95`: o palco desenhava os dois sacos de L2 com números escritos à mão,
+  sem olhar o spec; e a tag `TUDO_CINQUENTA` estava no saco errado, porque quem
+  acha que tudo é cinquenta por cento responde "iguais", não "Saco A".
+- `GE.06/F78`: em L3 o ângulo maior tinha o lado mais comprido, e o nível existe
+  para desmentir exatamente isso.
+- `GE.10/F92`: em L4 nada garantia cubo escondido; e os rótulos de L3 e L5 se
+  autodeclaravam ("Construção que reproduz as três vistas" ao lado de
+  "Construção girada"). Ler português vencia a competência.
+- `N5.01/F45`: L2 é "sobrepor" para CONFERIR, e as partes encaixavam sempre. Um
+  teste que não pode dar negativo não é um teste.
+- `N5.03/F73`: os três pares de L1 e L2 eram todos equivalentes. E em L3 a maior
+  estava sempre à direita, em L4 sempre à esquerda — decoração POSICIONAL, que a
+  varredura de rótulo não vê porque o rótulo traz a fração.
+- `N4.12/F71`: com quociente múltiplo de 10 a estimativa inicial virava uma
+  segunda resposta certa.
+
+### Três correções de medição, e o que elas custaram ao registro
+
+O gate da CLASS-009 errou nos dois sentidos, e as três correções encolheram o
+registro dele em seis entradas — todas artefato da medição, não reparo de app:
+
+1. **Texto colado** (linha 15): `textContent` concatena nós vizinhos sem
+   separador. A reta numérica virava `024681012` e `3 × 2` seguido de `6` virava
+   `3x26`. `N4.09` saiu; a justificativa antiga racionalizava o artefato.
+2. **Fronteira de elemento para todo rótulo** (linha 31): `C1` era detectado
+   dentro dos cabeçalhos `a b c 1 2 3` do mapa, que são células separadas.
+3. **Fronteira de palavra** (linha 31): `reto` casava dentro de `correto`, apoio
+   fixo da F78. Saíram `GE.08`, `GE.10`, `PE.03`, `PE.04` e `N2.06` — e a
+   entrada de `N2.06` dizia, com todas as letras, que "paridade" continha "par"
+   por acaso de substring. Justificativa que descreve um artefato é medição a
+   corrigir, não exceção a manter.
+
+Uma quarta correção foi do lado errado da mesma moeda: o rótulo era normalizado
+sem espaços e a tela com eles, então "Saco A" virava "sacoa" e deixava de casar
+com o "saco a" escrito ali. Falso negativo tão silencioso quanto o falso
+positivo.
+
+E o gate da própria CLASS-003 errou uma vez (linha 25): a digital usava
+`JSON.stringify(obj, chaves)`, que FILTRA chaves em vez de ordenar, e o conteúdo
+aninhado sumia. A contagem inflou de 16 para 31 competências. Os 13 reparos já
+feitos foram reconferidos um a um: todos continuavam justificados.
+
+### O acoplamento que a randomização expõe
+
+Um padrão recorrente, digno de registro porque vai voltar: quase todo contrato
+sorteado quebrou um teste que fixava o caso. `VolumePrismasStage`,
+`FatoresRetangulosStage`, `poligonosW33`, `conversaoUnidadesW36`,
+`divisaoDoisDigitosW43Stage`, `primosDivisoresW42Stage`,
+`MultiplicarFracoesStage`, `horasMinutosW35`, `mediaChanceW31`,
+`paresImparesW30`, `volumeVistasW41Stage` e `somarFracoesW44Stage`.
+
+Nenhum foi afrouxado. Todos passaram a derivar a expectativa do spec — o que os
+torna, de quebra, testes melhores: eles agora afirmam a REGRA, não o exemplo.
 
 ## 9. Recibos desta rodada
 
 - `tsc --noEmit`: limpo;
-- suíte inteira: **3492/3492** em 263 arquivos;
+- suíte inteira: **3653/3653** em 293 arquivos;
 - `npm run auditar`: invariantes canônicos, guard documental, palcos compostos e
   matriz de cobertura aprovados;
-- mutação: cada correção derruba o teste novo quando revertida — 3 mutações em
-  GE.09, 3 em GE.04, 5 em GE.07, 5 em N4.02, 6 na porta da casca, 5 no gate da
-  CLASS-003 e 6 no reparo de N4.10. As três que sobrevivem estão nomeadas nos
-  commits: a guarda redundante de `testar()` em GE.04, o `answerMode` de N4.02
-  que nenhum renderizador lê, e `cobraRepeticao` no gate da CLASS-003, que não
-  discrimina hoje porque toda ficha cobra repetição.
+- catraca de densidade documental: piso subido a cada arquivo de runtime que
+  cruzou o limiar, nunca baixado;
+- mutação: cada correção derruba o teste novo quando revertida. Nesta rodada, 5
+  em GM.06, 4 no instrumento da CLASS-003, 11 nas fichas de PE, 11 nas de GE, 8
+  em AL e GM.09, 9 nas últimas cinco, e 3 no gate da CLASS-010 — todas
+  vermelhas.
+
+Duas mutações precisaram de um gate MELHOR antes de morrer, e as duas são o
+mesmo aprendizado: **medir o par esconde a metade presa.**
+
+- congelar a hora do relógio em GM.06 ficava verde, porque o minuto sorteado já
+  fazia o par `hora:minuto` variar. O gate passou a medir os dois ponteiros
+  separados;
+- fixar a coluna do tesouro em GE.05, ou o índice da barra perguntada em PE.02,
+  ficava verde pelo mesmo motivo. Os dois gates passaram a medir cada eixo, e a
+  POSIÇÃO além do nome.
+
+Uma terceira sobreviveu por uma razão diferente e foi corrigida no instrumento:
+cegar a contagem do gate da CLASS-010 passava, porque com registro vazio "ninguém
+duplica" e "não olhei" dão o mesmo verde. O gate ganhou prova de vida.
+
+As três sobreviventes antigas continuam nomeadas nos commits: a guarda redundante
+de `testar()` em GE.04, o `answerMode` de N4.02 que nenhum renderizador lê, e
+`cobraRepeticao` no gate da CLASS-003, que não discrimina hoje porque toda ficha
+cobra repetição.
+
+## 10. Onde o Gate B′ está agora
+
+| Classe | Estado |
+|---|---|
+| CLASS-007 (bypass da ação probatória) | fechada nas testemunhas medidas; dívida do gate por descoberta DENTRO do palco continua aberta |
+| CLASS-009 (a tela declara a resposta) | fechada, com gate por descoberta e três correções de medição |
+| CLASS-003 (caso único / resposta decorável) | fechada nas duas dimensões, registros vazios |
+| CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
+| CLASS-008 (evidências distintas) | **aberta** — próxima |
+| CLASS-001, CLASS-002, CLASS-004 | abertas, prioridade 4 |
+
+A dívida do D068 que a frente da CLASS-007 registrou continua de pé e é a mais
+importante das que sobraram: **não existe gate por descoberta que meça, dentro
+do palco, se a ação probatória é contornável.** Hoje quem mede é
+`portaDeFora.test.tsx`, na casca, com lista escrita à mão de quais palcos
+desenham e quais têm portão. Enquanto ela existir, um palco novo pode nascer com
+a porta aberta sem nenhum teste ficar vermelho.
