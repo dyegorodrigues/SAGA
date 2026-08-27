@@ -47,6 +47,28 @@ const PALCOS_QUE_DESENHAM: Array<[string, number[]]> = [
   ["GE.09", [1, 2, 3, 4, 5]],
   ["GM.11", [1, 2, 3, 4, 5]],
   ["N2.07", [1, 2, 3, 4, 5]],
+  ["N2.06", [1, 2, 3, 4, 5]],
+  ["GE.10", [1, 2, 4]],
+];
+
+/**
+ * Palcos de PRODUÇÃO: a criança fabrica a resposta, e nenhum botão a carrega.
+ *
+ * Os `options` destas questões existem para o Radar — são nomes de erro, não
+ * alternativas. A barra da casca os desenhava assim mesmo, e o rótulo certo era
+ * clicável: em `N4.12` bastava tocar em "quociente ajustado" para vencer os
+ * cinco níveis sem estimar nada; em `GE.10` L3 e L5, "Construção que reproduz
+ * as três vistas" e "As três vistas desenhadas corretamente" pulavam a
+ * reconstrução e o desenho inteiros.
+ *
+ * A prova aqui é pela ausência: o rótulo da resposta não pode estar em botão
+ * nenhum. Mas ausência sozinha é fácil de conseguir quebrando o palco, então o
+ * teste também cobra que exista caminho — o botão de confirmar da produção.
+ */
+const PALCOS_DE_PRODUCAO: Array<[string, number[], string]> = [
+  ["N4.12", [1, 2, 3, 4, 5], "Confirmar esta estimativa"],
+  ["GE.10", [3], "Conferir reconstrução"],
+  ["GE.10", [5], "Conferir três vistas"],
 ];
 
 /**
@@ -78,6 +100,19 @@ describe("CLASS-007 na casca — o portão do palco não pode ter porta dos fund
       for (const nivel of niveis) {
         const { view, comORotuloDaResposta } = montar(id, nivel);
         expect(comORotuloDaResposta().length, `${id} L${nivel} desenhou a resposta duas vezes`).toBe(1);
+        view.unmount();
+      }
+    }
+  });
+
+  it("onde a criança produz a resposta, nenhum botão a entrega — e o caminho existe", () => {
+    for (const [id, niveis, confirmar] of PALCOS_DE_PRODUCAO) {
+      for (const nivel of niveis) {
+        const { view, comORotuloDaResposta } = montar(id, nivel);
+        expect(comORotuloDaResposta().length, `${id} L${nivel}: o rótulo da resposta está clicável`).toBe(0);
+        const caminho = [...view.container.querySelectorAll("button")]
+          .filter(botao => botao.textContent?.trim() === confirmar);
+        expect(caminho.length, `${id} L${nivel} ficou sem "${confirmar}"`).toBeGreaterThan(0);
         view.unmount();
       }
     }

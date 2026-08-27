@@ -86,12 +86,20 @@ export function construirPartesIguaisSpec(level: number, rng: () => number = Mat
     };
   }
   if (nivel === 2) {
+    // CLASS-003: as partes nem sempre encaixam.
+    //
+    // O nível é "sobrepor" — pôr uma parte sobre a outra para CONFERIR. Com
+    // `partesIguais` fixo em `true`, conferir nunca desmentia nada: "Encaixam"
+    // acertava em todo sorteio, e a criança vencia o nível sem sobrepor. Um
+    // teste que não pode dar negativo não é um teste.
+    const encaixam = rng() >= 0.45;
+    const cortes = encaixam ? alvo : alvo.map((valor, indice) => Math.max(0.08, Math.min(0.92, valor + (indice % 2 === 0 ? 0.10 : -0.08))));
     return {
-      nivel, modo: "sobrepor", suporte: "circulo", denominador, partesIguais: true, sobrepor: true,
-      cortes: alvo, cortesAlvo: alvo, toqueAlternativo: false, resposta: "iguais", rotulo,
+      nivel, modo: "sobrepor", suporte: "circulo", denominador, partesIguais: encaixam, sobrepor: true,
+      cortes, cortesAlvo: alvo, toqueAlternativo: false, resposta: encaixam ? "iguais" : "diferentes", rotulo,
       opcoes: [
-        { value: "iguais", label: "Encaixam: são iguais" },
-        { value: "diferentes", label: "Não encaixam", misconception: PartesIguaisMisconception.IGNORA_IGUALDADE },
+        { value: "iguais", label: "Encaixam: são iguais", ...(encaixam ? {} : { misconception: PartesIguaisMisconception.IGNORA_IGUALDADE }) },
+        { value: "diferentes", label: "Não encaixam", ...(!encaixam ? {} : { misconception: PartesIguaisMisconception.IGNORA_IGUALDADE }) },
       ],
     };
   }

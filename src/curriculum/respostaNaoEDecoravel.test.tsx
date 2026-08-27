@@ -47,14 +47,15 @@ import type { Question } from "../types";
  * Gate por descoberta com catraca nos dois sentidos, como os irmãos: entrada
  * nova reprova sem ninguém inscrever nada, e entrada que ganhou variedade
  * também, para o registro encolher a cada reparo.
+ *
+ * ### O registro está vazio, e é isso que ele quer dizer
+ *
+ * Ele abriu com dezesseis fichas e fechou em zero. Nenhuma ficha servida pelo
+ * Composer responde sempre o mesmo rótulo num nível que cobra repetição. O
+ * vazio não desliga nada: a varredura continua rodando sobre as 75, e a
+ * primeira que voltar a decorar entra aqui reprovando, com nome e nível.
  */
-const REGISTRO: Record<string, { niveis: number[]; porque: string }> = {
-  "N2.06": { niveis: [1, 2, 3, 4, 5], porque: "a paridade perguntada é sempre a mesma por nível" },
-  "N4.12": { niveis: [1, 2, 3, 4, 5], porque: "a casca desenha os nomes de erro como alternativas, e 'quociente ajustado' acerta sempre" },
-  "N5.01": { niveis: [2], porque: "as duas partes de L2 são sempre iguais: 'encaixam' acerta sempre" },
-  "N5.03": { niveis: [1, 2], porque: "os pares de L1/L2 são todos equivalentes: a resposta é sempre 'São iguais'" },
-  "N5.04": { niveis: [1, 2, 3, 4, 5], porque: "a soma de frações dá sempre o mesmo resultado por nível" },
-};
+const REGISTRO: Record<string, { niveis: number[]; porque: string }> = {};
 
 const SEMENTES = [0x2f6e2b1, 0x5bd1e99];
 const AMOSTRAS = 8;

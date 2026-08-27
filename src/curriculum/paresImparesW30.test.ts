@@ -33,6 +33,15 @@ describe("W30 regression-first — N2.06/F38 Pares e Ímpares", () => {
       for (const option of q.options ?? []) if (option.misconception) tags.add(option.misconception);
     }
 
+    // O `zero-impar` só existe onde a quantidade é zero, e desde a CLASS-003 o
+    // zero é um dos casos de L3, não O caso. Um sorteio por nível não basta
+    // para ver os três erros: a união se mede sobre o corpus.
+    for (let amostra = 0; amostra < 200 && tags.size < 3; amostra += 1) {
+      for (const option of generateRegisteredFichaQuestion("N2.06", 3).options ?? []) {
+        if (option.misconception) tags.add(option.misconception);
+      }
+    }
+
     expect((generateRegisteredFichaQuestion("N2.06", 1).uiProps as any).quantidade).toBeLessThanOrEqual(10);
     expect((generateRegisteredFichaQuestion("N2.06", 2).uiProps as any).quantidade).toBeLessThanOrEqual(20);
     expect((generateRegisteredFichaQuestion("N2.06", 3).uiProps as any).formarDuplas).toBe(false);

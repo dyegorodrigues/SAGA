@@ -49,22 +49,60 @@ const opcoes = (resposta: 0 | 1, erro: ParesImparesMisconceptionTag): ParesImpar
   { value: 0, label: "Ímpar", ...(resposta === 0 ? {} : { misconception: erro }) },
 ];
 
-const specs: readonly ParesImparesF38Spec[] = [
-  { ficha: "F38", nivel: 1, modo: "duplas", etapa: "formar-duplas-10", primitiva: "DragGroup", modoPrimitiva: "duplas", quantidade: 8, formarDuplas: true, resposta: 1, opcoes: opcoes(1, ParesImparesMisconception.CONFUNDE_TAMANHO), acessibilidade },
-  { ficha: "F38", nivel: 2, modo: "duplas", etapa: "formar-duplas-20", primitiva: "DragGroup", modoPrimitiva: "duplas", quantidade: 15, formarDuplas: true, resposta: 0, opcoes: opcoes(0, ParesImparesMisconception.CONFUNDE_TAMANHO), acessibilidade },
-  { ficha: "F38", nivel: 3, modo: "duplas", etapa: "decidir-visual", primitiva: "DragGroup", modoPrimitiva: "duplas", quantidade: 0, formarDuplas: false, resposta: 1, opcoes: opcoes(1, ParesImparesMisconception.ZERO_IMPAR), acessibilidade },
-  { ficha: "F38", nivel: 4, modo: "duplas", etapa: "ultimo-algarismo", primitiva: "DragGroup", modoPrimitiva: "duplas", quantidade: 47, formarDuplas: false, regraUltimoAlgarismo: true, resposta: 0, opcoes: opcoes(0, ParesImparesMisconception.DECORA_SEM_ENTENDER), acessibilidade },
-  { ficha: "F38", nivel: 5, modo: "duplas", etapa: "regra-soma", primitiva: "DragGroup", modoPrimitiva: "duplas", quantidade: 14, formarDuplas: false, soma: { a: 8, b: 6 }, resposta: 1, opcoes: opcoes(1, ParesImparesMisconception.DECORA_SEM_ENTENDER), acessibilidade },
-] as const;
-
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
 const clamp = (n: number) => Math.max(1, Math.min(5, Math.round(n)));
+
+/**
+ * CLASS-003 — a quantidade é sorteada, a escada não.
+ *
+ * Era uma quantidade só por nível — 8, 15, 0, 47 e 14 —, e a resposta certa
+ * saía sempre na mesma ordem: Par, Ímpar, Par, Ímpar, Par. Entre duas
+ * alternativas, decorar cinco palavras vencia a competência sem a criança
+ * formar uma dupla.
+ *
+ * O degrau continua sendo o ESCOPO e o método: formar duplas até 10, até 20,
+ * decidir sem formar, a regra do último algarismo, e a paridade de uma soma.
+ */
 export function construirParesImparesF38Spec(level: number): ParesImparesF38Spec {
-  const spec = specs[clamp(level) - 1];
+  const nivel = clamp(level);
+  const base = { ficha: "F38" as const, nivel, modo: "duplas" as const, primitiva: "DragGroup" as const, modoPrimitiva: "duplas" as const, acessibilidade: { ...acessibilidade } };
+
+  if (nivel === 1 || nivel === 2) {
+    const quantidade = nivel === 1 ? ri(3, 10) : ri(11, 20);
+    return {
+      ...base, etapa: nivel === 1 ? "formar-duplas-10" : "formar-duplas-20", quantidade, formarDuplas: true,
+      resposta: paridade(quantidade), opcoes: opcoes(paridade(quantidade), ParesImparesMisconception.CONFUNDE_TAMANHO),
+    };
+  }
+
+  if (nivel === 3) {
+    // Zero sai do caso fixo mas não some do corpus: é o único lugar onde a
+    // criança pode cometer o `ZERO_IMPAR`, e um erro que a tela nunca dá
+    // chance de cometer é um erro que o Radar nunca vê.
+    const quantidade = Math.random() < 0.25 ? 0 : ri(1, 12);
+    return {
+      ...base, etapa: "decidir-visual", quantidade, formarDuplas: false,
+      resposta: paridade(quantidade),
+      opcoes: opcoes(paridade(quantidade), quantidade === 0 ? ParesImparesMisconception.ZERO_IMPAR : ParesImparesMisconception.CONFUNDE_TAMANHO),
+    };
+  }
+
+  if (nivel === 4) {
+    const quantidade = ri(21, 99);
+    return {
+      ...base, etapa: "ultimo-algarismo", quantidade, formarDuplas: false, regraUltimoAlgarismo: true,
+      resposta: paridade(quantidade), opcoes: opcoes(paridade(quantidade), ParesImparesMisconception.DECORA_SEM_ENTENDER),
+    };
+  }
+
+  // As duas parcelas variam de paridade: par+par, ímpar+ímpar e par+ímpar dão
+  // resultados diferentes, e prever isso é o que o nível ensina.
+  const a = ri(2, 12);
+  const b = ri(2, 12);
+  const quantidade = a + b;
   return {
-    ...spec,
-    opcoes: spec.opcoes.map(option => ({ ...option })),
-    soma: spec.soma ? { ...spec.soma } : undefined,
-    acessibilidade: { ...spec.acessibilidade },
+    ...base, etapa: "regra-soma", quantidade, formarDuplas: false, soma: { a, b },
+    resposta: paridade(quantidade), opcoes: opcoes(paridade(quantidade), ParesImparesMisconception.DECORA_SEM_ENTENDER),
   };
 }
 

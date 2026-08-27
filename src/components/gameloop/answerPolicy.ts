@@ -102,6 +102,15 @@ export const PALCOS_QUE_RESPONDEM = new Set([
   // — e ainda por cima com o rótulo "Construção que reproduz as três vistas",
   // que dizia estar certo. Tocar nele pulava a reconstrução inteira.
   "volume-vistas-f92",
+  // N4.12/F71: o palco é produção no InteractiveVertical — estimar, testar,
+  // confirmar. Os `options` da questão são nomes de erro para o Radar, e a
+  // barra da casca os desenhava como alternativas: "quociente ajustado" estava
+  // num botão e acertava os cinco níveis para sempre, sem nenhuma estimativa.
+  "divisao-dois-digitos-f71",
+  // N2.06/F38 desenha "Par" e "Ímpar" no próprio palco. A exclusão logo abaixo
+  // fala de `drag-group`, com hífen — o kind desta ficha é `draggroup`, sem —,
+  // então a barra da casca vinha desenhando o mesmo par de botões por fora.
+  "draggroup",
 ]);
 export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {

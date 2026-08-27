@@ -103,9 +103,52 @@ function alternativas(spec: Omit<SomaFracoesF74Spec, "opcoes">): SomaFracoesOpca
   return candidatos.filter((item, index, all) => all.findIndex(other => other.value === item.value) === index).slice(0, 4);
 }
 
+const ri = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+
+/**
+ * CLASS-003 — a conta é sorteada, a escada não.
+ *
+ * Era uma conta só por nível: 1/4+2/4, 2/5+1/5, 5/7−2/7, 3/4+2/4 e 2/8+2/8. As
+ * respostas certas eram 3/4, 3/5, 3/7, 5/4 e 1/2, para sempre. A ficha cobra
+ * domínio por repetição: cinco frações decoradas venciam a competência.
+ *
+ * O degrau continua sendo o que cada nível pede — somar com barra, somar no
+ * símbolo, subtrair, chegar à imprópria, simplificar — e o denominador continua
+ * o mesmo dos dois lados, que é a restrição declarada da ficha.
+ */
+function sortearCaso(nivel: number): { modo: SomaFracoesModo; operacao: "+" | "-"; a: number; b: number; d: number } {
+  const modelo = CASOS[nivel - 1];
+  for (let tentativa = 0; tentativa < 200; tentativa += 1) {
+    const d = ri(3, 10);
+    const a = ri(1, d - 1);
+    const b = ri(1, d - 1);
+    if (modelo.modo === "subtrair") {
+      // Subtrair precisa sobrar alguma coisa: zero não é uma barra pintada.
+      if (a - b < 1) continue;
+      return { modo: modelo.modo, operacao: "-", a, b, d };
+    }
+    if (modelo.modo === "fracao-impropria") {
+      // Passar de um inteiro é justamente o degrau deste nível.
+      if (a + b <= d) continue;
+      return { modo: modelo.modo, operacao: "+", a, b, d };
+    }
+    if (modelo.modo === "simplificar") {
+      // Sem fator comum não há o que simplificar, e o distrator
+      // NAO_SIMPLIFICA cairia em cima da resposta.
+      if (a + b > d || mdc(a + b, d) === 1) continue;
+      return { modo: modelo.modo, operacao: "+", a, b, d };
+    }
+    // Os dois primeiros níveis ficam dentro do inteiro e sem simplificação:
+    // simplificar é L5, e antecipá-lo faria o nível cobrar o degrau seguinte.
+    if (a + b >= d || mdc(a + b, d) !== 1) continue;
+    return { modo: modelo.modo, operacao: "+", a, b, d };
+  }
+  return { ...modelo };
+}
+
 export function construirSomaFracoesF74Spec(level: number): SomaFracoesF74Spec {
   const nivel = Math.max(1, Math.min(5, Math.round(level)));
-  const caso = CASOS[nivel - 1];
+  const caso = sortearCaso(nivel);
   const resultadoNumeradorBruto = caso.operacao === "+" ? caso.a + caso.b : caso.a - caso.b;
   const resultadoBruto = formatar(resultadoNumeradorBruto, caso.d);
   const resposta = caso.modo === "simplificar" ? simplificar(resultadoNumeradorBruto, caso.d) : resultadoBruto;
