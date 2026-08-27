@@ -111,6 +111,17 @@ export const PALCOS_QUE_RESPONDEM = new Set([
   // fala de `drag-group`, com hífen — o kind desta ficha é `draggroup`, sem —,
   // então a barra da casca vinha desenhando o mesmo par de botões por fora.
   "draggroup",
+  // CLASS-010, medida por comportamento: em cada um destes o palco JÁ desenha
+  // as alternativas, e a barra da casca desenhava as mesmas por baixo. Não era
+  // só feio — eram dois caminhos para o mesmo acerto, e o de baixo não conhecia
+  // portão, cena nem manipulação. A varredura clicou botão por botão e contou
+  // dois que vendiam o acerto em todos os cinco níveis destes palcos.
+  "primos-divisores-f70", "multiplicar-fracoes-f86", "porcentagem-f87",
+  "reta-completa-f84", "operar-negativos-f85", "expressao-f77",
+  "linguagem-letras-f89", "mapa-tesouro-f60", "angulos-f78",
+  "plano-cartesiano-f80", "horas-minutos-f62", "area-f81",
+  "problemas-medida-f82", "conversao-unidades-f93", "jornal-turma-f64",
+  "media-chance-f83", "estatistica-chance-f95",
 ]);
 export function shouldRenderQuestionOptions(q: Question): boolean { return Boolean(q.options) && q.kind !== "vertical" && q.kind !== "numberline-interactive" && q.kind !== "drag-group" && q.kind !== "array" && !PALCOS_QUE_RESPONDEM.has(q.kind as string); }
 export function evidenciasDaResposta(meta?: AnswerMeta): string[] {
