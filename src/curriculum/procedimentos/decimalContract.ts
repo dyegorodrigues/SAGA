@@ -59,10 +59,23 @@ export function construirDecimalSpec(level: number, rng: () => number = Math.ran
     return { ...base, modo: "fracao-decimal", pintados: decimos * 10, resposta, fracao: `${decimos}/10`, opcoes: opcoes(resposta, [decimal(decimos / 100), decimal((10 - decimos) / 10)], DecimalMisconception.SEM_VALOR_POSICIONAL) };
   }
   if (nivel === 4) {
+    // CLASS-004 — viés posicional na comparação.
+    //
+    // Os quatro pares vinham sempre com o MAIOR à esquerda, e a resposta era
+    // "esquerda" em todo sorteio. O rótulo mudava, porque traz o decimal, e por
+    // isso a varredura de rótulo não via nada — mas a criança que reparasse no
+    // lado vencia o nível sem comparar décimo com centésimo uma vez.
+    //
+    // O par continua sendo o que ele era: o maior é o de menos casas, para que
+    // ler "25" como maior que "5" — o DECIMAL_COMO_INTEIRO — continue sendo o
+    // erro que o nível pega. O que passa a ser sorteado é de que lado ele cai.
     const pares = [[0.5, 0.25], [0.4, 0.35], [0.7, 0.62], [0.3, 0.28]] as const;
     const par = escolher([...pares], rng);
-    const resposta = par[0] > par[1] ? "esquerda" : "direita";
-    return { ...base, modo: "comparar", pintados: Math.round(par[0] * 100), resposta, comparar: { esquerda: par[0], direita: par[1] }, opcoes: [{ value: "esquerda", label: label(decimal(par[0])), ...(resposta === "esquerda" ? {} : { misconception: DecimalMisconception.DECIMAL_COMO_INTEIRO }) }, { value: "direita", label: label(decimal(par[1])), ...(resposta === "direita" ? {} : { misconception: DecimalMisconception.DECIMAL_COMO_INTEIRO }) }] };
+    const maiorNaEsquerda = rng() < 0.5;
+    const esquerda = maiorNaEsquerda ? par[0] : par[1];
+    const direita = maiorNaEsquerda ? par[1] : par[0];
+    const resposta = esquerda > direita ? "esquerda" : "direita";
+    return { ...base, modo: "comparar", pintados: Math.round(esquerda * 100), resposta, comparar: { esquerda, direita }, opcoes: [{ value: "esquerda", label: label(decimal(esquerda)), ...(resposta === "esquerda" ? {} : { misconception: DecimalMisconception.DECIMAL_COMO_INTEIRO }) }, { value: "direita", label: label(decimal(direita)), ...(resposta === "direita" ? {} : { misconception: DecimalMisconception.DECIMAL_COMO_INTEIRO }) }] };
   }
   const conjuntos = [[0.2, 0.45, 0.8], [0.15, 0.5, 0.72], [0.09, 0.3, 0.61]];
   const valores = escolher(conjuntos, rng);
