@@ -70,6 +70,8 @@ A ordem é a ordem real dos commits; nada aqui é reescrito depois.
 | 32 | CLASS-003 — AL.05, AL.06, AL.07, GM.09 | `707e48d` | `707e48d` | balança, expressão, letra e problema sorteados; cada distrator passa a ser o resultado do erro que nomeia |
 | 33 | CLASS-003 — resposta decorável fechada | `2149f93` | `2149f93` | N2.06, N4.12, N5.01, N5.03, N5.04; registro esvazia; dois palcos de produção param de ter barra por fora |
 | 34 | CLASS-010 — fechada | `4e658c6` | `4e658c6` | dezessete palcos param de vender o acerto por dois caminhos; gate por comportamento, com prova de vida |
+| 35 | CLASS-008 — fechada | `564cedd` | `564cedd` | emissão, transporte e aplicação da diversidade de famílias; oito níveis integradores, dois descobertos pelo gate |
+| 36 | D068 — inventário de portões medido | `54f59f7` | `54f59f7` | a lista escrita à mão vira medição com catraca; ela já estava três entradas atrás |
 
 A linha 10 é a única cujo recibo vermelho e correção estão no mesmo commit: o
 achado apareceu ao medir o efeito do reparo de GE.04, já dentro da frente, e
@@ -351,52 +353,139 @@ sorteado quebrou um teste que fixava o caso. `VolumePrismasStage`,
 Nenhum foi afrouxado. Todos passaram a derivar a expectativa do spec — o que os
 torna, de quebra, testes melhores: eles agora afirmam a REGRA, não o exemplo.
 
-## 9. Recibos desta rodada
+## 9. CLASS-008 — o nível integrador coroa uma família só — **FECHADA**
+
+A auditoria confirmou a classe em seis competências e não implementou nada. O
+mecanismo de reparo já existia — `evidenciasDistintas` no domínio da micro, e o
+`progressEngine` já sabia segurar a evidência da ficha até o mínimo aparecer. O
+que faltava era o caminho, e ele quebrava em três lugares distintos:
+
+| elo | o que estava quebrado |
+|---|---|
+| emissão | ninguém gravava QUAL família a tentativa exercitou. O Composer sorteia a tabuada e a operação e jogava a informação fora; `N1.09` e `GM.02` têm uma variável `family` no builder, e ela morria ali |
+| transporte | o serializador genérico do Composer copiava `acertos`, `de` e `sessoes` e deixava `evidenciasDistintas` para trás. Os dois builders autorais faziam o mesmo |
+| aplicação | a casca chamava `evidenciasDaResposta(meta)` sem a questão, e a família nunca entrava na tentativa |
+
+A evidência passa a se chamar `familia:<ficha>:<familia>`. O prefixo é por
+competência de propósito: com um prefixo global, alternar entre duas
+COMPETÊNCIAS satisfaria a diversidade de ambas sem ter alternado dentro de
+nenhuma — e há mutação provando isso.
+
+`evidenciasDaResposta` passou a exigir a questão. Deixá-la opcional era o
+convite a esquecê-la no único lugar que chama a função, e aí o requisito viaja
+até o motor sem nunca receber família nenhuma: a coroa não chegaria nunca, que é
+o defeito espelhado do que a classe veio corrigir.
+
+O gate mede as três coisas separadas, porque cada uma quebra sozinha, e decide
+participação por COMPORTAMENTO do gerador — quantas famílias distintas ele
+produz —, não por lista de nomes. Ele achou sozinho duas testemunhas que a
+auditoria não listava por micro: `N4.04` L5 (`fluencia`) e `N4.07` L5
+(`completa`), que também misturam tabuadas. Oito níveis integradores no total.
+
+A catraca aperta dos dois lados. Nível que sorteia famílias e não exige
+diversidade reprova; exigência que o gerador não consegue satisfazer também —
+sem essa metade bastaria escrever a exigência em toda ficha para ficar verde, e
+uma exigência impossível é uma coroa que nunca chega.
+
+A prova de aplicação é comportamental, em todos os níveis integradores achados:
+acertar de sobra em três sessões espaçadas, sempre na mesma família, não dá a
+evidência da ficha; o mesmo esforço alternando famílias dá.
+
+## 10. D068 — o portão medido, e a metade que continua aberta
+
+A frente da CLASS-007 registrou a dívida: não existia gate por descoberta que
+medisse, dentro do palco, se a ação probatória é contornável. Quem media era
+`portaDeFora.test.tsx`, com **três listas escritas à mão** — quais palcos
+desenham, quais têm portão, quais são de produção. Lista positiva decidindo
+participação é o que o D068 proíbe.
+
+### O que foi pago
+
+A lista de portões virou medição: o rótulo da resposta está na tela e o clique
+nele, no mount, não vende nada. Cada candidato é clicado num render limpo — o
+primeiro clique pode desabilitar a tela inteira, e reaproveitar o render diria
+que a porta está fechada justamente onde ela acabou de ser usada.
+
+A medição cobrou o preço na hora: **a lista escrita à mão já estava três
+entradas atrás.** `AL.03` L3 e `N2.06` L1 e L2 tinham portão e ninguém sabia.
+
+Um segundo gate mede a outra metade do que é mensurável hoje. Onde a ficha
+declara `exige.evidencia`, um clique no mount não pode entregar a prova quando
+ela depende do que a criança fez. O critério separa condição de ação sem lista
+nenhuma:
+
+> evidência que acompanha TODA resposta certa do nível é propriedade do item —
+> "comparou sem objetos", "a dimensão é a que falta". Não há o que contornar:
+> responder certo ali É a demonstração. Evidência que acompanha algumas e não
+> outras depende da ação, e aí um clique que a entregue é a ação sendo comprada.
+
+Nas 88 fichas que declaram a exigência, hoje a evidência é sempre da primeira
+espécie. O gate existe para o dia em que deixar de ser.
+
+### O que continua aberto, sem eufemismo
+
+Os dois gates descobrem onde EXISTE portão. Nenhum descobre onde DEVERIA
+existir. Para isso a ficha precisaria declarar, de forma legível por máquina,
+qual interação ela trata como probatória — e `exige.evidencia`, que é o que mais
+se aproxima, significa outra coisa, como a medição acima mostra.
+
+Declarar a ação probatória é decisão de cânone e não se toma por conta própria.
+Até lá, a catraca do inventário é o que impede um portão de sumir sem que
+alguém seja avisado.
+
+## 11. Recibos desta rodada
 
 - `tsc --noEmit`: limpo;
-- suíte inteira: **3653/3653** em 293 arquivos;
+- suíte inteira: **3660/3660** em 295 arquivos;
 - `npm run auditar`: invariantes canônicos, guard documental, palcos compostos e
   matriz de cobertura aprovados;
 - catraca de densidade documental: piso subido a cada arquivo de runtime que
   cruzou o limiar, nunca baixado;
 - mutação: cada correção derruba o teste novo quando revertida. Nesta rodada, 5
   em GM.06, 4 no instrumento da CLASS-003, 11 nas fichas de PE, 11 nas de GE, 8
-  em AL e GM.09, 9 nas últimas cinco, e 3 no gate da CLASS-010 — todas
-  vermelhas.
+  em AL e GM.09, 9 nas últimas cinco da CLASS-003, 3 no gate da CLASS-010, 7 na
+  CLASS-008 e 4 no D068 — todas vermelhas.
 
-Duas mutações precisaram de um gate MELHOR antes de morrer, e as duas são o
-mesmo aprendizado: **medir o par esconde a metade presa.**
+Quatro mutações precisaram de um gate MELHOR antes de morrer, e elas dizem duas
+coisas que valem mais que os reparos:
 
-- congelar a hora do relógio em GM.06 ficava verde, porque o minuto sorteado já
-  fazia o par `hora:minuto` variar. O gate passou a medir os dois ponteiros
-  separados;
-- fixar a coluna do tesouro em GE.05, ou o índice da barra perguntada em PE.02,
-  ficava verde pelo mesmo motivo. Os dois gates passaram a medir cada eixo, e a
-  POSIÇÃO além do nome.
+**Medir o par esconde a metade presa.** Congelar a hora do relógio em GM.06
+ficava verde porque o minuto sorteado já fazia o par `hora:minuto` variar; fixar
+a coluna do tesouro em GE.05, ou o índice da barra perguntada em PE.02, ficava
+verde pelo mesmo motivo. Os três gates passaram a medir cada eixo separado, e a
+POSIÇÃO além do nome.
 
-Uma terceira sobreviveu por uma razão diferente e foi corrigida no instrumento:
-cegar a contagem do gate da CLASS-010 passava, porque com registro vazio "ninguém
-duplica" e "não olhei" dão o mesmo verde. O gate ganhou prova de vida.
+**Registro vazio precisa de prova de vida.** Cegar a contagem do gate da
+CLASS-010 passava, porque com registro vazio "ninguém duplica" e "não olhei" dão
+o mesmo verde. O mesmo vale para o gate da evidência exigida, e lá a prova de
+vida precisou de duas pontas: contar as fichas que declaram não bastava, porque
+uma medição que parasse de separar "com prova" de "sem prova" zeraria os dois
+lados e passaria calada.
 
-As três sobreviventes antigas continuam nomeadas nos commits: a guarda redundante
-de `testar()` em GE.04, o `answerMode` de N4.02 que nenhum renderizador lê, e
-`cobraRepeticao` no gate da CLASS-003, que não discrimina hoje porque toda ficha
-cobra repetição.
+As três sobreviventes antigas continuam nomeadas nos commits: a guarda
+redundante de `testar()` em GE.04, o `answerMode` de N4.02 que nenhum
+renderizador lê, e `cobraRepeticao` no gate da CLASS-003, que não discrimina
+hoje porque toda ficha cobra repetição.
 
-## 10. Onde o Gate B′ está agora
+## 12. Onde o Gate B′ está agora
 
 | Classe | Estado |
 |---|---|
-| CLASS-007 (bypass da ação probatória) | fechada nas testemunhas medidas; dívida do gate por descoberta DENTRO do palco continua aberta |
-| CLASS-009 (a tela declara a resposta) | fechada, com gate por descoberta e três correções de medição |
 | CLASS-003 (caso único / resposta decorável) | fechada nas duas dimensões, registros vazios |
+| CLASS-007 (bypass da ação probatória) | fechada nas testemunhas medidas; inventário de portões medido; falta a ficha declarar a ação probatória |
+| CLASS-008 (diversidade de famílias no mastery) | fechada, gate por descoberta e prova comportamental |
+| CLASS-009 (a tela declara a resposta) | fechada, com três correções de medição |
 | CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
-| CLASS-008 (evidências distintas) | **aberta** — próxima |
-| CLASS-001, CLASS-002, CLASS-004 | abertas, prioridade 4 |
+| CLASS-001, CLASS-002, CLASS-004 | **abertas**, prioridade 4 |
 
-A dívida do D068 que a frente da CLASS-007 registrou continua de pé e é a mais
-importante das que sobraram: **não existe gate por descoberta que meça, dentro
-do palco, se a ação probatória é contornável.** Hoje quem mede é
-`portaDeFora.test.tsx`, na casca, com lista escrita à mão de quais palcos
-desenham e quais têm portão. Enquanto ela existir, um palco novo pode nascer com
-a porta aberta sem nenhum teste ficar vermelho.
+Sete gates por descoberta vigiam as 75 fichas do Composer, todos com catraca:
+
+| gate | o que mede |
+|---|---|
+| `telaNaoDeclaraResposta` | o suporte não escreve a resposta |
+| `nivelNaoRepeteOMesmoCaso` | o nível não é um caso só |
+| `respostaNaoEDecoravel` | o rótulo certo não é sempre o mesmo |
+| `respostaNaoSeCompraDuasVezes` | um acerto, um caminho |
+| `portaDeFora` | o inventário de portões não encolhe |
+| `evidenciaExigidaNaoSeCompra` | a prova não vem junto com o clique |
+| `nivelIntegradorExigeFamilias` | quem integra famílias exige mais de uma |
