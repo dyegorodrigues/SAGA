@@ -76,6 +76,26 @@ export function verticesDoNivel(nivel: number): VerticeOculto[] {
  * sem entregar nenhum resultado. Escrever `4 × 3 = 12` ao lado de `3 × 4 = ?`
  * seria dar a resposta com aparência de apoio.
  */
+/**
+ * CLASS-001 — o apoio é exigido só de quem pode tê-lo.
+ *
+ * O nível 3 promete "passar da multiplicação para a divisão dentro da mesma
+ * família", e nunca entregava uma divisão. A causa era esta: o filtro cobrava
+ * apoio de TODA candidata, e uma pergunta de divisão não sobra frase de apoio
+ * nenhuma — as outras três contas da família contêm o fator que é a resposta, e
+ * mostrá-las seria escrever o gabarito ao lado da pergunta.
+ *
+ * O resultado é que o L3 caía sempre no vértice `produto` e virava uma cópia
+ * exata do L2: mesma semente, mesma tela. O degrau existia no papel.
+ *
+ * Agora o apoio é condição de quem pergunta o PRODUTO. A divisão do L3 aparece
+ * sem apoio, que é justamente o passo que o nível declara — e continua distinta
+ * do L4, onde nem a multiplicação tem apoio.
+ */
+export function exigeApoio(nivel: number, vertice: VerticeOculto): boolean {
+  return contasDeApoio(nivel) > 0 && vertice === "produto";
+}
+
 export function contasDeApoio(nivel: number): number {
   if (nivel === 1) return 4;
   if (nivel === 2 || nivel === 3) return 2;

@@ -47,6 +47,7 @@ import {
   FATOR_MIN,
   VerticeOculto,
   contasDeApoio,
+  exigeApoio,
   ehPergunavelComDiagnostico as familiaDiagnostica,
   produto as produtoDaFamilia,
   produtoMaximoDoNivel,
@@ -702,7 +703,11 @@ export class Composer {
               // Nível que promete apoio precisa TER apoio: famílias de fatores
               // iguais não sobram frase nenhuma depois do filtro, e cairiam com
               // andaime alto numa tela idêntica à do nível 4.
-              if (contasDeApoio(lvl) > 0 && apoioDisponivel({ a, b }, vertice) === 0) continue;
+              //
+              // A cobrança vale para quem pergunta o produto. Cobrá-la também
+              // da divisão apagava toda pergunta de divisão do nível 3 — e o
+              // nível, que promete estrear a divisão, virava cópia do nível 2.
+              if (exigeApoio(lvl, vertice) && apoioDisponivel({ a, b }, vertice) === 0) continue;
               candidatas.push({ a, b, vertice });
             }
           }
