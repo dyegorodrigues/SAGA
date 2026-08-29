@@ -82,6 +82,19 @@ describe("o enunciado nunca entrega a resposta", () => {
     }
   });
 
+  it("no plural, o 'cada um' também concorda com o tema", () => {
+    // O print do app mostrou "Conte as maçãs. Toque em cada um!". O singular já
+    // concordava — "Toque nela!" —, e o plural tinha ficado para trás.
+    //
+    // É a mesma armadilha §6.5 que a F51 documenta: a criança de 4 anos OUVE o
+    // enunciado, e erro de concordância soa errado antes de parecer errado.
+    for (const t of TEMAS) {
+      const frase = enunciadoDoToque(t, 3);
+      expect(frase, t.nome).toContain(t.nome);
+      expect(frase.endsWith(t.artigo === "as" ? "cada uma!" : "cada um!"), `${t.nome}: "${frase}"`).toBe(true);
+    }
+  });
+
   it("o nome do tema é plural e não traz número", () => {
     for (const { spec } of TUDO) expect(spec.nome).not.toMatch(/\d/);
     for (const t of [...TEMAS, TEMA_DO_CANHAO]) expect(t.nome).not.toMatch(/\d/);

@@ -250,7 +250,11 @@ export function enunciadoDoToque(t: TemaDeContagem, total: number): string {
     const artigo = t.artigo === "as" ? "a" : "o";
     return `Conte ${artigo} ${t.singular}. Toque nel${t.artigo === "as" ? "a" : "e"}!`;
   }
-  return `Conte ${t.artigo} ${t.nome}. Toque em cada um!`;
+  // "cada uma" para tema feminino. O singular já concordava — "Toque nela!" — e
+  // o plural tinha ficado para trás: o app dizia "Conte as maçãs. Toque em cada
+  // um!". É a armadilha §6.5 da F51: a criança de 4 anos OUVE o enunciado, e
+  // erro de concordância soa errado antes de parecer errado.
+  return `Conte ${t.artigo} ${t.nome}. Toque em cada ${t.artigo === "as" ? "uma" : "um"}!`;
 }
 
 /**
