@@ -51,6 +51,7 @@ import { applyKidPurchase, purchaseAlbumItem, spendCoins } from "./lib/economyTr
 import { rewardForMissionCompletion, rewardForTerminalAnswer, type RewardMode } from "./lib/rewardPolicy";
 import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
+import { mostrandoCarregamento, telaDeEntrada } from "./lib/entradaDoApp";
 import { AdminGodPanel } from "./components/AdminGodPanel";
 import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
@@ -290,15 +291,20 @@ export default function App() {
     const user = auth.currentUser;
     // Produção entra sempre por Firebase (Google ou anônimo). E2E pode manter
     // o shell local sem identidade cloud; ele não participa da reconciliação.
-    if (!user) {
-      setScreen({ name: "login" });
-      if (E2E && visitorMode) {
+    if (telaDeEntrada({ temSessao: Boolean(user), visitante: visitorMode }) !== "sessao") {
+      // Visitante é decisão local: sem conta, sem rede e sem sessão a criança
+      // ainda precisa jogar. Isto só acontecia sob `?e2e=1` — fora do teste,
+      // "Começar sem Conta" acendia uma flag e não abria nada.
+      if (visitorMode) {
         void (async () => {
           const raw = await getStorage(LEGACY_STATE_KEY);
-          setState(raw ? migrate(JSON.parse(raw)) : defaultState());
-          setScreen({ name: "pick" });
+          const local = raw ? migrate(JSON.parse(raw)) : defaultState();
+          setState(local);
+          setScreen(local.kids.length ? { name: "pick" } : { name: "setup" });
         })();
+        return;
       }
+      setScreen({ name: "login" });
       return;
     }
 
@@ -359,7 +365,12 @@ export default function App() {
     if (imediato) void nuvem.descarregar();
   };
 
-  if (!state || screen.name === "loading") {
+  // A guarda exigia `state` para desenhar qualquer tela, e `state` só nascia
+  // depois de uma sessão do Firebase. Sem sessão — a situação de toda criança na
+  // primeira vez — o login nunca era desenhado e o app ficava em "Carregando
+  // SAGA..." para sempre, com as 90 competências atrás de uma porta que não
+  // abria. Quem decide agora é `entradaDoApp`, e o login é desenhável sem estado.
+  if (mostrandoCarregamento(screen.name, Boolean(state))) {
     return (
       <Shell>
         <div className="mt-28 text-center flex flex-col items-center justify-center gap-4">
@@ -368,6 +379,31 @@ export default function App() {
             Carregando SAGA...
           </div>
         </div>
+      </Shell>
+    );
+  }
+
+  const handleLoginSuccess = (email: string) => {
+    // Identidade muda aqui; estado é instalado exclusivamente pelo bootstrap.
+    setUserEmail(email);
+  };
+
+  const handleContinueAsVisitor = () => {
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.setItem("mk-visitor-mode", "true");
+    }
+    setVisitorMode(true);
+  };
+
+  // O login é a única tela que existe ANTES de haver estado, e por isso sai
+  // aqui, antes de qualquer derivação. Tudo o que vem abaixo lê `state` sem
+  // checar — `const sound = state.sound !== false` é a primeira linha a
+  // quebrar —, e com `strictNullChecks` desligado o compilador não avisaria.
+  // Foi assim que a porta de entrada ficou trancada sem nenhum teste vermelho.
+  if (!state) {
+    return (
+      <Shell screenName="login">
+        <LoginScreen onLoginSuccess={handleLoginSuccess} onContinueAsVisitor={handleContinueAsVisitor} />
       </Shell>
     );
   }
@@ -611,18 +647,6 @@ export default function App() {
       log: { ...state.log, [newKid.id]: [] },
     };
     persist(newState, true);
-  };
-
-  const handleLoginSuccess = (email: string) => {
-    // Identidade muda aqui; estado é instalado exclusivamente pelo bootstrap.
-    setUserEmail(email);
-  };
-
-  const handleContinueAsVisitor = () => {
-    if (typeof window !== "undefined" && window.localStorage) {
-      window.localStorage.setItem("mk-visitor-mode", "true");
-    }
-    setVisitorMode(true);
   };
 
   const handleLogout = async () => {

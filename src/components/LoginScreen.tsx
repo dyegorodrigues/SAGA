@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { loginAnonymously, loginWithGoogle } from "../lib/firebase";
 import { C, FONT, sfx } from "./Mascot";
+import { entrarSemConta, recadoDaEntradaLocal } from "../lib/entradaSemConta";
 import { Sparkles, Shield, User, Chrome } from "lucide-react";
 
 interface LoginScreenProps {
@@ -12,6 +13,8 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
   const [keepConnected, setKeepConnected] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Recado de entrada local. Não é erro: é convite, e por isso não usa `error`. */
+  const [aviso, setAviso] = useState<string | null>(null);
 
   const handleGoogleLogin = async () => {
     setLoading(true);
@@ -45,20 +48,23 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
     setError(null);
     sfx.level();
 
-    try {
-      const { email } = await loginAnonymously();
-      
+    // A sessão anônima continua sendo tentada primeiro — é ela que deixa o
+    // progresso subir para a nuvem. Mas ela deixa de ser CONDIÇÃO para jogar:
+    // quem toca aqui é justamente a criança que não tem conta e pode não ter
+    // internet boa. Sem o prazo, uma rede ruim deixava o botão girando para
+    // sempre, e `onContinueAsVisitor` — o caminho local, pronto — nunca era
+    // chamado.
+    const entrada = await entrarSemConta(loginAnonymously);
+    if (entrada.via === "nuvem") {
       if (keepConnected && typeof window !== "undefined") {
         window.localStorage.setItem("mk-keep-connected", "true");
       }
-
-      onLoginSuccess(email);
-    } catch (err: any) {
-      console.error(err);
-      setError("Ops! Erro ao iniciar sessão anônima. Verifique sua internet ou tente entrar com o Google! 🚶");
-    } finally {
-      setLoading(false);
+      onLoginSuccess(entrada.email);
+    } else {
+      setAviso(recadoDaEntradaLocal(entrada.porque));
+      onContinueAsVisitor();
     }
+    setLoading(false);
   };
 
   return (
@@ -145,6 +151,13 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
         {error && (
           <div className="bg-rose-50 border-2 border-rose-100 text-rose-700 rounded-2xl px-4 py-2.5 text-xs font-bold leading-relaxed text-center animate-pulse">
             {error}
+          </div>
+        )}
+
+        {/* Jogar offline não é falha: o aviso é sereno e não usa a cor de erro. */}
+        {aviso && (
+          <div className="bg-sky-50 border-2 border-sky-100 text-sky-800 rounded-2xl px-4 py-2.5 text-xs font-bold leading-relaxed text-center">
+            {aviso}
           </div>
         )}
       </div>

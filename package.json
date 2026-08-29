@@ -42,8 +42,39 @@
     "sonda:counting-on": "node scripts/sonda-counting-on.mjs",
     "sonda:skip-count": "node scripts/sonda-skip-count.mjs",
     "sonda:equal-groups": "sh -c 'npx vite --host 127.0.0.1 --port 5212 --strictPort >/tmp/f97-vite.log 2>&1 & sleep 2; node scripts/sonda-equal-groups.mjs'",
-    "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false"
+    "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false",
+    "e2e:entrada": "node scripts/e2e-entrada.mjs"
   },
-  "dependencies": {"@google/genai":"^2.4.0","@tailwindcss/vite":"^4.1.14","@vitejs/plugin-react":"^5.0.4","dotenv":"^17.2.3","express":"^4.21.2","firebase":"^12.15.0","jsonwebtoken":"^9.0.3","lucide-react":"^0.546.0","motion":"^12.23.24","react":"^19.0.1","react-dom":"^19.0.1","react-markdown":"^10.1.0","remark-gfm":"^4.0.1","yaml":"^2.9.0"},
-  "devDependencies": {"@testing-library/jest-dom":"^7.0.0","@testing-library/react":"^16.3.2","@types/express":"^4.17.21","@types/jsonwebtoken":"^9.0.10","@types/node":"^22.14.0","autoprefixer":"^10.4.21","axe-core":"^4.12.1","esbuild":"^0.25.0","jsdom":"^30.0.1","playwright-core":"^1.62.1","tsx":"^4.21.0","typescript":"~5.8.2","vite":"^6.2.3","vitest":"^4.1.10"}
+  "dependencies": {
+    "@google/genai": "^2.4.0",
+    "@tailwindcss/vite": "^4.1.14",
+    "@vitejs/plugin-react": "^5.0.4",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2",
+    "firebase": "^12.15.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^0.546.0",
+    "motion": "^12.23.24",
+    "react": "^19.0.1",
+    "react-dom": "^19.0.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "yaml": "^2.9.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^22.14.0",
+    "autoprefixer": "^10.4.21",
+    "axe-core": "^4.12.1",
+    "esbuild": "^0.25.0",
+    "jsdom": "^30.0.1",
+    "playwright-core": "^1.62.1",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.3",
+    "vitest": "^4.1.10"
+  }
 }
