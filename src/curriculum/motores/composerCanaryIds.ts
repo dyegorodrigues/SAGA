@@ -168,4 +168,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   "N1.04",
   "N1.08",
   "AL.02",
+
+  // W51 — N4.02/F98. A ficha existia e nunca fora registrada no Composer: não
+  // passara por nenhum dos dez gates. Registrada, os dez a aceitaram, e o
+  // portão de giro que a CLASS-007 instalou nela apareceu no inventário.
+  "N4.02",
 ] as const;

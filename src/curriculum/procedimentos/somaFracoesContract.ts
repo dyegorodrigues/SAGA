@@ -125,6 +125,11 @@ function sortearCaso(nivel: number): { modo: SomaFracoesModo; operacao: "+" | "-
     if (modelo.modo === "subtrair") {
       // Subtrair precisa sobrar alguma coisa: zero não é uma barra pintada.
       if (a - b < 1) continue;
+      // E o resto não pode ser o próprio subtraendo: 6/7 − 3/7 = 3/7 deixa a
+      // resposta escrita na conta, como um dos operandos, e a criança lê em vez
+      // de subtrair. Foi o gate da CLASS-009 que pegou, quando o fluxo do PRNG
+      // mudou e o caso passou a ser sorteado.
+      if (a - b === b) continue;
       return { modo: modelo.modo, operacao: "-", a, b, d };
     }
     if (modelo.modo === "fracao-impropria") {

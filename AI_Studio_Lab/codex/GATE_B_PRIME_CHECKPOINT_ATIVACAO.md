@@ -430,6 +430,79 @@ nenhuma:
 Nas 88 fichas que declaram a exigência, hoje a evidência é sempre da primeira
 espécie. O gate existe para o dia em que deixar de ser.
 
+## 14. W51 — a promoção da N4.02 e a dívida que ela revelou
+
+A N4.02/F98 existia como ficha desde sempre e **nunca fora registrada** em
+`COMPOSER_FICHAS`. Não era rollback nem decisão: era ausência. Nenhum dos dez
+gates a tinha olhado uma única vez, porque todos varrem o que está registrado.
+
+Registrada, os dez aceitaram. O que a promoção quebrou foi mais interessante
+que o que ela consertou:
+
+| o que caiu | por quê | o que foi feito |
+|---|---|---|
+| `N5.04` nível 3 | registrar a N4.02 deslocou o PRNG e revelou `6/7 − 3/7 = 3/7`, com a resposta escrita como operando | reparo na fonte: `somaFracoesContract` recusa o caso em que `a − b === b` |
+| `portaDeFora` | o portão de giro da N4.02 (`N4.02\|3`) entrou no inventário medido | registrado no inventário, junto com o `N3.09\|4` que três sementes fixas estabilizaram |
+| `composerCanary.test.ts` | o teste fixava `"N4.02"` como exemplo de nó **sem** ficha | reescrito por descoberta: pergunta ao catálogo quem não tem ficha, mais um id sintético para nunca ficar cego |
+| `visualOnboardingGate` | a N4.02 estreia o ArrayGrid e a ficha não declarava tutorial: **dívida nova de onboarding** | dívida paga, não anistiada — ver abaixo |
+
+### A dívida de onboarding foi paga, não anistiada
+
+O `visualOnboardingGate` diz no próprio comentário que a lista NÃO existe para
+anistiar onboarding ausente. Acrescentar `"N4.02"` à baseline seria usar a
+allowlist para exatamente o que ela proíbe. A N4.02 estreia o ArrayGrid — é a
+primeira vez, em toda a linhagem dela, que a criança vê quadradinhos arrumados
+em linhas — e agora a micro `contagem` declara a aulinha da estreia.
+
+A fala não promete gesto que a tela não tem: no `ArrayGrid` os quadradinhos são
+`aria-hidden` e não recebem toque, quem responde são os botões de baixo. Dizer
+"toque nos quadradinhos" ensinaria a criança a tentar o que não funciona.
+
+### O décimo primeiro gate — `aulinhaDeclaradaChegaNaQuestao`
+
+Pagar a dívida expôs um buraco no próprio mecanismo do §6.36: o portão de
+onboarding pergunta à **ficha** se ela declara tutorial, e a ficha é dado. Entre
+o dado e a criança existem dois pontos de perda silenciosa:
+
+1. `parseComposerParams` copia chave por chave — chave não listada é descartada
+   sem erro (foi assim que a F27 declarou `modo: "ritmico"` e o canhão de balões
+   saiu como peixinhos na tela);
+2. `normalizeFichaTutorial` descarta passo sem `say`/`fala` de texto — escrever
+   `{ texto: "..." }` por engano não quebra nada, o passo só não existe.
+
+Nos dois casos a Coverage Matrix continuaria dizendo `onboarding=presente` e a
+criança continuaria estreando a ferramenta sozinha: o portão ficaria verde
+medindo intenção, não entrega.
+
+A medição varreu as 76 fichas registradas: **147 pares (ficha, nível) declaram
+aulinha e os 147 chegam intactos** em `tutorialSteps()`, que é a função que o
+GameLoop chama para narrar. O gate fecha em zero defeitos, por descoberta —
+promover uma ficha a coloca sob ele no mesmo instante, sem editar o arquivo.
+
+Prova de vida: com a varredura cega, "ninguém perde passo" e "eu não olhei" são
+a mesma tela verde. O teste afirma ter observado mais de 100 pares.
+
+Mutação (quatro, todas vermelhas):
+
+| mutação | resultado |
+|---|---|
+| `Composer` deixa de repassar `tutorial` | VERMELHO |
+| `parseComposerParams` descarta a chave `tutorial` | VERMELHO |
+| varredura cega (nenhum par observado) | VERMELHO — pela prova de vida |
+| N4.02 volta a estrear o ArrayGrid sem aulinha | VERMELHO nos **dois** portões |
+
+Recibo: suíte inteira **301 arquivos, 3694 testes, verde**; `tsc --noEmit`
+limpo; `npm run auditar` aprovado; `grafo:check` sincronizado.
+
+Coverage Matrix reconciliada: Composer 76, legado 14, fallback 0, servido 90,
+divergências 11.
+
+> Uma nota sobre o delta da migração `W51-N4.02`. Escrevi `divergences: -1` de
+> primeira; a Matrix real mostrou 11 divergências e a N4.02 nunca esteve entre
+> elas. Corrigi **o livro-razão, não a expectativa** — a mensagem do próprio
+> teste manda investigar e reconciliar a fonte real em vez de ajustar o número
+> até ficar verde.
+
 ### O que continua aberto, sem eufemismo
 
 Os dois gates descobrem onde EXISTE portão. Nenhum descobre onde DEVERIA
@@ -564,7 +637,7 @@ envia nada.
 | CLASS-009 (a tela declara a resposta) | fechada, com três correções de medição |
 | CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
 
-Dez gates por descoberta vigiam as 75 fichas do Composer, todos com catraca:
+Onze gates por descoberta vigiam as 76 fichas do Composer, todos com catraca:
 
 | gate | o que mede |
 |---|---|
@@ -578,6 +651,7 @@ Dez gates por descoberta vigiam as 75 fichas do Composer, todos com catraca:
 | `portaDeFora` | o inventário de portões não encolhe |
 | `evidenciaExigidaNaoSeCompra` | a prova não vem junto com o clique |
 | `nivelIntegradorExigeFamilias` | quem integra famílias exige mais de uma |
+| `aulinhaDeclaradaChegaNaQuestao` | a estreia narrada na ficha chega na tela |
 
 ### O que continua aberto
 

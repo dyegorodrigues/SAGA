@@ -62,6 +62,10 @@ const PORTOES_MEDIDOS = [
   // a varredura ganhar sementes fixas; com uma amostra ao acaso por nível, ele
   // entrava e saía do inventário entre execuções.
   "N3.09|4",
+  // N4.02/F98: a partir de L2 o arranjo exige o giro antes de responder — é o
+  // reparo da CLASS-007 desta ficha, e ele aparece aqui assim que ela entra na
+  // varredura. Um portão que nasce junto com a promoção é o resultado certo.
+  "N4.02|3",
 ];
 
 /**

@@ -28,7 +28,30 @@ export const N4_02: FichaCompetencia = {
     5: { primitiva: "arraygrid", micro: "area", andaime: "nenhum", rt_alvo: 12000 },
   },
   micros: [
-    { id: "contagem", alvo: "contar o total em arranjos de até três por quatro", kinds: ["arraygrid"], params: params({ rows_max: 3, cols_max: 4 }), dominio },
+    {
+      id: "contagem",
+      alvo: "contar o total em arranjos de até três por quatro",
+      kinds: ["arraygrid"],
+      // §6.36 — o ArrayGrid estreia aqui. Nenhum pré-requisito da N4.02 usa a
+      // grade, então esta é a primeira vez que a criança vê quadradinhos
+      // arrumados em linhas: a linguagem visual é nova e precisa de estreia
+      // narrada, não de mais um enunciado.
+      //
+      // A fala não promete gesto que a tela não tem. No ArrayGrid os
+      // quadradinhos são `aria-hidden` e não recebem toque — quem responde são
+      // os botões de baixo. Dizer "toque nos quadradinhos" ensinaria a criança
+      // a tentar o que não funciona.
+      params: params({
+        rows_max: 3,
+        cols_max: 4,
+        tutorial: [
+          { fala: "Olhe: os quadradinhos estão arrumados em linhas. Isto é um arranjo." },
+          { fala: "Conte quantos quadradinhos tem uma linha. Todas as linhas têm a mesma quantidade." },
+          { fala: "Agora veja quantas linhas são e escolha o total nos botões." },
+        ],
+      }),
+      dominio,
+    },
     { id: "multiplicacao", alvo: "ligar linhas iguais à multiplicação", kinds: ["arraygrid"], params: params({ show_equation: true }), dominio },
     { id: "giro", alvo: "observar a comutatividade ao girar", kinds: ["arraygrid"], params: params({ allow_rotate: true, require_rotate: true, show_equation: true }), dominio },
     { id: "expressao", alvo: "escolher a expressão que representa o arranjo", kinds: ["arraygrid"], params: params({ rows_max: 10, cols_max: 10, answer_mode: "equation", show_equation: true }), dominio },

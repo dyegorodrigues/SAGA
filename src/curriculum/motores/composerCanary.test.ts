@@ -4,10 +4,11 @@ import { gN3_11 } from "../../utils/generatorsF2";
 import {
   COMPOSER_CANARIES,
   enableComposerCanary,
+  hasComposerFicha,
   rollbackComposerCanary,
   selectGenerator,
 } from "./composerCanary";
-import { getTrackById } from "./curriculum";
+import { ALL_MATH_TRACKS, getTrackById } from "./curriculum";
 
 const fallback = () => ({ kind: "multiple_choice", prompt: "fallback", answer: 1 });
 
@@ -35,8 +36,21 @@ describe("ponte de canário do Composer", () => {
     expect(selectGenerator("desconhecido", undefined, fallback).source()).toBe("fallback");
   });
 
+  // O id do nó sem ficha NÃO é escrito à mão. A primeira versão deste teste
+  // fixava "N4.02" como exemplo; no dia em que a N4.02 ganhou ficha e foi
+  // promovida, o teste passou a reprovar por envelhecimento — não por defeito.
+  // O contrato não fala de um nó, fala de qualquer nó sem ficha: então o teste
+  // pergunta ao catálogo quem ainda não tem, e acrescenta um id sintético para
+  // continuar observando alguma coisa mesmo no dia em que todas as 90 tiverem
+  // ficha registrada.
   it("recusa ativar canário de nó sem ficha autoral registrada", () => {
-    expect(() => enableComposerCanary("N4.02")).toThrow(/ficha autoral/);
+    const semFicha = ALL_MATH_TRACKS.map(t => t.id).filter(id => !hasComposerFicha(id));
+    const alvos = [...semFicha, "nó-que-não-existe"];
+
+    for (const id of alvos) {
+      expect(() => enableComposerCanary(id), id).toThrow(/ficha autoral/);
+      expect(COMPOSER_CANARIES.has(id), `${id} entrou no conjunto mesmo sem ficha`).toBe(false);
+    }
   });
 
   // Regressão: o rollback precisa valer no caminho de produção, não apenas na

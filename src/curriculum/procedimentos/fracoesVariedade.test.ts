@@ -80,6 +80,11 @@ describe("CLASS-003 — N5.04/F74: a conta muda, a escada não", () => {
     for (const spec of specs(3)) {
       expect(spec.aNumerador, "subtrair precisa sobrar alguma coisa").toBeGreaterThan(spec.bNumerador);
       expect(spec.resultadoNumeradorBruto).toBe(spec.aNumerador - spec.bNumerador);
+      // 6/7 − 3/7 = 3/7: a resposta fica escrita na própria conta, como um dos
+      // operandos. A criança lê em vez de subtrair, e o gate da CLASS-009 pegou
+      // isso quando o fluxo do PRNG mudou. É estrutural, não coincidência.
+      expect(spec.resultadoNumeradorBruto, `${spec.aNumerador}/${spec.denominador} - ${spec.bNumerador}/${spec.denominador} escreve a resposta`)
+        .not.toBe(spec.bNumerador);
     }
     for (const spec of specs(4)) {
       expect(spec.resultadoNumeradorBruto, "L4 existe para passar do inteiro").toBeGreaterThan(spec.denominador);

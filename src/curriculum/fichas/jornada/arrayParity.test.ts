@@ -4,9 +4,12 @@ import { N4_02 } from "./N4.02";
 import { getTrackById } from "../../motores/curriculum";
 
 describe("paridade controlada de N4.02", () => {
-  it("mantém gN4_02 em produção, sem canário do Composer", () => {
+  it("W51: a ficha F98 assume a produção e o legado sai", () => {
+    // A paridade nasceu guardando o legado enquanto a ficha amadurecia. A ficha
+    // amadureceu: registrada no Composer, passou os dez gates da Jornada, e o
+    // portão de giro da CLASS-007 apareceu no inventário de portões medidos.
     const production = getTrackById("N4.02");
-    expect(production?.generatorSource).toBe("legacy");
+    expect(production?.generatorSource).toBe("composer");
     expect(production?.gen(1).kind).toBe("array");
   });
 
