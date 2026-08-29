@@ -72,10 +72,10 @@ const FICHA_RUNTIME_MAP = [
     builderKinds: ["grandeza"], specializedBuilderIds: ["N2.03", "N4.01"], rendererKinds: ["grandeza", "comparacao-simbolica", "equal-groups-f97"], note: "W12/F97 reutiliza Grupo em equalGroupsStage.",
   },
   {
-    primitive: "InteractiveNumberLine", kinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85"],
-    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage"), component("FracaoNumeroStage"), component("RetaCompletaStage"), component("OperarNegativosStage")],
-    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03", "N5.02", "N7.01", "N7.02"], rendererKinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85"],
-    note: "W11/F30, W16/F72 e W24/F84 reutilizam InteractiveNumberLineSurface; F72 alinha a barra à mesma escala e F84 estende a reta para negativos. W37/F85 reutiliza a mesma superfície para operar com inteiros, incluindo cruzamento do zero e cancelamento de dívida em a − (−b)."
+    primitive: "InteractiveNumberLine", kinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85", "voltar-contando-f31"],
+    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage"), component("FracaoNumeroStage"), component("RetaCompletaStage"), component("OperarNegativosStage"), component("VoltarContandoStage")],
+    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03", "N5.02", "N7.01", "N7.02", "N3.04"], rendererKinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85", "voltar-contando-f31"],
+    note: "W11/F30, W16/F72 e W24/F84 reutilizam InteractiveNumberLineSurface; F72 alinha a barra à mesma escala e F84 estende a reta para negativos. W37/F85 reutiliza a mesma superfície para operar com inteiros, incluindo cruzamento do zero e cancelamento de dívida em a − (−b). W53/F31 usa a mesma reta para os dois caminhos da subtração, com a barra fechada até a criança escolher por onde vai."
   },
   {
     primitive: "InteractiveVertical", kinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76"],

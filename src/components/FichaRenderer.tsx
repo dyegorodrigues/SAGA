@@ -10,6 +10,7 @@ import { RazaoProporcaoStage } from "./primitives/RazaoProporcaoStage"; import t
 import { EquacoesStage } from "./primitives/EquacoesStage"; import type { EquacoesF90Spec } from "../curriculum/procedimentos/equacoesContract";
 import { AngulosStage } from "./primitives/AngulosStage"; import type { AngulosF78Spec } from "../curriculum/procedimentos/angulosContract";
 import { RetaCompletaStage } from "./primitives/RetaCompletaStage"; import type { RetaCompletaF84Spec } from "../curriculum/procedimentos/retaCompletaContract";
+import { VoltarContandoStage } from "./primitives/VoltarContandoStage"; import type { VoltarContandoF31Spec } from "../curriculum/procedimentos/voltarContandoContract";
 import { OperarNegativosStage } from "./primitives/OperarNegativosStage"; import type { OperarNegativosF85Spec } from "../curriculum/procedimentos/operarNegativosContract";
 import { LinguagemLetrasStage } from "./primitives/LinguagemLetrasStage"; import type { LinguagemLetrasF89Spec } from "../curriculum/procedimentos/linguagemLetrasContract";
 import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
@@ -66,6 +67,7 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'equacoes-f90': return <EquacoesStage spec={question.uiProps as EquacoesF90Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'angulos-f78': return <AngulosStage spec={question.uiProps as AngulosF78Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'reta-completa-f84': return <RetaCompletaStage spec={question.uiProps as RetaCompletaF84Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'voltar-contando-f31': return <VoltarContandoStage spec={question.uiProps as VoltarContandoF31Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'operar-negativos-f85': return <OperarNegativosStage spec={question.uiProps as OperarNegativosF85Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'linguagem-letras-f89': return <LinguagemLetrasStage spec={question.uiProps as LinguagemLetrasF89Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;

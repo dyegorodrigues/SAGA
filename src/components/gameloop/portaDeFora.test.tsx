@@ -66,6 +66,11 @@ const PORTOES_MEDIDOS = [
   // reparo da CLASS-007 desta ficha, e ele aparece aqui assim que ela entra na
   // varredura. Um portão que nasce junto com a promoção é o resultado certo.
   "N4.02|3",
+  // N3.04/F31: do L2 em diante escolher o caminho é a ação probatória — a barra
+  // só abre depois da escolha. A ficha declara isso em `acaoProbatoria`, e os
+  // quatro portões aparecem aqui no mesmo instante em que ela entra na
+  // varredura. Portão que nasce junto com a ficha é o resultado certo.
+  "N3.04|2", "N3.04|3", "N3.04|4", "N3.04|5",
 ];
 
 /**

@@ -29,6 +29,7 @@ const REGISTRO: Record<string, { motivo: Motivo; porque: string }> = {
   "GE.08": { motivo: "LEGITIMO", porque: "o enunciado dita o par ordenado; a habilidade é localizá-lo no plano" },
   "GE.10": { motivo: "LEGITIMO", porque: "as vistas precisam de rótulo A/B/C para poderem ser escolhidas" },
   "N1.07": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta: em L2 a régua vai até 10 e a resposta é 10; esconder a marca apaga a pergunta" },
+  "N3.04": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta: a criança conta os pulos entre as casas, e sem os numerais não há o que contar" },
   "N7.01": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta dos inteiros" },
   "N7.02": { motivo: "LEGITIMO", porque: "rótulos de marcação da reta dos inteiros" },
   "PE.02": { motivo: "LEGITIMO", porque: "as barras do gráfico precisam de rótulo de categoria" },

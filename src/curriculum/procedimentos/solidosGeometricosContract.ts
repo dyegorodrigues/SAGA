@@ -113,9 +113,14 @@ export function construirSolidosGeometricosF59Spec(level: number): SolidosGeomet
       ...base,
       modo: rolagem ? "testar-rolagem" : "testar-empilhamento",
       solido: perfil.solido,
+      // CLASS-009: o enunciado não pode conter o rótulo da alternativa certa.
+      // Ele perguntava "o {sólido} ROLA na rampa?" com "rola" na barra logo
+      // abaixo — quem não soubesse ler a figura casava a palavra do enunciado
+      // com a do botão e vencia o nível sem olhar sólido nenhum. A pergunta
+      // agora é aberta: o verbo está só nas alternativas.
       objetivo: rolagem
-        ? `Faça uma previsão e depois teste: o ${perfil.nome} rola na rampa?`
-        : `O ${perfil.nome} fica estável quando empilhado sobre uma face?`,
+        ? `Faça uma previsão e depois teste: o que acontece com o ${perfil.nome} na rampa?`
+        : `Faça uma previsão e depois teste: o que acontece com o ${perfil.nome} numa pilha?`,
       // A resposta acompanha o sólido: com a esfera sempre na rampa e o cubo
       // sempre na pilha, "sim" acertava para sempre sem olhar a figura.
       resposta: acontece ? 1 : 2,

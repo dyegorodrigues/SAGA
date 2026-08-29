@@ -180,4 +180,12 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // `andaime` que os separava é prosa que nenhuma primitiva lê. Reparada a
   // escada CPA pela irmã N3.09, os onze aceitaram.
   "N3.11",
+
+  // W53 — N3.04/F31. A primeira das doze competências que estavam SEM FICHA.
+  // Não é estreia de conteúdo: o `gN3_04` legado já servia o nó. É a primeira
+  // vez que ela tem ficha autoral, e portanto a primeira vez que passa por
+  // portão nenhum. A F31 canônica foi transcrita inteira — os dois caminhos, o
+  // custo de cada um, e a exigência do §9 de que duas das quatro tentativas
+  // sejam casos em que completar é o caminho curto.
+  "N3.04",
 ] as const;
