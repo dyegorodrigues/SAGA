@@ -58,7 +58,7 @@
   "src/curriculum/motores/aulaProgressContext.ts": 31,
   "src/curriculum/motores/composer.ts": 70,
   "src/curriculum/motores/composerCanary.ts": 32,
-  "src/curriculum/motores/composerCanaryIds.ts": 57,
+  "src/curriculum/motores/composerCanaryIds.ts": 62,
   "src/curriculum/motores/curriculum.ts": 25,
   "src/curriculum/motores/jardimCausalPrescription.ts": 31,
   "src/curriculum/motores/jardimEngine.ts": 28,

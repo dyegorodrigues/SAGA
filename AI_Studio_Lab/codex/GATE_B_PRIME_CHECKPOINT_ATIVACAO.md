@@ -503,6 +503,64 @@ divergências 11.
 > teste manda investigar e reconciliar a fonte real em vez de ajustar o número
 > até ficar verde.
 
+## 15. W52 — a N3.11 e o degrau que só existia no papel
+
+Mesma história da N4.02: ficha completa — cinco micros, aulinha da troca
+declarada, distratores nomeados — nunca registrada em `COMPOSER_FICHAS`, nunca
+vista por portão nenhum.
+
+Registrada, a CLASS-001 acusou no primeiro sopro: **L1 e L2 declaravam params
+idênticos byte a byte**. O único campo que os separava era o `andaime` —
+`mao_fantasma` no L1, `alto` no L2 — e `andaime` é prosa da ficha: nenhuma
+primitiva `vertical` lê esse campo. A criança subia de degrau e a tela não
+mudava; o nível que ela "venceu" não mediu o que prometia medir.
+
+O reparo não foi inventado: veio da **N3.09**, a ficha irmã que já atravessou
+todos os portões. A escada CPA dela diz onde mora a diferença — no L1 o
+algoritmo escrito fica escondido (`show_algorithm: false`) e só o material
+conta a troca; do L2 em diante o registro escrito aparece ao lado do material,
+e é isso que a criança passa a ligar. O L2 da N3.11 deixou de esconder o
+algoritmo. Os onze portões aceitaram.
+
+### Dois testes que morreram de velhice, não de defeito
+
+A promoção matou duas afirmações escritas à mão, as duas do mesmo gênero:
+
+| afirmação | por que morreu | o que ficou no lugar |
+|---|---|---|
+| `expect(COMPOSER_CANARIES.has("N3.11")).toBe(false)` | a N3.11 foi promovida | pergunta ao catálogo quem está fora do conjunto e exige `legacy` de quem tem legado próprio, `fallback` de quem nunca teve |
+| `curriculumLegacy`: "usa N3.09 como único canário e preserva N3.11 no legado" | idem | a propriedade que não envelhece: **enquanto um nó estiver no legado, produção entrega exatamente o que o gerador legado dele entrega** |
+
+`geradorLegadoDe()` já existia justamente para isso — descobrir o legado em vez
+de declarar o nome dele. Um teste que nomeia o estado atual do catálogo morre em
+toda promoção legítima, e ensina quem lê a "consertar" o teste sem pensar.
+
+### O que a varredura dos treze legados achou de brinde
+
+A versão antiga do teste de paridade fixava `Math.random` numa **constante**
+(`0.4242`) e funcionava porque olhava um nó só. Varrendo os treze, trava: o
+`numOpts` do `generatorsF1` sorteia distratores num `while` até juntar três
+distintos, e com fonte constante o mesmo valor sai para sempre.
+
+Com RNG de verdade o laço termina com probabilidade 1 — **não é travamento de
+produção**, e por isso o `numOpts` legado não foi reescrito nesta rodada; é
+hazard registrado, não defeito servido. O que mudou foi a ferramenta do teste:
+semente LCG em sequência, o mesmo idioma dos outros portões, três sementes.
+
+Mutação (três, todas vermelhas):
+
+| mutação | resultado |
+|---|---|
+| a ponte troca o legado pelo fallback | VERMELHO |
+| varredura cega (nenhum legado observado) | VERMELHO — pela prova de vida |
+| N3.11 volta a ter L1 e L2 idênticos | VERMELHO na CLASS-001 |
+
+Recibo: suíte inteira **301 arquivos, 3708 testes, verde**; `tsc --noEmit`
+limpo; `npm run auditar` aprovado; `grafo:check` sincronizado.
+
+Matrix reconciliada: **Composer 77, legado 13**, fallback 0, servido 90,
+divergências 11.
+
 ### O que continua aberto, sem eufemismo
 
 Os dois gates descobrem onde EXISTE portão. Nenhum descobre onde DEVERIA
@@ -637,7 +695,7 @@ envia nada.
 | CLASS-009 (a tela declara a resposta) | fechada, com três correções de medição |
 | CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
 
-Onze gates por descoberta vigiam as 76 fichas do Composer, todos com catraca:
+Onze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
 
 | gate | o que mede |
 |---|---|

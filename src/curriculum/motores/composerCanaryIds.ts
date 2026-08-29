@@ -173,4 +173,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // passara por nenhum dos dez gates. Registrada, os dez a aceitaram, e o
   // portão de giro que a CLASS-007 instalou nela apareceu no inventário.
   "N4.02",
+
+  // W52 — N3.11/adição com reagrupamento. Mesma história da N4.02: ficha
+  // pronta, nunca registrada. Os onze portões acharam nela o defeito que o
+  // registro existe para achar — L1 e L2 declaravam params idênticos e o
+  // `andaime` que os separava é prosa que nenhuma primitiva lê. Reparada a
+  // escada CPA pela irmã N3.09, os onze aceitaram.
+  "N3.11",
 ] as const;

@@ -157,6 +157,12 @@ export const COVERAGE_MIGRATIONS: readonly CoverageMigration[] = [
     rationale: "F98 promovida do legado. A ficha existia desde antes e nunca fora registrada em COMPOSER_FICHAS: não passara por gate nenhum dos dez que hoje vigiam a Jornada. Registrada, os dez a aceitaram sem reparo próprio, e o portão de giro instalado pela frente da CLASS-007 apareceu sozinho no inventário de portões medidos — resultado esperado de uma promoção, não exceção. Registrá-la deslocou o fluxo do PRNG e a CLASS-009 acusou N5.04 L3: 6/7 menos 3/7 dá 3/7 e deixava a resposta escrita como um dos operandos da própria conta. Defeito estrutural, corrigido na origem antes desta promoção. O legado gN4_02 sai de produção. A divergência ficha↔screen NÃO fecha aqui, e o delta não a reivindica: a Matrix observada nunca listou N4.02 entre as onze divergências, e escrever -1 seria ajustar a expectativa para ficar verde.",
     delta: { composer: 1, legacy: -1 },
   },
+  {
+    id: "W52-N3.11",
+    competence: "N3.11",
+    rationale: "Adição com reagrupamento promovida do legado. Como a N4.02, a ficha existia completa — cinco micros, aulinha da troca declarada, distratores nomeados — e nunca fora registrada em COMPOSER_FICHAS: nenhum dos onze portões por descoberta a tinha olhado uma única vez. Registrada, a CLASS-001 acusou no primeiro sopro: L1 e L2 declaravam params idênticos byte a byte, e o único campo que os separava era o `andaime` — prosa da ficha que primitiva `vertical` nenhuma lê. A criança subia de degrau e a tela não mudava. O reparo veio da escada CPA da N3.09, ficha irmã que já atravessou todos os portões: no L1 o algoritmo escrito fica escondido e só o material conta a troca; do L2 em diante o registro escrito aparece ao lado do material. Reparada, os onze aceitaram. O legado gN3_11 sai de produção. Delta observado na Matrix real: +1 Composer, -1 legado; as onze divergências ficha↔screen não mudam e o delta não reivindica nenhuma.",
+    delta: { composer: 1, legacy: -1 },
+  },
 ] as const;
 
 const migrationDelta = (key: keyof CoverageDelta) => COVERAGE_MIGRATIONS.reduce((sum, migration) => sum + (migration.delta[key] ?? 0), 0);

@@ -30,7 +30,19 @@ export const N3_11: FichaCompetencia = {
   },
   micros: [
     { id: "dois_mais_um_guiado", alvo: "trocar dez unidades por uma dezena com demonstração", kinds: ["vertical"], params: { top_min: 15, top_max: 89, bottom_min: 2, bottom_max: 9, operation: "+", require_regroup: true, result_max: 99, show_place_value: true, show_regroup: true, show_algorithm: false, tutorial }, dominio },
-    { id: "dois_mais_um", alvo: "reagrupar unidades em soma com uma parcela de um algarismo", kinds: ["vertical"], params: { top_min: 15, top_max: 89, bottom_min: 2, bottom_max: 9, operation: "+", require_regroup: true, result_max: 99, show_place_value: true, show_regroup: true, show_algorithm: false, tutorial }, dominio },
+    // CLASS-001 — o L2 era o L1 outra vez.
+    //
+    // Os dois níveis declaravam params idênticos byte a byte. O `andaime` que
+    // os separava — `mao_fantasma` no L1, `alto` no L2 — é prosa da ficha:
+    // nenhuma primitiva `vertical` lê esse campo. A criança subia de degrau e
+    // a tela não mudava.
+    //
+    // A escada CPA da N3.09, a ficha irmã que já atravessou todos os portões,
+    // diz onde está a diferença: no L1 o algoritmo escrito fica escondido e só
+    // o material conta a troca; do L2 em diante o registro escrito aparece ao
+    // lado do material, e é isso que a criança passa a ligar. Por isso o L2
+    // deixa de esconder o algoritmo.
+    { id: "dois_mais_um", alvo: "reagrupar unidades em soma com uma parcela de um algarismo", kinds: ["vertical"], params: { top_min: 15, top_max: 89, bottom_min: 2, bottom_max: 9, operation: "+", require_regroup: true, result_max: 99, show_place_value: true, show_regroup: true, tutorial }, dominio },
     { id: "duas_ordens_concreto", alvo: "ligar a troca já vivida ao registro da conta", kinds: ["vertical"], params: { top_min: 15, top_max: 89, bottom_min: 11, bottom_max: 79, operation: "+", require_regroup: true, result_max: 99, show_place_value: true, tutorial }, dominio },
     { id: "duas_ordens_abstrato", alvo: "registrar o reagrupamento na conta armada", kinds: ["vertical"], params: { top_min: 15, top_max: 89, bottom_min: 11, bottom_max: 79, operation: "+", require_regroup: true, result_max: 99 }, dominio },
     { id: "reagrupamento_duplo", alvo: "reagrupar unidades e dezenas em soma de três algarismos", kinds: ["vertical"], params: { top_min: 155, top_max: 799, bottom_min: 155, bottom_max: 799, operation: "+", require_regroup: true, require_double_regroup: true, result_max: 999 }, dominio },

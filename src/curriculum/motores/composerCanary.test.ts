@@ -8,7 +8,7 @@ import {
   rollbackComposerCanary,
   selectGenerator,
 } from "./composerCanary";
-import { ALL_MATH_TRACKS, getTrackById } from "./curriculum";
+import { ALL_MATH_TRACKS, geradorLegadoDe, getTrackById } from "./curriculum";
 
 const fallback = () => ({ kind: "multiple_choice", prompt: "fallback", answer: 1 });
 
@@ -28,8 +28,21 @@ describe("ponte de canário do Composer", () => {
     for (const id of COMPOSER_CANARIES) {
       expect(selectGenerator(id, undefined, fallback).source(), id).toBe("composer");
     }
-    expect(COMPOSER_CANARIES.has("N3.11"), "N3.11 não deve estar promovido").toBe(false);
-    expect(selectGenerator("N3.11", gN3_11, fallback).source()).toBe("legacy");
+    // O nó legado também não é escrito à mão. Esta linha fixava "N3.11" como o
+    // exemplo de quem fica no legado; quando a N3.11 foi promovida na W52, o
+    // teste reprovou por envelhecimento. O que importa afirmar é que a ponte
+    // NÃO promove quem não está no conjunto — para qualquer id fora dele.
+    const foraDoConjunto = ALL_MATH_TRACKS.map(track => track.id).filter(id => !COMPOSER_CANARIES.has(id));
+    expect(foraDoConjunto.length, "todo nó virou canário: esta metade do teste perdeu o objeto").toBeGreaterThan(0);
+    for (const id of foraDoConjunto) {
+      // O legado vem de `geradorLegadoDe`, não de um gerador emprestado: quem
+      // tem legado próprio cai no legado, quem nunca teve cai no fallback. Usar
+      // sempre o mesmo gerador de empréstimo faria os 46 nós sem gerador
+      // parecerem "legado" e a distinção sumiria do teste.
+      const legado = geradorLegadoDe(id);
+      expect(selectGenerator(id, legado, fallback).source(), `${id} está fora do conjunto e mesmo assim veio do Composer`)
+        .toBe(legado ? "legacy" : "fallback");
+    }
   });
 
   it("classifica implementação ausente como fallback", () => {
