@@ -561,6 +561,84 @@ limpo; `npm run auditar` aprovado; `grafo:check` sincronizado.
 Matrix reconciliada: **Composer 77, legado 13**, fallback 0, servido 90,
 divergências 11.
 
+## 16. DECISAO-001 — RESOLVIDA: a GM.04 é a hora, a GM.06 são os minutos
+
+A decisão estava registrada como `PENDENTE-DE-DECISÃO-HUMANA` desde o Lote 6, e
+o dono delegou a escolha. Ela foi tomada **medindo as quatro autoridades**, não
+escolhendo uma por preferência.
+
+| autoridade | escopo da GM.04 | faixa | pré-req |
+|---|---|---|---|
+| DAG (`grafo_saga`) | "Horas (ponteiros e digital)" | F1 | `[N1.06]` |
+| `curriculum/GM.yaml` | "horas exatas e meia hora"; nota explícita: *ler minutos exige contagem de 5 em 5 — por isso fica para GM.06* | F1 | `[N1.06]` |
+| ficha canônica F55 | 5 níveis: hora exata → meia hora → **quartos** → **5 em 5** → produzir | F1 | `[N1.06]` |
+| ficha TS viva, antes | horas exatas + **avançar 15 minutos** | **F2** | **`[N2.01, AL.01]`** |
+
+### Decisão
+
+**A GM.04 é a hora cheia e a meia hora, F1, pré-req `[N1.06]`. Os minutos —
+quartos em diante — são da GM.06.**
+
+Quatro razões, todas verificáveis em código hoje:
+
+1. **O DAG é a autoridade operante.** É dele que `unlockEngine` e
+   `rescuePlanner` leem os pré-requisitos — é o DAG que tranca a porta. A
+   `prereqs` da ficha é documentação, e o próprio portão CLASS-002 diz isso.
+
+2. **A F55 se contradiz, e a contradição aponta a saída.** O nível 4 dela diz
+   "usa contagem por saltos (AL.03)" — pré-requisito que o bloco de identidade
+   da própria F55 não lista. Uma GM.04 em F1 com `[N1.06]` ensinando 5 em 5
+   cobraria da criança um salto que o DAG só concede na GM.06.
+
+3. **O app já se comporta assim.** O `gGM_04`, que serve esta competência em
+   produção, tem cinco níveis e nenhum sai da hora cheia e da meia hora: L1
+   hora cheia, L2 meia hora, L3 mistura, L4 problema de horas inteiras, L5 em
+   palavras ("três e meia"). O micro invasor **não servia criança nenhuma** —
+   era prosa divergindo do que roda.
+
+4. **A GM.06 já entrega o resto, e testada.** A F62, promovida na W35 e
+   aprovada pelos onze portões, tem exatamente a escada da F55 do nível 3 em
+   diante: quartos (15/30/45) → 5 em 5 → minuto a minuto → duração.
+
+A F55 não foi descartada. Recebeu **nota normativa** dizendo onde cada degrau
+mora: níveis 1–2 na GM.04, níveis 3–5 na GM.06. A escada é a mesma; o que a
+decisão resolve é onde ela é servida.
+
+### Ordem de execução — a que o diagnóstico do Lote 6 tinha registrado
+
+O diagnóstico antigo avisava: *"não executar metadata isoladamente: isso
+produziria uma ficha F1 com prereq de numerais ainda ensinando frações de 15
+minutos"*. A ordem foi obedecida:
+
+1. escopo primeiro — o micro `b` deixou de ser "avançar 15 minutos" e passou a
+   ser "ler a meia hora, quando o ponteiro das horas fica entre dois números";
+2. **só então** faixa `F1` e pré-req `[N1.06]`;
+3. conferido que a GM.06 cobre o micro removido — o L1 dela sorteia entre
+   `15, 30, 45`, que são os quartos.
+
+O `nome` também mudou: "Relógio: Horas e Minutos" prometia à criança minutos
+que a competência não ensina mais. Agora é "Relógio: a Hora e a Meia Hora".
+
+### Como reverter
+
+Está escrito no cabeçalho da própria `GM.04.ts`, perto de quem for mexer nela:
+editar o **DAG primeiro** (GM.04 vira F2 e ganha AL.03), só então a ficha e a
+nota do YAML, e por último retirar da GM.06 o que subiu — senão as duas ensinam
+a mesma escada, e a GM.06 é servida pelo Composer sob onze portões.
+
+### A CLASS-002 fecha em zero
+
+`PENDENTE_DE_DECISAO_HUMANA` agora é `{}`. A catraca dos dois lados foi
+mutada e reprova nas duas direções:
+
+| mutação | resultado |
+|---|---|
+| GM.04 volta a divergir do DAG nos prereqs | VERMELHO |
+| o registro volta a listar GM.04 já resolvida | VERMELHO — a catraca pede a remoção |
+
+Recibo: suíte inteira **301 arquivos, 3708 testes, verde**; `tsc --noEmit`
+limpo; `npm run auditar` aprovado, guard documental canônico incluído.
+
 ### O que continua aberto, sem eufemismo
 
 Os dois gates descobrem onde EXISTE portão. Nenhum descobre onde DEVERIA
@@ -715,8 +793,9 @@ Onze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
 
 Duas coisas, as duas nomeadas e nenhuma delas por falta de trabalho:
 
-1. **`DECISAO-001/GM.04`** — decisão humana sobre qual autoridade curricular
-   vence antes de qualquer edição que redistribua escopo entre GM.04 e GM.06.
+1. ~~**`DECISAO-001/GM.04`**~~ — **RESOLVIDA na seção 16.** A GM.04 é a hora
+   cheia e a meia hora; os minutos são da GM.06. Decidida medindo as quatro
+   autoridades, com caminho de volta escrito na ficha.
 2. **A outra metade do D068** — descobrir onde DEVERIA existir portão exige a
    ficha declarar, de forma legível por máquina, qual interação ela trata como
-   probatória. Também é decisão de cânone.
+   probatória. Próxima da fila.

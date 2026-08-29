@@ -1556,6 +1556,25 @@ O sorvete custa R$ 7. Voce pagou R$ 10.
 
 **O nível 2 tem a dificuldade escondida:** às 3:30, o ponteiro das horas está **entre o 3 e o 4**. A criança que aprendeu "aponta para o número" fica perdida. Precisa ser ensinado explicitamente.
 
+> ### ⚠️ NOTA NORMATIVA — DECISAO-001 *(a escada acima mora em duas competências)*
+>
+> **Os níveis 1 e 2 são a GM.04. Os níveis 3, 4 e 5 são a GM.06.**
+>
+> A tabela acima descreve a escada pedagógica inteira do relógio, e ela está
+> certa — o que faltava dizer é onde cada degrau é servido. A GM.04 é F1 e
+> depende só de N1.06 (numerais); mas o nível 4 desta mesma ficha diz "usa
+> contagem por saltos (AL.03)", um pré-requisito que a identidade da F55 não
+> lista. O DAG resolve a contradição concedendo AL.03 na **GM.06** — que é
+> exatamente onde a F62 já implementa quartos → 5 em 5 → minuto a minuto →
+> duração, promovida e sob os onze portões por descoberta.
+>
+> Nada aqui foi descartado: a escada é a mesma, repartida entre a competência
+> que a criança encontra cedo (hora cheia e meia hora) e a que vem depois de
+> saber contar de 5 em 5.
+>
+> O porquê completo, as quatro autoridades comparadas e o caminho para reverter
+> estão no cabeçalho de `src/curriculum/fichas/jornada/GM.04.ts`.
+
 ## 6. Diagnóstico
 
 | Erro | Tag | Significado |

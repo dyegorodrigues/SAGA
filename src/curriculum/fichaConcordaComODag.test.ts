@@ -21,20 +21,24 @@ import { getTrackById } from "./motores/curriculum";
  */
 
 /**
- * A divergência que NÃO se resolve escrevendo código.
+ * Divergências que NÃO se resolvem escrevendo código.
  *
- * `GM.04` é a `DECISAO-001`: as autoridades curriculares divergem sobre o
- * escopo — o YAML reserva os minutos para GM.06, a F55 canônica os inclui, e a
- * ficha TS traz um micro de avançar 15 minutos. Alinhar os pré-requisitos aqui
- * seria escolher em silêncio qual autoridade vence e redistribuir escopo entre
- * duas competências.
+ * Uma entrada aqui não é anistia: é a declaração de que alinhar os
+ * pré-requisitos escolheria em silêncio qual autoridade curricular vence e
+ * redistribuiria escopo entre competências. Vem com catraca dos dois lados —
+ * uma divergência nova reprova, e uma entrada que parou de divergir reprova
+ * também, pedindo para ser removida.
  *
- * Fica registrada como pendência de decisão humana, com catraca: no dia em que
- * as duas concordarem, esta entrada reprova pedindo para ser removida.
+ * A `GM.04` morou aqui como `DECISAO-001` e saiu resolvida: a competência é a
+ * hora cheia e a meia hora, os minutos são da GM.06. O porquê, as quatro
+ * autoridades comparadas e o caminho de volta estão escritos no cabeçalho da
+ * própria ficha `GM.04.ts` — perto de quem for mexer nela, não num documento
+ * que ninguém abre.
+ *
+ * O registro está vazio hoje. Vazio é o estado saudável: a prova de vida do
+ * teste é a contagem de fichas varridas, não o tamanho desta lista.
  */
-const PENDENTE_DE_DECISAO_HUMANA: Record<string, string> = {
-  "GM.04": "DECISAO-001: YAML, F55 e a ficha TS divergem sobre o escopo dos minutos entre GM.04 e GM.06",
-};
+const PENDENTE_DE_DECISAO_HUMANA: Record<string, string> = {};
 
 describe("CLASS-002 — conformance ficha ↔ DAG", () => {
   it("os pré-requisitos documentados são os que o DAG cobra", () => {
