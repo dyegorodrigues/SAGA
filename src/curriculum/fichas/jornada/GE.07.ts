@@ -22,11 +22,11 @@ export const GE_07: FichaCompetencia = {
     { regra: "acha que girar a figura muda sua classe geométrica", tag: PoligonosMisconception.ORIENTACAO_FIXA },
   ],
   niveis: {
-    1: { primitiva: "shapecanvas", micro: "triangulos-lados", andaime: "alto" },
-    2: { primitiva: "shapecanvas", micro: "triangulos-angulos", andaime: "medio" },
-    3: { primitiva: "draggroup", micro: "quadrilateros", andaime: "medio" },
-    4: { primitiva: "draggroup", micro: "hierarquia", andaime: "minimo" },
-    5: { primitiva: "draggroup", micro: "propriedades-combinadas", andaime: "nenhum", rt_alvo: 18000 },
+    1: { primitiva: "shapecanvas", micro: "triangulos-lados", andaime: "alto", acaoProbatoria: { id: "conferir", porque: "A classe do polígono é a propriedade conferida, não a aparência do desenho. Nomear antes de conferir cada figura contra cada critério é ler a figura pela posição — exatamente o erro que o nível combate." } },
+    2: { primitiva: "shapecanvas", micro: "triangulos-angulos", andaime: "medio", acaoProbatoria: { id: "conferir", porque: "Idem para os ângulos: o acutângulo se reconhece conferindo os três, não pelo desenho parecer pontudo." } },
+    3: { primitiva: "draggroup", micro: "quadrilateros", andaime: "medio", acaoProbatoria: { id: "conferir", porque: "Quadriláteros só se distinguem pelas propriedades conferidas — lados iguais, pares paralelos. A olho, losango e paralelogramo se confundem." } },
+    4: { primitiva: "draggroup", micro: "hierarquia", andaime: "minimo", acaoProbatoria: { id: "conferir", porque: "A hierarquia (quadrado ⊂ retângulo ⊂ paralelogramo) exige conferir que a figura satisfaz TODOS os critérios da classe maior, não só os da menor." } },
+    5: { primitiva: "draggroup", micro: "propriedades-combinadas", andaime: "nenhum", rt_alvo: 18000, acaoProbatoria: { id: "conferir", porque: "Combinar propriedades é conferir mais de um critério na mesma figura; responder sem conferir devolve a resposta à aparência." } },
   },
   micros: [
     { id: "triangulos-lados", fonte: "F79", alvo: "classificar triângulos pelo número de lados iguais, independentemente da orientação", kinds: ["shapecanvas", "draggroup"], params: { modo: "triangulos-lados", tutorial }, dominio: { ...dominio } },

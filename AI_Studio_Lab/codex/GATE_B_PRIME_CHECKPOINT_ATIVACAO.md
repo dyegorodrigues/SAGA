@@ -553,7 +553,7 @@ envia nada.
 | CLASS-009 (a tela declara a resposta) | fechada, com três correções de medição |
 | CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
 
-Onze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
+Doze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
 
 | gate | o que mede |
 |---|---|
@@ -568,6 +568,7 @@ Onze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
 | `evidenciaExigidaNaoSeCompra` | a prova não vem junto com o clique |
 | `nivelIntegradorExigeFamilias` | quem integra famílias exige mais de uma |
 | `aulinhaDeclaradaChegaNaQuestao` | a estreia narrada na ficha chega na tela |
+| `acaoProbatoriaDeclaradaTemPortao` | onde a ficha declara prova, a tela tem porta |
 
 ### O que continua aberto
 
@@ -576,9 +577,15 @@ Duas coisas, as duas nomeadas e nenhuma delas por falta de trabalho:
 1. ~~**`DECISAO-001/GM.04`**~~ — **RESOLVIDA na seção 16.** A GM.04 é a hora
    cheia e a meia hora; os minutos são da GM.06. Decidida medindo as quatro
    autoridades, com caminho de volta escrito na ficha.
-2. **A outra metade do D068** — descobrir onde DEVERIA existir portão exige a
-   ficha declarar, de forma legível por máquina, qual interação ela trata como
-   probatória. Próxima da fila.
+2. ~~**A outra metade do D068**~~ — **PAGA na seção 17.** A ficha declara em
+   `niveis[n].acaoProbatoria` qual interação é probatória, e o portão
+   `acaoProbatoriaDeclaradaTemPortao` cobra que a tela tenha a porta. Quinze
+   níveis declaram.
+
+Com as duas resolvidas, **o Gate B′ não tem mais pendência de cânone aberta.**
+O que resta é trabalho de autoria: as 12 competências ainda sem ficha
+(`N2.04`, `N2.05`, `N3.04`, `N3.05`, `N3.06`, `N3.07`, `N3.08`, `N3.12`,
+`N3.13`, `N4.05`, `GM.03`, `PE.01`).
 
 ---
 
@@ -801,3 +808,98 @@ se aproxima, significa outra coisa, como a medição acima mostra.
 Declarar a ação probatória é decisão de cânone e não se toma por conta própria.
 Até lá, a catraca do inventário é o que impede um portão de sumir sem que
 alguém seja avisado.
+
+---
+
+## 17. D068 — a outra metade paga: a ficha declara a ação probatória
+
+A dívida estava escrita no fim do `portaDeFora.test.tsx`, sem eufemismo: *"o
+inventário descobre onde EXISTE portão. Ele não descobre onde DEVERIA existir:
+para isso seria preciso a ficha declarar, de forma legível por máquina, qual
+interação ela trata como probatória."* Era a segunda decisão de cânone
+delegada, e foi tomada.
+
+### O campo
+
+`niveis[n].acaoProbatoria = { id, porque }` em `FichaNivel`:
+
+- **`id`** — a ação em uma palavra: `girar`, `construir`, `transformar`,
+  `conferir`, `experimentar`, `formar-duplas`;
+- **`porque`** — por que responder sem executá-la não demonstra o que o nível
+  ensina. Não é ornamento: o portão cobra mais de 40 caracteres, porque
+  "porque sim" não é cânone.
+
+`dominio.exige.evidencia` foi considerado e recusado com medição, não com
+opinião: nas 88 fichas que o declaram, a evidência acompanha **toda** resposta
+certa do nível. É condição do item ("comparou sem objetos"), não ação a
+executar. Os dois campos falam de coisas diferentes e precisavam de nomes
+diferentes.
+
+### O portão que torna a declaração vinculante
+
+`acaoProbatoriaDeclaradaTemPortao.test.tsx` inverte a direção da prova: **a
+ficha promete a porta, a medição cobra que a porta exista.** Para cada nível
+que declara, em três sementes fixas: o rótulo da resposta está na tela e
+nenhum clique nele, no mount, entrega o acerto.
+
+Quinze níveis declaram hoje, todos com a ação medida no palco antes de ser
+escrita na ficha:
+
+| ficha | níveis | ação | o que a tela exige |
+|---|---|---|---|
+| `GE.04` | 3, 4 | `experimentar` | prever e então rodar o teste na rampa / no empilhamento |
+| `GE.07` | 1–5 | `conferir` | conferir cada figura contra cada critério |
+| `GE.09` | 1, 3, 5 | `transformar` | montar as cópias, cortar e encaixar, rearranjar os setores |
+| `GM.11` | 1, 2, 3, 5 | `construir` | encher o prisma, construir as camadas |
+| `N2.06` | 1, 2 | `formar-duplas` | formar as duplas antes de dizer par ou ímpar |
+| `N4.02` | 3 | `girar` | girar o arranjo antes de responder |
+
+### O que NÃO foi cobrado, e por quê
+
+A recíproca — todo portão medido tem de estar declarado — **mentiria**, e a
+medição mostra por quê. Os pares do inventário são de três espécies, e o
+clique sozinho não as separa:
+
+| espécie | exemplo medido | como se apresenta no mount |
+|---|---|---|
+| a barra recusa até a ação | `GE.09`, `GM.11`, `GE.07`, `N2.06`, `N4.02` | botão da resposta **desabilitado** |
+| o clique existe, mas significa outra coisa | `GE.04` | botão **habilitado**: o toque é a previsão, o experimento vem depois |
+| o rótulo caiu fora do caminho de resposta | `AL.03\|3`, `N3.09\|4` | marca de reta, dígito de teclado — coincidência de texto |
+
+Uma regra por "desabilitado no mount" acusaria a `AL.03` (marca de reta
+desabilitada, e não há prova nenhuma a fazer ali) e perderia a `GE.04` (portão
+real, botão habilitado). Erraria nas duas direções. E forçar declaração na
+terceira espécie escreveria no cânone uma prova que a criança não precisa
+fazer — pior que não declarar nada.
+
+Então a recíproca fica com o inventário de `portaDeFora`, catraca nos dois
+sentidos sobre o que É medido; e o portão novo cobra o que é DECLARADO. Juntos:
+nenhum portão some sem aviso, e nenhuma promessa de ficha fica sem porta.
+
+### Mutação
+
+| mutação | resultado |
+|---|---|
+| `CirculoAreas` para de exigir a transformação | VERMELHO |
+| declara prova num nível sem portão (`N2.06` L3) | VERMELHO — **é a metade nova funcionando** |
+| varredura cega (nenhuma declaração lida) | VERMELHO — pela prova de vida |
+| `ArrayGrid` deixa de exigir o giro | VERMELHO |
+
+> Nota de método sobre a última. Duas tentativas anteriores ficaram **verdes** e
+> não por cegueira: o `ArrayGrid` tranca a porta em dois lugares independentes —
+> o `disabled` do botão e a guarda dentro do `choose`. Remover um deixava o
+> outro segurando. Só a mutação na fonte única (`requireRotate`) abre as duas e
+> o portão acusa. Mutação que sobrevive nem sempre é gate cego; às vezes é
+> defesa em profundidade, e vale distinguir os dois casos antes de "consertar"
+> um teste que está certo.
+
+### O que continua aberto depois desta
+
+Nada de cânone. O mecanismo existe, é cobrado, e vale automaticamente para
+qualquer ficha nova que declare. Usar o campo numa ficha que precisa dele
+passou a ser **disciplina de autoria**, não lacuna de mecanismo — e uma ficha
+que declara e não entrega agora fica vermelha sozinha.
+
+Recibo: suíte inteira **302 arquivos, 3710 testes, verde**; `tsc --noEmit`
+limpo; `npm run auditar` aprovado; `grafo:check` sincronizado.
+

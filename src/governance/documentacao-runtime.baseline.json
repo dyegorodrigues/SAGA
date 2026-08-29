@@ -119,7 +119,7 @@
   "src/curriculum/procedimentos/touchCountProcedure.ts": 176,
   "src/curriculum/procedimentos/volumePrismasContract.ts": 26,
   "src/curriculum/procedimentos/volumeVistasContract.ts": 29,
-  "src/curriculum/schema.ts": 85,
+  "src/curriculum/schema.ts": 115,
   "src/lib/entradaDoApp.ts": 37,
   "src/lib/entradaSemConta.ts": 25,
   "src/lib/firebase.ts": 83,

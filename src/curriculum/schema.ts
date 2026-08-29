@@ -91,11 +91,47 @@ export interface FichaErroTipico {
   descricao: string;
 }
 
+/**
+ * A interação que o nível trata como PROVA — sem ela, responder certo não
+ * demonstra nada.
+ *
+ * ## Por que este campo existe (a outra metade do D068)
+ *
+ * O inventário de `portaDeFora.test.tsx` descobre onde EXISTE portão: mede, em
+ * cada nível, se o rótulo da resposta está na tela e se clicar nele no mount
+ * vende o acerto. O que ele nunca conseguiu descobrir é onde DEVERIA existir —
+ * porque isso não está na tela, está na intenção da ficha.
+ *
+ * `dominio.exige.evidencia` não serve para isso e a medição provou: nas 88
+ * fichas que o declaram, a evidência acompanha TODA resposta certa do nível. É
+ * condição do item ("comparou sem objetos"), não ação a executar.
+ *
+ * Declarar aqui inverte a direção da prova. A ficha promete uma porta; o portão
+ * `acaoProbatoriaDeclaradaTemPortao` vai lá e cobra que a tela tenha uma.
+ *
+ * ## O que NÃO declarar
+ *
+ * Um rótulo que aparece na tela fora do caminho de resposta — o número numa
+ * marca de reta, o dígito num teclado — também mede como "não vende", e não é
+ * portão nenhum: é coincidência de texto. Declarar ação ali seria escrever no
+ * cânone uma prova que a criança não precisa fazer.
+ *
+ * O critério é a ficha, não o pixel: existe uma ação que a criança PRECISA
+ * executar antes de a resposta valer? Se não existe, não declare.
+ */
+export interface AcaoProbatoria {
+  /** A ação, em uma palavra: `girar`, `construir`, `transformar`, `conferir`, `experimentar`, `formar-duplas`. */
+  id: string;
+  /** Por que responder sem executá-la não demonstra o que o nível ensina. */
+  porque: string;
+}
+
 export interface FichaNivel {
   primitiva: KindType;
   micro?: string;
   andaime?: "mao_fantasma" | "alto" | "medio" | "minimo" | "nenhum";
   rt_alvo?: number;
+  acaoProbatoria?: AcaoProbatoria;
 }
 
 export interface FichaDistrator {

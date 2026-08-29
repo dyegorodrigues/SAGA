@@ -19,8 +19,8 @@ export const N2_06: FichaCompetencia = {
   explain: "Par é o número que forma duplas sem sobrar ninguém; ímpar deixa exatamente um sem dupla.",
   distratores: [],
   niveis: {
-    1: { primitiva: "draggroup", micro: "duplas-10", andaime: "mao_fantasma" },
-    2: { primitiva: "draggroup", micro: "duplas-20", andaime: "alto" },
+    1: { primitiva: "draggroup", micro: "duplas-10", andaime: "mao_fantasma", acaoProbatoria: { id: "formar-duplas", porque: "Par e ímpar é sobrar ou não sobrar ao formar duplas. Dizer “par” antes de formá-las é adivinhar pela aparência da fileira." } },
+    2: { primitiva: "draggroup", micro: "duplas-20", andaime: "alto", acaoProbatoria: { id: "formar-duplas", porque: "Com vinte itens a contagem visual falha ainda mais; formar as duplas é a única demonstração de que a criança usou a definição." } },
     3: { primitiva: "draggroup", micro: "decidir-visual", andaime: "medio" },
     4: { primitiva: "draggroup", micro: "ultimo-algarismo", andaime: "minimo" },
     5: { primitiva: "draggroup", micro: "paridade-somas", andaime: "nenhum", rt_alvo: 12000 },

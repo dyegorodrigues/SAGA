@@ -23,7 +23,7 @@ export const N4_02: FichaCompetencia = {
   niveis: {
     1: { primitiva: "arraygrid", micro: "contagem", andaime: "alto" },
     2: { primitiva: "arraygrid", micro: "multiplicacao", andaime: "medio" },
-    3: { primitiva: "arraygrid", micro: "giro", andaime: "medio" },
+    3: { primitiva: "arraygrid", micro: "giro", andaime: "medio", acaoProbatoria: { id: "girar", porque: "A comutatividade se vê girando o arranjo: 3×5 e 5×3 cobrem os mesmos quadradinhos. Responder sem girar é dar o total — que a criança já sabia do nível 1 — sem observar o que o nível ensina." } },
     4: { primitiva: "arraygrid", micro: "expressao", andaime: "minimo" },
     5: { primitiva: "arraygrid", micro: "area", andaime: "nenhum", rt_alvo: 12000 },
   },

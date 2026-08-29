@@ -23,11 +23,11 @@ export const GE_09: FichaCompetencia = {
     { regra: "troca raio e diâmetro ou trata a circunferência como medida interna", tag: CirculoAreasMisconception.CONFUNDE_RAIO_DIAMETRO },
   ],
   niveis: {
-    1: { primitiva: "shapecanvas", micro: "triangulo-montagem", andaime: "alto" },
+    1: { primitiva: "shapecanvas", micro: "triangulo-montagem", andaime: "alto", acaoProbatoria: { id: "transformar", porque: "A área do triângulo se aprende vendo duas cópias virarem um paralelogramo. Escolher a área sem montar as cópias é aplicar fórmula decorada — o nível existe para que ela NÃO seja decorada." } },
     2: { primitiva: "shapecanvas", micro: "formula-triangulo", andaime: "medio" },
-    3: { primitiva: "shapecanvas", micro: "paralelogramo-corte", andaime: "medio" },
+    3: { primitiva: "shapecanvas", micro: "paralelogramo-corte", andaime: "medio", acaoProbatoria: { id: "transformar", porque: "Cortar e encaixar é o que mostra que a área se conserva. Sem o corte, a igualdade das áreas é afirmação, não observação." } },
     4: { primitiva: "shapecanvas", micro: "circulo-medidas", andaime: "minimo" },
-    5: { primitiva: "shapecanvas", micro: "area-circulo", andaime: "nenhum", rt_alvo: 18000 },
+    5: { primitiva: "shapecanvas", micro: "area-circulo", andaime: "nenhum", rt_alvo: 18000, acaoProbatoria: { id: "transformar", porque: "Rearranjar os setores é o que revela o círculo virando quase-retângulo. É de onde πr² sai; sem rearranjar, sai da memória." } },
   },
   micros: [
     { id: "triangulo-montagem", fonte: "F91", alvo: "derivar a área do triângulo montando dois triângulos iguais em um retângulo e reconhecendo a metade", kinds: ["shapecanvas"], params: { modo: "triangulo-montagem", tutorial }, dominio },

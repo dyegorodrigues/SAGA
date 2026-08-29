@@ -32,11 +32,11 @@ export const GM_11: FichaCompetencia = {
     { regra: "encontra a quantidade, mas registra área ou unidade linear em vez de unidade cúbica", tag: VolumePrismasMisconception.IGNORA_UNIDADE_CUBICA },
   ],
   niveis: {
-    1: { primitiva: "arraygrid", micro: "contar-cubos", andaime: "alto" },
-    2: { primitiva: "arraygrid", micro: "camada-multiplicar", andaime: "alto" },
-    3: { primitiva: "arraygrid", micro: "formula", andaime: "medio" },
+    1: { primitiva: "arraygrid", micro: "contar-cubos", andaime: "alto", acaoProbatoria: { id: "construir", porque: "O volume é a contagem dos cubinhos que cabem. Responder sem encher o prisma é ler o número em outro lugar que não a construção." } },
+    2: { primitiva: "arraygrid", micro: "camada-multiplicar", andaime: "alto", acaoProbatoria: { id: "construir", porque: "A camada repetida pela altura é o argumento inteiro do nível: construir as camadas é ver a multiplicação acontecer." } },
+    3: { primitiva: "arraygrid", micro: "formula", andaime: "medio", acaoProbatoria: { id: "construir", porque: "A fórmula só é fórmula depois de a construção mostrar o que ela resume." } },
     4: { primitiva: "arraygrid", micro: "dimensao-faltante", andaime: "minimo" },
-    5: { primitiva: "arraygrid", micro: "prisma-nao-retangular", andaime: "nenhum", rt_alvo: 22000 },
+    5: { primitiva: "arraygrid", micro: "prisma-nao-retangular", andaime: "nenhum", rt_alvo: 22000, acaoProbatoria: { id: "construir", porque: "No prisma não retangular a fórmula base×altura não é óbvia — construir camada por camada é o que prova que ela continua valendo." } },
   },
   micros: [
     { id: "contar-cubos", fonte: "F94", alvo: "construir volume preenchendo e contando cubos unitários em camadas", kinds: ["arraygrid"], params: { modo: "contar-cubos", visualizacao: "3D", tutorial, acessibilidade }, dominio },

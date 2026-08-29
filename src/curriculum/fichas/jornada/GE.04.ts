@@ -22,8 +22,8 @@ export const GE_04: FichaCompetencia = {
   niveis: {
     1: { primitiva: "shapecanvas", micro: "solidos-basicos", andaime: "mao_fantasma" },
     2: { primitiva: "shapecanvas", micro: "familia-solidos", andaime: "alto" },
-    3: { primitiva: "shapecanvas", micro: "rolagem", andaime: "medio" },
-    4: { primitiva: "shapecanvas", micro: "empilhamento", andaime: "minimo" },
+    3: { primitiva: "shapecanvas", micro: "rolagem", andaime: "medio", acaoProbatoria: { id: "experimentar", porque: "O nível ensina que a forma da superfície decide o rolamento. A criança prevê e o experimento na rampa é quem confirma ou desmente: escolher sem testar é palpite premiado." } },
+    4: { primitiva: "shapecanvas", micro: "empilhamento", andaime: "minimo", acaoProbatoria: { id: "experimentar", porque: "Empilhar é o teste que separa face plana de superfície curva. Sem rodar o experimento, acertar “empilha” não distingue quem entendeu de quem chutou." } },
     5: { primitiva: "shapecanvas", micro: "elementos-solido", andaime: "nenhum", rt_alvo: 18000 },
   },
   micros: [
