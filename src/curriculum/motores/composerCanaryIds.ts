@@ -188,4 +188,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // custo de cada um, e a exigência do §9 de que duas das quatro tentativas
   // sejam casos em que completar é o caminho curto.
   "N3.04",
+
+  // W54 — N3.06/F32. Palco composto ArrayGrid + TenFrame, como a ficha canônica
+  // nomeia: a grade desenha as duas fileiras espelhadas do dobro, a moldura
+  // mostra UMA delas dentro do dez. Preenchida com o total, a moldura seria a
+  // resposta desenhada na tela.
+  "N3.06",
 ] as const;

@@ -58,6 +58,15 @@ const composites = [
     primitives: ["MaterialDourado", "TenFrame"],
   },
   {
+    // W54/F32: a grade desenha as duas fileiras espelhadas — a simetria que fixa
+    // o dobro — e a moldura mostra UMA fileira dentro do dez. Uma só: preenchida
+    // com o total, ela seria a resposta desenhada na tela.
+    kind: "dobros-f32",
+    stage: "src/components/primitives/DobrosStage.tsx",
+    imports: ["./ArrayGrid", "./TenFrame"],
+    primitives: ["ArrayGrid", "TenFrame"],
+  },
+  {
     kind: "medidas",
     stage: "src/components/primitives/MedidasStage.tsx",
     imports: ["./Balanca", "./Recipientes"],
