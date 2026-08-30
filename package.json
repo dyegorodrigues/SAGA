@@ -20,7 +20,7 @@
     "grafo:check": "node scripts/generate-graph-artifacts.cjs --check",
     "grafo:codigo": "graphify update . && graphify cluster-only .",
     "pr:check": "node AI_Studio_Lab/tools/pr_text_guard.cjs",
-    "simular": "tsx simulated-learner-real.ts",
+    "simular": "vitest run --config vite.simular.config.ts --disable-console-intercept",
     "contrato": "vitest run",
     "sonda": "node scripts/sonda-layout.mjs",
     "sonda:sensei-dojo": "node scripts/sonda-sensei-dojo.mjs && node scripts/sonda-matricula.mjs && node scripts/sonda-detetive-formas.mjs && node scripts/sonda-regra-sequencia.mjs && node scripts/sonda-partes-iguais.mjs && node scripts/sonda-fracao-numero.mjs && node scripts/sonda-decimais.mjs && node scripts/sonda-fracoes-equivalentes.mjs && node scripts/sonda-divisao-longa.mjs && node scripts/sonda-perimetro.mjs && node scripts/sonda-igualdade-equilibrio.mjs",

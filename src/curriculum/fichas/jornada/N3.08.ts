@@ -100,7 +100,12 @@ export const N3_08: FichaCompetencia = {
     { id: "voltar-pelo-dez", fonte: "F34", alvo: "decompor o subtraendo para passar pela estação do dez", kinds: ["tenframe"], params: {}, dominio },
     { id: "escolher-caminho", fonte: "F34", alvo: "escolher entre voltar pelo dez e completar até o total", kinds: ["tenframe"], params: {}, dominio: dominioComEscolha },
     { id: "escolha-cobrada", fonte: "F34", alvo: "escolher o caminho curto sem as molduras", kinds: ["tenframe"], params: {}, dominio: dominioComEscolha },
-    { id: "mental", fonte: "F34", alvo: "cruzar a dezena de cabeça", kinds: ["tenframe"], params: {}, dominio },
+    // O L5 carrega a exigência porque é a regra do L5 que a coroa lê: o motor
+    // decide o domínio com a regra da questão na tela, e só a consulta quando o
+    // progresso já está no último nível. Declarada apenas nos níveis que
+    // sorteiam as famílias, ela ficava escrita e nunca era cobrada — medido: a
+    // coroa saía para quem demonstrou uma família só.
+    { id: "mental", fonte: "F34", alvo: "cruzar a dezena de cabeça", kinds: ["tenframe"], params: {}, dominio: dominioComEscolha },
   ],
 
   erros_tipicos: [

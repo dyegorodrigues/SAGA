@@ -93,7 +93,31 @@ export function construirNumerosGrandesSpec(level: number, familiaPedida?: Famil
   if (nivel === 4) {
     // Escolher a precisão: o número é o mesmo, e o que se pergunta é para qual
     // ordem arredondar faz sentido no contexto.
-    const numero = ri(1200, 9800);
+    //
+    // O sorteio RECUSA os números em que as três leituras se encontram. Medido
+    // em 400 mil sorteios sem a recusa: 0,45% das telas vinham com uma única
+    // alternativa — a criança não tinha como errar — e 9,1% com duas, uma cara
+    // ou coroa. A causa é aritmética: perto da marca do milhar (7006, 9005) a
+    // centena e a dezena caem em cima da resposta, e num número como 6095 elas
+    // caem uma em cima da outra. Um distrator que coincide com o gabarito não
+    // diagnostica nada, e some da barra levando o nível junto.
+    //
+    // A recusa não escolhe direção: com ela, a fração que arredonda para cima
+    // continua em 0,500. Fosse assim, o nível ensinaria "pegue o de cima".
+    const sortearNumero = () => {
+      for (let tentativa = 0; tentativa < 200; tentativa += 1) {
+        const candidato = ri(1200, 9800);
+        const milhar = arredondar(candidato, 1000);
+        const centena = arredondar(candidato, 100);
+        const dezena = arredondar(candidato, 10);
+        if (centena === milhar || dezena === milhar || centena === dezena) continue;
+        return candidato;
+      }
+      // Construção direta com as três leituras separadas: 4000, 3600, 3620.
+      return 3620;
+    };
+
+    const numero = sortearNumero();
     const paraMilhar = arredondar(numero, 1000);
     return {
       nivel, modo: "escolher-precisao", numero, ordem: 1000,
@@ -176,8 +200,16 @@ export function construirNumerosGrandesSpec(level: number, familiaPedida?: Famil
       { value: marcaAbaixo, misconception: NM.ARREDONDA_SEMPRE_BAIXO },
       // Foi para a marca errada apesar da distância.
       { value: resposta === marcaAbaixo ? marcaAcima : marcaAbaixo, misconception: NM.IGNORA_DISTANCIA },
-      // Arredondou para a ordem de baixo.
-      { value: arredondar(numero, Math.max(10, ordem / 10)), misconception: NM.ORDEM_ERRADA },
+      // Arredondou para a ordem de baixo. No L1 a ordem de baixo é a unidade, e
+      // arredondar para a unidade é DEVOLVER o número — que é o erro de não ter
+      // arredondado, e é um erro que a criança comete de verdade.
+      //
+      // Este distrator vinha com um `Math.max(10, …)` que, no L1, o fazia
+      // arredondar para a mesma dezena da resposta: ele coincidia com o gabarito
+      // e sumia da barra. Medido em 20 mil sorteios, o L1 vinha com DUAS
+      // alternativas em 100% das vezes — cara ou coroa, sempre. Sem o piso, o
+      // nível volta a ter três.
+      { value: arredondar(numero, ordem / 10), misconception: NM.ORDEM_ERRADA },
     ]),
   };
 }

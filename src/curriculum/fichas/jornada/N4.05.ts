@@ -80,7 +80,12 @@ export const N4_05: FichaCompetencia = {
     { id: "medida", fonte: "F99", alvo: "descobrir quantos grupos de tamanho conhecido cabem no total", kinds: ["draggroup"], params: {}, dominio },
     { id: "alternando", fonte: "F99", alvo: "alternar entre os dois sentidos da divisão", kinds: ["draggroup"], params: {}, dominio: dominioComOsDoisSentidos },
     { id: "identificar", fonte: "F99", alvo: "reconhecer qual sentido a pergunta pede antes de resolver", kinds: ["draggroup"], params: {}, dominio: dominioComOsDoisSentidos },
-    { id: "resto-decide", fonte: "F99", alvo: "decidir o que fazer com o resto conforme o contexto pede", kinds: ["draggroup"], params: {}, dominio },
+    // O L5 carrega a exigência porque é a regra do L5 que a coroa lê: o motor
+    // decide o domínio com a regra da questão na tela, e só a consulta quando o
+    // progresso já está no último nível. Declarada apenas nos níveis que
+    // sorteiam as famílias, ela ficava escrita e nunca era cobrada — medido: a
+    // coroa saía para quem demonstrou uma família só.
+    { id: "resto-decide", fonte: "F99", alvo: "decidir o que fazer com o resto conforme o contexto pede", kinds: ["draggroup"], params: {}, dominio: dominioComOsDoisSentidos },
   ],
 
   erros_tipicos: [

@@ -5,7 +5,7 @@ import {
 } from "../../procedimentos/igualdadeEquilibrioContract";
 
 const dominio: FichaDominio = { acertos: 4, de: 4, sessoes: 2 };
-const dominioL4: FichaDominio = {
+const dominioComOsDoisEquilibrios: FichaDominio = {
   ...dominio,
   evidenciasDistintas: {
     prefixo: IGUALDADE_EQUILIBRIO_EVIDENCE_PREFIX,
@@ -62,8 +62,13 @@ export const AL_05: FichaCompetencia = {
     },
     { id: "soma-um-lado", fonte: "F46", alvo: "igualar uma soma a uma quantidade equivalente", kinds: ["balanca"], params: {}, dominio },
     { id: "incognita-meio", fonte: "F46", alvo: "encontrar a parcela que mantém uma igualdade", kinds: ["balanca"], params: {}, dominio },
-    { id: "somas-dois-lados", fonte: "F46", alvo: "tratar os dois membros como expressões completas e equivalentes", kinds: ["balanca"], params: {}, dominio: dominioL4 },
-    { id: "saco-fechado", fonte: "F46", alvo: "descobrir o valor desconhecido preservando o equilíbrio", kinds: ["balanca"], params: {}, dominio },
+    { id: "somas-dois-lados", fonte: "F46", alvo: "tratar os dois membros como expressões completas e equivalentes", kinds: ["balanca"], params: {}, dominio: dominioComOsDoisEquilibrios },
+    // O L5 carrega a exigência porque é a regra do L5 que a coroa lê: o motor
+    // decide o domínio com a regra da questão na tela, e só a consulta quando o
+    // progresso já está no último nível. Declarada apenas nos níveis que
+    // sorteiam as famílias, ela ficava escrita e nunca era cobrada — medido: a
+    // coroa saía para quem demonstrou uma família só.
+    { id: "saco-fechado", fonte: "F46", alvo: "descobrir o valor desconhecido preservando o equilíbrio", kinds: ["balanca"], params: {}, dominio: dominioComOsDoisEquilibrios },
   ],
 
   erros_tipicos: [

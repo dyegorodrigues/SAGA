@@ -68,7 +68,12 @@ export const N2_05: FichaCompetencia = {
     { id: "centena", fonte: "F65", alvo: "arredondar para a centena mais próxima", kinds: ["numberline"], params: {}, dominio: dominioComOMeio },
     { id: "milhar", fonte: "F65", alvo: "arredondar para o milhar mais próximo", kinds: ["numberline"], params: {}, dominio: dominioComOMeio },
     { id: "escolher-precisao", fonte: "F65", alvo: "decidir para qual ordem arredondar faz sentido", kinds: ["numberline"], params: {}, dominio },
-    { id: "estimar-operacao", fonte: "F65", alvo: "estimar uma soma arredondando as duas parcelas", kinds: ["numberline"], params: {}, dominio },
+    // O L5 carrega a exigência porque é a regra do L5 que a coroa lê: o motor
+    // decide o domínio com a regra da questão na tela, e só a consulta quando o
+    // progresso já está no último nível. Declarada apenas nos níveis que
+    // sorteiam as famílias, ela ficava escrita e nunca era cobrada — medido: a
+    // coroa saía para quem demonstrou uma família só.
+    { id: "estimar-operacao", fonte: "F65", alvo: "estimar uma soma arredondando as duas parcelas", kinds: ["numberline"], params: {}, dominio: dominioComOMeio },
   ],
 
   erros_tipicos: [

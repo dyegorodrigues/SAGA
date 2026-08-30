@@ -71,6 +71,51 @@ function integradores(): Array<{ id: string; nivel: number; familias: string[] }
   return achados;
 }
 
+/** Toda ficha que exige diversidade em algum nível, com o requisito mais duro. */
+function fichasQueExigemDiversidade(): Array<{ id: string; prefixo: string; minimo: number }> {
+  const achadas: Array<{ id: string; prefixo: string; minimo: number }> = [];
+  for (const ficha of servidas()) {
+    let encontrada: { prefixo: string; minimo: number } | undefined;
+    for (let nivel = 1; nivel <= 5; nivel += 1) {
+      const regra = generateRegisteredFichaQuestion(ficha.id, nivel).masteryRule?.evidenciasDistintas;
+      if (!regra) continue;
+      if (!encontrada || regra.minimo > encontrada.minimo) encontrada = { prefixo: regra.prefixo, minimo: regra.minimo };
+    }
+    if (encontrada) achadas.push({ id: ficha.id, ...encontrada });
+  }
+  return achadas;
+}
+
+/**
+ * A criança no último nível, acertando tudo, com exatamente estas evidências.
+ *
+ * O calendário anda de três em três dias porque o motor só conta uma sessão
+ * como aprovada quando ela está a dois dias ou mais da anterior, e a janela
+ * generosa cobre a regra mais larga da Jornada (`8 de 10`).
+ */
+function coroaCom(fichaId: string, evidencias: string[]): boolean {
+  let progresso = noUltimoNivel();
+  for (let sessao = 0; sessao < 12; sessao += 1) {
+    const practiceDay = `2026-03-${String(sessao * 3 + 1).padStart(2, "0")}`;
+    for (let i = 0; i < 12; i += 1) {
+      const questao = generateRegisteredFichaQuestion(fichaId, 5);
+      progresso = applyJourneyAnswer(progresso, true, false, {
+        durationMs: 3_000,
+        helpUsed: false,
+        isReview: false,
+        practiceDay,
+        // A evidência exigida entra junto: ela é outra condição da coroa, e sem
+        // ela o teste mediria a exigência errada.
+        evidencias: [...evidencias, ...(questao.exigeEvidencia ? [questao.exigeEvidencia] : [])],
+        exigeEvidencia: questao.exigeEvidencia,
+        masteryRule: questao.masteryRule,
+      }).progress;
+      if (progresso.dom === true) return true;
+    }
+  }
+  return false;
+}
+
 describe("CLASS-008 — o nível integrador exige mais de uma família", () => {
   it("a varredura cobre todas as fichas servidas pelo Composer", () => {
     expect(servidas().length).toBeGreaterThanOrEqual(75);
@@ -96,22 +141,35 @@ describe("CLASS-008 — o nível integrador exige mais de uma família", () => {
     const semFamilias: string[] = [];
 
     for (const ficha of servidas()) {
+      // A volta é cobrada por COMPETÊNCIA, e não por nível, porque é assim que
+      // o motor conta: `evidenciasVistas` acumula desde o primeiro nível e
+      // nunca esquece. Uma ficha pode sortear as famílias nos níveis do meio e
+      // cobrar a variedade no cinco — e precisa fazê-lo, porque a coroa lê a
+      // regra do cinco. Cobrar a volta nível a nível proibiria exatamente o
+      // arranjo que faz a exigência funcionar.
+      const familiasDaFicha = new Set<string>();
+      let exigenciaDaFicha: { prefixo: string; minimo: number } | undefined;
+
       for (let nivel = 1; nivel <= 5; nivel += 1) {
         const familias = familiasGeradas(ficha.id, nivel);
+        for (const familia of familias) familiasDaFicha.add(familia);
         const regra = generateRegisteredFichaQuestion(ficha.id, nivel).masteryRule?.evidenciasDistintas;
         const daFicha = regra?.prefixo === prefixoDeFamilia(ficha.id) ? regra : undefined;
+        if (daFicha && (!exigenciaDaFicha || daFicha.minimo > exigenciaDaFicha.minimo)) exigenciaDaFicha = daFicha;
 
-        // Ida: o gerador sorteia entre famílias e a regra é cega a isso.
+        // Ida: o gerador sorteia entre famílias e a regra é cega a isso. Esta
+        // metade continua por nível — quem integra num nível declara ali.
         if (familias.size > 1 && !daFicha) {
           semRegra.push(`${ficha.id} L${nivel} sorteia ${familias.size} famílias e não exige nenhuma`);
         }
-        // Volta: a regra exige diversidade que o gerador não consegue produzir.
-        // Sem esta metade, bastaria escrever a exigência em toda ficha para o
-        // gate ficar verde — e uma exigência que o nível nunca satisfaz é uma
-        // coroa que nunca chega.
-        if (daFicha && familias.size < daFicha.minimo) {
-          semFamilias.push(`${ficha.id} L${nivel} exige ${daFicha.minimo} famílias e o gerador produz ${familias.size}`);
-        }
+      }
+
+      // Volta: a regra exige diversidade que o gerador não consegue produzir em
+      // nenhum nível. Sem esta metade, bastaria escrever a exigência em toda
+      // ficha para o gate ficar verde — e uma exigência que a competência nunca
+      // satisfaz é uma coroa que nunca chega.
+      if (exigenciaDaFicha && familiasDaFicha.size < exigenciaDaFicha.minimo) {
+        semFamilias.push(`${ficha.id} exige ${exigenciaDaFicha.minimo} famílias e a competência inteira produz ${familiasDaFicha.size}`);
       }
     }
 
@@ -170,6 +228,51 @@ describe("CLASS-008 — o nível integrador exige mais de uma família", () => {
     expect(evidenciasDaResposta(undefined, q)).toContain(q.evidenciaDeFamilia);
     expect(evidenciasDaResposta({ evidencias: ["outra-coisa"] }, q))
       .toEqual(expect.arrayContaining([q.evidenciaDeFamilia!, "outra-coisa"]));
+  });
+
+  /**
+   * A metade comportamental: a exigência SEGURA a coroa, e sai do caminho.
+   *
+   * As outras metades deste gate leem declarações — a ficha declara, a questão
+   * transporta, o gerador consegue produzir. Nenhuma delas pergunta a única
+   * coisa que a criança sente: a coroa fica presa quando ela demonstrou uma
+   * família só?
+   *
+   * A pergunta importa porque o motor lê a regra da QUESTÃO QUE ESTÁ NA TELA, e
+   * só olha para ela quando o progresso já está no nível cinco. Uma exigência
+   * declarada apenas em níveis anteriores é escrita que ninguém lê: o gate
+   * ficava verde, a ficha prometia cobrar variedade, e a coroa saía para quem
+   * nunca alternou. Medido, antes deste teste existir: quatro competências
+   * coroavam com uma família só.
+   *
+   * Os dois sentidos são cobrados. Sem o segundo, mover a exigência para um
+   * prefixo impossível deixaria a coroa presa para sempre e o teste passaria
+   * chamando isso de proteção.
+   */
+  it("comportamento: a exigência segura a coroa com uma família, e libera com as devidas", () => {
+    const exigentes = fichasQueExigemDiversidade();
+    expect(exigentes.length, "nenhuma ficha exige diversidade — a descoberta parou de observar").toBeGreaterThan(0);
+
+    const naoSeguram: string[] = [];
+    const naoLiberam: string[] = [];
+
+    for (const { id, prefixo, minimo } of exigentes) {
+      // Uma a MENOS que o exigido. Mandar exatamente `minimo` seria cumprir a
+      // regra: numa ficha de mínimo um, "uma evidência" já é o suficiente, e o
+      // teste acusaria como falha a coroa funcionando certo.
+      const insuficientes = Array.from({ length: minimo - 1 }, (_, i) => `${prefixo}variedade-${i}`);
+      if (coroaCom(id, insuficientes)) {
+        naoSeguram.push(`${id}: coroou com ${insuficientes.length} evidência(s) \`${prefixo}*\` quando a ficha exige ${minimo} — a exigência não é lida pela coroa`);
+        continue;
+      }
+      const suficientes = Array.from({ length: minimo }, (_, i) => `${prefixo}variedade-${i}`);
+      if (!coroaCom(id, suficientes)) {
+        naoLiberam.push(`${id}: não coroou nem com ${minimo} evidências \`${prefixo}*\` — a exigência prende a coroa para sempre`);
+      }
+    }
+
+    expect(naoSeguram, `exigências de diversidade que a coroa não lê:\n${naoSeguram.join("\n")}`).toEqual([]);
+    expect(naoLiberam, `exigências de diversidade que nunca liberam a coroa:\n${naoLiberam.join("\n")}`).toEqual([]);
   });
 
   it("a família de uma ficha não compra a diversidade de outra", () => {

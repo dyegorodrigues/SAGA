@@ -88,6 +88,44 @@ describe("W62 regression-first — N2.05/F65 Números Grandes", () => {
     }
   });
 
+  /**
+   * O nível que oferece duas alternativas é cara ou coroa, e a barra encolhe
+   * por colisão, não por decisão de quem escreveu a ficha.
+   *
+   * Os dois casos que este teste tranca foram medidos, não supostos. No L1, o
+   * distrator "arredondou para a ordem de baixo" caía sempre em cima do
+   * gabarito: 20 mil sorteios, 20 mil telas com duas alternativas. No L4, perto
+   * da marca do milhar, a centena e a dezena caíam em cima da resposta ou uma
+   * da outra: 0,45% das telas vinham com UMA alternativa — nem errar dava — e
+   * 9,1% com duas.
+   *
+   * O contrato do canário amostra 40 sorteios e só recusa a tela de UMA
+   * alternativa, então ele pegava o caso do L4 em cerca de um sexto das
+   * execuções: uma falha intermitente, que é o jeito mais caro de descobrir um
+   * defeito. Aqui a amostra é grande e o piso é três — as duas metades do que
+   * foi medido.
+   *
+   * O L2 e o L3 ficam de fora de propósito: neles, arredondar para a ordem de
+   * baixo às vezes ACERTA (399 vira 400 na dezena e na centena), e ali não há
+   * erro para diagnosticar. Exigir uma terceira alternativa seria inventar um
+   * erro que a criança não comete.
+   */
+  it("nenhum nível vira cara ou coroa: L1 e L4 sempre com três alternativas ou mais", () => {
+    enableComposerCanary("N2.05");
+    const magros: string[] = [];
+    for (const nivel of [1, 4]) {
+      for (let amostra = 0; amostra < 3000; amostra += 1) {
+        const q = generateRegisteredFichaQuestion("N2.05", nivel);
+        const distintas = new Set((q.options ?? []).map(opcao => String(opcao.value))).size;
+        if (distintas < 3) {
+          magros.push(`L${nivel}: ${distintas} alternativas em ${JSON.stringify((q.options ?? []).map(o => o.value))} (número ${(q.uiProps as NumerosGrandesF65Spec).numero})`);
+          break;
+        }
+      }
+    }
+    expect(magros, `níveis que encolheram a barra por colisão:\n${magros.join("\n")}`).toEqual([]);
+  });
+
   it("estimar é arredondar as duas parcelas, não somar exato", () => {
     enableComposerCanary("N2.05");
     for (let amostra = 0; amostra < 30; amostra += 1) {
