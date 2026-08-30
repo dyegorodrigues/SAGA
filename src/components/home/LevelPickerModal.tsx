@@ -6,6 +6,7 @@ import {
   type SenseiDojoTempleId,
 } from "../../curriculum/motores/senseiDojoPolicy";
 import { sfx, FONT, C, FRESH } from "../Mascot";
+import { NIVEIS_POR_COMPETENCIA } from "../../curriculum/schema";
 
 interface LevelPickerModalProps {
   pickerTrack: Track;
@@ -19,7 +20,10 @@ const dojoTempleId = (id: string): SenseiDojoTempleId | undefined =>
   id in SENSEI_DOJO_LEVEL_POLICIES ? id as SenseiDojoTempleId : undefined;
 
 export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTrack }: LevelPickerModalProps) {
-  const levels = pickerTrack.lvlSkills ? pickerTrack.lvlSkills.map((_, i) => i + 1) : [1, 2, 3, 4, 5];
+  // A escada vem do CURRÍCULO, não do array de rótulos. Derivá-la dos rótulos
+  // fazia a tela oferecer 4 de 5 degraus em todas as competências, escondendo
+  // justamente o quinto — onde a coroa é decidida.
+  const levels = Array.from({ length: NIVEIS_POR_COMPETENCIA }, (_, i) => i + 1);
   const templeId = dojoTempleId(pickerTrack.id);
   const dojoCeiling = templeId ? maxEligibleSenseiDojoStepById(templeId, prog) : undefined;
 

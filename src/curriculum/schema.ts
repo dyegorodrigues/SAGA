@@ -1,3 +1,13 @@
+/**
+ * Quantos degraus tem a escada de uma competência.
+ *
+ * O número estava solto em meia dúzia de lugares, e num deles — o seletor de
+ * nível — ele era derivado do comprimento de um array de RÓTULOS. Os rótulos
+ * eram quatro, a escada é de cinco, e o degrau que sumia da tela era o quinto:
+ * aquele onde a coroa é decidida.
+ */
+export const NIVEIS_POR_COMPETENCIA = 5;
+
 // schema.ts
 // Definindo o contrato estrito para o Motor de Fichas (Substituindo os generators.ts hardcoded)
 
