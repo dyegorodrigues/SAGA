@@ -31,6 +31,38 @@ export function telaDeEntrada(input: { temSessao: boolean; visitante: boolean })
 }
 
 /**
+ * O modo visitante, depois de o Firebase dizer o que sabe.
+ *
+ * ## O defeito que esta função existe para impedir
+ *
+ * O ouvinte de autenticação zerava o modo visitante sempre que não havia sessão
+ * no Firebase — e não haver sessão é exatamente a situação de quem escolheu
+ * "Começar sem Conta". A escolha continuava gravada no aparelho, mas era
+ * apagada da memória no primeiro instante do boot, e a criança **voltava para a
+ * tela de login toda vez que reabria o app**. O caminho rápido, o que um pai usa
+ * para só experimentar, perdia a criança em toda reabertura.
+ *
+ * Havia até um gancho `?e2e=1` para "não deixar o reset de auth mandar de volta
+ * pro login": o comportamento era conhecido e fora contornado para o teste, não
+ * para a criança.
+ *
+ * ## A regra
+ *
+ * Havendo sessão, quem manda é ela: sessão anônima é visitante, sessão de conta
+ * não é. **Não havendo sessão, quem manda é a escolha local** — e ela é
+ * autoritativa porque `logoutUser()` e o botão de sair apagam a marca do
+ * aparelho ao encerrar. Zerar aqui, além de errado, roubava daquela marca a
+ * única função que ela tinha.
+ *
+ * `anonimo` é `null` quando não há sessão nenhuma — que é diferente de haver uma
+ * sessão não-anônima, e a diferença é a razão de o parâmetro não ser booleano.
+ */
+export function modoVisitante(input: { anonimo: boolean | null; escolhaLocal: boolean; e2e: boolean }): boolean {
+  if (input.anonimo !== null) return input.anonimo;
+  return input.e2e || input.escolhaLocal;
+}
+
+/**
  * A tela pode ser desenhada sem estado carregado?
  *
  * Só o "carregando" e o login existem antes de haver estado. Qualquer outra

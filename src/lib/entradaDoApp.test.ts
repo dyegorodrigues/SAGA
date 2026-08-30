@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mostrandoCarregamento, precisaDeEstado, telaDeEntrada } from "./entradaDoApp";
+import { mostrandoCarregamento, precisaDeEstado, telaDeEntrada, modoVisitante } from "./entradaDoApp";
 
 /**
  * A porta de entrada do app.
@@ -48,5 +48,29 @@ describe("entrada do app", () => {
     // podendo aparecer sem estado é exatamente o defeito de origem.
     expect(precisaDeEstado("tela-que-ainda-nao-existe")).toBe(true);
     expect(mostrandoCarregamento("tela-que-ainda-nao-existe", false)).toBe(true);
+  });
+});
+
+describe("modoVisitante — a escolha de quem entrou sem conta sobrevive ao boot", () => {
+  it("com sessão, quem decide é a sessão", () => {
+    expect(modoVisitante({ anonimo: true, escolhaLocal: false, e2e: false })).toBe(true);
+    expect(modoVisitante({ anonimo: false, escolhaLocal: true, e2e: false })).toBe(false);
+  });
+
+  it("sem sessão, a escolha gravada no aparelho manda", () => {
+    // Este é o caso da criança que tocou em "Começar sem Conta" e voltou no dia
+    // seguinte. Sem esta linha ela cai no login e perde o caminho de casa.
+    expect(modoVisitante({ anonimo: null, escolhaLocal: true, e2e: false })).toBe(true);
+  });
+
+  it("sem sessão e sem escolha gravada, é login", () => {
+    // Depois de sair, `logoutUser()` apaga a marca — e o app precisa voltar a
+    // pedir identidade. Sem esta metade, bastaria ter sido visitante uma vez
+    // para nunca mais conseguir chegar na tela de login.
+    expect(modoVisitante({ anonimo: null, escolhaLocal: false, e2e: false })).toBe(false);
+  });
+
+  it("o gancho de teste não depende de gravação nenhuma", () => {
+    expect(modoVisitante({ anonimo: null, escolhaLocal: false, e2e: true })).toBe(true);
   });
 });

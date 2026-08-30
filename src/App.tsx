@@ -45,13 +45,13 @@ import { buildMatriculaTrack, seedFromResults } from "./utils/matricula";
 import { saveStateToCloud, loadStateFromCloud, getCurrentUserEmail, logoutUser, auth } from "./lib/firebase";
 import { carimbar } from "./lib/reconciliacaoDeSaves";
 import { resolveBootstrapState } from "./lib/bootstrapState";
-import { LEGACY_STATE_KEY, LEGACY_STATE_OWNER_KEY, stateKeyForUid } from "./lib/storageIdentity";
+import { LEGACY_STATE_KEY, LEGACY_STATE_OWNER_KEY, destinoDoProgresso, stateKeyForUid } from "./lib/storageIdentity";
 import { criarSincronizador } from "./lib/sincronizadorDeNuvem";
 import { applyKidPurchase, purchaseAlbumItem, spendCoins } from "./lib/economyTransactions";
 import { rewardForMissionCompletion, rewardForTerminalAnswer, type RewardMode } from "./lib/rewardPolicy";
 import { onAuthStateChanged } from "firebase/auth";
 import { LoginScreen } from "./components/LoginScreen";
-import { mostrandoCarregamento, telaDeEntrada } from "./lib/entradaDoApp";
+import { modoVisitante, mostrandoCarregamento, telaDeEntrada } from "./lib/entradaDoApp";
 import { AdminGodPanel } from "./components/AdminGodPanel";
 import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
@@ -178,12 +178,12 @@ export default function App() {
   // Gancho de teste E2E (só com ?e2e=1 na URL): entra como visitante e não deixa o
   // reset de auth do Firebase mandar de volta pro login. Inócuo em produção.
   const E2E = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("e2e");
-  const [visitorMode, setVisitorMode] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return E2E || window.localStorage.getItem("mk-visitor-mode") === "true";
-    }
-    return false;
-  });
+  /** A marca que "Começar sem Conta" grava e o botão de sair apaga. */
+  const escolheuVisitante = () =>
+    typeof window !== "undefined" && window.localStorage.getItem("mk-visitor-mode") === "true";
+  const [visitorMode, setVisitorMode] = useState<boolean>(() =>
+    modoVisitante({ anonimo: null, escolhaLocal: escolheuVisitante(), e2e: E2E }),
+  );
   const [showAdmin, setShowAdmin] = useState(false);
   const authUidRef = useRef<string | null>(auth.currentUser?.uid ?? null);
 
@@ -278,10 +278,14 @@ export default function App() {
       if (user) {
         const email = user.email || user.displayName || (user.isAnonymous ? "visitante" : "Conta Conectada");
         setUserEmail(email);
-        setVisitorMode(user.isAnonymous);
+        setVisitorMode(modoVisitante({ anonimo: user.isAnonymous, escolhaLocal: escolheuVisitante(), e2e: E2E }));
       } else {
         setUserEmail(null);
-        if (!E2E) setVisitorMode(false);
+        // Sem sessão no Firebase, quem manda é a escolha gravada no aparelho.
+        // Zerar aqui apagava "Começar sem Conta" no primeiro instante do boot e
+        // devolvia a criança ao login a cada reabertura; sair do app continua
+        // funcionando porque `handleLogout` apaga a marca antes de chegar aqui.
+        setVisitorMode(modoVisitante({ anonimo: null, escolhaLocal: escolheuVisitante(), e2e: E2E }));
       }
     });
     return () => unsubscribe();
@@ -353,11 +357,22 @@ export default function App() {
   const persist = (s: State, imediato = false) => {
     const carimbado = carimbar(s);
     setState(carimbado);
-    const uid = auth.currentUser?.uid;
-    if (!uid) {
-      if (E2E) void setStorage(LEGACY_STATE_KEY, JSON.stringify(carimbado));
+    const uid = auth.currentUser?.uid ?? null;
+    const destino = destinoDoProgresso({ uid, visitante: visitorMode, e2e: E2E });
+
+    if (destino === "nenhum") return;
+
+    if (destino === "local") {
+      // Visitante: sem UID, o progresso ainda precisa sobreviver ao fechamento
+      // do app. `LEGACY_STATE_KEY` é a chave que o boot lê no ramo do visitante
+      // — antes disto só o gancho de teste a escrevia, e a criança perdia
+      // perfil e progresso a cada reabertura.
+      void setStorage(LEGACY_STATE_KEY, JSON.stringify(carimbado)).catch((e) => {
+        console.error("Não consegui gravar o progresso local:", e);
+      });
       return;
     }
+
     void setStorage(stateKeyForUid(uid), JSON.stringify(carimbado)).catch((e) => {
       console.error("Não consegui gravar o progresso local:", e);
     });

@@ -37,3 +37,33 @@ export function canUseLegacyState(
   for (const id of legacyKids) if (cloudKids.has(id)) return true;
   return false;
 }
+
+/**
+ * Onde o progresso da criança é gravado, dado o que se sabe da identidade.
+ *
+ * ## O defeito que esta função existe para impedir
+ *
+ * A gravação era condicionada a haver um UID do Firebase. Sem UID — que é
+ * exatamente a situação de quem tocou em "Começar sem Conta" — o estado só era
+ * escrito sob `?e2e=1`. Na prática: o pai criava o perfil da criança, ela
+ * jogava, o app fechava e **o perfil e o progresso inteiro sumiam**, porque
+ * viviam só na memória da aba.
+ *
+ * O boot já sabia ler a chave local no ramo do visitante. Só faltava alguém
+ * escrevê-la — e o único que escrevia era o gancho de teste. É o mesmo padrão
+ * que travou `modoVisitante`: o caminho sem conta funcionava para o E2E e não
+ * para a criança.
+ *
+ * ## A regra
+ *
+ * Havendo conta, o progresso é dela (e sobe para a nuvem). Não havendo conta
+ * mas havendo escolha de visitante, ele é local e precisa sobreviver ao
+ * fechamento do app. Sem conta e sem escolha não há a quem pertencer: aí não se
+ * grava, e é isto que impede o estado de vazar de uma sessão para outra na tela
+ * de login.
+ */
+export function destinoDoProgresso(input: { uid: string | null; visitante: boolean; e2e: boolean }): "conta" | "local" | "nenhum" {
+  if (input.uid) return "conta";
+  if (input.visitante || input.e2e) return "local";
+  return "nenhum";
+}
