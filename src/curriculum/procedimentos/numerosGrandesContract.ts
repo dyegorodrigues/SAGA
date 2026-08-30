@@ -112,8 +112,23 @@ export function construirNumerosGrandesSpec(level: number, familiaPedida?: Famil
   if (nivel === 5) {
     // Estimar a operação: arredondar os dois e somar. O que se mede é a
     // estimativa, não a conta exata.
-    const primeiro = ri(120, 890);
-    const segundo = ri(120, 890);
+    // As duas parcelas, recusando o caso em que a estimativa dá o exato.
+    //
+    // Os erros de arredondamento se cancelam quando um número sobe o mesmo
+    // tanto que o outro desce, e aí "mais ou menos quanto dá" e "quanto dá"
+    // viram a mesma pergunta — justamente a distinção que o nível existe para
+    // ensinar. Foi esta a falha intermitente que apareceu uma vez na suíte
+    // completa e não voltou nas duas execuções seguintes: ela dependia do
+    // sorteio, e o teste nominal desta ficha é que a pegou.
+    const sortearParcelas = () => {
+      for (let tentativa = 0; tentativa < 200; tentativa += 1) {
+        const p1 = ri(120, 890);
+        const p2 = ri(120, 890);
+        if (arredondar(p1, 100) + arredondar(p2, 100) !== p1 + p2) return { p1, p2 };
+      }
+      return { p1: 180, p2: 240 };
+    };
+    const { p1: primeiro, p2: segundo } = sortearParcelas();
     const estimativa = arredondar(primeiro, 100) + arredondar(segundo, 100);
     return {
       nivel, modo: "estimar-operacao", numero: primeiro, segundo, ordem: 100,
@@ -125,7 +140,11 @@ export function construirNumerosGrandesSpec(level: number, familiaPedida?: Famil
         { value: Math.floor(primeiro / 100) * 100 + Math.floor(segundo / 100) * 100, misconception: NM.ARREDONDA_SEMPRE_BAIXO },
         // Arredondou na ordem errada.
         { value: arredondar(primeiro, 10) + arredondar(segundo, 10), misconception: NM.ORDEM_ERRADA },
+        // Uma centena fora, para os dois lados: com um só, quando as duas
+        // parcelas arredondam para baixo o distrator de baixo colapsa em cima
+        // da resposta e o nível podia ficar com duas alternativas.
         { value: estimativa + 100, misconception: NM.IGNORA_DISTANCIA },
+        { value: estimativa - 100, misconception: NM.IGNORA_DISTANCIA },
       ]),
     };
   }

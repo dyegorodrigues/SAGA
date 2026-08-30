@@ -76,9 +76,14 @@ export function construirCentenaSpec(level: number): CentenaF37Spec {
   // A escada é de alcance, e as faixas não se sobrepõem: L1 dentro de 199, L2
   // acima disso até 500, L3 acima de 500. Sem os pisos, o L3 sortearia 120 e o
   // degrau existiria só no papel.
+  // As três ordens são DISTINTAS entre si, e não por estética: com 3-4-4 a
+  // criança não tem como mostrar qual ordem leu, e o distrator "leu a ordem
+  // errada" coincide com a resposta e some da barra — o nível ficava com duas
+  // alternativas. Distintas, os quatro valores da barra nunca colidem.
   const centenas = nivel === 1 ? 1 : nivel === 2 ? ri(2, 4) : ri(5, 9);
-  const dezenas = ri(1, 9);
-  const unidades = ri(1, 9);
+  const restantes = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(n => n !== centenas);
+  const dezenas = restantes.splice(ri(0, restantes.length - 1), 1)[0];
+  const unidades = restantes[ri(0, restantes.length - 1)];
   const numero = centenas * 100 + dezenas * 10 + unidades;
   // Ler 347 como 743: as ordens trocadas de ponta a ponta.
   const invertido = unidades * 100 + dezenas * 10 + centenas;

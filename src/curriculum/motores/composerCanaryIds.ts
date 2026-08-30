@@ -239,4 +239,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // convenção do cinco aparece, e só nele que arredondar sempre para baixo
   // deixa de acertar por acidente.
   "N2.05",
+
+  // W63 — N3.12/F40 e W64 — N3.13/F41. As duas últimas das doze competências
+  // que estavam sem ficha autoral. Com elas, as 90 competências do DAG têm
+  // ficha, e a Jornada inteira é servida pelo Composer.
+  "N3.12",
+  "N3.13",
 ] as const;

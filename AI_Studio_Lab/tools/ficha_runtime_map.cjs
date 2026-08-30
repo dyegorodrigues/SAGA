@@ -72,22 +72,22 @@ const FICHA_RUNTIME_MAP = [
     builderKinds: ["grandeza"], specializedBuilderIds: ["N2.03", "N4.01"], rendererKinds: ["grandeza", "comparacao-simbolica", "equal-groups-f97"], note: "W12/F97 reutiliza Grupo em equalGroupsStage.",
   },
   {
-    primitive: "InteractiveNumberLine", kinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85", "voltar-contando-f31", "voltar-pelo-dez-f34", "numeros-grandes-f65"],
-    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage"), component("FracaoNumeroStage"), component("RetaCompletaStage"), component("OperarNegativosStage"), component("VoltarContandoStage"), component("VoltarPeloDezStage"), component("NumerosGrandesStage")],
-    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03", "N5.02", "N7.01", "N7.02", "N3.04", "N3.08", "N2.05"], rendererKinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85", "voltar-contando-f31", "voltar-pelo-dez-f34", "numeros-grandes-f65"],
+    primitive: "InteractiveNumberLine", kinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85", "voltar-contando-f31", "voltar-pelo-dez-f34", "numeros-grandes-f65", "calculo-mental-f41"],
+    componentFiles: [component("InteractiveNumberLine"), component("Reta20Stage"), component("SkipCountStage"), component("FracaoNumeroStage"), component("RetaCompletaStage"), component("OperarNegativosStage"), component("VoltarContandoStage"), component("VoltarPeloDezStage"), component("NumerosGrandesStage"), component("CalculoMentalStage")],
+    builderKinds: ["numberline"], specializedBuilderIds: ["AL.03", "N5.02", "N7.01", "N7.02", "N3.04", "N3.08", "N2.05", "N3.13"], rendererKinds: ["numberline", "numberline-f19", "skip-count-f30", "fracao-numero-f72", "reta-completa-f84", "operar-negativos-f85", "voltar-contando-f31", "voltar-pelo-dez-f34", "numeros-grandes-f65", "calculo-mental-f41"],
     note: "W11/F30, W16/F72 e W24/F84 reutilizam InteractiveNumberLineSurface; F72 alinha a barra à mesma escala e F84 estende a reta para negativos. W37/F85 reutiliza a mesma superfície para operar com inteiros, incluindo cruzamento do zero e cancelamento de dívida em a − (−b). W53/F31 usa a mesma reta para os dois caminhos da subtração, com a barra fechada até a criança escolher por onde vai."
   },
   {
-    primitive: "InteractiveVertical", kinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76"],
-    componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage"), component("DivisaoLongaStage"), component("DivisaoDoisDigitosStage"), component("ContasVirgulaStage")],
-    builderKinds: ["vertical"], specializedBuilderIds: ["N4.10", "N4.12", "N6.02"], rendererKinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76"],
+    primitive: "InteractiveVertical", kinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76", "dezena-desmonta-f40"],
+    componentFiles: [component("InteractiveVertical"), component("VerticalPlaceValueStage"), component("DivisaoLongaStage"), component("DivisaoDoisDigitosStage"), component("ContasVirgulaStage"), component("DezenaDesmontaStage")],
+    builderKinds: ["vertical"], specializedBuilderIds: ["N4.10", "N4.12", "N6.02", "N3.12"], rendererKinds: ["vertical", "divisao-longa-f69", "divisao-dois-digitos-f71", "contas-virgula-f76", "dezena-desmonta-f40"],
     note: "VerticalPlaceValueStage compõe InteractiveVertical + MaterialDourado. F69 usa InteractiveVerticalDivisionSurface no mesmo arquivo da primitiva. W43/F71/N4.12 reutiliza a mesma InteractiveVertical por DivisaoDoisDigitosStage e InteractiveVerticalDivisionEstimateSurface: a criança registra uma estimativa, testa pela multiplicação do divisor real e ajusta por toque; o rascunho não revela o quociente correto e o erro motor fica separado de misconception. W47/F76/N6.02 estende o mesmo arquivo com InteractiveVerticalDecimalSurface: a vírgula é eixo visual das ordens, zeros de preenchimento explicitam casas ausentes e o alinhamento pela direita produz wobble em vez de travar; ContasVirgulaStage compõe essa superfície com Quadrado100, sem primitiva paralela nem arrasto obrigatório.",
   },
   { primitive: "LinkingCubes", kinds: ["linking-cubes", "counting-on-f14"], componentFiles: [component("LinkingCubes"), component("CountingOnStage")], builderKinds: [], specializedBuilderIds: ["N3.03"], rendererKinds: ["linking-cubes", "counting-on-f14"], note: "W10/F14: CountingOnStage compõe LinkingCubes + NumberLine." },
   {
-    primitive: "MaterialDourado", kinds: ["tens", "material-dourado", "vertical", "deslocamento", "centena-f37"],
-    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage"), component("VerticalPlaceValueStage"), component("DeslocamentoStage"), component("CentenaStage")],
-    specializedBuilderIds: ["N2.04"], builderKinds: ["tens", "vertical", "deslocamento"], rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento", "centena-f37"],
+    primitive: "MaterialDourado", kinds: ["tens", "material-dourado", "vertical", "deslocamento", "centena-f37", "dezena-desmonta-f40"],
+    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage"), component("VerticalPlaceValueStage"), component("DeslocamentoStage"), component("CentenaStage"), component("DezenaDesmontaStage")],
+    specializedBuilderIds: ["N2.04", "N3.12"], builderKinds: ["tens", "vertical", "deslocamento"], rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento", "centena-f37", "dezena-desmonta-f40"],
     note: "MaterialDouradoStage compõe MaterialDourado + TenFrame; VerticalPlaceValueStage compõe MaterialDourado + InteractiveVertical."
   },
   { primitive: "NumberBond", kinds: ["bond", "familia"], componentFiles: [component("NumberBond"), component("FamiliaStage"), component("TrianguloDeFatos")], builderKinds: ["bond", "familia"], rendererKinds: ["bond", "familia"], note: "F96/N4.06 realiza NumberBond em linguagem triangular pelo helper TrianguloDeFatos." },

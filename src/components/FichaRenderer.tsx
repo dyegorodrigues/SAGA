@@ -20,6 +20,8 @@ import { DinheiroStage } from "./primitives/DinheiroStage"; import type { Dinhei
 import { CentenaStage } from "./primitives/CentenaStage"; import type { CentenaF37Spec } from "../curriculum/procedimentos/centenaContract";
 import { RepartirMedirStage } from "./primitives/RepartirMedirStage"; import type { RepartirMedirF99Spec } from "../curriculum/procedimentos/repartirMedirContract";
 import { NumerosGrandesStage } from "./primitives/NumerosGrandesStage"; import type { NumerosGrandesF65Spec } from "../curriculum/procedimentos/numerosGrandesContract";
+import { DezenaDesmontaStage } from "./primitives/DezenaDesmontaStage"; import type { DezenaDesmontaF40Spec } from "../curriculum/procedimentos/dezenaDesmontaContract";
+import { CalculoMentalStage } from "./primitives/CalculoMentalStage"; import type { CalculoMentalF41Spec } from "../curriculum/procedimentos/calculoMentalContract";
 import { OperarNegativosStage } from "./primitives/OperarNegativosStage"; import type { OperarNegativosF85Spec } from "../curriculum/procedimentos/operarNegativosContract";
 import { LinguagemLetrasStage } from "./primitives/LinguagemLetrasStage"; import type { LinguagemLetrasF89Spec } from "../curriculum/procedimentos/linguagemLetrasContract";
 import { JornalTurmaStage } from "./primitives/JornalTurmaStage"; import type { JornalTurmaF64Spec } from "../curriculum/procedimentos/jornalTurmaContract";
@@ -86,6 +88,8 @@ export function FichaRenderer(props: FichaRendererProps) {
     case 'centena-f37': return <CentenaStage spec={question.uiProps as CentenaF37Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'repartir-medir-f99': return <RepartirMedirStage spec={question.uiProps as RepartirMedirF99Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'numeros-grandes-f65': return <NumerosGrandesStage spec={question.uiProps as NumerosGrandesF65Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'dezena-desmonta-f40': return <DezenaDesmontaStage spec={question.uiProps as DezenaDesmontaF40Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
+    case 'calculo-mental-f41': return <CalculoMentalStage spec={question.uiProps as CalculoMentalF41Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'operar-negativos-f85': return <OperarNegativosStage spec={question.uiProps as OperarNegativosF85Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'linguagem-letras-f89': return <LinguagemLetrasStage spec={question.uiProps as LinguagemLetrasF89Spec} disabled={Boolean(disabled)} onAnswer={send}/>;
     case 'jornal-turma-f64': return <JornalTurmaStage spec={question.uiProps as JornalTurmaF64Spec} disabled={Boolean(disabled)} onAnswer={send}/>;

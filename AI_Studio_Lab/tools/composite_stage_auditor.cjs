@@ -58,6 +58,15 @@ const composites = [
     primitives: ["MaterialDourado", "TenFrame"],
   },
   {
+    // W63/F40: a conta armada é onde o algoritmo mora, e o material dourado é
+    // onde "desmontar uma dezena" deixa de ser marquinha em cima do algarismo e
+    // vira uma barra virando dez cubinhos.
+    kind: "dezena-desmonta-f40",
+    stage: "src/components/primitives/DezenaDesmontaStage.tsx",
+    imports: ["./InteractiveVertical", "./MaterialDourado"],
+    primitives: ["InteractiveVertical", "MaterialDourado"],
+  },
+  {
     // W62/F65: a reta mostra a vizinhança do número entre as duas marcas que o
     // cercam — é onde a distância se vê — e o quadrado de cem dá tamanho à
     // centena nos níveis dessa ordem.

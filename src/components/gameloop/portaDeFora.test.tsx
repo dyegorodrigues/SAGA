@@ -85,6 +85,10 @@ const PORTOES_MEDIDOS = [
   // como partição acerta metade por sorte e o SO_UM_SENTIDO, que é o alvo da
   // ficha, fica invisível.
   "N4.05|4",
+  // N3.13/F41: um portão no L5. Num nível de cálculo mental, chutar e acertar é
+  // indistinguível do domínio — dizer por onde foi é o que separa quem estimou
+  // de quem teve sorte, e a barra espera essa declaração.
+  "N3.13|5",
 ];
 
 /**
