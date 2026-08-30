@@ -210,38 +210,80 @@ async function main() {
   await foto(page, "06-depois-do-reload");
 
   // ------------------------------------------------------------- as telas
-  passo("Percorrer as telas que a criança e o responsável alcançam");
-  const telas = [
-    { nome: "Área dos Pais", botao: /Área dos Pais|Painel/i },
-    { nome: "Perfil da criança", botao: /Ver Meu Perfil|Perfil/i },
-    { nome: "Dojo", botao: /Dojo|Treinar/i },
-    { nome: "Mapa", botao: /Mapa|Jornada/i },
+  passo("Os quatro pilares, a partir da casa da criança");
+  // Voltar para casa antes de explorar: sem isso o passeio julgava "não achei
+  // como chegar" de dentro da missão, e acusava o app de um defeito que era do
+  // próprio passeio.
+  await voltarParaCasa(page);
+
+  // Comparar o texto antes e depois não serve aqui: a criança CAI na aba do
+  // Tutor ao entrar, e tocar nela — corretamente — não muda nada. Medir assim
+  // acusava o app de um botão morto que não existe. O sinal exato é a aba que o
+  // próprio app persiste em `mk-active-tab`.
+  const pilares = [
+    { nome: "Tutor", botao: /TUTOR/i, aba: "sensei" },
+    { nome: "Jornada", botao: /JORNADA/i, aba: "jornada" },
+    { nome: "Dojo", botao: /DOJO/i, aba: "dojo" },
+    { nome: "Oficina", botao: /OFICINA/i, aba: "oficina" },
+    { nome: "Perfil da criança", botao: /Ver Meu Perfil/i, aba: "perfil" },
   ];
-  for (const tela of telas) {
-    const antesTexto = await texto(page);
-    const abriu2 = await clicar(page, tela.botao);
-    if (!abriu2) { atencao(`não achei como chegar em "${tela.nome}" a partir daqui`); continue; }
+  for (const tela of pilares) {
+    if (!(await voltarParaCasa(page))) { atencao(`não consegui voltar para casa antes de "${tela.nome}"`); continue; }
+    if (!(await clicar(page, tela.botao))) { falha(`"${tela.nome}" não existe como botão na casa da criança`); continue; }
+    await page.waitForTimeout(1200);
+
+    const abaAtiva = await page.evaluate(() => localStorage.getItem("mk-active-tab"));
     const acoes = await acoesDisponiveis(page);
-    const agora = await texto(page);
-    if (acoes === 0) falha(`"${tela.nome}" não oferece nenhuma ação — a criança fica presa`);
-    else if (agora.trim().length < 20) falha(`"${tela.nome}" abriu praticamente vazia`);
+    const conteudo = (await texto(page)).trim();
+
+    if (abaAtiva !== tela.aba) falha(`"${tela.nome}" não ativou a aba dele (esperava "${tela.aba}", ficou "${abaAtiva}")`);
+    else if (acoes === 0) falha(`"${tela.nome}" abriu sem nenhuma ação possível — a criança fica presa`);
+    else if (conteudo.length < 40) falha(`"${tela.nome}" abriu praticamente vazio`);
     else ok(`"${tela.nome}" abre com ${acoes} ação(ões) possíveis`);
     await foto(page, `07-${tela.nome.replace(/\s+/g, "-").toLowerCase()}`);
-    if (agora.slice(0, 80) !== antesTexto.slice(0, 80)) {
-      await clicar(page, /Voltar|Fechar|✕|←|Sair/i);
-      await page.waitForTimeout(800);
-    }
   }
 
   // --------------------------------------------------------------- higiene
   passo("Erros técnicos durante todo o passeio");
   if (errosDePagina.length) for (const e of [...new Set(errosDePagina)].slice(0, 8)) falha(`erro de página: ${e}`);
   else ok("nenhum erro de página em todo o percurso");
-  const reaisFalhas = [...new Set(requisicoesFalhas)].filter((r) => !/favicon/i.test(r));
-  if (reaisFalhas.length) for (const r of reaisFalhas.slice(0, 8)) atencao(`requisição falhou: ${r}`);
-  else ok("nenhuma requisição falhou");
+  const todas = [...new Set(requisicoesFalhas)].filter((r) => !/favicon/i.test(r));
+  // O Firebase inalcançável não é defeito do app: é a máquina sem saída para a
+  // internet. Dizer isso em voz alta importa porque delimita o que este passeio
+  // cobriu — o caminho SEM nuvem, que é justamente o do visitante. O caminho da
+  // conta Google não é exercitado aqui, e fingir o contrário seria pior que
+  // não medir.
+  const semRede = todas.filter((r) => /googleapis|firebase|gstatic/i.test(r));
+  const reaisFalhas = todas.filter((r) => !/googleapis|firebase|gstatic/i.test(r));
+  if (semRede.length) atencao("o Firebase não foi alcançado nesta máquina: o passeio cobriu o caminho SEM nuvem (visitante). O caminho da conta Google não foi exercitado.");
+  if (reaisFalhas.length) for (const r of reaisFalhas.slice(0, 8)) falha(`requisição falhou: ${r}`);
+  else ok("nenhuma requisição do app falhou");
 
   await encerrar(browser, page);
+}
+
+/**
+ * Volta para a casa da criança de onde quer que o passeio esteja.
+ *
+ * Fecha o que estiver aberto pelo caminho de saída que a própria criança usaria
+ * — o ✕ do palco, o "Voltar" das telas — e confirma pela saudação.
+ */
+async function voltarParaCasa(page) {
+  for (let tentativa = 0; tentativa < 8; tentativa += 1) {
+    const t = await texto(page);
+    if (/TUTOR/i.test(t) && /JORNADA/i.test(t)) return true;
+
+    // Da tela de escolher a criança, o caminho de casa é entrar nela.
+    if (/Quem vai brincar|Monte seus Perfis/i.test(t)) {
+      if (await clicar(page, /JOGAR/i)) { await page.waitForTimeout(1500); continue; }
+    }
+    // De dentro de qualquer tela, a saída que a criança usa.
+    if (await clicar(page, /^✕$|Voltar|Fechar|Sair da|← /i)) { await page.waitForTimeout(1000); continue; }
+    // Sem porta visível: o app ainda pode estar em transição.
+    await page.waitForTimeout(1200);
+  }
+  const t = await texto(page);
+  return /TUTOR/i.test(t) && /JORNADA/i.test(t);
 }
 
 async function encerrar(browser, page) {
