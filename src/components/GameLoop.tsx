@@ -46,8 +46,6 @@ interface GameProps {
   onGardenRound?: (result: JardimRoundResult, summary: JardimMissionSummary) => void;
 }
 
-const TOTAL_Q = 8;
-const totalQFor = (track: Track) => (track as any).totalQ || TOTAL_Q;
 
 const qSig = (q: Question) =>
   [
@@ -102,10 +100,11 @@ function drawQuestion(track: Track, p: Progress, lvlOverride?: number, pure = fa
   return track.gen(lvlOverride ?? p.lvl);
 }
 
-/** Aquecimento (Parte E): as 2 primeiras questões vêm um nível abaixo — vitória fácil de entrada. */
-const WARMUP_QUESTIONS = 2;
-const warmupLvl = (lvl: number) => Math.max(1, lvl - 1);
 
+/* O tamanho da missão mora fora daqui porque não é decisão de UI: ele decide o
+   que a coroa consegue observar, e quem audita essa invariante não pode ser
+   obrigado a carregar a árvore de componentes para lê-lo. */
+import { TOTAL_Q, WARMUP_QUESTIONS, totalQFor, warmupLvl } from "./gameloop/tamanhoDaMissao";
 import { evaluateSpacedRepetition, trackMisconception } from "../curriculum/motores/radarEngine";
 import { fisherYates } from "../utils/shuffle";
 

@@ -28,9 +28,8 @@
  * Então o laço aqui é o laço do `GameLoop`: uma missão de `TOTAL_Q` questões
  * num mesmo `practiceDay`, as duas primeiras de aquecimento e um degrau abaixo,
  * o nível da questão seguindo `progresso.lvl`. Os dois números não são
- * copiados: são LIDOS do `GameLoop.tsx` (veja `lerConstante`), para que o
- * simulador quebre alto no dia em que a missão mudar de tamanho em vez de
- * continuar medindo um app antigo.
+ * copiados: vêm de `tamanhoDaMissao.ts`, o mesmo módulo que o `GameLoop`
+ * importa, para que o simulador acompanhe o app em vez de medir um app antigo.
  *
  * ## A licença para emitir a evidência exigida
  *
@@ -59,38 +58,30 @@
  * ## As duas cadências, e por que as duas importam
  *
  * A janela de compreensão cabe dentro de uma missão em quase toda a Jornada,
- * mas não em toda: três competências pedem `8 de 10` e uma missão tem oito
- * questões. Quem joga uma vez por dia nunca fecha essa janela; quem joga duas
- * fecha. Isso não é opinião — é aritmética da regra, e o simulador roda as duas
- * cadências para dizer qual competência depende de qual.
+ * mas houve um tempo em que não cabia: três competências pediam `8 de 10` numa
+ * missão de oito questões, e quem jogasse uma vez por dia nunca fechava a
+ * janela. Foi este simulador que mediu, e a `DECISAO-002` resolveu na ficha —
+ * era o critério do Dojo instalado como coroa da Jornada. As duas cadências
+ * continuam rodando: é o instrumento que prova que hoje não há mais nenhuma.
  */
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { evidenciasDaResposta } from "../src/components/gameloop/answerPolicy";
+import { TOTAL_Q, WARMUP_QUESTIONS } from "../src/components/gameloop/tamanhoDaMissao";
 import { JOURNEY_FICHAS } from "../src/curriculum/fichas";
 import { generateRegisteredFichaQuestion, hasComposerFicha } from "../src/curriculum/motores/composerCanary";
 import { applyJourneyAnswer, faltaParaCoroa } from "../src/curriculum/motores/progressEngine";
 import type { Progress, Question } from "../src/types";
 
 /**
- * Lê uma constante do `GameLoop.tsx` em vez de copiá-la.
+ * O tamanho da missão vem do runtime, não de uma cópia.
  *
- * O tamanho da missão e o número de questões de aquecimento definem se a janela
- * de compreensão cabe numa sessão. Copiá-los aqui criaria um simulador que
- * continua verde depois de o app mudar — exatamente o relatório sem lastro que
- * a Bíblia recusa.
+ * Estes dois números definem se a janela de compreensão cabe numa sessão.
+ * Copiá-los aqui criaria um simulador que continua verde depois de o app mudar
+ * — exatamente o relatório sem lastro que a Bíblia recusa. Eles moram em
+ * `tamanhoDaMissao.ts`, importável sem arrastar a árvore de componentes.
  */
-function lerConstante(nome: string): number {
-  const fonte = readFileSync("src/components/GameLoop.tsx", "utf8");
-  const achado = fonte.match(new RegExp(`const ${nome}\\s*=\\s*(\\d+)`));
-  if (!achado) throw new Error(`GameLoop.tsx não declara mais \`const ${nome} = <número>\`: o simulador precisa ser reancorado.`);
-  return Number(achado[1]);
-}
-
-/** Questões por missão da Jornada (`TOTAL_Q` do GameLoop). */
-const QUESTOES_POR_MISSAO = lerConstante("TOTAL_Q");
-/** As primeiras questões da missão vêm um degrau abaixo (`WARMUP_QUESTIONS`). */
-const AQUECIMENTO = lerConstante("WARMUP_QUESTIONS");
+const QUESTOES_POR_MISSAO = TOTAL_Q;
+const AQUECIMENTO = WARMUP_QUESTIONS;
 
 /** Perfil cognitivo do agente. */
 interface Agente {
@@ -352,7 +343,7 @@ function simular(): Achados {
 
   diz("SAGA — SIMULAÇÃO ESTOCÁSTICA DO APRENDIZ SINTÉTICO");
   diz(`- ${fichas.length} competências servidas pelo Composer`);
-  diz(`- missão de ${QUESTOES_POR_MISSAO} questões (${AQUECIMENTO} de aquecimento), lidas do GameLoop`);
+  diz(`- missão de ${QUESTOES_POR_MISSAO} questões (${AQUECIMENTO} de aquecimento), do mesmo módulo que o GameLoop usa`);
   diz(`- ${AGENTES.length} perfis cognitivos, ${LOTE} jornadas por cadência (Monte Carlo)`);
   diz(`- cadências: 1 e 2 missões por dia; teto de ${TETO_DE_MISSOES} missões\n`);
 

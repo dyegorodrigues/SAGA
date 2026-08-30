@@ -26,11 +26,17 @@ describe("a ficha em si", () => {
     for (let n = 1; n <= 4; n += 1) expect(N4_03.niveis?.[n].rt_alvo).toBeUndefined();
   });
 
-  it("o domínio é critério de fluência, não de compreensão", () => {
-    // 8 de 10 em 3 sessões: o que importa aqui é consistência, não acerto único.
+  it("o domínio é de COMPREENSÃO, e cabe numa missão (DECISAO-002)", () => {
+    // 4 de 5 é a mesma proporção de 8 de 10 — continua não bastando o acerto
+    // único —, mas cabe na missão de oito questões, e é critério conceitual.
+    // A §11.9 tira a fluência da decisão da coroa; ela vive no Dojo (`dojo_mul`)
+    // e no `rt_alvo` do nível 5, que segue medido sem reprovar domínio.
     for (const micro of N4_03.micros) {
-      expect(micro.dominio).toMatchObject({ acertos: 8, de: 10, sessoes: 3 });
+      expect(micro.dominio).toMatchObject({ acertos: 4, de: 5, sessoes: 3 });
     }
+    // A retenção continua sendo a mais exigente da Jornada: três sessões
+    // espaçadas. Retenção é dimensão conceitual pela §11.9, não fluência.
+    for (const micro of N4_03.micros) expect(micro.dominio.sessoes).toBe(3);
   });
 
   it("o nível que mistura tabuadas exige mais de uma tabuada (CLASS-008)", () => {

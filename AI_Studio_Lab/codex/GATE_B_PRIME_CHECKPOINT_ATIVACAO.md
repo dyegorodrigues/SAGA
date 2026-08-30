@@ -1120,3 +1120,87 @@ execução, com o número na frente.
   integrador, e os dois reparos da `N2.05`. As mutações que sobreviveram foram
   investigadas e eram mutações inválidas — `minimo: 1` satisfeito por uma
   evidência, e duas chaves sobrescritas pelo próprio literal — não gates cegos.
+
+## 20. DECISAO-002 — a coroa da Jornada é de compreensão; a fluência é do Dojo
+
+A seção 19 deixou um achado **relatado e não resolvido**: `N4.03`, `N4.04` e
+`N4.07` pedem `8 de 10` no último nível, e a missão tem oito questões. Eu havia
+classificado como decisão de currículo do dono. O dono devolveu a decisão. Fui
+ao cânone, e o cânone já tinha decidido — o que faltava era ler.
+
+### O que o cânone diz, e por que ele decide sozinho
+
+- **§11.9**: *"Fluência (velocidade + precisão + força do Dojo) é estado
+  paralelo e **NÃO participa da decisão da coroa**."* A coroa sai de
+  compreensão + independência + evidência autoral + sessões espaçadas.
+- **§11.8**: *"a fluência da tabuada acontece no Dojo (FD4→FD5), não na aula."*
+- **`DOJO_TRILHAS_COMPLETAS.md` §5.3**: *"8 de 10 corretos em 2 rounds
+  seguidos"* — esta é a regra de subida **do Dojo**.
+- **A ficha canônica F42, §5**: o nível 5 tem formato **"Dojo"**. E a §9 da
+  mesma ficha: critério de fluência, *"o formato é de rodada, não de questão
+  única"*.
+
+As três fichas traziam a nota `/** Critério de FLUÊNCIA, não de compreensão */`
+em cima da regra de domínio da Jornada. **A nota estava certa sobre o que o
+número é — e é exatamente por isso que ele não podia estar ali.** O número do
+Dojo tinha sido instalado como coroa da Academia.
+
+Não era só incoerência de papel. A janela de compreensão zera na virada do dia e
+uma missão tem oito questões: `de: 10` **nunca fechava** para quem joga uma
+missão por dia. Medido: zero coroas em todas as rodadas com cadência diária,
+todas as coroas com duas missões no mesmo dia — uma cadência que ficha nenhuma
+declara e tela nenhuma pede.
+
+### A decisão
+
+`{ acertos: 8, de: 10, sessoes: 3 }` → **`{ acertos: 4, de: 5, sessoes: 3 }`**
+
+O que ela preserva:
+
+- **A consistência que o autor queria.** 4 de 5 é 80%, a mesma proporção exata
+  de 8 de 10. Continua não bastando o acerto único.
+- **A retenção mais dura da Jornada.** `sessoes: 3` fica — retenção é dimensão
+  **conceitual** pela §11.9, não fluência. Só treze fichas exigem três sessões.
+- **A fluência, devolvida à casa dela.** O `dojo_mul` já treina exatamente estas
+  escadas (×2, ×3, ×4, ×5, mistas, 6-7, 8-9, 6-9), e o `rt_alvo` de 4s do nível
+  5 continua sendo medido como metadado, sem nunca reprovar domínio conceitual.
+
+**Medido depois do reparo, com uma missão por dia, 40 jornadas por perfil:**
+
+| Competência | atenta (0,95) | média (0,80) |
+|---|---|---|
+| N4.03 / N4.04 / N4.07 | 40/40, mediana **7** missões | 40/40, mediana **8-9** |
+| GM.02 | 40/40, mediana 5 | 40/40, mediana 6 |
+| N1.01 | 40/40, mediana 5 | 40/40, mediana 5 |
+| N3.09 | 40/40, mediana 4 | 40/40, mediana 6 |
+
+As três continuam **as mais caras da Jornada** — 7 a 9 missões contra 4 a 6 das
+demais. Elas deixaram de ser impossíveis, não de ser difíceis.
+
+### A invariante que faltava
+
+`janelaDeDominioCabeNaMissao.test.ts`: **nenhuma regra de domínio pode pedir uma
+janela maior que a missão.** Não é gosto, é mecanismo — o motor zera a janela na
+virada do dia e uma missão tem `TOTAL_Q` questões, então `de > TOTAL_Q` é uma
+regra que não fecha, e não uma regra difícil.
+
+Os dois lados vêm do runtime: a regra sai da questão, o tamanho da missão sai de
+`tamanhoDaMissao.ts` — o módulo novo de onde o próprio `GameLoop` importa
+`TOTAL_Q` e `WARMUP_QUESTIONS`. Estavam soltos dentro do componente, e quem
+quisesse auditar a invariante tinha de carregar a árvore de componentes inteira
+(ou, como o simulador fazia antes, ler o texto do arquivo com regex). Ficha nova
+que peça uma janela grande demais reprova sozinha; mudar o tamanho da missão
+reavalia as noventa de graça.
+
+Mutação, com recibo vermelho nos três sentidos: uma ficha voltando a `8 de 10`,
+a missão encolhendo para quatro questões (o gate reavalia todas), e a varredura
+deixando de achar fichas (prova de vida).
+
+### Recibos
+
+- `npm run simular`: a seção `[ATENÇÃO]` da cadência **desapareceu** — nenhuma
+  competência depende mais de duas missões no mesmo dia.
+- Suíte: **317 arquivos, 3974 testes, verde**.
+- App verificado no navegador de verdade depois do refactor do `GameLoop`:
+  login → visitante → perfil → mapa → sondagem → **dez rodadas de missão**
+  (contagem e correspondência um-a-um), zero erros de página.
