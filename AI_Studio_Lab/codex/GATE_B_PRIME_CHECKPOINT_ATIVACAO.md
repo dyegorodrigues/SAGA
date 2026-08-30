@@ -990,3 +990,133 @@ Recibo final: suíte inteira **314 arquivos, 3949 testes, verde em duas
 execuções seguidas**; `tsc --noEmit` limpo; `npm run auditar` aprovado;
 `grafo:check` sincronizado.
 
+
+## 19. O aprendiz sintético — `npm run simular` deixa de ser promessa
+
+O `package.json` declarava `"simular": "tsx simulated-learner-real.ts"`. Esse
+arquivo **nunca existiu no repositório** — nem no histórico do git. A §12.8 da
+Bíblia manda simular antes de lançar, e o capítulo de evidência diz que
+relatório narrado por quem executou não vale nada: toda ferramenta de auditoria
+precisa de um comando que o dono rode por conta própria e veja a mesma saída.
+O comando estava prometido, e a promessa era a única coisa reproduzível ali.
+
+### Por que ele imita a MISSÃO, e não uma fila de tentativas
+
+A primeira versão sorteava tentativas soltas e acusou becos que não existiam. A
+causa foi instrutiva: a coroa não olha tentativas, olha **sessões**. O motor
+zera a janela de compreensão toda vez que o dia muda e só conta um dia como
+aprovado se ele estiver a dois dias ou mais do anterior. Um simulador sem missão
+e sem calendário mede uma máquina que não existe.
+
+O laço passou a ser o laço do `GameLoop`: missão de `TOTAL_Q` questões num mesmo
+`practiceDay`, as duas primeiras de aquecimento e um degrau abaixo, nível da
+questão seguindo `progresso.lvl`. Os dois números não são copiados — são **lidos
+do `GameLoop.tsx`**, para o simulador quebrar alto no dia em que a missão mudar
+de tamanho, em vez de continuar medindo um app antigo.
+
+Ele roda **duas cadências**, uma e duas missões por dia, porque a janela zera na
+virada do dia e a cadência decide quais regras de domínio são alcançáveis.
+
+### O que ele achou — 1. A exigência que a coroa nunca lia
+
+O motor decide o domínio com a regra da questão **que está na tela**, e só a
+consulta quando o progresso já está no nível cinco. `N2.05`, `N3.08`, `N4.05` e
+`AL.05` declaravam `evidenciasDistintas` apenas nos níveis que sorteiam as
+famílias — que é onde o gate CLASS-008 cobrava a declaração. Escrita que ninguém
+lia.
+
+Medido antes do reparo, dirigindo o motor de verdade: **as quatro coroavam com
+UMA família demonstrada**. A ficha prometia cobrar variedade e não cobrava, e o
+gate ficava verde por cima. Falso verde é o defeito mais caro deste projeto, e
+este vinha de três fichas escritas nesta mesma sessão.
+
+Reparo: a exigência passa a morar também no nível que a coroa lê.
+
+### 2. CLASS-008 tinha metade da porta aberta
+
+A volta do gate (“quem exige, consegue produzir”) reconhecia a exigência pelo
+**prefixo de família**. Três fichas declaram diversidade com prefixo próprio —
+`AL.03` (o tamanho do salto), `AL.04` (o desafio da sequência) e `AL.05` (o caso
+do equilíbrio). Para essas, a volta nunca rodou: a exigência estava escrita e
+ninguém tinha provado que existe caminho para cumpri-la.
+
+Novo gate `diversidadeAutoralNasceNoPalco.test.tsx`: por descoberta (tudo que
+não é prefixo de família cai nele), dirige o **palco de verdade** — digita onde
+há campo, clica onde há barra — e cobra que a variedade exista. Testar as
+funções puras provaria que a função sabe calcular, não que a criança chega até
+ela; o que quebra na prática é o fio.
+
+A volta antiga passa a ser cobrada **por competência**, e não por nível, porque é
+assim que o motor conta: `evidenciasVistas` acumula desde o primeiro nível e
+nunca esquece. Cobrar nível a nível proibia exatamente o arranjo que faz a
+exigência funcionar.
+
+### 3. CLASS-008 ganha a metade comportamental
+
+As três metades antigas liam declarações — a ficha declara, a questão
+transporta, o gerador produz. Nenhuma perguntava a única coisa que a criança
+sente: **a coroa fica presa quando ela demonstrou uma família só?** A nova metade
+dirige o motor nos dois sentidos: segura com uma evidência a menos que o exigido,
+libera com as devidas. Sem o segundo sentido, mover a exigência para um prefixo
+impossível deixaria a coroa presa para sempre e o teste chamaria isso de proteção.
+
+### 4. Dois níveis degenerados na N2.05
+
+- **L4** — perto da marca do milhar (`7006`, `9005`) a centena e a dezena caem
+  sobre a resposta, e num número como `6095` caem uma sobre a outra. Medido em
+  400 mil sorteios: **0,45% das telas com UMA alternativa** — nem errar dava — e
+  **9,1% com duas**. Era a falha intermitente da suíte: o contrato do canário
+  amostra 40 sorteios e só recusa a tela de uma alternativa, então pegava o caso
+  em cerca de um sexto das execuções.
+- **L1** — um `Math.max(10, ordem / 10)` fazia o distrator da ordem arredondar
+  para a mesma dezena do gabarito: ele coincidia com a resposta e sumia da barra.
+  **Cara ou coroa em 100% dos sorteios.** Sem o piso, a ordem de baixo é a
+  unidade, e arredondar para a unidade é devolver o número — que é o erro de não
+  ter arredondado, e é um erro que a criança comete de verdade.
+
+Os dois reparados na fonte, com a recusa medida (sempre 3 ou 4 alternativas, e a
+fração que arredonda para cima intacta em 0,500 — o reparo não ensina “pegue o de
+cima”) e trancados por teste de amostra grande no nominal da própria ficha.
+
+O `L2` e o `L3` mantêm ~6% de telas com duas alternativas **de propósito**: ali,
+arredondar para a ordem de baixo às vezes ACERTA (`399` vira `400` na dezena e na
+centena), e não há erro para diagnosticar. Inventar uma terceira alternativa
+seria inventar um erro que a criança não comete.
+
+### O que ele NÃO vê, e diz em vez de insinuar
+
+Exigência que nasce no palco não é visível de um simulador sem palco. O
+simulador separa esses casos por **contrafactual** — a mesma jornada sem a
+exigência — em vez de por mensagem do motor, que varia conforme onde a última
+missão parou. Se sem ela a coroa sai, ela era o único obstáculo; se não sai, o
+beco é de verdade e continua reprovando.
+
+Uma **catraca de dois sentidos** recusa que esse conjunto mude calado, porque
+“nenhuma evidência alcança este prefixo” é indistinguível, daqui, de “este
+prefixo é impossível”. Medido: com o prefixo de família corrompido de propósito,
+catorze competências viravam “fora de alcance” e o simulador seguia verde.
+
+### Relatado e NÃO alterado — decisão de currículo
+
+`N4.03`, `N4.04` e `N4.07` pedem `8 de 10` no último nível, e a missão tem oito
+questões. A janela zera na virada do dia: **quem joga uma missão por dia nunca
+fecha essa janela; quem joga duas, fecha em todas as rodadas medidas.** Não há
+limite diário no app — a criança pode repetir a competência — então a coroa é
+alcançável, mas depende de uma cadência que a ficha não diz em lugar nenhum.
+
+O critério é declarado como de FLUÊNCIA (“velocidade e consistência”), e mudá-lo
+é decisão pedagógica, não de código. O simulador reporta em `[ATENÇÃO]` a cada
+execução, com o número na frente.
+
+### Recibos
+
+- `npm run simular`: 90 competências, 4 perfis, 8 jornadas por cadência —
+  **nenhum beco sem saída e nenhuma falha de geração**; esforço mediano de 5
+  missões para coroar (faixa 4 a 12); saída estável em três execuções seguidas.
+- Suíte inteira: **316 arquivos, 3973 testes, verde em duas execuções seguidas**.
+- `tsc --noEmit` limpo.
+- Mutação, com recibo vermelho para cada peça: emissão da evidência autoral,
+  transporte pelo palco, variedade do salto, a volta impossível, a ida do nível
+  integrador, e os dois reparos da `N2.05`. As mutações que sobreviveram foram
+  investigadas e eram mutações inválidas — `minimo: 1` satisfeito por uma
+  evidência, e duas chaves sobrescritas pelo próprio literal — não gates cegos.
