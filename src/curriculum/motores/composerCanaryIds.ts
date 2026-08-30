@@ -211,4 +211,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // contrária. Dois portões diferentes na mesma ficha — chegar ao dez enquanto
   // as molduras existem, escolher o caminho depois que elas somem.
   "N3.08",
+
+  // W58 — PE.01/F56. O começo da estatística: a primeira vez que a criança lê
+  // um dado coletado por outra pessoa. O degrau é a legenda de escala, e o L5
+  // mistura as duas para que ela precise OLHAR a legenda em vez de supor.
+  "PE.01",
 ] as const;
