@@ -548,12 +548,12 @@ envia nada.
 | CLASS-003 (caso único / resposta decorável) | fechada nas duas dimensões, registros vazios |
 | CLASS-004 (viés posicional em comparação) | fechada, detector com controle |
 | CLASS-005, CLASS-006 | fechadas antes do Gate B′ |
-| CLASS-007 (bypass da ação probatória) | fechada nas testemunhas medidas; inventário de portões medido; falta a ficha declarar a ação probatória |
-| CLASS-008 (diversidade de famílias no mastery) | fechada, gate por descoberta e prova comportamental |
+| CLASS-007 (bypass da ação probatória) | fechada nas duas metades: testemunhas medidas, inventário de portões medido e a ficha declarando a ação probatória (seção 17) |
+| CLASS-008 (diversidade de famílias no mastery) | fechada nas quatro metades: emissão, transporte, aplicação e **comportamento** — inclusive para prefixo autoral (seções 19 e 20) |
 | CLASS-009 (a tela declara a resposta) | fechada, com três correções de medição |
 | CLASS-010 (resposta comprada duas vezes) | fechada, registro vazio |
 
-Doze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
+Catorze gates por descoberta vigiam as 90 fichas do Composer, todos com catraca:
 
 | gate | o que mede |
 |---|---|
@@ -569,6 +569,8 @@ Doze gates por descoberta vigiam as 77 fichas do Composer, todos com catraca:
 | `nivelIntegradorExigeFamilias` | quem integra famílias exige mais de uma |
 | `aulinhaDeclaradaChegaNaQuestao` | a estreia narrada na ficha chega na tela |
 | `acaoProbatoriaDeclaradaTemPortao` | onde a ficha declara prova, a tela tem porta |
+| `diversidadeAutoralNasceNoPalco` | a exigência de prefixo próprio tem caminho no palco |
+| `janelaDeDominioCabeNaMissao` | nenhuma regra pede janela maior que a missão |
 
 ### O que continua aberto
 
@@ -585,6 +587,22 @@ Duas coisas, as duas nomeadas e nenhuma delas por falta de trabalho:
 Com as duas resolvidas, **o Gate B′ não tem mais pendência de cânone aberta.**
 ~~O que resta é trabalho de autoria: as 12 competências ainda sem ficha.~~
 **Feito na seção 18 (W53 a W64): as 90 competências do DAG têm ficha.**
+
+**Abertas depois, e fechadas nas seções 19 e 20** — todas achadas pelo aprendiz
+sintético, que passou a existir na seção 19:
+
+3. ~~**A exigência de diversidade que a coroa não lia**~~ — quatro fichas
+   declaravam fora do nível que decide a coroa, e coroavam com uma família só.
+   Reparadas, e a metade comportamental do CLASS-008 passa a cobrar.
+4. ~~**O critério de fluência como coroa da Jornada**~~ — `DECISAO-002`,
+   seção 20. A §11.9 tira a fluência da decisão da coroa; o número do Dojo
+   voltou para o Dojo.
+
+**Uma limitação declarada, que não é pendência:** a prova que nasce no palco
+(três fichas de prefixo autoral) está fora do alcance do simulador, que não tem
+palco. Ele diz isso em vez de insinuar, separa os casos por contrafactual, e o
+`diversidadeAutoralNasceNoPalco` dirige o palco de verdade para prová-la. Dois
+instrumentos, uma pergunta cada.
 
 ---
 

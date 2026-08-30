@@ -381,8 +381,13 @@ function simular(): Achados {
         // palco a coroa sai, ela era o único obstáculo, e o que travou foi o
         // limite deste instrumento. Se não sai, o beco é de verdade e continua
         // reprovando — nenhuma exigência de palco esconde um percurso quebrado.
+        // O contrafactual roda na cadência ESTRITA (uma missão por dia). Rodá-lo
+        // na folgada deixaria uma competência que também depende de cadência
+        // passar por "prova de palco" — dois problemas somados, um deles
+        // escondido atrás do outro. Na estrita, só é absolvida a competência
+        // cujo ÚNICO obstáculo é a exigência que este instrumento não vê.
         const semPalco = doPalco.length
-          ? Array.from({ length: LOTE }, () => simularJornada(agente, ficha.id, 2, doPalco)).filter(r => r.coroou)
+          ? Array.from({ length: LOTE }, () => simularJornada(agente, ficha.id, 1, doPalco)).filter(r => r.coroou)
           : [];
 
         if (semPalco.length) {
