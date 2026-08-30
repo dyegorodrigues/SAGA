@@ -90,17 +90,17 @@ const GENERATOR_MAP: Record<string, (lvl: number) => Question> = {
  * `escadaDoSeletorBateComOCurriculo.test.ts` recusa que voltem a divergir.
  */
 const ISLAND_INFO: Record<string, { icon: string, color: string, dark: string, islandId: string, lvlSkills: string[] }> = {
-  "N1": { icon: "🔢", color: C.pink, dark: C.pinkDark, islandId: "N1", lvlSkills: ["Visual", "Mental", "Abstrato", "Sozinho", "Dojo"] },
-  "N2": { icon: "💯", color: C.ocean, dark: C.oceanDark, islandId: "N2", lvlSkills: ["Material", "Identificar", "Compor", "Sozinho", "Dojo"] },
-  "N3": { icon: "➕", color: C.mint, dark: C.mintDark, islandId: "N3", lvlSkills: ["Concreto", "Mental", "Armado", "Sozinho", "Dojo"] },
-  "N4": { icon: "✖️", color: C.grape, dark: C.grapeDark, islandId: "N4", lvlSkills: ["Grupos", "Arranjos", "Mental", "Sozinho", "Dojo"] },
-  "N5": { icon: "🍕", color: C.melon, dark: C.melonDark, islandId: "N5", lvlSkills: ["Partes", "Comparar", "Somar", "Sozinho", "Dojo"] },
-  "N6": { icon: "📊", color: C.sun, dark: C.sunDark, islandId: "N6", lvlSkills: ["Fração", "Decimal", "Porcento", "Sozinho", "Dojo"] },
-  "N7": { icon: "➖", color: C.pink, dark: C.pinkDark, islandId: "N7", lvlSkills: ["Reta", "Somar", "Subtrair", "Sozinho", "Dojo"] },
-  "AL": { icon: "⚖️", color: C.sun, dark: C.sunDark, islandId: "AL", lvlSkills: ["Padrões", "Equilíbrio", "Equação", "Sozinho", "Dojo"] },
-  "GE": { icon: "🔺", color: C.melon, dark: C.melonDark, islandId: "GE", lvlSkills: ["Formas", "Espaço", "Sólidos", "Sozinho", "Dojo"] },
-  "GM": { icon: "📏", color: "#2E8B57", dark: "#1E5E3A", islandId: "GM", lvlSkills: ["Medidas", "Horas", "Dinheiro", "Sozinho", "Dojo"] },
-  "PE": { icon: "📈", color: C.ocean, dark: C.oceanDark, islandId: "PE", lvlSkills: ["Gráficos", "Tabelas", "Média", "Sozinho", "Dojo"] },
+  "N1": { icon: "🔢", color: "#7DD3FC", dark: "#047BB3", islandId: "N1", lvlSkills: ["Visual", "Mental", "Abstrato", "Sozinho", "Dojo"] }, // céu
+  "N2": { icon: "💯", color: "#2563EB", dark: "#2563EB", islandId: "N2", lvlSkills: ["Material", "Identificar", "Compor", "Sozinho", "Dojo"] }, // azul
+  "N3": { icon: "➕", color: "#34D399", dark: "#1D845F", islandId: "N3", lvlSkills: ["Concreto", "Mental", "Armado", "Sozinho", "Dojo"] }, // menta
+  "N4": { icon: "✖️", color: "#7C3AED", dark: "#7C3AED", islandId: "N4", lvlSkills: ["Grupos", "Arranjos", "Mental", "Sozinho", "Dojo"] }, // roxo
+  "N5": { icon: "🍕", color: "#EA580C", dark: "#C84B0A", islandId: "N5", lvlSkills: ["Partes", "Comparar", "Somar", "Sozinho", "Dojo"] }, // laranja
+  "N6": { icon: "📊", color: "#FCD34D", dark: "#917002", islandId: "N6", lvlSkills: ["Fração", "Decimal", "Porcento", "Sozinho", "Dojo"] }, // âmbar
+  "N7": { icon: "➖", color: "#172554", dark: "#172554", islandId: "N7", lvlSkills: ["Reta", "Somar", "Subtrair", "Sozinho", "Dojo"] }, // marinho
+  "AL": { icon: "⚖️", color: "#E879F9", dark: "#C40AE1", islandId: "AL", lvlSkills: ["Padrões", "Equilíbrio", "Equação", "Sozinho", "Dojo"] }, // fúcsia
+  "GE": { icon: "🔺", color: "#0F766E", dark: "#0F766E", islandId: "GE", lvlSkills: ["Formas", "Espaço", "Sólidos", "Sozinho", "Dojo"] }, // petróleo
+  "GM": { icon: "📏", color: "#92400E", dark: "#92400E", islandId: "GM", lvlSkills: ["Medidas", "Horas", "Dinheiro", "Sozinho", "Dojo"] }, // terra
+  "PE": { icon: "📈", color: "#DB2777", dark: "#DB2576", islandId: "PE", lvlSkills: ["Gráficos", "Tabelas", "Média", "Sozinho", "Dojo"] }, // magenta
 };
 
 const FAIXAS_INFO: Record<string, { id: string, name: string, description: string }> = {

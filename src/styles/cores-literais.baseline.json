@@ -79,7 +79,7 @@
   "src/curriculum/fichas/dojo/sensei/dojo_mul.ts": 2,
   "src/curriculum/fichas/dojo/sensei/dojo_sub.ts": 2,
   "src/curriculum/motores/composer.ts": 2,
-  "src/curriculum/motores/curriculum.ts": 2,
+  "src/curriculum/motores/curriculum.ts": 22,
   "src/curriculum/motores/jardimSession.ts": 12,
   "src/curriculum/motores/mixedChallenge.ts": 2,
   "src/curriculum/procedimentos/formaContract.ts": 6,

@@ -163,7 +163,32 @@ export function construirDinheiroSpec(level: number, familiaPedida?: FamiliaDaCo
     : [50, 25, 10, 5];
   const quantas = nivel === 3 ? 2 : ri(3, 4);
   const moedas: number[] = [];
-  for (let i = 0; i < quantas; i += 1) moedas.push(escolher(denominacoes));
+
+  // No nível integrador a família é ESCOLHIDA, não sorteada por acidente.
+  //
+  // Antes, as três ou quatro moedas eram tiradas de forma independente e a
+  // família saía do resultado: "só uma denominação" exigia que todas caíssem
+  // iguais — 1/16 com três moedas, 1/64 com quatro. Medido em 20 mil sorteios:
+  // 4,04%. A criança via o caso misto 96% das vezes num nível que existe para
+  // ela ALTERNAR, e a coroa — que cobra as duas famílias — passava a depender
+  // de um sorteio raro dentro de uma janela de três a cinco questões.
+  const familiaDoNivel: FamiliaDaComposicao = nivel === 5
+    ? familiaPedida ?? (Math.random() < 0.5 ? "so-uma-denominacao" : "denominacoes-diferentes")
+    : "denominacoes-diferentes";
+
+  if (nivel === 5 && familiaDoNivel === "so-uma-denominacao") {
+    const unica = escolher(denominacoes);
+    for (let i = 0; i < quantas; i += 1) moedas.push(unica);
+  } else if (nivel === 5) {
+    // Pelo menos duas denominações distintas: a primeira é livre, a segunda é
+    // obrigatoriamente outra, e o resto volta a ser sorteio.
+    const primeira = escolher(denominacoes);
+    const outras = denominacoes.filter(d => d !== primeira);
+    moedas.push(primeira, escolher(outras));
+    for (let i = 2; i < quantas; i += 1) moedas.push(escolher(denominacoes));
+  } else {
+    for (let i = 0; i < quantas; i += 1) moedas.push(escolher(denominacoes));
+  }
   // Fora de ordem de propósito: ordenar é a estratégia, não o presente.
   const total = moedas.reduce((s, m) => s + m, 0);
   const distintas = new Set(moedas).size;

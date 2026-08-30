@@ -146,3 +146,53 @@ div:has(> .mk-optin > span.absolute.top-1.right-1\.5) + div.text-center.mt-2 {
     visibility: hidden !important;
   }
 }
+
+/**
+ * O tema — o fio que faltava ligar.
+ *
+ * `src/styles/tokens.ts` nomeia cada cor por FUNÇÃO (`acao.primaria`,
+ * `feedback.acerto`, `superficie.cartao`) e a escreve como
+ * `var(--cor-x, emergência)`. Bem desenhado, e sem fio: **nenhuma variável
+ * `--cor-*` era definida em lugar nenhum**, então o app inteiro rodava nos
+ * valores de emergência. O interruptor do tema estava na parede, desligado.
+ *
+ * Ligá-lo é o passo 3 da ordem que o próprio `DESIGN_ESTADO_E_DECISOES.md`
+ * recomenda, e é o que transforma "mudar a cara do app" de um problema de 95
+ * arquivos num problema de um arquivo.
+ *
+ * Os valores aqui são os MESMOS que já estavam nas emergências: ligar o fio não
+ * muda um pixel. O que muda é que agora dá para mudar.
+ */
+:root {
+  /* Ação — o que a criança toca para seguir em frente. */
+  --cor-acao-primaria: #3b82f6;
+  --cor-acao-secundaria: #a855f7;
+
+  /* Feedback — o erro é laranja, e não vermelho, de propósito: errar faz parte. */
+  --cor-feedback-acerto: #22c55e;
+  --cor-feedback-erro-suave: #f97316;
+
+  /* Superfície — o papel sobre o qual tudo acontece. */
+  --cor-superficie-fundo: #f8fafc;
+  --cor-superficie-cartao: #ffffff;
+  --cor-superficie-destaque: #fefce8;
+
+  /* Texto. */
+  --cor-texto-principal: #1e293b;
+  --cor-texto-secundario: #64748b;
+  --cor-texto-inverso: #ffffff;
+
+  /* Elementos de palco — régua, reta, material dourado, balança. */
+  --cor-elementos-borda: #cbd5e1;
+  --cor-elementos-preenchimento: #f1f5f9;
+  --cor-base-a: #0ea5e9;
+  --cor-base-b: #f43f5e;
+  --cor-marcador: #fbbf24;
+
+  /* Tamanhos de alvo. O `alvo` é o mínimo que um dedo de criança acerta. */
+  --tamanho-base: 40px;
+  --tamanho-pequeno: 30px;
+  --tamanho-grande: 60px;
+  --tamanho-alvo: 80px;
+  --tamanho-raio: 8px;
+}

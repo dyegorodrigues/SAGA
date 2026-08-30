@@ -92,12 +92,33 @@ describe("W59 regression-first — GM.03/F53 O Tesouro do Pirata", () => {
       const q = generateRegisteredFichaQuestion("GM.03", nivel);
       expect(q.evidenciaDeFamilia, `L${nivel} tem composição fixa pelo próprio nível`).toBeUndefined();
     }
-    const familias = new Set<string>();
-    for (let amostra = 0; amostra < 80; amostra += 1) {
+    // As duas famílias precisam aparecer com frequência PARECIDA, não só
+    // aparecer. Medido antes do reparo: "só uma denominação" saía em 4,04% dos
+    // sorteios, porque a família não era escolhida — era acidente de as 3 ou 4
+    // moedas caírem todas iguais (1/16 a 1/64). Três efeitos, e o teste
+    // intermitente era o menos grave:
+    //
+    // 1. a criança via o mesmo caso 96% das vezes num nível que existe para ela
+    //    ALTERNAR entre os dois;
+    // 2. a coroa, que exige as duas famílias (CLASS-008), passava a depender de
+    //    um sorteio raro dentro de uma janela de 3 a 5 questões;
+    // 3. em 80 amostras havia 3,7% de chance de a família rara não sair
+    //    nenhuma vez — e aí este teste ficava vermelho sem nada ter quebrado.
+    const contagem = new Map<string, number>();
+    const AMOSTRAS = 400;
+    for (let amostra = 0; amostra < AMOSTRAS; amostra += 1) {
       const q = generateRegisteredFichaQuestion("GM.03", 5);
-      familias.add(String(q.evidenciaDeFamilia));
+      const familia = String(q.evidenciaDeFamilia);
+      contagem.set(familia, (contagem.get(familia) ?? 0) + 1);
       expect(q.masteryRule?.evidenciasDistintas).toMatchObject({ prefixo: "familia:GM.03:", minimo: 2 });
     }
-    expect(familias).toEqual(new Set(["familia:GM.03:so-uma-denominacao", "familia:GM.03:denominacoes-diferentes"]));
+    expect(new Set(contagem.keys())).toEqual(
+      new Set(["familia:GM.03:so-uma-denominacao", "familia:GM.03:denominacoes-diferentes"]),
+    );
+    // Um quarto é folgado para o sorteio e apertado para o defeito: 4% reprova,
+    // meio a meio passa.
+    for (const [familia, vezes] of contagem) {
+      expect(vezes / AMOSTRAS, `${familia} aparece pouco demais para a criança alternar`).toBeGreaterThan(0.25);
+    }
   });
 });
