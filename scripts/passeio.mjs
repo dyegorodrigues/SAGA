@@ -100,6 +100,50 @@ async function acoesDisponiveis(page) {
   });
 }
 
+/**
+ * Toca no palco como uma criança tocaria — e mede o que dá para medir assim.
+ *
+ * **Este passeio não sabe a resposta certa.** Ele toca em tudo que não é
+ * moldura, o que inclui as alternativas erradas. Medido no trace: o palco de
+ * pareamento aceita os toques, pergunta "sobrou algum?", recebe uma resposta
+ * errada e responde "Olha de novo! 👀" — deixando tentar outra vez, que é a
+ * pedagogia correta. Por isso a missão não termina, e por isso **exigir que ela
+ * termine aqui seria medir a pontaria do robô, não a saúde do app.**
+ *
+ * O que se mede aqui é robustez: cada rodada oferece ação, a tela responde ao
+ * toque, nada quebra e a criança nunca fica presa. **Se a missão CHEGA à coroa
+ * é pergunta do `npm run simular`**, que roda o motor de verdade com um
+ * aprendiz que sabe acertar.
+ */
+const CHROME = /^(✕|🔊|👉 Como faz\? 🫵|Avançar|Continuar|Ver Resultado|Sair|Voltar)$/i;
+
+async function jogarMissao(page, maxRodadas = 12) {
+  let rodadas = 0;
+  let reagiu = 0;
+  for (let i = 0; i < maxRodadas; i += 1) {
+    const antes = await texto(page);
+    if (/de \d+ acertos|Ver Resultado|Parabéns|Missão conclu/i.test(antes)) return { rodadas, reagiu, terminou: true };
+    // Saiu da missão? A casa tem os quatro pilares; a missão não.
+    if (/TUTOR/i.test(antes) && /JORNADA/i.test(antes) && rodadas > 0) return { rodadas, reagiu, saiu: true };
+    if ((await acoesDisponiveis(page)) === 0) return { rodadas, reagiu, travou: true };
+
+    const alvos = page.locator("button:visible");
+    const total = Math.min(await alvos.count(), 14);
+    for (let k = 0; k < total; k += 1) {
+      const botao = alvos.nth(k);
+      const rotulo = ((await botao.innerText().catch(() => "")) || "").replace(/\s+/g, " ").trim();
+      if (CHROME.test(rotulo)) continue;
+      await botao.click({ timeout: 1500 }).catch(() => {});
+    }
+    await page.waitForTimeout(1200);
+    if ((await texto(page)) !== antes) reagiu += 1;
+    await clicar(page, /Avançar|Continuar|Próxim|Ver Resultado/i);
+    await page.waitForTimeout(700);
+    rodadas += 1;
+  }
+  return { rodadas, reagiu, terminou: false };
+}
+
 async function main() {
   mkdirSync(FOTOS, { recursive: true });
   console.log(`SAGA — PASSEIO PELA PORTA DA FRENTE\n- alvo: ${BASE}\n- fotos: ${FOTOS}`);
@@ -241,6 +285,66 @@ async function main() {
     else if (conteudo.length < 40) falha(`"${tela.nome}" abriu praticamente vazio`);
     else ok(`"${tela.nome}" abre com ${acoes} ação(ões) possíveis`);
     await foto(page, `07-${tela.nome.replace(/\s+/g, "-").toLowerCase()}`);
+  }
+
+  // ------------------------------------------- a missão que ela faz todo dia
+  passo("Uma missão da Jornada, do começo ao resultado");
+  if (!(await voltarParaCasa(page))) {
+    atencao("não consegui voltar para casa para abrir a Jornada");
+  } else {
+    await clicar(page, /JORNADA/i);
+    await page.waitForTimeout(1200);
+    const trilha = await texto(page);
+    if (!/FRONTEIRA/i.test(trilha)) {
+      falha("a Jornada não oferece nenhuma competência de fronteira — a criança não tem por onde começar");
+    } else {
+      // O card é um botão cujo NOME ACESSÍVEL é "<competência>: disponível" —
+      // não o código da ficha. Procurar por "N1.01" não achava nada e acusava o
+      // app de um card intocável que não existe.
+      const abertos = page.getByRole("button", { name: /: disponível$/ });
+      const travados = await page.getByRole("button", { name: /: travada$/ }).count();
+      const quantos = await abertos.count();
+      if (!quantos) {
+        falha("nenhuma competência aparece como disponível na Jornada");
+      } else {
+        ok(`a Jornada mostra ${quantos} competência(s) aberta(s) e ${travados} travada(s)`);
+        const card = abertos.first();
+        const nome = (await card.getAttribute("aria-label")) ?? "";
+        await card.scrollIntoViewIfNeeded().catch(() => {});
+        await card.click({ timeout: 10000 }).catch(() => {});
+        // O seletor de nível é uma camada `fixed` que entra no FIM do DOM: um
+        // texto comparado só pelo começo não a enxerga.
+        const abriuSeletor = await esperar(page, (t) => /Escolha o nível/i.test(t), 15000);
+        if (!abriuSeletor) {
+          falha(`tocar em "${nome}" não abriu o seletor de nível`);
+        } else {
+          ok("tocar numa competência abre o seletor de nível, com exemplo de cada degrau");
+          await foto(page, "08-seletor-de-nivel");
+          // O botão do degrau é a LINHA inteira ("1 Nível 1 · Visual … ▶"), não
+          // o `▶`. E o seletor mostra um EXEMPLO de enunciado de cada nível:
+          // esperar por "Conte…" enquanto ele está aberto dá missão aberta como
+          // certa sem nunca ter saído do seletor. A missão só começou quando o
+          // seletor fechou.
+          await clicar(page, /Nível 1/i);
+          const naMissao = await esperar(
+            page,
+            (t) => !/Escolha o nível|Treine livremente/i.test(t) && /Toque|Conte|Quantos|Qual|Dê |Arraste/i.test(t),
+            20000,
+          );
+          if (!naMissao) {
+            falha(`escolher um nível de "${nome}" não abriu a missão`);
+          } else {
+            ok("escolher o nível abre a missão da competência");
+            const r = await jogarMissao(page);
+            if (r.travou) falha(`a missão da Jornada prendeu a criança: nenhuma ação possível na rodada ${r.rodadas + 1}`);
+            else if (r.saiu) atencao(`o passeio saiu da missão da Jornada na rodada ${r.rodadas}`);
+            else if (r.reagiu < r.rodadas / 2) falha(`a missão da Jornada ignorou a maioria dos toques (${r.reagiu} de ${r.rodadas} rodadas reagiram)`);
+            else ok(`a missão da Jornada responde a cada toque e nunca prende (${r.reagiu}/${r.rodadas} rodadas reagiram${r.terminou ? ", e chegou ao resultado" : ""})`);
+            await foto(page, "09-missao-jornada");
+          }
+        }
+      }
+    }
   }
 
   // --------------------------------------------------------------- higiene

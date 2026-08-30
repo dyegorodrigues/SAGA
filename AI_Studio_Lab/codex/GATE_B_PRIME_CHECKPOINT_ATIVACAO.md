@@ -1222,3 +1222,79 @@ deixando de achar fichas (prova de vida).
 - App verificado no navegador de verdade depois do refactor do `GameLoop`:
   login → visitante → perfil → mapa → sondagem → **dez rodadas de missão**
   (contagem e correspondência um-a-um), zero erros de página.
+
+## 21. O passeio pela porta da frente — e o que ele achou no primeiro dia
+
+O currículo foi auditado até o osso. **O app, como produto, nunca foi.** Não
+existia um único teste que abrisse a porta da frente, criasse um perfil, jogasse
+uma missão, fechasse o app e voltasse para ver se sobrou alguma coisa. As quase
+quatro mil asserções rodam em jsdom, sobre componentes isolados; nenhuma delas
+renderiza o `App`, e nenhuma renderiza o `GameLoop`.
+
+`npm run passeio` faz isso no Chromium, sobre o build de produção. Na primeira
+execução achou dois defeitos — os dois no caminho **"Começar sem Conta"**, que é
+o caminho rápido, o que um pai usa para só experimentar.
+
+### 1. A criança voltava para o login a cada reabertura
+
+`onAuthStateChanged` zerava o modo visitante sempre que não havia sessão no
+Firebase. E não haver sessão é **exatamente** a situação de quem entrou sem
+conta. A marca continuava gravada no aparelho e era apagada da memória no
+primeiro instante do boot.
+
+### 2. O perfil e o progresso não eram gravados
+
+A gravação era condicionada a haver um UID do Firebase. Sem UID, o estado só era
+escrito sob `?e2e=1`. O pai criava a criança, ela jogava, o app fechava — e
+sumia tudo, porque vivia só na memória da aba. O boot já sabia **ler** a chave
+local no ramo do visitante; faltava alguém **escrevê-la**.
+
+### O padrão, que é o achado maior que os dois
+
+O comentário do gancho de teste entrega o diagnóstico:
+
+> *"Gancho de teste E2E (só com `?e2e=1`): entra como visitante e **não deixa o
+> reset de auth do Firebase mandar de volta pro login**."*
+
+O comportamento era **conhecido** e fora contornado **para o teste, não para a
+criança**. Os dois defeitos são a mesma doença: o caminho sem conta funcionava
+sob o gancho e não na vida real. Um app que só funciona quando um sinalizador de
+teste está ligado é um app que ninguém nunca usou.
+
+As duas regras viraram função pura no módulo que já é dono da decisão —
+`modoVisitante` em `entradaDoApp.ts`, `destinoDoProgresso` em
+`storageIdentity.ts` — com teste antes do reparo e mutação provando o vermelho.
+Havendo sessão, ela decide; não havendo, decide a escolha gravada no aparelho,
+que sair do app apaga.
+
+### Três acusações falsas, e por que elas ficam registradas
+
+O passeio também acusou o app três vezes de coisas que eram **do próprio
+passeio**. Ficam escritas porque a lição vale mais que o susto:
+
+- **"TUTOR é um botão morto".** Não é: `activeShellTab` já começa em `sensei`, a
+  criança cai na aba do Tutor e tocar nela corretamente não muda nada. Comparar
+  texto antes/depois era a medida errada; o sinal exato é a aba que o app
+  persiste em `mk-active-tab`.
+- **"O card da Jornada não abre".** Abre: o seletor de nível é uma camada
+  `fixed` que entra no **fim** do DOM, e eu comparava só o começo do texto. Além
+  disso o nome acessível do card é `"<competência>: disponível"`, não o código
+  da ficha — procurar por `N1.01` não achava nada.
+- **"A missão nunca termina".** Termina: o passeio **não sabe a resposta certa**
+  e toca em todas as alternativas, inclusive as erradas. O app responde "Olha de
+  novo! 👀" e deixa tentar outra vez — pedagogia correta. Exigir fim de missão
+  ali seria medir a pontaria do robô, não a saúde do app.
+
+O passeio passou a medir o que ele **pode** medir — a tela responde, oferece
+ação, não prende e não quebra — e a dizer em voz alta o que não mediu: se a
+missão chega à coroa é pergunta do `npm run simular`, e o caminho da conta
+Google não é exercitado onde não há saída para a internet.
+
+### Recibos
+
+- `npm run passeio`: **19 verificações, zero falhas**, uma ressalva declarada.
+- Cobre: entrada, visitante, criação de perfil, missão, **reabrir o app**, os
+  cinco destinos da casa (Tutor, Jornada, Dojo, Oficina, Perfil), a Jornada com
+  7 competências abertas e 83 travadas, o seletor de nível e uma missão da
+  Jornada.
+- Suíte: **317 arquivos, 3982 testes, verde**.
