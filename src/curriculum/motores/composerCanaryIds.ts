@@ -216,4 +216,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // um dado coletado por outra pessoa. O degrau é a legenda de escala, e o L5
   // mistura as duas para que ela precise OLHAR a legenda em vez de supor.
   "PE.01",
+
+  // W59 — GM.03/F53. Trouxe uma PRIMITIVA NOVA, `Moedas`: nenhuma existente
+  // servia, porque dinheiro não é quantidade contínua, nem agrupamento
+  // posicional, nem coleção homogênea. É a primeira vez no currículo em que o
+  // valor não se lê no objeto — é atribuído a ele.
+  "GM.03",
 ] as const;

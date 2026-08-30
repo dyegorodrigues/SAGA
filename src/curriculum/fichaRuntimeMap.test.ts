@@ -14,9 +14,14 @@ describe("mapa autoral de fichas para o runtime", () => {
     expect(output).toContain("Quadrado100: executável");
     expect(output).toContain("decimos-centesimos-f75");
     expect(output).toContain("special:N6.01");
-    expect(output).toContain("Moedas: renderer-sem-builder");
-    expect(output).toContain("- executável: 25");
-    expect(output).toContain("- renderer-sem-builder: 1");
+    // A `Moedas` era a última primitiva com renderer e sem builder — o
+    // vocabulário existia e o componente não, e o `money` era um kind órfão
+    // apontando para decoração do mascote. Com a F53/GM.03 ela ganhou
+    // componente, builder especializado e palco: passou a executável, e o
+    // repositório ficou sem nenhuma primitiva pela metade.
+    expect(output).toContain("Moedas: executável");
+    expect(output).toContain("- executável: 26");
+    expect(output).toContain("- renderer-sem-builder: 0");
     expect(output).toContain("- componente-isolado: 0");
     expect(output).toContain("- ausente: 0");
     expect(output).toContain("[RESULTADO]");

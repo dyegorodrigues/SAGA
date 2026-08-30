@@ -115,7 +115,7 @@ function primitivasExistentes(): Set<string> {
  * sem o arquivo aparecer em `src/components/primitives/` significa que alguém
  * apagou a dívida em vez de pagá-la.
  */
-export const PRIMITIVAS_PENDENTES = ["Moedas"];
+export const PRIMITIVAS_PENDENTES: string[] = [];
 
 /**
  * De que primitiva é feito cada `kind` que o runtime produz.
@@ -175,7 +175,11 @@ const PRIMITIVA_DO_KIND: Record<string, string[]> = {
   // recebe a aula descrita — recebe um teste sobre ela.
   plain: [],
   math: [],
-  money: [],
+  // `money` era um kind sem primitiva: o vocabulário existia e o componente
+  // não. Com a `Moedas` construída na W59, ele passa a ter dono — e o kind
+  // autoral da F53 nasce apontando para a mesma primitiva.
+  money: ["Moedas"],
+  "dinheiro-f53": ["Moedas"],
   // Os palcos do Padrão Ouro carregam a primitiva por dentro.
   // F42 é composto: Arranjo realiza o ArrayGrid canônico, Quadrado100 é a
   // segunda primitiva exigida e NumberLine é entrega física adicional no L1.

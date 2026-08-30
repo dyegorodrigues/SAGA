@@ -90,7 +90,6 @@ const FICHA_RUNTIME_MAP = [
     builderKinds: ["tens", "vertical", "deslocamento"], rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento"],
     note: "MaterialDouradoStage compõe MaterialDourado + TenFrame; VerticalPlaceValueStage compõe MaterialDourado + InteractiveVertical."
   },
-  { primitive: "Moedas", kinds: ["money"], componentFiles: ["src/components/Mascot.tsx"], componentExports: ["MoneyCoin", "MoneyNote"], builderKinds: [], rendererKinds: ["money"] },
   { primitive: "NumberBond", kinds: ["bond", "familia"], componentFiles: [component("NumberBond"), component("FamiliaStage"), component("TrianguloDeFatos")], builderKinds: ["bond", "familia"], rendererKinds: ["bond", "familia"], note: "F96/N4.06 realiza NumberBond em linguagem triangular pelo helper TrianguloDeFatos." },
   {
     primitive: "NumberLine",
@@ -127,6 +126,17 @@ const FICHA_RUNTIME_MAP = [
   },
   { primitive: "StoryPanel", kinds: ["story", "scene", "storypanel", "story-bars"], componentFiles: [component("StoryPanel"), component("StoryPanelStage"), component("StoryBarsStage")], builderKinds: ["storypanel"], rendererKinds: ["story-bars"], note: "N3.10/F20 compõe StoryPanel + SingaporeBars." },
   { primitive: "TenFrame", kinds: ["tenframe", "moldura", "bond", "plain", "material-dourado", "dobros-f32", "fazer-dez-f33", "familia-aditiva-f16", "voltar-pelo-dez-f34"], componentFiles: [component("TenFrame"), component("MolduraStage"), component("NumberBond"), component("MaterialDouradoStage"), component("DobrosStage"), component("FazerDezStage"), component("FamiliaAditivaStage"), component("VoltarPeloDezStage")], builderKinds: ["tenframe", "moldura", "bond", "plain"], specializedBuilderIds: ["N3.06", "N3.07", "N3.05", "N3.08"], rendererKinds: ["tenframe", "moldura", "bond", "plain", "material-dourado", "dobros-f32", "fazer-dez-f33", "familia-aditiva-f16", "voltar-pelo-dez-f34"], note: "MaterialDouradoStage compõe MaterialDourado + TenFrame. W54/F32/N3.06 usa a moldura para UMA fileira do dobro: preenchida com o total, ela seria a resposta desenhada na tela. W55/F33/N3.07 usa DUAS molduras: a criança fecha a primeira em dez por toque e a sobra começa a segunda, tornando visível a quebra da parcela — sem arrasto, alvo grande, porque precisão de dedo nunca é requisito para demonstrar compreensão. W56/F16/N3.05 usa o NumberBond como triângulo aditivo: o vértice perguntado recebe '?' literalmente e as outras contas da família aparecem mascaradas, ensinando a estrutura sem entregar o resultado." },
+  {
+    // W59/F53/GM.03: primitiva nova. Nenhuma existente servia — dinheiro não é
+    // quantidade contínua, nem agrupamento posicional, nem coleção homogênea.
+    // É a primeira vez no currículo em que o valor NÃO se lê no objeto: é
+    // atribuído a ele. Os diâmetros seguem a ordem do dinheiro real, que não é
+    // a ordem dos valores, porque é justamente esse o erro a diagnosticar.
+    primitive: "Moedas", kinds: ["money", "dinheiro-f53"],
+    componentFiles: [component("Moedas"), component("DinheiroStage")],
+    builderKinds: [], specializedBuilderIds: ["GM.03"], rendererKinds: ["money", "dinheiro-f53"],
+    note: "W59/F53 desenha as moedas do Real com os diâmetros relativos do dinheiro de verdade; o contador acumula o que a criança tocou, nunca o total da mesa. Esta entrada ABSORVEU a antiga, que declarava Moedas apontando para MoneyCoin/MoneyNote dentro do Mascot.tsx: o mapa dizia que a primitiva existia enquanto PRIMITIVAS_PENDENTES e a Coverage Matrix diziam que não. Duas entradas com o mesmo nome eram a contradição escrita duas vezes; agora é uma só, com o componente de verdade em primitives/ e o kind legado `money` preservado. MoneyCoin e MoneyNote saíram da declaração: são decoração do mascote, não a primitiva do dinheiro, e mantê-las como export exigido da primitiva era chamar de moeda o que nunca serviu para medir valor.",
+  },
   { primitive: "TouchCount", kinds: ["touchcount"], componentFiles: [component("TouchCount")], builderKinds: ["touchcount"], rendererKinds: ["touchcount"] },
   { primitive: "TouchPlace", kinds: ["touchplace"], componentFiles: [component("TouchPlace"), component("TouchPlaceStage")], builderKinds: ["touchplace"], rendererKinds: ["touchplace"] },
   { primitive: "VisualAddition", kinds: ["visual-addition", "visual-addition-f13", "subvis"], componentFiles: [component("VisualAddition"), component("VisualAdditionStage")], builderKinds: [], specializedBuilderIds: ["N3.01"], rendererKinds: ["visual-addition", "visual-addition-f13"] },
