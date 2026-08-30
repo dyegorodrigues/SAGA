@@ -233,4 +233,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // parâmetro no outro lugar: desenhar duas telas diferentes ensinaria que são
   // duas contas diferentes, que é justamente o erro que a ficha combate.
   "N4.05",
+
+  // W62 — N2.05/F65. Arredondar é escolher entre as duas marcas que cercam o
+  // número, e o caso do meio exato é exigido de propósito: é só nele que a
+  // convenção do cinco aparece, e só nele que arredondar sempre para baixo
+  // deixa de acertar por acidente.
+  "N2.05",
 ] as const;

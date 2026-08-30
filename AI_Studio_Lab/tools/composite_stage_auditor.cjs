@@ -58,6 +58,15 @@ const composites = [
     primitives: ["MaterialDourado", "TenFrame"],
   },
   {
+    // W62/F65: a reta mostra a vizinhança do número entre as duas marcas que o
+    // cercam — é onde a distância se vê — e o quadrado de cem dá tamanho à
+    // centena nos níveis dessa ordem.
+    kind: "numeros-grandes-f65",
+    stage: "src/components/primitives/NumerosGrandesStage.tsx",
+    imports: ["./InteractiveNumberLine", "./Quadrado100"],
+    primitives: ["InteractiveNumberLine", "Quadrado100"],
+  },
+  {
     // W60/F37: o material dourado mostra as três ordens como quantidade física
     // — é onde "dez barras viram uma placa" acontece — e o quadrado de cem dá
     // tamanho à centena nos níveis que partem do numeral.
