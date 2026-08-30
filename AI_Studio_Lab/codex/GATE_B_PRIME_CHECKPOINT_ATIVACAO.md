@@ -583,9 +583,8 @@ Duas coisas, as duas nomeadas e nenhuma delas por falta de trabalho:
    níveis declaram.
 
 Com as duas resolvidas, **o Gate B′ não tem mais pendência de cânone aberta.**
-O que resta é trabalho de autoria: as 12 competências ainda sem ficha
-(`N2.04`, `N2.05`, `N3.04`, `N3.05`, `N3.06`, `N3.07`, `N3.08`, `N3.12`,
-`N3.13`, `N4.05`, `GM.03`, `PE.01`).
+~~O que resta é trabalho de autoria: as 12 competências ainda sem ficha.~~
+**Feito na seção 18 (W53 a W64): as 90 competências do DAG têm ficha.**
 
 ---
 
@@ -902,4 +901,92 @@ que declara e não entrega agora fica vermelha sozinha.
 
 Recibo: suíte inteira **302 arquivos, 3710 testes, verde**; `tsc --noEmit`
 limpo; `npm run auditar` aprovado; `grafo:check` sincronizado.
+
+---
+
+## 18. As doze que não tinham ficha — W53 a W64
+
+Quando as duas decisões de cânone fecharam, o que restava não era mecanismo:
+era autoria. Doze competências do DAG tinham gerador legado servindo criança e
+**nenhuma ficha autoral** — logo, nenhuma delas jamais passara por portão
+algum, porque todos os portões varrem o que está registrado.
+
+As doze foram escritas na ordem topológica do DAG, transcrevendo as fichas
+canônicas que já existiam nos documentos de pedagogia. Nenhuma foi inventada:
+todas as doze tinham F-ficha escrita, e o trabalho foi levá-las a contrato,
+palco, registro e portão.
+
+| onda | competência | ficha | o que ela traz de novo |
+|---|---|---|---|
+| W53 | `N3.04` | F31 Voltar Contando | os dois caminhos da subtração; escolher é a competência |
+| W54 | `N3.06` | F32 Dobros e Quase-Dobros | usar um fato sabido para descobrir outro |
+| W55 | `N3.07` | F33 Fazer Dez | onde os amigos do dez viram ferramenta |
+| W56 | `N3.05` | F16 Família de Fatos | um trio, quatro contas |
+| W57 | `N3.08` | F34 Voltar pelo Dez | o espelho da F33, cruzando a dezena |
+| W58 | `PE.01` | F56 O Contador de Animais | o começo da estatística: ler dado de outra pessoa |
+| W59 | `GM.03` | F53 O Tesouro do Pirata | **primitiva nova `Moedas`**: valor não se lê no objeto |
+| W60 | `N2.04` | F37 A Centena | a dezena um nível acima, no mesmo material |
+| W61 | `N4.05` | F99 Repartir e Medir | os dois rostos da divisão, no mesmo componente |
+| W62 | `N2.05` | F65 Números Grandes | arredondar como decisão de precisão |
+| W63 | `N3.12` | F40 A Dezena Desmonta | perceber a falta antes de agir |
+| W64 | `N3.13` | F41 Cálculo Mental | estimativa como mecanismo de autocorreção |
+
+**Resultado: as 90 competências do DAG têm ficha.** A Matrix fecha em Composer
+89, legado 1 — só a `GM.04` segue no legado, e por decisão registrada, não por
+esquecimento.
+
+### O que os portões cobraram antes de cada promoção
+
+Nenhuma das doze entrou limpa. A lista abaixo é o que a medição pegou **antes**
+de a ficha servir criança, e é o argumento mais forte que este checkpoint tem
+para a existência dos portões:
+
+| ficha | o que caiu | o que era |
+|---|---|---|
+| `N3.04` | o L1 perguntava "qual caminho é mais curto?" sem oferecer caminho | enunciado mentindo sobre o próprio nível |
+| `N3.04` | L3, L4 e L5 sorteavam totais abaixo de dez | o degrau de alcance existia só no papel |
+| `N3.04` | CLASS-009 acusou **GE.04 L3** | defeito ANTERIOR, exposto pelo deslocamento do PRNG: o enunciado perguntava "o {sólido} rola na rampa?" com "rola" na barra logo abaixo |
+| `N3.06` | com âncora 1, o L1 ficava com duas alternativas | cara ou coroa não mede nada |
+| `N3.07` | o L4 mandava fechar uma caixa que não estava na tela | apontar para o que não existe |
+| `N3.05` | o apoio escrevia o vértice oculto — `3 − 1 = ?` ao lado de `1 + 2 = ?` | CLASS-009 pela porta dos fundos |
+| `N3.08` | com total 19 ou 20 não havia unidade solta a tirar | a decomposição da ficha não existia naquele caso |
+| `N3.08` | evidência de família emitida em níveis sem escolha | afirmar estratégia que a criança não escolheu |
+| `PE.01` | duas linhas podiam empatar | "leu a linha errada" deixava de ser diagnosticável |
+| `GM.03` | o mapa declarava `Moedas` apontando para decoração do mascote | contradição escrita em três lugares ao mesmo tempo |
+| `N2.04` | as três ordens podiam repetir dígito | "leu a ordem errada" coincidia com a resposta |
+| `N2.05` | erros de arredondamento se cancelavam: `62+68` estima 130 e vale 130 | a falha intermitente, identificada e fechada |
+| `N3.12` | inverter as unidades dava exatamente o minuendo | um número com dois significados não diagnostica nenhum |
+| `N3.13` | desvio negativo derrubava a alternativa certa | **a CLASS-006 disse "perdeu o gabarito durante a serialização"** |
+
+### A falha intermitente, e por que ela não era flake
+
+Uma execução da suíte acusou um teste falhando e a saída foi truncada antes de
+nomeá-lo; duas execuções seguintes ficaram verdes. Ficou registrado como tarefa
+em vez de ser chamado de flake — e a decisão se pagou: era a `N2.05` L5, onde
+os dois arredondamentos se cancelam e a estimativa dá o exato. Dependia do
+sorteio, aparecia em menos de meio por cento dos casos, e o teste nominal da
+própria ficha foi quem a pegou. O mesmo cancelamento existia na `N3.13` e foi
+fechado junto.
+
+### Duas primitivas de composição que não existiam
+
+- **`Moedas`** (W59) — nenhuma primitiva servia: dinheiro não é quantidade
+  contínua, nem agrupamento posicional, nem coleção homogênea. Os diâmetros
+  seguem o dinheiro real, que **não** é a ordem dos valores: a de 25 é maior
+  que a de 50. Desenhá-las iguais faria o erro sumir da tela; proporcionais ao
+  valor, a tela ENSINARIA o erro.
+- Com ela, o repositório ficou **sem nenhuma primitiva pela metade**: 26 de 26
+  executáveis, e `PRIMITIVAS_PENDENTES` vazio — dívida paga, não apagada.
+
+### Cinco palcos compostos novos
+
+`dobros-f32` (ArrayGrid + TenFrame), `voltar-pelo-dez-f34` (TenFrame +
+InteractiveNumberLine), `centena-f37` (MaterialDourado + Quadrado100),
+`numeros-grandes-f65` (InteractiveNumberLine + Quadrado100) e
+`dezena-desmonta-f40` (InteractiveVertical + MaterialDourado), todos
+registrados no auditor de palcos compostos, que cobra os imports de verdade.
+
+Recibo final: suíte inteira **314 arquivos, 3949 testes, verde em duas
+execuções seguidas**; `tsc --noEmit` limpo; `npm run auditar` aprovado;
+`grafo:check` sincronizado.
 
