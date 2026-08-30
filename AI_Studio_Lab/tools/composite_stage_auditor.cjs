@@ -58,6 +58,15 @@ const composites = [
     primitives: ["MaterialDourado", "TenFrame"],
   },
   {
+    // W60/F37: o material dourado mostra as três ordens como quantidade física
+    // — é onde "dez barras viram uma placa" acontece — e o quadrado de cem dá
+    // tamanho à centena nos níveis que partem do numeral.
+    kind: "centena-f37",
+    stage: "src/components/primitives/CentenaStage.tsx",
+    imports: ["./MaterialDourado", "./Quadrado100"],
+    primitives: ["MaterialDourado", "Quadrado100"],
+  },
+  {
     // W57/F34: as molduras mostram a decomposição como quantidade — os soltos
     // saem primeiro, a caixa cheia se abre depois — e a reta mostra o mesmo
     // percurso como distância, que é o suporte do erro suave.

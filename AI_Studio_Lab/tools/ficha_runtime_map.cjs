@@ -85,9 +85,9 @@ const FICHA_RUNTIME_MAP = [
   },
   { primitive: "LinkingCubes", kinds: ["linking-cubes", "counting-on-f14"], componentFiles: [component("LinkingCubes"), component("CountingOnStage")], builderKinds: [], specializedBuilderIds: ["N3.03"], rendererKinds: ["linking-cubes", "counting-on-f14"], note: "W10/F14: CountingOnStage compõe LinkingCubes + NumberLine." },
   {
-    primitive: "MaterialDourado", kinds: ["tens", "material-dourado", "vertical", "deslocamento"],
-    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage"), component("VerticalPlaceValueStage"), component("DeslocamentoStage")],
-    builderKinds: ["tens", "vertical", "deslocamento"], rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento"],
+    primitive: "MaterialDourado", kinds: ["tens", "material-dourado", "vertical", "deslocamento", "centena-f37"],
+    componentFiles: [component("MaterialDourado"), component("MaterialDouradoStage"), component("VerticalPlaceValueStage"), component("DeslocamentoStage"), component("CentenaStage")],
+    specializedBuilderIds: ["N2.04"], builderKinds: ["tens", "vertical", "deslocamento"], rendererKinds: ["tens", "material-dourado", "vertical", "deslocamento", "centena-f37"],
     note: "MaterialDouradoStage compõe MaterialDourado + TenFrame; VerticalPlaceValueStage compõe MaterialDourado + InteractiveVertical."
   },
   { primitive: "NumberBond", kinds: ["bond", "familia"], componentFiles: [component("NumberBond"), component("FamiliaStage"), component("TrianguloDeFatos")], builderKinds: ["bond", "familia"], rendererKinds: ["bond", "familia"], note: "F96/N4.06 realiza NumberBond em linguagem triangular pelo helper TrianguloDeFatos." },
@@ -99,9 +99,9 @@ const FICHA_RUNTIME_MAP = [
     note: "W10/F14 renderiza NumberLine dentro de CountingOnStage; W14/F57 usa NumberLine só nos níveis 1–2. W32/F82 compõe NumberLine + Balanca para converter antes de comparar ou operar. W35/F62 compõe NumberLine + Relogio para leitura de minutos e duração. W36/F93 usa NumberLine + Balanca em escalas alinhadas.",
   },
   {
-    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "contas-virgula-f76", "porcentagem-f87", "primos-divisores-f70"],
-    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("ContasVirgulaStage"), component("PorcentagemStage"), component("PrimosDivisoresStage")],
-    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.02", "N6.03", "N4.11"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "contas-virgula-f76", "porcentagem-f87", "primos-divisores-f70"],
+    primitive: "Quadrado100", kinds: ["hundred-chart", "frac-shade", "quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "contas-virgula-f76", "porcentagem-f87", "primos-divisores-f70", "centena-f37"],
+    componentFiles: [component("Quadrado100"), component("Quadrado100Stage"), component("TabuadaStage"), component("SkipCountStage"), component("DecimalStage"), component("ContasVirgulaStage"), component("PorcentagemStage"), component("PrimosDivisoresStage"), component("CentenaStage")],
+    builderKinds: ["tabuada"], specializedBuilderIds: ["N2.02", "AL.03", "N6.01", "N6.02", "N6.03", "N4.11", "N2.04"], rendererKinds: ["quadrado100-f36", "tabuada", "skip-count-f30", "decimos-centesimos-f75", "contas-virgula-f76", "porcentagem-f87", "primos-divisores-f70", "centena-f37"],
     note: "W7/F36 usa builder especializado; W11/F30 compõe Quadrado100; W17/F75 relê o mesmo quadro como um inteiro em décimos e centésimos. W47/F76/N6.02 preserva essa mesma leitura do Quadrado100 como um inteiro enquanto InteractiveVertical explicita a conta e o eixo da vírgula; o quadro mostra as partes decimais sem antecipar o resultado. W22/F87 compõe Quadrado100 + SingaporeBars. W42/F70/N4.11 usa o próprio Quadrado100 para múltiplos e para o Crivo de Eratóstenes: o palco risca fisicamente as casas dos múltiplos compostos e preserva os primos-base, em vez de substituir o quadro/crivo por texto abstrato."
   },
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },

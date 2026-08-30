@@ -222,4 +222,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // posicional, nem coleção homogênea. É a primeira vez no currículo em que o
   // valor não se lê no objeto — é atribuído a ele.
   "GM.03",
+
+  // W60 — N2.04/F37. A dezena um nível acima, no mesmo material: dez barras
+  // viram uma placa. O erro NAO_AGRUPA_DEZENAS tem nome próprio porque ele não
+  // diz "errou a centena", diz "a dezena não está firme" — e o resgate certo é
+  // para a N2.01, não mais exercício desta ficha.
+  "N2.04",
 ] as const;
