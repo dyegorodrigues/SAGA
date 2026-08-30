@@ -194,4 +194,10 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // mostra UMA delas dentro do dez. Preenchida com o total, a moldura seria a
   // resposta desenhada na tela.
   "N3.06",
+
+  // W55 — N3.07/F33. A ficha canônica se chama a mais importante da faixa F1: é
+  // onde os amigos do dez deixam de ser exercício e viram ferramenta. Fechar a
+  // primeira caixa é ação probatória nos três níveis em que as molduras
+  // existem; do L4 em diante elas somem e o portão some junto.
+  "N3.07",
 ] as const;

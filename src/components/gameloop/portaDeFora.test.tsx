@@ -71,6 +71,10 @@ const PORTOES_MEDIDOS = [
   // quatro portões aparecem aqui no mesmo instante em que ela entra na
   // varredura. Portão que nasce junto com a ficha é o resultado certo.
   "N3.04|2", "N3.04|3", "N3.04|4", "N3.04|5",
+  // N3.07/F33: onde as caixas existem, a barra só abre depois que a primeira
+  // fecha em dez. Do L4 em diante as molduras somem e o portão some com elas —
+  // é por isso que são três, e não cinco.
+  "N3.07|1", "N3.07|2", "N3.07|3",
 ];
 
 /**
