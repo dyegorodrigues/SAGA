@@ -75,6 +75,11 @@ const PORTOES_MEDIDOS = [
   // fecha em dez. Do L4 em diante as molduras somem e o portão some com elas —
   // é por isso que são três, e não cinco.
   "N3.07|1", "N3.07|2", "N3.07|3",
+  // N3.08/F34: dois portões diferentes na mesma ficha. Nos L1 e L2 a barra
+  // espera a criança tirar os soltos e chegar ao dez; nos L3 e L4 as molduras
+  // já saíram e o que ela espera é a escolha do caminho. O L5 é mental e não
+  // tem porta — nem promete uma.
+  "N3.08|1", "N3.08|2", "N3.08|3", "N3.08|4",
 ];
 
 /**

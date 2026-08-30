@@ -58,6 +58,15 @@ const composites = [
     primitives: ["MaterialDourado", "TenFrame"],
   },
   {
+    // W57/F34: as molduras mostram a decomposição como quantidade — os soltos
+    // saem primeiro, a caixa cheia se abre depois — e a reta mostra o mesmo
+    // percurso como distância, que é o suporte do erro suave.
+    kind: "voltar-pelo-dez-f34",
+    stage: "src/components/primitives/VoltarPeloDezStage.tsx",
+    imports: ["./TenFrame", "./InteractiveNumberLine"],
+    primitives: ["TenFrame", "InteractiveNumberLine"],
+  },
+  {
     // W54/F32: a grade desenha as duas fileiras espelhadas — a simetria que fixa
     // o dobro — e a moldura mostra UMA fileira dentro do dez. Uma só: preenchida
     // com o total, ela seria a resposta desenhada na tela.

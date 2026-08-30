@@ -200,4 +200,15 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // primeira caixa é ação probatória nos três níveis em que as molduras
   // existem; do L4 em diante elas somem e o portão some junto.
   "N3.07",
+
+  // W56 — N3.05/F16. O triângulo aditivo: um trio, quatro contas. O vértice
+  // perguntado recebe '?' literalmente, e as contas de apoio mascaram o mesmo
+  // número — a primeira versão vazava por ali, escrevendo o todo oculto duas
+  // vezes ao lado da pergunta.
+  "N3.05",
+
+  // W57 — N3.08/F34. O espelho da F33: a mesma estação do dez, na direção
+  // contrária. Dois portões diferentes na mesma ficha — chegar ao dez enquanto
+  // as molduras existem, escolher o caminho depois que elas somem.
+  "N3.08",
 ] as const;
