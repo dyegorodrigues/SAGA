@@ -245,4 +245,11 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // ficha, e a Jornada inteira é servida pelo Composer.
   "N3.12",
   "N3.13",
+
+  // W65 — GM.04/F55. A última do legado, e a que fecha a Jornada: com ela as 90
+  // competências do DAG são servidas pelo Composer. A escada é a que a
+  // DECISAO-001 fixou — hora cheia e meia hora, nada de minutos —, e o teste
+  // nominal cobra esse escopo em todo nível, para que a decisão não tenha porta
+  // dos fundos.
+  "GM.04",
 ] as const;

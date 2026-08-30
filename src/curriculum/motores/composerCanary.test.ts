@@ -32,16 +32,35 @@ describe("ponte de canário do Composer", () => {
     // exemplo de quem fica no legado; quando a N3.11 foi promovida na W52, o
     // teste reprovou por envelhecimento. O que importa afirmar é que a ponte
     // NÃO promove quem não está no conjunto — para qualquer id fora dele.
-    const foraDoConjunto = ALL_MATH_TRACKS.map(track => track.id).filter(id => !COMPOSER_CANARIES.has(id));
-    expect(foraDoConjunto.length, "todo nó virou canário: esta metade do teste perdeu o objeto").toBeGreaterThan(0);
-    for (const id of foraDoConjunto) {
-      // O legado vem de `geradorLegadoDe`, não de um gerador emprestado: quem
-      // tem legado próprio cai no legado, quem nunca teve cai no fallback. Usar
-      // sempre o mesmo gerador de empréstimo faria os 46 nós sem gerador
-      // parecerem "legado" e a distinção sumiria do teste.
-      const legado = geradorLegadoDe(id);
-      expect(selectGenerator(id, legado, fallback).source(), `${id} está fora do conjunto e mesmo assim veio do Composer`)
-        .toBe(legado ? "legacy" : "fallback");
+    // ### Onde este teste foi buscar o objeto dele
+    //
+    // A metade de baixo media os nós FORA do conjunto, e ela morreu de sucesso:
+    // com a Jornada fechada em 90/90, não existe mais nó por promover. A
+    // afirmação não ficou falsa — ficou sem sujeito, e um teste sem sujeito
+    // passa vazio, que é a cegueira que esta suíte inteira existe para impedir.
+    //
+    // O sujeito não sumiu do repositório, mudou de lugar: o ramo `legacy` da
+    // ponte continua existindo porque o ROLLBACK existe. Tirar um nó do
+    // conjunto é o que a operação de rollback faz, e é exatamente ali que a
+    // pergunta "quem está fora vem do Composer?" volta a ter o que medir.
+    const cobaia = [...COMPOSER_CANARIES].find(id => geradorLegadoDe(id));
+    expect(cobaia, "nenhum canário tem gerador legado: o rollback perdeu o objeto").toBeDefined();
+
+    rollbackComposerCanary(cobaia!);
+    expect(COMPOSER_CANARIES.has(cobaia!)).toBe(false);
+    // O legado vem de `geradorLegadoDe`, não de um gerador emprestado: quem tem
+    // legado próprio cai no legado, quem nunca teve cai no fallback.
+    expect(selectGenerator(cobaia!, geradorLegadoDe(cobaia!), fallback).source(), `${cobaia} saiu do conjunto e mesmo assim veio do Composer`)
+      .toBe("legacy");
+
+    // O outro lado da mesma distinção: quem nunca teve gerador legado cai no
+    // fallback, não no legado. Também precisa sair do conjunto primeiro —
+    // dentro dele, todo nó vem do Composer, que é o ponto.
+    const semLegado = ALL_MATH_TRACKS.map(track => track.id).find(id => !geradorLegadoDe(id));
+    if (semLegado) {
+      rollbackComposerCanary(semLegado);
+      expect(selectGenerator(semLegado, undefined, fallback).source(), `${semLegado} nunca teve legado e não caiu no fallback`)
+        .toBe("fallback");
     }
   });
 

@@ -107,9 +107,9 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Regua", kinds: ["measure", "regua", "regua-f61"], componentFiles: [component("Regua"), component("ReguaStage")], builderKinds: [], specializedBuilderIds: ["GM.05"], rendererKinds: ["regua", "regua-f61"] },
   {
     primitive: "Relogio",
-    kinds: ["relogio", "horas-minutos-f62"],
-    componentFiles: [component("Relogio"), component("HorasMinutosStage")],
-    builderKinds: ["relogio"], specializedBuilderIds: ["GM.06"], rendererKinds: ["relogio", "horas-minutos-f62"],
+    kinds: ["relogio", "horas-minutos-f62", "que-horas-sao-f55"],
+    componentFiles: [component("Relogio"), component("HorasMinutosStage"), component("QueHorasSaoStage")],
+    builderKinds: ["relogio"], specializedBuilderIds: ["GM.06", "GM.04"], rendererKinds: ["relogio", "horas-minutos-f62", "que-horas-sao-f55"],
     note: "W35/F62 reutiliza Relogio e o compõe com NumberLine em HorasMinutosStage; não cria primitiva autoral nova.",
   },
   { primitive: "ScatteredItems", kinds: ["scattered"], componentFiles: [component("ScatteredItems")], builderKinds: ["scattered"], rendererKinds: ["scattered"] },

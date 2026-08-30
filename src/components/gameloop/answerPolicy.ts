@@ -117,7 +117,7 @@ export const PALCOS_QUE_RESPONDEM = new Set([
   // portão, cena nem manipulação. A varredura clicou botão por botão e contou
   // dois que vendiam o acerto em todos os cinco níveis destes palcos.
   "primos-divisores-f70", "multiplicar-fracoes-f86", "porcentagem-f87",
-  "reta-completa-f84", "operar-negativos-f85", "expressao-f77", "voltar-contando-f31", "dobros-f32", "fazer-dez-f33", "familia-aditiva-f16", "voltar-pelo-dez-f34", "pictograma-f56", "dinheiro-f53", "centena-f37", "repartir-medir-f99", "numeros-grandes-f65", "dezena-desmonta-f40", "calculo-mental-f41",
+  "reta-completa-f84", "operar-negativos-f85", "expressao-f77", "voltar-contando-f31", "dobros-f32", "fazer-dez-f33", "familia-aditiva-f16", "voltar-pelo-dez-f34", "pictograma-f56", "dinheiro-f53", "centena-f37", "repartir-medir-f99", "numeros-grandes-f65", "dezena-desmonta-f40", "calculo-mental-f41", "que-horas-sao-f55",
   "linguagem-letras-f89", "mapa-tesouro-f60", "angulos-f78",
   "plano-cartesiano-f80", "horas-minutos-f62", "area-f81",
   "problemas-medida-f82", "conversao-unidades-f93", "jornal-turma-f64",

@@ -1,4 +1,5 @@
 import { FichaCompetencia } from "../../schema";
+import { exigirFamiliasDistintas } from "../../procedimentos/familiaIntegradora";
 
 /**
  * DECISAO-001 — RESOLVIDA. A GM.04 é a hora cheia e a meia hora; os minutos
@@ -57,6 +58,30 @@ import { FichaCompetencia } from "../../schema";
  * 3. retirar da **GM.06** o que subiu, ou as duas passam a ensinar o mesmo —
  *    e a GM.06 é servida pelo Composer, com onze portões olhando.
  */
+/**
+ * §9 da F55: três de três em duas sessões, **incluindo pelo menos uma meia
+ * hora** — que é o nível 2, e o degrau escondido da ficha.
+ *
+ * Nos níveis que misturam as duas leituras isso vira exigência de duas
+ * famílias: sem ela a criança fecharia o nível integrador tendo lido três horas
+ * cheias, e a coroa diria que ela lê o relógio.
+ */
+const dominio = { acertos: 3, de: 3, sessoes: 2 };
+
+const dominioMisturado = {
+  ...dominio,
+  evidenciasDistintas: exigirFamiliasDistintas(
+    "GM.04",
+    "Demonstrar as duas leituras: uma hora cheia e uma meia hora, onde o ponteiro pequeno fica entre dois números.",
+  ),
+};
+
+const tutorial = [
+  { fala: "Este é o ponteiro das horas: curto e grosso.", show: { destacarPonteiro: "hora" } },
+  { fala: "Ele aponta para o número da hora.", show: { linhaAteNumero: true } },
+  { fala: "O ponteiro grande no 12 quer dizer hora cheia.", show: { destacarPonteiro: "minuto" } },
+];
+
 export const GM_04: FichaCompetencia = {
   id: "GM.04",
   nome: "Relógio: a Hora e a Meia Hora",
@@ -68,43 +93,27 @@ export const GM_04: FichaCompetencia = {
   howto: "O ponteiro pequeno marca a hora. O grande marca os minutos.",
   explain: "Cuidado para não confundir: o ponteiro curto e grosso aponta a hora. O ponteiro longo aponta os minutos.",
   distratores: [
-    { regra: "inverte_ponteiros", tag: "TROCA_PONTEIROS" }
+    { regra: "inverte_ponteiros", tag: "PONTEIRO_TROCADO" },
+    { regra: "meia_hora_para_a_seguinte", tag: "MEIA_HORA_ARREDONDA" },
   ],
   niveis: {
-    1: { primitiva: "relogio", andaime: "mao_fantasma" },
-    2: { primitiva: "relogio", andaime: "alto" },
-    3: { primitiva: "relogio", andaime: "medio" }, // Reading instead of dragging
-    4: { primitiva: "plain", andaime: "minimo" },
-    5: { primitiva: "plain", rt_alvo: 5000 }
+    1: { primitiva: "relogio", micro: "hora-cheia", andaime: "mao_fantasma" },
+    2: { primitiva: "relogio", micro: "meia-hora", andaime: "alto" },
+    3: { primitiva: "relogio", micro: "misturado", andaime: "medio" },
+    4: { primitiva: "relogio", micro: "problema-de-horas", andaime: "minimo" },
+    5: { primitiva: "relogio", micro: "em-palavras", andaime: "nenhum", rt_alvo: 15000 },
   },
 
   micros: [
-    {
-      id: "a",
-      alvo: "ler horas exatas no relógio analógico",
-      kinds: ["relogio"],
-      params: { 
-        apenas_horas_exatas: true,
-        audio_prompt: "Que horas o relógio está marcando?" 
-      },
-      dominio: { acertos: 3, de: 4, sessoes: 1 }
-    },
-    {
-      id: "b",
-      alvo: "ler a meia hora, quando o ponteiro das horas fica entre dois números",
-      kinds: ["relogio"],
-      params: {
-        interativo: true,
-        minutos_step: 30,
-        audio_prompt: "O ponteiro grande está no 6. Que horas são?"
-      },
-      dominio: { acertos: 3, de: 3, sessoes: 2 }
-    }
+    { id: "hora-cheia", fonte: "F55", alvo: "ler horas exatas no relógio analógico", kinds: ["relogio"], params: { apenas_horas_exatas: true, tutorial }, dominio },
+    { id: "meia-hora", fonte: "F55", alvo: "ler a meia hora, quando o ponteiro das horas fica entre dois números", kinds: ["relogio"], params: { minutos_step: 30 }, dominio },
+    { id: "misturado", fonte: "F55", alvo: "alternar entre hora cheia e meia hora sem aviso", kinds: ["relogio"], params: {}, dominio: dominioMisturado },
+    { id: "problema-de-horas", fonte: "F55", alvo: "avançar horas inteiras a partir de um horário dado", kinds: ["relogio"], params: {}, dominio },
+    { id: "em-palavras", fonte: "F55", alvo: "dizer a hora como se fala: três horas, três e meia", kinds: ["relogio"], params: {}, dominio: dominioMisturado },
   ],
+
   erros_tipicos: [
-    {
-      id: "troca_ponteiros",
-      descricao: "Confunde o ponteiro maior (minutos) com o ponteiro menor (horas)."
-    }
+    { id: "ponteiro_trocado", descricao: "Confunde o ponteiro maior (minutos) com o menor (horas)." },
+    { id: "meia_hora_arredonda", descricao: "Às três e meia lê quatro e meia: o ponteiro pequeno está entre dois números e ela pega o da frente. É o erro do nível 2." },
   ]
 };
