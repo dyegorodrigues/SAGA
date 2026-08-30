@@ -80,6 +80,11 @@ const PORTOES_MEDIDOS = [
   // já saíram e o que ela espera é a escolha do caminho. O L5 é mental e não
   // tem porta — nem promete uma.
   "N3.08|1", "N3.08|2", "N3.08|3", "N3.08|4",
+  // N4.05/F99: um portão só, e é o L4. É o nível em que a criança declara qual
+  // rosto da divisão a pergunta pede — sem essa declaração, quem trata tudo
+  // como partição acerta metade por sorte e o SO_UM_SENTIDO, que é o alvo da
+  // ficha, fica invisível.
+  "N4.05|4",
 ];
 
 /**

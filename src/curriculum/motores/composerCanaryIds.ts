@@ -228,4 +228,9 @@ export const DEFAULT_COMPOSER_CANARY_IDS = [
   // diz "errou a centena", diz "a dezena não está firme" — e o resgate certo é
   // para a N2.01, não mais exercício desta ficha.
   "N2.04",
+
+  // W61 — N4.05/F99. Os dois rostos da divisão no MESMO componente, com o
+  // parâmetro no outro lugar: desenhar duas telas diferentes ensinaria que são
+  // duas contas diferentes, que é justamente o erro que a ficha combate.
+  "N4.05",
 ] as const;

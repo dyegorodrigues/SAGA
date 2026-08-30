@@ -53,10 +53,10 @@ const FICHA_RUNTIME_MAP = [
   { primitive: "Recipientes", kinds: ["containers", "medidas"], componentFiles: [component("Recipientes"), component("MedidasStage")], builderKinds: ["medidas"], rendererKinds: ["medidas"] },
   {
     primitive: "DragGroup",
-    kinds: ["draggroup", "pareamento", "classificacao", "poligonos-f79"],
-    componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage"), component("PoligonosStage")],
-    builderKinds: ["draggroup", "pareamento", "classificacao"], specializedBuilderIds: ["GE.07"],
-    rendererKinds: ["draggroup", "pareamento", "classificacao", "poligonos-f79"],
+    kinds: ["draggroup", "pareamento", "classificacao", "poligonos-f79", "repartir-medir-f99"],
+    componentFiles: [component("DragGroup"), component("PareamentoStage"), component("ClassificacaoStage"), component("PoligonosStage"), component("RepartirMedirStage")],
+    builderKinds: ["draggroup", "pareamento", "classificacao"], specializedBuilderIds: ["GE.07", "N4.05"],
+    rendererKinds: ["draggroup", "pareamento", "classificacao", "poligonos-f79", "repartir-medir-f99"],
     note: "W33/F79 compõe ShapeCanvas + DragGroup em PoligonosStage; DragGroup realiza seleção, classificação e alternativa por toque sem criar primitiva nova.",
   },
   {
