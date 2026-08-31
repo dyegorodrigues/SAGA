@@ -75,6 +75,11 @@ jobs:
           # Recarregar numa URL profunda cai no 404 do Pages. Servindo o mesmo
           # HTML ali, o app abre e se recompõe sozinho.
           cp dist/index.html dist/404.html
+          # `npm run build` também empacota o servidor Express, que serve o app
+          # quando ele roda numa máquina nossa. No Pages quem serve é o
+          # GitHub: um arquivo de servidor Node na raiz pública não roda, não é
+          # usado por nada, e só confunde quem for olhar o que está no ar.
+          rm -f dist/server.cjs dist/server.cjs.map
 
       - name: Empurrar para gh-pages
         run: |
