@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Icone } from "./icones/Icone";
 import { State, Kid, Track } from "../types";
 import { computeUnlockStatus } from "../curriculum/motores/unlockEngine";
 import { C, FONT, CoinChip, sfx, THEMES } from "./Mascot";
@@ -209,19 +210,25 @@ export function KidHomeScreen({
       </div>
       <div className="bg-white border-t-2 border-slate-100 flex p-2 pb-5 shrink-0 z-10 shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
         {[
-          { id: "sensei", label: "Tutor", icon: "🦊", color: "text-blue-600", activeBg: "bg-blue-50" },
-          { id: "jornada", label: "Jornada", icon: "🗺️", color: "text-indigo-600", activeBg: "bg-indigo-50" },
-          { id: "dojo", label: "Dojo", icon: "🥋", color: "text-purple-600", activeBg: "bg-purple-50" },
-          { id: "oficina", label: "Oficina", icon: "🔧", color: "text-emerald-600", activeBg: "bg-emerald-50" },
+          // Arte hospedada, não emoji do sistema: a mesma raposa em todo
+          // aparelho, tamanho previsível (o emoji tinha métrica própria por
+          // família e desalinhava a barra), e nada de o leitor de tela anunciar
+          // "quimono" onde a aba se chama Dojo. Ver `icones/Icone.tsx`.
+          { id: "sensei", label: "Tutor", icone: "tutor" as const, color: "text-blue-600", activeBg: "bg-blue-50" },
+          { id: "jornada", label: "Jornada", icone: "jornada" as const, color: "text-indigo-600", activeBg: "bg-indigo-50" },
+          { id: "dojo", label: "Dojo", icone: "dojo" as const, color: "text-purple-600", activeBg: "bg-purple-50" },
+          { id: "oficina", label: "Oficina", icone: "oficina" as const, color: "text-emerald-600", activeBg: "bg-emerald-50" },
         ].map(tab => {
           const isActive = activeShellTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => { sfx.tick(); setActiveShellTab(tab.id as any); }}
-              className={`flex-1 flex flex-col items-center justify-center py-2 transition-all rounded-xl ${isActive ? tab.activeBg : "opacity-60 grayscale"}`}
+              className={`flex-1 flex flex-col items-center justify-center py-2 transition-all rounded-xl ${isActive ? tab.activeBg : "opacity-55 saturate-50"}`}
             >
-              <span className={`text-2xl mb-1 ${isActive ? "animate-bounce" : ""}`}>{tab.icon}</span>
+              <span className={`mb-1 ${isActive ? "animate-bounce" : ""}`}>
+                <Icone nome={tab.icone} tamanho={28} />
+              </span>
               <span className={`text-[10px] font-black uppercase ${isActive ? tab.color : "text-slate-500"}`}>{tab.label}</span>
             </button>
           )

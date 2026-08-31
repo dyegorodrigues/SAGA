@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_MATH_TRACKS } from "../curriculum/motores/curriculum";
+import { TINTA_TRAVADA } from "./coresDoNo";
 
 /**
  * A cor de cada ilha do mapa — medida, não escolhida no olho.
@@ -26,10 +27,12 @@ import { ALL_MATH_TRACKS } from "../curriculum/motores/curriculum";
  * 2. **Nenhuma ilha se parece com outra** em visão normal.
  * 3. **Sob deuteranopia** a exigência é menor, e o motivo é o mesmo da regra das
  *    operações: a cor **nunca carrega o significado sozinha**. Cada nó do mapa
- *    traz ícone, o código da competência, o nome e o estado escrito
- *    (`🔒 Travada`, `🔥 Fronteira`, `👑 Dominado`). A cor é reforço.
+ *    traz ícone, o código da competência, o nome e o estado escrito por extenso
+ *    ("Travada", "Fronteira", "Dominado"). A cor é reforço.
  * 4. **Nenhuma ilha vermelha.** Vermelho é cor de erro no SAGA; uma ilha
  *    vermelha ensinaria que aquela matéria é um problema.
+ * 5. **O rótulo do nó travado** é texto como qualquer outro, e por muito tempo
+ *    não era legível — ver `coresDoNo.ts`.
  */
 
 /** Piso WCAG AA para texto. Não se negocia: o rótulo é texto. */
@@ -132,5 +135,15 @@ describe("as cores das ilhas do mapa", () => {
       })
       .map(i => `${i.id}: ${i.color}`);
     expect(vermelhas, `ilhas vermelhas — colidem com o feedback de erro:\n${vermelhas.join("\n")}`).toEqual([]);
+  });
+});
+
+describe("o nó travado do mapa", () => {
+  it("o rótulo da competência travada passa no piso de TEXTO", () => {
+    // "Travada" é palavra escrita na página branca, não desenho: piso de 4,5:1.
+    // Era `#94A3B8` (2,56:1) enquanto o estado se dizia com `opacity-50` — ver
+    // a razão inteira em `coresDoNo.ts`.
+    const razao = contrasteNoBranco(TINTA_TRAVADA);
+    expect(razao, `rótulo travado a ${razao.toFixed(2)}:1 no branco`).toBeGreaterThanOrEqual(CONTRASTE_MINIMO);
   });
 });

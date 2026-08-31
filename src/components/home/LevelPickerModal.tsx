@@ -7,6 +7,7 @@ import {
 } from "../../curriculum/motores/senseiDojoPolicy";
 import { sfx, FONT, C, FRESH } from "../Mascot";
 import { NIVEIS_POR_COMPETENCIA } from "../../curriculum/schema";
+import { Icone, ICONE_DA_ILHA } from "../icones/Icone";
 
 interface LevelPickerModalProps {
   pickerTrack: Track;
@@ -56,11 +57,16 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
           ✕
         </button>
         <div className="text-center mb-5 mt-2">
+          {/* Mesmo disco branco do nó do mapa, e pelo mesmo motivo: a arte é
+              ilustração colorida, e o quadrado atrás dela muda de ilha para
+              ilha. Sobre o branco ela lê em todas. */}
           <div
-            className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-4xl mb-3 shadow-sm border-b-4"
-            style={{ background: pickerTrack.color, color: "#fff", borderColor: pickerTrack.dark }}
+            className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-3 shadow-sm border-b-4"
+            style={{ background: pickerTrack.color, borderColor: pickerTrack.dark }}
           >
-            {pickerTrack.icon}
+            <span className="w-12 h-12 rounded-xl bg-white/90 flex items-center justify-center">
+              <Icone nome={ICONE_DA_ILHA[pickerTrack.island] || "estrela"} tamanho={38} />
+            </span>
           </div>
           <h3 className="text-xl font-black text-slate-800" style={{ fontFamily: FONT }}>
             {pickerTrack.name}
