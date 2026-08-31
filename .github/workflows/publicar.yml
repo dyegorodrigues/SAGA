@@ -43,9 +43,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 22 como todos os outros workflows daqui, e não por gosto: o `jsdom` da
+      # suíte carrega `undici@8`, que chama `webidl.util.markAsUncloneable` —
+      # função que só existe a partir do Node 22. No 20 do runner, 65 arquivos
+      # de teste nem chegam a iniciar. `engines` no package.json agora declara
+      # esse piso num lugar só.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22'
           cache: npm
 
       - run: npm ci

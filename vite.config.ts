@@ -18,6 +18,27 @@ export default defineConfig({
    */
   base: process.env.SAGA_BASE || "/",
   plugins: [react(), tailwindcss()],
+  /**
+   * O aplicativo saía num arquivo só de 2,9 MB (815 KB comprimidos). No 4G de
+   * um tablet isso é dezena de segundos de tela branca antes do primeiro
+   * desenho — e é a primeira impressão de quem abre o link.
+   *
+   * A separação não diminui o total baixado na primeira visita; ela muda o que
+   * acontece DEPOIS. React e Firebase quase não mudam entre uma publicação e
+   * outra: em pedaço próprio, o navegador os guarda e a atualização seguinte
+   * só rebaixa o pedaço do SAGA. Como o app se republica a cada mudança, essa
+   * é a diferença entre a criança esperar tudo de novo toda semana ou não.
+   */
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom"],
+          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+        },
+      },
+    },
+  },
   test: {
     // O acervo histórico não é código vivo: mantê-lo fora da suíte impede que
     // testes de cópias antigas inflem a contagem e mascarem a saúde real.
