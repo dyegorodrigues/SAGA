@@ -42,6 +42,8 @@ import { describe, expect, it } from "vitest";
 
 const PASTA = resolve(__dirname);
 const CASCA = resolve(__dirname, "..", "KidHomeScreen.tsx");
+/** A porta da frente. Não é tela de criança, mas é a primeira coisa que se vê. */
+const PORTA = resolve(__dirname, "..", "LoginScreen.tsx");
 
 /** Emoji e símbolos decorativos. Faixas amplas de propósito: o portão erra para o lado de barrar. */
 const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2694}-\u{2697}]/u;
@@ -73,7 +75,7 @@ function arquivosDaCasa(): string[] {
   const daPasta = readdirSync(PASTA)
     .filter(n => n.endsWith(".tsx") && !n.includes(".test."))
     .map(n => resolve(PASTA, n));
-  return [...daPasta, CASCA];
+  return [...daPasta, CASCA, PORTA];
 }
 
 /**

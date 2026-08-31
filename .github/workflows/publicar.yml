@@ -1,0 +1,95 @@
+# Publica o SAGA como site estático, para a criança abrir num link.
+#
+# ## Por que este arquivo existe
+#
+# O aplicativo tinha noventa competências, quatro mil testes e nenhum jeito de
+# chegar num tablet. Faltava a última perna: um endereço.
+#
+# ## O que ele faz
+#
+# Roda a suíte inteira, constrói, e empurra o resultado para a branch
+# `gh-pages`. Quem serve o site é o GitHub Pages, de graça, a partir dessa
+# branch. Nada aqui toca `main`.
+#
+# **A suíte roda ANTES de publicar, e reprovar cancela a publicação.** Publicar
+# quebrado é pior do que não publicar: a criança abre, não funciona, e não
+# volta.
+#
+# ## O que falta um humano fazer, uma vez só
+#
+# Ligar o Pages no repositório: Settings → Pages → Source: **Deploy from a
+# branch** → branch `gh-pages`, pasta `/ (root)`. Enquanto isso não é feito, a
+# branch é construída e fica esperando; nada vai ao ar. O passo a passo está em
+# `PUBLICAR.md`, na raiz.
+name: Publicar o app
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - claude/gate-b-class-007-witnesses-q5i062
+
+concurrency:
+  group: publicar-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Nada vai ao ar vermelho.
+      - name: Suíte inteira
+        run: npm test
+
+      # O Pages de um repositório serve em `usuario.github.io/NOME/` — uma
+      # subpasta. Sem esta base, todo caminho absoluto do build apontaria para
+      # a raiz do domínio e a tela abriria em branco.
+      - name: Construir
+        run: npm run build
+        env:
+          SAGA_BASE: /${{ github.event.repository.name }}/
+
+      - name: Preparar a pasta publicada
+        run: |
+          # `.nojekyll`: sem isso o Pages roda Jekyll e ignora tudo que começa
+          # com sublinhado — o que apagaria arquivos do build sem avisar.
+          touch dist/.nojekyll
+          # Recarregar numa URL profunda cai no 404 do Pages. Servindo o mesmo
+          # HTML ali, o app abre e se recompõe sozinho.
+          cp dist/index.html dist/404.html
+
+      - name: Empurrar para gh-pages
+        run: |
+          set -euo pipefail
+          cd dist
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "publicação automática de ${GITHUB_SHA::7}"
+          git push -q --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD:gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Onde ficou
+        run: |
+          dono="${GITHUB_REPOSITORY%%/*}"
+          repo="${GITHUB_REPOSITORY##*/}"
+          echo "### O app foi construído e empurrado para \`gh-pages\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Assim que o Pages estiver ligado (Settings → Pages → Deploy from a branch → \`gh-pages\` → \`/ (root)\`), o endereço é:" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "**https://${dono,,}.github.io/${repo}/**" >> "$GITHUB_STEP_SUMMARY"

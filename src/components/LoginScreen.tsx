@@ -1,3 +1,4 @@
+import { Icone } from "./icones/Icone";
 import React, { useState } from "react";
 import { loginAnonymously, loginWithGoogle } from "../lib/firebase";
 import { C, FONT, sfx } from "./Mascot";
@@ -32,9 +33,9 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
     } catch (err: any) {
       console.error(err);
       if (err.code === "auth/popup-blocked") {
-        setError("Ops! O navegador bloqueou a janela de login do Google. Ative os pop-ups e tente novamente! 🔑");
+        setError("O navegador bloqueou a janela do Google. Libere os pop-ups e tente de novo.");
       } else if (err.code === "auth/popup-closed-by-user" || err.code === "auth/user-cancelled" || err.message?.includes("auth/user-cancelled")) {
-        setError("Login cancelado. Quando estiver pronto, clique para tentar novamente! 😊");
+        setError("Login cancelado. Quando quiser, é só tentar de novo.");
       } else {
         setError("Erro ao conectar com a Conta Google. Verifique sua conexão e tente novamente!");
       }
@@ -72,29 +73,30 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
       {/* Background visual elements */}
       <div className="absolute -top-12 -left-12 w-28 h-28 bg-indigo-50 rounded-full opacity-60 pointer-events-none" />
       <div className="absolute -bottom-12 -right-12 w-28 h-28 bg-emerald-50 rounded-full opacity-60 pointer-events-none" />
-      <div className="absolute top-4 left-4 text-2xl opacity-20 pointer-events-none">⭐</div>
-      <div className="absolute bottom-4 right-4 text-2xl opacity-20 pointer-events-none">✨</div>
-
       <div className="mb-6 relative z-10">
-        <span className="text-6xl inline-block mb-3 animate-[mkSway_3.5s_ease-in-out_infinite] transform-origin-bottom">
-          🥋
+        {/* A raposa é o Tutor — a mesma arte da barra de abas lá dentro, para
+            a porta da frente e a casa serem o mesmo aplicativo. */}
+        <span className="inline-flex justify-center mb-3 animate-[mkSway_3.5s_ease-in-out_infinite]">
+          <Icone nome="tutor" tamanho={76} />
         </span>
+        {/*
+          Era "SAGA IA", com dois selos ao lado: "Jogos Educativos 🎮" e "Nuvem
+          Ativa ☁️". Os três diziam a coisa errada. "IA" é como o app foi
+          FEITO, não o que ele é — quem instala quer saber que é matemática.
+          "Nuvem Ativa" é estado de sistema, informação de quem opera. E os dois
+          selos ocupavam o lugar da única frase que o pai precisa ler.
+        */}
         <h2 className="text-3.5xl font-black text-slate-850 tracking-tight leading-none" style={{ fontFamily: FONT }}>
-          SAGA <span className="text-indigo-600">IA</span>
+          SAGA
         </h2>
-        <div className="flex items-center justify-center gap-1 mt-2">
-          <span className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
-            Jogos Educativos 🎮
-          </span>
-          <span className="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
-            Nuvem Ativa ☁️
-          </span>
-        </div>
+        <p className="text-[11px] font-black uppercase tracking-[0.18em] text-indigo-600 mt-2">
+          Matemática do 1º ao 5º ano
+        </p>
       </div>
 
       <div className="flex flex-col gap-4 relative z-10">
         <p className="text-slate-500 font-bold text-sm leading-relaxed max-w-[280px] mx-auto">
-          Crie ou recupere o progresso das crianças com segurança na nuvem!
+          Entre para guardar o progresso das crianças na nuvem — ou comece agora mesmo, sem conta.
         </p>
 
         {/* Primary Action: Google Sign-In */}
@@ -164,7 +166,7 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
 
       <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col items-center gap-2 relative z-10">
         <span className="text-xs text-slate-400 font-bold">
-          Quer começar rápido sem e-mail?
+          Prefere começar sem e-mail?
         </span>
         <button
           onClick={handleAnonymousLogin}
@@ -172,7 +174,7 @@ export function LoginScreen({ onLoginSuccess, onContinueAsVisitor }: LoginScreen
           className="w-full relative overflow-hidden select-none transition-all active:translate-y-1 active:scale-[0.98] py-2.5 px-4 text-slate-700 font-black cursor-pointer text-sm rounded-xl border-2 border-slate-200 bg-slate-50 hover:bg-slate-100 flex items-center justify-center gap-2"
           style={{ fontFamily: FONT }}
         >
-          <span>Começar sem Conta (Rápido) ⚡</span>
+          <span>Começar sem Conta</span>
         </button>
       </div>
     </div>
