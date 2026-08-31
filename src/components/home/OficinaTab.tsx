@@ -1,4 +1,5 @@
 import React from "react";
+import { Icone } from "../icones/Icone";
 import { FONT, sfx } from "../Mascot";
 import { AulaPlan, RescuePlanItem, RescueReason } from "../../curriculum/motores/composer";
 
@@ -31,12 +32,12 @@ export function OficinaTab({ aulaPlan, onTrack }: Props) {
     <div className="animate-[mkPop_0.25s_ease-out_1]">
       <div className="text-center mb-6 mt-2"> 
          <h2 className="text-2xl font-black text-emerald-900" style={{ fontFamily: FONT }}>Oficina</h2> 
-         <p className="text-sm font-bold text-slate-500 mt-1">Aventura e Recuperação 🔧</p>
+         <p className="text-sm font-bold text-slate-500 mt-1">O que vale treinar de novo.</p>
       </div>
 
       {aulaPlan.resgates.length === 0 ? (
          <div className="text-center p-8 border-4 border-dashed border-slate-200 rounded-3xl bg-slate-50">
-           <span className="text-4xl mb-4 block opacity-50">✨</span>
+           <span className="mb-4 flex justify-center opacity-50"><Icone nome="estrela" tamanho={44} /></span>
            <p className="text-sm font-bold text-slate-400">Nenhuma missão de resgate necessária no momento. Você está indo super bem!</p>
          </div>
       ) : (
@@ -63,7 +64,7 @@ export function OficinaTab({ aulaPlan, onTrack }: Props) {
                     </div>
                   )}
                 </div>
-                <span className="text-2xl">🔧</span>
+                <Icone nome="oficina" tamanho={24} />
              </button>
            ))}
          </div>

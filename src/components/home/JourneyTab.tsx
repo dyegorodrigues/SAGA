@@ -3,7 +3,7 @@ import { Kid, Track } from "../../types";
 import { FONT, FRESH } from "../Mascot";
 import { LearningPath } from "../LearningPath";
 import { SUBJECTS } from "../../subjects";
-import { UnlockStatus } from "../../curriculum/motores/unlockEngine";
+import { isTrackUnlocked, UnlockStatus } from "../../curriculum/motores/unlockEngine";
 
 interface Props {
   kid: Kid;
@@ -33,27 +33,28 @@ export function JourneyTab({ kid, prog, tracks: allMathTracks, unlockStatus, onT
     return t.map(track => ({ ...track, island: track.island || subject.id }));
   })();
 
-  // --- DIAGNÓSTICO E CÁLCULO DE TEMPO ---
-  // Calcula o progresso real da criança na matéria ativa
-  const tracksWithProg = tracks.filter(t => prog[t.id]);
+  /**
+   * O painel de progresso da criança.
+   *
+   * Aqui havia uma estimativa de TEMPO RESTANTE — "31h 15m restantes" na
+   * primeira vez que a criança abre o mapa. Duas coisas erradas de uma vez:
+   *
+   * - **Diz o que falta, não o que ela fez.** Para quem está em zero, o painel
+   *   inteiro anunciava "zero de noventa" e "trinta e uma horas pela frente".
+   *   Isso desanima um adulto; numa criança de seis anos é pior.
+   * - **É informação de adulto.** Quanto tempo o programa ainda leva é pergunta
+   *   de quem planeja a rotina — e essa pergunta tem resposta no painel dos
+   *   pais, que é onde a estimativa continua existindo.
+   *
+   * O que ficou é o que a criança pode usar: quantas ela já dominou, e quantas
+   * estão ABERTAS agora — o número que responde "o que eu posso fazer hoje".
+   */
   const completedTracks = tracks.filter(t => (prog[t.id]?.lvl || 0) >= 5);
   const totalTracks = tracks.length;
-  
-  // Média de questões (tot) feitas por trilha iniciada
-  const totalTot = tracksWithProg.reduce((acc, t) => acc + (prog[t.id]?.tot || 0), 0);
-  const avgTotPerTrack = tracksWithProg.length ? Math.round(totalTot / tracksWithProg.length) : 0;
-  
-  // Estimativa de tempo baseado na premissa: 1 questão ~ 25 segundos
-  const avgSecondsPerTrack = avgTotPerTrack * 25; 
-  const estimatedSecondsRemaining = (totalTracks - completedTracks.length) * (avgSecondsPerTrack || (50 * 25)); // fallback: 50 questões/trilha
-  
-  const formatTime = (seconds: number) => {
-    if (seconds === 0) return "--";
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) return `${hours}h ${mins}m`;
-    return `${mins}m`;
-  };
+
+  // A MESMA função que o mapa usa para decidir se o nó abre. Recontar a regra
+  // aqui daria um número que discorda do que a criança vê logo abaixo.
+  const abertasAgora = tracks.filter(t => isTrackUnlocked(t.id, t.graphId, unlockStatus)).length;
 
   const progressPct = totalTracks > 0 ? Math.round((completedTracks.length / totalTracks) * 100) : 0;
 
@@ -62,32 +63,32 @@ export function JourneyTab({ kid, prog, tracks: allMathTracks, unlockStatus, onT
       <div className="mb-10">
          <div className="text-center mb-6 mt-4">
            <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Jornada</h2>
-           <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha de aventuras!</p>
+           <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha. Uma de cada vez.</p>
          </div>
 
          {/* Painel de Diagnóstico do Programa da Jornada */}
          <div className="mb-8 mx-2 bg-white rounded-3xl p-5 border-2 border-indigo-100 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
             <h3 className="text-sm font-black text-indigo-900 mb-4" style={{ fontFamily: FONT }}>
-               📊 Diagnóstico do Programa
+               Seu progresso
             </h3>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
                <div className="bg-indigo-50/50 rounded-2xl p-3 border border-indigo-100">
                   <div className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest mb-1">
-                     Domínio Atual
+                     Você já dominou
                   </div>
                   <div className="text-xl font-black text-indigo-700">
-                     {completedTracks.length} <span className="text-sm font-bold text-indigo-400">/ {totalTracks} Trilhas</span>
+                     {completedTracks.length} <span className="text-sm font-bold text-indigo-400">de {totalTracks}</span>
                   </div>
                </div>
                
                <div className="bg-emerald-50/50 rounded-2xl p-3 border border-emerald-100">
                   <div className="text-[10px] font-extrabold text-emerald-500 uppercase tracking-widest mb-1">
-                     Tempo Estimado
+                     Abertas agora
                   </div>
                   <div className="text-xl font-black text-emerald-700">
-                     {formatTime(estimatedSecondsRemaining)} <span className="text-sm font-bold text-emerald-500">restantes</span>
+                     {abertasAgora} <span className="text-sm font-bold text-emerald-500">para jogar</span>
                   </div>
                </div>
             </div>
@@ -101,7 +102,7 @@ export function JourneyTab({ kid, prog, tracks: allMathTracks, unlockStatus, onT
                </div>
             </div>
             <div className="text-right text-[10px] font-bold text-slate-400">
-              {progressPct}% das competências desta Jornada
+              {progressPct}% desta Jornada
             </div>
          </div>
 

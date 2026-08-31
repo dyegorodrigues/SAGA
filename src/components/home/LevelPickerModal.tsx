@@ -54,7 +54,7 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
           }}
           className="absolute top-3.5 right-3.5 w-9 h-9 rounded-md border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
         >
-          ✕
+          ×
         </button>
         <div className="text-center mb-5 mt-2">
           {/* Mesmo disco branco do nó do mapa, e pelo mesmo motivo: a arte é
@@ -73,12 +73,12 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
           </h3>
           <p className="text-xs text-slate-500 font-bold mt-1">
             {templeId
-              ? "Treine livremente qualquer faixa que o Sensei já tornou segura. 🥋"
-              : "Escolha o nível de dificuldade para jogar agora! 🎯"}
+              ? "Treine à vontade qualquer faixa que o Sensei já abriu."
+              : "Escolha o nível para jogar agora."}
           </p>
           {templeId && dojoCeiling === 0 && (
             <p className="mt-2 text-[11px] font-extrabold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-              Primeiro vamos construir essa ideia com o Sensei. O treino de velocidade abre depois. 🌱
+              Primeiro vamos montar essa ideia com o Sensei. O treino de velocidade abre depois.
             </p>
           )}
         </div>
@@ -95,7 +95,7 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
             className={`w-full mb-3 flex items-center justify-center gap-2 p-3 rounded-2xl border-2 font-black transition-all shadow-sm ${dojoAutoBlocked ? "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed" : "border-indigo-200 bg-indigo-50 text-indigo-700 active:translate-y-0.5"}`}
             style={{ fontFamily: FONT }}
           >
-            <span className="text-xl">🧠</span>
+            <Icone nome="estrela" tamanho={20} />
             {dojoAutoBlocked ? "Treino automático ainda bloqueado" : "Treino Inteligente (Automático)"}
           </button>
         )}
@@ -128,7 +128,7 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
                     color: won ? "#fff" : "#94A3B8",
                   }}
                 >
-                  {dojoLocked ? "🔒" : p.dom && lvl === 5 && !templeId ? "👑" : lvl}
+                  {dojoLocked ? <Icone nome="travada" tamanho={20} /> : p.dom && lvl === 5 && !templeId ? <Icone nome="coroa" tamanho={20} /> : lvl}
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-xs font-black" style={{ fontFamily: FONT, color: dojoLocked ? "#94A3B8" : C.ink }}>
@@ -146,7 +146,7 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
                     <span className="block text-[10px] text-slate-400 font-bold mt-0.5">Abre quando os fundamentos desta faixa estiverem firmes.</span>
                   )}
                 </span>
-                <span className="text-slate-300 font-black">{dojoLocked ? "" : "▶"}</span>
+                <span className="text-slate-300 font-black">{dojoLocked ? "" : "›"}</span>
               </button>
             );
           })}

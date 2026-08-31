@@ -54,7 +54,7 @@ function renderMaster(mixedAvailable: boolean) {
       onGardenTrack={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: /Dojo Sensei/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Dojo do Sensei/ }));
   return onMixed;
 }
 
@@ -142,7 +142,7 @@ describe("P8 — DojoTab consome o Jardim real", () => {
         },
       },
     );
-    expect(screen.getByText("✨ Reflexo")).toBeTruthy();
+    expect(screen.getByText("Reflexo")).toBeTruthy();
     expect(screen.getByText("Treino: 3/5")).toBeTruthy();
     expect(screen.getByText("Melhor: 5/5")).toBeTruthy();
   });

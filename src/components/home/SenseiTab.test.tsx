@@ -96,6 +96,8 @@ function renderSensei(
       onTrack={vi.fn()}
       onMixed={onMixed}
       setActiveShellTab={vi.fn()}
+      tracks={[]}
+      unlockStatus={{ unlocked: [], locked: [], frontier: [] } as any}
     />,
   );
   return { onSenseiDojo, onAula, onMixed };
@@ -108,12 +110,12 @@ describe("SenseiTab — missão prescrita do Dojo", () => {
     expect(screen.getByText("A Aventura do Sensei")).toBeTruthy();
     expect(screen.getByText(/Templo da Soma · faixa 2/)).toBeTruthy();
     expect(screen.getByText(/automatizar esta faixa/)).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Fazer round prescrito/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Fazer este treino/ })).toBeTruthy();
   });
 
   it("clicar no round chama somente a rota prescrita, sem misturar Aula ou Misto", () => {
     const { onSenseiDojo, onAula, onMixed } = renderSensei(prescription);
-    fireEvent.click(screen.getByRole("button", { name: /Fazer round prescrito/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Fazer este treino/ }));
 
     expect(onSenseiDojo).toHaveBeenCalledTimes(1);
     expect(onAula).not.toHaveBeenCalled();
@@ -123,7 +125,7 @@ describe("SenseiTab — missão prescrita do Dojo", () => {
   it("sem prescrição não inventa uma missão adaptativa", () => {
     renderSensei(null);
     expect(screen.queryByText(/Prescrição do Sensei/)).toBeNull();
-    expect(screen.queryByRole("button", { name: /Fazer round prescrito/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Fazer este treino/ })).toBeNull();
   });
 
   it("não exibe recomendação curricular paralela baseada em estrelas", () => {
@@ -133,13 +135,13 @@ describe("SenseiTab — missão prescrita do Dojo", () => {
 
   it("esconde o Misto enquanto o repertório dominado for insuficiente", () => {
     const { onMixed } = renderSensei(null, { kind: "lesson" }, false);
-    expect(screen.queryByText(/Mistura Total/)).toBeNull();
+    expect(screen.queryByText(/Mistura Geral/)).toBeNull();
     expect(onMixed).not.toHaveBeenCalled();
   });
 
   it("mantém o Misto opcional quando o repertório já é seguro", () => {
     const { onMixed } = renderSensei(null, { kind: "lesson" }, true);
-    const mixed = screen.getByRole("button", { name: /Mistura Total/ });
+    const mixed = screen.getByRole("button", { name: /Mistura Geral/ });
     fireEvent.click(mixed);
     expect(onMixed).toHaveBeenCalledTimes(1);
   });
@@ -149,12 +151,12 @@ describe("SenseiTab — Jardim causal", () => {
   it("torna a descida perceptual explícita sem parecer uma Aula conceitual normal", () => {
     renderSensei(null, { kind: "garden", prescription: gardenPrescription });
 
-    expect(screen.getByText(/Aula do Dia · Base Perceptual/)).toBeTruthy();
-    expect(screen.getByText(/Transformar em reflexo: Jardim · Olhômetro Relâmpago/)).toBeTruthy();
-    expect(screen.getByText(/Base já compreendida:/)).toBeTruthy();
+    expect(screen.getByText(/Hoje · deixar rápido/)).toBeTruthy();
+    expect(screen.getByText(/Ficar rápido em: Jardim · Olhômetro Relâmpago/)).toBeTruthy();
+    expect(screen.getByText(/Você já entende:/)).toBeTruthy();
     expect(screen.getByText("Subitização perceptual (Olhômetro)")).toBeTruthy();
-    expect(screen.getByText(/Round curto de/)).toBeTruthy();
-    expect(screen.getByRole("button", { name: /Começar Jardim Guiado/ })).toBeTruthy();
+    expect(screen.getByText(/curtinhos, para ficar rápido/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Vamos treinar/ })).toBeTruthy();
   });
 
   it("o CTA do Jardim usa a mesma porta principal e não dispara Dojo prescrito ou Misto", () => {
@@ -162,7 +164,7 @@ describe("SenseiTab — Jardim causal", () => {
       prescription,
       { kind: "garden", prescription: gardenPrescription },
     );
-    fireEvent.click(screen.getByRole("button", { name: /Começar Jardim Guiado/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Vamos treinar/ }));
 
     expect(onAula).toHaveBeenCalledTimes(1);
     expect(onSenseiDojo).not.toHaveBeenCalled();

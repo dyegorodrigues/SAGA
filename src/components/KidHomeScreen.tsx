@@ -147,7 +147,7 @@ export function KidHomeScreen({
               Oi, {kid.name}! {kid.avatar}
             </div>
             <div className="text-xs text-slate-500 font-bold underline decoration-slate-300 underline-offset-2">
-              Ver Meu Perfil 🌟
+              Ver Meu Perfil
             </div>
           </button>
         </div>
@@ -166,7 +166,7 @@ export function KidHomeScreen({
                 whiteSpace: "nowrap",
               }}
             >
-              🔥 {streak} {streak === 1 ? "dia" : "dias"}
+              <Icone nome="fronteira" tamanho={14} /> {streak} {streak === 1 ? "dia" : "dias"}
             </span>
           )}
           <CoinChip n={coins} />
@@ -176,7 +176,7 @@ export function KidHomeScreen({
       <div className="flex-1 overflow-y-auto px-4 pt-4 pb-24 scrollbar-hide">
         {activeShellTab === "sensei" && (
           <SenseiTab
-            kid={kid} prog={prog} aulaPlan={aulaPlan}
+            kid={kid} prog={prog} aulaPlan={aulaPlan} tracks={tracks} unlockStatus={unlockStatus}
             senseiEntry={senseiEntry} dojoPrescription={dojoPrescription}
             mixedAvailable={mixedAvailable}
             onMatricula={onMatricula} onAula={startSenseiMission} onSenseiDojo={startSenseiDojoMission}

@@ -10,7 +10,7 @@
   "src/components/home/DojoTab.tsx": 31,
   "src/components/home/LevelPickerModal.tsx": 5,
   "src/components/home/PerfilTab.tsx": 8,
-  "src/components/home/SenseiTab.tsx": 25,
+  "src/components/home/SenseiTab.tsx": 23,
   "src/components/KidHomeScreen.tsx": 3,
   "src/components/LoginScreen.tsx": 6,
   "src/components/Mascot.tsx": 56,

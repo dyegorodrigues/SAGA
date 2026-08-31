@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Icone } from "../icones/Icone";
 import { DojoTrackState, Progress, Track } from "../../types";
 import { FONT, sfx } from "../Mascot";
 import { JARDIM } from "../../curriculum/fichas/dojo/jardim";
@@ -126,7 +127,7 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
     <div className="animate-[mkPop_0.25s_ease-out_1]">
       <div className="text-center mb-6 mt-2">
         <h2 className="text-2xl font-black text-purple-900" style={{ fontFamily: FONT }}>Dojo Matemático</h2>
-        <p className="text-sm font-bold text-slate-500 mt-1">Treine até o que você aprendeu virar reflexo. ⚡</p>
+        <p className="text-sm font-bold text-slate-500 mt-1">Treine até sair sem pensar.</p>
       </div>
 
       <div className="flex bg-slate-100 rounded-xl p-1 mb-6 border-2 border-slate-200">
@@ -135,21 +136,21 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
           className={`flex-1 py-2 rounded-lg font-black text-sm transition-all ${mode === "garden" ? "bg-white shadow-sm text-green-700" : "text-slate-600 hover:text-slate-800"}`}
           style={{ fontFamily: FONT }}
         >
-          🪴 Jardim
+          Jardim
         </button>
         <button
           onClick={() => { sfx.tick(); setMode("sensei"); }}
           className={`flex-1 py-2 rounded-lg font-black text-sm transition-all ${mode === "sensei" ? "bg-white shadow-sm text-purple-700" : "text-slate-600 hover:text-slate-800"}`}
           style={{ fontFamily: FONT }}
         >
-          🦊 Dojo Sensei
+          Dojo do Sensei
         </button>
       </div>
 
       {mode === "garden" && (
         <div className="animate-[mkPop_0.2s_ease-out_1]">
           <div className="flex items-center gap-2 mb-2 pl-1">
-            <span className="text-xl">🌱</span>
+            <Icone nome="fronteira" tamanho={20} />
             <span className="font-bold text-slate-700" style={{ fontFamily: FONT, fontSize: 16 }}>
               Jardim do Dojo
             </span>
@@ -190,7 +191,7 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
                         background: state.unlocked ? track.color : "#E2E8F0",
                       }}
                     >
-                      {state.unlocked ? track.icon : "🔒"}
+                      {state.unlocked ? track.icon : <Icone nome="travada" tamanho={26} />}
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -200,7 +201,7 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
                         </div>
                         {state.mastered ? (
                           <span className="shrink-0 text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full bg-amber-100 text-amber-700">
-                            ✨ Reflexo
+                            Reflexo
                           </span>
                         ) : state.unlocked ? (
                           <span className="shrink-0 text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-full bg-emerald-100 text-emerald-700">
@@ -247,7 +248,7 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
 
           {gardenStats.unlocked === 0 && (
             <div className="mt-4 rounded-2xl bg-emerald-50 border-2 border-emerald-100 p-3 text-xs font-bold text-emerald-800 leading-relaxed">
-              🌱 O Jardim cresce junto com a Jornada. Continue aprendendo e os primeiros treinos vão abrir sozinhos.
+              O Jardim cresce junto com a Jornada. Continue aprendendo e os primeiros treinos abrem sozinhos.
             </div>
           )}
         </div>
@@ -257,7 +258,7 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
         <div className="animate-[mkPop_0.2s_ease-out_1]">
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3 pl-1">
-              <span className="text-xl">⛩️</span>
+              <Icone nome="dojo" tamanho={20} />
               <span className="font-bold text-slate-600" style={{ fontFamily: FONT, fontSize: 16 }}>
                 Os Templos
               </span>
@@ -282,7 +283,7 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
                     }}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="text-3xl mb-1">{open ? style.icon : "🔒"}</div>
+                      <div className="text-3xl mb-1 flex items-center justify-center">{open ? style.icon : <Icone nome="travada" tamanho={28} />}</div>
                       {open && (
                         <span className="text-[9px] font-black rounded-full bg-white/80 px-2 py-1 text-slate-600">
                           {state.currentStep}/{maxEligibleStep}
@@ -316,9 +317,9 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
               >
                 <div className="flex items-center justify-between gap-3 mb-2">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md inline-block text-orange-900 bg-orange-200 border-2 border-orange-300">
-                    🦊 Desafio Opcional
+                    Se você quiser
                   </span>
-                  <span className="text-2xl">🏆</span>
+                  <Icone nome="coroa" tamanho={24} />
                 </div>
                 <div style={{ fontFamily: FONT, fontWeight: 800, fontSize: 18, color: "#9A3412" }}>
                   Treino Mestre (Misto)
@@ -334,15 +335,15 @@ export function DojoTab({ prog, dojoTracks = {}, mixedAvailable = false, onMixed
               >
                 <div className="flex items-center justify-between gap-3 mb-1.5">
                   <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md text-slate-600 bg-slate-200">
-                    🔒 Mestre em preparação
+                    Mestre em preparação
                   </span>
-                  <span className="text-xl">🏆</span>
+                  <Icone nome="coroa" tamanho={20} />
                 </div>
                 <div className="font-black text-slate-600" style={{ fontFamily: FONT }}>
                   Treino Mestre (Misto)
                 </div>
                 <div className="text-[11px] font-bold mt-1 leading-snug text-slate-500">
-                  Domine pelo menos duas habilidades. Depois o Mestre mistura somente o repertório que você já conquistou.
+                  Domine pelo menos duas habilidades. Depois o Mestre mistura só o que você já conquistou.
                 </div>
               </div>
             )}

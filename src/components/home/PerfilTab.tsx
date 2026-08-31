@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { Icone } from "../icones/Icone";
 
 import { State, Kid } from "../../types";
 import { FONT, sfx, TOTAL_STICKERS } from "../Mascot";
@@ -53,7 +54,7 @@ export function PerfilTab({
     <div className="animate-[mkPop_0.25s_ease-out_1]">
       <div className="text-center mb-5 mt-2">
         <h2 className="text-2xl font-black text-amber-900" style={{ fontFamily: FONT }}>Meu Perfil</h2>
-        <p className="text-sm font-bold text-slate-500 mt-1">Sua jornada, conquistas e companheiro 🌟</p>
+        <p className="text-sm font-bold text-slate-500 mt-1">Sua jornada, suas conquistas e seu companheiro.</p>
       </div>
 
       {/* Nível do JOGADOR: identidade persistente da criança, separado do mascote. */}
@@ -62,12 +63,12 @@ export function PerfilTab({
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.14em] text-indigo-500">Jornada SAGA</div>
             <div className="text-2xl font-black text-indigo-950" style={{ fontFamily: FONT }}>
-              Nível {player.level} <span className="text-base">⚔️</span>
+              Nível {player.level}
             </div>
           </div>
           <div className="text-right">
             <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">XP vitalício</div>
-            <div className="text-lg font-black text-amber-500">⭐ {player.xp}</div>
+            <div className="text-lg font-black text-amber-500 flex items-center justify-center gap-1"><Icone nome="estrela" tamanho={18} />{player.xp}</div>
           </div>
         </div>
         <div className="mt-3 h-3 overflow-hidden rounded-full border border-indigo-100 bg-white shadow-inner">
@@ -87,7 +88,7 @@ export function PerfilTab({
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-600">Atlas de Habilidades</div>
-            <div className="text-lg font-black text-slate-900" style={{ fontFamily: FONT }}>Minhas Insígnias 🏅</div>
+            <div className="text-lg font-black text-slate-900" style={{ fontFamily: FONT }}>Minhas Insígnias</div>
             <p className="text-[10px] font-bold text-slate-400 mt-0.5">Insígnias máximas só aparecem com domínio matemático real.</p>
           </div>
           <div className="rounded-2xl bg-amber-50 border border-amber-200 px-3 py-2 text-center shrink-0">
@@ -116,7 +117,7 @@ export function PerfilTab({
           </div>
         ) : (
           <div className="rounded-2xl bg-slate-50 p-3 text-center text-xs font-bold text-slate-400">
-            Suas primeiras insígnias vão nascer conforme você demonstra novas habilidades. 🌱
+            Suas primeiras insígnias aparecem conforme você mostra o que já sabe.
           </div>
         )}
 
@@ -128,7 +129,7 @@ export function PerfilTab({
                 title={skill.name}
                 className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-black text-amber-800"
               >
-                {skill.icon} {skill.id} 👑
+                {skill.icon} {skill.id} <Icone nome="coroa" tamanho={14} />
               </span>
             ))}
           </div>
@@ -172,7 +173,7 @@ export function PerfilTab({
             boxShadow: `0 2px 0 #CA8A04`,
           }}
         >
-          <span>🎨 Mudar Cenário do Companheiro</span>
+          <span>Mudar o cenário do companheiro</span>
         </button>
       </div>
 
@@ -188,7 +189,7 @@ export function PerfilTab({
           <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-pink-900 bg-pink-200 border-2 border-pink-300 rounded-md inline-block">
             Sua Coleção
           </span>
-          <span className="text-2xl">📖</span>
+          <Icone nome="jornada" tamanho={24} />
         </div>
         <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#831843" }}>
           Álbum de Figurinhas

@@ -56,7 +56,7 @@ import { AdminGodPanel } from "./components/AdminGodPanel";
 import { AdminDashboardScreen } from "./components/AdminDashboardScreen";
 import { GalleryScreen } from "./components/GalleryScreen";
 import { MascotEnvironment } from "./engine/mascot-v2/MascotEnvironment";
-import { shellRootClass } from "./components/layout/shellLayout";
+import { shellBoxClass, shellRootClass, telaDeAppInteiro } from "./components/layout/shellLayout";
 import { CURRENT_SCHEMA_VERSION, defaultState, localDay, migrate } from "./utils/migrator";
 
 /* ============================================================
@@ -156,8 +156,8 @@ export function Shell({ children, theme = "classico", screenName }: ShellExtProp
         @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
       `}</style>
 
-      <div className={`relative mx-auto w-full px-4 pt-5 pb-8 flex flex-col ${screenName === "game" ? "h-[100dvh] max-w-3xl overflow-hidden" : "min-h-screen max-w-md"}`}>
-        <div className={`relative z-10 flex flex-col ${screenName === "game" ? "flex-1 h-full overflow-hidden" : ""}`}>{children}</div>
+      <div className={shellBoxClass(screenName)}>
+        <div className={`relative z-10 flex flex-col ${telaDeAppInteiro(screenName) ? "flex-1 h-full overflow-hidden" : ""}`}>{children}</div>
       </div>
     </div>
   );

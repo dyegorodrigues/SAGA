@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Icone } from "../icones/Icone";
 import { Kid } from "../../types";
 import { FONT, sfx, CoinChip, Mascote } from "../Mascot";
 
@@ -66,7 +67,7 @@ export function WardrobeModal({
         setTempBg(item.id);
       } else {
         sfx.wrong();
-        alert("Você precisa de mais moedinhas para comprar este item! Complete missões! 🪙💪");
+        alert("Faltam moedinhas para este item. Faça mais missões para ganhar mais!");
       }
     }
   };
@@ -93,11 +94,11 @@ export function WardrobeModal({
           }}
           className="absolute top-3.5 right-3.5 w-9 h-9 rounded-md border-2 border-slate-200 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-100 transition-all cursor-pointer"
         >
-          ✕
+          ×
         </button>
         <div className="text-center mb-4">
           <h3 className="text-xl font-black text-amber-950" style={{ fontFamily: FONT }}>
-            Cenário Mágico 🌌
+            Cenário Mágico
           </h3>
           <p className="text-xs text-slate-500 font-bold">
             Mude o cenário de fundo do seu mascote com suas estrelas!
@@ -158,7 +159,7 @@ export function WardrobeModal({
                           : "text-slate-400 bg-slate-100 border-2 border-slate-200 cursor-not-allowed"
                       }`}
                     >
-                      Comprar 🪙{item.cost}
+                      Comprar por {item.cost}
                     </button>
                   )}
                 </div>
@@ -172,7 +173,7 @@ export function WardrobeModal({
             className="w-full bg-emerald-500 text-white font-black py-3.5 px-5 rounded-2xl shadow-md border-b-4 border-emerald-700 active:translate-y-0.5 active:border-b-2 transition-all text-sm cursor-pointer"
             style={{ fontFamily: FONT }}
           >
-            Confirmar Cenário! 👍
+            Confirmar Cenário
           </button>
         </div>
       </div>
