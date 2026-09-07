@@ -1,3 +1,4 @@
+import { Icone } from "../icones/Icone";
 import React, { useEffect, useRef, useState } from "react";
 import { C, FONT, speak, stopSpeak, sfx } from "../Mascot";
 import PlaceScene, { Place } from "./PlaceScene";
@@ -112,7 +113,7 @@ export default function JourneyScene({ journey, sound, onDone }: Props) {
           className="select-none cursor-pointer active:translate-y-0.5 transition-all"
           style={{ fontFamily: FONT, fontWeight: 800, fontSize: 13, color: C.grape, background: "#F1EDFF", border: `2px solid ${C.grape}`, borderRadius: 12, padding: "8px 14px" }}
         >
-          🔊 Ouvir
+          <Icone nome="som" tamanho={18} /> Ouvir
         </button>
         <button
           onClick={next}

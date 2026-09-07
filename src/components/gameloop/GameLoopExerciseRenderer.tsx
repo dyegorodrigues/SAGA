@@ -1,3 +1,4 @@
+import { Icone } from "../icones/Icone";
 import React from "react";
 import { AnswerMeta, Question } from "../../types";
 import { RapidFire } from "../exercises/RapidFire";
@@ -597,7 +598,7 @@ export function GameLoopExerciseRenderer({
                 className="px-1 cursor-pointer active:scale-[0.98] transition-transform"
                 style={{ fontFamily: BODY, fontWeight: 800, fontSize: 17, color: C.ink, textAlign: "center", lineHeight: 1.5 }}
               >
-                🔊 {q.story}
+                <Icone nome="som" tamanho={18} /> {q.story}
               </div>
               <div style={{ color: C.sub, fontWeight: 700, fontSize: 11, textAlign: "center", marginTop: 10 }}>
                 👂 Toque na frase para ouvir de novo, quantas vezes quiser!
@@ -800,7 +801,7 @@ export function GameLoopExerciseRenderer({
                       O 🔊 é só um selo indicativo — não é mais alvo de toque. */}
                   {q.audibleOptions && !status && (
                     <span className="absolute top-1 right-1.5 text-sm" style={{ pointerEvents: "none", opacity: armed ? 1 : 0.55 }}>
-                      {armed ? "👂" : "🔊"}
+                      <Icone nome={armed ? "ouvido" : "som"} tamanho={26} />
                     </span>
                   )}
                   {o.groups ? (

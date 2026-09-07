@@ -48,6 +48,7 @@ export function LevelPickerModal({ pickerTrack, prog, onClose, onTrackLvl, onTra
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white card-block border-4 p-6 max-w-sm w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]" style={{ borderColor: pickerTrack.color }}>
         <button
+          aria-label="Fechar"
           onClick={() => {
             sfx.tick();
             onClose();

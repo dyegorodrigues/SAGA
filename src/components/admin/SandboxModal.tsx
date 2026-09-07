@@ -1,3 +1,4 @@
+import { Icone } from "../icones/Icone";
 import React, { useState, useEffect } from 'react';
 import { SagaNode } from '../../utils/grafoSaga';
 import { getTrackById } from '../../curriculum/motores/curriculum';
@@ -106,7 +107,7 @@ function LevelSimulator({ lvl, track, ficha }: { lvl: number, track: Track, fich
         <h3 className="font-black text-sm">Nível {lvl}</h3>
         <div className="flex gap-2">
           {q && q.prompt && (
-             <button onClick={() => { stopSpeak(); speak(q.prompt); }} className="text-xs bg-indigo-600 px-2 py-1 rounded hover:bg-indigo-500">🔊</button>
+             <button onClick={() => { stopSpeak(); speak(q.prompt); }} className="text-xs bg-indigo-600 px-2 py-1 rounded hover:bg-indigo-500"><Icone nome="som" tamanho={28} /></button>
           )}
           <button onClick={() => setShowJson(!showJson)} className="text-xs bg-slate-600 px-2 py-1 rounded hover:bg-slate-500">{showJson ? '{ }' : 'UI'}</button>
           <button onClick={generateQ} className="text-xs bg-emerald-600 px-2 py-1 rounded hover:bg-emerald-500">🔄</button>

@@ -115,7 +115,14 @@ async function acoesDisponiveis(page) {
  * é pergunta do `npm run simular`**, que roda o motor de verdade com um
  * aprendiz que sabe acertar.
  */
-const CHROME = /^(✕|🔊|👉 Como faz\? 🫵|Avançar|Continuar|Ver Resultado|Sair|Voltar)$/i;
+// Os botões que NÃO são resposta: moldura da tela.
+//
+// O fechar era reconhecido pelo glifo `✕`. Isso quebrou no dia em que o glifo
+// virou `×` — o passeio passou a clicar em sair e a acusar que "a missão
+// terminou sozinha", uma falsa acusação causada pelo próprio instrumento.
+// Agora vai pelo NOME ACESSÍVEL, que é o que o app promete a quem usa leitor
+// de tela e por isso não muda por causa de estética.
+const CHROME = /^(Fechar|Sair da missão|🔊|👉 Como faz\? 🫵|Avançar|Continuar|Ver Resultado|Sair|Voltar)$/i;
 
 async function jogarMissao(page, maxRodadas = 12) {
   let rodadas = 0;
@@ -131,7 +138,13 @@ async function jogarMissao(page, maxRodadas = 12) {
     const total = Math.min(await alvos.count(), 14);
     for (let k = 0; k < total; k += 1) {
       const botao = alvos.nth(k);
-      const rotulo = ((await botao.innerText().catch(() => "")) || "").replace(/\s+/g, " ").trim();
+      // Nome ACESSÍVEL, e não o texto visível: um botão de ícone não tem texto,
+      // e é justamente ele que precisa ser reconhecido para não ser clicado.
+      const rotulo = (
+        (await botao.getAttribute("aria-label").catch(() => null)) ||
+        (await botao.innerText().catch(() => "")) ||
+        ""
+      ).replace(/\s+/g, " ").trim();
       if (CHROME.test(rotulo)) continue;
       await botao.click({ timeout: 1500 }).catch(() => {});
     }

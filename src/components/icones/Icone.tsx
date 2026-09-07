@@ -32,6 +32,13 @@ import React from "react";
  * Arte profissional, a mesma em todo aparelho, servida como arquivo estático
  * (não entra no bundle) e trocável um a um sem tocar em código.
  *
+ * ## Os dois do som
+ *
+ * `som`, `som-baixo` e `som-mudo` são o mesmo alto-falante em três estados, e
+ * `ouvido` é "estou escutando". Não é enfeite: as fichas que tocam áudio
+ * mostram um enquanto o som sai e outro quando para, e é assim que a criança
+ * que ainda não lê sabe se o botão funcionou.
+ *
  * ## O que este componente garante
  *
  * - **Nome do SAGA, não do Unicode.** Pede-se `"fracao"`, não `"pizza"`. O que
@@ -51,7 +58,8 @@ export type NomeDoIcone =
   | "tutor" | "jornada" | "dojo" | "oficina"
   | "travada" | "coroa" | "fronteira" | "estrela" | "moeda"
   | "contagem" | "posicional" | "adicao" | "multiplicacao" | "fracao"
-  | "porcento" | "reta" | "balanca" | "formas" | "regua" | "barras";
+  | "porcento" | "reta" | "balanca" | "formas" | "regua" | "barras"
+  | "som" | "som-baixo" | "som-mudo" | "ouvido";
 
 interface Props {
   nome: NomeDoIcone;

@@ -121,7 +121,13 @@ describe("F05 — roteiro real de ouvir e escolher", () => {
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
 
     rerender(<AudioChoiceStage spec={s} mostrar={{ ondasSonoras: true }} />);
-    expect(screen.getByLabelText("Escutar o número").textContent).toContain("🔊");
+    // A arte de ONDAS, e não a de som baixo: é assim que a criança que ainda não
+    // lê sabe que o som está saindo. Antes isto se media pelo glifo `🔊` dentro
+    // do botão — que amarrava o teste a um emoji do sistema e quebrou no dia em
+    // que o botão passou a mostrar arte nossa. O estado é o que importa.
+    expect(
+      screen.getByLabelText("Escutar o número").querySelector("img")?.getAttribute("src"),
+    ).toMatch(/som\.svg$/);
     expect(screen.queryByRole("group", { name: "Números" })).toBeNull();
 
     rerender(<AudioChoiceStage spec={s} mostrar={{ pulsarOpcoes: true }} />);

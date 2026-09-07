@@ -1,3 +1,4 @@
+import { Icone } from "./icones/Icone";
 import React, { useState, useEffect, useRef } from "react";
 import { AnswerMeta, Kid, Track, Question, Progress, JardimTrackState } from "../types";
 import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
@@ -482,7 +483,7 @@ export function GameLoop({
     // painel dos pais. Nem som de erro — a criança não errou nada.
     if (!right && isMotorSlip(answerMeta)) {
       speak("Quase! Põe de novo com calma.");
-      setToast("Quase! Tenta de novo 🖐️");
+      setToast("Quase! Tenta de novo");
       setTimeout(() => setToast(null), 2000);
       return;
     }
@@ -503,7 +504,7 @@ export function GameLoop({
         setHiddenOpts((prev) => [...prev, val]);
         if (sound) sfx.wrong();
         speak("Ops, não é esse. Olha de novo!");
-        setToast("Olha de novo! 👀");
+        setToast("Olha de novo!");
         setTimeout(() => setToast(null), 2500);
         return; // não avança, não marca answeredRef
       }
@@ -568,11 +569,11 @@ export function GameLoop({
       p = progressResult.progress;
       diagnostics.misconceptionTags.forEach(tag => trackMisconception(p, tag));
       currentToast = progressResult.transition?.type === "level-up"
-        ? `Subiu para o nível ${progressResult.transition.level}! 🚀`
+        ? `Subiu para o nível ${progressResult.transition.level}!`
         : progressResult.transition?.type === "level-down"
-          ? "Vamos voltar um passinho para treinar! 💪"
+          ? "Vamos voltar um passinho para treinar!"
           : progressResult.transition?.type === "multidimensional-crown"
-            ? "DOMÍNIO ABSOLUTO! 👑✨"
+            ? "Você dominou esta competência!"
             : null;
     }
 
@@ -595,7 +596,7 @@ export function GameLoop({
             if (hits >= 2) {
               p.bank.splice(bi, 1);
               p.mast = (p.mast || 0) + 1;
-              if (!currentToast) currentToast = "Você dominou essa! 🧠✨";
+              if (!currentToast) currentToast = "Você dominou essa!";
             } else {
               p.bank[bi] = { ...p.bank[bi], hits };
             }
@@ -722,7 +723,9 @@ export function GameLoop({
     // O elogio TEMÁTICO (divertido/longo) é RARO de propósito: só no 1º acerto da
     // missão (auditoria do Zeus: elogio maluco toda hora cansa e vira ruído).
     // Ao ERRAR: o momento de ensino — mostra/fala o PORQUÊ (explain).
-    const SHORT_OK = ["Isso! 🎉", "Muito bem! ⭐", "Boa! 👏", "Acertou! 🌟", "Perfeito! ✨"];
+    // Sem emoji do sistema: o estouro de confete, o som e a estrela desenhada já
+// festejam. O emoji só acrescentava um desenho diferente em cada aparelho.
+const SHORT_OK = ["Isso!", "Muito bem!", "Boa!", "Acertou!", "Perfeito!"];
     const firstOkOfMission = right && ok === 0;
     const baseFb = feedbackAutoral ? "" : right
       ? (firstOkOfMission ? praises[Math.floor(Math.random() * praises.length)] : SHORT_OK[Math.floor(Math.random() * SHORT_OK.length)])
@@ -841,7 +844,7 @@ export function GameLoop({
     runCountAula(
       total,
       "Somar é JUNTAR os dois grupos! Vamos contar tudo, um por um:",
-      `${q.a} mais ${q.b}... contamos tudo junto: ${total}! 🎉`,
+      `${q.a} mais ${q.b}... contamos tudo junto: ${total}!`,
       isAuto
     );
   };
@@ -851,7 +854,7 @@ export function GameLoop({
     runCountAula(
       remains,
       "Tirar é ver o que SOBRA! Os riscados foram embora. Vamos contar só o que ficou:",
-      `Tiramos ${q.b} e sobraram ${remains}! 🎉`,
+      `Tiramos ${q.b} e sobraram ${remains}!`,
       isAuto
     );
   };
@@ -913,10 +916,14 @@ export function GameLoop({
           Aventura Concluída!
         </div>
         <div style={{ fontFamily: FONT, fontSize: 26, fontWeight: 700, color: C.sunDark, marginTop: 10 }}>
-          +{stars} ⭐{bonus > 0 && <span style={{ fontSize: 16, color: C.mintDark }}> (bônus especial!)</span>}
+          <span className="inline-flex items-center justify-center gap-1.5">
+            +{stars} <Icone nome="estrela" tamanho={26} />
+          </span>{bonus > 0 && <span style={{ fontSize: 16, color: C.mintDark }}> (bônus especial!)</span>}
         </div>
         <div style={{ fontFamily: FONT, fontSize: 22, fontWeight: 700, color: "#9A3412", marginTop: 4 }}>
-          +{coinsEarned} 🪙{firstMissionReward && <span style={{ fontSize: 14, color: C.mintDark }}> (bônus da primeira missão do dia!)</span>}
+          <span className="inline-flex items-center justify-center gap-1.5">
+            +{coinsEarned} <Icone nome="moeda" tamanho={22} />
+          </span>{firstMissionReward && <span style={{ fontSize: 14, color: C.mintDark }}> (bônus da primeira missão do dia!)</span>}
         </div>
         <div style={{ color: C.sub, fontWeight: 800, fontSize: 16, marginTop: 6 }}>
           {ok} de {totalQFor(track)} acertos!
@@ -938,7 +945,7 @@ export function GameLoop({
                 borderRadius: 8,
               }}
             >
-              Jogar de novo 🔁
+              Jogar de novo
             </button>
           )}
 
@@ -956,7 +963,7 @@ export function GameLoop({
               borderRadius: 8,
             }}
           >
-            Trocar por Amiguinhos 🎁
+            Trocar por Amiguinhos
           </button>
 
           <button
@@ -1000,6 +1007,7 @@ export function GameLoop({
       {/* Game navigation header */}
       <div className="mb-4 flex-shrink-0 flex items-center justify-between gap-3">
         <button
+          aria-label="Sair da missão"
           onClick={() => {
             sfx.tick();
             onExit();
@@ -1012,7 +1020,7 @@ export function GameLoop({
             boxShadow: `0 4px 0 ${C.line}`,
           }}
         >
-          ✕
+          ×
         </button>
         <ProgressBar idx={idx} total={totalQFor(track)} />
         <SoundBtn on={sound} onToggle={onToggleSound} />
@@ -1069,7 +1077,7 @@ export function GameLoop({
 
       {q.kind !== "audiochoice" && q.review && !status && (
         <div className="inline-block bg-indigo-50 text-indigo-700 border border-indigo-100 px-3 py-1 rounded-md text-xs font-bold mb-3">
-          🧠 Prática Espaçada / Revisão Inteligente
+          Isto você já viu — vamos lembrar
         </div>
       )}
 
@@ -1094,7 +1102,6 @@ export function GameLoop({
           }}
         >
           <span>{idx >= totalQFor(track) - 1 ? "Ver Resultado" : "Avançar"}</span>
-          <span>→</span>
         </button>
       )}
 
@@ -1102,25 +1109,27 @@ export function GameLoop({
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white card-block border-4 border-indigo-400 p-6 max-w-sm w-full shadow-2xl relative mk-pop select-none text-center">
             <button
+              aria-label="Fechar"
               onClick={() => {
                 sfx.tick();
                 setShowClockTutorial(false);
               }}
               className="absolute top-3 right-3 w-8 h-8 rounded-md border-2 border-slate-300 flex items-center justify-center font-bold text-slate-500 hover:bg-slate-50"
             >
-              ✕
+              ×
             </button>
-            <div className="text-4xl mb-2 animate-bounce">🧭</div>
+            <div className="mb-2 flex justify-center animate-bounce"><Icone nome="regua" tamanho={44} /></div>
             <h3 className="text-xl font-black text-indigo-900" style={{ fontFamily: FONT }}>
               Segredos do Reloginho!
             </h3>
             <p className="text-xs text-slate-500 font-bold mb-4">
-              Aprenda com o Mascote de forma super rápida! 💡
+              Dois ponteiros, duas coisas diferentes. É só isso.
             </p>
 
             <div className="space-y-4 text-left text-sm font-extrabold text-slate-700 leading-snug">
               <div className="flex items-start gap-3 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                <span className="text-xl">🖤</span>
+                {/* O ponteiro, e não um coração: curto e preto, como na tela. */}
+                <span className="w-4 h-1.5 rounded-full bg-slate-900 shrink-0 mt-1.5" />
                 <div>
                   <span className="text-indigo-950 font-bold">Ponteiro Curto (Preto):</span>
                   <p className="text-xs text-slate-500 font-bold mt-0.5">Ele aponta para as HORAS! Se apontar para o 3, são 3 horas.</p>
@@ -1128,7 +1137,8 @@ export function GameLoop({
               </div>
 
               <div className="flex items-start gap-3 bg-indigo-50 p-2.5 rounded-xl border border-indigo-100">
-                <span className="text-xl">💙</span>
+                {/* Longo e azul, como na tela — a diferença de comprimento é a lição. */}
+                <span className="w-7 h-1.5 rounded-full bg-blue-500 shrink-0 mt-1.5" />
                 <div>
                   <span className="text-indigo-600 font-bold">Ponteiro Longo (Azul):</span>
                   <p className="text-xs text-slate-500 font-bold mt-0.5">Ele aponta para os MINUTOS! Ele anda mais rápido.</p>
@@ -1136,7 +1146,7 @@ export function GameLoop({
               </div>
 
               <div className="flex items-start gap-3 bg-amber-50 p-2.5 rounded-xl border border-amber-100">
-                <span className="text-xl">⭐</span>
+                <Icone nome="estrela" tamanho={20} />
                 <div>
                   <span className="text-amber-800 font-bold">Se o Azul apontar para o 12:</span>
                   <p className="text-xs text-slate-500 font-bold mt-0.5">Significa hora exata! Minutos valem <span className="text-amber-600">00</span>.</p>
@@ -1144,7 +1154,8 @@ export function GameLoop({
               </div>
 
               <div className="flex items-start gap-3 bg-emerald-50 p-2.5 rounded-xl border border-emerald-100">
-                <span className="text-xl">🍕</span>
+                {/* O círculo com a metade preenchida: é a própria meia hora. */}
+                <Icone nome="fracao" tamanho={20} />
                 <div>
                   <span className="text-emerald-800 font-bold">Se o Azul apontar para o 6:</span>
                   <p className="text-xs text-slate-500 font-bold mt-0.5">Significa "meia hora", ou seja, <span className="text-emerald-600">30 minutos</span>!</p>
@@ -1160,7 +1171,7 @@ export function GameLoop({
               className="mt-5 w-full bg-indigo-600 text-white font-bold py-3 px-5 rounded-2xl shadow-md border-b-4 border-indigo-800 active:translate-y-0.5 active:border-b-2 transition-all text-sm"
               style={{ fontFamily: FONT }}
             >
-              Entendi! Vamos Jogar! 👍
+              Entendi! Vamos jogar
             </button>
           </div>
         </div>

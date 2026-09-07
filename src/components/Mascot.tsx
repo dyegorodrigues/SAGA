@@ -1,3 +1,4 @@
+import { Icone } from "./icones/Icone";
 import React from "react";
 import { AudioPlayer } from "./AudioPlayer";
 import { ThemeConfig } from "../types";
@@ -30,7 +31,9 @@ export const AVATARS = ["🦖", "🦄", "🐼", "🦊", "🐸", "🐙", "🦁", 
 export const EMO = ["🍎", "🐶", "⚽", "🍓", "🐟", "🚗", "🦆", "🌼", "🍪", "🎈", "🐞", "⭐"];
 export const PATPOOL = ["🍎", "🍌", "⚽", "🐶", "🌞", "🚗", "🍓", "🐸", "⭐", "🎈", "🐟", "🌼"];
 export const PATSETS = [["🍎", "🍌"], ["⚽", "🏀"], ["🐶", "🐱"], ["🌞", "🌙"], ["🚗", "🚌"], ["🍓", "🍇"], ["🐸", "🦆"]];
-export const PRAISE = ["Você acertou! Que orgulho! 🎉", "Uau, você mandou muito bem! ⭐", "Isso mesmo! Você é brilhante! 🥳", "Parabéns, meu amiguinho! Que inteligência! 💪", "Uhul! Que lindo acerto! ✨", "Perfeito! Você brilha como uma estrela! 🌟"];
+// Sem emoji do sistema: a festa é o mascote, o som e o estouro de confete. O
+// emoji só punha um desenho diferente em cada aparelho no meio do elogio.
+export const PRAISE = ["Você acertou! Que orgulho!", "Uau, você mandou muito bem!", "Isso mesmo! Você é brilhante!", "Parabéns, meu amiguinho! Que inteligência!", "Uhul! Que lindo acerto!", "Perfeito! Você brilha como uma estrela!"];
 export const OOPS = ["Hum, quase! Mas você está indo muito bem! A resposta certa está com a cor verde bem ali embaixo! 👇", "Tudo bem, errar faz parte do jogo! Dá uma olhadinha no botão verde que é a resposta certa. ✨", "Excelente tentativa! O certo está destacado em verde para você ver como é fácil. 💚", "Sem problemas, meu campeão! O balão verde mostra o caminho certo. Vamos para a próxima? 😊"];
 
 import { THEMES, THEME_EMOJIS } from "./mascots/MascotThemes";
@@ -362,7 +365,7 @@ export const CoinChip = ({ n }: { n: number }) => (
       whiteSpace: "nowrap",
     }}
   >
-    🪙 {n}
+    <Icone nome="moeda" tamanho={17} /> {n}
   </span>
 );
 
@@ -381,13 +384,13 @@ export const StarChip = ({ n }: { n: number }) => (
       whiteSpace: "nowrap",
     }}
   >
-    ⭐ {n}
+    <Icone nome="estrela" tamanho={17} /> {n}
   </span>
 );
 
 /**
  * As 5 bolinhas = níveis CONQUISTADOS da trilha (nunca regridem).
- * A bolinha do nível atual pulsa; Domínio Absoluto 👑 (3 seguidos no nível 5)
+ * A bolinha do nível atual pulsa; o domínio (3 seguidos no nível 5)
  * pinta tudo de dourado e coroa a trilha. É o nosso "SmartScore" — com carinho.
  */
 export const LevelDots = ({ lvl, conquered, dom, color }: { lvl: number; conquered?: number; dom?: boolean; color: string }) => {
@@ -536,7 +539,7 @@ export const SoundBtn = ({ on, onToggle }: { on: boolean; onToggle: () => void }
       boxShadow: `0 4px 0 ${C.line}`,
     }}
   >
-    {on ? "🔊" : "🔇"}
+    <Icone nome={on ? "som" : "som-mudo"} tamanho={20} />
   </button>
 );
 

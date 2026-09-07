@@ -1,3 +1,4 @@
+import { Icone } from "../icones/Icone";
 import React from "react";
 import { TouchPlace } from "./TouchPlace";
 import { PalcoEscalado } from "./PalcoEscalado";
@@ -244,7 +245,7 @@ export function TouchPlaceStage({ spec, onAnswer, disabled, falar, mostrar }: Pr
               className="flex items-center justify-center rounded-2xl"
               style={{ width: 56, height: 44, backgroundColor: "#F8FAFC", border: "2px solid #C7D7F0", fontSize: 22 }}
             >
-              <span aria-hidden>🔊</span>
+              <span aria-hidden><Icone nome="som" tamanho={28} /></span>
             </button>
           )}
 

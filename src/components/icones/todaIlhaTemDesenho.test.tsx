@@ -43,6 +43,7 @@ const TODOS_OS_NOMES: NomeDoIcone[] = [
   "travada", "coroa", "fronteira", "estrela", "moeda",
   "contagem", "posicional", "adicao", "multiplicacao", "fracao",
   "porcento", "reta", "balanca", "formas", "regua", "barras",
+  "som", "som-baixo", "som-mudo", "ouvido",
 ];
 
 describe("a arte dos ícones", () => {

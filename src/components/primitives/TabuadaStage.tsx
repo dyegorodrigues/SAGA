@@ -1,3 +1,4 @@
+import { Icone } from "../icones/Icone";
 import React from "react";
 import { Quadrado100 } from "./Quadrado100";
 import { Arranjo } from "./Arranjo";
@@ -115,7 +116,7 @@ export function TabuadaStage({ spec, onReplay }: Props) {
             aria-label="Ouvir a conta de novo"
             className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-indigo-300 bg-indigo-50 text-2xl"
           >
-            🔊
+            <Icone nome="som" tamanho={28} />
           </button>
         )}
       </div>

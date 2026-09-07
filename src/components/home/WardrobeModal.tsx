@@ -88,6 +88,7 @@ export function WardrobeModal({
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
       <div className="bg-white card-block border-4 border-amber-300 p-6 max-w-md w-full shadow-2xl relative mk-pop select-none flex flex-col max-h-[90vh]">
         <button
+          aria-label="Fechar"
           onClick={() => {
             sfx.tick();
             onClose();

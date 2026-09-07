@@ -1,3 +1,4 @@
+import { Icone } from "../icones/Icone";
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { tokens } from '../../styles/tokens';
@@ -134,7 +135,7 @@ export function AudioChoice({
         animate={pulsarBotao ? { scale: [1, 1.06, 1] } : { scale: 1 }}
         transition={{ duration: 1.2, repeat: pulsarBotao ? Infinity : 0 }}
       >
-        <span aria-hidden className="text-6xl">{mostrarOndas ? '🔊' : '🔈'}</span>
+        <span aria-hidden className="flex justify-center"><Icone nome={mostrarOndas ? "som" : "som-baixo"} tamanho={64} /></span>
         {mostrarOndas && (
           <motion.span
             aria-hidden

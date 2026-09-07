@@ -14,6 +14,10 @@ import { describe, expect, it } from "vitest";
  * > Perceptual" · "recuperar automaticidade" · "Fluência complementar" ·
  * > "revisão/reconstrução no radar" · "Tempo Estimado: 31h 15m restantes"
  *
+ * E dentro da própria missão, no selo que aparece quando a questão é uma
+ * revisão: **"🧠 Prática Espaçada / Revisão Inteligente"** — o nome que a
+ * literatura dá ao método, exibido para quem tem seis anos.
+ *
  * Nenhuma dessas frases é lida por quem tem seis anos — e seis anos é o COMEÇO
  * da Jornada, a idade com menos leitura do aplicativo inteiro. Uma tela que a
  * criança não lê é uma tela onde ela toca no que for maior e mais colorido: o
@@ -44,6 +48,8 @@ const PASTA = resolve(__dirname);
 const CASCA = resolve(__dirname, "..", "KidHomeScreen.tsx");
 /** A porta da frente. Não é tela de criança, mas é a primeira coisa que se vê. */
 const PORTA = resolve(__dirname, "..", "LoginScreen.tsx");
+/** A missão. É onde a criança passa a maior parte do tempo dentro do app. */
+const MISSAO = resolve(__dirname, "..", "GameLoop.tsx");
 
 /** Emoji e símbolos decorativos. Faixas amplas de propósito: o portão erra para o lado de barrar. */
 const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2190}-\u{21FF}\u{2300}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{2694}-\u{2697}]/u;
@@ -68,6 +74,9 @@ const PALAVRAS_DE_ADULTO: Array<[RegExp, string]> = [
   [/\bCompactar\b/i, '"Menos"'],
   [/\bExpandir\b/i, '"Mais"'],
   [/repertório/i, '"o que você já sabe"'],
+  [/Prática Espaçada/i, '"Isto você já viu — vamos lembrar"'],
+  [/Revisão Inteligente/i, '"Isto você já viu — vamos lembrar"'],
+  [/DOMÍNIO ABSOLUTO/i, '"Você dominou esta competência!"'],
 ];
 
 /** Os arquivos da casa, descobertos — não escritos à mão. */
@@ -75,7 +84,7 @@ function arquivosDaCasa(): string[] {
   const daPasta = readdirSync(PASTA)
     .filter(n => n.endsWith(".tsx") && !n.includes(".test."))
     .map(n => resolve(PASTA, n));
-  return [...daPasta, CASCA, PORTA];
+  return [...daPasta, CASCA, PORTA, MISSAO];
 }
 
 /**
