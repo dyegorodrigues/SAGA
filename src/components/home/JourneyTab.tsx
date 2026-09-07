@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Kid, Track } from "../../types";
 import { FONT, FRESH } from "../Mascot";
 import { LearningPath } from "../LearningPath";
+import { Icone, ICONE_DA_MATERIA } from "../icones/Icone";
 import { SUBJECTS } from "../../subjects";
 import { isTrackUnlocked, UnlockStatus } from "../../curriculum/motores/unlockEngine";
 
@@ -114,7 +115,7 @@ export function JourneyTab({ kid, prog, tracks: allMathTracks, unlockStatus, onT
                  onClick={() => setActiveSubject(s.id)}
                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full font-bold whitespace-nowrap transition-all shadow-sm shrink-0 border-2 ${activeSubject === s.id ? 'bg-indigo-600 border-indigo-700 text-white shadow-md scale-105' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
                >
-                 <span className="text-xl">{s.icon}</span>
+                 <Icone nome={ICONE_DA_MATERIA[s.id] || "estrela"} tamanho={22} />
                  {s.nome}
                </button>
              ))}

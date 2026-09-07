@@ -59,7 +59,8 @@ export type NomeDoIcone =
   | "travada" | "coroa" | "fronteira" | "estrela" | "moeda"
   | "contagem" | "posicional" | "adicao" | "multiplicacao" | "fracao"
   | "porcento" | "reta" | "balanca" | "formas" | "regua" | "barras"
-  | "som" | "som-baixo" | "som-mudo" | "ouvido";
+  | "som" | "som-baixo" | "som-mudo" | "ouvido"
+  | "materia-mundo" | "materia-portugues" | "materia-ingles" | "materia-ciencias";
 
 interface Props {
   nome: NomeDoIcone;
@@ -105,6 +106,27 @@ export function caminhoDoIcone(nome: NomeDoIcone): string {
  * nasça sem ícone e o teste avise, em vez de a criança encontrar a imagem
  * quebrada no mapa.
  */
+/**
+ * O desenho de cada MATÉRIA, para as abas da Jornada.
+ *
+ * Matemática reaproveita o mesmo `contagem` da ilha N1 de propósito: é a mesma
+ * matéria, e dois desenhos diferentes para ela fariam a criança achar que são
+ * dois lugares.
+ *
+ * **Inglês deixou de ser uma bandeira.** Era `🇺🇸`, e virou o desenho de letras.
+ * Uma bandeira amarra o idioma a um país — o app ensina inglês, não os Estados
+ * Unidos, e a criança que aprende inglês na Inglaterra, na Austrália ou na
+ * Nigéria não está aprendendo outra matéria. É juízo meu e desfaz-se numa
+ * linha, se o dono do projeto preferir a bandeira.
+ */
+export const ICONE_DA_MATERIA: Record<string, NomeDoIcone> = {
+  mundo: "materia-mundo",
+  mat: "contagem",
+  port: "materia-portugues",
+  eng: "materia-ingles",
+  sci: "materia-ciencias",
+};
+
 export const ICONE_DA_ILHA: Record<string, NomeDoIcone> = {
   N1: "contagem",
   N2: "posicional",

@@ -5,7 +5,8 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { render } from "@testing-library/react";
 import { ALL_MATH_TRACKS } from "../../curriculum/motores/curriculum";
-import { ICONE_DA_ILHA, Icone, NomeDoIcone, PASTA_DOS_ICONES } from "./Icone";
+import { ICONE_DA_ILHA, ICONE_DA_MATERIA, Icone, NomeDoIcone, PASTA_DOS_ICONES } from "./Icone";
+import { SUBJECTS } from "../../subjects";
 
 /**
  * Toda ilha do mapa tem arte — e a arte existe no disco.
@@ -44,6 +45,7 @@ const TODOS_OS_NOMES: NomeDoIcone[] = [
   "contagem", "posicional", "adicao", "multiplicacao", "fracao",
   "porcento", "reta", "balanca", "formas", "regua", "barras",
   "som", "som-baixo", "som-mudo", "ouvido",
+  "materia-mundo", "materia-portugues", "materia-ingles", "materia-ciencias",
 ];
 
 describe("a arte dos ícones", () => {
@@ -69,6 +71,15 @@ describe("a arte dos ícones", () => {
       .filter(({ conteudo }) => !conteudo.includes("<svg") || conteudo.length < 200)
       .map(({ n, conteudo }) => `${n}.svg (${conteudo.length} bytes)`);
     expect(suspeitos, `arquivos que não são arte:\n${suspeitos.join("\n")}`).toEqual([]);
+  });
+
+  it("toda matéria servida aponta para um ícone", () => {
+    // Mesma regra das ilhas, mesma origem: a lista de matérias REAL, e não uma
+    // cópia. Uma matéria nova entra na aba da Jornada sem ninguém lembrar de
+    // desenhá-la, e aí a criança vê o buraco antes de qualquer teste.
+    const sem = SUBJECTS.filter(s => !ICONE_DA_MATERIA[s.id]).map(s => `${s.id} (${s.nome})`);
+    expect(sem, `matérias sem ícone:\n${sem.join(", ")}`).toEqual([]);
+    expect(SUBJECTS.length, "o app precisa ter matérias").toBeGreaterThanOrEqual(2);
   });
 
   it("nenhuma ilha usa a arte de outra", () => {
