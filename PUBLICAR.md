@@ -1,71 +1,96 @@
-# Como pôr o SAGA no ar, e no tablet da criança
+# Como usar o SAGA, e como pôr no ar
 
-Três coisas, uma vez só. Depois disso o app se republica sozinho a cada
-mudança, e o endereço nunca muda.
+Há **dois caminhos**. O primeiro já funciona e não pede nada de você. O
+segundo dá um endereço público e definitivo, e pede um clique.
 
 ---
 
-## 1. Ligar o Pages (é o único passo obrigatório)
+## Caminho 1 — o link que já existe (nenhum passo)
 
-No celular ou no computador, aberto o repositório no GitHub:
+O app inteiro cabe num arquivo `.html`. Ele está publicado e é só abrir:
 
-**Settings** → no menu da esquerda, **Pages** → em *Build and deployment*,
-**Source: Deploy from a branch** → *Branch:* **`gh-pages`** → *pasta:* **`/ (root)`**
-→ **Save**.
+> **https://claude.ai/code/artifact/3303a25a-024f-46a5-bd1c-77993a2d24b5**
 
-Se a branch `gh-pages` ainda não aparecer na lista, é porque a publicação
-automática ainda não rodou nenhuma vez. Vá para o passo 2, rode, e volte aqui.
+Abra no tablet, toque em **Começar sem Conta**, e a criança joga.
 
-Um a três minutos depois, o endereço fica de pé:
+- **Serve para**: mostrar o app agora, testar com a criança, mandar para
+  alguém ver.
+- **Não serve para**: guardar o progresso na nuvem. Sem servidor não há
+  domínio autorizado no Firebase, então este caminho é sempre o do VISITANTE:
+  o progresso fica **no navegador que abriu**. Trocou de aparelho, começa do
+  zero.
+- **Quem enxerga**: só você, até compartilhar pelo menu da própria página.
+
+Para gerar de novo, depois de qualquer mudança:
+
+```
+node scripts/gerar-arquivo-unico.mjs
+```
+
+Sai um `dist/saga-arquivo-unico.html` que roda até offline, com dois toques.
+
+---
+
+## Caminho 2 — o endereço definitivo (um clique, uma vez só)
 
 ```
 https://dyegorodrigues.github.io/SAGA/
 ```
 
-> **O que fica público.** A página do app. O repositório continua com a
-> visibilidade que já tem — ligar o Pages não abre o código.
+Hoje esse endereço dá **404**. O app já está construído e guardado na branch
+`gh-pages`; falta ligar o interruptor, e só o dono da conta pode ligar.
+
+### Onde clicar
+
+1. Abra **github.com/dyegorodrigues/SAGA**
+2. No topo, a aba **Settings** (no celular pode estar dentro de um menu `⋯`)
+3. Na lista da esquerda, role até **Pages**
+4. Em **Source**, troque para **Deploy from a branch**
+5. Duas caixinhas: na primeira **`gh-pages`**, na segunda **`/ (root)`**
+6. **Save**
+
+Dois minutos depois o endereço responde.
+
+> **O que fica público**: a página do app. O repositório mantém a visibilidade
+> que já tem — ligar o Pages não abre o código.
+
+### Depois disso, nada
+
+A publicação roda sozinha a cada mudança no código. Para forçar na mão:
+**Actions → Publicar o app → Run workflow**.
+
+Antes de publicar, o robô roda os 4005 testes. **Se um falhar, nada vai ao
+ar** — de propósito: a criança abrir e não funcionar é pior do que esperar.
 
 ---
 
-## 2. Publicar (automático, mas dá para forçar)
-
-A publicação roda sozinha a cada envio de código. Para forçar na mão:
-
-**Actions** → na lista da esquerda, **Publicar o app** → botão **Run workflow**
-→ **Run workflow**.
-
-A execução roda a suíte inteira ANTES de publicar. **Se um teste falhar, nada
-vai ao ar** — de propósito: a criança abrir e não funcionar é pior do que
-esperar. Quando termina em verde, o resumo da execução mostra o endereço.
-
----
-
-## 3. Pôr na tela do tablet (vira ícone, como aplicativo de loja)
+## Pôr na tela do tablet (vale para os dois caminhos)
 
 Abra o endereço no tablet e:
 
-- **Android / Chrome:** menu `⋮` → *Adicionar à tela inicial* → *Instalar*.
-- **iPad / Safari:** botão de compartilhar → *Adicionar à Tela de Início*.
+- **Android / Chrome**: menu `⋮` → *Adicionar à tela inicial* → *Instalar*
+- **iPad / Safari**: botão de compartilhar → *Adicionar à Tela de Início*
 
 Aparece a raposa em fundo azul, com o nome **SAGA**. Abrindo por ali, o app
-ocupa a tela inteira, sem barra de navegador — a criança não vê que é um site.
+ocupa a tela inteira, sem barra de navegador.
 
 ---
 
-## O que já funciona e o que ainda não
+## O que está pronto e o que não está
 
-**Funciona sem conta nenhuma.** Tocar em *Começar sem Conta* cria o perfil da
-criança e guarda tudo no próprio aparelho. Fecha, abre de novo, e ela continua
-lá — isso é testado a cada publicação, pelo `npm run passeio`.
+**Pronto e verificado a cada publicação.** Entrar, criar o perfil, jogar uma
+missão inteira, fechar o app, abrir de novo e a criança continuar lá com o
+progresso. É o `npm run passeio`: 19 verificações, 0 falhas. As 90
+competências, cinco níveis cada.
 
-**A conta Google ainda não foi exercitada de ponta a ponta.** O código existe,
-mas nunca rodou de verdade contra o Firebase. Duas consequências práticas:
+**Não está**: a conta Google. O código existe e nunca rodou de verdade contra
+o Firebase. Enquanto isso, o progresso é do aparelho. Para a conta funcionar,
+depois do caminho 2: console do Firebase → *Authentication* → *Settings* →
+*Authorized domains* → adicionar `dyegorodrigues.github.io`.
 
-1. Enquanto isso, use *Começar sem Conta*. O progresso fica NO APARELHO — se a
-   criança trocar de tablet, ele não vai junto.
-2. Para a conta funcionar depois, o domínio precisa ser autorizado no Firebase:
-   console do projeto → *Authentication* → *Settings* → *Authorized domains* →
-   adicionar `dyegorodrigues.github.io`.
+**Também não está**: a arte dos mascotes. A pasta `src/assets/mascotes/` tem
+só o README — os PNGs nunca foram feitos, e o app cai no desenho de emergência.
+Não é defeito de código: o encaixe funciona e usa o PNG assim que ele existir.
 
 ---
 
@@ -73,7 +98,8 @@ mas nunca rodou de verdade contra o Firebase. Duas consequências práticas:
 
 | O que você vê | O que é | O que fazer |
 |---|---|---|
-| Página em branco | O build saiu com a base errada | Confira que a execução usou `SAGA_BASE=/SAGA/` — o workflow já faz isso sozinho |
-| `404` no endereço | O Pages não está ligado, ou a branch `gh-pages` ainda não existe | Passo 1, depois passo 2 |
-| A execução falha em *Suíte inteira* | Algum teste quebrou | É o portão funcionando: nada foi publicado. O log da execução diz qual teste |
-| O ícone no tablet é uma letra num círculo | O atalho foi criado antes desta versão | Apague o atalho e adicione de novo |
+| Página em branco | Build com a base errada | O workflow já cuida disso sozinho; refaça a execução |
+| `404` no endereço do GitHub | O Pages não está ligado | Caminho 2, passo a passo acima |
+| A execução falha em *Suíte inteira* | Um teste quebrou | É o portão funcionando: nada foi publicado. O log diz qual |
+| Ícone do atalho é uma letra num círculo | O atalho é anterior a esta versão | Apague o atalho e adicione de novo |
+| Progresso sumiu | Trocou de navegador ou de aparelho | Esperado enquanto a conta Google não funciona |
