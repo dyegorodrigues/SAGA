@@ -32,10 +32,22 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ["react", "react-dom"],
-          firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
-        },
+        /**
+         * `SAGA_ARQUIVO_UNICO=1` desliga a separação.
+         *
+         * O `scripts/gerar-arquivo-unico.mjs` costura o app inteiro num só
+         * `.html` — para abrir offline, mandar por mensagem, ou publicar onde
+         * não há servidor. Pedaços separados se importam uns aos outros por
+         * caminho relativo, e caminho relativo não existe dentro de um arquivo
+         * só: costurar exigiria refazer o trabalho do empacotador na mão.
+         * Mais honesto pedir a ele um pedaço só quando é isso que se quer.
+         */
+        manualChunks: process.env.SAGA_ARQUIVO_UNICO
+          ? undefined
+          : {
+              react: ["react", "react-dom"],
+              firebase: ["firebase/app", "firebase/auth", "firebase/firestore"],
+            },
       },
     },
   },

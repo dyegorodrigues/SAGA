@@ -63,7 +63,26 @@ interface Props {
 /** A pasta pública onde a arte mora. Um teste cobra que todo nome tenha arquivo. */
 export const PASTA_DOS_ICONES = "icones";
 
+/**
+ * A costura para o app servido como ARQUIVO ÚNICO.
+ *
+ * `scripts/gerar-arquivo-unico.mjs` empacota o SAGA inteiro num só `.html` —
+ * para abrir sem servidor, mandar por mensagem, ou publicar onde não dá para
+ * subir uma pasta. Ali não existe `/icones/tutor.svg`: não há pasta, não há
+ * servidor, e o pedido sairia para o nada. O gerador então põe a arte
+ * embutida neste objeto, e é ele que responde.
+ *
+ * Fora desse caso o objeto não existe e nada muda — o app continua pedindo o
+ * arquivo à pasta, que é o caminho normal e o que o teste do disco cobra.
+ */
+declare global {
+  // eslint-disable-next-line no-var
+  var __SAGA_ARTE_EMBUTIDA__: Partial<Record<NomeDoIcone, string>> | undefined;
+}
+
 export function caminhoDoIcone(nome: NomeDoIcone): string {
+  const embutida = globalThis.__SAGA_ARTE_EMBUTIDA__?.[nome];
+  if (embutida) return embutida;
   const base = import.meta.env?.BASE_URL ?? "/";
   return `${base.endsWith("/") ? base : `${base}/`}${PASTA_DOS_ICONES}/${nome}.svg`;
 }
