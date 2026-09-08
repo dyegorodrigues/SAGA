@@ -89,7 +89,7 @@ export function PerfilTab({
           <div>
             <div className="text-[10px] font-black uppercase tracking-[0.14em] text-emerald-600">Atlas de Habilidades</div>
             <div className="text-lg font-black text-slate-900" style={{ fontFamily: FONT }}>Minhas Insígnias</div>
-            <p className="text-[10px] font-bold text-slate-400 mt-0.5">Insígnias máximas só aparecem com domínio matemático real.</p>
+            <p className="text-[10px] font-bold text-slate-400 mt-0.5">As insígnias grandes vêm quando você domina a competência de verdade.</p>
           </div>
           <div className="rounded-2xl bg-amber-50 border border-amber-200 px-3 py-2 text-center shrink-0">
             <div className="text-xl font-black text-amber-600">{masteredSkills.length}</div>

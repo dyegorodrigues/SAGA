@@ -39,6 +39,14 @@ import React from "react";
  * mostram um enquanto o som sai e outro quando para, e é assim que a criança
  * que ainda não lê sabe se o botão funcionou.
  *
+ * ## Os do bichinho
+ *
+ * `maca`, `bola`, `soneca`, `racao` são as AÇÕES do companheiro; `humor` e
+ * `energia`, as duas barras; e as três caras (`cara-feliz`, `cara-sono`,
+ * `cara-saudade`) são o estado dele. Aqui o desenho não é reforço, é a
+ * informação: uma criança de seis anos lê a cara do bichinho antes de ler a
+ * palavra ao lado — e por isso ela não pode mudar de aparelho para aparelho.
+ *
  * ## O que este componente garante
  *
  * - **Nome do SAGA, não do Unicode.** Pede-se `"fracao"`, não `"pizza"`. O que
@@ -60,7 +68,9 @@ export type NomeDoIcone =
   | "contagem" | "posicional" | "adicao" | "multiplicacao" | "fracao"
   | "porcento" | "reta" | "balanca" | "formas" | "regua" | "barras"
   | "som" | "som-baixo" | "som-mudo" | "ouvido"
-  | "materia-mundo" | "materia-portugues" | "materia-ingles" | "materia-ciencias";
+  | "materia-mundo" | "materia-portugues" | "materia-ingles" | "materia-ciencias"
+  | "maca" | "bola" | "soneca" | "humor" | "energia" | "racao"
+  | "cara-feliz" | "cara-sono" | "cara-saudade" | "dica" | "lapis" | "coracao";
 
 interface Props {
   nome: NomeDoIcone;

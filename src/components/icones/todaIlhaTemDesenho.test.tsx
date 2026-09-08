@@ -46,6 +46,8 @@ const TODOS_OS_NOMES: NomeDoIcone[] = [
   "porcento", "reta", "balanca", "formas", "regua", "barras",
   "som", "som-baixo", "som-mudo", "ouvido",
   "materia-mundo", "materia-portugues", "materia-ingles", "materia-ciencias",
+  "maca", "bola", "soneca", "humor", "energia", "racao",
+  "cara-feliz", "cara-sono", "cara-saudade", "dica", "lapis", "coracao",
 ];
 
 describe("a arte dos ícones", () => {

@@ -1,3 +1,4 @@
+import { Icone } from "./icones/Icone";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Kid, State } from "../types";
@@ -23,14 +24,14 @@ interface EvolutionStage {
  * topo em ~3 meses de uso saudável. XP (⭐) é vitalício e NUNCA se gasta.
  */
 export const STAGES: EvolutionStage[] = [
-  { stage: 1, name: "Faixa Branca 🥋", desc: "Sua jornada matemática começou! O kimono está limpinho e pronto para aprender os primeiros movimentos.", minStars: 0 },
-  { stage: 2, name: "Faixa Amarela 🥋", desc: "Você já está brilhando como o sol! Seus golpes matemáticos básicos estão ficando rápidos.", minStars: 15 },
-  { stage: 3, name: "Faixa Verde 🥋", desc: "Como uma floresta que cresce, sua inteligência matemática está cada vez mais forte!", minStars: 75 },
-  { stage: 4, name: "Faixa Azul 🥋", desc: "A profundidade de um oceano! Seus cálculos mentais agora são velozes e precisos.", minStars: 150 },
-  { stage: 5, name: "Faixa Vermelha 🥋", desc: "O fogo do conhecimento! Você domina as operações com agilidade incrível.", minStars: 300 },
-  { stage: 6, name: "Faixa Roxa 🥋", desc: "A cor da sabedoria avançada. Problemas difíceis são resolvidos num piscar de olhos!", minStars: 500 },
-  { stage: 7, name: "Faixa Marrom 🥋", desc: "O domínio da terra e da base. Sua fundação matemática é inquebrável, quase um mestre!", minStars: 750 },
-  { stage: 8, name: "Faixa Preta 🥋", desc: "Mestre Supremo da SAGA! A glória absoluta. Você alcançou o nível mais alto do Dojo Matemático!", minStars: 1000 },
+  { stage: 1, name: "Faixa Branca", desc: "Sua jornada matemática começou! O kimono está limpinho e pronto para aprender os primeiros movimentos.", minStars: 0 },
+  { stage: 2, name: "Faixa Amarela", desc: "Você já está brilhando como o sol! Seus golpes matemáticos básicos estão ficando rápidos.", minStars: 15 },
+  { stage: 3, name: "Faixa Verde", desc: "Como uma floresta que cresce, sua inteligência matemática está cada vez mais forte!", minStars: 75 },
+  { stage: 4, name: "Faixa Azul", desc: "A profundidade de um oceano! Seus cálculos mentais agora são velozes e precisos.", minStars: 150 },
+  { stage: 5, name: "Faixa Vermelha", desc: "O fogo do conhecimento! Você domina as operações com agilidade incrível.", minStars: 300 },
+  { stage: 6, name: "Faixa Roxa", desc: "A cor da sabedoria avançada. Problemas difíceis são resolvidos num piscar de olhos!", minStars: 500 },
+  { stage: 7, name: "Faixa Marrom", desc: "O domínio da terra e da base. Sua fundação matemática é inquebrável, quase um mestre!", minStars: 750 },
+  { stage: 8, name: "Faixa Preta", desc: "Mestre Supremo da SAGA! A glória absoluta. Você alcançou o nível mais alto do Dojo Matemático!", minStars: 1000 },
 ];
 
 export function getMascotStage(stars: number): EvolutionStage {
@@ -66,10 +67,10 @@ function getPetMood(kid: Kid, state: State) {
     );
   }
   if (daysAway === 0)
-    return { emoji: "😄", label: "Feliz", phrase: (n: string) => `${n} está radiante porque você jogou hoje!` };
+    return { icone: "cara-feliz" as const, label: "Feliz", phrase: (n: string) => `${n} está radiante porque você jogou hoje!` };
   if (daysAway === 1)
-    return { emoji: "😴", label: "Sonolento", phrase: (n: string) => `${n} está bocejando... uma missãozinha ia animar!` };
-  return { emoji: "🥺", label: "Com saudade", phrase: (n: string) => `${n} está com olhinhos pidões de saudade de você!` };
+    return { icone: "cara-sono" as const, label: "Sonolento", phrase: (n: string) => `${n} está bocejando... uma missãozinha ia animar!` };
+  return { icone: "cara-saudade" as const, label: "Com saudade", phrase: (n: string) => `${n} está com olhinhos pidões de saudade de você!` };
 }
 
 import { MascotV2ProfileCard } from "../engine/mascot-v2/MascotV2ProfileCard";
@@ -125,7 +126,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
     if (!onUpdateKid) return;
     if (petEnergy >= 100) {
       sfx.wrong();
-      setPraiseText(`${petName} já está cheinho de energia! 😋⚡`);
+      setPraiseText(`${petName} já está cheinho de energia!`);
       setTimeout(() => setPraiseText(""), 3500);
       return;
     }
@@ -134,7 +135,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
       playSfxChewing();
       setPetAction("eating");
       onUpdateKid({ ...kid, petEnergy: Math.min(100, petEnergy + 25), petFood: petFood - 1 }, 0);
-      setPraiseText(`Nham! Você alimentou ${petName} com a ração do dia! 🍎⚡`);
+      setPraiseText(`Nham! Você alimentou ${petName} com a ração do dia!`);
       setTimeout(() => {
         setPetAction("idle");
         setPraiseText("");
@@ -143,14 +144,14 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
       playSfxChewing();
       setPetAction("eating");
       onUpdateKid({ ...kid, petEnergy: Math.min(100, petEnergy + 25) }, 2);
-      setPraiseText(`Você gastou 2 moedinhas para comprar ração para ${petName}! 🥩🪙`);
+      setPraiseText(`Você gastou 2 moedinhas para comprar ração para ${petName}!`);
       setTimeout(() => {
         setPetAction("idle");
         setPraiseText("");
       }, 3000);
     } else {
       sfx.wrong();
-      setPraiseText(`Sem rações e sem moedinhas! Complete a Missão do Dia para ganhar 1 ração grátis! 📝🍖`);
+      setPraiseText(`Sem ração e sem moedinha! Faça a missão do dia para ganhar uma ração.`);
       setTimeout(() => setPraiseText(""), 4500);
     }
   };
@@ -161,8 +162,8 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
     setPetAction("playing");
     setPraiseText(
       petEnergy <= 25
-        ? `${petName} brincou devagarzinho, meio sonolento... que fofura! 🥎😴`
-        : `Yupi! Você brincou de pegar a bola com ${petName}! 🥎❤️`
+        ? `${petName} brincou devagarzinho, meio sonolento... que fofura!`
+        : `Yupi! Você brincou de pegar a bola com ${petName}!`
     );
     setTimeout(() => {
       setPetAction("idle");
@@ -174,7 +175,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
   const handleSleep = () => {
     playSfxSnoring();
     setPetAction("sleeping");
-    setPraiseText(`Shhh... ${petName} está tirando uma soneca relaxante e sonhando com estrelas! 💤✨`);
+    setPraiseText(`Shhh... ${petName} está tirando uma soneca e sonhando com estrelas.`);
     setTimeout(() => {
       setPetAction("idle");
       setPraiseText("");
@@ -237,7 +238,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             ) : (
               <div className="flex items-center gap-1.5">
                 <h4 className="text-xl font-black text-slate-900" style={{ fontFamily: FONT }}>
-                  🤖 {petName}
+                  {petName}
                 </h4>
                 <button
                   onClick={() => {
@@ -248,7 +249,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
                   title="Dar outro nome para o Pet"
                   className="text-xs text-slate-400 hover:text-indigo-600 bg-none border-none cursor-pointer outline-none transition-colors"
                 >
-                  ✏️
+                  <Icone nome="lapis" tamanho={16} />
                 </button>
               </div>
             )}
@@ -258,7 +259,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
 
         <div className="text-right flex-shrink-0">
           <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Estrelas do Perfil</div>
-          <div className="text-md font-black text-amber-500 whitespace-nowrap">⭐ {totalStars} XP</div>
+          <div className="text-md font-black text-amber-500 whitespace-nowrap inline-flex items-center gap-1"><Icone nome="estrela" tamanho={17} /> {totalStars} XP</div>
         </div>
       </div>
 
@@ -280,16 +281,16 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
 
           {petAction === "eating" && (
             <div className="absolute inset-0 pointer-events-none select-none z-10">
-              <span className="absolute text-2xl animate-ping" style={{ top: "25%", left: "30%" }}>🍏</span>
-              <span className="absolute text-2xl animate-ping" style={{ top: "45%", right: "30%" }}>🍖</span>
+              <span className="absolute text-2xl animate-ping" style={{ top: "25%", left: "30%" }}><Icone nome="maca" tamanho={26} /></span>
+              <span className="absolute text-2xl animate-ping" style={{ top: "45%", right: "30%" }}><Icone nome="racao" tamanho={26} /></span>
             </div>
           )}
 
           {petAction === "playing" && (
             <div className="absolute inset-0 pointer-events-none select-none z-10">
-              <span className="absolute text-2xl animate-bounce" style={{ top: "10%", left: "40%" }}>🥎</span>
-              <span className="absolute text-2xl animate-pulse" style={{ top: "30%", right: "15%" }}>❤️</span>
-              <span className="absolute text-xl animate-pulse" style={{ top: "40%", left: "15%" }}>❤️</span>
+              <span className="absolute text-2xl animate-bounce" style={{ top: "10%", left: "40%" }}><Icone nome="bola" tamanho={26} /></span>
+              <span className="absolute text-2xl animate-pulse" style={{ top: "30%", right: "15%" }}><Icone nome="coracao" tamanho={26} /></span>
+              <span className="absolute text-xl animate-pulse" style={{ top: "40%", left: "15%" }}><Icone nome="coracao" tamanho={26} /></span>
             </div>
           )}
 
@@ -347,18 +348,18 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             {/* Humor chip (calculado do streak — nunca vira castigo) */}
             <div className="flex items-center justify-between p-2 rounded-xl bg-indigo-50/60 border border-indigo-100">
               <span className="text-[11px] font-extrabold text-slate-700 flex items-center gap-1">
-                💛 Humor
+                <Icone nome="humor" tamanho={15} /> Humor
               </span>
               <span className="text-[11px] font-black text-indigo-700 flex items-center gap-1">
-                {mood.emoji} {mood.label}
+                <Icone nome={mood.icone} tamanho={18} /> {mood.label}
               </span>
             </div>
             {/* Energy Bar */}
             <div>
               <div className="flex justify-between items-center text-[11px] font-extrabold text-slate-700 mb-0.5">
-                <span className="flex items-center gap-1">⚡ Energia</span>
+                <span className="flex items-center gap-1"><Icone nome="energia" tamanho={15} /> Energia</span>
                 <span className={petEnergy <= 20 ? "text-indigo-400 font-black" : "text-indigo-600"}>
-                  {petEnergy}% {petEnergy <= 20 ? "😴 sonequinha" : petEnergy >= 90 ? "🔥 A MIL!" : ""}
+                  {petEnergy}% {petEnergy <= 20 ? "sonequinha" : petEnergy >= 90 ? "a mil!" : ""}
                 </span>
               </div>
               <div className="w-full bg-slate-100 rounded-full h-3.5 border border-slate-200 overflow-hidden relative shadow-inner">
@@ -393,12 +394,12 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             opacity: petAction !== "idle" ? 0.6 : 1,
           }}
         >
-          <span className="text-2xl">🍏</span>
+          <Icone nome="maca" tamanho={26} />
           <span className="text-[11px] font-black text-blue-900 mt-1" style={{ fontFamily: FONT }}>
             Alimentar
           </span>
           <span className="text-[9px] font-bold text-blue-700 mt-0.5">
-            {petFood > 0 ? `🍖 x${petFood} Grátis` : "🪙 2 moedinhas"}
+            {petFood > 0 ? `x${petFood} de graça` : "2 moedinhas"}
           </span>
         </button>
 
@@ -414,12 +415,12 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             opacity: petAction !== "idle" ? 0.6 : 1,
           }}
         >
-          <span className="text-2xl">🥎</span>
+          <Icone nome="bola" tamanho={26} />
           <span className="text-[11px] font-black text-emerald-900 mt-1" style={{ fontFamily: FONT }}>
             Brincar
           </span>
           <span className="text-[9px] font-bold text-emerald-700 mt-0.5">
-            Pura diversão! 🥎
+            Pura diversão
           </span>
         </button>
 
@@ -435,12 +436,12 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             opacity: petAction !== "idle" ? 0.6 : 1,
           }}
         >
-          <span className="text-2xl">💤</span>
+          <Icone nome="soneca" tamanho={26} />
           <span className="text-[11px] font-black text-purple-900 mt-1" style={{ fontFamily: FONT }}>
             Dormir
           </span>
           <span className="text-[9px] font-bold text-purple-700 mt-0.5">
-            Sonequinha boa 💤
+            Sonequinha boa
           </span>
         </button>
 
@@ -451,7 +452,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
         <div className="mt-4 bg-amber-50/70 rounded-2xl border border-amber-200/50 p-3">
           <div className="flex justify-between text-[11px] font-black text-amber-900 mb-1.5">
             <span>Próxima Evolução: {nextStage.name}</span>
-            <span>{totalStars} / {nextStage.minStars} ⭐</span>
+            <span className="inline-flex items-center gap-1">{totalStars} / {nextStage.minStars} <Icone nome="estrela" tamanho={14} /></span>
           </div>
           <div className="w-full bg-amber-100/60 rounded-full h-3 border border-amber-200 overflow-hidden shadow-inner relative">
             <div
@@ -460,13 +461,13 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
             />
           </div>
           <p className="text-[9.5px] font-bold text-amber-700 mt-1.5 leading-relaxed italic">
-            💡 Resolva missões matemáticas para ganhar estrelas (XP). Faltam exatamente {nextStage.minStars - totalStars} estrelas de missões para evoluir seu pet!
+            Resolva missões para ganhar estrelas. Faltam {nextStage.minStars - totalStars} para o companheiro crescer.
           </p>
         </div>
       ) : (
         <div className="mt-4 p-3 bg-indigo-50 rounded-2xl border border-indigo-100 text-center">
           <span className="text-xs font-black text-indigo-950">
-            🚀 MASCOTE EM EVOLUÇÃO MÁXIMA!
+            SEU COMPANHEIRO CHEGOU AO TOPO
           </span>
           <p className="text-[10px] font-bold text-indigo-700 mt-0.5 leading-relaxed">
             Seu {petName} brilha como um Mestre Lendário Supremo da matemática! Você alcançou o nível mais alto possível de glória!
