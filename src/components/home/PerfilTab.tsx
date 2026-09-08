@@ -189,7 +189,7 @@ export function PerfilTab({
           <span className="text-xs font-black uppercase tracking-wider px-2.5 py-1 text-pink-900 bg-pink-200 border-2 border-pink-300 rounded-md inline-block">
             Sua Coleção
           </span>
-          <Icone nome="jornada" tamanho={24} />
+          <Icone nome="album" tamanho={24} />
         </div>
         <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 20, color: "#831843" }}>
           Álbum de Figurinhas

@@ -70,7 +70,7 @@ export type NomeDoIcone =
   | "som" | "som-baixo" | "som-mudo" | "ouvido"
   | "materia-mundo" | "materia-portugues" | "materia-ingles" | "materia-ciencias"
   | "maca" | "bola" | "soneca" | "humor" | "energia" | "racao"
-  | "cara-feliz" | "cara-sono" | "cara-saudade" | "dica" | "lapis" | "coracao";
+  | "cara-feliz" | "cara-sono" | "cara-saudade" | "dica" | "lapis" | "coracao" | "album";
 
 interface Props {
   nome: NomeDoIcone;

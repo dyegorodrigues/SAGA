@@ -338,7 +338,7 @@ export function MascotEvolutionCard({ kid, state, onUpdateKid, coins = 0 }: Masc
               </motion.div>
             ) : (
               <div className="p-2.5 rounded-xl text-xs font-semibold text-slate-500 leading-relaxed bg-slate-50 border border-slate-100">
-                Seu pet de estimação vive neste perfil! Quanto mais desafios matemáticos você resolver, mais feliz, forte e alimentado ele ficará!
+                Seu companheiro mora aqui. Quanto mais missões você faz, mais feliz e forte ele fica.
               </div>
             )}
           </AnimatePresence>
