@@ -263,8 +263,10 @@ export function stopSpeak() {
 }
 
 export function speak(text: string, opts: { rate?: number; pitch?: number; onEnd?: () => void; lang?: string } = {}) {
-  // Use Luna Studio Pipeline / TTS Fallback
-  AudioPlayer.speak(text, opts.onEnd);
+  // A `rate` era descartada aqui. A F05 acelera a voz no nível 5 (§5) e a
+  // aceleração nunca chegava a lugar nenhum — nem no sintetizador, nem no
+  // arquivo. Agora chega nos dois.
+  AudioPlayer.speak(text, opts.onEnd, opts.rate);
 }
 
 let AC: AudioContext | null = null;

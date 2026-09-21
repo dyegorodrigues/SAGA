@@ -47,7 +47,10 @@
     "sonda:skip-count": "node scripts/sonda-skip-count.mjs",
     "sonda:equal-groups": "sh -c 'npx vite --host 127.0.0.1 --port 5212 --strictPort >/tmp/f97-vite.log 2>&1 & sleep 2; node scripts/sonda-equal-groups.mjs'",
     "fichas:conferir": "vitest run src/curriculum/conformidadeDeFichas.test.ts --silent=false",
-    "e2e:entrada": "node scripts/e2e-entrada.mjs"
+    "e2e:entrada": "node scripts/e2e-entrada.mjs",
+    "vozes": "tsx scripts/gerar-vozes.ts",
+    "vozes:conferir": "tsx scripts/conferir-vozes.ts",
+    "sonda:voz": "node scripts/sonda-voz.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

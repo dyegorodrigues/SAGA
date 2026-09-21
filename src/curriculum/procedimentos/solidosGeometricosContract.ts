@@ -65,6 +65,23 @@ const PERFIS: readonly PerfilSolido[] = [
   { solido: "piramide", nome: "pirâmide", plano: "triângulo", facePlana: "quadrado", rola: false, empilha: true, contagem: { faces: 5, vertices: 5, arestas: 8 } },
 ];
 
+/**
+ * "o cubo", mas "a esfera" e "a pirâmide".
+ *
+ * O enunciado é FALADO para uma criança de seis anos. "o que acontece com o
+ * esfera" sai errado no ouvido dela antes de sair errado no papel — e ela
+ * confia no que ouve. Gênero é propriedade da palavra, então mora no perfil do
+ * sólido; `Record<SolidoF59, ...>` obriga o compilador a cobrar o gênero de
+ * todo sólido novo.
+ */
+const GENERO: Record<SolidoF59, "m" | "f"> = {
+  cubo: "m", esfera: "f", cilindro: "m", cone: "m", piramide: "f",
+};
+/** "o cubo" / "a esfera". */
+const oSolido = (p: PerfilSolido) => `${GENERO[p.solido] === "f" ? "a" : "o"} ${p.nome}`;
+/** "do cubo" / "da esfera". */
+const doSolido = (p: PerfilSolido) => `${GENERO[p.solido] === "f" ? "da" : "do"} ${p.nome}`;
+
 const perfilDe = (solido: SolidoF59) => PERFIS.find(perfil => perfil.solido === solido)!;
 const escolher = <T,>(itens: readonly T[]): T => itens[Math.floor(Math.random() * itens.length)];
 
@@ -119,8 +136,8 @@ export function construirSolidosGeometricosF59Spec(level: number): SolidosGeomet
       // com a do botão e vencia o nível sem olhar sólido nenhum. A pergunta
       // agora é aberta: o verbo está só nas alternativas.
       objetivo: rolagem
-        ? `Faça uma previsão e depois teste: o que acontece com o ${perfil.nome} na rampa?`
-        : `Faça uma previsão e depois teste: o que acontece com o ${perfil.nome} numa pilha?`,
+        ? `Faça uma previsão e depois teste: o que acontece com ${oSolido(perfil)} na rampa?`
+        : `Faça uma previsão e depois teste: o que acontece com ${oSolido(perfil)} numa pilha?`,
       // A resposta acompanha o sólido: com a esfera sempre na rampa e o cubo
       // sempre na pilha, "sim" acertava para sempre sem olhar a figura.
       resposta: acontece ? 1 : 2,
@@ -141,7 +158,7 @@ export function construirSolidosGeometricosF59Spec(level: number): SolidosGeomet
     ...base,
     modo: "contar-elementos",
     solido: perfil.solido,
-    objetivo: `Conte os elementos do ${perfil.nome} em qualquer orientação.`,
+    objetivo: `Conte os elementos ${doSolido(perfil)} em qualquer orientação.`,
     resposta: 1,
     opcoes: [
       { value: 1, label: `${faces} faces, ${vertices} vértices e ${arestas} arestas` },

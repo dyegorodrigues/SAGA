@@ -8,6 +8,15 @@ export type UnidadeRegua = "bolas" | "cm";
 export interface ItemRegua {
   id: string;
   nome: string;
+  /**
+   * O gênero da palavra, porque o enunciado é FALADO.
+   *
+   * "fita de treino" é feminino, e os enunciados diziam "o fita de treino",
+   * "do fita de treino", "onde ELE termina". Escrito já é feio; falado para
+   * uma criança de seis anos que está aprendendo a língua ao mesmo tempo que a
+   * matemática, é pior — ela ouve um erro e confia nele.
+   */
+  genero: "m" | "f";
   comprimentoCm: number;
 }
 
@@ -35,12 +44,19 @@ export interface ReguaSpec {
  * esticada. Pontas/caps mantêm tamanho fixo; o corpo central absorve a variação.
  */
 const OBJETOS = [
-  { id: "lapis", nome: "lápis" },
-  { id: "pincel", nome: "pincel" },
-  { id: "giz", nome: "giz de cera" },
-  { id: "marcador", nome: "marcador" },
-  { id: "fita", nome: "fita de treino" },
+  { id: "lapis", nome: "lápis", genero: "m" },
+  { id: "pincel", nome: "pincel", genero: "m" },
+  { id: "giz", nome: "giz de cera", genero: "m" },
+  { id: "marcador", nome: "marcador", genero: "m" },
+  { id: "fita", nome: "fita de treino", genero: "f" },
 ] as const;
+
+/** "o lápis" / "a fita de treino". */
+const o = (i: { genero: "m" | "f"; nome: string }) => `${i.genero === "f" ? "a" : "o"} ${i.nome}`;
+/** "do lápis" / "da fita de treino". */
+const doDa = (i: { genero: "m" | "f"; nome: string }) => `${i.genero === "f" ? "da" : "do"} ${i.nome}`;
+/** "onde ele termina" / "onde ela termina". */
+const ele = (i: { genero: "m" | "f" }) => (i.genero === "f" ? "ela" : "ele");
 
 function inteiro(min: number, max: number, sorteio: () => number): number {
   const raw = sorteio();
@@ -94,8 +110,8 @@ export function construirReguaSpec(
       resposta: `${valor}:bolas`,
       valorCerto: valor,
       alternativas: alternativas(valor, 1, 8),
-      enunciado: `Quantas bolas iguais medem o ${alvo.nome}?`,
-      falado: `Meça o ${alvo.nome} colocando bolas iguais, uma encostada na outra, sem deixar espaço.`,
+      enunciado: `Quantas bolas iguais medem ${o(alvo)}?`,
+      falado: `Meça ${o(alvo)} colocando bolas iguais, uma encostada na outra, sem deixar espaço.`,
     };
   }
 
@@ -142,8 +158,8 @@ export function construirReguaSpec(
       valorCerto: valor,
       unidadeCerta: "cm",
       alternativas: alternativas(valor),
-      enunciado: `Quantos centímetros mede o ${alvo.nome}?`,
-      falado: `A régua já está alinhada. Leia a marca inteira onde termina o ${alvo.nome}.`,
+      enunciado: `Quantos centímetros mede ${o(alvo)}?`,
+      falado: `A régua já está alinhada. Leia a marca inteira onde termina ${o(alvo)}.`,
     };
   }
 
@@ -161,8 +177,8 @@ export function construirReguaSpec(
       valorCerto: valor,
       unidadeCerta: "cm",
       alternativas: alternativas(valor),
-      enunciado: `Alinhe a régua e meça o ${alvo.nome}.`,
-      falado: `Alinhe o zero da régua com a ponta do ${alvo.nome}. Depois leia a marca inteira onde ele termina.`,
+      enunciado: `Alinhe a régua e meça ${o(alvo)}.`,
+      falado: `Alinhe o zero da régua com a ponta ${doDa(alvo)}. Depois leia a marca inteira onde ${ele(alvo)} termina.`,
     };
   }
 
@@ -179,7 +195,7 @@ export function construirReguaSpec(
     unidadeCerta: "cm",
     alternativas: alternativas(valor, 1, 14),
     estimativas: estimativas(valor),
-    enunciado: `Primeiro estime. Depois meça o ${alvo.nome}.`,
+    enunciado: `Primeiro estime. Depois meça ${o(alvo)}.`,
     falado: `Quanto você acha que mede? Faça uma estimativa inteira em centímetros e depois confira com a régua.`,
   };
 }

@@ -95,6 +95,17 @@ css = css.replace(/url\(["']?(?:\.\.?\/)*(fonts\/[^"')]+)["']?\)/g, (_, caminho)
 console.log(`· ${fontes} fonte(s) embutida(s)`);
 
 // -------------------------------------------------------------- a arte
+/*
+ * O pacote de vozes NÃO entra no arquivo único.
+ *
+ * São doze megabytes de áudio; embutidos em base64 virariam dezesseis, e o
+ * publicador de página recusa um arquivo desse tamanho. Aqui o app cai na voz
+ * do aparelho, como fazia antes — `vozNativa` trata o índice ausente como
+ * pacote vazio e não quebra nada.
+ *
+ * Quem precisa da voz nativa usa a publicação normal (GitHub Pages), onde os
+ * arquivos são servidos ao lado da página.
+ */
 const pastaIcones = resolve(RAIZ, "public", "icones");
 const arte = {};
 for (const nome of readdirSync(pastaIcones).filter(n => n.endsWith(".svg"))) {
