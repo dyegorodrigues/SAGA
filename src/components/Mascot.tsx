@@ -525,8 +525,20 @@ export const pickPraise = () => {
 };
 
 /* ---------------- Atmospheric sound trigger ---------------- */
+/**
+ * Liga e desliga o som do app.
+ *
+ * O `aria-label` não é enfeite: quando o glifo `🔊` virou arte desenhada, o
+ * `<Icone>` entrou com `aria-hidden` — e o botão, que só tinha o emoji por
+ * texto, ficou **sem nome nenhum**. Um quadrado de 44×44 mudo para leitor de
+ * tela, e invisível para qualquer auditoria que procure botões pelo nome. Foi
+ * assim que a auditoria dos exercícios o encontrou, em toda questão de toda
+ * competência.
+ */
 export const SoundBtn = ({ on, onToggle }: { on: boolean; onToggle: () => void }) => (
   <button
+    aria-label={on ? "Desligar o som" : "Ligar o som"}
+    title={on ? "Desligar o som" : "Ligar o som"}
     onClick={() => {
       sfx.tick();
       onToggle();

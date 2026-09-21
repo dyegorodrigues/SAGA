@@ -69,6 +69,25 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
     setRespondido(false);
   }, [spec]);
 
+  /**
+   * Errar não mata a questão.
+   *
+   * `respondido` existe para um toque não disparar `onAnswer` duas vezes. Ele
+   * NÃO é o fim da questão — quem decide isso é o app, pelo `disabled`.
+   *
+   * Enquanto `disabled` for falso, o app ainda espera resposta: é o estado do
+   * erro suave, em que ele diz "Olha de novo!" e devolve a vez. Sem esta
+   * reabertura, a pergunta e os três botões sumiam da tela nesse instante e a
+   * criança ficava sem nenhum jeito de responder — travada no primeiro
+   * exercício da Jornada, com o × de sair como única saída.
+   *
+   * Numa resposta certa (ou no terceiro erro) o app marca o desfecho, o
+   * `disabled` vira verdadeiro e a pergunta fica fechada, como deve.
+   */
+  React.useEffect(() => {
+    if (!disabled && respondido) setRespondido(false);
+  }, [disabled, respondido]);
+
   const colocados = porReceptor.reduce((s, n) => s + n, 0);
   const naBandeja = spec.itens.quantidade - colocados;
   const acao: AcaoDePareamento = { porReceptor, naBandeja };

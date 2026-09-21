@@ -80,13 +80,16 @@ export const THEME_EMOJIS: Record<string, string> = {
 };
 
 export const EMO = ["🍎", "🐶", "⚽", "🍓", "🐟", "🚗", "🦆", "🌼", "🍪", "🎈", "🐞", "⭐"];
+// Sem emoji do sistema: quem festeja é o mascote, o som e o estouro de
+// confete. O emoji punha um desenho diferente em cada aparelho no meio do
+// elogio — e esta lista é a que a tela realmente usa.
 export const PRAISE = [
-  "Você acertou! Que orgulho! 🎉",
-  "Uau, você mandou muito bem! ⭐",
-  "Isso mesmo! Você é brilhante! 🥳",
-  "Parabéns, meu amiguinho! Que inteligência! 💪",
-  "Uhul! Que lindo acerto! ✨",
-  "Perfeito! Você brilha como uma estrela! 🌟"
+  "Você acertou! Que orgulho!",
+  "Uau, você mandou muito bem!",
+  "Isso mesmo! Você é brilhante!",
+  "Parabéns, meu amiguinho! Que inteligência!",
+  "Uhul! Que lindo acerto!",
+  "Perfeito! Você brilha como uma estrela!",
 ];
 
 export const THEMES: Record<string, ThemeConfig> = {

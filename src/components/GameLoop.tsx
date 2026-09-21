@@ -1,4 +1,5 @@
 import { Icone } from "./icones/Icone";
+import { OuvirDeNovo } from "./gameloop/OuvirDeNovo";
 import React, { useState, useEffect, useRef } from "react";
 import { AnswerMeta, Kid, Track, Question, Progress, JardimTrackState } from "../types";
 import { applyJourneyAnswer } from "../curriculum/motores/progressEngine";
@@ -1063,6 +1064,18 @@ const SHORT_OK = ["Isso!", "Muito bem!", "Boa!", "Acertou!", "Perfeito!"];
         >
           {status ? msg : <QuestionPrompt q={q} />}
         </div>
+        {/* A criança de 1º ano não lê. Sem este botão, o único jeito de repetir
+            o enunciado era tocar no balão — uma `div` sem nome, sem borda e sem
+            nenhuma pista de que é tocável. */}
+        {!status && (
+          <OuvirDeNovo
+            mudo={!sound}
+            onOuvir={() => {
+              sfx.tick();
+              if (sound) speak(qSpeech(q), q.lang ? { lang: q.lang } : {});
+            }}
+          />
+        )}
       </div>
 
       {q.kind === "audiochoice" && audioChoicePromptVisible && !status && (

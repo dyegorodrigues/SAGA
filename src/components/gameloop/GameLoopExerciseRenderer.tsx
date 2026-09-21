@@ -10,6 +10,7 @@ import { AncoraStage } from "../primitives/AncoraStage";
 import { FamiliaStage } from "../primitives/FamiliaStage";
 import { DeslocamentoStage } from "../primitives/DeslocamentoStage";
 import { AreaStage } from "../primitives/AreaStage";
+import { chaveDaTentativa } from "./chaveDaTentativa";
 import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
@@ -170,6 +171,20 @@ export function GameLoopExerciseRenderer({
         )}
         {q.kind === "fileira" && q.uiProps && (
           <EmojiRowStage
+            // A chave carrega o número de tentativas já gastas nesta questão.
+            //
+            // Estes palcos fecham a pergunta depois de UMA resposta — é
+            // contrato deles, e é o que impede o toque duplo de contar duas
+            // vezes. Só que o app, ao errar de leve, esconde a alternativa
+            // errada, diz "Olha de novo!" e DEVOLVE A VEZ — para um palco já
+            // fechado. A criança ficava presa na questão: sem alternativa
+            // tocável, sem "Avançar", sem saída além de abandonar a missão.
+            //
+            // Mudar a chave remonta o palco a cada tentativa concedida. O
+            // contrato de uma-resposta-por-tentativa fica de pé, a alternativa
+            // errada continua escondida pelo app, e a criança pode responder
+            // de novo — que é o que "Olha de novo!" promete.
+            key={chaveDaTentativa(hiddenOpts.length)}
             spec={q.uiProps as never}
             // §4 das três fichas manda a voz falar na revelação — e na JD2 a
             // fala É a aula ("uma mão cheia e dois — sete!").
@@ -208,6 +223,10 @@ export function GameLoopExerciseRenderer({
             estados em três segundos e o flash é o conteúdo da ficha. */}
         {q.kind === "moldura" && q.uiProps && (
           <MolduraStage
+            // Mesma razão do `EmojiRowStage`: o palco fecha depois de uma
+            // resposta, e o app concede outra. Sem remontar, a segunda
+            // tentativa não tem onde acontecer.
+            key={chaveDaTentativa(hiddenOpts.length)}
             spec={q.uiProps as never}
             // §4 da JD5: a contagem em voz alta na abertura é OBRIGATÓRIA — sem
             // ela a criança não constrói o total na memória e o exercício vira
