@@ -84,6 +84,13 @@ type EtapaReclassificacao = "primeira" | "transicao" | "segunda";
 
 /** §4: a troca de critério dura 2,5s. */
 const DURACAO_DA_TROCA = 2500;
+/**
+ * Quanto tempo o critério errado fica marcado antes de a vez voltar.
+ *
+ * Não é enfeite: sem a pausa, a alternativa reacende no mesmo quadro em que a
+ * criança tocou e ela não vê que aquele foi o seu toque.
+ */
+const MARCA_DO_ERRO_MS = 1400;
 
 const TINTA_DO_CRITERIO: Record<string, string> = {
   vermelho: "#DC2626",
@@ -191,6 +198,32 @@ export function ClassificacaoStage({
     setTentativas({});
     enviado.current = false;
   }, [spec, resolvidas, faseReclassificacao]);
+
+  /**
+   * O critério errado marca, mas não fecha a questão.
+   *
+   * ## O beco
+   *
+   * A AL.01 nível 5 pergunta "por que estas estão juntas?" e oferece três
+   * critérios. Ao primeiro toque, as TRÊS alternativas ficavam desabilitadas
+   * para sempre. Se a criança errava, o app fazia o que faz em toda alternativa
+   * errada: escondia aquela, dizia "Olha de novo!" e DEVOLVIA A VEZ — para uma
+   * tela em que nada mais respondia. Sem "Avançar", sem alternativa viva: a
+   * única saída era abandonar a missão. Foi medido em todo erro possível deste
+   * nível, não em um caso.
+   *
+   * Quem decide que a questão acabou é o app, pelo `disabled`. Enquanto ele for
+   * falso, a pergunta continua aberta e a alternativa tem de voltar a responder
+   * — depois de uma pausa curta, para a criança ver qual foi o seu toque.
+   *
+   * O acerto não passa por aqui: acertou, o app fecha a questão e `disabled`
+   * chega verdadeiro antes de a pausa terminar.
+   */
+  React.useEffect(() => {
+    if (escolhaDoCriterio === null || disabled) return;
+    const t = window.setTimeout(() => setEscolhaDoCriterio(null), MARCA_DO_ERRO_MS);
+    return () => window.clearTimeout(t);
+  }, [escolhaDoCriterio, disabled]);
 
   const etapaEfetiva = faseReclassificacao ?? etapa;
   const emTransicao = ehReclassificacao && etapaEfetiva === "transicao";
@@ -362,9 +395,12 @@ export function ClassificacaoStage({
                 style={{
                   color: "#22315C",
                   border: "2px solid #C7D7F0",
-                  boxShadow: `0 4px 0 ${escolhaDoCriterio && certa ? "#2FB98C" : "#C7D7F0"}`,
-                  background: escolhaDoCriterio === null ? "#F8FAFC"
-                    : certa ? "#D1FAE5" : escolhida ? "#FEF3C7" : "#F8FAFC",
+                  // Só o toque DA CRIANÇA muda de cor. Pintar a alternativa
+                  // certa de verde no erro entregava a resposta um instante
+                  // antes de o app dizer "Olha de novo!" e devolver a vez: a
+                  // segunda tentativa virava cópia, não pensamento.
+                  boxShadow: `0 4px 0 ${escolhida && certa ? "#2FB98C" : "#C7D7F0"}`,
+                  background: !escolhida ? "#F8FAFC" : certa ? "#D1FAE5" : "#FEF3C7",
                 }}
               >
                 {criterio && <CriterioVisual criterio={criterio} />}

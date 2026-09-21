@@ -123,7 +123,35 @@ export function TenFrame({ filled = 0, filled2 = null, flashDurationMs, destacar
     </div>
   );
 
-  if (moldura) return <Moldura {...moldura} />;
+  /**
+   * `moldura` só vale quando vem como OBJETO de props da moldura.
+   *
+   * O `FichaRendererBase` espalha o `uiProps` da ficha direto aqui
+   * (`<TenFrame filled={n} {...uiProps} />`). Duas fichas — N3.07 e N3.08 —
+   * declaram `uiProps: { n, moldura: 10 }`, onde `moldura` é o NÚMERO de
+   * casas, não as props de `<Moldura>`. Espalhar um número dá objeto vazio,
+   * `ocupadas` chega `undefined`, e a linha do `aria-label` estoura com
+   * "Cannot read properties of undefined (reading 'length')" — o palco inteiro
+   * morre.
+   *
+   * ## O que foi medido, para não contar vitória falsa
+   *
+   * Esse estouro NÃO chega à criança hoje, e é honesto dizer por quê: N3.07 e
+   * N3.08 têm construtor especializado (`construirFazerDezQuestion`,
+   * `construirVoltarPeloDezQuestion`), e `selectGenerator` serve o construtor,
+   * não o `Composer.generate` genérico. Pela porta do app (`track.gen`) elas
+   * nascem `fazer-dez-f33` e `voltar-pelo-dez-f34`; nenhuma das noventa
+   * competências, em nenhum dos cinco níveis, serve `tenframe` com `moldura`
+   * numérica. Quem alcançava o estouro era uma sonda chamando o Composer
+   * direto — uma porta que o app não usa.
+   *
+   * A guarda fica mesmo assim, e aqui e não só no chamador, porque o chamador
+   * é um `spread` genérico: basta uma ficha nova com `moldura` numérica, ou um
+   * canário promovido para o Composer, e o buraco volta — desta vez na mão da
+   * criança. Com número, o que vale é o `filled`, que já desenha a moldura de
+   * dez casas: exatamente o que essas fichas querem.
+   */
+  if (moldura && typeof moldura === "object") return <Moldura {...moldura} />;
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-3 py-2 min-h-[120px]">

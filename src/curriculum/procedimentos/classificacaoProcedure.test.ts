@@ -245,6 +245,10 @@ describe("§7 — as falas são as da ficha, letra por letra", () => {
 
   it("o rótulo do laço concorda em número", () => {
     expect(rotuloDoCriterio(VERMELHO)).toBe("vermelhos");
+    // "azuls" não existe. Palavra em -l faz plural em -is, e este rótulo é
+    // FALADO para uma criança que ainda não lê.
+    expect(rotuloDoCriterio({ atributo: "cor", valor: "azul" })).toBe("azuis");
+    expect(rotuloDoCriterio({ atributo: "cor", valor: "amarelo" })).toBe("amarelos");
     expect(rotuloDoCriterio({ atributo: "forma", valor: "circulo" })).toBe("círculos");
     expect(rotuloDoCriterio(GRANDE)).toBe("grandes");
   });

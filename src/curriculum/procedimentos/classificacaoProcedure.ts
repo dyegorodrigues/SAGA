@@ -103,8 +103,14 @@ export function satisfaz(p: Peca, c: Criterio): boolean {
  * *"as vermelhas"* conforme a peça, e *"os grandes"*. A criança de 4 anos
  * **ouve** o enunciado — erro de concordância soa errado antes de parecer.
  */
+const PLURAL_DA_COR: Record<Cor, string> = { vermelho: "vermelhos", azul: "azuis", amarelo: "amarelos" };
+
 export function rotuloDoCriterio(c: Criterio): string {
-  if (c.atributo === "cor") return `${c.valor}s`;
+  // "azul" + "s" dava **"azuls"**, que não é português — e a criança de quatro
+  // anos OUVE este rótulo antes de ler qualquer coisa. Palavra terminada em -l
+  // faz plural em -is. A tabela é fechada de propósito: `Record<Cor, string>`
+  // obriga o compilador a cobrar o plural de toda cor nova.
+  if (c.atributo === "cor") return PLURAL_DA_COR[c.valor as Cor];
   if (c.atributo === "tamanho") return `${c.valor}s`;
   const plural: Record<Forma, string> = {
     circulo: "círculos",

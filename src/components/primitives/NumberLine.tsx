@@ -23,6 +23,44 @@ interface NumberLineProps {
   larguraPorPonto?: number;
 }
 
+/**
+ * Uma casa da reta.
+ *
+ * ## Por que isto é um `<button>` e não uma `<div>` com `onClick`
+ *
+ * Era uma `<div onClick>`. Funcionava no mouse e no dedo, e por isso passou
+ * despercebida por muito tempo — mas:
+ *
+ * - **A varredura não a via.** O `CountingOnStage` da N3.03 diz "toque na
+ *   próxima casa da reta" e, depois que a criança acerta a partida, a reta é a
+ *   ÚNICA coisa que resta na tela. Para qualquer auditoria que conte controles
+ *   — e para qualquer leitor de tela — aquela tela estava vazia. A N3.03
+ *   aparecia como beco sem saída em três níveis.
+ * - **Não tinha nome nem teclado.** Uma casa da reta sem `aria-label` não é
+ *   anunciada, e sem foco não é alcançável por teclado.
+ *
+ * Trocar por `<button>` resolve os três de uma vez sem mexer no desenho: as
+ * classes são as mesmas, e `appearance-none`/`bg-transparent` impedem o
+ * navegador de pintar o botão por conta própria.
+ *
+ * Quando não há `onValueClick`, a reta é ilustração — e ilustração não vira
+ * botão: um botão que não faz nada é pior que nenhum.
+ */
+function Ponto({ val, onValueClick, children }: { val: number; onValueClick?: (v: number) => void; children: React.ReactNode }) {
+  const classes = "relative flex flex-col items-center justify-center group";
+  if (!onValueClick) return <div className={classes}>{children}</div>;
+  return (
+    <button
+      type="button"
+      aria-label={`Número ${val} na reta`}
+      onClick={() => onValueClick(val)}
+      className={`${classes} cursor-pointer appearance-none border-0 bg-transparent p-0`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function NumberLine({
   min = 0,
   max = 20,
@@ -107,10 +145,10 @@ export function NumberLine({
           const isTarget = targetValue === val;
           const isCurrent = currentValue === val;
           return (
-            <div 
-              key={val} 
-              className="relative flex flex-col items-center justify-center cursor-pointer group"
-              onClick={() => onValueClick?.(val)}
+            <Ponto
+              key={val}
+              val={val}
+              onValueClick={onValueClick}
             >
               {/* Tick mark */}
               <div 
@@ -132,7 +170,7 @@ export function NumberLine({
                 className="absolute w-12 h-12 rounded-full opacity-0 hover:opacity-10 transition-opacity"
                 style={{ backgroundColor: tokens.cor.elementos.base_A }}
               />
-            </div>
+            </Ponto>
           );
         })}
       </div>

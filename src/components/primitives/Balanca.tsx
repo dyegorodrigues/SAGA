@@ -92,6 +92,21 @@ export function Balanca({ leftItems, rightItems, state = 'ocioso', maxTilt = 15,
             animate={{ rotate: -rotation }} // Counter-rotate to stay horizontal
             transition={{ type: 'spring', stiffness: 120, damping: 12 }}
             onClick={() => onPanClick && onPanClick('left')}
+            /**
+             * O prato é ALVO DE RESPOSTA quando há `onPanClick`: em GM.12 no modo
+             * peso, escolher o prato É a resposta. Sendo uma `div` crua, ele
+             * funcionava no dedo de quem enxerga e não existia para mais ninguém —
+             * sem papel, sem nome, sem teclado. Também não aparecia em nenhuma
+             * varredura que procure controles, o que o deixava invisível para
+             * auditoria: dois níveis desta competência constavam como "tela sem
+             * nada em que tocar".
+             */
+            role={onPanClick ? "button" : undefined}
+            tabIndex={onPanClick ? 0 : undefined}
+            aria-label={onPanClick ? "Escolher o prato da esquerda" : undefined}
+            onKeyDown={onPanClick ? (e) => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPanClick('left'); }
+            } : undefined}
           >
             {renderPanItems(leftItems)}
           </motion.div>
@@ -111,6 +126,21 @@ export function Balanca({ leftItems, rightItems, state = 'ocioso', maxTilt = 15,
             animate={{ rotate: -rotation }} // Counter-rotate to stay horizontal
             transition={{ type: 'spring', stiffness: 120, damping: 12 }}
             onClick={() => onPanClick && onPanClick('right')}
+            /**
+             * O prato é ALVO DE RESPOSTA quando há `onPanClick`: em GM.12 no modo
+             * peso, escolher o prato É a resposta. Sendo uma `div` crua, ele
+             * funcionava no dedo de quem enxerga e não existia para mais ninguém —
+             * sem papel, sem nome, sem teclado. Também não aparecia em nenhuma
+             * varredura que procure controles, o que o deixava invisível para
+             * auditoria: dois níveis desta competência constavam como "tela sem
+             * nada em que tocar".
+             */
+            role={onPanClick ? "button" : undefined}
+            tabIndex={onPanClick ? 0 : undefined}
+            aria-label={onPanClick ? "Escolher o prato da direita" : undefined}
+            onKeyDown={onPanClick ? (e) => {
+              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onPanClick('right'); }
+            } : undefined}
           >
             {renderPanItems(rightItems)}
           </motion.div>
