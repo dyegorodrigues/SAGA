@@ -1,0 +1,25 @@
+{
+  "image": "magosha_spritesheet_pro.png",
+  "cell": 512,
+  "spacing": 24,
+  "margin": 32,
+  "cols": 4,
+  "frames": {
+    "idle_front": { "frame": { "x": 32, "y": 32, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "walk_left": { "frame": { "x": 568, "y": 32, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "walk_right": { "frame": { "x": 1104, "y": 32, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "back": { "frame": { "x": 1640, "y": 32, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "walk_front": { "frame": { "x": 32, "y": 568, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "punch_jab": { "frame": { "x": 568, "y": 568, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "kick_high": { "frame": { "x": 1104, "y": 568, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "block": { "frame": { "x": 1640, "y": 568, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "victory_jump": { "frame": { "x": 32, "y": 1104, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "flex_power": { "frame": { "x": 568, "y": 1104, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "hurt_dizzy": { "frame": { "x": 1104, "y": 1104, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "sleep": { "frame": { "x": 1640, "y": 1104, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "eat": { "frame": { "x": 32, "y": 1640, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "sit_idle": { "frame": { "x": 568, "y": 1640, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "jump": { "frame": { "x": 1104, "y": 1640, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } },
+    "roar_special": { "frame": { "x": 1640, "y": 1640, "w": 512, "h": 512 }, "sourceSize": { "w": 512, "h": 512 }, "pivot": { "x": 0.5, "y": 0.9 } }
+  }
+}
