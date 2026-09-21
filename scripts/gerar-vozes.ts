@@ -70,13 +70,18 @@ const VELOCIDADE = 0.95;
  * - `y`: o espeak usa "y" para o /i/ final átono. O Kokoro lê como o "y" do
  *   inglês e "sete" virava "satu".
  * - `æ`: idem para o /a/ final átono — "casa" saía com vogal de inglês.
- * - `lj`: o espeak não usa `ʎ`; escreve "olha" como `ˈɔljæ`, que o Kokoro lê
- *   "óleo". Com `ʎ` a palavra volta certa.
+ * Houve uma terceira, `lj` → `ʎ`, e ela foi RETIRADA — fica registrada porque
+ * o erro vale mais que a correção. Ela nasceu de uma amostra só: "olha"
+ * voltava "óleo". Medida depois em oito frases com "lh", perdeu em duas
+ * ("Olhe a linha" virou "Pode alinhar"; "pilha" virou "pídia") e não ganhou em
+ * nenhuma. O "óleo" da amostra original era do `æ` final, não do `lj`: com
+ * `æ` → `ɐ` no lugar, o `lj` do espeak já sai certo.
+ *
+ * A lição, que é a regra da casa: uma amostra não é medição.
  */
 const CORRECOES: [RegExp, string][] = [
   [/y/g, "i"],
   [/æ/g, "ɐ"],
-  [/lj/g, "ʎ"],
 ];
 
 function fonemizar(texto: string): string {
