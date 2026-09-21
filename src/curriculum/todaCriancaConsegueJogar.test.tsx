@@ -273,6 +273,36 @@ describe("toda criança consegue jogar", () => {
     expect(becos, `exercícios que prendem a criança depois de um erro:\n${becos.join("\n")}`).toEqual([]);
   }, 300000);
 
+  it("toda demonstração termina e devolve a vez para a criança", () => {
+    /*
+     * A varredura acima prende a fase do palco em "perguntando", e tem razão:
+     * ela mede se HÁ o que tocar quando a pergunta chega. Só que isso pula
+     * justamente o que o auditor de navegador acusa — `PALCO-VAZIO` e `TRAVOU`
+     * na primeira questão de várias competências. A suspeita é de roteiro: o
+     * palco mostra, esconde, conta, e **só então** pergunta. Se algum desses
+     * relógios não disparar, a criança fica olhando uma demonstração que nunca
+     * acaba, e nenhum teste com a fase presa veria isso.
+     *
+     * Aqui a fase NÃO é presa. O palco nasce como nasce na mão da criança e o
+     * relógio corre. Doze segundos é folga larga sobre o roteiro mais longo
+     * declarado nas fichas (a moldura da JD5 gasta pouco mais de cinco).
+     */
+    const presos: string[] = [];
+    for (const { track, nivel } of COMBINACOES) {
+      let q: any;
+      try { q = gerar(track, nivel); } catch { continue; }
+      try {
+        const { container } = render(<GameLoopExerciseRenderer {...props(q, { faseDaCena: undefined })} />);
+        act(() => { vi.advanceTimersByTime(12000); });
+        if (controlesVivos(container).length === 0) {
+          presos.push(`${track.id} n${nivel} (${q.kind}): a demonstração não devolveu a vez em 12s`);
+        }
+      } catch { /* quebra de render já é cobrada acima */ }
+      cleanup();
+    }
+    expect(presos, `exercícios em que a demonstração nunca acaba:\n${presos.join("\n")}`).toEqual([]);
+  }, 300000);
+
   it("todo enunciado de texto tem como ser ouvido", () => {
     // Número e símbolo sozinhos não exigem leitura; palavra exige.
     const mudos: string[] = [];

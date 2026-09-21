@@ -43,6 +43,21 @@
  * outras: no nível 1 há demonstração guiada, e o auditor ainda não sabe
  * esperá-la.
  *
+ * ## O `[TRAVOU]` da primeira questão, especificamente
+ *
+ * Medido em 21/09: ele acusa `TRAVOU` e `PALCO-VAZIO` na q1 de várias
+ * competências — N1.01, N1.02, N1.03, AL.01, GE.01 — e nenhuma delas está
+ * travada. O que ele encontra é a DEMONSTRAÇÃO: o palco mostra, esconde,
+ * conta e só então pergunta, e ele gasta os toques antes de a pergunta
+ * chegar.
+ *
+ * Isso agora tem prova do outro lado:
+ * `src/curriculum/todaCriancaConsegueJogar.test.tsx` renderiza os 450
+ * exercícios SEM prender a fase, deixa o relógio correr doze segundos e cobra
+ * que haja o que tocar. Passa nos 450, e a mutação que congela o roteiro da
+ * moldura derruba o teste. Ou seja: as demonstrações terminam e devolvem a
+ * vez. O `TRAVOU` de q1 é do instrumento.
+ *
  * Por isso um `[TRAVOU]` daqui é **suspeita**, não veredicto: só vale depois
  * de reproduzido à mão no app. O que já está provado assim vira teste de
  * unidade, que é onde a prova fica — `errarNaoMataAQuestao.test.tsx` e

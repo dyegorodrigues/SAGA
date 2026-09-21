@@ -644,7 +644,13 @@ export function GameLoopExerciseRenderer({
             style={{
               fontFamily: FONT, fontWeight: 900, fontSize: 14, color: "#fff",
               background: C.grape, border: "none", borderRadius: 14,
-              padding: "10px 18px", boxShadow: "0 4px 0 rgba(0,0,0,0.2)",
+              // 44px é o piso da WCAG 2.5.5 e da Apple, e os dois foram
+              // escritos para mão adulta. Medido no navegador, em tela de
+              // celular, este botão saía 41px — e é justamente o botão de
+              // quem está travado. Errar o toque em quem pede socorro é o
+              // pior lugar possível para três pixels.
+              minHeight: 44,
+              padding: "12px 18px", boxShadow: "0 4px 0 rgba(0,0,0,0.2)",
             }}
           >
             💡 Tá difícil? Vem ver a aulinha! 👉

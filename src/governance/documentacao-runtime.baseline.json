@@ -11,7 +11,7 @@
   "src/components/KidHomeScreen.tsx": 30,
   "src/components/Mascot.tsx": 51,
   "src/components/MascotEvolution.tsx": 37,
-  "src/components/gameloop/GameLoopExerciseRenderer.tsx": 61,
+  "src/components/gameloop/GameLoopExerciseRenderer.tsx": 66,
   "src/components/gameloop/OuvirDeNovo.tsx": 27,
   "src/components/gameloop/answerPolicy.ts": 49,
   "src/components/gameloop/chaveDaTentativa.ts": 27,

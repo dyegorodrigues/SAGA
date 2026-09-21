@@ -24,6 +24,26 @@ export function MapaTesouroStage({ spec, disabled, onAnswer }: Props) {
     onAnswer(valor, misconception ? { misconception } : undefined);
   };
 
+  /**
+   * O lado do mapa nasce da grade, e não de um número fixo.
+   *
+   * Era 280 px fixos. Com a grade de cinco, cada célula ficava 44×42 — dois
+   * pixels abaixo do piso de 44, que é o mínimo da WCAG 2.5.5 e da Apple, e
+   * ambos foram escritos para MÃO ADULTA. A criança de quatro anos encosta a
+   * polpa inteira do dedo: ela erra a célula, toca na vizinha e conclui que o
+   * mapa não obedece.
+   *
+   * Medido no navegador, em tela de celular, pelo `auditar-exercicios.mjs`:
+   * quinhentas ocorrências, todas desta grade.
+   *
+   * As margens do tabuleiro (`left-10 right-3 top-8 bottom-8`) comem 52 px na
+   * largura e 64 na altura; o lado sai da conta para a célula sobrar com
+   * folga, e nunca menor que os 280 de antes.
+   */
+  const CELULA_MINIMA = 48;
+  const MARGENS_DO_TABULEIRO = 64;
+  const ladoDoMapa = Math.max(280, spec.gradeSize * CELULA_MINIMA + MARGENS_DO_TABULEIRO);
+
   const board = (
     <div className="absolute inset-0" data-f60-grid-size={spec.gradeSize}>
       <div className="absolute left-10 right-3 top-8 bottom-8 grid" style={{ gridTemplateColumns: `repeat(${spec.gradeSize}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${spec.gradeSize}, minmax(0, 1fr))` }}>
@@ -39,7 +59,7 @@ export function MapaTesouroStage({ spec, disabled, onAnswer }: Props) {
               disabled={disabled || !interactive}
               aria-label={`coluna ${spec.colunas[cell.coluna - 1]}, linha ${spec.linhas[cell.linha - 1]}`}
               onClick={() => interactive && responder(value)}
-              className={`relative min-h-10 border border-slate-300 bg-white/70 p-0 ${interactive ? "cursor-pointer" : "cursor-default"} ${selecionada ? "ring-4 ring-inset ring-violet-500" : ""}`}
+              className={`relative min-h-11 border border-slate-300 bg-white/70 p-0 ${interactive ? "cursor-pointer" : "cursor-default"} ${selecionada ? "ring-4 ring-inset ring-violet-500" : ""}`}
               data-f60-cell={value}
             >
               {alvo && spec.modo !== "colocar-objeto" && <span aria-label="tesouro" className="absolute inset-0 flex items-center justify-center text-2xl">★</span>}
@@ -61,7 +81,7 @@ export function MapaTesouroStage({ spec, disabled, onAnswer }: Props) {
     <section className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 overflow-x-hidden" data-f60-stage data-f60-mode={spec.modo}>
       <p className="text-center text-sm font-bold text-slate-700">{spec.objetivo}</p>
       <div className="max-w-full overflow-hidden rounded-2xl">
-        <ShapeCanvas cena={{ pecas: [], largura: 280, altura: 280 }} fundo={board} />
+        <ShapeCanvas cena={{ pecas: [], largura: ladoDoMapa, altura: ladoDoMapa }} fundo={board} />
       </div>
       {spec.modo !== "colocar-objeto" && (
         <div className="grid w-full grid-cols-2 gap-3" aria-label="Respostas do mapa">
