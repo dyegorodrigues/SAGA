@@ -23,8 +23,30 @@
  *    é impossível, e ela erra por analfabetismo, não por matemática.
  *
  * Este auditor entra em cada competência, em cada nível, e responde de
- * verdade: tenta todos os caminhos de resposta até achar um que avance. Se
- * nenhum avança, é falha e o relatório diz qual das sete é.
+ * verdade: tenta todos os caminhos de resposta até achar um que avance.
+ *
+ * ## O ESTADO DELE, sem maquiagem
+ *
+ * **Ainda não é confiável para absolver ou condenar um exercício sozinho.**
+ * Ele já provou o seu valor — foi com ele que se achou o beco em que a criança
+ * travava, e ele joga duas competências inteiras do começo ao fim. Mas um
+ * jogador genérico não sabe jogar noventa exercícios pedagogicamente
+ * distintos, e três vezes nesta sessão ele acusou de travado um exercício que
+ * funciona:
+ *
+ * 1. identificava controle pelo RÓTULO — três macacos iguais viravam um só;
+ * 2. tocava UMA vez em cada — "estoure os balões" pede três tiros no canhão;
+ * 3. reiniciava a varredura a cada mudança de tela — girava no botão de dica
+ *    para sempre e nunca chegava ao exercício.
+ *
+ * As três foram corrigidas e estão registradas no próprio código. Sobram
+ * outras: no nível 1 há demonstração guiada, e o auditor ainda não sabe
+ * esperá-la.
+ *
+ * Por isso um `[TRAVOU]` daqui é **suspeita**, não veredicto: só vale depois
+ * de reproduzido à mão no app. O que já está provado assim vira teste de
+ * unidade, que é onde a prova fica — `errarNaoMataAQuestao.test.tsx` e
+ * `aCriancaQueNaoLe.test.tsx` nasceram exatamente desse caminho.
  */
 import { chromium } from "playwright-core";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -75,7 +97,10 @@ const candidatos = async (p) => p.evaluate(() => {
   // que a criança já fez: um auditor que insiste nela nunca termina uma
   // questão — e acusa de travado um exercício que funciona.
   const CHROME = /^(Fechar|Sair da missão|Avançar|Continuar|Ver Resultado|Sair|Voltar|TUTOR|JORNADA|DOJO|OFICINA)$/i;
-  const AJUDA = /como faz|aulinha|tá difícil|ta dificil|dica|ouvir|escutar|repetir/i;
+  // Só o que REINICIA a narração fica de fora. "Como faz?" e "a aulinha" são
+  // andaime: no nível 1 a demonstração faz parte do caminho, e excluí-los fez
+  // o auditor estacionar antes de chegar ao exercício.
+  const AJUDA = /ouvir de novo|escutar|repetir|ligar o som|desligar o som/i;
   const saida = [];
   document.querySelectorAll("button, [role=button], [draggable=true], input[type=radio], input[type=text], input[type=number], select").forEach((e, i) => {
     if (!vis(e)) return;
