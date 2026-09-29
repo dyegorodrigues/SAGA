@@ -16,8 +16,8 @@ import { JOURNEY_FICHAS } from "../curriculum/fichas";
  * escreve dentro de `show` é lida por algum componente?** Em segundos, sem
  * render, sem sorteio, e apontando a chave e a ficha pelo nome.
  *
- * A medida da primeira execução: **185 chaves declaradas, 64 lidas, 129
- * órfãs.** Os 215 passos mortos que a irmã contou não são 215 defeitos
+ * A medida: **185 chaves declaradas dentro de `show`, 55 lidas de verdade,
+ * 130 órfãs.** Os 215 passos mortos que a irmã contou não são 215 defeitos
  * independentes — são, em grande parte, estas 129 palavras que as fichas
  * falam e os palcos não entendem. `destacarTodos`, `pulsarTampa`,
  * `fecharMoldura`, `destacarMoeda`, `piscarLados`: escritas na ficha,
@@ -68,15 +68,18 @@ function chavesLidas(): Set<string> {
       if (statSync(caminho).isDirectory()) { varrer(caminho); continue; }
       if (!/\.tsx?$/.test(entrada) || /\.test\./.test(entrada)) continue;
       const fonte = readFileSync(caminho, "utf8");
-      // O acesso direto: `mostrar?.destacarMaior`, `mostrar.taparN`.
+      // Só o ACESSO conta: `mostrar?.destacarMaior`, `mostrar.taparN`.
+      //
+      // A primeira versão também contava as chaves declaradas no tipo
+      // `mostrar?: { ... }` de cada palco, e isso era duas coisas erradas ao
+      // mesmo tempo. Uma: chave no tipo e nunca lida no corpo é exatamente o
+      // defeito que esta catraca existe para achar — o `MolduraStage` tipa
+      // `pulsarTampa` e `contarUmAUm` e não usa nenhum dos dois. Outra: o
+      // recorte `[^}]*` parava na primeira chave fechada, então um tipo com
+      // objeto aninhado (`moldura?: { vazia?: boolean }`) era lido pela
+      // metade. Medido: nenhum palco desestrutura `mostrar`, e só 3 chaves
+      // viviam apenas no tipo, então a fonte inteira sai sem perda.
       for (const m of fonte.matchAll(/mostrar\??\.([a-zA-Z_][a-zA-Z0-9_]*)/g)) lidas.add(m[1]);
-      // E o contrato do palco: `mostrar?: { destacarMaior?: boolean; ... }`.
-      for (const m of fonte.matchAll(/mostrar\??:\s*\{([^}]*)\}/gs)) {
-        for (const linha of m[1].split(/[,\n]/)) {
-          const nome = linha.trim().split(/[?:=\s]/)[0];
-          if (nome && /^[a-zA-Z_]/.test(nome)) lidas.add(nome);
-        }
-      }
     }
   };
   varrer(COMPONENTES);
