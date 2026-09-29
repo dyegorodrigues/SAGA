@@ -11,7 +11,7 @@
  *
  * Esta sonda abre o app pela porta da frente, entra numa missão como uma
  * criança entraria, e mede no tráfego de rede: o índice foi buscado? algum
- * `.m4a` foi pedido? algum foi recusado?
+ * `.mp3` foi pedido? algum foi recusado?
  *
  *     npm run build && npm start &
  *     node scripts/sonda-voz.mjs
@@ -42,6 +42,28 @@ const clicar = async (page, nome, espera) => {
 
 const browser = await chromium.launch({ executablePath: CHROMIUM });
 const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+
+/*
+ * O tráfego, que ficou sem quem o anotasse.
+ *
+ * Quando reescrevi esta sonda para medir REPRODUÇÃO em vez de bytes, tirei o
+ * `Audio` de lugar errado e levei junto o ouvinte que preenchia `pedidos` — e
+ * a sonda passou a morrer em `ReferenceError` antes de medir coisa alguma.
+ * Tráfego continua importando: ele separa "não tocou porque não baixou" de
+ * "baixou e o navegador recusou o codec", que foi o defeito do pacote em AAC.
+ */
+const pedidos = [];
+page.on("requestfinished", async req => {
+  const url = req.url().replace(BASE, "").replace(/^\//, "");
+  if (!/vozes\//.test(url)) return;
+  const resp = await req.response().catch(() => null);
+  pedidos.push({ url: url.replace(/^vozes\//, ""), status: resp ? resp.status() : "sem resposta" });
+});
+page.on("requestfailed", req => {
+  const url = req.url().replace(BASE, "").replace(/^\//, "");
+  if (!/vozes\//.test(url)) return;
+  pedidos.push({ url: url.replace(/^vozes\//, ""), status: req.failure()?.errorText ?? "falhou" });
+});
 
 /*
  * Medir REPRODUÇÃO, e não tráfego.
@@ -88,9 +110,6 @@ const clipes = pedidos.filter(p => p.url.endsWith(".mp3"));
 // 206 é o normal para áudio: o `<audio>` pede por faixa de bytes. A primeira
 // versão desta sonda tratava 206 como recusa e acusava de mudo um app que
 // estava tocando — falsa acusação causada pelo próprio instrumento.
-// 206 é o normal para áudio: o `<audio>` pede por faixa de bytes. A primeira
-// versão desta sonda tratava 206 como recusa e acusava de mudo um app que
-// estava tocando.
 //
 // `ERR_ABORTED` também é normal, e por bom motivo: quando uma fala nova
 // começa, a anterior é cortada — é o que o app deve fazer para não falar duas

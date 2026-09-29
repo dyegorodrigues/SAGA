@@ -155,8 +155,6 @@ async function main() {
   const [fatia, fatias] = (process.env.FATIA ?? "0/1").split("/").map(Number);
   const escreveIndice = fatias === 1;
 
-  const indice: string[] = existsSync(INDICE) ? JSON.parse(readFileSync(INDICE, "utf8")) : [];
-  const jaTem = new Set(indice);
   const colisoes = new Map<string, string>();
   let gravadas = 0;
   let puladas = 0;
@@ -174,7 +172,22 @@ async function main() {
     colisoes.set(chave, texto);
 
     const destino = resolve(DESTINO, `${chave}.${EXTENSAO}`);
-    if (jaTem.has(chave) && existsSync(destino)) { puladas += 1; continue; }
+    /*
+     * ⚠️ Quem diz que a fala já existe é o ARQUIVO, não o índice.
+     *
+     * Isto era `jaTem.has(chave) && existsSync(destino)` — e o `jaTem` vinha
+     * de `indice.json`, que é a SAÍDA deste mesmo script. Rodando em fatias,
+     * só a fatia única escreve o índice; as quatro paralelas gravaram as 1860
+     * falas e deixaram o índice vazio. A passada final então encontrou 1860
+     * arquivos em disco, um índice dizendo "nenhuma", e começou a regravar
+     * tudo do zero — duas horas e meia de GPU para reproduzir byte a byte o
+     * que já estava ali.
+     *
+     * O nome do arquivo é o hash do texto: texto diferente, arquivo
+     * diferente. Então o arquivo existir É a resposta, e o índice é só o
+     * resumo que a linha 200 monta a partir do disco.
+     */
+    if (existsSync(destino)) { puladas += 1; continue; }
 
     const ipa = fonemizar(texto);
     const { input_ids } = tts.tokenizer(ipa, { truncation: true });
@@ -184,10 +197,8 @@ async function main() {
       execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", wav, "-c:a", "libmp3lame", "-b:a", "48k", "-ac", "1", "-ar", "24000", destino]);
     rmSync(wav);
 
-    jaTem.add(chave);
     gravadas += 1;
     if (gravadas % 25 === 0) {
-      if (escreveIndice) writeFileSync(INDICE, JSON.stringify([...jaTem].sort()) + "\n");
       console.log(`${i + 1}/${corpus.length} — ${gravadas} gravadas, ${puladas} já existiam`);
     }
   }
