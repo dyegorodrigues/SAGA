@@ -233,10 +233,64 @@ export function ClassificacaoStage({
     : spec.lacos;
   const criteriosAtivos = lacosAtivos.map(l => l.criterio);
 
-  const naBandeja = spec.pecas.filter(p => colocado[p.id] === undefined);
-  const terminou = naBandeja.length === 0;
   const emAula = mostrar != null && Object.keys(mostrar).length > 0;
   const travado = Boolean(disabled) || emTransicao || emAula;
+
+  /**
+   * A coreografia da ficha passa um índice de exemplo, mas o índice é só uma
+   * preferência editorial. O sorteio muda as peças. Se o índice deixou de ser
+   * semanticamente válido, o palco encontra uma peça que realmente demonstre o
+   * conceito. Foi um PRINT que pegou a versão anterior ensinando uma peça
+   * vermelha como exemplo de "fica fora" num laço de vermelhos.
+   */
+  function pecaDaDemonstracao(preferida: number | undefined, destino: "dentro" | "fora"): number | undefined {
+    if (preferida === undefined) return undefined;
+    const serve = (p: Peca) => destino === "dentro"
+      ? destinoCerto(p, criteriosAtivos).length > 0
+      : destinoCerto(p, criteriosAtivos).length === 0;
+    const pedida = spec.pecas.find(p => p.id === preferida);
+    if (pedida && serve(pedida)) return pedida.id;
+    return spec.pecas.find(serve)?.id;
+  }
+
+  const maoDentro = emAula ? pecaDaDemonstracao(mostrar?.moverParaDentro, "dentro") : undefined;
+  const maoFora = emAula ? pecaDaDemonstracao(mostrar?.deixarFora, "fora") : undefined;
+
+  /**
+   * ⚠️ A aula que diz "entra" faz entrar.
+   *
+   * O dedo subia e descia ao lado da peça, e a peça ficava na bandeja: o laço
+   * seguia vazio enquanto a voz dizia *"Este é vermelho, **entra**"*. Um dedo
+   * balançando não é a peça entrando, e a criança de quatro anos lê o que a
+   * tela FAZ, não o que ela promete. É a mesma família do balão que não
+   * estourava e da mão fantasma que não levava a banana — o pai resumiu as
+   * três de uma vez: *"o como faz é bugado"*.
+   *
+   * O destino não é escolhido aqui: é o mesmo `destinoCerto` que julga a
+   * criança. A demonstração e a correção passam pela mesma regra, então não
+   * existe versão em que a aula ensine um lugar e o app aceite outro.
+   */
+  const demonstrado: Colocado = React.useMemo(() => {
+    const d: Colocado = {};
+    if (maoDentro !== undefined) {
+      const p = spec.pecas.find(x => x.id === maoDentro);
+      if (p) d[maoDentro] = destinoCerto(p, criteriosAtivos);
+    }
+    if (maoFora !== undefined) d[maoFora] = [];
+    return d;
+  }, [maoDentro, maoFora, spec.pecas, criteriosAtivos.join("|")]);
+
+  /**
+   * Onde cada peça está AGORA na tela: o que a criança colocou, mais o que a
+   * aula está demonstrando. É esta a leitura que a bandeja e os laços usam —
+   * sem ela a peça demonstrada ficava nos dois lugares ao mesmo tempo, ou em
+   * nenhum.
+   */
+  const naTela: Colocado = emAula ? { ...colocado, ...demonstrado } : colocado;
+
+  const naBandeja = spec.pecas.filter(p => naTela[p.id] === undefined);
+  // `terminou` continua olhando só para a CRIANÇA: a aula não conclui a ficha.
+  const terminou = spec.pecas.every(p => colocado[p.id] !== undefined);
 
   /**
    * Fim da PRIMEIRA classificação não é resposta: é a troca de critério. Só a
@@ -335,25 +389,6 @@ export function ClassificacaoStage({
 
   const lacoAceso = (emAula && mostrar?.destacarLaco === true) || emTransicao;
 
-  /**
-   * A coreografia da ficha passa um índice de exemplo, mas o índice é só uma
-   * preferência editorial. O sorteio muda as peças. Se o índice deixou de ser
-   * semanticamente válido, o palco encontra uma peça que realmente demonstre o
-   * conceito. Foi um PRINT que pegou a versão anterior ensinando uma peça
-   * vermelha como exemplo de "fica fora" num laço de vermelhos.
-   */
-  function pecaDaDemonstracao(preferida: number | undefined, destino: "dentro" | "fora"): number | undefined {
-    if (preferida === undefined) return undefined;
-    const serve = (p: Peca) => destino === "dentro"
-      ? destinoCerto(p, criteriosAtivos).length > 0
-      : destinoCerto(p, criteriosAtivos).length === 0;
-    const pedida = spec.pecas.find(p => p.id === preferida);
-    if (pedida && serve(pedida)) return pedida.id;
-    return spec.pecas.find(serve)?.id;
-  }
-
-  const maoDentro = emAula ? pecaDaDemonstracao(mostrar?.moverParaDentro, "dentro") : undefined;
-  const maoFora = emAula ? pecaDaDemonstracao(mostrar?.deixarFora, "fora") : undefined;
 
   /* ---------------------------------------------------------------- *
    *  Nível 5 — descobrir o critério
@@ -419,9 +454,42 @@ export function ClassificacaoStage({
 
   const intersecao = spec.forma === "intersecao";
 
+  /**
+   * A peça desenhada DENTRO de um destino.
+   *
+   * Quando é a peça que a aula acabou de levar, ela leva junto a marca da
+   * demonstração e a mão — no lugar onde a peça agora está, não onde ela
+   * estava. A mão apontando para uma bandeja que já não tem a peça seria a
+   * mesma mentira de antes, virada do avesso.
+   */
+  const pecaNoDestino = (p: Peca) => {
+    const demonstracao = maoDentro === p.id ? "dentro" : maoFora === p.id ? "fora" : null;
+    return (
+      <span
+        key={p.id}
+        className="relative flex items-center justify-center"
+        data-peca-id={p.id}
+        data-mao-fantasma={demonstracao ?? undefined}
+      >
+        <PecaDeAtributo peca={p} brilhando={brilho === p.id || demonstracao !== null} disabled />
+        {demonstracao && (
+          <motion.span
+            aria-hidden
+            className="pointer-events-none absolute right-[-2px] text-[24px]"
+            style={{ zIndex: 2, top: demonstracao === "dentro" ? 18 : -10 }}
+            animate={semMovimento ? undefined : { scale: [1, 0.85, 1] }}
+            transition={{ duration: 0.7, repeat: Infinity }}
+          >
+            {demonstracao === "dentro" ? "\u{1F446}" : "\u{1F447}"}
+          </motion.span>
+        )}
+      </span>
+    );
+  };
+
   /** As peças que caíram num destino. */
   const dentroDe = (alvo: number[]) => spec.pecas.filter(p => {
-    const onde = colocado[p.id];
+    const onde = naTela[p.id];
     if (onde === undefined) return false;
     return onde.length === alvo.length && alvo.every(i => onde.includes(i));
   });
@@ -455,9 +523,7 @@ export function ClassificacaoStage({
         {rotuloDoLaco(l)}
       </span>
       <span className="flex flex-wrap items-center justify-center gap-0.5">
-        {dentroDe(indices).map(p => (
-          <PecaDeAtributo key={p.id} peca={p} brilhando={brilho === p.id} disabled />
-        ))}
+        {dentroDe(indices).map(pecaNoDestino)}
       </span>
     </motion.button>
   );
@@ -483,9 +549,7 @@ export function ClassificacaoStage({
           <span>{rotulo}</span>
         </span>
         <span className="flex max-w-full flex-wrap items-center justify-center gap-0.5">
-          {dentroDe(indices).map(p => (
-            <PecaDeAtributo key={p.id} peca={p} brilhando={brilho === p.id} disabled />
-          ))}
+          {dentroDe(indices).map(pecaNoDestino)}
         </span>
       </button>
     );
@@ -598,9 +662,7 @@ export function ClassificacaoStage({
           fica fora
         </span>
         <span className="flex flex-wrap items-center justify-center gap-0.5">
-          {dentroDe([]).map(p => (
-            <PecaDeAtributo key={p.id} peca={p} brilhando={brilho === p.id} disabled />
-          ))}
+          {dentroDe([]).map(pecaNoDestino)}
         </span>
       </motion.button>
 

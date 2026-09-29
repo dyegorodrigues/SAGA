@@ -156,4 +156,55 @@ describe("ClassificacaoStage — a tela de AL.01 (F51)", () => {
       unmount();
     }
   }, 60000);
+
+  /* ---------------------------------------------------------------- *
+   *  A aula que diz "entra" precisa fazer entrar
+   * ---------------------------------------------------------------- */
+
+  /**
+   * ⚠️ Na micro-aula, a peça demonstrada SAI DA BANDEJA e chega ao destino.
+   *
+   * A folha de contato do `scripts/filme.mjs` mostrou a aula inteira da AL.01:
+   *
+   * | fala                        | o que a criança via                 |
+   * |-----------------------------|-------------------------------------|
+   * | "Vamos separar os vermelhos"| o laço aceso, vazio                 |
+   * | "Este é vermelho, entra."   | **o laço vazio e um dedo balançando** |
+   * | "Este não é. Fica fora!"    | **o "fica fora" vazio, outro dedo** |
+   *
+   * Um dedo que sobe e desce ao lado da peça não é a peça entrando. A aula
+   * dizia *entra* e nada entrava — o mesmo defeito do balão que não estourava
+   * e da mão fantasma que não levava a banana. O pai já tinha nomeado a
+   * família inteira: *"o como faz é bugado"*.
+   *
+   * A regra é medida por descoberta: varre-se a coreografia declarada na
+   * própria ficha atrás de passos `moverParaDentro`/`deixarFora`, e em cada um
+   * exige-se que a peça demonstrada tenha SAÍDO da bandeja.
+   */
+  it("⚠️ na aula, a peça demonstrada sai da bandeja e vai para o destino", () => {
+    const coreografia = Object.values(AL_01.micros ?? {})
+      .flatMap(m => ((m.params as { tutorial?: unknown[] } | undefined)?.tutorial ?? []))
+      .map(p => (p as { show?: Record<string, unknown> }).show ?? {})
+      .filter(s => "moverParaDentro" in s || "deixarFora" in s);
+
+    expect(coreografia.length, "a AL.01 declara passos que movem peça").toBeGreaterThan(0);
+
+    const naBandeja = (mostrar: Record<string, unknown> | undefined) => {
+      const s = spec(1);
+      const { container, unmount } = render(
+        <ClassificacaoStage spec={s} mostrar={mostrar as never} />,
+      );
+      const bandeja = container.querySelector('[aria-label="Peças para separar"]');
+      const n = bandeja ? bandeja.querySelectorAll("[data-peca-id]").length : 0;
+      unmount();
+      return n;
+    };
+
+    const parada = naBandeja(undefined);
+    for (const show of coreografia) {
+      // Uma peça a menos na bandeja: ela está no destino, não flutuando.
+      expect(naBandeja(show), `${JSON.stringify(show)}`).toBe(parada - 1);
+    }
+  });
+
 });

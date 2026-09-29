@@ -146,9 +146,17 @@ describe("F51 — regressões que o print encontrou", () => {
       nomeDaPeca(primeira),
       destino.length === 0 ? "Deixar fora dos laços" : `Laço: ${a.lacos[destino[0]].rotulo}`,
     );
-    expect(container.querySelectorAll('[data-peca-id]').length).toBe(a.pecas.length - 1);
+    // A contagem é DA BANDEJA. Desde que a peça no destino também carrega
+    // `data-peca-id` (para a aula poder marcá-la onde ela está), contar no
+    // container inteiro contaria a mesma peça duas vezes de lugares
+    // diferentes — e nunca cairia.
+    const naBandeja = () => container
+      .querySelector('[aria-label="Peças para separar"]')
+      ?.querySelectorAll('[data-peca-id]').length ?? 0;
+
+    expect(naBandeja()).toBe(a.pecas.length - 1);
 
     rerender(<ClassificacaoStage spec={b} />);
-    expect(container.querySelectorAll('[data-peca-id]').length).toBe(b.pecas.length);
+    expect(naBandeja()).toBe(b.pecas.length);
   });
 });
