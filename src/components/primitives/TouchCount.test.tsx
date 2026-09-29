@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { fireEvent, render } from "@testing-library/react";
 import axe from "axe-core";
 import { TouchCount } from "./TouchCount";
+import { JOURNEY_FICHAS } from "../../curriculum/fichas";
 import { construirTouchCountSpec } from "../../curriculum/procedimentos/touchCountContract";
 import { MisconceptionTag } from "../../constants/misconceptions";
 import { diagnosticar } from "../../curriculum/procedimentos/touchCountProcedure";
@@ -383,4 +384,56 @@ describe("acessibilidade e travamento", () => {
       expect(b.getAttribute("aria-label")).toMatch(/já contei|ainda não contei/);
     }
   });
+
+  /* ---------------------------------------------------------------- *
+   *  A aula que promete estourar precisa estourar
+   * ---------------------------------------------------------------- */
+
+  /**
+   * ⚠️ Quando a coreografia diz o numeral sobre um alvo, o alvo JÁ FOI marcado.
+   *
+   * O pai: *"O do balão ali de estourar também tá bugado como faz"*. A folha
+   * de contato mostrou o roteiro inteiro da F01 §8 e o que ele faz na tela:
+   *
+   * | fala                  | o que a criança vê                       |
+   * |-----------------------|------------------------------------------|
+   * | "Olha os balões!"     | três balões acesos                       |
+   * | "Vou estourar um."    | a mão fantasma chega                     |
+   * | "UM!"                 | **os três balões, inteiros, com um "1"** |
+   * | "Agora você estoura!" | três balões inteiros                     |
+   *
+   * A aula diz *vou estourar* e não estoura. O numeral aparecia como enfeite
+   * ao lado de um balão intacto — e o §16 desta ficha é justamente
+   * *"o numeral é o **produto do ato**"*. Sem o ato, o numeral é decoração, e
+   * a criança de quatro anos aprende que o app fala uma coisa e faz outra.
+   *
+   * A regra é medida por descoberta: para TODO passo de TODA coreografia que
+   * traga `numeral` junto de `maoFantasma`, o alvo apontado tem de sair da
+   * cena marcado — `aria-pressed="true"`. Nenhum passo é listado à mão.
+   */
+  it("⚠️ na aula, o alvo que ganha numeral sai da cena MARCADO", () => {
+    // Descoberta, não lista: varre as 90 fichas da jornada atrás de QUALQUER
+    // passo de micro-aula de `touchcount` que traga numeral sobre a mão.
+    const passos = JOURNEY_FICHAS
+      .flatMap(f => f.micros ?? [])
+      .filter(m => (m.kinds ?? []).includes("touchcount"))
+      .flatMap(m => ((m.params as { tutorial?: unknown[] } | undefined)?.tutorial ?? []))
+      .map(p => (p as { show?: Record<string, unknown> }).show)
+      .filter((s): s is { maoFantasma: number; numeral: number } =>
+        typeof s?.maoFantasma === "number" && typeof s?.numeral === "number");
+
+    expect(passos.length, "alguma coreografia de touchcount diz um numeral").toBeGreaterThan(0);
+
+    for (const show of passos) {
+      const s = toque(1);
+      const { container, unmount } = render(<TouchCount spec={s} mostrar={show} />);
+      const alvos = [...container.querySelectorAll("button")];
+      const apontado = alvos[show.maoFantasma];
+      expect(apontado?.getAttribute("aria-pressed"), `alvo ${show.maoFantasma}`).toBe("true");
+      // E o numeral que a voz diz é o que está escrito no alvo.
+      expect(apontado?.textContent ?? "").toContain(String(show.numeral));
+      unmount();
+    }
+  });
+
 });

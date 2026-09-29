@@ -199,8 +199,26 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
     });
   }
 
+  /**
+   * O que a AULA já marcou — e com que número.
+   *
+   * A coreografia da F27 §8 diz, em dois passos: *"Vou estourar um."* com a
+   * mão no alvo 0, e depois *"UM!"* com a mão no alvo 0 e `numeral: 1`. O
+   * segundo passo É o estouro: a mão desce, o balão vai, e o número nasce
+   * disso. §16: **o numeral é o produto do ato.**
+   *
+   * Isto não existia. A aula falava "vou estourar" e nada estourava; o "1"
+   * aparecia pendurado num balão inteiro, como enfeite. O pai viu antes de
+   * mim: *"o do balão ali de estourar também tá bugado como faz"*.
+   *
+   * O ato não é inventado aqui: ele é LIDO da coreografia. Numeral sobre a
+   * mão significa alvo marcado, sempre, em qualquer ficha que use este palco.
+   */
+  const marcadoPelaAula = (i: number): number | null =>
+    mostrar?.numeral !== undefined && mostrar.maoFantasma === i ? mostrar.numeral : null;
+
   /** O numeral que o alvo mostra: a posição dele na contagem, deslocada. */
-  const numeralDe = (i: number) => ordem[i];
+  const numeralDe = (i: number) => ordem[i] || (marcadoPelaAula(i) ?? 0);
 
   const acesoPelaAula = mostrar?.destacarGrupo === true;
 
@@ -244,7 +262,8 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
         style={{ height: linhasDaCena(spec.alvos) * (ALVO + 24) + 24 }}
       >
         {spec.alvos.map((a, i) => {
-          const contado = ordem[i] > 0;
+          const daAula = marcadoPelaAula(i);
+          const contado = ordem[i] > 0 || daAula !== null;
           // Balão estourado saiu da cena: não responde mais ao tiro. Ele fica
           // no lugar, invisível, porque remover do fluxo faria os balões
           // restantes escorregarem para debaixo do dedo da criança.
@@ -339,16 +358,19 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
                   `numeral: 1` junto com `maoFantasma: 0` — a voz diz "UM" e o
                   número salta. Este bloco existia como PROP e não como desenho:
                   a aula prometia um numeral que a tela nunca mostrava. */}
-              {!contado && maoAqui && mostrar?.numeral !== undefined && (
+              {/* Fica DEPOIS do estouro, não no lugar dele: a opacidade zero
+                  vive no `span` do emoji, então o balão some e o número que
+                  ele produziu permanece exatamente onde ele estava. */}
+              {daAula !== null && (
                 <span
                   aria-hidden
                   className="absolute -top-1 -right-1 rounded-full bg-indigo-600 px-1.5 text-sm font-black text-white"
                 >
-                  {mostrar.numeral}
+                  {daAula}
                 </span>
               )}
 
-              {contado && !estourado && spec.mostraNumeral && (
+              {contado && !estourado && daAula === null && spec.mostraNumeral && (
                 <motion.span
                   initial={semMovimento ? false : { scale: 0, y: 0 }}
                   animate={{ scale: 1, y: -2 }}
