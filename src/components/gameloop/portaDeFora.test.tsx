@@ -52,6 +52,15 @@ const casca = {
  */
 const PORTOES_MEDIDOS = [
   "AL.03|3",
+  // GM.02/F52: o portão é a AUDIÇÃO. As alternativas são palavras — "de manhã",
+  // "à noite" — e a criança de quatro a seis anos não lê: o primeiro toque faz
+  // o app dizer o rótulo, e só o segundo escolhe. A tela prometia isso por
+  // escrito desde sempre ("Toque para OUVIR · toque de novo para escolher") e o
+  // código não cumpria — falava e respondia no mesmo gesto. Os cinco níveis
+  // entram aqui no instante em que a promessa passou a valer, que é o
+  // resultado certo: portão novo aparece porque nasceu, não porque alguém o
+  // escreveu na lista.
+  "GM.02|1", "GM.02|2", "GM.02|3", "GM.02|4", "GM.02|5",
   "GE.04|3", "GE.04|4",
   "GE.07|1", "GE.07|2", "GE.07|3", "GE.07|4", "GE.07|5",
   "GE.09|1", "GE.09|3", "GE.09|5",

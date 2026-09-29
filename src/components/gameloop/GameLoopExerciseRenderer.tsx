@@ -11,6 +11,7 @@ import { FamiliaStage } from "../primitives/FamiliaStage";
 import { DeslocamentoStage } from "../primitives/DeslocamentoStage";
 import { AreaStage } from "../primitives/AreaStage";
 import { chaveDaTentativa } from "./chaveDaTentativa";
+import { opcoesPrecisamDeVoz } from "./opcaoQueSeOuve";
 import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
@@ -135,6 +136,14 @@ export function GameLoopExerciseRenderer({
   onFirstAuditionComplete, faseDaCena
 
 }: Props) {
+  /**
+   * Esta alternativa precisa ser ouvida antes de ser escolhida?
+   *
+   * A regra mora em `opcaoQueSeOuve` e pergunta ao CONTEÚDO do rótulo, não a
+   * um campo que alguém lembrou de marcar na ficha. Ver o arquivo para o
+   * porquê — em resumo: palavra precisa, numeral não.
+   */
+  const audivel = opcoesPrecisamDeVoz(q);
   return (
     <>
       <div className="relative">
@@ -796,17 +805,21 @@ export function GameLoopExerciseRenderer({
                 }
               }
 
-              const armed = q.audibleOptions && armedOpt === o.value;
+              const armed = audivel && armedOpt === o.value;
               const isHidden = hiddenOpts.includes(o.value);
               return (
                 <button
                   key={i}
                   onClick={() => {
                     if (status || isHidden) return;
-                    if (q.audibleOptions) {
-                      speak(String(o.say ?? o.label).toLowerCase(), q.lang ? { lang: q.lang } : {});
-                    }
-                    handlePick(o.value);
+                    if (!audivel) { handlePick(o.value); return; }
+                    // Primeiro toque OUVE, segundo ESCOLHE. A tela promete isso
+                    // desde sempre ("Toque para OUVIR · toque de novo para
+                    // escolher") e o código não cumpria: falava e escolhia no
+                    // mesmo toque. Para quem não lê, era escolher no escuro.
+                    if (armedOpt === o.value) { setArmedOpt(null); handlePick(o.value); return; }
+                    setArmedOpt(o.value);
+                    speak(String(o.say ?? o.label).toLowerCase(), q.lang ? { lang: q.lang } : {});
                   }}
                   disabled={!!status || isHidden}
                   className={`mk-optin select-none cursor-pointer py-4 px-2 border-none transition-all active:translate-y-1 rounded-2xl text-center flex flex-col items-center justify-center relative ${
@@ -824,7 +837,7 @@ export function GameLoopExerciseRenderer({
                 >
                   {/* Opção audível: o BOTÃO INTEIRO é o alto-falante (toque duplo).
                       O 🔊 é só um selo indicativo — não é mais alvo de toque. */}
-                  {q.audibleOptions && !status && (
+                  {audivel && !status && (
                     <span className="absolute top-1 right-1.5 text-sm" style={{ pointerEvents: "none", opacity: armed ? 1 : 0.55 }}>
                       <Icone nome={armed ? "ouvido" : "som"} tamanho={26} />
                     </span>
@@ -845,7 +858,7 @@ export function GameLoopExerciseRenderer({
               );
             })}
           </div>)}
-          {q.audibleOptions && !status && (
+          {audivel && !status && (
             <div className="text-center mt-2" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 11.5, color: C.sub }}>
               👂 Toque para OUVIR · toque de novo para escolher
             </div>
