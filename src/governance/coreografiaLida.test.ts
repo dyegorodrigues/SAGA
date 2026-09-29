@@ -86,7 +86,67 @@ function chavesLidas(): Set<string> {
   return lidas;
 }
 
+const CAMINHO_SEM = resolve(__dirname, "coreografia-ausente.baseline.json");
+
+/** As fichas que não declaram micro-aula nenhuma, em nível nenhum. */
+function fichasSemCoreografia(): string[] {
+  return JOURNEY_FICHAS
+    .filter(ficha => !(ficha.micros ?? []).some(micro => {
+      const bruto = (micro.params as { tutorial?: unknown } | undefined)?.tutorial;
+      return Array.isArray(bruto) && bruto.length > 0;
+    }))
+    .map(ficha => ficha.id)
+    .sort();
+}
+
 describe("catraca da coreografia lida", () => {
+  /**
+   * ⚠️ A ficha que não tem aula nenhuma.
+   *
+   * As duas catracas irmãs medem aula QUEBRADA. Esta mede aula AUSENTE, que é
+   * mais barato de achar e pior de ter: a criança abre o exercício e não
+   * existe "Como faz?" — só o enunciado, que ela não lê.
+   *
+   * **13 das 90 fichas não declaram micro-aula em nível nenhum**, e uma delas
+   * é a `GM.02`, que está entre as SETE que a criança encontra ao abrir o app
+   * pela primeira vez. Seis das sete têm demonstração; essa não tem.
+   *
+   * Não escrevo a coreografia que falta aqui. A regra do projeto é que a
+   * coreografia é "§8 transcrita" da ficha pedagógica, e a §8 da GM.02 não
+   * existe na Bíblia — inventá-la seria pôr pedagogia minha na boca do app,
+   * que é pior do que a dívida. O que cabe é a dívida ficar MEDIDA, com nome
+   * e tamanho, e não poder crescer.
+   */
+  it("nenhuma ficha perde a micro-aula que tem", () => {
+    const sem = fichasSemCoreografia();
+
+    if (process.env.ATUALIZAR_COREOGRAFIA === "1") {
+      writeFileSync(CAMINHO_SEM, `${JSON.stringify(sem, null, 2)}\n`);
+      return;
+    }
+
+    const baseline: string[] = JSON.parse(readFileSync(CAMINHO_SEM, "utf8"));
+    const novas = sem.filter(id => !baseline.includes(id));
+    expect(
+      novas,
+      [
+        "Fichas que deixaram de ter micro-aula:",
+        ...novas.map(id => `  ${id}`),
+        "",
+        "Quem não lê só tem o 'Como faz?'. Sem ele, o exercício abre mudo.",
+      ].join("\n"),
+    ).toEqual([]);
+
+    const ganharam = baseline.filter(id => !sem.includes(id));
+    expect(
+      ganharam.length,
+      [
+        `${ganharam.length} fichas ganharam aula e a baseline não desceu: ${ganharam.join(", ")}`,
+        "Rode `npm run coreografia:baseline`. A catraca só desce.",
+      ].join("\n"),
+    ).toBe(0);
+  });
+
   it("nenhuma chave nova de micro-aula nasce órfã, e as consertadas saem da lista", () => {
     const declaradas = chavesDeclaradas();
     const lidas = chavesLidas();
