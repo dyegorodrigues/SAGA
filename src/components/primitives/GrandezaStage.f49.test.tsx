@@ -70,4 +70,42 @@ describe("GrandezaStage — F49",()=>{
     expect(botoes(container)[0].disabled).toBe(false);
     expect(container.querySelector('[data-grandeza-order]')).toBeNull();
   });
+
+  /**
+   * ⚠️ "Este é mais alto!" precisa MARCAR o mais alto, e de um jeito visível.
+   *
+   * A catraca da coreografia acusou `GM.01 n1 p2` de não mudar a tela. Ela
+   * acusou por uma cegueira própria — o efeito vivia só em `transform` —, mas
+   * quando fui olhar o efeito, ele era **`scale: 1.08`**. Oito por cento, num
+   * palco onde os dois objetos JÁ têm alturas diferentes de propósito: é essa
+   * diferença que a ficha inteira pede para a criança notar.
+   *
+   * Oito por cento em cima de uma diferença de altura não é destaque; é ruído
+   * dentro do sinal. A voz dizia *"Este é mais alto!"* e a criança de quatro
+   * anos não tinha como saber qual dos dois. Esta é a mesma família do balão
+   * que não estourava — só que mais sutil, e por isso passou.
+   *
+   * O portão cobra a MARCA, não o pixel: exatamente um objeto marcado, e é o
+   * da resposta. A ficha declara o passo; o teste descobre qual é.
+   */
+  it("⚠️ o passo que diz 'este é mais alto' marca um objeto, e é o certo", () => {
+    const passos = (GM_01.micros ?? [])
+      .flatMap(m => ((m.params as { tutorial?: unknown[] } | undefined)?.tutorial ?? []))
+      .map(p => (p as { show?: Record<string, unknown> }).show ?? {})
+      .filter(s => s.destacarMaior === true);
+
+    expect(passos.length, "a GM.01 declara o passo que aponta o maior").toBeGreaterThan(0);
+
+    for (const show of passos) {
+      const s = spec(1);
+      const { container, unmount } = render(<GrandezaStage spec={s} mostrar={show as never} />);
+      const marcados = [...container.querySelectorAll("[data-grandeza-object]")]
+        .map((e, i) => [i, e.getAttribute("data-grandeza-destaque")] as const)
+        .filter(([, v]) => v === "true")
+        .map(([i]) => i);
+      expect(marcados, "exatamente o objeto da resposta marcado").toEqual([s.resposta]);
+      unmount();
+    }
+  });
+
 });

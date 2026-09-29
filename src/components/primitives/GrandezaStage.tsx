@@ -1,5 +1,5 @@
 import React from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { Grupo } from "./Grupo";
 import { PalcoEscalado } from "./PalcoEscalado";
 import { ComparacaoQuantidadeStage } from "./ComparacaoQuantidadeStage";
@@ -49,6 +49,7 @@ function ObjetoVisual({ o, eixo, destaque, erro, delay }: {
   erro: boolean;
   delay: number;
 }) {
+  const semHalo = useReducedMotion();
   const sx = o.comprimento / BASE_OBJETO;
   const sy = o.altura / BASE_OBJETO;
   return (
@@ -56,6 +57,7 @@ function ObjetoVisual({ o, eixo, destaque, erro, delay }: {
       data-grandeza-object
       data-grandeza-altura={o.altura}
       data-grandeza-comprimento={o.comprimento}
+      data-grandeza-destaque={destaque ? "true" : undefined}
       className="relative z-10 flex h-[84px] w-[84px] items-center justify-center"
       initial={{ opacity: 0, x: eixo === "horizontal" ? -24 : 0, y: eixo === "horizontal" ? 0 : -28, scale: 0.94 }}
       animate={{
@@ -66,6 +68,24 @@ function ObjetoVisual({ o, eixo, destaque, erro, delay }: {
       }}
       transition={erro ? { duration: 0.4 } : { duration: 0.7, delay }}
     >
+      {/*
+        ⚠️ O halo — porque `scale: 1.08` sozinho não era destaque nenhum.
+        Oito por cento, num palco onde os dois objetos JÁ têm alturas
+        diferentes DE PROPÓSITO: é essa diferença que a ficha pede para a
+        criança notar. Oito por cento em cima dela é ruído dentro do sinal, e
+        a voz dizia "Este é mais alto!" sem a criança ter como saber qual.
+        Um anel atrás do objeto diz, sem palavra nenhuma, "este".
+      */}
+      {destaque && (
+        <motion.span
+          aria-hidden
+          className="absolute inset-[-8px] rounded-full"
+          style={{ border: "5px solid #2FB98C", background: "rgba(47,185,140,0.12)" }}
+          initial={semHalo ? false : { opacity: 0, scale: 0.8 }}
+          animate={semHalo ? { opacity: 1 } : { opacity: [0.55, 1, 0.55], scale: 1 }}
+          transition={semHalo ? undefined : { duration: 1.1, repeat: Infinity }}
+        />
+      )}
       <span
         aria-hidden
         className="block text-[68px] leading-none"
