@@ -43,10 +43,18 @@ import { GameLoopExerciseRenderer } from "../components/gameloop/GameLoopExercis
  *
  * ## Onde esta sonda é cega, dito antes que alguém confie demais
  *
- * 1. **Efeito medido em pixel.** Animação que depende de `getBoundingClientRect`
- *    não roda no jsdom, onde todo retângulo é zero. A trajetória da mão
- *    fantasma do pareamento é assim. Ela pode acusar de morto um passo que se
- *    mexe no aparelho.
+ * 1. **Efeito medido em pixel, e efeito só em `transform`.** Animação que
+ *    depende de `getBoundingClientRect` não roda no jsdom, onde todo retângulo
+ *    é zero. E o `transform` é apagado do HTML antes da comparação, porque o
+ *    framer-motion escreve ali valores interpolados que mudam entre execuções:
+ *    medido, deixá-lo dentro dá o mesmo total (215) com CONTEÚDO diferente a
+ *    cada rodada, e catraca que treme não é catraca. O preço é ficar cega para
+ *    o passo cujo único efeito é `scale` — `N1.01 p3`, o "Agora você!", é um
+ *    desses, e ele pulsa de verdade no aparelho.
+ *
+ *    Isto NÃO é convite para trocar um pulso por uma borda só para a sonda
+ *    enxergar. O efeito se conserta quando ele é fraco para a CRIANÇA — foi o
+ *    caso do `scale: 1.08` da GM.01 —, nunca para agradar o instrumento.
  * 2. **Efeito só no tempo.** Compara-se um instante por passo; algo que só
  *    existe durante a transição passa batido.
  *
