@@ -200,6 +200,38 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
     return () => { vivo = false; timers.forEach(window.clearTimeout); };
   }, [spec, faseFixa, emAula]);
 
+  /**
+   * ⚠️ A pergunta volta ao ar quando passa a ser respondível.
+   *
+   * Medido no navegador, neste exercício, com o `Audio` instrumentado:
+   *
+   *     +0,8s  "Prepare o olho!"          (demonstração)
+   *     +3,3s  "Já!"                      (demonstração)
+   *     +5,9s  "Viu? Eram dois."          (demonstração)
+   *     +8,8s  "Quantos você viu?"        ← a pergunta
+   *     +10,3s "Olhe o desenho todo..."   (a dica)
+   *     +12,5s                            ← as alternativas aparecem
+   *
+   * A pergunta era falada 3,7 segundos ANTES de existir o que tocar, e no meio
+   * desse intervalo a criança via um relance e um macaco tapando os olhos.
+   * Quando podia agir, encarava dois símbolos que não lê, em silêncio.
+   *
+   * O pai: *"não sai o som antes, quando a criança que não sabe ler e escrever
+   * aperta"*. Para quem não lê, o enunciado escrito acima do palco não existe:
+   * a pergunta só está no ar enquanto a voz a está dizendo.
+   *
+   * Não fala durante a aula — ali quem conduz é a coreografia — nem depois de
+   * respondida, que é hora da revelação.
+   */
+  const jaPerguntou = React.useRef(false);
+  React.useEffect(() => { jaPerguntou.current = false; }, [spec]);
+  React.useEffect(() => {
+    if (emAula || escolha !== null || fase !== "perguntando") return;
+    if (jaPerguntou.current) return;
+    jaPerguntou.current = true;
+    if (spec.enunciado) falar?.(spec.enunciado);
+  }, [fase, emAula, escolha, spec, falar]);
+
   /** Mostra o desenho de novo, pelo mesmo tempo do relance daquele nível. */
   function verDeNovo() {
     if (disabled || escolha !== null || emAula || faseFixa) return;

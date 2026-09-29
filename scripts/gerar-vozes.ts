@@ -126,9 +126,50 @@ const VELOCIDADE = 0.95;
  *
  * A lição, que é a regra da casa: uma amostra não é medição.
  */
+/**
+ * As correções do IPA do espeak-ng, e o que cada uma custou para descobrir.
+ *
+ * Nenhuma é palpite. O `scripts/conferir-vozes.ts` transcreve o áudio gerado
+ * e compara com o texto de origem; só entra aqui o que baixa o erro medido.
+ * Esta lista já teve uma entrada errada — `lj` → `ʎ`, tirada de UMA amostra,
+ * que ao ser medida em oito frases perdeu duas vezes e não ganhou nenhuma.
+ *
+ * - `y` → `i`: o espeak escreve o /i/ átono final como `y`, que no inventário
+ *   do Kokoro é a consoante /j/. "Este" saía "estch-j".
+ * - `æ` → `ɐ`: o /a/ átono final vinha como a vogal de "cat" do inglês.
+ * - `ɾə` antes de consoante → `ɾ`: **a sílaba fantasma.**
+ *
+ * ## A sílaba fantasma
+ *
+ * O espeak-ng insere uma schwa depois de todo R travado:
+ *
+ *     certo      sˈɛɾətʊ      (deveria ser sˈɛɾtʊ)
+ *     verde      vˈeɾədʒi     (vˈeɾdʒi)
+ *     porta      pˈɔɾətɐ      (pˈɔɾtɐ)
+ *     vermelhos  vˌeɾəmˈeʎʊs  (veɾmˈeʎʊs)
+ *
+ * Toda palavra com R + consoante ganhava uma sílaba. São **355 das 1864 falas
+ * do corpus, 19%**. O pai ouviu e chamou pelo nome: *"a voz tá de robô. E ela
+ * não tá de português brasileiro nativo."*
+ *
+ * Medido em 60 frases do corpus que exercitam R+consoante, 625 palavras, com
+ * Whisper-small julgando: **6,6% → 5,6% de erro de palavra**. O ganho na
+ * medida é modesto porque o reconhecedor tolera bem uma schwa a mais; o
+ * ouvido humano não tolera — ele conta a sílaba.
+ *
+ * ## O que eu testei e NÃO entrou
+ *
+ * Porque medir também serve para descartar o que eu teria jurado que era bom:
+ *
+ * - Nasal `eɪŋ` → `ẽj` e família: **piorou**, 8,7% → 11,8%. O "em" virava "e".
+ * - `r` em grupo (prato, três) → `ɾ`: **piorou**, 6,7% → 7,4%.
+ * - `x` do R forte (carro, rato) → `ʁ`: **empatou**, 6,7% → 6,7%. Sem
+ *   evidência, não muda.
+ */
 const CORRECOES: [RegExp, string][] = [
   [/y/g, "i"],
   [/æ/g, "ɐ"],
+  [/ɾə(?=[bdfgjklmnpstvzʃʒɲʎ])/g, "ɾ"],
 ];
 
 function fonemizar(texto: string): string {

@@ -133,6 +133,24 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
   }, [spec, faseFixa, emAula]);
 
   /** Reabre a cena pelo mesmo tempo da primeira exibição, e tampa de novo. */
+  /**
+   * ⚠️ A pergunta volta ao ar quando passa a ser respondível.
+   *
+   * Mesmo defeito medido no palco da fileira (ver `EmojiRowStage`): o
+   * enunciado é falado no começo da questão, a cena leva segundos mostrando e
+   * tampando, e quando as alternativas chegam a criança que não lê encara
+   * símbolos em silêncio. Para ela o enunciado escrito acima do palco não
+   * existe — a pergunta só está no ar enquanto a voz a diz.
+   */
+  const jaPerguntou = React.useRef(false);
+  React.useEffect(() => { jaPerguntou.current = false; }, [spec]);
+  React.useEffect(() => {
+    if (emAula || escolha !== null || fase !== "perguntando") return;
+    if (jaPerguntou.current) return;
+    jaPerguntou.current = true;
+    if (spec.enunciado) falar?.(spec.enunciado);
+  }, [fase, emAula, escolha, spec, falar]);
+
   function verDeNovo() {
     if (disabled || escolha !== null || emAula || faseFixa) return;
     setEspiadas(n => n + 1);
