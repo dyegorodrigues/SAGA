@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { ALL_MATH_TRACKS } from "./motores/curriculum";
 import { GameLoopExerciseRenderer } from "../components/gameloop/GameLoopExerciseRenderer";
+import { colunasDasAlternativas, deixaAlguemSozinho } from "../components/gameloop/colunasDasAlternativas";
 import { isMotorSlip, isRetryableAnswer, ownsAuthorialRetry } from "../components/gameloop/answerPolicy";
 
 /**
@@ -367,6 +368,34 @@ describe("toda criança consegue jogar", () => {
       cleanup();
     }
     expect(semSaida, `palcos que escondem sem deixar ver de novo:\n${semSaida.join("\n")}`).toEqual([]);
+  }, 300000);
+
+  it("nenhuma alternativa fica sozinha numa linha", () => {
+    /*
+     * Alternativa sozinha numa linha é PISTA DE POSIÇÃO.
+     *
+     * A barra era `grid-cols-2` fixo. Com três alternativas — 162 das 450
+     * combinações, incluindo os cinco níveis da N1.01, que é o primeiro
+     * exercício que a criança encontra — a terceira caía sozinha embaixo,
+     * com espaço, silhueta e centro só para ela. A criança de quatro anos
+     * escolhe o que salta aos olhos, e o app registra "acertou" quando o que
+     * houve foi "achou a diferente".
+     *
+     * Aqui se cobra pela geometria, e não pela aparência: a quantidade de
+     * alternativas contra a largura que a barra escolheu.
+     */
+    const sozinhas: string[] = [];
+    for (const { track, nivel } of COMBINACOES) {
+      let q: any;
+      try { q = gerar(track, nivel); } catch { continue; }
+      const quantas = Array.isArray(q.options) ? q.options.length : 0;
+      if (quantas < 2) continue;
+      const colunas = colunasDasAlternativas(quantas);
+      if (deixaAlguemSozinho(quantas, colunas)) {
+        sozinhas.push(`${track.id} n${nivel}: ${quantas} alternativas em ${colunas} colunas`);
+      }
+    }
+    expect(sozinhas, `alternativa sozinha na última linha:\n${sozinhas.join("\n")}`).toEqual([]);
   }, 300000);
 
   it("todo enunciado de texto tem como ser ouvido", () => {

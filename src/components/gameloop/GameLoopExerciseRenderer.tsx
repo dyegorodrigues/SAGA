@@ -12,6 +12,7 @@ import { DeslocamentoStage } from "../primitives/DeslocamentoStage";
 import { AreaStage } from "../primitives/AreaStage";
 import { chaveDaTentativa } from "./chaveDaTentativa";
 import { opcoesPrecisamDeVoz } from "./opcaoQueSeOuve";
+import { colunasDasAlternativas } from "./colunasDasAlternativas";
 import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
@@ -783,7 +784,14 @@ export function GameLoopExerciseRenderer({
           </div>
         ) : (
           <>
-          {shouldRenderQuestionOptions(q) && q.options && (<div className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid grid-cols-2"}`}>
+          {shouldRenderQuestionOptions(q) && q.options && (<div
+            className={`gap-3.5 ${(q.kind === "take-apart" || q.kind === "sequence" || q.options.some(o => !!o.groups)) ? "flex flex-col" : "grid"}`}
+            // A largura da grade vem da QUANTIDADE de alternativas. Era
+            // `grid-cols-2` fixo, e com três a terceira ficava sozinha na
+            // linha de baixo — espaço, silhueta e centro só para ela. Ver
+            // `colunasDasAlternativas` para o porquê de cada número.
+            style={{ gridTemplateColumns: `repeat(${colunasDasAlternativas(q.options.length)}, minmax(0, 1fr))` }}
+          >
             {q.options.map((o, i) => {
               const isAnswer = o.value === q.answer;
               const picked = sel === o.value;
