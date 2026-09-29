@@ -41,16 +41,35 @@ const clicar = async (page, nome, espera) => {
 };
 
 const browser = await chromium.launch({ executablePath: CHROMIUM });
-const page = await browser.newPage({ viewport: { width: 1100, height: 900 } });
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 
-const pedidos = [];
-page.on("response", r => {
-  const u = r.url();
-  if (u.includes("/vozes/")) pedidos.push({ url: u.split("/vozes/")[1], status: r.status() });
-});
-page.on("requestfailed", r => {
-  const u = r.url();
-  if (u.includes("/vozes/")) pedidos.push({ url: u.split("/vozes/")[1], status: `FALHOU ${r.failure()?.errorText ?? "?"}` });
+/*
+ * Medir REPRODUÇÃO, e não tráfego.
+ *
+ * A primeira versão desta sonda olhava só o código HTTP: índice 200, clipes
+ * 206, "A VOZ SAI". Estava errada, e o erro era caro — o pacote nasceu em AAC
+ * e **o Chromium de código aberto não decodifica AAC**. O arquivo chegava
+ * inteiro e `play()` devolvia `NotSupportedError`. Bytes servidos não são som
+ * na sala.
+ *
+ * Agora a sonda envolve o `Audio` da página e conta o que interessa: quantos
+ * clipes COMEÇARAM a tocar (evento `playing`) e quantos deram erro, com o
+ * motivo. Um pacote inteiro servido e nenhum tocando reprova.
+ */
+await page.addInitScript(() => {
+  window.__voz = { criados: 0, tocaram: 0, erros: [] };
+  const A = window.Audio;
+  window.Audio = function (src) {
+    const a = new A(src);
+    window.__voz.criados += 1;
+    a.addEventListener("playing", () => { window.__voz.tocaram += 1; });
+    a.addEventListener("error", () => {
+      const e = a.error;
+      window.__voz.erros.push(`${String(src).split("/").pop()}: código ${e ? e.code : "?"} ${e && e.message ? e.message : ""}`.trim());
+    });
+    return a;
+  };
+  window.Audio.prototype = A.prototype;
 });
 
 await page.goto(BASE, { waitUntil: "domcontentloaded", timeout: 60000 });
@@ -65,7 +84,7 @@ await clicar(page, /Começar Sondagem|Começar|Jogar|Missão/i, /Toque|Conte|Qua
 await page.waitForTimeout(6000);
 
 const indice = pedidos.filter(p => p.url.startsWith("indice.json"));
-const clipes = pedidos.filter(p => p.url.endsWith(".m4a"));
+const clipes = pedidos.filter(p => p.url.endsWith(".mp3"));
 // 206 é o normal para áudio: o `<audio>` pede por faixa de bytes. A primeira
 // versão desta sonda tratava 206 como recusa e acusava de mudo um app que
 // estava tocando — falsa acusação causada pelo próprio instrumento.
@@ -87,6 +106,9 @@ console.log(`clipes pedidos: ${clipes.length}`);
 for (const c of clipes.slice(0, 10)) console.log(`  ${c.url} → ${c.status}`);
 const cancelados = pedidos.filter(p => cancelado(p.status)).length;
 console.log(recusados.length ? `RECUSADOS: ${recusados.map(r => `${r.url} ${r.status}`).join(", ")}` : "nenhum recusado");
+const voz = await page.evaluate(() => window.__voz);
+console.log(`clipes criados: ${voz.criados} · começaram a tocar: ${voz.tocaram}`);
+for (const e of voz.erros.slice(0, 8)) console.log(`  erro: ${e}`);
 if (cancelados) console.log(`${cancelados} download(s) cortado(s) por fala nova — esperado`);
 
 await browser.close();

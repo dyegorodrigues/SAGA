@@ -50,6 +50,7 @@ vi.mock("../components/Mascot", async (original) => {
 });
 
 import { ALL_MATH_TRACKS } from "../curriculum/motores/curriculum";
+import { tutorialSteps } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "../components/gameloop/GameLoopExerciseRenderer";
 
 const CAMINHO = resolve(__dirname, "corpus-da-voz.json");
@@ -101,6 +102,16 @@ function varrer(): string[] {
          */
         [q.prompt, q.audioPrompt, q.speech, q.falado, q.explain, q.howto, q.sayTarget, q.story, ui?.falado, ui?.enunciado].forEach(guardar);
         if (Array.isArray(q.audioSteps)) q.audioSteps.forEach(guardar);
+        /*
+         * A AULINHA também fala, e era a que faltava.
+         *
+         * `tutorialSteps` devolve os passos da demonstração — "Olha quem está
+         * esperando.", "Assim, ó.", "Agora você!". Sem áudio gravado, cada
+         * passo caía no sintetizador; num aparelho sem voz pt-BR isso é
+         * silêncio, e a criança vê a demonstração passar muda. É o primeiro
+         * lugar onde ela precisa de voz, e era o único que o corpus não olhava.
+         */
+        tutorialSteps(q as never).forEach(passo => guardar(passo?.say));
         // Renderizar é caro; um sorteio por nível basta para as falas de palco,
         // que não dependem do sorteio e sim do toque.
         if (sorteio > 0) continue;

@@ -23,8 +23,34 @@
  * - **pf_dora** é a voz feminina pt-BR do Kokoro. O pacote npm já traz o
  *   tensor dela; só a lista de vozes do `kokoro-js` é que não a anuncia, e por
  *   isso este script chama `generate_from_ids` em vez de `generate`.
- * - **ffmpeg** encolhe para AAC mono, que toca em todo navegador — inclusive
- *   Safari antigo, onde Opus não toca.
+ * - **ffmpeg** encolhe para MP3 mono.
+ *
+ * ## Por que MP3, e não AAC (que foi a primeira escolha, e estava errada)
+ *
+ * O pacote nasceu em AAC dentro de `.m4a`, escolhido por "toca em todo
+ * navegador". Não toca: **o Chromium de código aberto é compilado sem codecs
+ * proprietários** e recusa AAC. Medido no navegador, com o pacote no ar:
+ *
+ *     new Audio("/vozes/<clipe>.m4a").play()
+ *     → NotSupportedError: Failed to load because no supported source was found
+ *
+ * O arquivo chegava com 206, o app pedia certo, e nada tocava. A primeira
+ * sonda deu "A VOZ SAI" porque olhava o TRÁFEGO — bytes servidos — e não a
+ * reprodução. Instrumento que mede a coisa errada dá verde em app mudo.
+ *
+ * MP3 é o único formato que nenhum navegador recusa: Chromium livre, Chrome,
+ * Firefox, Safari de qualquer idade, Android, iOS. Opus rende mais por
+ * kilobyte, mas o Safari só o toca a partir do 17 — e não se sabe que iPhone
+ * a criança tem na mão.
+ *
+ * ## Por que 48 kbps, e não 24
+ *
+ * O pai ouviu a primeira versão e disse: "a voz tá meio robótica ainda, como
+ * se fosse de um microfone vagabundo". Era a taxa. 24 kbps num sinal de 24 kHz
+ * é qualidade de telefone; 48 kbps dobra o orçamento de bits para o mesmo
+ * áudio de origem e tira a chiadeira metálica. O pacote passa de ~16 MB para
+ * ~38 MB, que continua servindo sob demanda — a criança baixa o clipe quando
+ * ele toca, nunca o pacote inteiro.
  *
  * ## Como rodar
  *
@@ -37,6 +63,18 @@
  *
  * O pacote gerado entra no repositório; quem não vai regravar nada não precisa
  * de nada disso.
+ *
+ * ## Regravar o pacote inteiro sem esperar duas horas
+ *
+ * A síntese é de um clipe por vez e mil e seiscentos clipes levam horas. Uma
+ * variável quebra o trabalho em processos paralelos:
+ *
+ *     FATIA=0/4 npx tsx scripts/gerar-vozes.ts &   # e 1/4, 2/4, 3/4
+ *     npx tsx scripts/gerar-vozes.ts               # no fim, reconstrói o índice
+ *
+ * Cada fatia grava só os clipes que lhe cabem e **não toca no índice** — dois
+ * processos escrevendo o mesmo JSON se apagariam. A passada final não gera
+ * nada (tudo já existe) e escreve o índice a partir do que está em disco.
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, statSync } from "node:fs";
@@ -53,6 +91,8 @@ const TEMP = resolve(RAIZ, ".vozes-temp");
 
 /** A voz. Feminina, pt-BR, do próprio Kokoro. */
 const VOZ = "pf_dora";
+/** Ver o cabeçalho: MP3 é o único formato que nenhum navegador recusa. */
+const EXTENSAO = "mp3";
 /**
  * Um pouco mais devagar que o normal.
  *
@@ -101,6 +141,13 @@ async function main() {
 
   const tts = await KokoroTTS.from_pretrained("onnx-community/Kokoro-82M-v1.0-ONNX", { dtype: "q8", device: "cpu" });
 
+  /**
+   * A fatia deste processo, no formato `i/N`. Sem ela, faz tudo.
+   * Quem tem fatia não escreve o índice: só grava os arquivos.
+   */
+  const [fatia, fatias] = (process.env.FATIA ?? "0/1").split("/").map(Number);
+  const escreveIndice = fatias === 1;
+
   const indice: string[] = existsSync(INDICE) ? JSON.parse(readFileSync(INDICE, "utf8")) : [];
   const jaTem = new Set(indice);
   const colisoes = new Map<string, string>();
@@ -108,6 +155,7 @@ async function main() {
   let puladas = 0;
 
   for (const [i, bruto] of corpus.entries()) {
+    if (i % fatias !== fatia) continue;
     const texto = textoFalado(bruto);
     if (!texto) continue;
     const chave = chaveDaFala(texto);
@@ -118,7 +166,7 @@ async function main() {
     }
     colisoes.set(chave, texto);
 
-    const destino = resolve(DESTINO, `${chave}.m4a`);
+    const destino = resolve(DESTINO, `${chave}.${EXTENSAO}`);
     if (jaTem.has(chave) && existsSync(destino)) { puladas += 1; continue; }
 
     const ipa = fonemizar(texto);
@@ -126,25 +174,34 @@ async function main() {
     const audio = await tts.generate_from_ids(input_ids, { voice: VOZ, speed: VELOCIDADE });
     const wav = resolve(TEMP, `${chave}.wav`);
     await audio.save(wav);
-    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", wav, "-c:a", "aac", "-b:a", "24k", "-ac", "1", "-ar", "24000", destino]);
+      execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", wav, "-c:a", "libmp3lame", "-b:a", "48k", "-ac", "1", "-ar", "24000", destino]);
     rmSync(wav);
 
     jaTem.add(chave);
     gravadas += 1;
     if (gravadas % 25 === 0) {
-      writeFileSync(INDICE, JSON.stringify([...jaTem].sort()) + "\n");
+      if (escreveIndice) writeFileSync(INDICE, JSON.stringify([...jaTem].sort()) + "\n");
       console.log(`${i + 1}/${corpus.length} — ${gravadas} gravadas, ${puladas} já existiam`);
     }
   }
 
-  writeFileSync(INDICE, JSON.stringify([...jaTem].sort()) + "\n");
+  if (!escreveIndice) {
+    console.log(`fatia ${fatia}/${fatias}: ${gravadas} gravadas, ${puladas} já existiam`);
+    rmSync(TEMP, { recursive: true, force: true });
+    return;
+  }
+
+  // O índice anuncia o que EXISTE em disco, e não o que este processo gravou:
+  // é a única forma de as fatias paralelas convergirem num índice só.
+  const emDisco = [...colisoes.keys()].filter(c => existsSync(resolve(DESTINO, `${c}.${EXTENSAO}`))).sort();
+  writeFileSync(INDICE, JSON.stringify(emDisco) + "\n");
   rmSync(TEMP, { recursive: true, force: true });
 
-  const bytes = [...jaTem].reduce((soma, c) => {
-    const f = resolve(DESTINO, `${c}.m4a`);
+  const bytes = emDisco.reduce((soma, c) => {
+    const f = resolve(DESTINO, `${c}.${EXTENSAO}`);
     return soma + (existsSync(f) ? statSync(f).size : 0);
   }, 0);
-  console.log(`pronto: ${jaTem.size} falas, ${(bytes / 1048576).toFixed(1)} MB`);
+  console.log(`pronto: ${emDisco.length} falas, ${(bytes / 1048576).toFixed(1)} MB`);
 }
 
 main().catch(e => { console.error(e); process.exit(1); });

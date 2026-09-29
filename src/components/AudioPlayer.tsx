@@ -1,4 +1,4 @@
-import { caminhoDaVoz, carregarVozes, temVozNativa } from "../audio/vozNativa";
+import { caminhoDaVoz, carregarVozes, temVozNativa, vozesCarregadas } from "../audio/vozNativa";
 import { textoFalado } from "../audio/chaveDaFala";
 
 /**
@@ -68,9 +68,20 @@ export const AudioPlayer = {
     const texto = textoFalado(text ?? "");
     if (!texto) { onEnd?.(); return; }
 
-    const pedacos = emPedacos(texto);
-    if (!pedacos.some(temVozNativa)) { vozDoAparelho(texto, seq, rate, onEnd); return; }
-    tocarPedacos(pedacos, 0, seq, rate, onEnd);
+    const falar = () => {
+      if (seq !== SPEAK_SEQ) return;
+      const pedacos = emPedacos(texto);
+      if (!pedacos.some(temVozNativa)) { vozDoAparelho(texto, seq, rate, onEnd); return; }
+      tocarPedacos(pedacos, 0, seq, rate, onEnd);
+    };
+
+    // A PRIMEIRA fala do app costuma acontecer antes de o índice chegar, e
+    // perdia o pacote por milissegundos: na N1.01 era o "Olha quem está
+    // esperando." da aulinha, o primeiro som que a criança ouve na vida do
+    // app. Se o índice ainda não chegou, espera-se por ele — `carregarVozes`
+    // nunca rejeita, e pacote ausente resolve com índice vazio.
+    if (vozesCarregadas() === 0) { void carregarVozes().then(falar); return; }
+    falar();
   },
 };
 

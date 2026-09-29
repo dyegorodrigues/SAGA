@@ -33,9 +33,19 @@ export function pastaDasVozes(): string {
   return `${base.endsWith("/") ? base : `${base}/`}vozes/`;
 }
 
+/**
+ * A extensão do pacote.
+ *
+ * MP3, e não AAC, porque **o Chromium de código aberto é compilado sem codecs
+ * proprietários e recusa AAC**. Medido com o pacote no ar: o arquivo chegava
+ * com 206 e `play()` devolvia `NotSupportedError`. MP3 nenhum navegador
+ * recusa. Ver o cabeçalho de `scripts/gerar-vozes.ts`.
+ */
+export const EXTENSAO_DA_VOZ = "mp3";
+
 /** O arquivo desta fala, exista ele ou não. */
 export function caminhoDaVoz(texto: string): string {
-  return `${pastaDasVozes()}${chaveDaFala(texto)}.m4a`;
+  return `${pastaDasVozes()}${chaveDaFala(texto)}.${EXTENSAO_DA_VOZ}`;
 }
 
 let indice: Set<string> | null = null;

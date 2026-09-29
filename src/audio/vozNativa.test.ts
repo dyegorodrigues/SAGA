@@ -7,7 +7,7 @@ describe("a voz que vai junto com o app", () => {
   afterEach(() => { vi.unstubAllGlobals(); esquecerVozes(); });
 
   it("o nome do arquivo é o da chave da fala", () => {
-    expect(caminhoDaVoz("Muito bem!")).toContain(`${chaveDaFala("Muito bem!")}.m4a`);
+    expect(caminhoDaVoz("Muito bem!")).toContain(`${chaveDaFala("Muito bem!")}.mp3`);
     expect(caminhoDaVoz("Muito bem!")).toContain("/vozes/");
   });
 

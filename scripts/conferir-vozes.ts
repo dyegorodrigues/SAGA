@@ -85,7 +85,7 @@ function comparavel(t: string): string {
  */
 const umaPalavraSo = (t: string) => t.trim().split(/\s+/).length <= 2 && t.length <= 12;
 
-function lerM4a(caminho: string): Float32Array {
+function lerClipe(caminho: string): Float32Array {
   const dir = mkdtempSync(join(tmpdir(), "voz-"));
   const wav = join(dir, "a.wav");
   try {
@@ -120,11 +120,11 @@ async function main() {
   let curtas = 0;
   const divergem: string[] = [];
   for (const texto of alvos) {
-    const arquivo = resolve(VOZES, `${chaveDaFala(texto)}.m4a`);
+    const arquivo = resolve(VOZES, `${chaveDaFala(texto)}.mp3`);
     if (!existsSync(arquivo)) { divergem.push(`SEM ARQUIVO  ${JSON.stringify(texto)}`); continue; }
     const falado = textoFalado(texto);
     if (umaPalavraSo(falado)) { curtas += 1; continue; }
-    const r = await asr(lerM4a(arquivo), { language: "portuguese", task: "transcribe" });
+    const r = await asr(lerClipe(arquivo), { language: "portuguese", task: "transcribe" });
     const ouvido = String(r.text ?? "").trim();
     ouvidos += 1;
     if (comparavel(ouvido) === comparavel(falado)) batem += 1;
