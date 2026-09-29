@@ -39,7 +39,7 @@
   "src/components/primitives/MaoDeDedos.tsx": 74,
   "src/components/primitives/ModeloDeArea.tsx": 86,
   "src/components/primitives/Moedas.tsx": 28,
-  "src/components/primitives/MolduraStage.tsx": 136,
+  "src/components/primitives/MolduraStage.tsx": 155,
   "src/components/primitives/NumberLine.tsx": 35,
   "src/components/primitives/NumerosGrandesStage.tsx": 21,
   "src/components/primitives/PalcoEscalado.tsx": 78,

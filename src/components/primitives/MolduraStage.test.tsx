@@ -383,15 +383,33 @@ describe("as três fichas chegam ao palco pelo Composer", () => {
    * O portão varre a coreografia declarada pela própria ficha e exige que
    * passos vizinhos desenhem coisas diferentes — descoberta, não lista.
    */
-  it("⚠️ nenhum passo da aula da N1.10 desenha igual ao passo anterior", () => {
-    const passos = (N1_10.micros ?? [])
+  /**
+   * O mesmo portão, para as DUAS fichas que este palco serve.
+   *
+   * A N1.11 ("fechar dez") tinha um defeito diferente e pior: a máquina de
+   * fases congela durante a aula (`if (faseFixa || emAula) return`), e o modo
+   * `faltam` NASCE em "preparando" — que é a fase da moldura vazia. Resultado:
+   * a moldura ficava vazia a aula INTEIRA.
+   *
+   * | fala             | o que a criança via                |
+   * |------------------|------------------------------------|
+   * | "Prepare o olho!"| moldura vazia (certo)              |
+   * | "Ja!"            | **moldura vazia** — o relance sumiu |
+   * | "Faltavam dois." | **dez bolinhas verdes**, não duas   |
+   *
+   * O último passo era ativamente errado: com a moldura vazia, TODAS as dez
+   * casas contam como faltando, então "faltavam dois" pintava dez.
+   */
+  it.each([["N1.10", N1_10], ["N1.11", N1_11]] as const)(
+    "⚠️ na aula de %s, nenhum passo desenha igual ao anterior", (_id, ficha) => {
+    const passos = (ficha.micros ?? [])
       .flatMap(m => ((m.params as { tutorial?: unknown[] } | undefined)?.tutorial ?? []))
       .map(p => (p as { show?: Record<string, unknown> }).show)
       .filter((s): s is Record<string, unknown> => s != null && Object.keys(s).length > 0);
 
-    expect(passos.length, "a N1.10 declara coreografia").toBeGreaterThan(2);
+    expect(passos.length, "a ficha declara coreografia").toBeGreaterThan(2);
 
-    const s = Composer.generate(N1_10, 1).uiProps as MolduraSpec;
+    const s = Composer.generate(ficha, 1).uiProps as MolduraSpec;
     const telas = passos.map(show => {
       const { container, unmount } = render(<MolduraStage spec={s} mostrar={show as never} />);
       const html = (container.innerHTML ?? "").replace(/transform: [^;"]*;?/g, "");

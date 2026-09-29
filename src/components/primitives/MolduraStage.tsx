@@ -60,7 +60,8 @@ interface Props {
     piscarFileira?: 1 | 2;
     contar?: number;
     moldura?: { vazia?: boolean };
-    flash?: unknown;
+    /** O relance da aula: `{ tenframe: n }` mostra n fichas na moldura. */
+    flash?: { tenframe?: number; ms?: number };
     preencherFaltantes?: number;
     contarUmAUm?: number;
     /** O grupo INTEIRO aceso — o "Três!" que fecha a contagem no todo. */
@@ -213,6 +214,12 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
    * propósito, porque a ficha ensina exatamente a passagem de um para o
    * outro.
    */
+  /** Quantas fichas o relance da aula mostra. `flash: { tenframe: n }`. */
+  const relanceDaAula: number | null = emAula
+    && typeof mostrar?.flash?.tenframe === "number"
+    ? mostrar.flash.tenframe
+    : null;
+
   const acesasPelaAula = emAula
     ? (mostrar?.destacarTodos === true
       ? spec.ocupadas
@@ -250,7 +257,12 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
         <TenFrame
           moldura={{
             casas: spec.casas,
-            ocupadas: spec.ocupadas,
+            // O relance da aula manda quantas fichas aparecem: a coreografia
+            // da N1.11 diz `flash: { tenframe: 8 }`, e são oito que a criança
+            // tem de ver para "faltavam dois" fazer sentido.
+            ocupadas: relanceDaAula !== null
+              ? spec.ocupadas.slice(0, relanceDaAula)
+              : spec.ocupadas,
             tapadas,
             revelados,
             // §6.34: o enunciado da F02 nomeia estrelas, ovos ou medalhas, e a
@@ -271,10 +283,25 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
             ordinais: emAula && typeof mostrar?.contarUmAUm === "number",
             pulsarTampa: emAula && mostrar?.pulsarTampa === true,
             semMoldura: spec.semMoldura && fase !== "revelando",
-            // A moldura VAZIA: antes do flash e — o que a ficha exige — depois
-            // dele, sozinha por 300ms.
-            soAMoldura: fase === "preparando" || fase === "vazio"
-              || (emAula && mostrar?.moldura?.vazia === true),
+            /*
+             * A moldura VAZIA: antes do flash e — o que a ficha exige — depois
+             * dele, sozinha por 300ms.
+             *
+             * ⚠️ **Durante a aula, quem manda é a aula, não a fase.**
+             *
+             * A máquina de fases congela na micro-aula (`if (faseFixa ||
+             * emAula) return`), e o modo `faltam` NASCE em "preparando" — que
+             * é exatamente a fase da moldura vazia. A aula da N1.11 inteira
+             * rodava com a moldura vazia: o passo "Ja!" não mostrava relance
+             * nenhum, e "Faltavam dois" pintava DEZ bolinhas verdes, porque
+             * com a moldura vazia todas as dez casas contam como faltando.
+             *
+             * A fase congelada não é estado da cena durante a aula; é lixo
+             * do que a cena seria se a aula não estivesse acontecendo.
+             */
+            soAMoldura: emAula
+              ? mostrar?.moldura?.vazia === true
+              : fase === "preparando" || fase === "vazio",
             // §4 da F02: a fileira acende INTEIRA, e só no acerto ou na aula.
             fileiraAcesa: emAula
               ? (mostrar?.destacarFileira ?? mostrar?.piscarFileira ?? null)
