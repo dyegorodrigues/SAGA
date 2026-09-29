@@ -87,7 +87,14 @@ const RAIZ = resolve(AQUI, "..");
 const CORPUS = resolve(RAIZ, "src/audio/corpus-da-voz.json");
 const DESTINO = resolve(RAIZ, "public/vozes");
 const INDICE = resolve(DESTINO, "indice.json");
-const TEMP = resolve(RAIZ, ".vozes-temp");
+/**
+ * A pasta temporária é POR FATIA.
+ *
+ * Era uma só, compartilhada. A primeira fatia a terminar apagava a pasta —
+ * e derrubava as outras três no meio da gravação, com `ENOENT` ao salvar o
+ * WAV. Trabalho paralelo não pode ter um único dono do rascunho.
+ */
+const TEMP = resolve(RAIZ, `.vozes-temp-${process.env.FATIA?.replace("/", "-") ?? "0-1"}`);
 
 /** A voz. Feminina, pt-BR, do próprio Kokoro. */
 const VOZ = "pf_dora";
