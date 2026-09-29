@@ -69,14 +69,25 @@ describe("ouvir antes de escolher", () => {
     expect(armado, "a alternativa fica armada para o segundo toque").toBe(3);
   });
 
-  it("o segundo toque na MESMA alternativa responde", () => {
+  /**
+   * ⚠️ Este teste dizia "o segundo toque na MESMA alternativa responde".
+   *
+   * Estava certo sobre a regra e cego sobre a tela: nada dizia à criança que
+   * tocar de novo decidia. O pai desenhou o conserto:
+   *
+   * > *"ela ouviu o som (...) e embaixo ou do lado (...) o botão de confirmar,
+   * > sei lá, piscando, piscando para a criança entender."*
+   */
+  it("⚠️ quem responde é o botão de confirmar, não um segundo toque invisível", () => {
     const escolhas: unknown[] = [];
-    // Já armada, como o app a devolve depois do primeiro toque.
     render(<GameLoopExerciseRenderer {...props(PERGUNTA, v => escolhas.push(v), 3, () => {})} />);
 
+    // Tocar de novo na alternativa NÃO responde: só re-arma e fala.
     fireEvent.click(screen.getByText("Faltou"));
+    expect(escolhas, "a alternativa não decide sozinha").toEqual([]);
 
-    expect(escolhas, "o segundo toque escolhe").toEqual([3]);
+    fireEvent.click(screen.getByLabelText("Confirmar: Faltou"));
+    expect(escolhas, "o confirmar decide").toEqual([3]);
   });
 
   it("a tela promete o que o código faz", () => {
@@ -97,13 +108,50 @@ describe("ouvir antes de escolher", () => {
     expect(screen.queryByText(/Toque para OUVIR/i)).toBeNull();
   });
 
-  it("alternativa de número responde no primeiro toque — não vira dois toques por conta", () => {
+  /**
+   * ⚠️ Este teste também guardava a decisão antiga — ver `opcaoQueSeOuve.test.ts`.
+   *
+   * O numeral passou a pedir audição, então o primeiro toque OUVE e não
+   * responde. Quem responde é o botão de confirmar, que agora existe na tela.
+   */
+  it("⚠️ alternativa de número OUVE no primeiro toque e não responde sozinha", () => {
     const escolhas: unknown[] = [];
     render(<GameLoopExerciseRenderer {...props(NUMEROS, v => escolhas.push(v), null, () => {})} />);
 
     fireEvent.click(screen.getByText("7"));
 
-    expect(escolhas, "numeral não pede audição: a missão ficaria arrastada").toEqual([7]);
-    expect(screen.queryByText(/Toque para OUVIR/i), "e a tela não promete o que não faz").toBeNull();
+    expect(escolhas, "o primeiro toque não decide nada").toEqual([]);
   });
+
+  /**
+   * ⚠️ O segundo toque precisa ser VISÍVEL.
+   *
+   * O pai desenhou este conserto:
+   *
+   * > *"quando tu aperta a primeira vez (...) ela ouviu o som, deu certinho,
+   * > deu não sei o que, e embaixo ou do lado (...) o botão de confirmar, sei
+   * > lá, piscando, piscando para a criança entender."*
+   *
+   * A regra "toque de novo para escolher" estava certa e era invisível: nada
+   * na tela dizia que o segundo toque valia. A criança ouvia, ficava
+   * satisfeita, e a resposta nunca saía.
+   */
+  it("dá para ouvir de novo sem responder, quantas vezes quiser", () => {
+    const escolhas: unknown[] = [];
+    render(<GameLoopExerciseRenderer {...props(PERGUNTA, v => escolhas.push(v), 1, () => {})} />);
+    fireEvent.click(screen.getByLabelText("Ouvir de novo: Sobrou"));
+    fireEvent.click(screen.getByLabelText("Ouvir de novo: Sobrou"));
+    expect(FALAS.filter(f => /sobrou/i.test(f)).length, "falou as duas vezes").toBe(2);
+    expect(escolhas, "e não respondeu nenhuma").toEqual([]);
+  });
+
+  it("dá para mudar de ideia antes de confirmar", () => {
+    const escolhas: unknown[] = [];
+    let armado: unknown = 1;
+    render(<GameLoopExerciseRenderer {...props(PERGUNTA, v => escolhas.push(v), armado, (v: unknown) => { armado = v; })} />);
+    fireEvent.click(screen.getByLabelText("Escolher outra"));
+    expect(armado, "desarmou").toBeNull();
+    expect(escolhas, "sem responder").toEqual([]);
+  });
+
 });

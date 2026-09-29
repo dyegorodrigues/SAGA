@@ -3,6 +3,9 @@ import { PalcoEscalado } from "./PalcoEscalado";
 import { motion, useReducedMotion } from "motion/react";
 import { EmojiRow } from "./EmojiRow";
 import { MaoDeDedos } from "./MaoDeDedos";
+import { porExtenso } from "../../curriculum/procedimentos/audioChoiceProcedure";
+import { tokens } from "../../styles/tokens";
+import { ConfirmarEscolha } from "../gameloop/ConfirmarEscolha";
 import {
   EmojiRowSpec,
   PecaDoPadrao,
@@ -205,6 +208,43 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
     window.setTimeout(() => {
       setFaseInterna(atual => (atual === "flash" ? "perguntando" : atual));
     }, spec.roteiro.flash);
+  }
+
+  /**
+   * ⚠️ As alternativas deste palco eram numerais MUDOS.
+   *
+   * O pai, sobre exatamente este exercício:
+   *
+   * > *"Aquele lá do macaquinho também, de quantos tem, some, aparece (...)
+   * > tinha que dar essa opção de ouvir também, né? Um, dois, tu apertar nos
+   * > botões e ouvir o som."*
+   *
+   * A regra de ouvir-antes-de-escolher existia no app, mas morava no
+   * renderizador genérico — e este palco desenha as PRÓPRIAS alternativas,
+   * então nunca passou por lá. Resultado: na ficha que ensina a reconhecer o
+   * numeral, a criança de quatro anos escolhia entre "1" e "2" sem poder ouvir
+   * nenhum dos dois. Cara ou coroa anotado como erro de matemática.
+   *
+   * Agora o primeiro toque FALA e arma; quem responde é o botão de confirmar,
+   * o mesmo do resto do app — porque um gesto diferente por palco é uma regra
+   * nova para a criança decorar em cada exercício.
+   */
+  const [armada, setArmada] = React.useState<number | string | null>(null);
+  React.useEffect(() => { setArmada(null); }, [spec]);
+
+  const rotuloDe = (valor: number | string) =>
+    String(spec.alternativas.find(a => a.valor === valor)?.rotulo ?? valor);
+
+  /** O que a voz diz de uma alternativa: o número por extenso, não o símbolo. */
+  const ditoDe = (valor: number | string) => {
+    const n = Number(valor);
+    return Number.isFinite(n) ? porExtenso(n) : String(valor).toLowerCase();
+  };
+
+  function armar(valor: number | string) {
+    if (disabled || escolha !== null) return;
+    setArmada(valor);
+    falar?.(ditoDe(valor));
   }
 
   function escolher(valor: number | string) {
@@ -505,7 +545,7 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
               <motion.button
                 key={String(a.valor)}
                 type="button"
-                onClick={() => escolher(a.valor)}
+                onClick={() => armar(a.valor)}
                 disabled={disabled || escolha !== null}
                 // O idioma do botão é o do app: mesma altura, mesmo raio, e a
                 // sombra sólida de 5px que a criança já viu em todas as outras
@@ -525,11 +565,15 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
                   fontSize: a.rotulo.length > 2 ? 22 : 30,
                   // §4: "o botão escolhido BRILHA". O verde do acerto e o âmbar
                   // do erro suave — sem X, sem penalidade, é a ficha inteira.
-                  background: escolha === null ? "#F8FAFC"
-                    : certa ? "#D1FAE5"
-                      : escolhida ? "#FEF3C7" : "#F8FAFC",
+                  background: escolha !== null
+                    ? (certa ? "#D1FAE5" : escolhida ? "#FEF3C7" : "#F8FAFC")
+                    : armada === a.valor
+                      ? `color-mix(in srgb, ${tokens.cor.elementos.marcador} 26%, white)`
+                      : "#F8FAFC",
                 }}
-                animate={semMovimento || !escolhida ? undefined : { scale: [1, 1.12, 1] }}
+                animate={semMovimento || (!escolhida && armada !== a.valor)
+                  ? undefined
+                  : { scale: [1, 1.12, 1] }}
                 transition={{ duration: 0.35 }}
               >
                 {/* No padrão, a peça do banco é desenhada pelo MESMO componente
@@ -543,6 +587,18 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
             );
           })}
         </div>
+      )}
+
+      {/* O confirmar. Mesmo gesto do resto do app: um gesto diferente por
+          palco seria uma regra nova para a criança decorar em cada
+          exercício. */}
+      {!emAula && perguntando && escolha === null && armada !== null && !disabled && (
+        <ConfirmarEscolha
+          rotulo={rotuloDe(armada)}
+          onOuvirDeNovo={() => falar?.(ditoDe(armada))}
+          onConfirmar={() => { const v = armada; setArmada(null); escolher(v); }}
+          onCancelar={() => setArmada(null)}
+        />
       )}
     </div>
     </PalcoEscalado>

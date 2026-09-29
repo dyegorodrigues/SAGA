@@ -15,6 +15,19 @@ import { EmojiRowSpec, chaveDaPeca, maoCanonica } from "../../curriculum/procedi
 const spec = (ficha: FichaCompetencia, lvl: number) =>
   Composer.generate(ficha, lvl).uiProps as EmojiRowSpec;
 
+/**
+ * Responder = armar + confirmar.
+ *
+ * O primeiro toque na alternativa passou a FALAR e armar; quem responde é o
+ * botão de confirmar. Ver a nota em `EmojiRowStage.tsx`: na ficha que ensina a
+ * reconhecer o numeral, a criança escolhia entre "1" e "2" sem poder ouvir
+ * nenhum dos dois.
+ */
+function responder(rotulo: string) {
+  fireEvent.click(screen.getByText(rotulo));
+  fireEvent.click(screen.getByLabelText(new RegExp(`^Confirmar: ${rotulo}$`)));
+}
+
 describe("EmojiRowStage — o palco das três fichas da fileira", () => {
   it("NÃO imprime o enunciado: quem o desenha é o app, acima do palco", () => {
     // `GameLoop.tsx` já desenha `q.prompt` numa caixa acima do renderizador.
@@ -81,7 +94,7 @@ describe("EmojiRowStage — o palco das três fichas da fileira", () => {
   it("responder revela a fileira PARADA, com a quantidade escrita", () => {
     const s = spec(N1_03, 2);
     const { container } = render(<EmojiRowStage spec={s} fase="perguntando" />);
-    fireEvent.click(screen.getByText(String(s.resposta)));
+    responder(String(s.resposta));
     expect(container.textContent).toContain(s.emoji!);
     expect(container.textContent).toContain(`${s.total === 1 ? "Era" : "Eram"} ${s.total}`);
   });
@@ -108,7 +121,7 @@ describe("EmojiRowStage — o palco das três fichas da fileira", () => {
 
     const vozErro = vi.fn();
     const { unmount } = render(<EmojiRowStage spec={s} fase="perguntando" falar={vozErro} />);
-    fireEvent.click(screen.getByText(errada.rotulo));
+    responder(errada.rotulo);
     expect(vozErro).toHaveBeenCalledWith(expect.stringContaining("olha o formato"));
     unmount();
 
@@ -116,6 +129,10 @@ describe("EmojiRowStage — o palco das três fichas da fileira", () => {
     const vozAcerto = vi.fn();
     render(<EmojiRowStage spec={s} fase="perguntando" falar={vozAcerto} />);
     fireEvent.click(screen.getByText(String(s.resposta)));
+    // O toque que ARMA fala o numeral — é para isso que ele existe. O que a
+    // §4 proíbe é fala na REVELAÇÃO do acerto, e é isso que se mede daqui.
+    vozAcerto.mockClear();
+    fireEvent.click(screen.getByLabelText(new RegExp(`^Confirmar: ${s.resposta}$`)));
     expect(vozAcerto).not.toHaveBeenCalled();
   });
 
@@ -123,9 +140,10 @@ describe("EmojiRowStage — o palco das três fichas da fileira", () => {
     const s = spec(N1_03, 2);
     const onAnswer = vi.fn();
     render(<EmojiRowStage spec={s} fase="perguntando" onAnswer={onAnswer} />);
-    const botao = screen.getByText(String(s.resposta));
-    fireEvent.click(botao);
-    fireEvent.click(botao);
+    responder(String(s.resposta));
+    // Depois de respondida, a barra de confirmar não existe mais — e tocar de
+    // novo na alternativa não pode mandar uma segunda resposta.
+    fireEvent.click(screen.getByText(String(s.resposta)));
     expect(onAnswer).toHaveBeenCalledTimes(1);
   });
 

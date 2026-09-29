@@ -20,13 +20,27 @@ import type { Question } from "../../types";
  * é feita ao CONTEÚDO da alternativa: se o rótulo é palavra, precisa de voz.
  *
  * - **"Sobrou", "Faltou", "Deu certinho"** → palavra. Precisa.
- * - **"7", "12", "3 + 4", "½"** → número e símbolo. Não precisa: o numeral é
- *   justamente o que o exercício está ensinando a reconhecer, e obrigar dois
- *   toques em toda conta deixaria a missão arrastada.
  * - **"A", "B"** → uma letra só é rótulo de coordenada, não palavra.
  *
- * A ficha ainda pode pedir voz explicitamente (`audibleOptions`), e isso
- * continua valendo — a regra só acrescenta, nunca tira.
+ * ## ⚠️ O numeral também precisa, e eu tinha decidido que não
+ *
+ * A versão anterior desta regra abria exceção: *"o numeral é justamente o que
+ * o exercício está ensinando a reconhecer, e obrigar dois toques em toda conta
+ * deixaria a missão arrastada"*. Raciocínio de quem lê. O pai devolveu a
+ * medida certa, no exercício do relance, onde as alternativas são "1" e "2":
+ *
+ * > *"tinha que dar essa opção de ouvir também, né? Um, dois, tu apertar nos
+ * > botões e ouvir o som."*
+ *
+ * Para uma criança de quatro anos o algarismo 2 é tão ilegível quanto a
+ * palavra "dois" — é EXATAMENTE isso que essas fichas existem para ensinar.
+ * Obrigá-la a escolher entre dois símbolos que ela ainda não lê transforma a
+ * ficha num cara ou coroa, e o app anota o cara ou coroa como erro de
+ * matemática. O custo do toque a mais é um segundo; o custo do chute é a
+ * medida pedagógica inteira.
+ *
+ * Então a regra passa a ser: **toda alternativa é ouvível.** A ficha ainda
+ * pode pedir explicitamente (`audibleOptions`), e isso continua valendo.
  */
 
 /** Duas letras seguidas já são palavra; uma letra sozinha é rótulo. */
@@ -39,6 +53,5 @@ export function rotuloEhPalavra(rotulo: unknown): boolean {
 export function opcoesPrecisamDeVoz(q: Pick<Question, "audibleOptions" | "options">): boolean {
   if (q.audibleOptions) return true;
   const opcoes = q.options;
-  if (!Array.isArray(opcoes) || opcoes.length === 0) return false;
-  return opcoes.some(o => rotuloEhPalavra((o as { label?: unknown } | null)?.label));
+  return Array.isArray(opcoes) && opcoes.length > 0;
 }

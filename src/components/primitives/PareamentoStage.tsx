@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { tokens } from "../../styles/tokens";
 import { PareamentoSpec } from "../../curriculum/procedimentos/pareamentoContract";
 import { AcaoDePareamento, Desfecho } from "../../curriculum/procedimentos/pareamentoProcedure";
 
@@ -42,6 +43,11 @@ interface Props {
     pulsar?: boolean;
   } | null;
 }
+
+/** O arrasto só começa depois de 8px — o mesmo limiar do `TouchPlace`. */
+const LIMIAR_DE_ARRASTO = 8;
+/** Folga em volta de quem espera: dedo de criança não acerta o pixel. */
+const RAIO_DE_ENTREGA = 28;
 
 /** Onde cada peça fica, por arranjo. Semente fixa: a cena não pula a cada render. */
 function posicoes(quantas: number, arranjo: PareamentoSpec["arranjo"]): { x: number; y: number }[] {
@@ -115,7 +121,7 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
    * largura do aparelho.
    */
   const refDoPrimeiroReceptor = React.useRef<HTMLButtonElement | null>(null);
-  const refDoPrimeiroItem = React.useRef<HTMLSpanElement | null>(null);
+  const refDoPrimeiroItem = React.useRef<HTMLButtonElement | null>(null);
   const [trajeto, setTrajeto] = React.useState<{ dx: number; dy: number } | null>(null);
 
   React.useEffect(() => {
@@ -142,6 +148,81 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
     () => posicoes(spec.itens.quantidade, spec.arranjo === "cena" ? "espalhado" : spec.arranjo),
     [spec.itens.quantidade, spec.arranjo],
   );
+
+  /**
+   * ⚠️ O gesto que a aula ensina tem de funcionar.
+   *
+   * A demonstração desta ficha mostra a peça VIAJANDO da bandeja até quem
+   * espera — fui eu que a fiz viajar, ao consertar a mão fantasma parada. Só
+   * que a bandeja era feita de `<span aria-hidden>`: não recebia dedo nenhum.
+   * A aula ensinava arrastar e o palco só aceitava tocar no destino. O pai
+   * fez exatamente o que viu e nada aconteceu:
+   *
+   * > *"ele não arrasta, eu tenho que clicar no bichinho lá pra frutinha ir
+   * > pra ele. Então esse drag and drop não tá funcionando."*
+   *
+   * Demonstração que ensina um gesto recusado é pior que nenhuma: a criança
+   * faz o que viu, não acontece nada, e conclui que errou.
+   *
+   * As DUAS portas ficam abertas. A §8.3-bis proíbe exigir precisão de dedo,
+   * então tocar em quem espera continua entregando; arrastar passa a ser o
+   * gesto natural para quem já tentou arrastar. Mesmo limiar de 8px do
+   * `TouchPlace`, para um toque simples não ser roubado pelo detector.
+   */
+  const refsDosReceptores = React.useRef<(HTMLButtonElement | null)[]>([]);
+  const [arrasto, setArrasto] = React.useState<{ id: number; x: number; y: number; ativo: boolean; x0: number; y0: number } | null>(null);
+  const [receptorSobODedo, setReceptorSobODedo] = React.useState(-1);
+
+  /** Qual receptor está sob este ponto da tela. Geometria, não `elementFromPoint`. */
+  function receptorEm(x: number, y: number): number {
+    let melhor = -1;
+    let menorDistancia = Infinity;
+    refsDosReceptores.current.forEach((el, i) => {
+      if (!el || porReceptor[i] > 0) return;
+      const r = el.getBoundingClientRect();
+      if (!r.width) return;
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dentro = x >= r.left - RAIO_DE_ENTREGA && x <= r.right + RAIO_DE_ENTREGA
+        && y >= r.top - RAIO_DE_ENTREGA && y <= r.bottom + RAIO_DE_ENTREGA;
+      if (!dentro) return;
+      const d = Math.hypot(x - cx, y - cy);
+      if (d < menorDistancia) { menorDistancia = d; melhor = i; }
+    });
+    return melhor;
+  }
+
+  function comecarArrasto(e: React.PointerEvent<HTMLButtonElement>) {
+    if (travado || naBandeja <= 0) return;
+    setArrasto({ id: e.pointerId, x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, ativo: false });
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* sem capture */ }
+  }
+
+  function moverArrasto(e: React.PointerEvent<HTMLButtonElement>) {
+    const atual = arrasto;
+    if (!atual || atual.id !== e.pointerId) return;
+    const virou = atual.ativo
+      || Math.hypot(e.clientX - atual.x0, e.clientY - atual.y0) >= LIMIAR_DE_ARRASTO;
+    setArrasto({ ...atual, x: e.clientX, y: e.clientY, ativo: virou });
+    setReceptorSobODedo(virou ? receptorEm(e.clientX, e.clientY) : -1);
+  }
+
+  function soltarArrasto(e: React.PointerEvent<HTMLButtonElement>) {
+    const atual = arrasto;
+    setArrasto(null);
+    setReceptorSobODedo(-1);
+    if (!atual || atual.id !== e.pointerId) return;
+    if (!atual.ativo) {
+      // Toque simples na peça: entrega no primeiro que ainda está sem. É a
+      // mesma entrega do toque no receptor, começada pelo outro lado.
+      const vazio = porReceptor.findIndex(n => n === 0);
+      if (vazio >= 0) tocarReceptor(vazio);
+      return;
+    }
+    const alvo = receptorEm(e.clientX, e.clientY);
+    // Soltar fora não pune: a peça volta para a bandeja, calada.
+    if (alvo >= 0) tocarReceptor(alvo);
+  }
 
   function tocarReceptor(i: number) {
     if (travado) return;
@@ -188,7 +269,10 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
         {porReceptor.map((tem, i) => (
           <motion.button
             key={i}
-            ref={i === 0 ? refDoPrimeiroReceptor : undefined}
+            ref={el => {
+              refsDosReceptores.current[i] = el;
+              if (i === 0) refDoPrimeiroReceptor.current = el;
+            }}
             type="button"
             onClick={() => tocarReceptor(i)}
             disabled={travado}
@@ -196,9 +280,15 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
             aria-label={tem > 0 ? "Este já tem" : "Este ainda está sem"}
             className="relative flex h-16 w-16 items-center justify-center rounded-2xl border-2 text-3xl"
             style={{
-              borderColor: tem > 0 ? "#16A34A" : "#CBD5E1",
-              borderStyle: tem > 0 ? "solid" : "dashed",
-              background: tem > 0 ? "#F0FDF4" : "#F8FAFC",
+              // Sob o dedo, quem espera ACENDE: é o único jeito de a criança
+              // saber que soltar ali vale, antes de soltar.
+              borderColor: receptorSobODedo === i
+                ? tokens.cor.acao.secundaria
+                : tem > 0 ? "#16A34A" : "#CBD5E1",
+              borderStyle: tem > 0 || receptorSobODedo === i ? "solid" : "dashed",
+              background: receptorSobODedo === i
+                ? `color-mix(in srgb, ${tokens.cor.acao.secundaria} 14%, transparent)`
+                : tem > 0 ? "#F0FDF4" : "#F8FAFC",
               transform: `translate(${posDosReceptores[i]?.x ?? 0}px, ${posDosReceptores[i]?.y ?? 0}px)`,
             }}
             animate={mostrar?.maoFantasma && i === 0 && !reduzido ? { scale: [1, 1.12, 1] } : { scale: 1 }}
@@ -222,17 +312,29 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
         style={{ opacity: realce("itens") }}
       >
         {Array.from({ length: Math.max(naBandeja, 0) }, (_, i) => (
-          <motion.span
+          <motion.button
             key={i}
             ref={i === 0 ? refDoPrimeiroItem : undefined}
-            aria-hidden="true"
-            className="text-3xl"
-            style={{ transform: `translate(${posDosItens[i]?.x ?? 0}px, ${posDosItens[i]?.y ?? 0}px)` }}
+            type="button"
+            disabled={travado}
+            onPointerDown={comecarArrasto}
+            onPointerMove={moverArrasto}
+            onPointerUp={soltarArrasto}
+            onPointerCancel={() => { setArrasto(null); setReceptorSobODedo(-1); }}
+            // Sem numeral, como a ficha exige — e sem "arraste", porque a
+            // criança desta faixa não lê. Quem ensina o gesto é a aula.
+            aria-label={`Dar para quem espera: ${spec.itens.nome}`}
+            className="flex h-11 w-11 items-center justify-center text-3xl"
+            style={{
+              transform: `translate(${posDosItens[i]?.x ?? 0}px, ${posDosItens[i]?.y ?? 0}px)`,
+              touchAction: "none",
+              opacity: arrasto?.ativo && i === 0 ? 0.35 : 1,
+            }}
             animate={mostrar?.pulsar && i === 0 && !reduzido ? { scale: [1, 1.2, 1] } : { scale: 1 }}
             transition={{ duration: 0.8, repeat: mostrar?.pulsar ? Infinity : 0 }}
           >
-            {spec.itens.emoji}
-          </motion.span>
+            <span aria-hidden="true">{spec.itens.emoji}</span>
+          </motion.button>
         ))}
         {naBandeja <= 0 && (
           // Moldura vazia lê como bug (§6.6): a bandeja vazia se explica.

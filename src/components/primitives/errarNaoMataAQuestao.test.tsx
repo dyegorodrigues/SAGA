@@ -86,7 +86,11 @@ describe("errar não mata a questão — o palco continua aceitando resposta", (
     const { container } = render(<EmojiRowStage spec={spec} onAnswer={onAnswer} disabled={false} fase="perguntando" />);
     const opcoes = () => vivos(container).filter(b => /\d/.test((b.textContent ?? "").trim()));
     expect(opcoes().length, "o palco precisa oferecer alternativas").toBeGreaterThan(0);
+    // Armar e confirmar: o primeiro toque passou a FALAR o numeral, porque
+    // quem não lê não escolhe entre "1" e "2" no escuro. Ver `EmojiRowStage`.
+    const rotulo = (opcoes()[0].textContent ?? "").trim();
     fireEvent.click(opcoes()[0]);
+    fireEvent.click(container.querySelector(`[aria-label="Confirmar: ${rotulo}"]`) as HTMLElement);
     expect(onAnswer).toHaveBeenCalledTimes(1);
     expect(opcoes().length, "fechar depois de uma resposta é o contrato deste palco").toBe(0);
 

@@ -153,4 +153,66 @@ describe("a micro-aula da ficha F07 §8", () => {
       .map(el => el.style.opacity);
     expect(new Set(opacidades).size).toBeGreaterThan(1);
   });
+
+  /* ---------------------------------------------------------------- *
+   *  O gesto que a aula ensina tem de funcionar
+   * ---------------------------------------------------------------- */
+
+  /**
+   * ⚠️ A peça da bandeja responde ao dedo.
+   *
+   * O pai:
+   *
+   * > *"aquele lá que você manda arrastar ali pro bichinho, a frutinha, seja
+   * > lá o que for, não, ele não arrasta, eu tenho que clicar no bichinho lá
+   * > pra frutinha ir pra ele. Então esse drag and drop não tá funcionando."*
+   *
+   * Ele está descrevendo um defeito que EU criei. A demonstração desta ficha
+   * mostra a peça VIAJANDO da bandeja até quem espera — fui eu que a fiz
+   * viajar, no commit que consertou a mão fantasma parada. Só que a bandeja
+   * era feita de `<span aria-hidden>`: não recebia dedo nenhum. A aula
+   * ensinava arrastar e o palco só aceitava tocar no destino.
+   *
+   * Demonstração que ensina um gesto que o app recusa é pior do que
+   * demonstração nenhuma: a criança faz exatamente o que viu, não acontece
+   * nada, e ela conclui que errou.
+   *
+   * O portão cobra as DUAS portas, porque a §8.3-bis proíbe exigir precisão de
+   * dedo: arrastar tem de funcionar, e tocar tem de continuar funcionando.
+   */
+  it("⚠️ a peça da bandeja é tocável — a bandeja não é decoração", () => {
+    const { container } = render(<PareamentoStage spec={spec(1)} />);
+    const bandeja = container.querySelector('[aria-label^="Ainda na bandeja"]')!;
+    const tocaveis = bandeja.querySelectorAll("button:not([disabled])");
+    expect(tocaveis.length, "alguma peça da bandeja recebe o dedo").toBeGreaterThan(0);
+  });
+
+  it("⚠️ arrastar a peça até quem espera ENTREGA a peça", () => {
+    const s = spec(1);
+    const { container } = render(<PareamentoStage spec={s} />);
+    const bandeja = container.querySelector('[aria-label^="Ainda na bandeja"]')!;
+    const peca = bandeja.querySelector("button")!;
+    const receptor = container.querySelector('[aria-label="Este ainda está sem"]') as HTMLElement;
+
+    const antes = container.querySelectorAll('[aria-label="Este já tem"]').length;
+
+    // O gesto: desce na peça, anda mais que o limiar, solta em cima de quem
+    // espera. `elementFromPoint` não existe no jsdom, então o palco precisa
+    // decidir o destino pela geometria dos receptores — e é isso que se cobra.
+    receptor.getBoundingClientRect = () => ({ left: 100, top: 100, width: 64, height: 64, right: 164, bottom: 164, x: 100, y: 100, toJSON: () => ({}) }) as DOMRect;
+    fireEvent.pointerDown(peca, { pointerId: 1, clientX: 10, clientY: 200 });
+    fireEvent.pointerMove(peca, { pointerId: 1, clientX: 130, clientY: 132 });
+    fireEvent.pointerUp(peca, { pointerId: 1, clientX: 130, clientY: 132 });
+
+    const depois = container.querySelectorAll('[aria-label="Este já tem"]').length;
+    expect(depois, "um receptor a mais recebeu").toBe(antes + 1);
+  });
+
+  it("tocar em quem espera CONTINUA entregando — a porta acessível não fecha", () => {
+    const { container } = render(<PareamentoStage spec={spec(1)} />);
+    const receptor = container.querySelector('[aria-label="Este ainda está sem"]') as HTMLElement;
+    fireEvent.click(receptor);
+    expect(container.querySelectorAll('[aria-label="Este já tem"]').length).toBe(1);
+  });
+
 });

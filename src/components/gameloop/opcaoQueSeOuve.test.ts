@@ -9,13 +9,28 @@ describe("a alternativa que precisa ser ouvida", () => {
     ] } as never)).toBe(true);
   });
 
-  it("número e símbolo não precisam — é o que o exercício ensina a ler", () => {
+  /**
+   * ⚠️ Este teste dizia o CONTRÁRIO, e a decisão que ele guardava era minha.
+   *
+   * "Número e símbolo não precisam — é o que o exercício ensina a ler." Eu
+   * escrevi isso raciocinando como quem lê. O pai devolveu a medida certa, no
+   * exercício do relance, onde as alternativas são "1" e "2":
+   *
+   * > *"tinha que dar essa opção de ouvir também, né? Um, dois, tu apertar nos
+   * > botões e ouvir o som."*
+   *
+   * Para uma criança de quatro anos o algarismo 2 é tão ilegível quanto a
+   * palavra "dois" — é exatamente isso que essas fichas existem para ensinar.
+   * Escolher entre dois símbolos que ela ainda não lê é cara ou coroa, e o app
+   * anotava o cara ou coroa como erro de matemática.
+   */
+  it("⚠️ número também precisa: para quem não lê, '2' é tão opaco quanto 'dois'", () => {
     expect(opcoesPrecisamDeVoz({ options: [
       { value: 7, label: "7" }, { value: 8, label: "8" }, { value: 9, label: "9" },
-    ] } as never)).toBe(false);
+    ] } as never)).toBe(true);
     expect(opcoesPrecisamDeVoz({ options: [
       { value: 1, label: "3 + 4" }, { value: 2, label: "½" }, { value: 3, label: "=" },
-    ] } as never)).toBe(false);
+    ] } as never)).toBe(true);
   });
 
   it("uma letra sozinha é rótulo de coordenada, não palavra", () => {

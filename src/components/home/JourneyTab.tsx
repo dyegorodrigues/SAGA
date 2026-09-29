@@ -5,6 +5,7 @@ import { LearningPath } from "../LearningPath";
 import { Icone, ICONE_DA_MATERIA } from "../icones/Icone";
 import { SUBJECTS } from "../../subjects";
 import { isTrackUnlocked, UnlockStatus } from "../../curriculum/motores/unlockEngine";
+import { desligarModoDeTeste, modoDeTesteLigado } from "../../curriculum/motores/modoDeTeste";
 
 interface Props {
   kid: Kid;
@@ -66,6 +67,28 @@ export function JourneyTab({ kid, prog, tracks: allMathTracks, unlockStatus, onT
            <h2 className="text-2xl font-black text-indigo-900" style={{ fontFamily: FONT }}>Jornada</h2>
            <p className="text-sm font-bold text-slate-500 mt-1">Siga a trilha. Uma de cada vez.</p>
          </div>
+
+         {/*
+           O aviso do modo de teste.
+           Ele é feio de propósito: enquanto estiver ligado, a trilha não é a
+           que a criança veria, e quem olha a tela precisa saber disso sem
+           perguntar. O botão desliga no mesmo lugar, para não depender de
+           lembrar a URL.
+         */}
+         {modoDeTesteLigado() && (
+           <div className="mx-2 mb-6 flex items-center justify-between gap-3 rounded-2xl border-2 border-amber-400 bg-amber-50 px-4 py-3">
+             <span className="text-xs font-black text-amber-900">
+               Modo de teste: todas as {tracks.length} competências abertas
+             </span>
+             <button
+               type="button"
+               onClick={() => { desligarModoDeTeste(); window.location.reload(); }}
+               className="min-h-11 shrink-0 rounded-xl border-2 border-amber-500 bg-white px-3 text-xs font-black text-amber-900"
+             >
+               Desligar
+             </button>
+           </div>
+         )}
 
          {/* Painel de Diagnóstico do Programa da Jornada */}
          <div className="mb-8 mx-2 bg-white rounded-3xl p-5 border-2 border-indigo-100 shadow-sm relative overflow-hidden">

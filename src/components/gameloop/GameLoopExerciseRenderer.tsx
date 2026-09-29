@@ -13,6 +13,7 @@ import { AreaStage } from "../primitives/AreaStage";
 import { chaveDaTentativa } from "./chaveDaTentativa";
 import { opcoesPrecisamDeVoz } from "./opcaoQueSeOuve";
 import { colunasDasAlternativas } from "./colunasDasAlternativas";
+import { ConfirmarEscolha } from "./ConfirmarEscolha";
 import { PareamentoStage } from "../primitives/PareamentoStage";
 import { TouchCount } from "../primitives/TouchCount";
 import { EmojiRowStage, Fase as FaseDaFileira } from "../primitives/EmojiRowStage";
@@ -821,11 +822,16 @@ export function GameLoopExerciseRenderer({
                   onClick={() => {
                     if (status || isHidden) return;
                     if (!audivel) { handlePick(o.value); return; }
-                    // Primeiro toque OUVE, segundo ESCOLHE. A tela promete isso
-                    // desde sempre ("Toque para OUVIR · toque de novo para
-                    // escolher") e o código não cumpria: falava e escolhia no
-                    // mesmo toque. Para quem não lê, era escolher no escuro.
-                    if (armedOpt === o.value) { setArmedOpt(null); handlePick(o.value); return; }
+                    /*
+                     * O primeiro toque FALA e ARMA. Quem responde é o botão
+                     * de confirmar, logo abaixo.
+                     *
+                     * Antes o segundo toque na própria alternativa respondia,
+                     * e isso era invisível: nada na tela dizia que tocar de
+                     * novo decidia. A criança ouvia "dois", ficava satisfeita,
+                     * e a resposta nunca saía — ou ela tocava de novo sem
+                     * saber que estava decidindo.
+                     */
                     setArmedOpt(o.value);
                     speak(String(o.say ?? o.label).toLowerCase(), q.lang ? { lang: q.lang } : {});
                   }}
@@ -873,9 +879,25 @@ export function GameLoopExerciseRenderer({
               nada. Promessa fora de hora ensina a criança a ignorar a frase
               justamente onde ela importa. */}
           {audivel && !status && shouldRenderQuestionOptions(q) && q.options && q.options.length > 0 && (
-            <div className="text-center mt-2" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 11.5, color: C.sub }}>
-              👂 Toque para OUVIR · toque de novo para escolher
-            </div>
+            armedOpt !== null && armedOpt !== undefined
+              ? (() => {
+                const escolhida = q.options.find(o => o.value === armedOpt);
+                if (!escolhida) return null;
+                const dito = String(escolhida.say ?? escolhida.label).toLowerCase();
+                return (
+                  <ConfirmarEscolha
+                    rotulo={String(escolhida.label)}
+                    onOuvirDeNovo={() => speak(dito, q.lang ? { lang: q.lang } : {})}
+                    onConfirmar={() => { setArmedOpt(null); handlePick(escolhida.value); }}
+                    onCancelar={() => setArmedOpt(null)}
+                  />
+                );
+              })()
+              : (
+                <div className="text-center mt-2" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 11.5, color: C.sub }}>
+                  👂 Toque para OUVIR o que cada um diz
+                </div>
+              )
           )}
           </>
         )}

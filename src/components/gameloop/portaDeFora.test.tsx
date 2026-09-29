@@ -98,6 +98,73 @@ const PORTOES_MEDIDOS = [
   // indistinguível do domínio — dizer por onde foi é o que separa quem estimou
   // de quem teve sorte, e a barra espera essa declaração.
   "N3.13|5",
+
+  /*
+   * ⚠️ Estas 48 entram de uma vez porque a regra de ouvir-antes-de-escolher
+   * chegou ao NUMERAL.
+   *
+   * Eu tinha aberto exceção, por escrito, em `opcaoQueSeOuve.ts`: "número e
+   * símbolo não precisam — é o que o exercício ensina a ler". Raciocínio de
+   * quem lê. O pai desfez a exceção no exercício do relance, onde as
+   * alternativas são "1" e "2":
+   *
+   *   "tinha que dar essa opção de ouvir também, né? Um, dois, tu apertar
+   *    nos botões e ouvir o som."
+   *
+   * Para quem tem quatro anos o algarismo 2 é tão ilegível quanto a palavra
+   * "dois" — é exatamente isso que essas fichas existem para ensinar. Com o
+   * numeral pedindo audição, 48 combinações que antes entregavam a resposta
+   * num toque passaram a ter portão.
+   */
+  "N1.07|1",
+  "N1.07|2",
+  "N1.07|3",
+  "N1.07|4",
+  "N1.07|5",
+  "N1.09|1",
+  "N1.09|2",
+  "N1.09|3",
+  "N1.09|4",
+  "N1.09|5",
+  "N1.10|5",
+  "N1.11|3",
+  "N1.11|4",
+  "N1.11|5",
+  "N3.10|1",
+  "N3.10|2",
+  "N3.10|3",
+  "N3.10|4",
+  "N3.10|5",
+  "N4.03|1",
+  "N4.03|2",
+  "N4.03|3",
+  "N4.03|4",
+  "N4.03|5",
+  "N4.04|1",
+  "N4.04|2",
+  "N4.04|3",
+  "N4.04|4",
+  "N4.04|5",
+  "N4.06|1",
+  "N4.06|2",
+  "N4.06|3",
+  "N4.06|4",
+  "N4.06|5",
+  "N4.07|1",
+  "N4.07|2",
+  "N4.07|3",
+  "N4.07|4",
+  "N4.07|5",
+  "N4.08|1",
+  "N4.08|2",
+  "N4.08|3",
+  "N4.08|4",
+  "N4.08|5",
+  "N4.09|5",
+  "N4.09|1",
+  "N4.09|2",
+  "N4.09|3",
+  "N4.09|4",
 ];
 
 /**
