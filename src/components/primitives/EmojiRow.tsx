@@ -132,8 +132,22 @@ export function EmojiRow({
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
                   scale: isHighlighted ? 1.35 : 1, 
-                  opacity: isMarked ? 0.42 : (isTouched ? 1 : 0.3),
-                  filter: isTouched ? 'grayscale(0%)' : 'grayscale(100%)'
+                  /*
+                   * O que ainda NÃO foi tocado é o que a criança precisa
+                   * tocar — então é o que tem de estar vivo na tela.
+                   *
+                   * Era ao contrário: não tocado saía com 30% de opacidade e
+                   * cinza total. Na tela de um celular isso é o desenho
+                   * universal de "desligado": o pai abriu o primeiro exercício
+                   * e viu três peixes fantasmas. A criança de quatro anos lê
+                   * cinza-apagado como "não pode", e não toca em nada.
+                   *
+                   * Agora o não-tocado fica em cor cheia (e já vinha maior,
+                   * pelo `scale`), e o tocado é que recua um pouco. Quem conta
+                   * o progresso não é a opacidade e sim a etiqueta com o
+                   * número, que aparece embaixo de cada item já contado.
+                   */
+                  opacity: isMarked ? 0.42 : (isTouched ? 0.72 : 1),
                 }}
                 exit={{ scale: 0, opacity: 0 }}
                 onClick={() => markInteractive ? handleMark(i) : handleTouch(i)}

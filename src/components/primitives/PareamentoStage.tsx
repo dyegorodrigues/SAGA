@@ -100,6 +100,40 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
   /** No nível 5 a criança prevê antes: até responder, não se mexe nas peças. */
   const travado = Boolean(disabled) || (spec.momentoDaPergunta === "antes" && !respondido);
 
+  /**
+   * O trajeto da mão fantasma: de onde a peça sai até onde ela chega.
+   *
+   * A coreografia da ficha diz "Assim, ó." e mandava `maoFantasma: true`. O
+   * que isso fazia era PULSAR o primeiro receptor — e só. A peça nunca saía do
+   * lugar. O pai abriu o primeiro exercício da Jornada e descreveu exatamente
+   * o buraco: "não aparece indo a banana pro macaco".
+   *
+   * Uma demonstração que não demonstra o gesto é pior que nenhuma: ela ocupa
+   * os dez segundos em que a criança estava prestando atenção e não ensina o
+   * que fazer. Agora a peça VIAJA, e o trajeto é medido na tela (e não chutado
+   * em pixels), porque a posição depende do arranjo, da quantidade e da
+   * largura do aparelho.
+   */
+  const refDoPrimeiroReceptor = React.useRef<HTMLButtonElement | null>(null);
+  const refDoPrimeiroItem = React.useRef<HTMLSpanElement | null>(null);
+  const [trajeto, setTrajeto] = React.useState<{ dx: number; dy: number } | null>(null);
+
+  React.useEffect(() => {
+    if (!mostrar?.maoFantasma) { setTrajeto(null); return; }
+    const alvo = refDoPrimeiroReceptor.current;
+    const origem = refDoPrimeiroItem.current;
+    if (!alvo || !origem) return;
+    const a = alvo.getBoundingClientRect();
+    const o = origem.getBoundingClientRect();
+    // Sem layout (jsdom, ou tela ainda não medida) todas as caixas são zero:
+    // animar por zero seria uma peça parada fingindo que anda.
+    if (a.width === 0 || o.width === 0) return;
+    setTrajeto({
+      dx: (a.left + a.width / 2) - (o.left + o.width / 2),
+      dy: (a.top + a.height / 2) - (o.top + o.height / 2),
+    });
+  }, [mostrar?.maoFantasma, spec, naBandeja]);
+
   const posDosReceptores = React.useMemo(
     () => posicoes(spec.receptores.quantidade, spec.arranjo),
     [spec.receptores.quantidade, spec.arranjo],
@@ -126,8 +160,18 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
     onAnswer?.(d, { ...acao, respostaDaPergunta: d });
   }
 
+  /**
+   * O holofote da aulinha: destaca sem apagar.
+   *
+   * Era 0,35 — e 35% de opacidade é o desenho universal de "desligado". Nos
+   * passos da demonstração as duas fileiras se revezavam nesse estado, e o que
+   * a criança via era a tela piscando entre acesa e apagada. O pai chamou de
+   * "muda, pisca, muda", e é exatamente isso.
+   *
+   * Holofote é diferença, não apagão: 0,7 destaca e mantém a fileira legível.
+   */
   const realce = (qual: "receptores" | "itens") =>
-    !mostrar?.destacarFileira || mostrar.destacarFileira === qual ? 1 : 0.35;
+    !mostrar?.destacarFileira || mostrar.destacarFileira === qual ? 1 : 0.7;
 
   return (
     <div className="flex w-full flex-col items-center gap-4 select-none">
@@ -144,6 +188,7 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
         {porReceptor.map((tem, i) => (
           <motion.button
             key={i}
+            ref={i === 0 ? refDoPrimeiroReceptor : undefined}
             type="button"
             onClick={() => tocarReceptor(i)}
             disabled={travado}
@@ -173,12 +218,13 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
       <div
         role="group"
         aria-label={naBandeja > 0 ? `Ainda na bandeja: ${spec.itens.nome}` : "A bandeja está vazia"}
-        className="flex min-h-[60px] w-full flex-wrap items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-3 transition-opacity"
+        className="relative flex min-h-[60px] w-full flex-wrap items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 p-3 transition-opacity"
         style={{ opacity: realce("itens") }}
       >
         {Array.from({ length: Math.max(naBandeja, 0) }, (_, i) => (
           <motion.span
             key={i}
+            ref={i === 0 ? refDoPrimeiroItem : undefined}
             aria-hidden="true"
             className="text-3xl"
             style={{ transform: `translate(${posDosItens[i]?.x ?? 0}px, ${posDosItens[i]?.y ?? 0}px)` }}
@@ -191,6 +237,27 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
         {naBandeja <= 0 && (
           // Moldura vazia lê como bug (§6.6): a bandeja vazia se explica.
           <span className="text-sm font-bold text-slate-500">Acabou!</span>
+        )}
+
+        {/* A peça que VIAJA: é ela que ensina o gesto. Sai da bandeja, chega em
+            quem espera, e recomeça — em laço, porque a criança de quatro anos
+            costuma olhar para a tela no meio, e não no começo. */}
+        {trajeto && !reduzido && (
+          <motion.span
+            aria-hidden="true"
+            className="pointer-events-none absolute text-3xl"
+            style={{ left: "50%", top: "50%", zIndex: 30 }}
+            initial={{ x: 0, y: 0, opacity: 0, scale: 0.9 }}
+            animate={{
+              x: [0, trajeto.dx, trajeto.dx],
+              y: [0, trajeto.dy, trajeto.dy],
+              opacity: [0, 1, 1, 0],
+              scale: [0.9, 1.15, 1],
+            }}
+            transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.65, 0.85, 1] }}
+          >
+            {spec.itens.emoji}
+          </motion.span>
         )}
       </div>
 

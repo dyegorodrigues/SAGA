@@ -20,7 +20,16 @@ const spec = (ficha: FichaCompetencia, lvl: number) =>
 const casas = (container: HTMLElement) =>
   container.querySelectorAll('[role="group"][aria-label*="moldura"] > div');
 
-const botoes = (container: HTMLElement) => [...container.querySelectorAll("button")];
+/**
+ * Os botões de RESPOSTA.
+ *
+ * O palco também desenha o "Ver de novo" — a saída de quem piscou durante a
+ * tampa. Ele é botão e não é resposta; varrer `querySelectorAll("button")`
+ * cru passou a misturar os dois e reprovou testes que estavam certos. O grupo
+ * "Números" é o que o próprio palco declara como a barra de alternativas.
+ */
+const botoes = (container: HTMLElement) =>
+  [...(container.querySelector('[aria-label="Números"]') ?? container).querySelectorAll("button")];
 
 describe("MolduraStage — o palco das três fichas da moldura de dez", () => {
   it("NÃO imprime o enunciado: quem o desenha é o app, acima do palco", () => {

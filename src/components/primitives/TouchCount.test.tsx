@@ -205,16 +205,36 @@ describe("o desmame do nível 5", () => {
 });
 
 describe("o modo rítmico — ficha F27: quem dispara é o CANHÃO", () => {
-  it("o balão não é botão — a criança não escolhe alvo", () => {
-    // A primeira versão fazia a criança tocar cada balão, que é a interação do
-    // modo `toque`. A F27 §3 põe um canhão na base, e a §4 descreve o disparo:
-    // um toque no canhão, uma bala, um balão, um número. Colapsar os dois modos
-    // apagou o que a ficha ensina — contar é AGIR NO TEMPO CERTO, não mirar.
-    const { container } = render(<TouchCount spec={ritmico(2)} />);
-    const baloes = [...container.querySelectorAll("button")]
-      .filter(b => (b.getAttribute("aria-label") ?? "").includes("balões"));
-    expect(baloes.length).toBeGreaterThan(0);
-    for (const b of baloes) expect(b.hasAttribute("disabled"), "balão clicável").toBe(true);
+  it("no rítmico a criança não escolhe alvo — tocar em qualquer balão estoura o PRÓXIMO", () => {
+    /*
+     * A F27 §3 põe um canhão na base e a §4 descreve o disparo: um toque, uma
+     * bala, um balão, um número. O que a ficha ensina é AGIR NO TEMPO CERTO,
+     * não mirar — e por isso a escolha de alvo não pode voltar.
+     *
+     * A primeira versão deste teste defendia isso pelo jeito errado: exigia
+     * que o balão fosse um botão DESABILITADO. O efeito na tela era o pior
+     * possível — balões grandes e coloridos, o enunciado gritando "Estoure os
+     * balões!", e o toque da criança ignorado. O pai resumiu: "manda clicar,
+     * ele não clica".
+     *
+     * Agora o balão responde e dispara o canhão. O invariante que importa
+     * continua cobrado, e de forma mais forte que antes: tocar no ÚLTIMO
+     * balão estoura o PRIMEIRO da ordem. Quem escolhe o alvo é a sequência.
+     */
+    const { container } = render(<TouchCount spec={ritmico(3)} />);
+    const inteiros = [...container.querySelectorAll("button")]
+      .filter(b => (b.getAttribute("aria-label") ?? "") === "Estourar o próximo balão");
+    expect(inteiros.length, "não há balão inteiro na cena").toBeGreaterThan(1);
+
+    fireEvent.click(inteiros[inteiros.length - 1]);
+
+    const estourados = [...container.querySelectorAll("button")]
+      .filter(b => /já contei: /.test(b.getAttribute("aria-label") ?? ""));
+    expect(estourados, "um toque, um balão").toHaveLength(1);
+    expect(
+      estourados[0].getAttribute("aria-label"),
+      "o dedo tocou no último e a ordem estourou o primeiro",
+    ).toContain("já contei: 1");
   });
 
   it("cada disparo estoura UM balão e produz UM número", () => {

@@ -263,20 +263,41 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
             <motion.button
               key={i}
               type="button"
-              onClick={() => tocar(i)}
-              // No rítmico o balão é CENÁRIO: quem age é o canhão. Deixá-lo
-              // clicável ofereceria duas interações para a mesma ação e
-              // devolveria a escolha de alvo, que é o modo `toque`.
-              disabled={disabled || estourado || spec.modo === "ritmico"}
+              /*
+               * No rítmico, tocar num balão DISPARA O CANHÃO — não estoura
+               * aquele balão.
+               *
+               * Antes o balão era cenário morto: desenhado grande, colorido,
+               * com nome de leitor de tela, e desabilitado. E o enunciado
+               * dizia, em letras garrafais, "Estoure os balões contando
+               * junto!". A criança de quatro anos lê o DESENHO, não o botão:
+               * ela toca no balão e não acontece nada. O pai resumiu assim —
+               * "manda clicar, ele não clica" — e estava certo.
+               *
+               * A pedagogia continua de pé, e é por isso que o toque no balão
+               * chama `dispararCanhao` e não `tocar(i)`: quem escolhe o alvo
+               * continua sendo a ORDEM, nunca o dedo. O engasgo do §4 também
+               * continua valendo, porque é o mesmo disparo. O que muda é só
+               * isto: o gesto óbvio deixou de ser ignorado.
+               */
+              onClick={() => (spec.modo === "ritmico" ? dispararCanhao() : tocar(i))}
+              disabled={disabled || (spec.modo === "ritmico" ? terminou : estourado)}
               // Sem `aria-hidden`: o alvo já feito CARREGA sentido — é a
               // âncora de onde continuar. Escondê-lo do leitor de tela tiraria
               // de quem não enxerga justamente a informação que a cena dá de
               // graça a quem enxerga.
+              // No rítmico o nome do balão AINDA INTEIRO diz o que o toque
+              // faz — estourar o PRÓXIMO, não este. Prometer "escolha este" e
+              // estourar outro seria mentir para quem não enxerga. Os já
+              // estourados mantêm o nome de sempre: eles são a âncora de onde
+              // a contagem continua.
               aria-label={jaVeioFeito
                 ? `${spec.nome}, este já estourei: ${numeralDe(i)}`
                 : contado
                   ? `${spec.nome}, já contei: ${numeralDe(i)}`
-                  : `${spec.nome}, ainda não contei`}
+                  : spec.modo === "ritmico"
+                    ? "Estourar o próximo balão"
+                    : `${spec.nome}, ainda não contei`}
               aria-pressed={contado}
               className="absolute flex items-center justify-center rounded-full"
               style={{

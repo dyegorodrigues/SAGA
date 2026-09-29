@@ -146,6 +146,21 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
     spec.modo === "padrao" ? "entrando" : "preparando",
   );
   const [escolha, setEscolha] = React.useState<number | string | null>(null);
+  /**
+   * Quantas vezes a criança pediu para ver de novo.
+   *
+   * O relance é curto de propósito — é o que treina reconhecer sem contar. Mas
+   * "curto de propósito" e "sem saída" são coisas diferentes: 1,5 s no nível 1
+   * e 600 ms no nível 5, e se ela piscar, olhou para o lado ou o adulto falou
+   * com ela, acabou. A tela ficava com "Sumiram!" e duas alternativas, e a
+   * única coisa que restava era chutar.
+   *
+   * O pai descreveu assim: "ele tampa, mas não mostra o que tinha antes, é
+   * muito rápido". Estava certo, e o app JÁ tinha essa ideia — o `peekAgain`
+   * do GameLoop —, só que ela nunca alcançou este palco, que é o que serve as
+   * fichas autorais.
+   */
+  const [espiadas, setEspiadas] = React.useState(0);
 
   const emAula = mostrar != null && Object.keys(mostrar).length > 0;
   // A fase presa vale até a criança responder: depois disso quem manda é a
@@ -181,6 +196,16 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
 
     return () => { vivo = false; timers.forEach(window.clearTimeout); };
   }, [spec, faseFixa, emAula]);
+
+  /** Mostra o desenho de novo, pelo mesmo tempo do relance daquele nível. */
+  function verDeNovo() {
+    if (disabled || escolha !== null || emAula || faseFixa) return;
+    setEspiadas(n => n + 1);
+    setFaseInterna("flash");
+    window.setTimeout(() => {
+      setFaseInterna(atual => (atual === "flash" ? "perguntando" : atual));
+    }, spec.roteiro.flash);
+  }
 
   function escolher(valor: number | string) {
     if (disabled || escolha !== null) return;
@@ -443,6 +468,28 @@ export function EmojiRowStage({ spec, onAnswer, disabled, falar, fase: faseFixa,
         >
           👀 Olhe rápido…
         </p>
+      )}
+
+      {/*
+        Ver de novo.
+        Fica ACIMA das alternativas de propósito: quem não viu precisa
+        encontrá-lo antes de chutar, e não depois. A fase presa pela sonda não
+        tira o botão da tela — presa é a máquina do roteiro, não a saída da
+        criança; quem não pode reexibir é o `verDeNovo`, e ele se protege.
+      */}
+      {!emAula && fase === "perguntando" && escolha === null && !disabled && (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={verDeNovo}
+            aria-label="Ver de novo"
+            className="flex min-h-11 items-center gap-2 rounded-2xl border-2 px-4 text-sm font-black"
+            style={{ borderColor: "#C7D7F0", background: "#F8FAFC", color: "#22315C" }}
+          >
+            <span aria-hidden>👀</span>
+            <span>Ver de novo</span>
+          </button>
+        </div>
       )}
 
       {!emAula && perguntando && (

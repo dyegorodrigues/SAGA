@@ -73,6 +73,19 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
     spec.modo === "faltam" ? "preparando" : "mostrando",
   );
   const [escolha, setEscolha] = React.useState<number | null>(null);
+  /**
+   * A criança pediu para ver de novo.
+   *
+   * A moldura mostra as fichas e TAMPA — é isso que cria a pergunta. Mas se a
+   * criança piscou, olhou para o lado ou o adulto falou com ela nesses dois
+   * segundos e meio, a tela fica com a tampa fechada e duas alternativas, e a
+   * única saída é chutar. O pai descreveu essa exata tela: "ele tampa, mas não
+   * mostra o que tinha antes, é muito rápido".
+   *
+   * Ver de novo não estraga o exercício — a memória ainda é dela, e quem vê
+   * duas vezes ainda precisa lembrar. Chutar é que estraga.
+   */
+  const [espiadas, setEspiadas] = React.useState(0);
   const relogios = React.useRef<number[]>([]);
 
   const emAula = mostrar != null && Object.keys(mostrar).length > 0;
@@ -115,6 +128,15 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
     return () => relogios.current.forEach(window.clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spec, faseFixa, emAula]);
+
+  /** Reabre a cena pelo mesmo tempo da primeira exibição, e tampa de novo. */
+  function verDeNovo() {
+    if (disabled || escolha !== null || emAula || faseFixa) return;
+    setEspiadas(n => n + 1);
+    setFaseInterna("mostrando");
+    relogios.current.push(window.setTimeout(() => setFaseInterna("tampando"), 1600));
+    relogios.current.push(window.setTimeout(() => setFaseInterna("perguntando"), 1600 + TAMPA_MS + 300));
+  }
 
   function escolher(valor: number) {
     if (disabled || escolha !== null) return;
@@ -227,6 +249,22 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
       {/* As alternativas. O palco desenha as suas — como a fileira do relance —
           porque o diagnóstico e a evidência da §9 dependem do que a CENA
           mostrava, e isso não cabe no valor de uma alternativa da barra. */}
+      {/* Ver de novo vem ANTES das alternativas: quem não viu precisa achá-lo
+          antes de chutar, e não depois. A fase presa pela sonda não tira o
+          botão da tela; quem não pode reexibir é o `verDeNovo`. */}
+      {fase === "perguntando" && escolha === null && !disabled && !emAula && (
+        <button
+          type="button"
+          onClick={verDeNovo}
+          aria-label="Ver de novo"
+          className="flex min-h-11 items-center gap-2 rounded-2xl border-2 px-4 text-sm font-black"
+          style={{ borderColor: "#C7D7F0", background: "#F8FAFC", color: "#22315C" }}
+        >
+          <span aria-hidden>👀</span>
+          <span>Ver de novo</span>
+        </button>
+      )}
+
       <div role="group" aria-label="Números" className="flex flex-wrap justify-center gap-3" style={{ minHeight: 64 }}>
         {(fase === "perguntando" || fase === "revelando") && spec.alternativas.map(v => {
           const certa = v === spec.resposta;

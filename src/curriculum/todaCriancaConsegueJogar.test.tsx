@@ -303,6 +303,72 @@ describe("toda criança consegue jogar", () => {
     expect(presos, `exercícios em que a demonstração nunca acaba:\n${presos.join("\n")}`).toEqual([]);
   }, 300000);
 
+  it("o que a tela esconde, a criança pode ver de novo", () => {
+    /*
+     * Vários palcos MOSTRAM e depois ESCONDEM — é assim que a pergunta nasce:
+     * o relance da subitização, a moldura que tampa as fichas. O tempo é curto
+     * de propósito, porque é isso que treina reconhecer sem contar.
+     *
+     * Curto de propósito e sem saída são coisas diferentes. Se a criança
+     * piscou, olhou para o lado, ou o adulto falou com ela naquele segundo e
+     * meio, sobra a tela tampada e as alternativas — e a única coisa a fazer é
+     * chutar. O pai encontrou exatamente isso: "ele tampa, mas não mostra o
+     * que tinha antes, é muito rápido".
+     *
+     * A regra é por DESCOBERTA, não por lista de fichas: renderiza-se o palco
+     * na fase em que ele mostra e na fase em que ele pergunta. Se o desenho
+     * sumiu entre as duas, o palco esconde — e então tem de oferecer "Ver de
+     * novo". Um palco novo que esconda cai sob a regra sem ninguém editar
+     * este arquivo.
+     */
+    const DESENHO = /[\p{Extended_Pictographic}]/gu;
+    /*
+     * Conta CADA desenho separadamente, e não o total.
+     *
+     * A primeira versão contava quantos emoji havia na tela e comparava os
+     * dois números. Ficou cega, e a mutação provou: quando a fileira esconde,
+     * ela põe no lugar uma marca única — o "Sumiram!" — que também é um emoji.
+     * O total nunca chegava a zero e o portão passava calado mesmo sem o "Ver
+     * de novo". Instrumento que soma coisas diferentes não distingue nenhuma.
+     */
+    const contagem = (c: HTMLElement) => {
+      const mapa = new Map<string, number>();
+      for (const d of (c.textContent ?? "").match(DESENHO) ?? []) mapa.set(d, (mapa.get(d) ?? 0) + 1);
+      return mapa;
+    };
+
+    const semSaida: string[] = [];
+    for (const { track, nivel } of COMBINACOES) {
+      let q: any;
+      try { q = gerar(track, nivel); } catch { continue; }
+      try {
+        const mostrando = render(<GameLoopExerciseRenderer {...props(q, { faseDaCena: "mostrando" })} />);
+        const noShow = contagem(mostrando.container);
+        cleanup();
+
+        const { container } = render(<GameLoopExerciseRenderer {...props(q)} />);
+        deixarORoteiroCorrer();
+        const naPergunta = contagem(container);
+        const temVerDeNovo = [...container.querySelectorAll("button")]
+          .some(b => /ver de novo/i.test(nomeDe(b as HTMLButtonElement)));
+        cleanup();
+
+        // O desenho que se contava aparecia repetido. Sumiu de vez? Então a
+        // pergunta é de memória, e memória sem segunda olhada é chute.
+        const sumiu = [...noShow.entries()]
+          .filter(([, quantos]) => quantos >= 2)
+          .filter(([desenho]) => !naPergunta.has(desenho))
+          .map(([desenho, quantos]) => `${quantos}× ${desenho}`);
+
+        if (sumiu.length && !temVerDeNovo) {
+          semSaida.push(`${track.id} n${nivel} (${q.kind}): esconde ${sumiu.join(", ")} e não oferece "Ver de novo"`);
+        }
+      } catch { /* quebra de render já é cobrada acima */ }
+      cleanup();
+    }
+    expect(semSaida, `palcos que escondem sem deixar ver de novo:\n${semSaida.join("\n")}`).toEqual([]);
+  }, 300000);
+
   it("todo enunciado de texto tem como ser ouvido", () => {
     // Número e símbolo sozinhos não exigem leitura; palavra exige.
     const mudos: string[] = [];
