@@ -224,4 +224,44 @@ describe("EmojiRowStage — o palco das três fichas da fileira", () => {
       }
     }
   }, 60000);
+
+  /* ---------------------------------------------------------------- *
+   *  A contagem regressiva não pode ser uma quantidade
+   * ---------------------------------------------------------------- */
+
+  /**
+   * ⚠️ Antes do relance, nada na área pode ser contável além de UM ponto.
+   *
+   * O pai viu e descreveu: *"ele fica os três pontinhos oscilando, ok, mas aí
+   * ele muda, pisca, muda"*. A `Regressiva` desenhava **três bolinhas lado a
+   * lado**, todas na tela ao mesmo tempo, oscilando para sempre.
+   *
+   * Numa ficha de SUBITIZAÇÃO isso é o pior desenho possível: a pergunta é
+   * *quantos você viu*, e o app mostra três objetos em fila no segundo
+   * anterior ao relance. A criança que responde "3" está lendo a tela certo.
+   *
+   * A §4 pede *"três **pulsos** suaves: 3… 2… 1"*. Pulso é evento no TEMPO;
+   * ponto é objeto no ESPAÇO. Um ponto que pulsa três vezes é três pulsos e
+   * zero quantidade. Três pontos que pulsam são uma quantidade — e ela mente.
+   *
+   * A regra é medida por descoberta, não por lista: conta-se TODA marca
+   * redonda desenhada na área em cada fase anterior ao relance.
+   */
+  it("⚠️ antes do relance, a área nunca tem mais de UMA marca na tela", () => {
+    const marcas = (container: HTMLElement) =>
+      container.querySelectorAll('[aria-hidden="true"].rounded-full, [aria-hidden].rounded-full').length;
+
+    for (const ficha of [N1_03, N1_08, AL_02]) {
+      for (let nivel = 1; nivel <= 5; nivel += 1) {
+        const s = spec(ficha, nivel);
+        if (s.modo === "padrao") continue;
+        for (const fase of ["preparando", "regressiva"] as const) {
+          const { container, unmount } = render(<EmojiRowStage spec={s} fase={fase} />);
+          expect(marcas(container), `${ficha.id} n${nivel} · ${fase}`).toBeLessThanOrEqual(1);
+          unmount();
+        }
+      }
+    }
+  });
+
 });

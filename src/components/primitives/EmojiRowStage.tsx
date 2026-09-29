@@ -635,20 +635,44 @@ function PontoDeFixacao({ semMovimento }: { semMovimento: boolean | null }) {
  * na tela numa competência de 4 anos, cuja pergunta é um número, poria três
  * numerais no ar imediatamente antes das alternativas — e a criança que ainda
  * não lê número veria só piscos, enquanto a que lê veria uma dica falsa.
+ *
+ * ⚠️ E **três pulsos não são três pontos.**
+ *
+ * Isto desenhava três bolinhas lado a lado, as três na tela ao mesmo tempo,
+ * oscilando com `repeat: Infinity`. O pai viu e disse: *"ele fica os três
+ * pontinhos oscilando, ok, mas aí ele muda, pisca, muda"*.
+ *
+ * Ele estava descrevendo o pior desenho possível para esta ficha. A pergunta
+ * da subitização é *quantos você viu* — e o app punha TRÊS OBJETOS EM FILA no
+ * segundo anterior ao relance, no mesmo lugar onde o relance ia acontecer. A
+ * criança que responde "3" leu a tela corretamente; quem errou fui eu.
+ *
+ * Pulso é evento no TEMPO. Ponto é objeto no ESPAÇO. A §4 pediu pulsos.
+ *
+ * Agora é **o mesmo ponto** da preparação — mesma cor, mesmo tamanho, mesmo
+ * lugar — pulsando três vezes e encolhendo a cada uma, de modo que a contagem
+ * tenha direção e ACABE. Nada aparece, nada se multiplica, e a quantidade na
+ * tela antes do relance é sempre zero ou um.
  */
+const PULSOS = 3;
+
 function Regressiva({ semMovimento }: { semMovimento: boolean | null }) {
   return (
-    <div role="presentation" className="flex h-full items-center justify-center gap-4">
-      {[0, 1, 2].map(i => (
-        <motion.span
-          key={i}
-          aria-hidden
-          className="block rounded-full bg-indigo-300"
-          style={{ width: 14, height: 14 }}
-          animate={semMovimento ? undefined : { scale: [0.7, 1.25, 0.7] }}
-          transition={{ duration: 0.3, repeat: Infinity, delay: i * 0.3 }}
-        />
-      ))}
+    <div role="presentation" className="flex h-full items-center justify-center">
+      <motion.span
+        aria-hidden
+        className="block rounded-full bg-indigo-600"
+        style={{ width: 18, height: 18 }}
+        /* Três picos, cada um menor que o anterior: 3… 2… 1. O último vale
+           quase nada, e é dele que o relance nasce. Sem `repeat` — uma
+           regressiva que recomeça para sempre não está contando nada. */
+        animate={semMovimento ? undefined : { scale: [1, 0.3, 0.78, 0.3, 0.56, 0.24] }}
+        transition={{
+          duration: (PULSOS * 300) / 1000,
+          times: [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 1],
+          ease: "easeInOut",
+        }}
+      />
     </div>
   );
 }
