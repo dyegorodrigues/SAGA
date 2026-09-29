@@ -357,4 +357,54 @@ describe("as três fichas chegam ao palco pelo Composer", () => {
   it("a tag da inversão da F02 tem descrição na ficha", () => {
     expect(N1_08.erros_tipicos?.some(e => e.id === MisconceptionTag.INVERTE_PERGUNTA)).toBe(true);
   });
+
+  /* ---------------------------------------------------------------- *
+   *  A coreografia da N1.10 tem de chegar à moldura
+   * ---------------------------------------------------------------- */
+
+  /**
+   * ⚠️ Cada passo da micro-aula desenha algo diferente do anterior.
+   *
+   * A ficha declara quatro passos, e três das quatro chaves não eram lidas
+   * por palco nenhum — `contarUmAUm`, `destacarTodos`, `pulsarTampa` estão
+   * entre as 130 órfãs que `coreografiaLida.test.ts` mediu. Só `taparN`
+   * chegava. Na tela a aula era:
+   *
+   * | fala                    | o que mudava |
+   * |-------------------------|--------------|
+   * | "Olha bem: um, dois..." | nada         |
+   * | "Três!"                 | nada         |
+   * | "Vou esconder um..."    | a tampa      |
+   * | "Quantos escondi?"      | nada         |
+   *
+   * Esta é a ficha da "forminha de gelo" de que o pai falou. Três das quatro
+   * falas eram voz sobre imagem parada, e para quem não lê a aula É a tela.
+   *
+   * O portão varre a coreografia declarada pela própria ficha e exige que
+   * passos vizinhos desenhem coisas diferentes — descoberta, não lista.
+   */
+  it("⚠️ nenhum passo da aula da N1.10 desenha igual ao passo anterior", () => {
+    const passos = (N1_10.micros ?? [])
+      .flatMap(m => ((m.params as { tutorial?: unknown[] } | undefined)?.tutorial ?? []))
+      .map(p => (p as { show?: Record<string, unknown> }).show)
+      .filter((s): s is Record<string, unknown> => s != null && Object.keys(s).length > 0);
+
+    expect(passos.length, "a N1.10 declara coreografia").toBeGreaterThan(2);
+
+    const s = Composer.generate(N1_10, 1).uiProps as MolduraSpec;
+    const telas = passos.map(show => {
+      const { container, unmount } = render(<MolduraStage spec={s} mostrar={show as never} />);
+      const html = (container.innerHTML ?? "").replace(/transform: [^;"]*;?/g, "");
+      unmount();
+      return html;
+    });
+
+    for (let i = 1; i < telas.length; i += 1) {
+      expect(
+        telas[i] === telas[i - 1],
+        `passo ${i} (${JSON.stringify(passos[i])}) desenha igual ao anterior`,
+      ).toBe(false);
+    }
+  });
+
 });

@@ -63,6 +63,8 @@ interface Props {
     flash?: unknown;
     preencherFaltantes?: number;
     contarUmAUm?: number;
+    /** O grupo INTEIRO aceso — o "Três!" que fecha a contagem no todo. */
+    destacarTodos?: boolean;
     taparN?: number;
     pulsarTampa?: boolean;
   } | null;
@@ -188,6 +190,38 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
     : [];
 
   /**
+   * ⚠️ As casas que a AULA aponta — as três chaves que ninguém lia.
+   *
+   * A ficha declara quatro passos e três das quatro chaves eram órfãs:
+   * `contarUmAUm`, `destacarTodos` e `pulsarTampa` estavam entre as 130 que
+   * `coreografiaLida.test.ts` mediu. Só `taparN` chegava à tela. Na prática a
+   * aula desta ficha era:
+   *
+   * | fala                        | o que mudava |
+   * |-----------------------------|--------------|
+   * | "Olha bem: um, dois, tres." | nada         |
+   * | "Tres!"                     | nada         |
+   * | "Vou esconder um..."        | a tampa      |
+   * | "Quantos escondi?"          | nada         |
+   *
+   * Três das quatro falas eram voz sobre imagem parada. Esta é a ficha da
+   * "forminha de gelo" de que o pai falou, e ele estava descrevendo isto.
+   *
+   * `contarUmAUm: n` acende as n primeiras casas ocupadas — a contagem que a
+   * voz está fazendo, uma a uma. `destacarTodos` acende o grupo inteiro: é o
+   * "Três!" que fecha a contagem no todo. São dois gestos diferentes de
+   * propósito, porque a ficha ensina exatamente a passagem de um para o
+   * outro.
+   */
+  const acesasPelaAula = emAula
+    ? (mostrar?.destacarTodos === true
+      ? spec.ocupadas
+      : typeof mostrar?.contarUmAUm === "number"
+        ? spec.ocupadas.slice(0, mostrar.contarUmAUm)
+        : [])
+    : [];
+
+  /**
    * ⚠️ Com a pergunta no ar, a área fica VAZIA — e vazia quer dizer sem moldura.
    *
    * A JD3 §3 é literal: *"a moldura de 10 … aparece e some. **A área fica vazia
@@ -227,7 +261,15 @@ export function MolduraStage({ spec, onAnswer, disabled, falar, fase: faseFixa, 
             // §4 da F02, fecho: o numeral grande semitransparente sobre a
             // moldura. Só no modo `contar` — nas outras duas o número da
             // resposta não é o que está desenhado.
-            numeralDoFecho: fase === "revelando" && spec.modo === "contar" ? spec.resposta : null,
+            numeralDoFecho: emAula && mostrar?.destacarTodos === true
+              ? spec.ocupadas.length
+              : fase === "revelando" && spec.modo === "contar" ? spec.resposta : null,
+            acesas: acesasPelaAula,
+            // Os ordinais são do CONTAR; o numeral grande é do TODO. Os dois
+            // passos acendiam as mesmas casas e desenhavam a mesma tela — e
+            // a ficha existe para ensinar a passagem de um para o outro.
+            ordinais: emAula && typeof mostrar?.contarUmAUm === "number",
+            pulsarTampa: emAula && mostrar?.pulsarTampa === true,
             semMoldura: spec.semMoldura && fase !== "revelando",
             // A moldura VAZIA: antes do flash e — o que a ficha exige — depois
             // dele, sozinha por 300ms.

@@ -62,6 +62,27 @@ export interface MolduraProps {
   preencherFaltantes?: boolean;
   /** JD3, erro: as casas vazias piscam EM BLOCO (não uma a uma). */
   piscarVazias?: boolean;
+  /**
+   * As casas que a MICRO-AULA está apontando agora.
+   *
+   * `fileiraAcesa` acende uma fileira inteira de propósito — a F02 §4 proíbe
+   * acender célula por célula, porque isso ensinaria contagem numa ficha de
+   * subitização. Mas a N1.10 é o contrário: a fala dela é literalmente *"olha
+   * bem: um, dois, três"*, e ali contar UMA A UMA é a aula. São duas fichas
+   * com necessidades opostas, e por isso dois caminhos, não um com exceção.
+   */
+  acesas?: number[];
+  /**
+   * Cada casa acesa mostra a POSIÇÃO dela na contagem: 1, 2, 3.
+   *
+   * É o que separa *"olha bem: um, dois, três"* de *"três!"*. Sem isto os
+   * dois passos acendiam exatamente as mesmas casas e desenhavam a mesma
+   * tela — e a ficha existe justamente para ensinar a passagem de contar
+   * um a um para dizer o todo.
+   */
+  ordinais?: boolean;
+  /** JD5: a tampa pulsa enquanto a aula pergunta "quantos escondi?". */
+  pulsarTampa?: boolean;
   /** JD5, nível 5: sem moldura — os objetos ficam soltos. */
   semMoldura?: boolean;
   /** O desenho da ficha. Padrão: um disco. */
@@ -223,6 +244,9 @@ function Moldura({
   revelados = [],
   numeralDoFecho = null,
   fileiraAcesa = null,
+  acesas = [],
+  ordinais,
+  pulsarTampa,
   soAMoldura,
   preencherFaltantes,
   piscarVazias,
@@ -285,7 +309,7 @@ function Moldura({
             // §4 da F02: a fileira acende INTEIRA, de uma vez. Acender célula
             // por célula ensinaria contagem — o oposto do que a ficha quer.
             animate={{
-              backgroundColor: naFileiraAcesa
+              backgroundColor: naFileiraAcesa || acesas.includes(i)
                 ? "#FDE68A"
                 : semMoldura ? "rgba(0,0,0,0)" : vazia
                   ? (piscarVazias ? "#FDE68A" : tokens.cor.elementos.preenchimento)
@@ -310,6 +334,17 @@ function Moldura({
               >
                 {emoji}
               </motion.span>
+            )}
+            {/* O numeral da contagem da aula: a posição desta casa entre as
+                acesas. É o "um, dois, três" desenhado. */}
+            {ordinais && acesas.includes(i) && (
+              <span
+                aria-hidden
+                className="absolute rounded-full bg-indigo-600 px-1.5 text-sm font-black text-white"
+                style={{ transform: "translate(16px, -16px)" }}
+              >
+                {acesas.indexOf(i) + 1}
+              </span>
             )}
             {/* JD3, acerto: "as casas que faltavam se preenchem sozinhas, uma
                 cor diferente" — é a animação que mostra os dois números juntos
@@ -351,8 +386,13 @@ function Moldura({
             alignSelf: "stretch",
           }}
           initial={{ x: 40, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.7 }}
+          // Pulsando, a tampa É a pergunta: "quantos escondi?" sem palavra
+          // nenhuma. Parada, ela era só um retângulo cinza enquanto a voz
+          // perguntava — e a criança não tinha para onde olhar.
+          animate={pulsarTampa ? { x: 0, opacity: [1, 0.55, 1] } : { x: 0, opacity: 1 }}
+          transition={pulsarTampa
+            ? { duration: 0.9, repeat: Infinity }
+            : { duration: 0.7 }}
         />
       ))}
 
