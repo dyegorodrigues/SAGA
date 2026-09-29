@@ -73,8 +73,13 @@ const dominio = {
  * exatamente o `TUDO_CABE`.
  */
 const coreografia = [
-  { fala: "Vamos separar os vermelhos.", show: { destacarLaco: true } },
-  { fala: "Este é vermelho, entra.", show: { moverParaDentro: 0 } },
+  // `{laco}` e `{umLaco}` são preenchidos pelo Composer com o critério que a
+  // criança está VENDO. Eram texto fixo — "Vamos separar os vermelhos" — e o
+  // laço é sorteado entre cor, forma e tamanho: com o laço escrito AZUIS na
+  // tela, a voz dizia "vermelhos". Para quem não lê, a voz é a única
+  // instrução, e ela estava ensinando o critério errado.
+  { fala: "Vamos separar os {laco}.", show: { destacarLaco: true } },
+  { fala: "Este é {umLaco}, entra.", show: { moverParaDentro: 0 } },
   { fala: "Este não é. Fica fora!", show: { deixarFora: 1 } },
 ];
 

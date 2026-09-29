@@ -52,6 +52,28 @@ interface ParObservado {
   brutos: number;
 }
 
+/**
+ * A fala declarada chegou — inteira ou com os marcadores preenchidos.
+ *
+ * A AL.01 declara "Vamos separar os {laco}." e o Composer troca `{laco}` pelo
+ * critério que a criança está VENDO ("azuis", "círculos", "grandes"), porque o
+ * laço é sorteado e a voz é a única instrução de quem não lê. Comparar por
+ * igualdade literal reprovaria a correção.
+ *
+ * O que continua sendo cobrado é o que importa: o passo tem de CHEGAR. Só o
+ * trecho do marcador é livre; o resto da frase tem de bater, e um passo que
+ * sumiu não bate com nada.
+ */
+function chegouAlguma(declarada: string, chegaram: string[]): boolean {
+  if (chegaram.includes(declarada)) return true;
+  if (!/\{[^}]+\}/.test(declarada)) return false;
+  const molde = new RegExp(`^${declarada
+    .split(/\{[^}]+\}/)
+    .map(pedaco => pedaco.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("[^.!?]+")}$`);
+  return chegaram.some(fala => molde.test(fala));
+}
+
 function varrer(): { pares: ParObservado[]; perdas: string[] } {
   const pares: ParObservado[] = [];
   const perdas: string[] = [];
@@ -86,7 +108,7 @@ function varrer(): { pares: ParObservado[]; perdas: string[] } {
         continue;
       }
       for (const fala of declarados) {
-        if (!chegaram.includes(fala)) perdas.push(`${chave}: a fala "${fala}" não chegou na questão`);
+        if (!chegouAlguma(fala, chegaram)) perdas.push(`${chave}: a fala "${fala}" não chegou na questão`);
       }
 
       pares.push({ chave, declarados, brutos: bruto.length });

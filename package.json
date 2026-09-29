@@ -50,7 +50,8 @@
     "e2e:entrada": "node scripts/e2e-entrada.mjs",
     "vozes": "tsx scripts/gerar-vozes.ts",
     "vozes:conferir": "tsx scripts/conferir-vozes.ts",
-    "sonda:voz": "node scripts/sonda-voz.mjs"
+    "sonda:voz": "node scripts/sonda-voz.mjs",
+    "filme": "node scripts/filme.mjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

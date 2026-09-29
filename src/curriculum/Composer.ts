@@ -62,6 +62,7 @@ import { EmojiRowSpec, chaveDaPeca, construirEmojiRowSpec } from "./procedimento
 import { MisconceptionTag } from "../constants/misconceptions";
 import { ModoDaFileira, diagnosticarPadrao } from "./procedimentos/emojiRowProcedure";
 import { construirClassificacaoSpec } from "./procedimentos/classificacaoContract";
+import { rotuloDoCriterio } from "./procedimentos/classificacaoProcedure";
 import { construirAudioChoiceSpec } from "./procedimentos/audioChoiceContract";
 import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
@@ -259,6 +260,17 @@ export class Composer {
     let n: number | undefined;
     let emoji: string | undefined;
     let promptOverride: string | undefined;
+    /**
+     * A narração da aulinha, quando ela precisa falar do caso SORTEADO.
+     *
+     * A coreografia da ficha é texto fixo, e para a maioria das fichas isso
+     * basta. Não para a AL.01: o laço é sorteado entre cor, forma e tamanho, e
+     * a coreografia dizia sempre "Vamos separar os vermelhos" — inclusive com
+     * o laço escrito AZUIS na tela. Para a criança de quatro anos, que não lê,
+     * a voz é a ÚNICA instrução: ela ouvia o critério errado e aprendia o
+     * critério errado.
+     */
+    let tutorialOverride: ReturnType<typeof normalizeFichaTutorial>;
     /**
      * CLASS-008: a família que ESTA tentativa exercitou, quando o nível reúne
      * mais de uma. Quem sabe qual foi é o sorteio logo abaixo; sem gravá-la
@@ -880,6 +892,19 @@ export class Composer {
         const spec = construirClassificacaoSpec(lvl, Math.random);
         uiProps = spec;
 
+        // A coreografia fala do laço que a criança está vendo, e não de um
+        // vermelho imaginário. `{laco}` é o plural do critério sorteado
+        // ("azuis", "círculos", "grandes") e `{umLaco}` o singular.
+        const criterioDaCena = spec.lacos[0]?.criterio;
+        if (criterioDaCena) {
+          const plural = rotuloDoCriterio(criterioDaCena);
+          const singular = String(criterioDaCena.valor);
+          tutorialOverride = normalizeFichaTutorial(params.tutorial)?.map(passo => ({
+            ...passo,
+            say: passo.say.replace(/\{laco\}/g, plural).replace(/\{umLaco\}/g, singular),
+          }));
+        }
+
         if (spec.forma === "descobrir") {
           answer = spec.resposta!;
           options = spec.alternativas!.map(a => ({ value: a.valor, label: a.rotulo }));
@@ -1244,7 +1269,7 @@ export class Composer {
       kind: kind === "intruso_math" ? "plain" : kind === "arraygrid" ? "array" : kind === "storypanel" ? "story-bars" : kind,
       prompt: promptOverride || params.audio_prompt || "Responda:",
       audioPrompt: promptOverride || params.audio_prompt,
-      tutorial: normalizeFichaTutorial(params.tutorial),
+      tutorial: tutorialOverride ?? normalizeFichaTutorial(params.tutorial),
       excecaoCPA: ficha.excecaoCPA,
       uiProps,
       evaluate,
