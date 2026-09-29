@@ -68,6 +68,7 @@ import { construirProducaoSpec } from "./procedimentos/producaoContract";
 import { construirPosicaoSpec } from "./procedimentos/posicaoContract";
 import { construirFormaSpec } from "./procedimentos/formaContract";
 import { construirGrandezaSpec } from "./procedimentos/grandezaContract";
+import { ADJETIVO } from "./procedimentos/grandezaProcedure";
 import { construirMedidasSpec } from "./procedimentos/medidasContract";
 import { construirMolduraSpec } from "./procedimentos/tenFrameContract";
 import { ModoDaMoldura } from "./procedimentos/tenFrameProcedure";
@@ -1013,6 +1014,21 @@ export class Composer {
         evaluate = candidate => Number(candidate) === answer;
         promptOverride = spec.enunciado;
         options = undefined;
+
+        // A aula fala do objeto que ela acende. `{adjetivo}` sai da MESMA
+        // tabela que monta o enunciado, então não existe sorteio em que a voz
+        // diga "mais alto" e o anel esteja no mais baixo.
+        const onde = spec.eixo === "vertical" ? "no chão" : "no mesmo começo";
+        const vai = spec.eixo === "vertical" ? "sobe mais"
+          : spec.eixo === "horizontal" ? "vai mais longe"
+            : "ocupa mais espaço";
+        tutorialOverride = normalizeFichaTutorial(params.tutorial)?.map(passo => ({
+          ...passo,
+          say: passo.say
+            .replace(/\{adjetivo\}/g, ADJETIVO[spec.atributo][spec.polo])
+            .replace(/\{onde\}/g, onde)
+            .replace(/\{vai\}/g, vai),
+        }));
         break;
       }
 

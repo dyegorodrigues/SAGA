@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { tokens } from "../../styles/tokens";
 import { Grupo } from "./Grupo";
 import { PalcoEscalado } from "./PalcoEscalado";
 import { ComparacaoQuantidadeStage } from "./ComparacaoQuantidadeStage";
@@ -80,7 +81,12 @@ function ObjetoVisual({ o, eixo, destaque, erro, delay }: {
         <motion.span
           aria-hidden
           className="absolute inset-[-8px] rounded-full"
-          style={{ border: "5px solid #2FB98C", background: "rgba(47,185,140,0.12)" }}
+          // A cor do halo é a MESMA do acerto, e vem do sistema: o anel diz
+          // "este", e é o mesmo verde que confirma a resposta certa depois.
+          style={{
+            border: `5px solid ${tokens.cor.feedback.acerto}`,
+            background: `color-mix(in srgb, ${tokens.cor.feedback.acerto} 14%, transparent)`,
+          }}
           initial={semHalo ? false : { opacity: 0, scale: 0.8 }}
           animate={semHalo ? { opacity: 1 } : { opacity: [0.55, 1, 0.55], scale: 1 }}
           transition={semHalo ? undefined : { duration: 1.1, repeat: Infinity }}

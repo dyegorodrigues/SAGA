@@ -63,11 +63,31 @@ const dominio = {
   },
 };
 
-/** §8, transcrita. */
+/**
+ * §8, transcrita — com uma correção que a §8 não podia prever.
+ *
+ * O texto original era fixo: *"Este é mais alto!"*. Mas a cena sorteia o
+ * POLO: metade das questões pergunta "qual é o mais baixo?". Nessas, a aula
+ * acendia o objeto certo (o mais baixo, que é a resposta) e dizia por cima a
+ * palavra do polo contrário. Para quem não lê, voz e desenho são a mesma
+ * fonte — quando discordam, o app não ensina devagar, ensina errado.
+ *
+ * `{adjetivo}` é o mesmo `ADJETIVO[atributo][polo]` que monta o enunciado.
+ *
+ * `{onde}` e `{vai}` acompanham o EIXO. Medido: esta ficha sorteia altura
+ * (vertical), comprimento (horizontal) e tamanho (uniforme) — "os dois estão
+ * no chão" e "veja qual sobe mais" só valiam para um terço dos casos, e um
+ * objeto deitado não sobe.
+ *
+ * Os marcadores não tomam a frase inteira de propósito: o portão do §6.36
+ * confere que a fala declarada CHEGOU na criança, e só consegue conferir o
+ * que ficou literal. "Veja qual {vai}." deixa "Veja qual" e o ponto final
+ * como âncora; "{veja}" sozinho não deixaria nada, e o portão cegaria.
+ */
 const coreografia = [
-  { fala: "Os dois estão no chão.", show: { destacarLinhaBase: true } },
-  { fala: "Veja qual sobe mais.", show: { subirLinhaTracejada: true } },
-  { fala: "Este é mais alto!", show: { destacarMaior: true } },
+  { fala: "Os dois estão {onde}.", show: { destacarLinhaBase: true } },
+  { fala: "Veja qual {vai}.", show: { subirLinhaTracejada: true } },
+  { fala: "Este é {adjetivo}!", show: { destacarMaior: true } },
 ];
 
 export const GM_01: FichaCompetencia = {

@@ -6,6 +6,7 @@ import { Composer } from "../../curriculum/Composer";
 import { GM_01 } from "../../curriculum/fichas/jornada/GM.01";
 import { GrandezaSpec } from "../../curriculum/procedimentos/grandezaContract";
 import { GrandezaStage } from "./GrandezaStage";
+import { ADJETIVO } from "../../curriculum/procedimentos/grandezaProcedure";
 
 const spec=(lvl:number)=>Composer.generate(GM_01,lvl).uiProps as GrandezaSpec;
 const botoes=(c:HTMLElement)=>[...c.querySelectorAll<HTMLButtonElement>('button[aria-label]')];
@@ -106,6 +107,60 @@ describe("GrandezaStage — F49",()=>{
       expect(marcados, "exatamente o objeto da resposta marcado").toEqual([s.resposta]);
       unmount();
     }
+  });
+
+
+  /**
+   * ⚠️ A palavra que a aula diz é a do objeto que a aula acende.
+   *
+   * O halo que acabei de acender na GM.01 revelou um defeito que o
+   * `scale: 1.08` escondia. A folha de contato mostrou, no mesmo quadro:
+   *
+   * - o enunciado: **"Qual girassol é mais BAIXO?"**
+   * - a fala da aula: **"Este é mais ALTO!"**
+   * - o anel verde: em volta do girassol **menor**
+   *
+   * A aula acendia `spec.resposta`, que é o extremo do `polo` PERGUNTADO — e
+   * dizia, por cima, a palavra do polo contrário, porque a fala era texto fixo
+   * escrito supondo que a pergunta fosse sempre "qual é o maior". Metade dos
+   * sorteios cai em `polo: "menor"`, e nessa metade a aula ensinava o oposto
+   * do que mostrava.
+   *
+   * Uma criança de quatro anos que não lê tem UMA fonte: a voz e o desenho
+   * juntos. Quando os dois discordam, o app não está ensinando devagar — está
+   * ensinando errado.
+   *
+   * O portão não confere texto escrito à mão: pega o adjetivo na MESMA tabela
+   * que monta o enunciado (`ADJETIVO[atributo][polo]`), e varre níveis e
+   * sementes.
+   */
+  it("⚠️ a fala que aponta o objeto usa a palavra do polo PERGUNTADO", () => {
+    const sorteioOriginal = Math.random;
+    const semear = (semente: number) => {
+      let estado = semente >>> 0;
+      Math.random = () => { estado = (estado * 1664525 + 1013904223) >>> 0; return estado / 0x100000000; };
+    };
+
+    let conferidos = 0;
+    for (const semente of [0x2f6e2b1, 0x5bd1e99, 0x1a2b3c4, 0x77c0ffe, 0x31e13b]) {
+      for (let nivel = 1; nivel <= 5; nivel += 1) {
+        semear(semente);
+        const q = Composer.generate(GM_01, nivel);
+        Math.random = sorteioOriginal;
+        const s = q.uiProps as GrandezaSpec;
+        const passo = (q.tutorial ?? []).find(
+          p => (p as { show?: Record<string, unknown> }).show?.destacarMaior === true,
+        ) as { say?: string } | undefined;
+        if (!passo || s.seria) continue;
+
+        conferidos += 1;
+        // O objeto aceso é `spec.resposta`. A palavra tem de ser a dele.
+        expect(passo.say ?? "", `n${nivel} polo=${s.polo} atributo=${s.atributo}`)
+          .toContain(ADJETIVO[s.atributo][s.polo]);
+      }
+    }
+    Math.random = sorteioOriginal;
+    expect(conferidos, "algum nível traz o passo que aponta").toBeGreaterThan(0);
   });
 
 });
