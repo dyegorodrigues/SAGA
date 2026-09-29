@@ -866,7 +866,13 @@ export function GameLoopExerciseRenderer({
               );
             })}
           </div>)}
-          {audivel && !status && (
+          {/* A promessa só aparece quando há o que escolher.
+              Vários palcos guardam a pergunta para DEPOIS da ação — a N1.01
+              pede a distribuição primeiro —, e a barra de alternativas ainda
+              não existe. A frase aparecia assim mesmo, prometendo um toque em
+              nada. Promessa fora de hora ensina a criança a ignorar a frase
+              justamente onde ela importa. */}
+          {audivel && !status && shouldRenderQuestionOptions(q) && q.options && q.options.length > 0 && (
             <div className="text-center mt-2" style={{ fontFamily: FONT, fontWeight: 800, fontSize: 11.5, color: C.sub }}>
               👂 Toque para OUVIR · toque de novo para escolher
             </div>

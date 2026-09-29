@@ -84,6 +84,19 @@ describe("ouvir antes de escolher", () => {
     expect(screen.getByText(/Toque para OUVIR/i)).toBeTruthy();
   });
 
+  it("a promessa não aparece quando ainda não há alternativa na tela", () => {
+    /*
+     * Vários palcos guardam a pergunta para DEPOIS da ação: na N1.01 a criança
+     * distribui os ovos e só então aparecem "Sobrou / Deu certinho / Faltou".
+     * A frase "Toque para OUVIR" saía desde o começo, prometendo um toque em
+     * nada. Promessa fora de hora ensina a ignorar a frase justamente onde ela
+     * importa.
+     */
+    const semAlternativaAinda = { ...PERGUNTA, options: [] };
+    render(<GameLoopExerciseRenderer {...props(semAlternativaAinda, () => {}, null, () => {})} />);
+    expect(screen.queryByText(/Toque para OUVIR/i)).toBeNull();
+  });
+
   it("alternativa de número responde no primeiro toque — não vira dois toques por conta", () => {
     const escolhas: unknown[] = [];
     render(<GameLoopExerciseRenderer {...props(NUMEROS, v => escolhas.push(v), null, () => {})} />);
