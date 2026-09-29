@@ -13,6 +13,7 @@ import {
 import { hasTutorial, tutorialSteps, hasAulinha, aulaSeen, markAulaSeen } from "../utils/tutorials";
 import { GameLoopExerciseRenderer } from "./gameloop/GameLoopExerciseRenderer";
 import { QuestionPrompt } from "./gameloop/QuestionPrompt";
+import { TETO_DA_FALA_MS, podeSeguir, tempoMinimoDoPasso } from "./gameloop/ritmoDaAulinha";
 import {
   authorialFeedbackHoldMs,
   evidenciasDaResposta,
@@ -291,12 +292,34 @@ export function GameLoop({
       const st = steps[i++];
       setGuidedNarr(st.say);
       setTutShow(st.show ?? null);
-      if (sound) {
-        // o próximo passo SÓ entra quando a fala deste TERMINA (nunca corta no meio)
-        speak(st.say, { ...(q.lang ? { lang: q.lang } : {}), onEnd: () => aulaT(play, 550) });
-      } else {
-        aulaT(play, st.ms ?? Math.max(2000, st.say.length * 65));
-      }
+
+      /*
+       * O passo dura o MAIOR entre a fala e o tempo mínimo da cena.
+       *
+       * Antes o ritmo vinha só do `onEnd` da fala. Num aparelho sem voz pt-BR
+       * instalada — e são muitos: medido aqui, `speechSynthesis.getVoices()`
+       * devolve ZERO — a fala termina em erro no mesmo quadro em que começa.
+       * Os quatro passos da aulinha da N1.01 passavam em menos de um segundo:
+       * a criança não via o ovo ir para o dino, via um piscar. O pai relatou
+       * exatamente isso — "não aparece indo a banana pro macaco".
+       *
+       * A regra e o porquê de cada número estão em `ritmoDaAulinha`.
+       */
+      const minimo = tempoMinimoDoPasso(st);
+      if (!sound) { aulaT(play, minimo); return; }
+
+      let falaAcabou = false;
+      let tempoAcabou = false;
+      let seguiu = false;
+      const seguir = () => {
+        if (seguiu || qRef.current !== q0) return;
+        seguiu = true;
+        aulaT(play, 550);
+      };
+      const talvezSeguir = () => { if (podeSeguir(falaAcabou, tempoAcabou)) seguir(); };
+      aulaT(() => { tempoAcabou = true; talvezSeguir(); }, minimo);
+      aulaT(seguir, minimo + TETO_DA_FALA_MS);
+      speak(st.say, { ...(q.lang ? { lang: q.lang } : {}), onEnd: () => { falaAcabou = true; talvezSeguir(); } });
     };
     play();
   };
@@ -990,7 +1013,16 @@ const SHORT_OK = ["Isso!", "Muito bem!", "Boa!", "Acertou!", "Perfeito!"];
   }
 
   return (
-    <div className="mk-pop text-left flex flex-col h-full">
+    /*
+     * A folga lateral existe porque a tela da criança é um celular.
+     *
+     * Medido em 390 px: o × da saída, a caixa do mascote e o cartão do
+     * exercício começavam todos em x=0, colados na borda, enquanto a direita
+     * tinha respiro. O pai descreveu exatamente isso — "a organização visual
+     * tá tudo pra esquerda, não tá alinhado". Não era ilusão: era assimetria
+     * de verdade, 0 px de um lado e 8 do outro.
+     */
+    <div className="mk-pop text-left flex flex-col h-full px-3">
       {toast && (
         <div
           className="fixed left-1/2 -translate-x-1/2 z-50 text-white font-bold text-sm px-5 py-2.5 rounded-md shadow-lg border-b-4"
