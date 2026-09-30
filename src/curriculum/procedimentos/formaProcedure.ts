@@ -94,7 +94,7 @@ export const FALAS = {
 
   // Não fixa "triângulo": o alvo é sorteado. A fala antiga podia pedir
   // quadrado e, em seguida, ensinar "o triângulo tem três lados".
-  howto: "Olhe o contorno. Se houver lados, conte; mesmo virada, a forma continua a mesma.",
+  howto: "Olhe o contorno. Conte os lados. Virada, ela continua a mesma.",
   explain: "Não use a posição, a cor ou o tamanho como pista. Compare lados e contorno.",
 
   acerto: (forma: Forma): string => forma === "circulo"

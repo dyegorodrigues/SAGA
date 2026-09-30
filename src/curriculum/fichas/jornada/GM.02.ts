@@ -28,8 +28,8 @@ export const GM_02: FichaCompetencia = {
   prereqs: [],
   bncc: "EI03ET07",
 
-  howto: "Ouça a situação e use as pistas de rotina, sequência e passagem do tempo.",
-  explain: "O tempo cotidiano tem uma ordem: partes do dia mudam, ontem vem antes de hoje, amanhã vem depois, e os acontecimentos também seguem sequências.",
+  howto: "Ouça o que acontece. Pense em que hora do dia isso costuma ser.",
+  explain: "O dia tem uma ordem. Ontem veio antes. Amanhã vem depois.",
 
   // O builder procedimental cria as alternativas porque precisa preservar
   // áudio por opção e distinguir apenas erros temporalmente causais.

@@ -24,7 +24,10 @@ describe("ComparacaoQuantidadeStage — F06 / N1.05", () => {
     );
 
     expect(container.querySelector("[data-comparacao-pareamento]")).not.toBeNull();
-    expect(container.querySelectorAll("[data-comparacao-par]")).toHaveLength(1);
+    // O par agora é o ANEL no próprio objeto, e não mais um `●—●` numa caixa
+    // — ver `comparacaoLigaDeVerdade.test.tsx`. Um par ligado = dois objetos
+    // marcados, um de cada lado.
+    expect(container.querySelectorAll("[data-par-do-item]")).toHaveLength(2);
     expect(container.querySelector("[data-comparacao-sobra]")).toBeNull();
 
     rerender(<ComparacaoQuantidadeStage spec={spec} mostrar={{ pulsarGrupos: true }} />);

@@ -11,7 +11,7 @@ export const N1_07: FichaCompetencia = {
   faixa: "F0",
   prereqs: ["N1.02", "N1.06"],
   bncc: "EF01MA01",
-  howto: "Use a ordem da contagem para descobrir quem vem antes, quem vem depois e como colocar os números em sequência.",
+  howto: "Conte na ordem. Veja quem vem antes e quem vem depois.",
   explain: "O antecessor vem imediatamente antes; o sucessor vem imediatamente depois.",
   distratores: [],
   niveis: {

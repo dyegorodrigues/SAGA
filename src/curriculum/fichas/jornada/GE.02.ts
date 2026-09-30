@@ -102,7 +102,7 @@ export const GE_02: FichaCompetencia = {
       params: {
         modo: "formas",
         howto: "Algumas formas estão sozinhas e outras escondidas em objetos. Olhe o contorno.",
-        explain: "A aparência mudou, mas os lados e o contorno continuam dizendo qual é a forma.",
+        explain: "Mudou de cara, mas não de forma. Olhe os lados e o contorno.",
       },
       dominio,
     },

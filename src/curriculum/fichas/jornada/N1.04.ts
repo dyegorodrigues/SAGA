@@ -84,7 +84,7 @@ const FALAS_F01 = {
 
 const FALAS_F03 = {
   howto: "Comece por um canto e vá seguindo. Toque em cada um para marcar.",
-  explain: "Escolha um para começar e vá tocando de um lado para o outro, sem pular nenhum.",
+  explain: "Escolha um para começar. Vá de um lado para o outro, sem pular nenhum.",
 } as const;
 
 export const N1_04: FichaCompetencia = {
@@ -174,7 +174,7 @@ export const N1_04: FichaCompetencia = {
         audio_prompt: "Agora sem pista. Conte com atenção.",
         // F03 manda criar um caminho. No nível 5 o caminho deixa de ser marcado
         // por cor, então a fala não pode prometer uma marca visual inexistente.
-        howto: "Comece por um canto e siga um caminho mental. Toque uma vez em cada um, sem voltar.",
+        howto: "Comece num canto. Toque uma vez em cada um, sem voltar.",
         explain: FALAS_F03.explain,
       },
       // A F01 §9 pede uma regra extra: pelo menos um acerto no arranjo disperso.

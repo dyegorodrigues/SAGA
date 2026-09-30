@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { ComparacaoQuantidadeSpec, GrupoQuantidadeSpec } from "../../curriculum/procedimentos/comparacaoQuantidadeContract";
 import { Grupo } from "./Grupo";
 import { PalcoEscalado } from "./PalcoEscalado";
+import { tokens } from "../../styles/tokens";
 
 const ERRO_MS = 2400;
 const ACERTO_MS = 1100;
@@ -24,25 +25,66 @@ interface Props {
   mostrar?: ComparacaoQuantidadeMostrar | null;
 }
 
-function itensDoGrupo(grupo: GrupoQuantidadeSpec) {
-  return Array.from({ length: grupo.quantidade }, (_, i) => (
-    <motion.span
-      key={`${grupo.emoji}-${i}`}
-      data-grupo-quantidade-item
-      aria-hidden
-      className={grupo.distribuicao === "espalhada"
-        ? "m-2 inline-flex items-center justify-center text-[28px] leading-none"
-        : grupo.distribuicao === "compacta"
-          ? "-m-0.5 inline-flex items-center justify-center text-[28px] leading-none"
-          : "inline-flex items-center justify-center text-[28px] leading-none"}
-      style={{ transform: `scale(${grupo.escalaItem})` }}
-      initial={{ opacity: 0, scale: 0.7 * grupo.escalaItem }}
-      animate={{ opacity: 1, scale: grupo.escalaItem }}
-      transition={{ delay: 0.04 * i, duration: 0.25 }}
-    >
-      {grupo.emoji}
-    </motion.span>
-  ));
+/**
+ * As cores do par. Cada par recebe a MESMA cor nos dois grupos.
+ *
+ * Poucas e bem separadas: a criança precisa distinguir "este com aquele" de
+ * relance, não estudar uma paleta. Depois da sexta, repete — a esta altura o
+ * que importa já não é qual par é qual, e sim que ainda há objeto sem cor.
+ */
+const CORES_DO_PAR = [
+  tokens.cor.acao.primaria,
+  tokens.cor.feedback.acerto,
+  tokens.cor.feedback.erro_suave,
+  tokens.cor.acao.secundaria,
+  tokens.cor.elementos.base_B,
+  tokens.cor.elementos.base_A,
+];
+
+/**
+ * ⚠️ A ligação acontece NO OBJETO.
+ *
+ * `pareados` diz quantos itens deste grupo já foram ligados ao outro lado.
+ * Cada um recebe um anel na cor do seu par — a mesma cor do parceiro no
+ * grupo oposto —, e quem sobra fica sem anel.
+ *
+ * Antes, "ligar um de cada lado" desenhava uma caixinha embaixo com `●—●`
+ * repetido: símbolos abstratos, desligados dos objetos na tela. O pai viu e
+ * disse: *"diz que vai ligar, mas não ligou nada, não sei para que que ia
+ * ligar."* A correspondência um a um é a competência inteira desta ficha;
+ * desenhá-la como dois pontinhos genéricos é desenhar outra coisa.
+ */
+function itensDoGrupo(grupo: GrupoQuantidadeSpec, pareados = 0) {
+  return Array.from({ length: grupo.quantidade }, (_, i) => {
+    const temPar = i < pareados;
+    return (
+      <motion.span
+        key={`${grupo.emoji}-${i}`}
+        data-grupo-quantidade-item
+        data-par-do-item={temPar ? i : undefined}
+        aria-hidden
+        className={grupo.distribuicao === "espalhada"
+          ? "relative m-2 inline-flex items-center justify-center text-[28px] leading-none"
+          : grupo.distribuicao === "compacta"
+            ? "relative -m-0.5 inline-flex items-center justify-center text-[28px] leading-none"
+            : "relative inline-flex items-center justify-center text-[28px] leading-none"}
+        style={{
+          transform: `scale(${grupo.escalaItem})`,
+          // O anel da cor do par. `outline` não empurra o vizinho, e estes
+          // grupos têm distribuição "compacta" onde qualquer borda mudaria o
+          // arranjo — e o arranjo é justamente a armadilha que a ficha testa.
+          outline: temPar ? `3px solid ${CORES_DO_PAR[i % CORES_DO_PAR.length]}` : undefined,
+          outlineOffset: temPar ? 2 : undefined,
+          borderRadius: temPar ? 9999 : undefined,
+        }}
+        initial={{ opacity: 0, scale: 0.7 * grupo.escalaItem }}
+        animate={{ opacity: 1, scale: grupo.escalaItem }}
+        transition={{ delay: 0.04 * i, duration: 0.25 }}
+      >
+        {grupo.emoji}
+      </motion.span>
+    );
+  });
 }
 
 function Pareamento({ spec, limitePares, mostrarSobra }: {
@@ -64,12 +106,19 @@ function Pareamento({ spec, limitePares, mostrarSobra }: {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
     >
+      {/*
+        ⚠️ Os `●—●` saíram daqui.
+        Eles eram a ÚNICA coisa que aparecia quando a voz dizia "vou ligar um
+        de cada lado": pontinhos abstratos numa caixa, desligados dos objetos
+        na tela. O pai: *"diz que vai ligar, mas não ligou nada, não sei para
+        que que ia ligar."* Agora a ligação é o anel colorido no próprio
+        objeto, nos dois grupos — ver `itensDoGrupo`. Esta caixa ficou só
+        para o que ela sabe dizer e o anel não diz: quantos sobraram.
+
+        O contador continua no DOM (`data-pares-visiveis`) porque os testes da
+        ficha medem por ele, e medir pelo anel exigiria geometria.
+      */}
       <span className="text-xs font-bold text-blue-900">Um de cada lado</span>
-      <div className="flex max-w-[290px] flex-wrap justify-center gap-1" aria-hidden>
-        {Array.from({ length: paresVisiveis }, (_, i) => (
-          <span key={i} data-comparacao-par className="text-sm">●—●</span>
-        ))}
-      </div>
       {mostrarSobra && (sobraEsquerda > 0 || sobraDireita > 0) && (
         <span data-comparacao-sobra className="text-sm font-black text-blue-800">
           {sobraEsquerda > 0 ? `Sobrou ${sobraEsquerda} à esquerda` : `Sobrou ${sobraDireita} à direita`}
@@ -100,6 +149,18 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar, mos
   const pareamentoDeErro = fase === "erro" && spec.autoParearNoErro;
   const exibirPareamento = pareamentoDeErro || mostrarPares || paresTutorial > 0;
   const limitePares = pareamentoDeErro || mostrarPares ? undefined : paresTutorial;
+  /**
+   * Quantos objetos já estão ligados, na CENA.
+   *
+   * A aula liga um de cada vez (`parear: 0` = o primeiro par); quando a
+   * criança pede "Quer parear?", ou quando o erro mostra a conta, liga todos
+   * os que têm par. Nunca mais do que o grupo menor: ligar um objeto a nada
+   * seria mentir sobre a correspondência.
+   */
+  const paresPossiveis = Math.min(spec.grupos[0].quantidade, spec.grupos[1].quantidade);
+  const paresVisiveisNaCena = limitePares == null
+    ? paresPossiveis
+    : Math.max(0, Math.min(paresPossiveis, limitePares));
   const mostrarSobra = pareamentoDeErro || mostrarPares;
 
   function tocar(i: number) {
@@ -161,7 +222,7 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar, mos
                 }}
               >
                 <Grupo
-                  items={itensDoGrupo(grupo)}
+                  items={itensDoGrupo(grupo, exibirPareamento ? paresVisiveisNaCena : 0)}
                   onClick={() => tocar(i)}
                   disabled={travado}
                   selected={correto}

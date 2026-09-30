@@ -9,7 +9,7 @@ const F01 = {
 
 const F03 = {
   howto: "Comece por um canto e vá seguindo. Toque em cada um para marcar.",
-  explain: "Escolha um para começar e vá tocando de um lado para o outro, sem pular nenhum.",
+  explain: "Escolha um para começar. Vá de um lado para o outro, sem pular nenhum.",
 };
 
 const EXPECTATIVA = [
@@ -21,7 +21,7 @@ const EXPECTATIVA = [
     nivel: 5,
     micro: "sem_marcacao",
     fonte: "F03",
-    howto: "Comece por um canto e siga um caminho mental. Toque uma vez em cada um, sem voltar.",
+    howto: "Comece num canto. Toque uma vez em cada um, sem voltar.",
     explain: F03.explain,
   },
 ] as const;

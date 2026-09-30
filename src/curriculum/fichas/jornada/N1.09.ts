@@ -27,8 +27,8 @@ export const N1_09: FichaCompetencia = {
   faixa: "F0",
   prereqs: ["N1.04", "N1.02"],
   bncc: "EF01MA01",
-  howto: "Conte cada objeto uma vez ou continue a sequência do número em que ela começou.",
-  explain: "A contagem não precisa começar no um. Cada número aponta para o próximo da sequência; para voltar, seguimos a ordem ao contrário.",
+  howto: "Conte cada um só uma vez. Ou continue do número em que ela parou.",
+  explain: "Não precisa começar no um. Cada número chama o próximo. Para voltar, conte de trás para a frente.",
   distratores: [
     { regra: "n+1", tag: MisconceptionTag.OFF_BY_ONE },
     { regra: "n-1", tag: MisconceptionTag.OFF_BY_ONE },
