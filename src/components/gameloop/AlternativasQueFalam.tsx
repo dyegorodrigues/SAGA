@@ -73,11 +73,30 @@ export function AlternativasQueFalam({
   className = "flex flex-wrap justify-center gap-2",
 }: Props) {
   const [armada, setArmada] = React.useState<number | string | null>(null);
+  /**
+   * ⚠️ A última resposta enviada, para ERRAR APARECER.
+   *
+   * A sonda que joga encontrou isto no "Sistema monetário" e no "Horas":
+   * responder errado deixava a tela **byte a byte idêntica**. A criança
+   * tocava, confirmava, e não acontecia nada — nem cor, nem dica, nem sinal
+   * de que o app tinha ouvido. Com a resposta certa a tela virava "Perfeito!"
+   * e aparecia Avançar; com a errada, silêncio.
+   *
+   * Silêncio depois de agir é a pior resposta para quem não lê: ela não sabe
+   * se errou, se o botão quebrou, ou se não apertou direito.
+   *
+   * Isto marca a escolha e **não tranca nada**. Quem tranca é o `escolhida`
+   * que o palco controla (a `ClassificacaoStage` usa); aqui o app pode
+   * devolver a vez, e devolver a vez sem apagar a marca é o que deixa a
+   * criança comparar a tentativa nova com a anterior.
+   */
+  const [ultima, setUltima] = React.useState<number | string | null>(null);
 
-  // Alternativas novas (questão nova) desarmam. Sem isto a barra de confirmar
-  // sobrevive à troca de questão apontando para um valor que não existe mais.
+  // Alternativas novas (questão nova) desarmam e limpam a marca. Sem isto a
+  // barra de confirmar sobrevive à troca de questão apontando para um valor
+  // que não existe mais.
   const assinatura = alternativas.map(a => String(a.valor)).join("|");
-  React.useEffect(() => { setArmada(null); }, [assinatura]);
+  React.useEffect(() => { setArmada(null); setUltima(null); }, [assinatura]);
   React.useEffect(() => { if (escolhida !== null) setArmada(null); }, [escolhida]);
 
   const daArmada = alternativas.find(a => a.valor === armada) ?? null;
@@ -87,8 +106,10 @@ export function AlternativasQueFalam({
     <>
       <div role="group" aria-label={rotuloDoGrupo} className={className}>
         {alternativas.map(a => {
+          // `escolhida` vem do palco e TRANCA; `ultima` é só a marca.
           const respondida = escolhida !== null;
-          const estaEscolhida = escolhida === a.valor;
+          const marcada = escolhida !== null ? escolhida : ultima;
+          const estaEscolhida = marcada !== null && marcada === a.valor;
           const estaCerta = correta !== null && a.valor === correta;
           return (
             <button
@@ -97,12 +118,13 @@ export function AlternativasQueFalam({
               disabled={disabled || respondida}
               onClick={() => { setArmada(a.valor); dizer(a); }}
               aria-label={a.rotulo}
+              data-escolhida={estaEscolhida ? "true" : undefined}
               className="flex min-h-[56px] min-w-[64px] items-center justify-center rounded-2xl border-2 px-4 text-lg font-black transition-all active:translate-y-1"
               style={{
                 borderColor: tokens.cor.elementos.borda,
                 color: tokens.cor.texto.principal,
                 // Só a ESCOLHIDA muda de cor — ver a nota em `correta`.
-                background: respondida
+                background: estaEscolhida || respondida
                   ? (estaEscolhida
                     ? (estaCerta
                       ? `color-mix(in srgb, ${tokens.cor.feedback.acerto} 22%, white)`
@@ -123,7 +145,7 @@ export function AlternativasQueFalam({
         <ConfirmarEscolha
           rotulo={daArmada.rotulo}
           onOuvirDeNovo={() => dizer(daArmada)}
-          onConfirmar={() => { const v = daArmada.valor; setArmada(null); onEscolher(v); }}
+          onConfirmar={() => { const v = daArmada.valor; setArmada(null); setUltima(v); onEscolher(v); }}
           onCancelar={() => setArmada(null)}
         />
       )}

@@ -18,6 +18,20 @@
  *     ALVOS="Correspondência um a um" node scripts/...  # uma só
  *
  * Saída: `/tmp/varredura.txt`, uma linha por competência.
+ *
+ * ## Onde ela para, e isso está medido
+ *
+ * A primeira execução completa chegou a **45 das 90** e depois passou a
+ * escrever `SEM MAPA`: ela não soube sair de alguma tela e nunca mais achou
+ * a Jornada. As 45 seguintes ficaram sem veredito — não são "ok", são
+ * **não testadas**, e chamá-las de ok seria a mentira mais cara que uma
+ * sonda pode contar.
+ *
+ * Nas 45 que ela alcançou: 3 julgadas (todas ok depois dos consertos), 42
+ * de produção (fora do alcance), 2 travadas — `Sistema monetário` e `Horas`,
+ * onde responder ERRADO deixava a tela byte a byte idêntica.
+ *
+ * O caminho de volta ao mapa é o que falta consertar aqui.
  */
 import { chromium } from "playwright-core";
 import { writeFileSync, appendFileSync } from "node:fs";

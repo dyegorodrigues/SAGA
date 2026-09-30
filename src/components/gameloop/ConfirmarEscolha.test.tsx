@@ -53,3 +53,52 @@ describe("ConfirmarEscolha — o alvo não pode se mexer", () => {
     expect(confirmar).toHaveBeenCalledTimes(1);
   });
 });
+
+/**
+ * Errar tem de aparecer.
+ *
+ * O pai não chegou a nomear este, mas a sonda que joga encontrou: no
+ * "Sistema monetário" e no "Horas", responder ERRADO deixava a tela
+ * **byte a byte idêntica**. A criança tocava, confirmava, e não acontecia
+ * nada — nem cor, nem dica, nem sinal de que o app tinha ouvido.
+ *
+ * Medido: com a resposta certa a tela vira "Perfeito! Você brilha como uma
+ * estrela" e aparece Avançar; com a errada, nada.
+ *
+ * Silêncio depois de agir é a pior resposta possível para quem não lê: ela
+ * não sabe se errou, se o botão quebrou, ou se ela não apertou direito.
+ */
+describe("AlternativasQueFalam — errar tem de aparecer", () => {
+  it("⚠️ depois de confirmar, a alternativa escolhida fica MARCADA", async () => {
+    const { AlternativasQueFalam } = await import("./AlternativasQueFalam");
+    const { container } = render(
+      <AlternativasQueFalam
+        alternativas={[{ valor: 1, rotulo: "um" }, { valor: 2, rotulo: "dois" }]}
+        onEscolher={() => {}}
+        correta={2}
+      />,
+    );
+    fireEvent.click(container.querySelector('[aria-label="um"]') as HTMLElement);
+    fireEvent.click(container.querySelector('[aria-label="Confirmar: um"]') as HTMLElement);
+
+    const escolhida = container.querySelector('[aria-label="um"][data-escolhida]');
+    expect(escolhida, "a que ela escolheu leva marca").toBeTruthy();
+  });
+
+  it("e errar NÃO tranca a tela: ela pode escolher outra", async () => {
+    const { AlternativasQueFalam } = await import("./AlternativasQueFalam");
+    const escolhas: unknown[] = [];
+    const { container } = render(
+      <AlternativasQueFalam
+        alternativas={[{ valor: 1, rotulo: "um" }, { valor: 2, rotulo: "dois" }]}
+        onEscolher={v => escolhas.push(v)}
+        correta={2}
+      />,
+    );
+    fireEvent.click(container.querySelector('[aria-label="um"]') as HTMLElement);
+    fireEvent.click(container.querySelector('[aria-label="Confirmar: um"]') as HTMLElement);
+    fireEvent.click(container.querySelector('[aria-label="dois"]') as HTMLElement);
+    fireEvent.click(container.querySelector('[aria-label="Confirmar: dois"]') as HTMLElement);
+    expect(escolhas, "as duas tentativas chegaram").toEqual([1, 2]);
+  });
+});
