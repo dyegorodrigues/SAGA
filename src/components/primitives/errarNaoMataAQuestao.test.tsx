@@ -64,8 +64,11 @@ describe("errar não mata a questão — o palco continua aceitando resposta", (
     const respostas = () => vivos(container).filter(b => /Sobrou|Deu certinho|Faltou/.test(b.textContent ?? ""));
     expect(respostas().length, "a pergunta precisa aparecer depois de distribuir").toBeGreaterThan(0);
 
-    // Erra de propósito.
+    // Erra de propósito. Armar e confirmar: "Sobrou", "Deu certinho" e
+    // "Faltou" são palavras, e quem abre esta ficha tem quatro anos e não lê.
+    const rotulo = (respostas()[0].textContent ?? "").trim();
     fireEvent.click(respostas()[0]);
+    fireEvent.click(container.querySelector(`[aria-label="Confirmar: ${rotulo}"]`) as HTMLElement);
     expect(onAnswer, "a resposta precisa chegar ao app").toHaveBeenCalled();
 
     // O app NÃO encerrou (continua `disabled={false}`): a criança tem de poder

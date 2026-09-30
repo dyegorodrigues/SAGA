@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { PecaDeAtributo, nomeDaPeca } from "./PecaDeAtributo";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 import { ClassificacaoSpec, LacoSpec } from "../../curriculum/procedimentos/classificacaoContract";
 import {
   AcaoDeClassificacao,
@@ -408,42 +409,44 @@ export function ClassificacaoStage({
             .map(p => <PecaDeAtributo key={p.id} peca={p} disabled />)}
         </div>
 
-        <div role="group" aria-label="Alternativas" className="flex flex-wrap justify-center gap-2">
-          {(spec.alternativas ?? []).map(a => {
-            const escolhida = escolhaDoCriterio === a.valor;
-            const certa = a.valor === spec.resposta;
+        {/*
+          As alternativas do nível 5 são PALAVRAS ("os vermelhos", "os
+          redondos"). Passam por `AlternativasQueFalam`: o primeiro toque fala
+          o rótulo e arma, e só o ✓ responde. A pista visual do critério
+          continua dentro do botão, porque ler a palavra não pode ser
+          requisito para responder.
+        */}
+        <AlternativasQueFalam
+          alternativas={(spec.alternativas ?? []).map(a => {
             const criterio = criterioDaChave(a.valor);
-            return (
-              <button
-                key={a.valor}
-                type="button"
-                disabled={disabled || escolhaDoCriterio !== null}
-                onClick={() => {
-                  setEscolhaDoCriterio(a.valor);
-                  onAnswer?.(a.valor, {
-                    colocacoes: [],
-                    criterios: spec.lacos.map(l => l.criterio),
-                    forma: spec.forma,
-                  });
-                }}
-                className="flex min-h-[56px] items-center gap-2 rounded-2xl px-4 text-lg font-black transition-all active:translate-y-1"
-                style={{
-                  color: "#22315C",
-                  border: "2px solid #C7D7F0",
-                  // Só o toque DA CRIANÇA muda de cor. Pintar a alternativa
-                  // certa de verde no erro entregava a resposta um instante
-                  // antes de o app dizer "Olha de novo!" e devolver a vez: a
-                  // segunda tentativa virava cópia, não pensamento.
-                  boxShadow: `0 4px 0 ${escolhida && certa ? "#2FB98C" : "#C7D7F0"}`,
-                  background: !escolhida ? "#F8FAFC" : certa ? "#D1FAE5" : "#FEF3C7",
-                }}
-              >
-                {criterio && <CriterioVisual criterio={criterio} />}
-                <span>{a.rotulo}</span>
-              </button>
-            );
+            return {
+              valor: a.valor,
+              rotulo: a.rotulo,
+              conteudo: (
+                <span className="flex items-center gap-2">
+                  {criterio && <CriterioVisual criterio={criterio} />}
+                  <span>{a.rotulo}</span>
+                </span>
+              ),
+            };
           })}
-        </div>
+          onEscolher={valor => {
+            setEscolhaDoCriterio(String(valor));
+            onAnswer?.(String(valor), {
+              colocacoes: [],
+              criterios: spec.lacos.map(l => l.criterio),
+              forma: spec.forma,
+            });
+          }}
+          falar={falar}
+          disabled={Boolean(disabled)}
+          escolhida={escolhaDoCriterio}
+          // `correta` pinta APENAS a escolhida, verde ou âmbar. A certa que a
+          // criança não escolheu nunca acende: acender entregaria a resposta
+          // um instante antes de o app dizer "Olha de novo!" e devolver a vez,
+          // e a segunda tentativa viraria cópia, não pensamento.
+          correta={spec.resposta ?? null}
+        />
       </div>
     );
   }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { AnswerMeta } from "../../types";
 import type { CalculoMentalF41Spec } from "../../curriculum/procedimentos/calculoMentalContract";
 import { InteractiveNumberLineSurface } from "./InteractiveNumberLine";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 
 /**
  * F41 / N3.13 — a reta da estimativa, e a estimativa que a criança declara.
@@ -23,6 +24,8 @@ import { InteractiveNumberLineSurface } from "./InteractiveNumberLine";
 interface Props {
   spec: CalculoMentalF41Spec;
   disabled?: boolean;
+  /** A voz do app: é ela que lê as alternativas para quem não lê. */
+  falar?: (texto: string) => void;
   onAnswer: (valor: number, meta?: AnswerMeta) => void;
 }
 
@@ -32,7 +35,7 @@ const ESTRATEGIAS = [
   { id: "fazer-dez", rotulo: "Fiz dez e somei o resto" },
 ] as const;
 
-export function CalculoMentalStage({ spec, disabled, onAnswer }: Props) {
+export function CalculoMentalStage({ spec, disabled, falar, onAnswer }: Props) {
   const [estrategia, setEstrategia] = useState<string | null>(null);
   const exigeEstrategia = spec.modo === "mental-com-estrategia";
   const respostasFechadas = Boolean(disabled) || (exigeEstrategia && estrategia === null);
@@ -97,19 +100,21 @@ export function CalculoMentalStage({ spec, disabled, onAnswer }: Props) {
         Diga por onde você foi antes de responder.
       </p>}
 
-      <div role="group" aria-label="Alternativas" className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {spec.opcoes.map(opcao => (
-          <button
-            key={String(opcao.value)}
-            type="button"
-            disabled={respostasFechadas}
-            onClick={() => responder(opcao.value, opcao.misconception)}
-            className="min-h-16 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl font-black text-slate-800 hover:border-sky-400 disabled:opacity-40"
-          >
-            {opcao.label}
-          </button>
-        ))}
-      </div>
+      {/*
+        As alternativas passam por `AlternativasQueFalam`: o primeiro toque
+        FALA o rótulo e arma, e só o ✓ responde. Escolher entre símbolos que a
+        criança não lê é cara ou coroa — e o app anotava como erro de conta.
+      */}
+      <AlternativasQueFalam
+        alternativas={spec.opcoes.map(o => ({ valor: o.value, rotulo: String(o.label) }))}
+        onEscolher={valor => {
+          const escolhida = spec.opcoes.find(o => o.value === valor);
+          responder(valor as never, escolhida?.misconception);
+        }}
+        falar={falar}
+        disabled={respostasFechadas}
+        className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4"
+      />
     </div>
   </section>;
 }

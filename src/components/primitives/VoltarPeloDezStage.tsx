@@ -4,6 +4,7 @@ import type { CaminhoDaSubtracao, VoltarPeloDezF34Spec } from "../../curriculum/
 import { metaDoCaminhoF34 } from "../../curriculum/procedimentos/voltarPeloDezContract";
 import { TenFrame } from "./TenFrame";
 import { InteractiveNumberLineSurface } from "./InteractiveNumberLine";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 
 /**
  * F34 / N3.08 — o espelho do fazer dez, com as duas molduras e a reta.
@@ -29,10 +30,12 @@ import { InteractiveNumberLineSurface } from "./InteractiveNumberLine";
 interface Props {
   spec: VoltarPeloDezF34Spec;
   disabled?: boolean;
+  /** A voz do app: é ela que lê as alternativas para quem não lê. */
+  falar?: (texto: string) => void;
   onAnswer: (valor: number, meta?: AnswerMeta) => void;
 }
 
-export function VoltarPeloDezStage({ spec, disabled, onAnswer }: Props) {
+export function VoltarPeloDezStage({ spec, disabled, falar, onAnswer }: Props) {
   const [tirados, setTirados] = useState(0);
   const [escolhido, setEscolhido] = useState<CaminhoDaSubtracao | null>(null);
 
@@ -110,19 +113,21 @@ export function VoltarPeloDezStage({ spec, disabled, onAnswer }: Props) {
         {spec.exigeChegarAoDez && !chegouAoDez ? "Tire os soltos até chegar no dez." : "Escolha um caminho antes de responder."}
       </p>}
 
-      <div role="group" aria-label="Alternativas" className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {spec.opcoes.map(opcao => (
-          <button
-            key={String(opcao.value)}
-            type="button"
-            disabled={respostasFechadas}
-            onClick={() => responder(opcao.value, opcao.misconception)}
-            className="min-h-16 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl font-black text-slate-800 hover:border-sky-400 disabled:opacity-40"
-          >
-            {opcao.label}
-          </button>
-        ))}
-      </div>
+      {/*
+        As alternativas passam por `AlternativasQueFalam`: o primeiro toque
+        FALA o rótulo e arma, e só o ✓ responde. Escolher entre símbolos que a
+        criança não lê é cara ou coroa — e o app anotava como erro de conta.
+      */}
+      <AlternativasQueFalam
+        alternativas={spec.opcoes.map(o => ({ valor: o.value, rotulo: String(o.label) }))}
+        onEscolher={valor => {
+          const escolhida = spec.opcoes.find(o => o.value === valor);
+          responder(valor as never, escolhida?.misconception);
+        }}
+        falar={falar}
+        disabled={respostasFechadas}
+        className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4"
+      />
     </div>
   </section>;
 }

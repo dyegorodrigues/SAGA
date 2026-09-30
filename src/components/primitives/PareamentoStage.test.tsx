@@ -116,7 +116,11 @@ describe("o diagnóstico sai da AÇÃO, não da alternativa", () => {
     const onAnswer = vi.fn();
     const { container } = render(<PareamentoStage spec={s} onAnswer={onAnswer} />);
     [...container.querySelectorAll("button")].forEach(b => fireEvent.click(b));
+    // Armar e confirmar: "Sobrou", "Deu certinho" e "Faltou" são palavras, e
+    // esta é a primeira ficha da Jornada — quem a abre não lê. Ver
+    // `AlternativasQueFalam`.
     fireEvent.click(screen.getByText("Sobrou"));
+    fireEvent.click(screen.getByLabelText("Confirmar: Sobrou"));
 
     expect(onAnswer).toHaveBeenCalledTimes(1);
     const [valor, acao] = onAnswer.mock.calls[0];

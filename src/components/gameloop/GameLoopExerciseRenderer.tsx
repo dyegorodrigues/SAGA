@@ -166,6 +166,7 @@ export function GameLoopExerciseRenderer({
             spec={q.uiProps as never}
             onAnswer={(valor, acao) => handlePick(valor, undefined, { source: "pareamento", pareamento: acao } as never)}
             disabled={status !== null}
+            falar={sound ? (t) => speak(t) : undefined}
             mostrar={typeof tutShow === "object" ? tutShow : null}
           />
         )}

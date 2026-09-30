@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 import { tokens } from "../../styles/tokens";
 import { PareamentoSpec } from "../../curriculum/procedimentos/pareamentoContract";
 import { AcaoDePareamento, Desfecho } from "../../curriculum/procedimentos/pareamentoProcedure";
@@ -36,6 +37,8 @@ interface Props {
   /** Recebe o desfecho escolhido e o que a ação revelou. */
   onAnswer?: (valor: Desfecho, acao: AcaoDePareamento) => void;
   disabled?: boolean;
+  /** A voz do app: é ela que lê as alternativas para quem não lê. */
+  falar?: (texto: string) => void;
   /** O passo atual da micro-aula, vindo do `tutShow` do GameLoop. */
   mostrar?: {
     destacarFileira?: "receptores" | "itens";
@@ -63,7 +66,7 @@ function posicoes(quantas: number, arranjo: PareamentoSpec["arranjo"]): { x: num
   }));
 }
 
-export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
+export function PareamentoStage({ spec, onAnswer, disabled, falar, mostrar }: Props) {
   const reduzido = Boolean(useReducedMotion());
   const [porReceptor, setPorReceptor] = React.useState<number[]>(
     () => Array(spec.receptores.quantidade).fill(0),
@@ -363,21 +366,27 @@ export function PareamentoStage({ spec, onAnswer, disabled, mostrar }: Props) {
         )}
       </div>
 
+      {/*
+        ⚠️ "Sobrou", "Deu certinho", "Faltou" são PALAVRAS, e esta é a primeira
+        ficha da Jornada — a criança que a abre tem quatro anos e não lê.
+
+        Aqui havia três botões de um toque só: ela escolhia entre três palavras
+        que não conseguia ler, e o app anotava o chute como erro de matemática.
+        O pai encontrou o buraco exatamente aqui: *"no primeiro exercício nem
+        confirma, o botão ali verdinho para confirmar a resposta, não"*.
+
+        A regra mora em `AlternativasQueFalam`, uma peça só, porque foi
+        espalhando a regra por palco que ela se perdeu em quinze deles.
+      */}
       {perguntaAgora && (
         <div className="flex w-full flex-col items-center gap-2">
           <p className="text-center text-lg font-black text-slate-700">{spec.pergunta}</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {spec.respostas.map(r => (
-              <button
-                key={r.desfecho}
-                type="button"
-                onClick={() => responder(r.desfecho)}
-                className="min-h-[48px] rounded-2xl border-2 border-indigo-300 bg-indigo-50 px-4 py-2 text-base font-black text-indigo-800"
-              >
-                {r.rotulo}
-              </button>
-            ))}
-          </div>
+          <AlternativasQueFalam
+            alternativas={spec.respostas.map(r => ({ valor: r.desfecho, rotulo: r.rotulo }))}
+            onEscolher={v => responder(v as Desfecho)}
+            falar={falar}
+            disabled={Boolean(disabled) || respondido}
+          />
         </div>
       )}
     </div>

@@ -3,6 +3,7 @@ import type { AnswerMeta } from "../../types";
 import type { NumerosGrandesF65Spec } from "../../curriculum/procedimentos/numerosGrandesContract";
 import { InteractiveNumberLineSurface } from "./InteractiveNumberLine";
 import { Quadrado100 } from "./Quadrado100";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 
 /**
  * F65 / N2.05 — a reta com as duas marcas, e o número entre elas.
@@ -26,10 +27,12 @@ import { Quadrado100 } from "./Quadrado100";
 interface Props {
   spec: NumerosGrandesF65Spec;
   disabled?: boolean;
+  /** A voz do app: é ela que lê as alternativas para quem não lê. */
+  falar?: (texto: string) => void;
   onAnswer: (valor: number, meta?: AnswerMeta) => void;
 }
 
-export function NumerosGrandesStage({ spec, disabled, onAnswer }: Props) {
+export function NumerosGrandesStage({ spec, disabled, falar, onAnswer }: Props) {
   const responder = (valor: number, misconception?: string) => {
     if (disabled) return;
     onAnswer(valor, misconception && valor !== spec.resposta ? { misconception } : undefined);
@@ -66,19 +69,22 @@ export function NumerosGrandesStage({ spec, disabled, onAnswer }: Props) {
         <Quadrado100 />
       </div>}
 
-      <div role="group" aria-label="Alternativas" className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {spec.opcoes.map(opcao => (
-          <button
-            key={String(opcao.value)}
-            type="button"
-            disabled={Boolean(disabled)}
-            onClick={() => responder(opcao.value, opcao.misconception)}
-            className="min-h-16 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl font-black text-slate-800 hover:border-sky-400 disabled:opacity-40"
-          >
-            {opcao.label}
-          </button>
-        ))}
-      </div>
+      {/*
+        As alternativas passam por `AlternativasQueFalam`: o primeiro toque
+        FALA o rótulo e arma, e só o ✓ responde. A criança da Jornada pode
+        não ler — escolher entre símbolos que ela não lê é cara ou coroa, e o
+        app anotava o cara ou coroa como erro de matemática.
+      */}
+      <AlternativasQueFalam
+        alternativas={spec.opcoes.map(o => ({ valor: o.value, rotulo: String(o.label) }))}
+        onEscolher={valor => {
+          const escolhida = spec.opcoes.find(o => o.value === valor);
+          responder(valor as never, escolhida?.misconception);
+        }}
+        falar={falar}
+        disabled={Boolean(disabled)}
+        className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4"
+      />
     </div>
   </section>;
 }

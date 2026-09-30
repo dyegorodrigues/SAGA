@@ -52,25 +52,47 @@ export function ConfirmarEscolha({ rotulo, onOuvirDeNovo, onConfirmar, onCancela
         <span aria-hidden>🔊</span>
       </button>
 
-      <motion.button
-        type="button"
-        onClick={onConfirmar}
-        aria-label={`Confirmar: ${rotulo}`}
-        className="flex min-h-[56px] flex-1 items-center justify-center gap-2 rounded-2xl border-none px-4 text-lg font-black"
-        style={{
-          background: tokens.cor.feedback.acerto,
-          color: tokens.cor.texto.inverso,
-          boxShadow: `0 5px 0 color-mix(in srgb, ${tokens.cor.feedback.acerto} 70%, black)`,
-        }}
-        /* Pulsa porque é o que o pai pediu e porque é o que a tela precisava:
-           sem movimento, mais um retângulo verde entre outros retângulos não
-           diz "é aqui que você termina". */
-        animate={reduzido ? undefined : { scale: [1, 1.05, 1] }}
-        transition={{ duration: 1, repeat: Infinity }}
-      >
-        <span aria-hidden>✓</span>
-        <span className="truncate">É esta: {rotulo}</span>
-      </motion.button>
+      {/*
+        ⚠️ O ALVO NÃO SE MEXE. Quem pulsa é o halo atrás dele.
+
+        Aqui o botão inteiro pulsava com `scale`, porque o pulso é o que o pai
+        pediu e é o que a tela precisava. Só que um alvo que nunca para de se
+        mexer não assenta: o toque não vira `click`, e a criança ficava com
+        "É esta: 2" na tela para sempre, sem conseguir avançar. Ele descreveu
+        exatamente isso — *"nem confirma (...) fica com a resposta 2 marcada
+        (...) não vai para o próximo exercício, bugou"*.
+
+        Medido no navegador: clicar dava `element is not stable` em 4s; com
+        `force: true` a questão avançava na hora.
+
+        O pulso continua, e continua visível. Ele só não é mais o botão.
+      */}
+      <span className="relative flex flex-1">
+        {!reduzido && (
+          <motion.span
+            aria-hidden="true"
+            data-halo-confirmar
+            className="pointer-events-none absolute inset-[-6px] rounded-[20px]"
+            style={{ background: tokens.cor.feedback.acerto }}
+            animate={{ opacity: [0.45, 0, 0.45], scale: [0.98, 1.06, 0.98] }}
+            transition={{ duration: 1.1, repeat: Infinity }}
+          />
+        )}
+        <button
+          type="button"
+          onClick={onConfirmar}
+          aria-label={`Confirmar: ${rotulo}`}
+          className="relative flex min-h-[56px] w-full items-center justify-center gap-2 rounded-2xl border-none px-4 text-lg font-black"
+          style={{
+            background: tokens.cor.feedback.acerto,
+            color: tokens.cor.texto.inverso,
+            boxShadow: `0 5px 0 color-mix(in srgb, ${tokens.cor.feedback.acerto} 70%, black)`,
+          }}
+        >
+          <span aria-hidden>✓</span>
+          <span className="truncate">É esta: {rotulo}</span>
+        </button>
+      </span>
 
       <button
         type="button"

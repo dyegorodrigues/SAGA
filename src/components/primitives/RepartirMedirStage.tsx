@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { AnswerMeta } from "../../types";
 import type { RepartirMedirF99Spec, SentidoDaDivisao } from "../../curriculum/procedimentos/repartirMedirContract";
 import { DragGroup } from "./DragGroup";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 
 /**
  * F99 / N4.05 — o DragGroup nos dois modos.
@@ -27,10 +28,12 @@ import { DragGroup } from "./DragGroup";
 interface Props {
   spec: RepartirMedirF99Spec;
   disabled?: boolean;
+  /** A voz do app: é ela que lê as alternativas para quem não lê. */
+  falar?: (texto: string) => void;
   onAnswer: (valor: number, meta?: AnswerMeta) => void;
 }
 
-export function RepartirMedirStage({ spec, disabled, onAnswer }: Props) {
+export function RepartirMedirStage({ spec, disabled, falar, onAnswer }: Props) {
   const [identificado, setIdentificado] = useState<SentidoDaDivisao | null>(null);
   const respostasFechadas = Boolean(disabled) || (spec.exigeIdentificar && identificado === null);
 
@@ -80,19 +83,21 @@ export function RepartirMedirStage({ spec, disabled, onAnswer }: Props) {
         Diga primeiro o que a pergunta já conta.
       </p>}
 
-      <div role="group" aria-label="Alternativas" className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {spec.opcoes.map(opcao => (
-          <button
-            key={String(opcao.value)}
-            type="button"
-            disabled={respostasFechadas}
-            onClick={() => responder(opcao.value, opcao.misconception)}
-            className="min-h-16 rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-3 text-xl font-black text-slate-800 hover:border-sky-400 disabled:opacity-40"
-          >
-            {opcao.label}
-          </button>
-        ))}
-      </div>
+      {/*
+        As alternativas passam por `AlternativasQueFalam`: o primeiro toque
+        FALA o rótulo e arma, e só o ✓ responde. Escolher entre símbolos que a
+        criança não lê é cara ou coroa — e o app anotava como erro de conta.
+      */}
+      <AlternativasQueFalam
+        alternativas={spec.opcoes.map(o => ({ valor: o.value, rotulo: String(o.label) }))}
+        onEscolher={valor => {
+          const escolhida = spec.opcoes.find(o => o.value === valor);
+          responder(valor as never, escolhida?.misconception);
+        }}
+        falar={falar}
+        disabled={respostasFechadas}
+        className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4"
+      />
     </div>
   </section>;
 }
