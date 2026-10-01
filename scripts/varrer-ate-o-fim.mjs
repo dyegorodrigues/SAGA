@@ -27,8 +27,28 @@ import { writeFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { T, primeiroAcesso, abrir, competencias } from "./navegar.mjs";
 
 const SAIDA = process.env.SAIDA ?? "/tmp/ateofim-todos.txt";
+/**
+ * A maior janela em que o app segura a cena de propósito.
+ *
+ * O erro da comparação explica por 2,5s com tudo desligado; o acerto do
+ * `FormaStage` faz 2,2s de cinema. 3s cobre as duas com folga.
+ */
+const ESPERA_DO_FEEDBACK_MS = Number(process.env.ESPERA_FEEDBACK ?? 3000);
 const LARGURA = Number(process.env.LARGURA ?? 820);
-const PASSOS = Number(process.env.PASSOS ?? 20);
+/**
+ * Quantos toques a sonda dá antes de desistir de uma competência.
+ *
+ * ⚠️ Era 20 e virou pouco: **escolher passou a custar DOIS toques** (tocar
+ * para ouvir, ✓ para confirmar), e a sonda erra de propósito para ver o
+ * erro — cada erro ainda gasta a janela de explicação. Com 20 ela parava no
+ * meio e escrevia "indefinido", que eu quase li como travamento: as fotos da
+ * "Formas planas básicas" e da "Correspondência um a um" mostravam as duas
+ * telas CERTAS, no meio do exercício.
+ *
+ * Veredito de sonda que acabou o fôlego não é defeito do app — é orçamento
+ * da sonda.
+ */
+const PASSOS = Number(process.env.PASSOS ?? 44);
 const SOBREPOSICAO_MS = 300;
 const TOLERANCIA_PX = 24;
 
@@ -147,10 +167,29 @@ for (const alvo of alvos) {
       const alvosVivos = await tocaveis();
       if (alvosVivos.length === 0) { veredito = `TRAVA no passo ${passo} (nada tocável)`; break; }
 
-      const novos = alvosVivos.filter(a => !tentados.has(a.n));
+      let novos = alvosVivos.filter(a => !tentados.has(a.n));
       if (novos.length === 0) {
-        veredito = `PRESA no passo ${passo} (todos os ${alvosVivos.length} controles tentados, nada muda)`;
-        break;
+        /*
+         * ⚠️ Travado de propósito não é travado.
+         *
+         * Esta sonda acusou "PRESA" na "Comparação de quantidades" e a foto
+         * mostrou a tela certa: a explicação do erro ("Sobrou 4 à direita")
+         * com os dois grupos DESLIGADOS, que é a janela de 2,5s em que o app
+         * segura a cena para a criança olhar. O único controle vivo era o
+         * "Como faz?", já tentado — e a sonda chamou de travamento o que é a
+         * pedagogia funcionando.
+         *
+         * Criança não desiste em um segundo: ela espera. Então a sonda espera
+         * também, uma vez, o tempo da maior janela de feedback do app, e só
+         * declara presa se depois disso continuar sem controle novo.
+         */
+        await page.waitForTimeout(ESPERA_DO_FEEDBACK_MS);
+        const depoisDeEsperar = await tocaveis();
+        novos = depoisDeEsperar.filter(a => !tentados.has(a.n));
+        if (novos.length === 0) {
+          veredito = `PRESA no passo ${passo} (todos os ${depoisDeEsperar.length} controles tentados, nada muda nem depois de esperar)`;
+          break;
+        }
       }
       const conf = novos.find(a => /^Confirmar:/.test(a.n));
       const escolha = conf ?? novos.find(a => !/^(Ouvir de novo|Escolher outra|Ver de novo)/.test(a.n)) ?? novos[0];
