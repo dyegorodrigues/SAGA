@@ -17,6 +17,61 @@ import { textoFalado } from "../audio/chaveDaFala";
  * como erro de matemática.
  */
 
+/**
+ * ⚠️ UMA VIA CALA A OUTRA — a regra que faltava, e por que ela faltou tanto.
+ *
+ * O pai relatou "as vozes uma em cima da outra" em quatro conversas seguidas.
+ * Eu "consertei" três vezes reforçando o cancelamento no começo do `speak`, e
+ * voltou três vezes. Voltou porque eu estava olhando para o lugar errado.
+ *
+ * ## Onde a sobreposição nasce
+ *
+ * Quase toda narração do app tem a forma `enunciado ... como faz`. O
+ * `emPedacos` separa os dois, e eles quase nunca vão pela mesma via: o
+ * enunciado tem número ("Qual moeda vale 5 centavos?"), varia com o sorteio e
+ * não está no pacote — cai no sintetizador do aparelho; o "como faz" é fixo,
+ * está no pacote — toca como arquivo.
+ *
+ * Então a narração mais ouvida do app é: **aparelho, depois arquivo**, e a
+ * emenda entre os dois é o `onend` do `speechSynthesis`.
+ *
+ * O `onend` do Chrome chega antes de o sintetizador calar — é bug conhecido, e
+ * o próprio arquivo acima já registra que o TTS do Chrome trava e corta
+ * utterances. Quando ele chega adiantado, o arquivo começa com o aparelho
+ * ainda falando. Duas vozes, ao mesmo tempo, exatamente o que o pai ouve.
+ *
+ * ## Por que o cancelamento do `speak` nunca pegou isso
+ *
+ * Porque a emenda acontece DENTRO de uma narração só. O `speak` cancela na
+ * entrada, uma vez, e aí entrega a narração ao `tocarPedacos` — que troca de
+ * via no meio sem cancelar nada. Cada via desligava só a si mesma:
+ * `pararArquivo()` não cala o sintetizador, `cancel()` não para o arquivo.
+ *
+ * A correção é mecânica e não depende de evento nenhum chegar na hora certa:
+ * **antes de abrir a boca, cada via cala a outra.** Dentro de uma sequência
+ * correta a outra via já está parada e o pedido é inócuo; na emenda torta, é
+ * ele que impede as duas de falarem juntas.
+ *
+ * ## O que este defeito NÃO era (medido, e errei antes de acertar)
+ *
+ * Minha primeira hipótese foi que o app pedia duas falas no mesmo tique. Vinha
+ * de uma medição minha no navegador que mostrava duas vias começando a 1 ms de
+ * distância. Fui medir os dois lados antes de mexer:
+ *
+ * - o Chromium headless deste ambiente tem **zero vozes** instaladas, e
+ *   `speechSynthesis.speak` falha em 1 ms com `synthesis-failed`. A sonda
+ *   registrava a fala do aparelho como se durasse 2 s, e o arquivo seguinte
+ *   — que começa certo, logo depois da falha — aparecia "por cima". O 1 ms
+ *   era artefato da minha régua, não defeito do app;
+ * - instrumentando o próprio `speak` em cinco competências: **29 pedidos de
+ *   fala, zero no mesmo tique**. O app nunca pediu duas vozes de uma vez.
+ *
+ * Fica escrito porque a conclusão errada era plausível e eu quase coalesci
+ * todo pedido de fala numa janela de 60 ms para consertar o que não existia —
+ * o que atrasaria toda narração do app e quebraria o gesto do toque no iOS.
+ * Ver `umaVozDeCadaVez.test.ts`, que trava as duas coisas: a exclusão mútua, e
+ * que a fala sai no mesmo tique em que foi pedida.
+ */
 let SPEAK_SEQ = 0;
 let tocando: HTMLAudioElement | null = null;
 
@@ -31,17 +86,35 @@ function pararArquivo() {
   tocando = null;
 }
 
-/** A voz do aparelho — o caminho de antes, preservado inteiro. */
+/** A voz do aparelho — o caminho de antes, mais a exclusão mútua. */
 function vozDoAparelho(texto: string, seq: number, rate: number, onEnd?: () => void) {
   if (typeof window === "undefined" || !window.speechSynthesis) { onEnd?.(); return; }
+  // ⚠️ Uma via cala a outra: o `cancel` abaixo não para arquivo nenhum.
+  pararArquivo();
   window.speechSynthesis.cancel();
   if (!texto) return;
   const u = new SpeechSynthesisUtterance(texto);
   u.lang = "pt-BR";
   u.rate = 1.05 * rate;
   u.pitch = 1.25;
-  u.onend = () => { if (seq === SPEAK_SEQ) onEnd?.(); };
-  u.onerror = () => { if (seq === SPEAK_SEQ) onEnd?.(); };
+  /*
+   * ⚠️ O fim avisa UMA vez.
+   *
+   * `onend` e `onerror` chamavam os dois o mesmo `onEnd`, e navegador que
+   * dispara os dois (ou que erra uma fala já encerrada, o que o `cancel` novo
+   * acima torna possível) fazia o `adiante` do `tocarPedacos` correr duas
+   * vezes: a narração PULAVA um pedaço. Na forma `enunciado ... como faz` o
+   * pedaço pulado é o "como faz" — a criança que não lê perde justamente a
+   * parte que diz o que fazer.
+   */
+  let avisou = false;
+  const terminou = () => {
+    if (avisou || seq !== SPEAK_SEQ) return;
+    avisou = true;
+    onEnd?.();
+  };
+  u.onend = terminou;
+  u.onerror = terminou;
   window.speechSynthesis.speak(u);
 }
 
@@ -113,6 +186,10 @@ function tocarPedacos(pedacos: string[], i: number, seq: number, rate: number, o
   const audio = new Audio(caminhoDaVoz(pedaco));
   audio.playbackRate = rate;
   tocando = audio;
+  // ⚠️ Uma via cala a outra. Esta é A emenda do defeito: chegamos aqui pelo
+  // `onend` do pedaço anterior, e o `onend` do Chrome chega antes de ele parar
+  // de falar. Sem este cancelamento o arquivo entra por cima da voz.
+  try { window.speechSynthesis?.cancel(); } catch { /* ambiente sem fala */ }
 
   // Arquivo que não toca (pacote pela metade, formato recusado) não pode
   // virar silêncio: a criança fica sem o enunciado. Cai para o aparelho.

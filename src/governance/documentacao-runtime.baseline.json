@@ -6,7 +6,7 @@
   "src/App.tsx": 73,
   "src/audio/chaveDaFala.ts": 23,
   "src/audio/vozNativa.ts": 47,
-  "src/components/AudioPlayer.tsx": 37,
+  "src/components/AudioPlayer.tsx": 106,
   "src/components/GameLoop.tsx": 111,
   "src/components/KidHomeScreen.tsx": 30,
   "src/components/Mascot.tsx": 51,

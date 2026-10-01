@@ -25,8 +25,20 @@ import { T, primeiroAcesso, abrir, competencias } from "./navegar.mjs";
 
 const SAIDA = process.env.SAIDA ?? "/tmp/enquadramento.txt";
 const LARGURA = Number(process.env.LARGURA ?? 820);
-/** Meio palmo de criança. Acima disto o olho vê a tela torta. */
-const TOLERANCIA_PX = 24;
+/**
+ * Quanto desvio o olho perdoa.
+ *
+ * Começou em 24px e produziu três falsos positivos em noventa: "Tempo
+ * cotidiano" (45px, puxado pelos ícones 🔊 no canto das alternativas),
+ * "Contagem até 20" (30px, que é o sorteio das posições espalhadas) e
+ * "Números grandes" (-2072px, um elemento fora da tela que entrou na conta).
+ * Fui ver os três: as três telas estavam certas.
+ *
+ * Um sinal só de cada quatro era verdadeiro — e sonda que grita demais a
+ * gente para de ouvir, que é como o defeito do balão sobreviveu tanto tempo.
+ * 60px é a metade de um palmo: abaixo disso o olho não reclama.
+ */
+const TOLERANCIA_PX = Number(process.env.TOLERANCIA ?? 60);
 
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH ?? "/opt/pw-browsers/chromium" });
 const page = await browser.newPage({ viewport: { width: LARGURA, height: 900 } });
@@ -66,6 +78,9 @@ for (const alvo of alvos) {
         if (r.width < 8 || r.height < 8) continue;
         if (r.width > window.innerWidth * 0.7) continue;
         if (r.top < 150 || r.bottom > window.innerHeight - 20) continue;
+        // Fora da tela não é enquadramento: um elemento a -2000px arrastava a
+        // média inteira e acusava de torta uma tela que estava certa.
+        if (r.left < 0 || r.right > window.innerWidth) continue;
         const temTinta = (el.textContent ?? "").trim().length > 0
           || getComputedStyle(el).backgroundImage !== "none"
           || el.tagName === "IMG" || el.tagName === "SVG";

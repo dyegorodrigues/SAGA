@@ -23,7 +23,7 @@
  *     node scripts/varrer-ate-o-fim.mjs        # saída: /tmp/ateofim-todos.txt
  */
 import { chromium } from "playwright-core";
-import { writeFileSync, appendFileSync } from "node:fs";
+import { writeFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { T, primeiroAcesso, abrir, competencias } from "./navegar.mjs";
 
 const SAIDA = process.env.SAIDA ?? "/tmp/ateofim-todos.txt";
@@ -57,6 +57,12 @@ await page.addInitScript(() => {
       const reg = { via: "aparelho", inicio: Date.now(), fim: null, src: String(u.text).slice(0, 36) };
       window.__falas.push(reg);
       u.addEventListener?.("end", () => { reg.fim = Date.now(); });
+      // ⚠️ Fala que FALHA não durou dois segundos e meio: durou um
+      // milissegundo. Sem esta linha a sonda dava toda fala do aparelho por
+      // morta aos 2,5 s e acusava sobreposição em toda narração da forma
+      // `enunciado ... como faz` — que são quase todas. Eu acreditei nela e
+      // diagnostiquei um defeito que não existia. Ver scripts/uma-voz.mjs.
+      u.addEventListener?.("error", () => { reg.fim = Date.now(); reg.falhou = true; });
       return orig(u);
     };
     const cancel = ss.cancel.bind(ss);
@@ -68,9 +74,24 @@ const erros = [];
 page.on("pageerror", e => erros.push(String(e).slice(0, 120)));
 
 await primeiroAcesso(page);
+
+/*
+ * ⚠️ A régua se confere antes de medir — ver scripts/uma-voz.mjs.
+ *
+ * Sem voz instalada a via do aparelho falha em ~1 ms e não sai som: a ORDEM e a
+ * CONTAGEM das falas continuam válidas, a DURAÇÃO não. Acusação de
+ * sobreposição nesta via, aqui, pede conferência antes de virar conserto.
+ */
+const vozesDoNavegador = await page.evaluate(() => (window.speechSynthesis?.getVoices?.() ?? []).length);
+const AVISO_DA_REGUA = vozesDoNavegador === 0
+  ? "⚠️ navegador sem voz instalada: duração da via do aparelho não é confiável\n"
+  : `${vozesDoNavegador} voz(es) no navegador\n`;
+console.log(AVISO_DA_REGUA);
+
 const nomes = await competencias(page);
 const alvos = process.env.ALVOS ? process.env.ALVOS.split("|") : nomes.slice(0, Number(process.env.QUANTOS ?? 90));
-writeFileSync(SAIDA, `jogando ${alvos.length} competências até o fim, a ${LARGURA}px\n\n`);
+mkdirSync("/tmp/provas", { recursive: true });
+writeFileSync(SAIDA, `jogando ${alvos.length} competências até o fim, a ${LARGURA}px\n${AVISO_DA_REGUA}\n`);
 
 const tocaveis = async () => {
   const out = [];
@@ -105,37 +126,75 @@ for (const alvo of alvos) {
     await page.waitForTimeout(12000);
 
     const desvio = await desvioDaTinta();
-    let veredito = "em círculo";
-    let iguais = 0, anterior = "";
+    /*
+     * ⚠️ Preso é quando TODO controle já foi tentado e nada muda.
+     *
+     * A primeira versão clicava no primeiro botão vivo e, se a tela não
+     * mudasse quatro vezes, gritava "em círculo". Ela acusou vinte
+     * competências — mas o que ela fazia era bater no MESMO controle morto
+     * quatro vezes (um objeto já contado, por exemplo, que não muda nada de
+     * propósito). Criança não faz isso: ela tenta os outros.
+     *
+     * É o mesmo erro que eu já cometi duas vezes nesta sessão, e ele tem um
+     * custo: sonda que grita demais a gente para de ouvir, e foi assim que o
+     * travamento do balão sobreviveu. Agora cada passo escolhe um controle
+     * AINDA NÃO TENTADO, e só se declara preso quando a lista acaba.
+     */
+    let veredito = "indefinido";
+    const tentados = new Set();
     for (let passo = 1; passo <= PASSOS; passo += 1) {
       if (AVANCOU.test(await T(page))) { veredito = "termina"; break; }
       const alvosVivos = await tocaveis();
       if (alvosVivos.length === 0) { veredito = `TRAVA no passo ${passo} (nada tocável)`; break; }
-      const conf = alvosVivos.find(a => /^Confirmar:/.test(a.n));
-      const escolha = conf ?? alvosVivos.find(a => !/^(Ouvir de novo|Escolher outra|Ver de novo)/.test(a.n)) ?? alvosVivos[0];
+
+      const novos = alvosVivos.filter(a => !tentados.has(a.n));
+      if (novos.length === 0) {
+        veredito = `PRESA no passo ${passo} (todos os ${alvosVivos.length} controles tentados, nada muda)`;
+        break;
+      }
+      const conf = novos.find(a => /^Confirmar:/.test(a.n));
+      const escolha = conf ?? novos.find(a => !/^(Ouvir de novo|Escolher outra|Ver de novo)/.test(a.n)) ?? novos[0];
+      tentados.add(escolha.n);
+      const antes = await T(page);
       await escolha.b.click({ timeout: 4000 }).catch(() => {});
       await page.waitForTimeout(1100);
-      const agora = await T(page);
-      if (agora === anterior) iguais += 1; else { iguais = 0; anterior = agora; }
-      if (iguais >= 4) { veredito = `EM CÍRCULO no passo ${passo}`; break; }
+      // Mudou a tela? Então o mapa de tentados não vale mais: é outra cena.
+      if ((await T(page)) !== antes) tentados.clear();
     }
 
     const falas = await page.evaluate(() => window.__falas.map(f => ({ ...f })));
     let sobrepostas = 0;
     for (let i = 0; i < falas.length; i += 1) {
       for (let j = i + 1; j < falas.length; j += 1) {
+        // Fala que falhou nunca esteve no ar: não dá para estar por baixo de
+        // outra. Era daqui que saíam as acusações falsas.
+        if (falas[i].falhou) continue;
         const fimA = falas[i].fim ?? falas[i].inicio + 2500;
-        if (falas[j].inicio < fimA - SOBREPOSICAO_MS) sobrepostas += 1;
+        if (falas[j].falhou) continue;
+        if (falas[j].inicio >= falas[i].inicio && falas[j].inicio < fimA - SOBREPOSICAO_MS) sobrepostas += 1;
       }
     }
     const torto = desvio !== null && Math.abs(desvio) > TOLERANCIA_PX;
+    /*
+     * ⚠️ Toda acusação sai com FOTO.
+     *
+     * Três vezes nesta sessão eu li um veredito desta família, acreditei, e
+     * fui consertar coisa que não estava quebrada. O veredito sozinho é
+     * palpite com cara de medida. Com a foto do instante, quem lê confere em
+     * dois segundos — e eu confiro antes de tocar no código.
+     */
     const marcas = [
       veredito === "termina" ? "" : `⚠️ ${veredito}`,
       sobrepostas ? `⚠️ ${sobrepostas} vozes sobrepostas` : "",
       torto ? `⚠️ torto ${desvio}px` : "",
       erros.length ? `⚠️ erro JS: ${erros[0]}` : "",
     ].filter(Boolean);
-    appendFileSync(SAIDA, `${marcas.length ? "PROBLEMA" : "ok      "} ${alvo}${marcas.length ? " — " + marcas.join(" · ") : ""}\n`);
+    let foto = "";
+    if (marcas.length) {
+      foto = `/tmp/provas/${alvo.replace(/\W+/g, "_")}.png`;
+      await page.screenshot({ path: foto }).catch(() => { foto = "(sem foto)"; });
+    }
+    appendFileSync(SAIDA, `${marcas.length ? "PROBLEMA" : "ok      "} ${alvo}${marcas.length ? " — " + marcas.join(" · ") + `  [${foto}]` : ""}\n`);
   } catch (e) {
     appendFileSync(SAIDA, `erro      ${alvo} — ${String(e).split("\n")[0].slice(0, 80)}\n`);
   }
