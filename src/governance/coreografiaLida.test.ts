@@ -87,14 +87,39 @@ function chavesLidas(): Set<string> {
 }
 
 const CAMINHO_SEM = resolve(__dirname, "coreografia-ausente.baseline.json");
+const CAMINHO_SEM_N1 = resolve(__dirname, "coreografia-ausente-nivel1.baseline.json");
+
+/** Esta micro declara micro-aula? */
+function temAula(micro: unknown): boolean {
+  const bruto = (micro as { params?: { tutorial?: unknown } } | undefined)?.params?.tutorial;
+  return Array.isArray(bruto) && bruto.length > 0;
+}
 
 /** As fichas que não declaram micro-aula nenhuma, em nível nenhum. */
 function fichasSemCoreografia(): string[] {
   return JOURNEY_FICHAS
-    .filter(ficha => !(ficha.micros ?? []).some(micro => {
-      const bruto = (micro.params as { tutorial?: unknown } | undefined)?.tutorial;
-      return Array.isArray(bruto) && bruto.length > 0;
-    }))
+    .filter(ficha => !(ficha.micros ?? []).some(temAula))
+    .map(ficha => ficha.id)
+    .sort();
+}
+
+/**
+ * A micro que o nível 1 realmente entrega — a mesma resolução do `Composer`.
+ *
+ * ⚠️ Não é `micros[0]`. O nível escolhe a micro por `niveis[n].micro`, e só
+ * cai na primeira quando aquele nome não existe. Medir pelo índice daria
+ * resposta certa por acaso em algumas fichas e errada nas outras.
+ */
+function microDoNivel(ficha: (typeof JOURNEY_FICHAS)[number], nivel: number): unknown {
+  const nome = (ficha as { niveis?: Record<number, { micro?: string }> }).niveis?.[nivel]?.micro;
+  const micros = (ficha.micros ?? []) as { id?: string }[];
+  return (nome ? micros.find(m => m.id === nome) : null) ?? micros[0];
+}
+
+/** As fichas que abrem o NÍVEL 1 sem micro-aula. */
+function fichasSemCoreografiaNoNivel1(): string[] {
+  return JOURNEY_FICHAS
+    .filter(ficha => (ficha.micros ?? []).length > 0 && !temAula(microDoNivel(ficha, 1)))
     .map(ficha => ficha.id)
     .sort();
 }
@@ -142,6 +167,58 @@ describe("catraca da coreografia lida", () => {
       ganharam.length,
       [
         `${ganharam.length} fichas ganharam aula e a baseline não desceu: ${ganharam.join(", ")}`,
+        "Rode `npm run coreografia:baseline`. A catraca só desce.",
+      ].join("\n"),
+    ).toBe(0);
+  });
+
+  /**
+   * ⚠️ A ficha que tem aula — em outro nível.
+   *
+   * A catraca acima mede ficha sem aula em nível NENHUM, e passou a dizer 13.
+   * Medindo no navegador, achei palcos que abrem sem "Como faz?" e não estão
+   * nessas 13: a `GE.02` ("Formas planas básicas") abre o nível 1 com *"Qual é
+   * o círculo?"* e três botões escritos — `o círculo`, `o quadrado`, `o
+   * triângulo` — e nenhuma demonstração. Ela declara aula, só não no nível em
+   * que a criança entra.
+   *
+   * Para a catraca irmã isso é uma ficha com aula. Para a criança de seis
+   * anos que não lê, é tela muda: ela nunca chega ao nível 3 onde a aula
+   * existe, porque não passa do 1.
+   *
+   * **O nível 1 é a porta: é o nível que TODA criança encontra, em todas as
+   * noventa competências.** Então ele se mede separado.
+   *
+   * Vale a mesma regra da irmã: a dívida fica medida, com nome e tamanho, e
+   * não pode crescer. Não se escreve aqui a coreografia que falta — ela é
+   * "§8 transcrita" da ficha pedagógica, e inventá-la seria pôr pedagogia
+   * minha na boca do app.
+   */
+  it("nenhuma ficha passa a abrir o nível 1 sem micro-aula", () => {
+    const sem = fichasSemCoreografiaNoNivel1();
+
+    if (process.env.ATUALIZAR_COREOGRAFIA === "1") {
+      writeFileSync(CAMINHO_SEM_N1, `${JSON.stringify(sem, null, 2)}\n`);
+      return;
+    }
+
+    const baseline: string[] = JSON.parse(readFileSync(CAMINHO_SEM_N1, "utf8"));
+    const novas = sem.filter(id => !baseline.includes(id));
+    expect(
+      novas,
+      [
+        "Fichas que passaram a abrir o nível 1 sem micro-aula:",
+        ...novas.map(id => `  ${id}`),
+        "",
+        "O nível 1 é a porta de entrada: sem 'Como faz?' ali, quem não lê não entra.",
+      ].join("\n"),
+    ).toEqual([]);
+
+    const ganharam = baseline.filter(id => !sem.includes(id));
+    expect(
+      ganharam.length,
+      [
+        `${ganharam.length} fichas ganharam aula no nível 1 e a baseline não desceu: ${ganharam.join(", ")}`,
         "Rode `npm run coreografia:baseline`. A catraca só desce.",
       ].join("\n"),
     ).toBe(0);
