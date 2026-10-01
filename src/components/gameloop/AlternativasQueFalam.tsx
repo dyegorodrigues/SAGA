@@ -60,6 +60,46 @@ interface Props {
   /** Nome do grupo para leitor de tela. */
   rotuloDoGrupo?: string;
   className?: string;
+  /** Para grade: `className` não carrega `gridTemplateColumns`. */
+  style?: React.CSSProperties;
+  /**
+   * O palco desenha a própria alternativa, e a REGRA continua aqui.
+   *
+   * ## Por que isto existe
+   *
+   * O `FormaStage` desenha formas que giram, contam os próprios lados e se
+   * fecham no acerto — a §4 da ficha pede isso, e trocar os botões dele pelos
+   * botões daqui apagaria a aula. Então ele ficou de fora da regra, e o pai
+   * encontrou o buraco: *"Qual é o círculo?"*, três botões escritos, um toque
+   * e já era.
+   *
+   * A saída errada é o palco implementar a regra por conta — foi assim que a
+   * regra nasceu valendo em dois lugares e faltando em treze. A saída é esta:
+   * **a regra mora aqui; o desenho vem de fora.** Quem usa isto recebe o
+   * estado e devolve o botão, e não tem como esquecer o confirmar: quem fala,
+   * arma e confirma continua sendo esta peça.
+   *
+   * Recebe `onToque` (fala e arma — nunca responde) e `disabled`, e deve
+   * devolver UM botão. O grupo `aria-label="Alternativas"` entra junto, o que
+   * faz o palco passar a ser VISTO pelo portão de
+   * `escolherExigeConfirmar.test.tsx`.
+   */
+  renderAlternativa?: (
+    a: Alternativa,
+    estado: {
+      /** Tocada uma vez, esperando o ✓. */
+      armada: boolean;
+      /** Esta é a marcada (escolha enviada). */
+      escolhida: boolean;
+      /** Já houve resposta: ninguém mais responde. */
+      respondida: boolean;
+      /** Esta é a certa — só para pintar a ESCOLHIDA. Ver a nota em `correta`. */
+      certa: boolean;
+      /** Fala o rótulo e arma. Não responde. */
+      onToque: () => void;
+      disabled: boolean;
+    },
+  ) => React.ReactNode;
 }
 
 export function AlternativasQueFalam({
@@ -71,6 +111,8 @@ export function AlternativasQueFalam({
   correta = null,
   rotuloDoGrupo = "Alternativas",
   className = "flex flex-wrap justify-center gap-2",
+  style,
+  renderAlternativa,
 }: Props) {
   const [armada, setArmada] = React.useState<number | string | null>(null);
   /**
@@ -104,19 +146,34 @@ export function AlternativasQueFalam({
 
   return (
     <>
-      <div role="group" aria-label={rotuloDoGrupo} className={className}>
+      <div role="group" aria-label={rotuloDoGrupo} className={className} style={style}>
         {alternativas.map(a => {
           // `escolhida` vem do palco e TRANCA; `ultima` é só a marca.
           const respondida = escolhida !== null;
           const marcada = escolhida !== null ? escolhida : ultima;
           const estaEscolhida = marcada !== null && marcada === a.valor;
           const estaCerta = correta !== null && a.valor === correta;
+          const onToque = () => { setArmada(a.valor); dizer(a); };
+          if (renderAlternativa) {
+            return (
+              <React.Fragment key={String(a.valor)}>
+                {renderAlternativa(a, {
+                  armada: armada === a.valor,
+                  escolhida: estaEscolhida,
+                  respondida,
+                  certa: estaCerta,
+                  onToque,
+                  disabled: Boolean(disabled) || respondida,
+                })}
+              </React.Fragment>
+            );
+          }
           return (
             <button
               key={String(a.valor)}
               type="button"
               disabled={disabled || respondida}
-              onClick={() => { setArmada(a.valor); dizer(a); }}
+              onClick={onToque}
               aria-label={a.rotulo}
               data-escolhida={estaEscolhida ? "true" : undefined}
               className="flex min-h-[56px] min-w-[64px] items-center justify-center rounded-2xl border-2 px-4 text-lg font-black transition-all active:translate-y-1"

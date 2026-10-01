@@ -186,7 +186,7 @@
   "src/components/gameloop/ConfirmarEscolha.tsx": 30,
   "src/components/home/JourneyTab.tsx": 20,
   "src/curriculum/motores/modoDeTeste.ts": 44,
-  "src/components/gameloop/AlternativasQueFalam.tsx": 64,
+  "src/components/gameloop/AlternativasQueFalam.tsx": 92,
   "src/components/primitives/CalculoMentalStage.tsx": 21,
   "src/components/primitives/ComparacaoQuantidadeStage.tsx": 34
 }

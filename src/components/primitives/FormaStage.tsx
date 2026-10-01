@@ -4,6 +4,7 @@ import { PalcoEscalado } from "./PalcoEscalado";
 import { FiguraDesenhada } from "./ShapeCanvas";
 import { FormaSpec, LADO_DO_CONTEINER, OpcaoDeForma, VAO } from "../../curriculum/procedimentos/formaContract";
 import { AcaoDeForma, descricaoDeLados, FALAS, Forma, NOME } from "../../curriculum/procedimentos/formaProcedure";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 
 const DURACAO_ERRO = 2500;
 const DURACAO_ACERTO = 2200;
@@ -177,13 +178,25 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
   return (
     <PalcoEscalado>
       <div className="flex flex-col items-center gap-3 select-none">
-        <div
-          role="group"
-          aria-label="As formas"
+        {/*
+          ⚠️ A regra de ouvir-e-confirmar, com o desenho da ficha intacto.
+          Ver a nota de `renderAlternativa` em `AlternativasQueFalam`: as formas
+          que giram e contam os próprios lados são a §4 da ficha e não podem
+          virar botão de texto, mas o primeiro toque não pode responder —
+          *"Qual é o círculo?"* com três palavras escritas e resposta no toque
+          era escolha no escuro para quem não lê. Agora o toque FALA o nome da
+          forma e arma; só o ✓ responde.
+        */}
+        <AlternativasQueFalam
+          alternativas={spec.opcoes.map((o, i) => ({ valor: `${i}:${o.figura}`, rotulo: NOME[o.figura] }))}
+          onEscolher={valor => responder(Number(String(valor).split(":")[0]))}
+          falar={falar}
+          disabled={travado}
           className="grid justify-center"
           style={{ gridTemplateColumns: `repeat(${colunas}, ${LADO_DO_CONTEINER}px)`, gap: VAO }}
-        >
-          {spec.opcoes.map((o, i) => {
+          renderAlternativa={(alternativa, estadoDaRegra) => {
+            const i = Number(String(alternativa.valor).split(":")[0]);
+            const o = spec.opcoes[i];
             const certa = i === corretaIdx;
             const selecionada = i === escolhida;
             const erroEscolhido = fase === "erro" && selecionada && !certa;
@@ -207,7 +220,11 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
               ? "#F97316"
               : (mostrarCertaNoErro || sucesso)
                 ? "#16A34A"
-                : tutorialAlvo
+                // Armada: a criança tem de VER qual forma o ✓ vai confirmar.
+                // Mesma tinta do destaque da aula de propósito — é o mesmo
+                // recado ("é desta que estamos falando") e a catraca das cores
+                // literais cobra cada literal nova.
+                : (estadoDaRegra.armada || tutorialAlvo)
                   ? "#2563EB"
                   : tutorialTodas
                     ? "#60A5FA"
@@ -221,9 +238,10 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                 data-forma-representacao={o.objeto ? "real" : "pura"}
                 data-forma-spinning={rodando ? "true" : undefined}
                 data-forma-close={fase === "fecho" && certa ? "true" : undefined}
-                disabled={travado}
-                onClick={() => responder(i)}
+                disabled={estadoDaRegra.disabled}
+                onClick={estadoDaRegra.onToque}
                 aria-label={NOME[o.figura]}
+                data-forma-armada={estadoDaRegra.armada ? "true" : undefined}
                 className="relative flex items-center justify-center overflow-visible rounded-2xl"
                 style={{
                   width: LADO_DO_CONTEINER,
@@ -262,8 +280,8 @@ export function FormaStage({ spec, onAnswer, disabled, falar, mostrar }: Props) 
                 )}
               </motion.button>
             );
-          })}
-        </div>
+          }}
+        />
 
         {fase === "erro" && escolhidaOpcao && corretaOpcao && (
           <ComparacaoDoErro escolhida={escolhidaOpcao} certa={corretaOpcao} />
