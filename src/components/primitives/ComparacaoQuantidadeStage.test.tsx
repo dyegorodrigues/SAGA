@@ -44,7 +44,13 @@ describe("ComparacaoQuantidadeStage — F06 / N1.05", () => {
       const grupos = container.querySelectorAll<HTMLButtonElement>("button[aria-label^='grupo']");
       const errada = spec.resposta === 0 ? grupos[1] : grupos[0];
 
+      // ⚠️ O primeiro toque arma; não responde.
       fireEvent.click(errada);
+      expect(onAnswer, "o primeiro toque não responde").not.toHaveBeenCalled();
+      const confirmar = container.querySelector<HTMLButtonElement>('[aria-label^="Confirmar:"]');
+      expect(confirmar, "a barra de confirmar aparece").not.toBeNull();
+      fireEvent.click(confirmar!);
+      expect(onAnswer).toHaveBeenCalledTimes(1);
       expect(container.querySelector("[data-comparacao-pareamento]")).not.toBeNull();
       expect(container.querySelector("[data-comparacao-sobra]")).not.toBeNull();
 

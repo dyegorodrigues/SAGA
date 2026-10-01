@@ -10,13 +10,27 @@ import { ADJETIVO } from "../../curriculum/procedimentos/grandezaProcedure";
 
 const spec=(lvl:number)=>Composer.generate(GM_01,lvl).uiProps as GrandezaSpec;
 const botoes=(c:HTMLElement)=>[...c.querySelectorAll<HTMLButtonElement>('button[aria-label]')];
+
+/**
+ * Escolher um objeto: tocar, e CONFIRMAR.
+ *
+ * Sem `seria`, a pergunta é "qual é o mais alto?" e o toque num objeto era a
+ * resposta — dedo que escorrega respondia errado, sem desfazer. Agora o
+ * primeiro toque fala o nome e arma; só o ✓ responde.
+ */
+function escolher(c:HTMLElement,i:number){
+  fireEvent.click(botoes(c)[i]);
+  const confirmar=c.querySelector<HTMLButtonElement>('[aria-label^="Confirmar:"]');
+  if(!confirmar) throw new Error(`sem barra de confirmar depois de tocar no objeto ${i}`);
+  fireEvent.click(confirmar);
+}
 afterEach(()=>vi.useRealTimers());
 
 describe("GrandezaStage — F49",()=>{
   it("trocar spec zera seleção, ordem e fase",()=>{
     vi.useFakeTimers(); const s1=spec(1),s2=spec(2);
     const {container,rerender}=render(<GrandezaStage spec={s1}/>);
-    fireEvent.click(botoes(container)[s1.resposta]);
+    escolher(container,s1.resposta);
     expect(botoes(container)[0].disabled).toBe(true);
     rerender(<GrandezaStage spec={s2}/>);
     expect(botoes(container)[0].disabled).toBe(false);
@@ -27,7 +41,12 @@ describe("GrandezaStage — F49",()=>{
     vi.useFakeTimers(); const s=spec(1); const onAnswer=vi.fn();
     const {container}=render(<GrandezaStage spec={s} onAnswer={onAnswer}/>);
     const errada=s.resposta===0?1:0;
+    // ⚠️ O primeiro toque arma; não responde.
     fireEvent.click(botoes(container)[errada]);
+    expect(onAnswer,"o primeiro toque não responde").not.toHaveBeenCalled();
+    const confirmar=container.querySelector<HTMLButtonElement>('[aria-label^="Confirmar:"]');
+    expect(confirmar,"a barra de confirmar aparece").toBeTruthy();
+    fireEvent.click(confirmar!);
     expect(onAnswer).toHaveBeenCalledTimes(1);
     expect(botoes(container)[0].disabled).toBe(true);
     expect(container.querySelector('[data-grandeza-guide]')).toBeTruthy();
@@ -37,7 +56,7 @@ describe("GrandezaStage — F49",()=>{
 
   it("acerto mostra seta de medida e fecha com a linha de comparação",()=>{
     vi.useFakeTimers(); const s=spec(1); const {container}=render(<GrandezaStage spec={s}/>);
-    fireEvent.click(botoes(container)[s.resposta]);
+    escolher(container,s.resposta);
     expect(container.querySelector('[data-grandeza-measure-arrow]')).toBeTruthy();
     act(()=>vi.advanceTimersByTime(1800));
     expect(container.querySelector('[data-grandeza-measure-arrow]')).toBeNull();

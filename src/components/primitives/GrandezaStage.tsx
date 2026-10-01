@@ -4,6 +4,7 @@ import { tokens } from "../../styles/tokens";
 import { Grupo } from "./Grupo";
 import { PalcoEscalado } from "./PalcoEscalado";
 import { ComparacaoQuantidadeStage } from "./ComparacaoQuantidadeStage";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 import { ComparacaoQuantidadeSpec } from "../../curriculum/procedimentos/comparacaoQuantidadeContract";
 import {
   ALTURA_DA_CAIXA,
@@ -22,6 +23,9 @@ const ACERTO_MS = 1800;
 const BASE_OBJETO = 84;
 
 type Fase = "idle" | "erro" | "acerto" | "fecho";
+
+/** O que a regra de ouvir-e-confirmar entrega a quem desenha a alternativa. */
+type EstadoDaRegra = { armada: boolean; onToque: () => void; disabled: boolean };
 
 interface Props {
   spec: GrandezaSpec | ComparacaoQuantidadeSpec;
@@ -256,66 +260,108 @@ function GrandezaDimensionalStage({ spec, onAnswer, disabled, falar, mostrar }: 
   const escolhidoObj = escolhido != null && escolhido >= 0 ? spec.objetos[escolhido] : null;
   const corretoObj = spec.objetos[spec.resposta];
 
+  /**
+   * Desenha UM objeto da fila.
+   *
+   * Recebe `regra` quando a fila está sob o ouvir-e-confirmar (modo de
+   * ESCOLHA) e `null` quando está sob o gesto de ordenar. É a mesma função nos
+   * dois casos de propósito: desenho duplicado é desenho que diverge.
+   */
+  function desenharObjeto(i: number, regra: EstadoDaRegra | null) {
+    const o = spec.objetos[i];
+          const naOrdem = spec.seria ? ordem.indexOf(i) : -1;
+          const certoVisual = fase === "acerto" && i === spec.resposta;
+          const erroVisual = fase === "erro" && escolhido === i;
+          const destaqueAula = Boolean(emAula && mostrar?.destacarMaior && i === spec.resposta);
+          const ref = {
+            largura: LARGURA_DA_CAIXA,
+            altura: ALTURA_DA_CAIXA,
+            destacada: Boolean(emAula && mostrar?.destacarLinhaBase),
+          };
+          const grupo = spec.eixo === "horizontal"
+            ? { inicio: { ...ref, linha: LINHA_DE_INICIO } }
+            : { chao: { ...ref, linha: LINHA_DO_CHAO } };
+          return (
+            <div key={`${entradaSeq}-${i}-${o.nome}`} className="relative" style={{ width: LARGURA_DA_CAIXA, height: ALTURA_DA_CAIXA }}>
+              <Grupo
+                {...grupo}
+                disabled={regra ? regra.disabled : travado}
+                onClick={regra ? regra.onToque : () => tocar(i)}
+                // Armada: a criança tem de VER qual objeto o ✓ vai confirmar.
+                selected={certoVisual || naOrdem >= 0 || Boolean(regra?.armada)}
+                rotulo={`${o.nome} ${i + 1}`}
+                items={[
+                  <ObjetoVisual
+                    key="obj"
+                    o={o}
+                    eixo={spec.eixo}
+                    destaque={certoVisual || destaqueAula}
+                    erro={erroVisual}
+                    delay={0.25 + i * 0.18}
+                  />,
+                ]}
+              />
+
+              {mostrarGuiaNormal && <Guia spec={spec} objeto={objetoMenor} />}
+              {fase === "erro" && escolhidoObj && (
+                <Guia
+                  key={`erro-${escolhido}`}
+                  spec={spec}
+                  objeto={corretoObj}
+                  de={spec.eixo === "horizontal" ? escolhidoObj.comprimento : escolhidoObj.altura}
+                  para={spec.eixo === "horizontal" ? corretoObj.comprimento : corretoObj.altura}
+                />
+              )}
+              {certoVisual && <SetaMedida spec={spec} objeto={o} />}
+
+              {naOrdem >= 0 && (
+                <span
+                  data-grandeza-order={naOrdem + 1}
+                  aria-hidden
+                  className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white shadow"
+                >{naOrdem + 1}</span>
+              )}
+            </div>
+          );
+  }
+
   return (
     <PalcoEscalado>
       <div className="flex flex-col items-center gap-2 select-none" data-grandeza-stage data-grandeza-eixo={spec.eixo}>
-        <div className="flex items-end justify-center" style={{ gap: 14 }}>
-          {spec.objetos.map((o, i) => {
-            const naOrdem = spec.seria ? ordem.indexOf(i) : -1;
-            const certoVisual = fase === "acerto" && i === spec.resposta;
-            const erroVisual = fase === "erro" && escolhido === i;
-            const destaqueAula = Boolean(emAula && mostrar?.destacarMaior && i === spec.resposta);
-            const ref = {
-              largura: LARGURA_DA_CAIXA,
-              altura: ALTURA_DA_CAIXA,
-              destacada: Boolean(emAula && mostrar?.destacarLinhaBase),
-            };
-            const grupo = spec.eixo === "horizontal"
-              ? { inicio: { ...ref, linha: LINHA_DE_INICIO } }
-              : { chao: { ...ref, linha: LINHA_DO_CHAO } };
-            return (
-              <div key={`${entradaSeq}-${i}-${o.nome}`} className="relative" style={{ width: LARGURA_DA_CAIXA, height: ALTURA_DA_CAIXA }}>
-                <Grupo
-                  {...grupo}
-                  disabled={travado}
-                  onClick={() => tocar(i)}
-                  selected={certoVisual || naOrdem >= 0}
-                  rotulo={`${o.nome} ${i + 1}`}
-                  items={[
-                    <ObjetoVisual
-                      key="obj"
-                      o={o}
-                      eixo={spec.eixo}
-                      destaque={certoVisual || destaqueAula}
-                      erro={erroVisual}
-                      delay={0.25 + i * 0.18}
-                    />,
-                  ]}
-                />
+        {/*
+          ⚠️ ESCOLHER pede confirmar; ORDENAR não.
 
-                {mostrarGuiaNormal && <Guia spec={spec} objeto={objetoMenor} />}
-                {fase === "erro" && escolhidoObj && (
-                  <Guia
-                    key={`erro-${escolhido}`}
-                    spec={spec}
-                    objeto={corretoObj}
-                    de={spec.eixo === "horizontal" ? escolhidoObj.comprimento : escolhidoObj.altura}
-                    para={spec.eixo === "horizontal" ? corretoObj.comprimento : corretoObj.altura}
-                  />
-                )}
-                {certoVisual && <SetaMedida spec={spec} objeto={o} />}
+          Sem `seria` a pergunta é "qual é o mais alto?" e o toque num objeto
+          era a resposta: dedo que escorrega respondia errado e a criança não
+          tinha como desfazer. É a escolha que o pai cobrou — *"o botão de
+          confirmar, sei lá, piscando, piscando para a criança entender"* — e
+          que o portão não via, porque a fila de objetos não era um grupo de
+          alternativas.
 
-                {naOrdem >= 0 && (
-                  <span
-                    data-grandeza-order={naOrdem + 1}
-                    aria-hidden
-                    className="absolute right-2 top-2 z-50 flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-sm font-black text-white shadow"
-                  >{naOrdem + 1}</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+          Com `seria` a criança ORDENA tocando um atrás do outro: ali o gesto é
+          a resposta e só o último toque resolve. Pedir confirmação a cada
+          toque atravessaria o exercício, então a fila fica como estava.
+
+          A voz diz o NOME do objeto, sem o número: "foguete" entra no pacote
+          de vozes, "foguete 1" cairia na voz do aparelho — que em celular sem
+          voz pt-BR é silêncio. O número continua no rótulo que o leitor de
+          tela lê e na barra de confirmar.
+        */}
+        {spec.seria ? (
+          <div className="flex items-end justify-center" style={{ gap: 14 }}>
+            {spec.objetos.map((_, i) => desenharObjeto(i, null))}
+          </div>
+        ) : (
+          <AlternativasQueFalam
+            alternativas={spec.objetos.map((o, i) => ({ valor: `${i}:${o.nome}`, rotulo: `${o.nome} ${i + 1}`, dito: o.nome }))}
+            onEscolher={valor => tocar(Number(String(valor).split(":")[0]))}
+            falar={falar}
+            disabled={travado}
+            className="flex items-end justify-center"
+            style={{ gap: 14 }}
+            renderAlternativa={(alternativa, regra) => desenharObjeto(Number(String(alternativa.valor).split(":")[0]), regra)}
+          />
+        )}
       </div>
     </PalcoEscalado>
   );

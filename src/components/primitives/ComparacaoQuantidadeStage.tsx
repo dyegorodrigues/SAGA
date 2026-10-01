@@ -2,6 +2,7 @@ import React from "react";
 import { motion } from "motion/react";
 import { ComparacaoQuantidadeSpec, GrupoQuantidadeSpec } from "../../curriculum/procedimentos/comparacaoQuantidadeContract";
 import { Grupo } from "./Grupo";
+import { AlternativasQueFalam } from "../gameloop/AlternativasQueFalam";
 import { PalcoEscalado } from "./PalcoEscalado";
 import { tokens } from "../../styles/tokens";
 
@@ -193,8 +194,30 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar, mos
         data-armadilha-espaco={spec.armadilhaEspaco || undefined}
         className="flex flex-col items-center gap-2 select-none"
       >
-        <div className="flex items-stretch justify-center gap-3">
-          {spec.grupos.map((grupo, i) => {
+        {/*
+          ⚠️ ESCOLHER pede confirmar.
+
+          "Qual grupo tem MAIS?" é escolha entre dois, e o toque num grupo era
+          a resposta. É uma das sete competências que a criança encontra ao
+          abrir o app, e o pai cobrou a confirmação mais de uma vez.
+
+          A voz diz a POSIÇÃO — "o grupo da esquerda" —, não a contagem: dizer
+          "este grupo tem cinco" entregaria a resposta no toque. Posição é fala
+          fixa, está no pacote de vozes, e é o que uma criança que não lê pode
+          usar para saber o que o ✓ vai confirmar.
+        */}
+        <AlternativasQueFalam
+          alternativas={spec.grupos.map((_, i) => ({
+            valor: i,
+            rotulo: i === 0 ? "o grupo da esquerda" : "o grupo da direita",
+          }))}
+          onEscolher={valor => tocar(Number(valor))}
+          falar={falar}
+          disabled={travado}
+          className="flex items-stretch justify-center gap-3"
+          renderAlternativa={(alternativa, regra) => {
+            const i = Number(alternativa.valor);
+            const grupo = spec.grupos[i];
             const selecionado = escolhido === i;
             const correto = fase === "acerto" && i === spec.resposta;
             const erro = fase === "erro" && selecionado;
@@ -223,15 +246,16 @@ export function ComparacaoQuantidadeStage({ spec, onAnswer, disabled, falar, mos
               >
                 <Grupo
                   items={itensDoGrupo(grupo, exibirPareamento ? paresVisiveisNaCena : 0)}
-                  onClick={() => tocar(i)}
-                  disabled={travado}
-                  selected={correto}
+                  onClick={regra.onToque}
+                  disabled={regra.disabled}
+                  // Armada: a criança tem de VER qual grupo o ✓ vai confirmar.
+                  selected={correto || regra.armada}
                   rotulo={`grupo ${i + 1}`}
                 />
               </motion.div>
             );
-          })}
-        </div>
+          }}
+        />
 
         {spec.pareamentoDisponivel && fase === "idle" && !emAula && (
           <button

@@ -64,6 +64,21 @@ const NIVEIS = [1, 2, 3, 4, 5];
  * saturar as falas que variam — os objetos sorteados, as posições, os nomes.
  */
 const SORTEIOS = Number(process.env.SORTEIOS ?? 60);
+/**
+ * Quantos sorteios são RENDERIZADOS por nível.
+ *
+ * ⚠️ Era um, e a razão escrita aqui deixou de valer: *"as falas de palco não
+ * dependem do sorteio e sim do toque"*. Dependem, desde que o palco passou a
+ * FALAR o rótulo da alternativa que a criança toca — e o rótulo é o objeto
+ * sorteado. A GM.01 sorteia entre seis objetos (casa, dinossauro, foguete,
+ * girassol, pinguim, árvore); com um sorteio por nível, o pacote ficou com
+ * cinco e **"árvore" caía na voz do aparelho**, que em celular sem voz pt-BR é
+ * silêncio no toque.
+ *
+ * Renderizar é caro, então não se renderiza tudo: renderiza-se o suficiente
+ * para o sorteio saturar. Cinco acha os seis nomes; um achava cinco.
+ */
+const RENDERS = Number(process.env.RENDERS ?? 5);
 
 function props(q: unknown): any {
   return {
@@ -112,9 +127,9 @@ function varrer(): string[] {
          * lugar onde ela precisa de voz, e era o único que o corpus não olhava.
          */
         tutorialSteps(q as never).forEach(passo => guardar(passo?.say));
-        // Renderizar é caro; um sorteio por nível basta para as falas de palco,
-        // que não dependem do sorteio e sim do toque.
-        if (sorteio > 0) continue;
+        // Renderizar é caro: só os primeiros sorteios de cada nível entram na
+        // tela. Ver a nota de `RENDERS` — um não bastava.
+        if (sorteio >= RENDERS) continue;
         try {
           const { container } = render(<GameLoopExerciseRenderer {...props(q)} />);
           act(() => { vi.advanceTimersByTime(8000); });
