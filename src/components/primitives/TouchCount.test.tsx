@@ -436,4 +436,49 @@ describe("acessibilidade e travamento", () => {
     }
   });
 
+
+  /* ---------------------------------------------------------------- *
+   *  Acabar o exercício tem de ACABAR o exercício
+   * ---------------------------------------------------------------- */
+
+  /**
+   * ⚠️ No rítmico sem pergunta, terminar de contar É a resposta.
+   *
+   * O pai: *"tu estoura tudo e depois o exercício não pode prosseguir mais,
+   * ele trava."*
+   *
+   * Reproduzido com a sonda que joga até o fim: ela estourou os três balões,
+   * a tela escreveu **"Foram 3 balões!"** — e aí não havia mais nada tocável
+   * e a questão continuava aberta. Veredito: `EM CÍRCULO no passo 7`.
+   *
+   * A causa: `responder()` só era chamado pelo caminho da PERGUNTA
+   * (`perguntando = terminou && spec.pergunta !== null`). No rítmico do nível
+   * 1 não há pergunta — o fecho é a sequência falada — então `onAnswer` nunca
+   * saía, e o app nunca ficava sabendo que a criança tinha acabado.
+   *
+   * Nenhum portão pegou porque todos paravam no primeiro toque. Travar é um
+   * estado que só existe no FIM.
+   */
+  it("⚠️ estourar o último balão manda a resposta — senão a criança fica presa", async () => {
+    const s = ritmico(1);
+    expect(s.pergunta, "o nível 1 do rítmico fecha sem pergunta").toBeNull();
+
+    const onAnswer = vi.fn();
+    const { container } = render(<TouchCount spec={s} onAnswer={onAnswer} />);
+
+    // Estoura tudo, como a criança estoura.
+    for (let i = 0; i < s.total; i += 1) {
+      const vivos = [...container.querySelectorAll("button")].filter(b => !b.disabled);
+      const balao = vivos.find(b => /Estourar|balão|balões/i.test(b.getAttribute("aria-label") ?? ""));
+      if (balao) fireEvent.click(balao);
+      await new Promise(r => setTimeout(r, 420));   // o engasgo do canhão
+    }
+
+    expect(container.textContent, "a tela anuncia o fecho").toMatch(/Foram \d+/);
+    // O envio espera o numeral do último estouro saltar, para a criança ver a
+    // contagem fechar antes de a tela virar.
+    await new Promise(r => setTimeout(r, 1200));
+    expect(onAnswer, "e o app precisa ficar sabendo").toHaveBeenCalled();
+  });
+
 });

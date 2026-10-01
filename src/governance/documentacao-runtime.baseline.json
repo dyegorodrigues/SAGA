@@ -51,7 +51,7 @@
   "src/components/primitives/ShapeCanvas.tsx": 65,
   "src/components/primitives/TabuadaStage.tsx": 53,
   "src/components/primitives/TenFrame.tsx": 135,
-  "src/components/primitives/TouchCount.tsx": 165,
+  "src/components/primitives/TouchCount.tsx": 190,
   "src/components/primitives/TouchPlaceStage.tsx": 37,
   "src/components/primitives/TrianguloDeFatos.tsx": 28,
   "src/components/primitives/VoltarContandoStage.tsx": 22,

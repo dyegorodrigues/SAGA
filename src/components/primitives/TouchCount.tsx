@@ -200,6 +200,35 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
   }
 
   /**
+   * ⚠️ No rítmico sem pergunta, TERMINAR é a resposta.
+   *
+   * O pai: *"tu estoura tudo e depois o exercício não pode prosseguir mais,
+   * ele trava."* A sonda que joga até o fim reproduziu: estourou os três
+   * balões, a tela escreveu "Foram 3 balões!", e aí não havia mais nada
+   * tocável e a questão continuava aberta.
+   *
+   * `responder()` só saía pelo caminho da PERGUNTA. No rítmico do nível 1 não
+   * há pergunta — o fecho é a sequência falada —, então `onAnswer` nunca era
+   * chamado e o app nunca ficava sabendo que a criança tinha acabado.
+   *
+   * Nenhum portão pegou porque todos paravam no primeiro toque. Travar é um
+   * estado que só existe no FIM, e eu não tinha instrumento que chegasse lá.
+   *
+   * O envio espera o numeral do último estouro saltar (700ms) para a criança
+   * ver a contagem fechar antes de a tela virar.
+   */
+  const jaEnviou = React.useRef(false);
+  React.useEffect(() => { jaEnviou.current = false; }, [spec]);
+  React.useEffect(() => {
+    if (!terminou || spec.pergunta !== null || disabled || jaEnviou.current) return;
+    jaEnviou.current = true;
+    const t = window.setTimeout(() => responder(spec.total), FECHO_DO_RITMICO_MS);
+    return () => window.clearTimeout(t);
+    // `responder` é estável o bastante: depende de `disabled` e `onAnswer`, e
+    // ambos entram na lista.
+  }, [terminou, spec, disabled, onAnswer]);
+
+  /**
    * O que a AULA já marcou — e com que número.
    *
    * A coreografia da F27 §8 diz, em dois passos: *"Vou estourar um."* com a
@@ -217,13 +246,27 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
   const marcadoPelaAula = (i: number): number | null =>
     mostrar?.numeral !== undefined && mostrar.maoFantasma === i ? mostrar.numeral : null;
 
-  /** O numeral que o alvo mostra: a posição dele na contagem, deslocada. */
+  /* O tempo que o numeral do último estouro leva para saltar. A tela só vira
+   depois que a criança viu a contagem fechar. */
+const FECHO_DO_RITMICO_MS = 900;
+
+/** O numeral que o alvo mostra: a posição dele na contagem, deslocada. */
   const numeralDe = (i: number) => ordem[i] || (marcadoPelaAula(i) ?? 0);
 
   const acesoPelaAula = mostrar?.destacarGrupo === true;
 
   return (
-    <div className="w-full max-w-[390px] px-3 py-2">
+    /*
+      ⚠️ `mx-auto`. Sem ele, `max-w-[390px]` dentro de um invólucro mais largo
+      encosta o palco inteiro na ESQUERDA — e é o que o pai via: *"o exercício
+      ali do balão tá bugado, ele tá deslocado pra esquerda"*.
+
+      Eu nunca enxerguei porque todas as minhas fotos sempre foram de 390px de
+      largura, onde o palco e a tela coincidem e o defeito desaparece. Medir
+      numa largura só é não medir enquadramento. Ver
+      `scripts/enquadramento.mjs`, que mede a 820px: desvio de -90px.
+    */
+    <div className="mx-auto w-full max-w-[390px] px-3 py-2">
       {/* O enunciado NÃO sai aqui: o app já o desenha na caixa acima do palco
           (`GameLoop.tsx` → `q.prompt`). Imprimir de novo punha a pergunta duas
           vezes na tela — o §6.32 outra vez, e desta vez escondido porque a
@@ -239,7 +282,9 @@ export function TouchCount({ spec, onAnswer, disabled, preenchidos, falar, mostr
           // rótulo simplesmente não é anunciado a quem usa leitor de tela.
           role="group"
           aria-label="Números que já saíram"
-          className="mb-1 flex min-h-[28px] items-center justify-end gap-1 pr-1"
+          // Centrado, como todo o resto do palco. Estava `justify-end`, e era
+          // a única coisa da tela encostada numa borda.
+          className="mb-1 flex min-h-[28px] items-center justify-center gap-1"
         >
           {ordem.filter(o => o > 0).sort((a, b) => a - b).map(o => (
             <span
